@@ -20,6 +20,8 @@
 
 #include <QString>
 
+class QXmlStreamReader;
+
 namespace KateSyntax {
 
 class SyntaxDefinition
@@ -29,6 +31,10 @@ public:
     ~SyntaxDefinition();
 
     bool load(const QString &definitionFileName);
+
+private:
+    void loadHighlighting(QXmlStreamReader &reader);
+
 };
 
 }

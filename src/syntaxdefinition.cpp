@@ -17,6 +17,10 @@
 
 #include "syntaxdefinition.h"
 
+#include <QDebug>
+#include <QFile>
+#include <QXmlStreamReader>
+
 using namespace KateSyntax;
 
 SyntaxDefinition::SyntaxDefinition()
@@ -29,5 +33,38 @@ SyntaxDefinition::~SyntaxDefinition()
 
 bool SyntaxDefinition::load(const QString& definitionFileName)
 {
+    qDebug() << "parsing" << definitionFileName;
+    QFile file(definitionFileName);
+    if (!file.open(QFile::ReadOnly))
+        return false;
+
+    QXmlStreamReader reader(&file);
+    while (!reader.atEnd()) {
+        const auto token = reader.readNext();
+        if (token != QXmlStreamReader::StartElement)
+            continue;
+
+        if (reader.name() == QLatin1String("highlighting"))
+            loadHighlighting(reader);
+    }
+
     return true;
+}
+
+void SyntaxDefinition::loadHighlighting(QXmlStreamReader& reader)
+{
+    while (!reader.atEnd()) {
+        const auto token = reader.readNext();
+        switch (token) {
+            case QXmlStreamReader::StartElement:
+                if (reader.name() == QLatin1String("list")) {
+                    qDebug() << "TODO parse keyword list" << reader.attributes().value(QStringLiteral("name"));
+                    break;
+                }
+            case QXmlStreamReader::EndElement:
+                return;
+            default:
+                break;
+        }
+    }
 }

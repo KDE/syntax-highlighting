@@ -16,6 +16,7 @@
 */
 
 #include "syntaxdefinition.h"
+#include "keywordlist.h"
 
 #include <QDebug>
 #include <QFile>
@@ -57,11 +58,16 @@ void SyntaxDefinition::loadHighlighting(QXmlStreamReader& reader)
         const auto token = reader.readNext();
         switch (token) {
             case QXmlStreamReader::StartElement:
+                qDebug() << reader.name() << "begin";
                 if (reader.name() == QLatin1String("list")) {
-                    qDebug() << "TODO parse keyword list" << reader.attributes().value(QStringLiteral("name"));
-                    break;
+                    KeywordList keywords;
+                    keywords.load(reader);
+                    qDebug() << "loaded keyword list: " <<  keywords.name();
                 }
+//                 reader.skipCurrentElement();
+                break;
             case QXmlStreamReader::EndElement:
+                qDebug() << reader.name() << "end";
                 return;
             default:
                 break;

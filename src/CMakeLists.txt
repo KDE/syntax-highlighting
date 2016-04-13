@@ -1,6 +1,7 @@
 set(kate_syntax_srcs
-   syntaxdefinition.cpp
-   syntaxrepository.cpp
+    keywordlist.cpp
+    syntaxdefinition.cpp
+    syntaxrepository.cpp
 )
 qt5_add_resources(kate_syntax_srcs ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/kate/data/syntax-data.qrc)
 

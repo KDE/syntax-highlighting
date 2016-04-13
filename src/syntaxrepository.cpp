@@ -15,22 +15,31 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef KATESYNTAX_SYNTAXDEFINITION_H
-#define KATESYNTAX_SYNTAXDEFINITION_H
+#include "syntaxrepository.h"
+#include "syntaxdefinition.h"
 
-#include <QString>
+#include <QDebug>
+#include <QDirIterator>
 
-namespace KateSyntax {
+using namespace KateSyntax;
 
-class SyntaxDefinition
+SyntaxRepository::SyntaxRepository()
 {
-public:
-    SyntaxDefinition();
-    ~SyntaxDefinition();
-
-    bool load(const QString &definitionFileName);
-};
-
+    load();
 }
 
-#endif
+SyntaxRepository::~SyntaxRepository()
+{
+}
+
+void SyntaxRepository::load()
+{
+    QDirIterator it(QStringLiteral(":/kate-syntax"));
+    while (it.hasNext()) {
+        SyntaxDefinition def;
+        if (def.load(it.next()))
+            m_defs.push_back(def);
+    }
+
+    qDebug() << "Found" << m_defs.size() << "syntax definitions.";
+}

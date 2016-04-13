@@ -15,22 +15,29 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef KATESYNTAX_SYNTAXDEFINITION_H
-#define KATESYNTAX_SYNTAXDEFINITION_H
+#ifndef KATESYNTAX_SYNTAXREPOSITORY_H
+#define KATESYNTAX_SYNTAXREPOSITORY_H
 
-#include <QString>
+#include "katesyntax_export.h"
+
+#include <QVector>
 
 namespace KateSyntax {
 
-class SyntaxDefinition
+class SyntaxDefinition;
+
+class KATESYNTAX_EXPORT SyntaxRepository
 {
 public:
-    SyntaxDefinition();
-    ~SyntaxDefinition();
+    SyntaxRepository();
+    ~SyntaxRepository();
 
-    bool load(const QString &definitionFileName);
+private:
+    void load();
+
+    QVector<SyntaxDefinition> m_defs;
 };
 
 }
 
-#endif
+#endif // KATESYNTAX_SYNTAXREPOSITORY_H

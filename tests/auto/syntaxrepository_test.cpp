@@ -15,22 +15,24 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef KATESYNTAX_SYNTAXDEFINITION_H
-#define KATESYNTAX_SYNTAXDEFINITION_H
+#include <syntaxrepository.h>
 
-#include <QString>
+#include <QObject>
+#include <QtTest/qtest.h>
 
-namespace KateSyntax {
+using namespace KateSyntax;
 
-class SyntaxDefinition
+class SyntaxRepositoryTest : public QObject
 {
-public:
-    SyntaxDefinition();
-    ~SyntaxDefinition();
+    Q_OBJECT
+private slots:
+    void testLoad()
+    {
+        SyntaxRepository repo;
+    }
 
-    bool load(const QString &definitionFileName);
 };
 
-}
+QTEST_MAIN(SyntaxRepositoryTest)
 
-#endif
+#include "syntaxrepository_test.moc"

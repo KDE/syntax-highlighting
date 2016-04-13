@@ -19,10 +19,15 @@
 
 using namespace KateSyntax;
 
-SyntaxDefinition::SyntaxDefinition(const QString& definitionFileName)
+SyntaxDefinition::SyntaxDefinition()
 {
 }
 
 SyntaxDefinition::~SyntaxDefinition()
 {
+}
+
+bool SyntaxDefinition::load(const QString& definitionFileName)
+{
+    return true;
 }

@@ -47,7 +47,7 @@ endif()
 # Dependencies
 #
 
-find_package(Qt5 NO_MODULE REQUIRED COMPONENTS Gui)
+find_package(Qt5 NO_MODULE REQUIRED COMPONENTS Gui Test)
 find_package(Qt5 NO_MODULE QUIET OPTIONAL_COMPONENTS Widgets)
 add_definitions(-DQT_DEPRECATED_WARNINGS)
 add_definitions(-DQT_USE_FAST_CONCATENATION -DQT_NO_CAST_TO_ASCII -DQT_NO_URL_CAST_FROM_STRING -DQT_NO_CAST_FROM_ASCII)
@@ -87,6 +87,7 @@ set(
 # Actually build the stuff
 #
 add_subdirectory(src)
+add_subdirectory(tests)
 
 #
 # CMake package config file generation

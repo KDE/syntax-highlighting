@@ -15,46 +15,48 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "keywordlist.h"
+#include "context.h"
 
 #include <QDebug>
+#include <QString>
 #include <QXmlStreamReader>
 
 using namespace KateSyntax;
 
-KeywordList::KeywordList()
+Context::Context()
 {
 }
 
-KeywordList::~KeywordList()
+Context::~Context()
 {
 }
 
-QString KeywordList::name() const
+QString Context::name() const
 {
     return m_name;
 }
 
-void KeywordList::load(QXmlStreamReader& reader)
+QString Context::attribute() const
 {
-    Q_ASSERT(reader.name() == QLatin1String("list"));
+    return m_attribute;
+}
+
+void Context::load(QXmlStreamReader& reader)
+{
+    Q_ASSERT(reader.name() == QLatin1String("context"));
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
 
     m_name = reader.attributes().value(QStringLiteral("name")).toString();
+    m_attribute = reader.attributes().value(QStringLiteral("attribute")).toString();
 
     while (!reader.atEnd()) {
         switch (reader.tokenType()) {
             case QXmlStreamReader::StartElement:
-                if (reader.name() == QLatin1String("item")) {
-                    m_keywords.push_back(reader.readElementText());
-                    reader.readNextStartElement();
-                    break;
-                }
-                reader.readNext();
+                qDebug() << reader.name() << "begin";
+                reader.skipCurrentElement();
                 break;
             case QXmlStreamReader::EndElement:
-                qDebug() << m_name << m_keywords;
-                reader.readNext();
+                qDebug() << reader.name() << "end";
                 return;
             default:
                 reader.readNext();

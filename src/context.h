@@ -15,38 +15,30 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef KATESYNTAX_SYNTAXDEFINITION_H
-#define KATESYNTAX_SYNTAXDEFINITION_H
-
-#include "context.h"
-#include "keywordlist.h"
+#ifndef KATESYNTAX_CONTEXT_H
+#define KATESYNTAX_CONTEXT_H
 
 #include <QString>
-#include <QVector>
 
 class QXmlStreamReader;
 
 namespace KateSyntax {
 
-class Context;
-class KeywordList;
-
-class SyntaxDefinition
+class Context
 {
 public:
-    SyntaxDefinition();
-    ~SyntaxDefinition();
+    Context();
+    ~Context();
 
-    bool load(const QString &definitionFileName);
+    QString name() const;
+    QString attribute() const;
+
+    void load(QXmlStreamReader &reader);
 
 private:
-    void loadHighlighting(QXmlStreamReader &reader);
-    void loadContexts(QXmlStreamReader &reader);
-
-    QVector<KeywordList> m_keywordLists;
-    QVector<Context> m_contexts;
+    QString m_name;
+    QString m_attribute;
 };
-
 }
 
-#endif
+#endif // KATESYNTAX_CONTEXT_H

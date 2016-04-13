@@ -1,4 +1,5 @@
 set(kate_syntax_srcs
+    context.cpp
     keywordlist.cpp
     syntaxdefinition.cpp
     syntaxrepository.cpp

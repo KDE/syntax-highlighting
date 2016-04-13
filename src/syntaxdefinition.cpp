@@ -16,7 +16,6 @@
 */
 
 #include "syntaxdefinition.h"
-#include "keywordlist.h"
 
 #include <QDebug>
 #include <QFile>
@@ -54,22 +53,55 @@ bool SyntaxDefinition::load(const QString& definitionFileName)
 
 void SyntaxDefinition::loadHighlighting(QXmlStreamReader& reader)
 {
+    Q_ASSERT(reader.name() == QLatin1String("highlighting"));
+    Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
+
     while (!reader.atEnd()) {
-        const auto token = reader.readNext();
-        switch (token) {
+        switch (reader.tokenType()) {
             case QXmlStreamReader::StartElement:
                 qDebug() << reader.name() << "begin";
                 if (reader.name() == QLatin1String("list")) {
                     KeywordList keywords;
                     keywords.load(reader);
                     qDebug() << "loaded keyword list: " <<  keywords.name();
+                    m_keywordLists.push_back(keywords);
+                } else if (reader.name() == QLatin1String("contexts")) {
+                    loadContexts(reader);
+                } else {
+                    reader.readNext();
                 }
-//                 reader.skipCurrentElement();
                 break;
             case QXmlStreamReader::EndElement:
                 qDebug() << reader.name() << "end";
                 return;
             default:
+                reader.readNext();
+                break;
+        }
+    }
+}
+
+void SyntaxDefinition::loadContexts(QXmlStreamReader& reader)
+{
+    Q_ASSERT(reader.name() == QLatin1String("contexts"));
+    Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
+
+    while (!reader.atEnd()) {
+        switch (reader.tokenType()) {
+            case QXmlStreamReader::StartElement:
+                if (reader.name() == QLatin1String("context")) {
+                    Context context;
+                    context.load(reader);
+                    qDebug() << "loaded context" << context.name() << context.attribute();
+                    m_contexts.push_back(context);
+                }
+                reader.readNext();
+                break;
+            case QXmlStreamReader::EndElement:
+                qDebug() << reader.name() << "end";
+                return;
+            default:
+                reader.readNext();
                 break;
         }
     }

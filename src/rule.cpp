@@ -15,35 +15,23 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef KATESYNTAX_CONTEXT_H
-#define KATESYNTAX_CONTEXT_H
+#include "rule.h"
 
+#include <QDebug>
 #include <QString>
-#include <QVector>
 
-class QXmlStreamReader;
+using namespace KateSyntax;
 
-namespace KateSyntax {
-
-class Rule;
-
-class Context
+Rule::Rule()
 {
-public:
-    Context();
-    ~Context();
-
-    QString name() const;
-    QString attribute() const;
-
-    void load(QXmlStreamReader &reader);
-
-private:
-    QString m_name;
-    QString m_attribute;
-
-    QVector<Rule*> m_rules;
-};
 }
 
-#endif // KATESYNTAX_CONTEXT_H
+Rule::~Rule()
+{
+}
+
+Rule* Rule::create(const QStringRef& name)
+{
+    qDebug() << name;
+    return nullptr;
+}

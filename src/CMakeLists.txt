@@ -1,6 +1,7 @@
 set(kate_syntax_srcs
     context.cpp
     keywordlist.cpp
+    rule.cpp
     syntaxdefinition.cpp
     syntaxrepository.cpp
 )

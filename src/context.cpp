@@ -16,6 +16,7 @@
 */
 
 #include "context.h"
+#include "rule.h"
 
 #include <QDebug>
 #include <QString>
@@ -29,6 +30,7 @@ Context::Context()
 
 Context::~Context()
 {
+    qDeleteAll(m_rules);
 }
 
 QString Context::name() const
@@ -49,12 +51,22 @@ void Context::load(QXmlStreamReader& reader)
     m_name = reader.attributes().value(QStringLiteral("name")).toString();
     m_attribute = reader.attributes().value(QStringLiteral("attribute")).toString();
 
+    reader.readNext();
     while (!reader.atEnd()) {
         switch (reader.tokenType()) {
             case QXmlStreamReader::StartElement:
+            {
                 qDebug() << reader.name() << "begin";
-                reader.skipCurrentElement();
+                auto rule = Rule::create(reader.name());
+                if (rule) {
+                    rule->load(reader);
+                    m_rules.push_back(rule);
+                } else {
+                    reader.skipCurrentElement();
+                }
+                reader.readNext();
                 break;
+            }
             case QXmlStreamReader::EndElement:
                 qDebug() << reader.name() << "end";
                 return;

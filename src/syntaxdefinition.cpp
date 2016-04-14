@@ -33,6 +33,16 @@ SyntaxDefinition::~SyntaxDefinition()
     qDeleteAll(m_contexts);
 }
 
+QString SyntaxDefinition::name() const
+{
+    return m_name;
+}
+
+QVector<QString> SyntaxDefinition::extensions() const
+{
+    return m_extensions;
+}
+
 bool SyntaxDefinition::load(const QString& definitionFileName)
 {
     qDebug() << "parsing" << definitionFileName;
@@ -45,6 +55,17 @@ bool SyntaxDefinition::load(const QString& definitionFileName)
         const auto token = reader.readNext();
         if (token != QXmlStreamReader::StartElement)
             continue;
+
+        if (reader.name() == QLatin1String("language")) {
+            m_name = reader.attributes().value(QStringLiteral("name")).toString();
+            m_section = reader.attributes().value(QStringLiteral("section")).toString();
+            const auto exts = reader.attributes().value(QStringLiteral("extensions")).toString();
+            foreach (const auto &ext, exts.split(QLatin1Char(';')))
+                m_extensions.push_back(ext);
+            const auto mts = reader.attributes().value(QStringLiteral("mimetypes")).toString();
+            foreach (const auto &mt, mts.split(QLatin1Char(';')))
+                m_mimetypes.push_back(mt);
+        }
 
         if (reader.name() == QLatin1String("highlighting"))
             loadHighlighting(reader);

@@ -36,6 +36,9 @@ public:
     SyntaxDefinition();
     ~SyntaxDefinition();
 
+    QString name() const;
+    QVector<QString> extensions() const;
+
     bool load(const QString &definitionFileName);
 
 private:
@@ -46,6 +49,11 @@ private:
 
     QVector<KeywordList> m_keywordLists;
     QVector<Context*> m_contexts;
+
+    QString m_name;
+    QString m_section;
+    QVector<QString> m_extensions;
+    QVector<QString> m_mimetypes;
 };
 
 }

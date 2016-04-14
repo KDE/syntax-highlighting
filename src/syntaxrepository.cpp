@@ -37,8 +37,10 @@ void SyntaxRepository::load()
     QDirIterator it(QStringLiteral(":/kate-syntax"));
     while (it.hasNext()) {
         auto def = new SyntaxDefinition;
-        if (def->load(it.next()))
+        if (def->load(it.next())) {
+            qDebug() << def->name() << def->extensions();
             m_defs.push_back(def);
+        }
     }
 
     qDebug() << "Found" << m_defs.size() << "syntax definitions.";

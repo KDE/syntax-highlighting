@@ -60,8 +60,12 @@ bool SyntaxDefinition::load(const QString& definitionFileName)
             m_name = reader.attributes().value(QStringLiteral("name")).toString();
             m_section = reader.attributes().value(QStringLiteral("section")).toString();
             const auto exts = reader.attributes().value(QStringLiteral("extensions")).toString();
-            foreach (const auto &ext, exts.split(QLatin1Char(';')))
-                m_extensions.push_back(ext);
+            foreach (const auto &ext, exts.split(QLatin1Char(';'))) {
+                if (ext.startsWith(QLatin1String("*.")))
+                    m_extensions.push_back(ext.mid(2));
+                else
+                    m_extensions.push_back(ext);
+            }
             const auto mts = reader.attributes().value(QStringLiteral("mimetypes")).toString();
             foreach (const auto &mt, mts.split(QLatin1Char(';')))
                 m_mimetypes.push_back(mt);

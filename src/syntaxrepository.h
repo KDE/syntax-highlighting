@@ -32,6 +32,8 @@ public:
     SyntaxRepository();
     ~SyntaxRepository();
 
+    SyntaxDefinition* definitionForFileName(const QString &fileName) const;
+
 private:
     void load();
 

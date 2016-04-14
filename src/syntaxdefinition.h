@@ -18,6 +18,8 @@
 #ifndef KATESYNTAX_SYNTAXDEFINITION_H
 #define KATESYNTAX_SYNTAXDEFINITION_H
 
+#include "katesyntax_export.h"
+
 #include "keywordlist.h"
 
 #include <QString>
@@ -30,7 +32,7 @@ namespace KateSyntax {
 class Context;
 class KeywordList;
 
-class SyntaxDefinition
+class KATESYNTAX_EXPORT SyntaxDefinition
 {
 public:
     SyntaxDefinition();

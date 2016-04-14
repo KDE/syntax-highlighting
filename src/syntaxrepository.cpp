@@ -20,6 +20,7 @@
 
 #include <QDebug>
 #include <QDirIterator>
+#include <QFileInfo>
 
 using namespace KateSyntax;
 
@@ -30,6 +31,19 @@ SyntaxRepository::SyntaxRepository()
 
 SyntaxRepository::~SyntaxRepository()
 {
+}
+
+SyntaxDefinition* SyntaxRepository::definitionForFileName(const QString& fileName) const
+{
+    QFileInfo fi(fileName);
+    const auto ext = fi.suffix();
+
+    foreach (auto def, m_defs) {
+        if (def->extensions().contains(ext))
+            return def;
+    }
+
+    return nullptr;
 }
 
 void SyntaxRepository::load()

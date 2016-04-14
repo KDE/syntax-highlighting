@@ -16,6 +16,7 @@
 */
 
 #include <syntaxrepository.h>
+#include <syntaxdefinition.h>
 
 #include <QObject>
 #include <QtTest/qtest.h>
@@ -25,10 +26,32 @@ using namespace KateSyntax;
 class SyntaxRepositoryTest : public QObject
 {
     Q_OBJECT
+private:
+        SyntaxRepository m_repo;
+
 private slots:
-    void testLoad()
+    void testDefinitionByExtension_data()
     {
-        SyntaxRepository repo;
+        QTest::addColumn<QString>("fileName");
+        QTest::addColumn<QString>("defName");
+
+        QTest::newRow("empty") << QString() << QString();
+        QTest::newRow("qml") << QStringLiteral("/bla/foo.qml") << QStringLiteral("QML");
+        QTest::newRow("glsl") << QStringLiteral("flat.frag") << QStringLiteral("GLSL");
+    }
+
+    void testDefinitionByExtension()
+    {
+        QFETCH(QString, fileName);
+        QFETCH(QString, defName);
+
+        auto def = m_repo.definitionForFileName(fileName);
+        if (defName.isEmpty()) {
+            QVERIFY(!def);
+        } else {
+            QVERIFY(def);
+            QCOMPARE(def->name(), defName);
+        }
     }
 
 };

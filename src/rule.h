@@ -18,7 +18,9 @@
 #ifndef KATESYNTAX_RULE_H
 #define KATESYNTAX_RULE_H
 
-class QStringRef;
+#include <QString>
+#include <QVector>
+
 class QXmlStreamReader;
 
 namespace KateSyntax {
@@ -29,11 +31,36 @@ public:
     Rule();
     virtual ~Rule();
 
-    virtual void load(QXmlStreamReader &reader) = 0;
+    void load(QXmlStreamReader &reader);
+
+    int match(const QString &text, int offset);
 
     static Rule* create(const QStringRef &name);
 
+protected:
+    virtual void doLoad(QXmlStreamReader &reader) = 0;
+    virtual int doMatch(const QString &text, int offset) = 0;
+
+private:
+    Q_DISABLE_COPY(Rule)
+
+    QString m_attribute;
+    QString m_context;
+    QVector<Rule*> m_subRules;
 };
+
+
+class KeywordListRule : public Rule
+{
+public:
+    void doLoad(QXmlStreamReader & reader) override;
+    int doMatch(const QString & text, int offset) override;
+
+private:
+    QString m_listName;
+};
+
+
 }
 
 #endif // KATESYNTAX_RULE_H

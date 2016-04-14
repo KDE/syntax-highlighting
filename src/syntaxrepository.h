@@ -35,7 +35,7 @@ public:
 private:
     void load();
 
-    QVector<SyntaxDefinition> m_defs;
+    QVector<SyntaxDefinition*> m_defs;
 };
 
 }

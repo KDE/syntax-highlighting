@@ -16,6 +16,7 @@
 */
 
 #include "syntaxdefinition.h"
+#include "context.h"
 
 #include <QDebug>
 #include <QFile>
@@ -29,6 +30,7 @@ SyntaxDefinition::SyntaxDefinition()
 
 SyntaxDefinition::~SyntaxDefinition()
 {
+    qDeleteAll(m_contexts);
 }
 
 bool SyntaxDefinition::load(const QString& definitionFileName)
@@ -90,9 +92,9 @@ void SyntaxDefinition::loadContexts(QXmlStreamReader& reader)
         switch (reader.tokenType()) {
             case QXmlStreamReader::StartElement:
                 if (reader.name() == QLatin1String("context")) {
-                    Context context;
-                    context.load(reader);
-                    qDebug() << "loaded context" << context.name() << context.attribute();
+                    auto context = new Context;
+                    context->load(reader);
+                    qDebug() << "loaded context" << context->name() << context->attribute();
                     m_contexts.push_back(context);
                 }
                 reader.readNext();

@@ -18,7 +18,6 @@
 #ifndef KATESYNTAX_SYNTAXDEFINITION_H
 #define KATESYNTAX_SYNTAXDEFINITION_H
 
-#include "context.h"
 #include "keywordlist.h"
 
 #include <QString>
@@ -40,11 +39,13 @@ public:
     bool load(const QString &definitionFileName);
 
 private:
+    Q_DISABLE_COPY(SyntaxDefinition)
+
     void loadHighlighting(QXmlStreamReader &reader);
     void loadContexts(QXmlStreamReader &reader);
 
     QVector<KeywordList> m_keywordLists;
-    QVector<Context> m_contexts;
+    QVector<Context*> m_contexts;
 };
 
 }

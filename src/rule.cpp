@@ -19,6 +19,7 @@
 
 #include <QDebug>
 #include <QString>
+#include <QXmlStreamReader>
 
 using namespace KateSyntax;
 
@@ -28,10 +29,45 @@ Rule::Rule()
 
 Rule::~Rule()
 {
+    qDeleteAll(m_subRules);
+}
+
+void Rule::load(QXmlStreamReader &reader)
+{
+    m_attribute = reader.attributes().value(QStringLiteral("attribute")).toString();
+    m_context = reader.attributes().value(QStringLiteral("context")).toString();
+
+    doLoad(reader);
+
+    // TODO load sub-rules
+}
+
+int Rule::match(const QString &text, int offset)
+{
+    auto result = doMatch(text, offset);
+
+    // TODO match sub-rules
+
+    return result;
 }
 
 Rule* Rule::create(const QStringRef& name)
 {
     qDebug() << name;
-    return nullptr;
+    Rule *rule = nullptr;
+    if (name == QLatin1String("keyword"))
+        rule = new KeywordListRule;
+
+    return rule;
+}
+
+
+void KeywordListRule::doLoad(QXmlStreamReader& reader)
+{
+    m_listName = reader.attributes().value(QStringLiteral("String")).toString();
+}
+
+int KeywordListRule::doMatch(const QString& text, int offset)
+{
+    return offset;
 }

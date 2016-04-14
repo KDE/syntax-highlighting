@@ -39,6 +39,8 @@ public:
     void load(QXmlStreamReader &reader);
 
 private:
+    Q_DISABLE_COPY(Context)
+
     QString m_name;
     QString m_attribute;
 

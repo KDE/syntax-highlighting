@@ -18,6 +18,8 @@
 #ifndef KATESYNTAX_RULE_H
 #define KATESYNTAX_RULE_H
 
+#include "keywordlist.h"
+
 #include <QString>
 #include <QVector>
 
@@ -53,11 +55,16 @@ private:
 class KeywordListRule : public Rule
 {
 public:
+    QString listName() const;
+    void setKeywordList(const KeywordList &list);
+
+protected:
     void doLoad(QXmlStreamReader & reader) override;
     int doMatch(const QString & text, int offset) override;
 
 private:
     QString m_listName;
+    KeywordList m_keywordList;
 };
 
 

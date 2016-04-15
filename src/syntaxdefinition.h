@@ -22,6 +22,7 @@
 
 #include "keywordlist.h"
 
+#include <QHash>
 #include <QString>
 #include <QVector>
 
@@ -31,6 +32,7 @@ namespace KateSyntax {
 
 class Context;
 class KeywordList;
+class Rule;
 
 class KATESYNTAX_EXPORT SyntaxDefinition
 {
@@ -42,14 +44,16 @@ public:
     QVector<QString> extensions() const;
 
     bool load(const QString &definitionFileName);
+    void assemble();
 
 private:
     Q_DISABLE_COPY(SyntaxDefinition)
 
     void loadHighlighting(QXmlStreamReader &reader);
     void loadContexts(QXmlStreamReader &reader);
+    void assembleKeywordList(Rule *rule);
 
-    QVector<KeywordList> m_keywordLists;
+    QHash<QString, KeywordList> m_keywordLists;
     QVector<Context*> m_contexts;
 
     QString m_name;

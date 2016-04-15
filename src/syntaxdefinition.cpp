@@ -17,6 +17,7 @@
 
 #include "syntaxdefinition.h"
 #include "context.h"
+#include "rule.h"
 
 #include <QDebug>
 #include <QFile>
@@ -75,6 +76,7 @@ bool SyntaxDefinition::load(const QString& definitionFileName)
             loadHighlighting(reader);
     }
 
+    assemble();
     return true;
 }
 
@@ -91,7 +93,7 @@ void SyntaxDefinition::loadHighlighting(QXmlStreamReader& reader)
                     KeywordList keywords;
                     keywords.load(reader);
                     qDebug() << "loaded keyword list: " <<  keywords.name();
-                    m_keywordLists.push_back(keywords);
+                    m_keywordLists.insert(keywords.name(), keywords);
                 } else if (reader.name() == QLatin1String("contexts")) {
                     loadContexts(reader);
                 } else {
@@ -132,4 +134,22 @@ void SyntaxDefinition::loadContexts(QXmlStreamReader& reader)
                 break;
         }
     }
+}
+
+void SyntaxDefinition::assemble()
+{
+    // resolve keyword lists
+    foreach (auto context, m_contexts) {
+        foreach (auto rule, context->rules())
+            assembleKeywordList(rule);
+    }
+    m_keywordLists.clear();
+}
+
+void SyntaxDefinition::assembleKeywordList(Rule* rule)
+{
+    if (auto keywordRule = dynamic_cast<KeywordListRule*>(rule))
+        keywordRule->setKeywordList(m_keywordLists.value(keywordRule->listName()));
+
+    // TODO recurse into sub-rules
 }

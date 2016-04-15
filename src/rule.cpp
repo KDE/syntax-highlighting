@@ -62,6 +62,16 @@ Rule* Rule::create(const QStringRef& name)
 }
 
 
+QString KeywordListRule::listName() const
+{
+    return m_listName;
+}
+
+void KeywordListRule::setKeywordList(const KeywordList &keywordList)
+{
+    m_keywordList = keywordList;
+}
+
 void KeywordListRule::doLoad(QXmlStreamReader& reader)
 {
     m_listName = reader.attributes().value(QStringLiteral("String")).toString();

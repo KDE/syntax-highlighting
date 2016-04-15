@@ -43,6 +43,11 @@ QString Context::attribute() const
     return m_attribute;
 }
 
+QVector<Rule*> Context::rules() const
+{
+    return m_rules;
+}
+
 void Context::load(QXmlStreamReader& reader)
 {
     Q_ASSERT(reader.name() == QLatin1String("context"));

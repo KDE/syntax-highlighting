@@ -27,6 +27,7 @@ using namespace KateSyntax;
 SyntaxRepository::SyntaxRepository()
 {
     load();
+    assemble();
 }
 
 SyntaxRepository::~SyntaxRepository()
@@ -58,4 +59,9 @@ void SyntaxRepository::load()
     }
 
     qDebug() << "Found" << m_defs.size() << "syntax definitions.";
+}
+
+void SyntaxRepository::assemble()
+{
+    // TODO resolve include rules
 }

@@ -36,6 +36,8 @@ public:
     QString name() const;
     QString attribute() const;
 
+    QVector<Rule*> rules() const;
+
     void load(QXmlStreamReader &reader);
 
 private:

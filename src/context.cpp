@@ -64,8 +64,8 @@ void Context::load(QXmlStreamReader& reader)
                 qDebug() << reader.name() << "begin";
                 auto rule = Rule::create(reader.name());
                 if (rule) {
-                    rule->load(reader);
-                    m_rules.push_back(rule);
+                    if (rule->load(reader))
+                        m_rules.push_back(rule);
                 } else {
                     reader.skipCurrentElement();
                 }

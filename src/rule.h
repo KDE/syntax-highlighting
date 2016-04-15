@@ -33,14 +33,14 @@ public:
     Rule();
     virtual ~Rule();
 
-    void load(QXmlStreamReader &reader);
+    bool load(QXmlStreamReader &reader);
 
     int match(const QString &text, int offset);
 
     static Rule* create(const QStringRef &name);
 
 protected:
-    virtual void doLoad(QXmlStreamReader &reader) = 0;
+    virtual bool doLoad(QXmlStreamReader &reader) = 0;
     virtual int doMatch(const QString &text, int offset) = 0;
 
 private:
@@ -49,8 +49,19 @@ private:
     QString m_attribute;
     QString m_context;
     QVector<Rule*> m_subRules;
+    bool m_firstNonSpace;
 };
 
+
+class DetectChar : public Rule
+{
+protected:
+    bool doLoad(QXmlStreamReader & reader) override;
+    int doMatch(const QString & text, int offset) override;
+
+private:
+    QChar m_char;
+};
 
 class KeywordListRule : public Rule
 {
@@ -59,7 +70,7 @@ public:
     void setKeywordList(const KeywordList &list);
 
 protected:
-    void doLoad(QXmlStreamReader & reader) override;
+    bool doLoad(QXmlStreamReader & reader) override;
     int doMatch(const QString & text, int offset) override;
 
 private:

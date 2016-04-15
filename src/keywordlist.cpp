@@ -53,7 +53,6 @@ void KeywordList::load(QXmlStreamReader& reader)
                 reader.readNext();
                 break;
             case QXmlStreamReader::EndElement:
-                qDebug() << m_name << m_keywords;
                 reader.readNext();
                 return;
             default:

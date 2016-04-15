@@ -23,7 +23,8 @@
 
 using namespace KateSyntax;
 
-Rule::Rule()
+Rule::Rule() :
+    m_firstNonSpace(false)
 {
 }
 
@@ -32,18 +33,26 @@ Rule::~Rule()
     qDeleteAll(m_subRules);
 }
 
-void Rule::load(QXmlStreamReader &reader)
+bool Rule::load(QXmlStreamReader &reader)
 {
     m_attribute = reader.attributes().value(QStringLiteral("attribute")).toString();
     m_context = reader.attributes().value(QStringLiteral("context")).toString();
+    m_firstNonSpace = reader.attributes().value(QStringLiteral("m_firstNonSpace")) == QLatin1String("true");
 
-    doLoad(reader);
+    auto result = doLoad(reader);
 
     // TODO load sub-rules
+
+    reader.readNextStartElement();
+    return result;
 }
 
 int Rule::match(const QString &text, int offset)
 {
+    Q_ASSERT(!text.isEmpty());
+    if (m_firstNonSpace && (offset > 0 || text.at(0).isSpace()))
+        return false;
+
     auto result = doMatch(text, offset);
 
     // TODO match sub-rules
@@ -55,10 +64,29 @@ Rule* Rule::create(const QStringRef& name)
 {
     qDebug() << name;
     Rule *rule = nullptr;
+    if (name == QLatin1String("DetectChar"))
+        rule = new DetectChar;
     if (name == QLatin1String("keyword"))
         rule = new KeywordListRule;
 
     return rule;
+}
+
+
+bool DetectChar::doLoad(QXmlStreamReader& reader)
+{
+    const auto s = reader.attributes().value(QStringLiteral("char"));
+    if (s.isEmpty())
+        return false;
+    m_char = s.at(0);
+    return true;
+}
+
+int DetectChar::doMatch(const QString& text, int offset)
+{
+    if (text.at(offset) == m_char)
+        return offset + 1;
+    return offset;
 }
 
 
@@ -72,12 +100,14 @@ void KeywordListRule::setKeywordList(const KeywordList &keywordList)
     m_keywordList = keywordList;
 }
 
-void KeywordListRule::doLoad(QXmlStreamReader& reader)
+bool KeywordListRule::doLoad(QXmlStreamReader& reader)
 {
     m_listName = reader.attributes().value(QStringLiteral("String")).toString();
+    return !m_listName.isEmpty();
 }
 
 int KeywordListRule::doMatch(const QString& text, int offset)
 {
+    // TODO
     return offset;
 }

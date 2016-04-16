@@ -45,6 +45,8 @@ QString Rule::context() const
 
 bool Rule::load(QXmlStreamReader &reader)
 {
+    Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
+
     m_attribute = reader.attributes().value(QStringLiteral("attribute")).toString();
     m_context = reader.attributes().value(QStringLiteral("context")).toString();
     if (m_context.isEmpty())
@@ -53,9 +55,30 @@ bool Rule::load(QXmlStreamReader &reader)
 
     auto result = doLoad(reader);
 
-    // TODO load sub-rules
+    if (m_lookAhead && m_context == QLatin1String("#stay"))
+        result = false;
 
-    reader.readNextStartElement();
+    reader.readNext();
+    while (!reader.atEnd()) {
+        switch (reader.tokenType()) {
+            case QXmlStreamReader::StartElement:
+            {
+                qDebug() << reader.name() << "sub-rule";
+                auto rule = Rule::create(reader.name());
+                if (rule && rule->load(reader))
+                    m_subRules.push_back(rule);
+                reader.skipCurrentElement();
+                break;
+            }
+            case QXmlStreamReader::EndElement:
+                qDebug() << reader.name() << "end element";
+                return result;
+            default:
+                reader.readNext();
+                break;
+        }
+    }
+
     return result;
 }
 

@@ -37,6 +37,9 @@ public:
     QString attribute() const;
     QString lineEndContext() const;
 
+    bool fallthrough() const;
+    QString fallthroughContext() const;
+
     QVector<Rule*> rules() const;
 
     void load(QXmlStreamReader &reader);
@@ -47,8 +50,11 @@ private:
     QString m_name;
     QString m_attribute;
     QString m_lineEndContext;
+    QString m_fallthroughContext;
 
     QVector<Rule*> m_rules;
+
+    bool m_fallthrough;
 };
 }
 

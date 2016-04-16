@@ -24,7 +24,8 @@
 
 using namespace KateSyntax;
 
-Context::Context()
+Context::Context() :
+    m_fallthrough(false)
 {
 }
 
@@ -48,6 +49,16 @@ QString Context::lineEndContext() const
     return m_lineEndContext;
 }
 
+bool Context::fallthrough() const
+{
+    return m_fallthrough;
+}
+
+QString Context::fallthroughContext() const
+{
+    return m_fallthroughContext;
+}
+
 QVector<Rule*> Context::rules() const
 {
     return m_rules;
@@ -63,6 +74,10 @@ void Context::load(QXmlStreamReader& reader)
     m_lineEndContext = reader.attributes().value(QStringLiteral("lineEndContext")).toString();
     if (m_lineEndContext.isEmpty())
         m_lineEndContext = QStringLiteral("#stay");
+    m_fallthrough = reader.attributes().value(QStringLiteral("fallthrough")) == QLatin1String("true");
+    m_fallthroughContext = reader.attributes().value(QStringLiteral("fallthroughContext")).toString();
+    if (m_fallthroughContext.isEmpty())
+        m_fallthrough = false;
 
     reader.readNext();
     while (!reader.atEnd()) {

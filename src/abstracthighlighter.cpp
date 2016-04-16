@@ -75,7 +75,11 @@ void AbstractHighlighter::highlightLine(const QString& text)
         if (isLookAhead)
             continue;
 
-        if (newOffset <= offset) {
+        if (newOffset <= offset) { // no matching rule
+            if (m_context.top()->fallthrough()) {
+                switchContext(m_context.top()->fallthroughContext());
+                continue;
+            }
             newOffset = offset + 1;
             newFormat = m_context.top()->attribute();
         }
@@ -117,6 +121,7 @@ void AbstractHighlighter::switchContext(const QString& contextName)
     }
 
     Q_ASSERT(!m_context.isEmpty());
+    Q_ASSERT(m_context.top());
 }
 
 void AbstractHighlighter::setFormat(int offset, int length, const QString& format)

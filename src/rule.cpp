@@ -191,6 +191,8 @@ Rule* Rule::create(const QStringRef& name)
         rule = new HlCHex;
     else if (name == QLatin1String("HlCOct"))
         rule = new HlCOct;
+    else if (name == QLatin1String("HlCStringChar"))
+        rule = new HlCStringChar;
     else if (name == QLatin1String("keyword"))
         rule = new KeywordListRule;
     else if (name == QLatin1String("RangeDetect"))
@@ -363,6 +365,13 @@ int HlCOct::doMatch(const QString& text, int offset)
 
     return offset;
 }
+
+
+int HlCStringChar::doMatch(const QString& text, int offset)
+{
+    return matchEscapedChar(text, offset);
+}
+
 
 
 QString KeywordListRule::listName() const

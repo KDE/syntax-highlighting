@@ -128,6 +128,12 @@ protected:
     int doMatch(const QString & text, int offset) override;
 };
 
+class HlCStringChar : public Rule
+{
+protected:
+    int doMatch(const QString & text, int offset) override;
+};
+
 class KeywordListRule : public Rule
 {
 public:

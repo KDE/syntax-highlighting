@@ -84,7 +84,6 @@ void Context::load(QXmlStreamReader& reader)
         switch (reader.tokenType()) {
             case QXmlStreamReader::StartElement:
             {
-                qDebug() << reader.name() << "begin";
                 auto rule = Rule::create(reader.name());
                 if (rule) {
                     if (rule->load(reader))
@@ -96,7 +95,6 @@ void Context::load(QXmlStreamReader& reader)
                 break;
             }
             case QXmlStreamReader::EndElement:
-                qDebug() << reader.name() << "end";
                 return;
             default:
                 reader.readNext();

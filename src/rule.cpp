@@ -122,7 +122,6 @@ bool Rule::load(QXmlStreamReader &reader)
         switch (reader.tokenType()) {
             case QXmlStreamReader::StartElement:
             {
-                qDebug() << reader.name() << "sub-rule";
                 auto rule = Rule::create(reader.name());
                 if (rule && rule->load(reader)) {
                     m_subRules.push_back(rule);
@@ -133,7 +132,6 @@ bool Rule::load(QXmlStreamReader &reader)
                 break;
             }
             case QXmlStreamReader::EndElement:
-                qDebug() << reader.name() << "end element";
                 return result;
             default:
                 reader.readNext();
@@ -195,7 +193,7 @@ Rule* Rule::create(const QStringRef& name)
     else if (name == QLatin1String("HlCStringChar"))
         rule = new HlCStringChar;
     else if (name == QLatin1String("IncludeRules"))
-        ; // TODO
+        rule = new IncludeRules;
     else if (name == QLatin1String("keyword"))
         rule = new KeywordListRule;
     else if (name == QLatin1String("LineContinue"))
@@ -334,14 +332,6 @@ int Float::doMatch(const QString& text, int offset)
 }
 
 
-int Int::doMatch(const QString& text, int offset)
-{
-    while(offset < text.size() && text.at(offset).isDigit())
-        ++offset;
-    return offset;
-}
-
-
 int HlCChar::doMatch(const QString& text, int offset)
 {
     if (text.size() < offset + 3)
@@ -412,6 +402,34 @@ int HlCStringChar::doMatch(const QString& text, int offset)
     return matchEscapedChar(text, offset);
 }
 
+
+bool IncludeRules::doLoad(QXmlStreamReader& reader)
+{
+    const auto s = reader.attributes().value(QLatin1String("context"));
+    auto splitted = s.split(QLatin1String("##"), QString::KeepEmptyParts);
+    if (splitted.isEmpty())
+        return false;
+    m_contextName = splitted.at(0).toString();
+    if (splitted.size() > 1)
+        m_defName = splitted.at(1).toString();
+
+    return !m_contextName.isEmpty();
+}
+
+int IncludeRules::doMatch(const QString& text, int offset)
+{
+    Q_UNUSED(text);
+    qWarning() << "Unresolved include rule for" << m_contextName << "##" << m_defName;
+    return offset;
+}
+
+
+int Int::doMatch(const QString& text, int offset)
+{
+    while(offset < text.size() && text.at(offset).isDigit())
+        ++offset;
+    return offset;
+}
 
 
 QString KeywordListRule::listName() const

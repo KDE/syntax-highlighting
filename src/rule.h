@@ -110,6 +110,17 @@ protected:
     int doMatch(const QString & text, int offset) override;
 };
 
+class IncludeRules : public Rule
+{
+protected:
+    bool doLoad(QXmlStreamReader & reader) override;
+    int doMatch(const QString & text, int offset) override;
+
+private:
+    QString m_contextName;
+    QString m_defName;
+};
+
 class Int : public Rule
 {
 protected:

@@ -311,9 +311,22 @@ int Float::doMatch(const QString& text, int offset)
     if (newOffset == offset + 1) // we only found a decimal point
         return offset;
 
-    // TODO exponentialPart
+    auto expOffset = newOffset;
+    if (expOffset >= text.size() || (text.at(expOffset) != QLatin1Char('e') && text.at(expOffset) != QLatin1Char('E')))
+        return newOffset;
+    ++expOffset;
 
-    return newOffset;
+    if (expOffset < text.size() && (text.at(expOffset) == QLatin1Char('+') || text.at(expOffset) == QLatin1Char('-')))
+        ++expOffset;
+    bool foundExpDigit = false;
+    while (expOffset < text.size() && text.at(expOffset).isDigit()) {
+        ++expOffset;
+        foundExpDigit = true;
+    }
+
+    if (!foundExpDigit)
+        return newOffset;
+    return expOffset;
 }
 
 

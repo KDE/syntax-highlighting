@@ -51,30 +51,38 @@ void AbstractHighlighter::highlightLine(const QString& text)
     }
 
     Q_ASSERT(!m_context.isEmpty());
-    int offset = 0, prevOffset = 0;
+    int offset = 0, beginOffset = 0;
+    auto currentFormat = m_context.top()->attribute();
     do {
-        bool foundMatch = false;
+        int newOffset = 0;
+        QString newFormat;
         foreach (auto rule, m_context.top()->rules()) {
-            auto newOffset = rule->match(text, offset);
+            newOffset = rule->match(text, offset);
             if (newOffset <= offset)
                 continue;
 
-            if (prevOffset < offset)
-                setFormat(prevOffset, offset-prevOffset, m_context.top()->attribute());
-
-            setFormat(offset, newOffset - offset, rule->attribute().isEmpty() ? m_context.top()->attribute() : rule->attribute());
-            offset = newOffset;
-            prevOffset = offset;
+            newFormat = rule->attribute().isEmpty() ? m_context.top()->attribute() : rule->attribute();
             switchContext(rule->context());
-            foundMatch = true;
             break;
         }
-        if (!foundMatch)
-            ++offset;
+        if (newOffset <= offset) {
+            newOffset = offset + 1;
+            newFormat = m_context.top()->attribute();
+        }
+
+        if (newFormat != currentFormat) {
+            if (offset > 0)
+                setFormat(beginOffset, offset - beginOffset, currentFormat);
+            beginOffset = offset;
+            currentFormat = newFormat;
+        }
+        Q_ASSERT(newOffset > offset);
+        offset = newOffset;
+
     } while (offset < text.size());
 
-    if (prevOffset < offset)
-        setFormat(prevOffset, text.size() - prevOffset, m_context.top()->attribute());
+    if (beginOffset < offset)
+        setFormat(beginOffset, text.size() - beginOffset, currentFormat);
 
     switchContext(m_context.top()->lineEndContext());
 }

@@ -59,6 +59,12 @@ bool Rule::load(QXmlStreamReader &reader)
     return result;
 }
 
+bool Rule::doLoad(QXmlStreamReader& reader)
+{
+    Q_UNUSED(reader);
+    return true;
+}
+
 int Rule::match(const QString &text, int offset)
 {
     Q_ASSERT(!text.isEmpty());
@@ -82,6 +88,8 @@ Rule* Rule::create(const QStringRef& name)
         rule = new DetectChar;
     else if (name == QLatin1String("Detect2Chars"))
         rule = new Detect2Char;
+    else if (name == QLatin1String("DetectSpaces"))
+        rule = new DetectSpaces;
     else if (name == QLatin1String("keyword"))
         rule = new KeywordListRule;
     else if (name == QLatin1String("RegExpr"))
@@ -152,6 +160,14 @@ int Detect2Char::doMatch(const QString& text, int offset)
         return offset;
     if (text.at(offset) == m_char1 && text.at(offset + 1) == m_char2)
         return offset + 2;
+    return offset;
+}
+
+
+int DetectSpaces::doMatch(const QString& text, int offset)
+{
+    while(offset < text.size() && text.at(offset).isSpace())
+        ++offset;
     return offset;
 }
 

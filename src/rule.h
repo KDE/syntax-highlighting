@@ -44,7 +44,7 @@ public:
     static Rule* create(const QStringRef &name);
 
 protected:
-    virtual bool doLoad(QXmlStreamReader &reader) = 0;
+    virtual bool doLoad(QXmlStreamReader &reader);
     virtual int doMatch(const QString &text, int offset) = 0;
 
     bool isDelimiter(QChar c) const;
@@ -88,6 +88,12 @@ protected:
 private:
     QChar m_char1;
     QChar m_char2;
+};
+
+class DetectSpaces : public Rule
+{
+protected:
+    int doMatch(const QString & text, int offset) override;
 };
 
 class KeywordListRule : public Rule

@@ -66,6 +66,17 @@ private:
     QChar m_char;
 };
 
+class Detect2Char : public Rule
+{
+protected:
+    bool doLoad(QXmlStreamReader & reader) override;
+    int doMatch(const QString & text, int offset) override;
+
+private:
+    QChar m_char1;
+    QChar m_char2;
+};
+
 class KeywordListRule : public Rule
 {
 public:

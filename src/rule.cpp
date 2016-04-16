@@ -78,8 +78,12 @@ Rule* Rule::create(const QStringRef& name)
     Rule *rule = nullptr;
     if (name == QLatin1String("DetectChar"))
         rule = new DetectChar;
-    if (name == QLatin1String("keyword"))
+    else if (name == QLatin1String("Detect2Chars"))
+        rule = new Detect2Char;
+    else if (name == QLatin1String("keyword"))
         rule = new KeywordListRule;
+    else
+        qDebug() << name << "rule not yet implemented";
 
     return rule;
 }
@@ -98,6 +102,27 @@ int DetectChar::doMatch(const QString& text, int offset)
 {
     if (text.at(offset) == m_char)
         return offset + 1;
+    return offset;
+}
+
+
+bool Detect2Char::doLoad(QXmlStreamReader& reader)
+{
+    const auto s1 = reader.attributes().value(QStringLiteral("char"));
+    const auto s2 = reader.attributes().value(QStringLiteral("char1"));
+    if (s1.isEmpty() || s2.isEmpty())
+        return false;
+    m_char1 = s1.at(0);
+    m_char2 = s2.at(0);
+    return true;
+}
+
+int Detect2Char::doMatch(const QString& text, int offset)
+{
+    if (text.size() - offset < 2)
+        return offset;
+    if (text.at(offset) == m_char1 && text.at(offset + 1) == m_char2)
+        return offset + 2;
     return offset;
 }
 

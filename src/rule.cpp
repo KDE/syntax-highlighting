@@ -137,6 +137,8 @@ Rule* Rule::create(const QStringRef& name)
         rule = new HlCHex;
     else if (name == QLatin1String("keyword"))
         rule = new KeywordListRule;
+    else if (name == QLatin1String("RangeDetect"))
+        rule = new RangeDetect;
     else if (name == QLatin1String("RegExpr"))
         rule = new RegExpr;
     else if (name == QLatin1String("StringDetect"))
@@ -307,6 +309,34 @@ int KeywordListRule::doMatch(const QString& text, int offset)
     // TODO support case-insensitive keywords
     if (m_keywordList.keywords().contains(text.mid(offset, wordLen)))
         return offset2;
+    return offset;
+}
+
+
+bool RangeDetect::doLoad(QXmlStreamReader& reader)
+{
+    const auto s1 = reader.attributes().value(QStringLiteral("char"));
+    const auto s2 = reader.attributes().value(QStringLiteral("char1"));
+    if (s1.isEmpty() || s2.isEmpty())
+        return false;
+    m_begin = s1.at(0);
+    m_end = s2.at(0);
+    return true;
+}
+
+int RangeDetect::doMatch(const QString& text, int offset)
+{
+    if (text.size() - offset < 2)
+        return offset;
+    if (text.at(offset) != m_begin)
+        return offset;
+
+    auto newOffset = offset + 1;
+    while (newOffset < text.size()) {
+        if (text.at(newOffset) == m_end)
+            return newOffset + 1;
+        ++newOffset;
+    }
     return offset;
 }
 

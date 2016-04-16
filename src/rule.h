@@ -133,6 +133,17 @@ private:
     KeywordList m_keywordList;
 };
 
+class RangeDetect : public Rule
+{
+protected:
+    bool doLoad(QXmlStreamReader & reader) override;
+    int doMatch(const QString & text, int offset) override;
+
+private:
+    QChar m_begin;
+    QChar m_end;
+};
+
 class RegExpr : public Rule
 {
 protected:

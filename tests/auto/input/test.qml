@@ -7,8 +7,9 @@
 import QtQuick 2.0
 
 Rectangle {
-    property int myIntProp = 0;
+    property real myNumProp: 0.1e12;
     property alias sub.color;
+    signal mySignal(int arg1, string arg2)
     color: "lightsteelblue"
     width: 320
     height: width/2

@@ -58,6 +58,16 @@ private:
 };
 
 
+class AnyChar : public Rule
+{
+protected:
+    bool doLoad(QXmlStreamReader & reader) override;
+    int doMatch(const QString & text, int offset) override;
+
+private:
+    QString m_chars;
+};
+
 class DetectChar : public Rule
 {
 protected:

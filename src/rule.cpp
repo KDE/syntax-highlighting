@@ -76,7 +76,9 @@ Rule* Rule::create(const QStringRef& name)
 {
     qDebug() << name;
     Rule *rule = nullptr;
-    if (name == QLatin1String("DetectChar"))
+    if (name == QLatin1String("AnyChar"))
+        rule = new AnyChar;
+    else if (name == QLatin1String("DetectChar"))
         rule = new DetectChar;
     else if (name == QLatin1String("Detect2Chars"))
         rule = new Detect2Char;
@@ -95,6 +97,22 @@ bool Rule::isDelimiter(QChar c) const
     // TODO: this is definition-global and configurable!
     static const QString delimiters = QStringLiteral(".():!+,-<=>%&*/;?[]^{|}~\\ \t");
     return delimiters.contains(c);
+}
+
+
+bool AnyChar::doLoad(QXmlStreamReader& reader)
+{
+    m_chars = reader.attributes().value(QStringLiteral("String")).toString();
+    if (m_chars.size() == 1)
+        qDebug() << "AnyChar rule with just one char: use DetectChar instead.";
+    return !m_chars.isEmpty();
+}
+
+int AnyChar::doMatch(const QString& text, int offset)
+{
+    if (m_chars.contains(text.at(offset)))
+        return offset + 1;
+    return offset;
 }
 
 

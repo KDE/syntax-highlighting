@@ -62,7 +62,7 @@ void AbstractHighlighter::highlightLine(const QString& text)
             if (prevOffset < offset)
                 setFormat(prevOffset, offset-prevOffset, m_context.top()->attribute());
 
-            setFormat(offset, newOffset - offset, rule->attribute());
+            setFormat(offset, newOffset - offset, rule->attribute().isEmpty() ? m_context.top()->attribute() : rule->attribute());
             offset = newOffset;
             prevOffset = offset;
             switchContext(rule->context());
@@ -71,7 +71,7 @@ void AbstractHighlighter::highlightLine(const QString& text)
         }
         if (!foundMatch)
             ++offset;
-    } while (offset < text.size() - 1);
+    } while (offset < text.size());
 
     if (prevOffset < offset)
         setFormat(prevOffset, text.size() - prevOffset, m_context.top()->attribute());

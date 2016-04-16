@@ -43,6 +43,9 @@ public:
     QString name() const;
     QVector<QString> extensions() const;
 
+    Context* initialContext() const;
+    Context* contextByName(const QString &name) const;
+
     bool load(const QString &definitionFileName);
     void assemble();
 

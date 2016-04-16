@@ -1,5 +1,7 @@
 set(kate_syntax_srcs
+    abstracthighlighter.cpp
     context.cpp
+    htmlhighlighter.cpp
     keywordlist.cpp
     rule.cpp
     syntaxdefinition.cpp

@@ -44,6 +44,21 @@ QVector<QString> SyntaxDefinition::extensions() const
     return m_extensions;
 }
 
+Context* SyntaxDefinition::initialContext() const
+{
+    Q_ASSERT(!m_contexts.isEmpty());
+    return m_contexts.first();
+}
+
+Context* SyntaxDefinition::contextByName(const QString& name) const
+{
+    foreach (auto context, m_contexts) {
+        if (context->name() == name)
+            return context;
+    }
+    return nullptr;
+}
+
 bool SyntaxDefinition::load(const QString& definitionFileName)
 {
     qDebug() << "parsing" << definitionFileName;

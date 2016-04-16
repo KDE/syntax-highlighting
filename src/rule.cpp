@@ -37,7 +37,7 @@ bool Rule::load(QXmlStreamReader &reader)
 {
     m_attribute = reader.attributes().value(QStringLiteral("attribute")).toString();
     m_context = reader.attributes().value(QStringLiteral("context")).toString();
-    m_firstNonSpace = reader.attributes().value(QStringLiteral("m_firstNonSpace")) == QLatin1String("true");
+    m_firstNonSpace = reader.attributes().value(QStringLiteral("firstNonSpace")) == QLatin1String("true");
 
     auto result = doLoad(reader);
 

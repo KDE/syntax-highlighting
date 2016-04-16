@@ -46,6 +46,8 @@ protected:
     virtual bool doLoad(QXmlStreamReader &reader) = 0;
     virtual int doMatch(const QString &text, int offset) = 0;
 
+    bool isDelimiter(QChar c) const;
+
 private:
     Q_DISABLE_COPY(Rule)
 
@@ -92,6 +94,15 @@ private:
     KeywordList m_keywordList;
 };
 
+class WordDetect : public Rule
+{
+protected:
+    bool doLoad(QXmlStreamReader & reader) override;
+    int doMatch(const QString & text, int offset) override;
+
+private:
+    QString m_word;
+};
 
 }
 

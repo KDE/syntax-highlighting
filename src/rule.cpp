@@ -82,10 +82,19 @@ Rule* Rule::create(const QStringRef& name)
         rule = new Detect2Char;
     else if (name == QLatin1String("keyword"))
         rule = new KeywordListRule;
+    else if (name == QLatin1String("WordDetect"))
+        rule = new WordDetect;
     else
         qDebug() << name << "rule not yet implemented";
 
     return rule;
+}
+
+bool Rule::isDelimiter(QChar c) const
+{
+    // TODO: this is definition-global and configurable!
+    static const QString delimiters = QStringLiteral(".():!+,-<=>%&*/;?[]^{|}~\\ \t");
+    return delimiters.contains(c);
 }
 
 
@@ -145,17 +154,14 @@ bool KeywordListRule::doLoad(QXmlStreamReader& reader)
 
 int KeywordListRule::doMatch(const QString& text, int offset)
 {
-    // TODO: this is definition-global!
-    QString deliminators = QStringLiteral(".():!+,-<=>%&*/;?[]^{|}~\\ \t");
-
-    if (offset > 0 && !deliminators.contains(text.at(offset - 1)))
+    if (offset > 0 && !isDelimiter(text.at(offset - 1)))
         return offset;
 
     int offset2 = offset;
     int wordLen = 0;
     int len = text.size();
 
-    while ((len > offset2) && !deliminators.contains(text[offset2])) {
+    while ((len > offset2) && !isDelimiter(text[offset2])) {
         offset2++;
         wordLen++;
     }
@@ -163,5 +169,29 @@ int KeywordListRule::doMatch(const QString& text, int offset)
     // TODO support case-insensitive keywords
     if (m_keywordList.keywords().contains(text.mid(offset, wordLen)))
         return offset2;
+    return offset;
+}
+
+
+bool WordDetect::doLoad(QXmlStreamReader& reader)
+{
+    m_word = reader.attributes().value(QStringLiteral("String")).toString();
+    return !m_word.isEmpty();
+}
+
+int WordDetect::doMatch(const QString& text, int offset)
+{
+    if (text.size() - offset < m_word.size())
+        return offset;
+
+    if (offset > 0 && !isDelimiter(text.at(offset - 1)))
+        return offset;
+
+    if (text.midRef(offset, m_word.size()) != m_word)
+        return offset;
+
+    if (text.size() == offset + m_word.size() || isDelimiter(text.at(offset + m_word.size())))
+        return offset + m_word.size();
+
     return offset;
 }

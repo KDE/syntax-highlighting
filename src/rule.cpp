@@ -194,8 +194,12 @@ Rule* Rule::create(const QStringRef& name)
         rule = new HlCOct;
     else if (name == QLatin1String("HlCStringChar"))
         rule = new HlCStringChar;
+    else if (name == QLatin1String("IncludeRules"))
+        ; // TODO
     else if (name == QLatin1String("keyword"))
         rule = new KeywordListRule;
+    else if (name == QLatin1String("LineContinue"))
+        rule = new LineContinue;
     else if (name == QLatin1String("RangeDetect"))
         rule = new RangeDetect;
     else if (name == QLatin1String("RegExpr"))
@@ -205,7 +209,7 @@ Rule* Rule::create(const QStringRef& name)
     else if (name == QLatin1String("WordDetect"))
         rule = new WordDetect;
     else
-        qDebug() << name << "rule not yet implemented";
+        qWarning() << "Unknown rule type:" << name;
 
     return rule;
 }
@@ -443,6 +447,24 @@ int KeywordListRule::doMatch(const QString& text, int offset)
     // TODO support case-insensitive keywords
     if (m_keywordList.keywords().contains(text.mid(offset, wordLen)))
         return offset2;
+    return offset;
+}
+
+
+bool LineContinue::doLoad(QXmlStreamReader& reader)
+{
+    const auto s = reader.attributes().value(QStringLiteral("char"));
+    if (s.isEmpty())
+        m_char = QLatin1Char('\\');
+    else
+        m_char = s.at(0);
+    return true;
+}
+
+int LineContinue::doMatch(const QString& text, int offset)
+{
+    if (offset == text.size() - 1 && text.at(offset) == m_char)
+        return offset + 1;
     return offset;
 }
 

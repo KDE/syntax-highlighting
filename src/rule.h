@@ -155,6 +155,16 @@ private:
     KeywordList m_keywordList;
 };
 
+class LineContinue : public Rule
+{
+protected:
+    bool doLoad(QXmlStreamReader & reader) override;
+    int doMatch(const QString & text, int offset) override;
+
+private:
+    QChar m_char;
+};
+
 class RangeDetect : public Rule
 {
 protected:

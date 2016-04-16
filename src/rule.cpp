@@ -72,9 +72,12 @@ bool Rule::load(QXmlStreamReader &reader)
             {
                 qDebug() << reader.name() << "sub-rule";
                 auto rule = Rule::create(reader.name());
-                if (rule && rule->load(reader))
+                if (rule && rule->load(reader)) {
                     m_subRules.push_back(rule);
-                reader.skipCurrentElement();
+                    reader.readNext();
+                } else {
+                    reader.skipCurrentElement();
+                }
                 break;
             }
             case QXmlStreamReader::EndElement:
@@ -99,11 +102,17 @@ int Rule::match(const QString &text, int offset)
 {
     Q_ASSERT(!text.isEmpty());
     if (m_firstNonSpace && (offset > 0 || text.at(0).isSpace()))
-        return false;
+        return offset;
 
-    auto result = doMatch(text, offset);
+    const auto result = doMatch(text, offset);
+    if (result == offset || result == text.size())
+        return result;
 
-    // TODO match sub-rules
+    foreach (auto subRule, m_subRules) {
+        const auto subResult = subRule->match(text, result);
+        if (subResult > result)
+            return subResult;
+    }
 
     return result;
 }
@@ -324,8 +333,8 @@ int RegExpr::doMatch(const QString& text, int offset)
 bool StringDetect::doLoad(QXmlStreamReader& reader)
 {
     m_string = reader.attributes().value(QStringLiteral("String")).toString();
-    m_caseSensitivity = reader.attributes().value(QStringLiteral("insensitive")) != QLatin1String("true") ? Qt::CaseInsensitive : Qt::CaseSensitive;
-    return m_string.isEmpty();
+    m_caseSensitivity = reader.attributes().value(QStringLiteral("insensitive")) == QLatin1String("true") ? Qt::CaseInsensitive : Qt::CaseSensitive;
+    return !m_string.isEmpty();
 }
 
 int StringDetect::doMatch(const QString& text, int offset)

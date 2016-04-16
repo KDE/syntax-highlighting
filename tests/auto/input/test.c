@@ -19,8 +19,8 @@ static float floatQualifier = 23.123f;
 
 static const char c1 = 'c';
 static const char c2 = '\n';
-static const char c2a = '\020';
-static const char c2b = '\x10';
+static const char c2a = '\120'; // octal
+static const char c2b = '\x1f'; // hex
 static const char c2c = '\'';
 static const char c2d = '\\';
 static const char* c3  = "string";

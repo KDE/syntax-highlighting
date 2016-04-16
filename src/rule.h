@@ -120,8 +120,6 @@ class HlCHex : public Rule
 {
 protected:
     int doMatch(const QString & text, int offset) override;
-private:
-    static bool isHexChar(QChar c);
 };
 
 class HlCOct : public Rule

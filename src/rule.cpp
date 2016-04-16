@@ -28,40 +28,49 @@ static bool isOctalChar(QChar c)
     return c.isNumber() && c != QLatin1Char('9') && c != QLatin1Char('8');
 }
 
+static bool isHexChar(QChar c)
+{
+    return c.isNumber()
+        || c == QLatin1Char('a') || c == QLatin1Char('A')
+        || c == QLatin1Char('b') || c == QLatin1Char('B')
+        || c == QLatin1Char('c') || c == QLatin1Char('C')
+        || c == QLatin1Char('d') || c == QLatin1Char('D')
+        || c == QLatin1Char('e') || c == QLatin1Char('E')
+        || c == QLatin1Char('f') || c == QLatin1Char('F');
+}
+
 static int matchEscapedChar(const QString &text, int offset)
 {
     if (text.at(offset) != QLatin1Char('\\') || text.size() < offset + 2)
         return offset;
 
-    switch (text.at(offset + 1).toLatin1()) {
-        case 'a':
-        case 'b':
-        case 'e':
-        case 'f':
-        case 'n':
-        case 'r':
-        case 't':
-        case 'v':
-        case '"':
-        case '\'':
-        case '?':
-        case '\\':
-            return offset + 2;
-        case 'x':
-            // TODO \xff
-            break;
-        case '0': // octal encoding
-        {
-            auto newOffset = offset + 2;
-            for (int i = 0; i < 2 && newOffset + i < text.size(); ++i, ++newOffset) {
-                if (!isOctalChar(text.at(newOffset)))
-                    break;
-            }
-            return newOffset;
+    const auto c = text.at(offset + 1);
+    static const auto controlChars = QStringLiteral("abefnrtv\"'?\\");
+    if (controlChars.contains(c))
+        return offset + 2;
+
+    if (c == QLatin1Char('x')) { // hex encoded character
+        auto newOffset = offset + 2;
+        for (int i = 0; i < 2 && newOffset + i < text.size(); ++i, ++newOffset) {
+            if (!isHexChar(text.at(newOffset)))
+                break;
         }
-        default:
+        if (newOffset == offset + 2)
             return offset;
+        return newOffset;
     }
+
+    if (isOctalChar(c)) { // octal encoding
+        auto newOffset = offset + 2;
+        for (int i = 0; i < 2 && newOffset + i < text.size(); ++i, ++newOffset) {
+            if (!isOctalChar(text.at(newOffset)))
+                break;
+        }
+        if (newOffset == offset + 2)
+            return offset;
+        return newOffset;
+    }
+
     return offset;
 }
 
@@ -315,17 +324,6 @@ int HlCChar::doMatch(const QString& text, int offset)
     return offset;
 }
 
-
-bool HlCHex::isHexChar(QChar c)
-{
-    return c.isNumber()
-        || c == QLatin1Char('a') || c == QLatin1Char('A')
-        || c == QLatin1Char('b') || c == QLatin1Char('B')
-        || c == QLatin1Char('c') || c == QLatin1Char('C')
-        || c == QLatin1Char('d') || c == QLatin1Char('D')
-        || c == QLatin1Char('e') || c == QLatin1Char('E')
-        || c == QLatin1Char('f') || c == QLatin1Char('F');
-}
 
 int HlCHex::doMatch(const QString& text, int offset)
 {

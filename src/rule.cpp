@@ -84,6 +84,8 @@ Rule* Rule::create(const QStringRef& name)
         rule = new Detect2Char;
     else if (name == QLatin1String("keyword"))
         rule = new KeywordListRule;
+    else if (name == QLatin1String("RegExpr"))
+        rule = new RegExpr;
     else if (name == QLatin1String("WordDetect"))
         rule = new WordDetect;
     else
@@ -187,6 +189,25 @@ int KeywordListRule::doMatch(const QString& text, int offset)
     // TODO support case-insensitive keywords
     if (m_keywordList.keywords().contains(text.mid(offset, wordLen)))
         return offset2;
+    return offset;
+}
+
+
+bool RegExpr::doLoad(QXmlStreamReader& reader)
+{
+    m_regexp.setPattern(reader.attributes().value(QStringLiteral("String")).toString());
+    m_regexp.setMinimal(reader.attributes().value(QStringLiteral("minimal")) != QLatin1String("true"));
+    m_regexp.setCaseSensitivity(reader.attributes().value(QStringLiteral("insensitive")) == QLatin1String("true") ? Qt::CaseInsensitive : Qt::CaseSensitive);
+    return m_regexp.isValid();
+}
+
+int RegExpr::doMatch(const QString& text, int offset)
+{
+    Q_ASSERT(m_regexp.isValid());
+
+    auto idx = m_regexp.indexIn(text, offset, QRegExp::CaretAtOffset);
+    if (idx == offset)
+        return offset + m_regexp.matchedLength();
     return offset;
 }
 

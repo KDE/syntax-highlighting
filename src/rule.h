@@ -20,6 +20,7 @@
 
 #include "keywordlist.h"
 
+#include <QRegExp>
 #include <QString>
 #include <QVector>
 
@@ -102,6 +103,16 @@ protected:
 private:
     QString m_listName;
     KeywordList m_keywordList;
+};
+
+class RegExpr : public Rule
+{
+protected:
+    bool doLoad(QXmlStreamReader & reader) override;
+    int doMatch(const QString & text, int offset) override;
+
+private:
+    QRegExp m_regexp;
 };
 
 class WordDetect : public Rule

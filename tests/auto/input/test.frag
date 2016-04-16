@@ -14,6 +14,12 @@ in ColorFormat {
 
 out vec4 fragColor;
 
+vec3 fun(const in vec3 foo) {
+    foo[2] = foo.x;
+
+    return foo;
+}
+
 void main()
 {
     fragColor = vec4( fs_in.color, 1.0 );

@@ -102,6 +102,12 @@ protected:
     int doMatch(const QString & text, int offset) override;
 };
 
+class Int : public Rule
+{
+protected:
+    int doMatch(const QString & text, int offset) override;
+};
+
 class KeywordListRule : public Rule
 {
 public:

@@ -92,6 +92,8 @@ Rule* Rule::create(const QStringRef& name)
         rule = new DetectIdentifier;
     else if (name == QLatin1String("DetectSpaces"))
         rule = new DetectSpaces;
+    else if (name == QLatin1String("Int"))
+        rule = new Int;
     else if (name == QLatin1String("keyword"))
         rule = new KeywordListRule;
     else if (name == QLatin1String("RegExpr"))
@@ -184,6 +186,14 @@ int DetectIdentifier::doMatch(const QString& text, int offset)
 int DetectSpaces::doMatch(const QString& text, int offset)
 {
     while(offset < text.size() && text.at(offset).isSpace())
+        ++offset;
+    return offset;
+}
+
+
+int Int::doMatch(const QString& text, int offset)
+{
+    while(offset < text.size() && text.at(offset).isDigit())
         ++offset;
     return offset;
 }

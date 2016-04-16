@@ -94,7 +94,8 @@ void AbstractHighlighter::highlightLine(const QString& text)
     if (beginOffset < offset)
         setFormat(beginOffset, text.size() - beginOffset, currentFormat);
 
-    switchContext(m_context.top()->lineEndContext());
+    while (m_context.top()->lineEndContext() != QLatin1String("#stay"))
+        switchContext(m_context.top()->lineEndContext());
 }
 
 void AbstractHighlighter::switchContext(const QString& contextName)

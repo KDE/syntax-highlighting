@@ -19,6 +19,9 @@ static float floatQualifier = 23.123f;
 
 static const char c1 = 'c';
 static const char c2 = '\n';
+static const char c2a = '\020';
+static const char c2b = '\x10';
+static const char c2c = '\'';
 static const char* c3  = "string";
 static const char* c4 = "\"string\n\t\012\x12\"";
 static const char* c5 = "multiline \

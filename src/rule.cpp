@@ -133,6 +133,8 @@ Rule* Rule::create(const QStringRef& name)
         rule = new DetectSpaces;
     else if (name == QLatin1String("Int"))
         rule = new Int;
+    else if (name == QLatin1String("HlCChar"))
+        rule = new HlCChar;
     else if (name == QLatin1String("HlCHex"))
         rule = new HlCHex;
     else if (name == QLatin1String("HlCOct"))
@@ -246,7 +248,23 @@ int Int::doMatch(const QString& text, int offset)
 }
 
 
-bool KateSyntax::HlCHex::isHexChar(QChar c)
+int HlCChar::doMatch(const QString& text, int offset)
+{
+    if (text.size() < offset + 3)
+        return offset;
+
+    if (text.at(offset) != QLatin1Char('\'') || text.at(offset + 1) == QLatin1Char('\''))
+        return offset;
+
+    // TODO escaped characters!
+    if (text.at(offset + 2) == QLatin1Char('\''))
+        return offset;
+
+    return offset;
+}
+
+
+bool HlCHex::isHexChar(QChar c)
 {
     return c.isNumber()
         || c == QLatin1Char('a') || c == QLatin1Char('A')

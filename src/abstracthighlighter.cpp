@@ -80,6 +80,7 @@ void AbstractHighlighter::highlightLine(const QString& text)
                 switchContext(m_context.top()->fallthroughContext());
                 continue;
             }
+
             newOffset = offset + 1;
             newFormat = m_context.top()->attribute();
         }

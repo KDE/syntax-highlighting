@@ -110,6 +110,12 @@ protected:
     int doMatch(const QString & text, int offset) override;
 };
 
+class HlCChar : public Rule
+{
+protected:
+    int doMatch(const QString & text, int offset) override;
+};
+
 class HlCHex : public Rule
 {
 protected:

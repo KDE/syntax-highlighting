@@ -36,6 +36,7 @@ public:
 
     QString attribute() const;
     QString context() const;
+    bool isLookAhead() const;
 
     bool load(QXmlStreamReader &reader);
 
@@ -56,6 +57,7 @@ private:
     QString m_context;
     QVector<Rule*> m_subRules;
     bool m_firstNonSpace;
+    bool m_lookAhead;
 };
 
 

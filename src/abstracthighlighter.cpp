@@ -54,6 +54,7 @@ void AbstractHighlighter::highlightLine(const QString& text)
     int offset = 0, beginOffset = 0;
     auto currentFormat = m_context.top()->attribute();
     do {
+        bool isLookAhead = false;
         int newOffset = 0;
         QString newFormat;
         foreach (auto rule, m_context.top()->rules()) {
@@ -61,10 +62,19 @@ void AbstractHighlighter::highlightLine(const QString& text)
             if (newOffset <= offset)
                 continue;
 
+            if (rule->isLookAhead()) {
+                switchContext(rule->context());
+                isLookAhead = true;
+                break;
+            }
+
             newFormat = rule->attribute().isEmpty() ? m_context.top()->attribute() : rule->attribute();
             switchContext(rule->context());
             break;
         }
+        if (isLookAhead)
+            continue;
+
         if (newOffset <= offset) {
             newOffset = offset + 1;
             newFormat = m_context.top()->attribute();

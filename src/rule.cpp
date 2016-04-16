@@ -24,7 +24,8 @@
 using namespace KateSyntax;
 
 Rule::Rule() :
-    m_firstNonSpace(false)
+    m_firstNonSpace(false),
+    m_lookAhead(false)
 {
 }
 
@@ -43,6 +44,11 @@ QString Rule::context() const
     return m_context;
 }
 
+bool Rule::isLookAhead() const
+{
+    return m_lookAhead;
+}
+
 bool Rule::load(QXmlStreamReader &reader)
 {
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
@@ -52,6 +58,7 @@ bool Rule::load(QXmlStreamReader &reader)
     if (m_context.isEmpty())
         m_context = QStringLiteral("#stay");
     m_firstNonSpace = reader.attributes().value(QStringLiteral("firstNonSpace")) == QLatin1String("true");
+    m_lookAhead = reader.attributes().value(QStringLiteral("lookAhead")) == QLatin1String("true");
 
     auto result = doLoad(reader);
 

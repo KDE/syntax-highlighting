@@ -171,7 +171,6 @@ int Rule::match(const QString &text, int offset)
 
 Rule* Rule::create(const QStringRef& name)
 {
-    qDebug() << name;
     Rule *rule = nullptr;
     if (name == QLatin1String("AnyChar"))
         rule = new AnyChar;
@@ -183,6 +182,8 @@ Rule* Rule::create(const QStringRef& name)
         rule = new DetectIdentifier;
     else if (name == QLatin1String("DetectSpaces"))
         rule = new DetectSpaces;
+    else if (name == QLatin1String("Float"))
+        rule = new Float;
     else if (name == QLatin1String("Int"))
         rule = new Int;
     else if (name == QLatin1String("HlCChar"))
@@ -291,6 +292,28 @@ int DetectSpaces::doMatch(const QString& text, int offset)
     while(offset < text.size() && text.at(offset).isSpace())
         ++offset;
     return offset;
+}
+
+
+int Float::doMatch(const QString& text, int offset)
+{
+    auto newOffset = offset;
+    while (newOffset < text.size() && text.at(newOffset).isDigit())
+        ++newOffset;
+
+    if (newOffset >= text.size() || text.at(newOffset) != QLatin1Char('.'))
+        return offset;
+    ++newOffset;
+
+    while (newOffset < text.size() && text.at(newOffset).isDigit())
+        ++newOffset;
+
+    if (newOffset == offset + 1) // we only found a decimal point
+        return offset;
+
+    // TODO exponentialPart
+
+    return newOffset;
 }
 
 

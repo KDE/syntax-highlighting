@@ -104,6 +104,12 @@ protected:
     int doMatch(const QString & text, int offset) override;
 };
 
+class Float : public Rule
+{
+protected:
+    int doMatch(const QString & text, int offset) override;
+};
+
 class Int : public Rule
 {
 protected:

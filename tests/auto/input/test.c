@@ -15,6 +15,11 @@ static uint64_t hexNum = 0xDEADBEEF42;
 static uint64_t invalidHexNum = 0xGLDFKG;
 static char binNum = 0b0101010;
 
+static double d1 = 42.;
+static double d2 = .42;
+static double d3 = 42.3e1;
+static double d4 = .2e-12;
+static double d5 = 32.e+12;
 static float floatQualifier = 23.123f;
 
 static const char c1 = 'c';

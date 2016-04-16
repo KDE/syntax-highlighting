@@ -120,6 +120,23 @@ bool KeywordListRule::doLoad(QXmlStreamReader& reader)
 
 int KeywordListRule::doMatch(const QString& text, int offset)
 {
-    // TODO
+    // TODO: this is definition-global!
+    QString deliminators = QStringLiteral(".():!+,-<=>%&*/;?[]^{|}~\\ \t");
+
+    if (offset > 0 && !deliminators.contains(text.at(offset - 1)))
+        return offset;
+
+    int offset2 = offset;
+    int wordLen = 0;
+    int len = text.size();
+
+    while ((len > offset2) && !deliminators.contains(text[offset2])) {
+        offset2++;
+        wordLen++;
+    }
+
+    // TODO support case-insensitive keywords
+    if (m_keywordList.keywords().contains(text.mid(offset, wordLen)))
+        return offset2;
     return offset;
 }

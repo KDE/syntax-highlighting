@@ -18,6 +18,7 @@
 #ifndef KATESYNTAX_KEYWORDLIST_H
 #define KATESYNTAX_KEYWORDLIST_H
 
+#include <QSet>
 #include <QString>
 #include <QVector>
 
@@ -32,12 +33,13 @@ public:
     ~KeywordList();
 
     QString name() const;
+    QSet<QString> keywords() const;
 
     void load(QXmlStreamReader &reader);
 
 private:
     QString m_name;
-    QVector<QString> m_keywords;
+    QSet<QString> m_keywords;
 };
 }
 

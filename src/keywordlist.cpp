@@ -35,6 +35,11 @@ QString KeywordList::name() const
     return m_name;
 }
 
+QSet<QString> KeywordList::keywords() const
+{
+    return m_keywords;
+}
+
 void KeywordList::load(QXmlStreamReader& reader)
 {
     Q_ASSERT(reader.name() == QLatin1String("list"));
@@ -46,7 +51,7 @@ void KeywordList::load(QXmlStreamReader& reader)
         switch (reader.tokenType()) {
             case QXmlStreamReader::StartElement:
                 if (reader.name() == QLatin1String("item")) {
-                    m_keywords.push_back(reader.readElementText());
+                    m_keywords.insert(reader.readElementText());
                     reader.readNextStartElement();
                     break;
                 }

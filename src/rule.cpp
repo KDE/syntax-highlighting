@@ -135,6 +135,8 @@ Rule* Rule::create(const QStringRef& name)
         rule = new Int;
     else if (name == QLatin1String("HlCHex"))
         rule = new HlCHex;
+    else if (name == QLatin1String("HlCOct"))
+        rule = new HlCOct;
     else if (name == QLatin1String("keyword"))
         rule = new KeywordListRule;
     else if (name == QLatin1String("RangeDetect"))
@@ -271,6 +273,30 @@ int HlCHex::doMatch(const QString& text, int offset)
         ++offset;
 
     // TODO Kate matches U/L suffix, QtC does not?
+
+    return offset;
+}
+
+
+bool HlCOct::isOctalChar(QChar c)
+{
+    return c.isNumber() && c != QLatin1Char('9') && c != QLatin1Char('8');
+}
+
+int HlCOct::doMatch(const QString& text, int offset)
+{
+    if (text.size() < offset + 2)
+        return offset;
+
+    if (text.at(offset) != QLatin1Char('0'))
+        return offset;
+
+    if (!isOctalChar(text.at(offset + 1)))
+        return offset;
+
+    offset += 2;
+    while (offset < text.size() && isOctalChar(text.at(offset)))
+        ++offset;
 
     return offset;
 }

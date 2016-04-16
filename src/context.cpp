@@ -43,6 +43,11 @@ QString Context::attribute() const
     return m_attribute;
 }
 
+QString Context::lineEndContext() const
+{
+    return m_lineEndContext;
+}
+
 QVector<Rule*> Context::rules() const
 {
     return m_rules;
@@ -55,6 +60,9 @@ void Context::load(QXmlStreamReader& reader)
 
     m_name = reader.attributes().value(QStringLiteral("name")).toString();
     m_attribute = reader.attributes().value(QStringLiteral("attribute")).toString();
+    m_lineEndContext = reader.attributes().value(QStringLiteral("lineEndContext")).toString();
+    if (m_lineEndContext.isEmpty())
+        m_lineEndContext = QStringLiteral("#stay");
 
     reader.readNext();
     while (!reader.atEnd()) {

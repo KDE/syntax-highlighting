@@ -35,6 +35,7 @@ public:
 
     QString name() const;
     QString attribute() const;
+    QString lineEndContext() const;
 
     QVector<Rule*> rules() const;
 
@@ -45,6 +46,7 @@ private:
 
     QString m_name;
     QString m_attribute;
+    QString m_lineEndContext;
 
     QVector<Rule*> m_rules;
 };

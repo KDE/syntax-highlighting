@@ -33,6 +33,9 @@ public:
     Rule();
     virtual ~Rule();
 
+    QString attribute() const;
+    QString context() const;
+
     bool load(QXmlStreamReader &reader);
 
     int match(const QString &text, int offset);

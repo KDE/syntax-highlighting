@@ -17,6 +17,8 @@
 
 #include "abstracthighlighter.h"
 #include "syntaxdefinition.h"
+#include "context.h"
+#include "rule.h"
 
 #include <QDebug>
 
@@ -43,12 +45,59 @@ void AbstractHighlighter::setDefinition(SyntaxDefinition* def)
 void AbstractHighlighter::highlightLine(const QString& text)
 {
     qDebug() << text;
-    if (!m_definition) {
+    if (!m_definition || text.isEmpty()) {
         setFormat(0, text.size(), QStringLiteral("dsNormal"));
         return;
     }
 
-    setFormat(0, text.size(), QStringLiteral("dsNormal"));
+    Q_ASSERT(!m_context.isEmpty());
+    int offset = 0, prevOffset = 0;
+    do {
+        bool foundMatch = false;
+        foreach (auto rule, m_context.top()->rules()) {
+            auto newOffset = rule->match(text, offset);
+            if (newOffset <= offset)
+                continue;
+
+            if (prevOffset < offset)
+                setFormat(prevOffset, offset-prevOffset, m_context.top()->attribute());
+
+            setFormat(offset, newOffset - offset, rule->attribute());
+            offset = newOffset;
+            prevOffset = offset;
+            switchContext(rule->context());
+            foundMatch = true;
+            break;
+        }
+        if (!foundMatch)
+            ++offset;
+    } while (offset < text.size() - 1);
+
+    if (prevOffset < offset)
+        setFormat(prevOffset, text.size() - prevOffset, m_context.top()->attribute());
+
+    switchContext(m_context.top()->lineEndContext());
+}
+
+void AbstractHighlighter::switchContext(const QString& contextName)
+{
+    Q_ASSERT(m_definition);
+    Q_ASSERT(!m_context.isEmpty());
+
+    if (contextName == QLatin1String("#stay"))
+        return;
+
+    if (contextName == QLatin1String("#pop")) {
+        m_context.pop();
+    } else {
+        auto newContext = m_definition->contextByName(contextName);
+        if (!newContext)
+            qWarning() << "cannot find context" << contextName;
+        else
+            m_context.push(newContext);
+    }
+
+    Q_ASSERT(!m_context.isEmpty());
 }
 
 void AbstractHighlighter::setFormat(int offset, int length, const QString& format)

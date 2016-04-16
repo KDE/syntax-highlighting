@@ -33,10 +33,22 @@ Rule::~Rule()
     qDeleteAll(m_subRules);
 }
 
+QString Rule::attribute() const
+{
+    return m_attribute;
+}
+
+QString Rule::context() const
+{
+    return m_context;
+}
+
 bool Rule::load(QXmlStreamReader &reader)
 {
     m_attribute = reader.attributes().value(QStringLiteral("attribute")).toString();
     m_context = reader.attributes().value(QStringLiteral("context")).toString();
+    if (m_context.isEmpty())
+        m_context = QStringLiteral("#stay");
     m_firstNonSpace = reader.attributes().value(QStringLiteral("firstNonSpace")) == QLatin1String("true");
 
     auto result = doLoad(reader);

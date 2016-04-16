@@ -53,6 +53,8 @@ void AbstractHighlighter::highlightLine(const QString& text)
     Q_ASSERT(!m_context.isEmpty());
     int offset = 0, beginOffset = 0;
     auto currentFormat = m_context.top()->attribute();
+    bool lineContinuation = false;
+
     do {
         bool isLookAhead = false;
         int newOffset = 0;
@@ -70,6 +72,8 @@ void AbstractHighlighter::highlightLine(const QString& text)
 
             newFormat = rule->attribute().isEmpty() ? m_context.top()->attribute() : rule->attribute();
             switchContext(rule->context());
+            if (newOffset == text.size() && dynamic_cast<LineContinue*>(rule))
+                lineContinuation = true;
             break;
         }
         if (isLookAhead)
@@ -99,7 +103,7 @@ void AbstractHighlighter::highlightLine(const QString& text)
     if (beginOffset < offset)
         setFormat(beginOffset, text.size() - beginOffset, currentFormat);
 
-    while (m_context.top()->lineEndContext() != QLatin1String("#stay"))
+    while (m_context.top()->lineEndContext() != QLatin1String("#stay") && !lineContinuation)
         switchContext(m_context.top()->lineEndContext());
 }
 

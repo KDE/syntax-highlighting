@@ -23,6 +23,11 @@
 
 using namespace KateSyntax;
 
+static bool isOctalChar(QChar c)
+{
+    return c.isNumber() && c != QLatin1Char('9') && c != QLatin1Char('8');
+}
+
 static int matchEscapedChar(const QString &text, int offset)
 {
     if (text.at(offset) != QLatin1Char('\\') || text.size() < offset + 2)
@@ -44,9 +49,16 @@ static int matchEscapedChar(const QString &text, int offset)
             return offset + 2;
         case 'x':
             // TODO \xff
-
-        case '0':
-            // TODO \007
+            break;
+        case '0': // octal encoding
+        {
+            auto newOffset = offset + 2;
+            for (int i = 0; i < 2 && newOffset + i < text.size(); ++i, ++newOffset) {
+                if (!isOctalChar(text.at(newOffset)))
+                    break;
+            }
+            return newOffset;
+        }
         default:
             return offset;
     }
@@ -335,11 +347,6 @@ int HlCHex::doMatch(const QString& text, int offset)
     return offset;
 }
 
-
-bool HlCOct::isOctalChar(QChar c)
-{
-    return c.isNumber() && c != QLatin1Char('9') && c != QLatin1Char('8');
-}
 
 int HlCOct::doMatch(const QString& text, int offset)
 {

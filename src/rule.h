@@ -128,8 +128,6 @@ class HlCOct : public Rule
 {
 protected:
     int doMatch(const QString & text, int offset) override;
-private:
-    static bool isOctalChar(QChar c);
 };
 
 class KeywordListRule : public Rule

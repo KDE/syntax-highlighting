@@ -88,6 +88,8 @@ Rule* Rule::create(const QStringRef& name)
         rule = new DetectChar;
     else if (name == QLatin1String("Detect2Chars"))
         rule = new Detect2Char;
+    else if (name == QLatin1String("DetectIdentifier"))
+        rule = new DetectIdentifier;
     else if (name == QLatin1String("DetectSpaces"))
         rule = new DetectSpaces;
     else if (name == QLatin1String("keyword"))
@@ -161,6 +163,21 @@ int Detect2Char::doMatch(const QString& text, int offset)
     if (text.at(offset) == m_char1 && text.at(offset + 1) == m_char2)
         return offset + 2;
     return offset;
+}
+
+
+int DetectIdentifier::doMatch(const QString& text, int offset)
+{
+    if (!text.at(offset).isLetter() && text.at(offset) != QLatin1Char('_'))
+        return offset;
+
+    for (int i = offset + 1; i < text.size(); ++i) {
+        const auto c = text.at(i);
+        if (!c.isLetterOrNumber() && c != QLatin1Char('_'))
+            return i;
+    }
+
+    return offset + 1;
 }
 
 

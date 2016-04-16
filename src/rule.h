@@ -90,6 +90,12 @@ private:
     QChar m_char2;
 };
 
+class DetectIdentifier : public Rule
+{
+protected:
+    int doMatch(const QString & text, int offset) override;
+};
+
 class DetectSpaces : public Rule
 {
 protected:

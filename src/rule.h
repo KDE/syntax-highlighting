@@ -108,6 +108,14 @@ protected:
     int doMatch(const QString & text, int offset) override;
 };
 
+class HlCHex : public Rule
+{
+protected:
+    int doMatch(const QString & text, int offset) override;
+private:
+    static bool isHexChar(QChar c);
+};
+
 class KeywordListRule : public Rule
 {
 public:

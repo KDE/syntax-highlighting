@@ -94,6 +94,8 @@ Rule* Rule::create(const QStringRef& name)
         rule = new DetectSpaces;
     else if (name == QLatin1String("Int"))
         rule = new Int;
+    else if (name == QLatin1String("HlCHex"))
+        rule = new HlCHex;
     else if (name == QLatin1String("keyword"))
         rule = new KeywordListRule;
     else if (name == QLatin1String("RegExpr"))
@@ -195,6 +197,38 @@ int Int::doMatch(const QString& text, int offset)
 {
     while(offset < text.size() && text.at(offset).isDigit())
         ++offset;
+    return offset;
+}
+
+
+bool KateSyntax::HlCHex::isHexChar(QChar c)
+{
+    return c.isNumber()
+        || c == QLatin1Char('a') || c == QLatin1Char('A')
+        || c == QLatin1Char('b') || c == QLatin1Char('B')
+        || c == QLatin1Char('c') || c == QLatin1Char('C')
+        || c == QLatin1Char('d') || c == QLatin1Char('D')
+        || c == QLatin1Char('e') || c == QLatin1Char('E')
+        || c == QLatin1Char('f') || c == QLatin1Char('F');
+}
+
+int HlCHex::doMatch(const QString& text, int offset)
+{
+    if (text.size() < offset + 3)
+        return offset;
+
+    if (text.at(offset) != QLatin1Char('0') || (text.at(offset + 1) != QLatin1Char('x') && text.at(offset + 1) != QLatin1Char('X')))
+        return offset;
+
+    if (!isHexChar(text.at(offset + 2)))
+        return offset;
+
+    offset += 3;
+    while (offset < text.size() && isHexChar(text.at(offset)))
+        ++offset;
+
+    // TODO Kate matches U/L suffix, QtC does not?
+
     return offset;
 }
 

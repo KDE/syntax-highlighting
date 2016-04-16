@@ -109,7 +109,6 @@ void SyntaxDefinition::loadHighlighting(QXmlStreamReader& reader)
                 if (reader.name() == QLatin1String("list")) {
                     KeywordList keywords;
                     keywords.load(reader);
-                    qDebug() << "loaded keyword list: " <<  keywords.name();
                     m_keywordLists.insert(keywords.name(), keywords);
                 } else if (reader.name() == QLatin1String("contexts")) {
                     loadContexts(reader);
@@ -138,13 +137,11 @@ void SyntaxDefinition::loadContexts(QXmlStreamReader& reader)
                 if (reader.name() == QLatin1String("context")) {
                     auto context = new Context;
                     context->load(reader);
-                    qDebug() << "loaded context" << context->name() << context->attribute();
                     m_contexts.push_back(context);
                 }
                 reader.readNext();
                 break;
             case QXmlStreamReader::EndElement:
-                qDebug() << reader.name() << "end";
                 return;
             default:
                 reader.readNext();
@@ -163,9 +160,9 @@ void SyntaxDefinition::assemble()
     m_keywordLists.clear();
 }
 
-void SyntaxDefinition::assembleKeywordList(Rule* rule)
+void SyntaxDefinition::assembleKeywordList(const Rule::Ptr &rule)
 {
-    if (auto keywordRule = dynamic_cast<KeywordListRule*>(rule))
+    if (auto keywordRule = std::dynamic_pointer_cast<KeywordListRule>(rule))
         keywordRule->setKeywordList(m_keywordLists.value(keywordRule->listName()));
 
     // TODO recurse into sub-rules

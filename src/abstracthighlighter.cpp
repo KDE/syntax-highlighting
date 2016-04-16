@@ -72,7 +72,7 @@ void AbstractHighlighter::highlightLine(const QString& text)
 
             newFormat = rule->attribute().isEmpty() ? m_context.top()->attribute() : rule->attribute();
             switchContext(rule->context());
-            if (newOffset == text.size() && dynamic_cast<LineContinue*>(rule))
+            if (newOffset == text.size() && std::dynamic_pointer_cast<LineContinue>(rule))
                 lineContinuation = true;
             break;
         }

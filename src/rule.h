@@ -24,6 +24,8 @@
 #include <QString>
 #include <QVector>
 
+#include <memory>
+
 class QXmlStreamReader;
 
 namespace KateSyntax {
@@ -34,6 +36,8 @@ public:
     Rule();
     virtual ~Rule();
 
+    typedef std::shared_ptr<Rule> Ptr;
+
     QString attribute() const;
     QString context() const;
     bool isLookAhead() const;
@@ -42,7 +46,7 @@ public:
 
     int match(const QString &text, int offset);
 
-    static Rule* create(const QStringRef &name);
+    static Rule::Ptr create(const QStringRef &name);
 
 protected:
     virtual bool doLoad(QXmlStreamReader &reader);
@@ -55,7 +59,7 @@ private:
 
     QString m_attribute;
     QString m_context;
-    QVector<Rule*> m_subRules;
+    QVector<Rule::Ptr> m_subRules;
     bool m_firstNonSpace;
     bool m_lookAhead;
 };

@@ -83,7 +83,6 @@ Rule::Rule() :
 
 Rule::~Rule()
 {
-    qDeleteAll(m_subRules);
 }
 
 QString Rule::attribute() const
@@ -167,7 +166,7 @@ int Rule::match(const QString &text, int offset)
     return result;
 }
 
-Rule* Rule::create(const QStringRef& name)
+Rule::Ptr Rule::create(const QStringRef& name)
 {
     Rule *rule = nullptr;
     if (name == QLatin1String("AnyChar"))
@@ -209,7 +208,7 @@ Rule* Rule::create(const QStringRef& name)
     else
         qWarning() << "Unknown rule type:" << name;
 
-    return rule;
+    return Ptr(rule);
 }
 
 bool Rule::isDelimiter(QChar c) const

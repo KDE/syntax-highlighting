@@ -18,14 +18,14 @@
 #ifndef KATESYNTAX_CONTEXT_H
 #define KATESYNTAX_CONTEXT_H
 
+#include "rule.h"
+
 #include <QString>
 #include <QVector>
 
 class QXmlStreamReader;
 
 namespace KateSyntax {
-
-class Rule;
 
 class Context
 {
@@ -40,7 +40,7 @@ public:
     bool fallthrough() const;
     QString fallthroughContext() const;
 
-    QVector<Rule*> rules() const;
+    QVector<Rule::Ptr> rules() const;
 
     void load(QXmlStreamReader &reader);
 
@@ -52,7 +52,7 @@ private:
     QString m_lineEndContext;
     QString m_fallthroughContext;
 
-    QVector<Rule*> m_rules;
+    QVector<Rule::Ptr> m_rules;
 
     bool m_fallthrough;
 };

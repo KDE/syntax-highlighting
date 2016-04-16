@@ -31,7 +31,6 @@ Context::Context() :
 
 Context::~Context()
 {
-    qDeleteAll(m_rules);
 }
 
 QString Context::name() const
@@ -59,7 +58,7 @@ QString Context::fallthroughContext() const
     return m_fallthroughContext;
 }
 
-QVector<Rule*> Context::rules() const
+QVector<Rule::Ptr> Context::rules() const
 {
     return m_rules;
 }

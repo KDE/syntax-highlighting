@@ -21,6 +21,7 @@
 #include "katesyntax_export.h"
 
 #include "keywordlist.h"
+#include "rule.h"
 
 #include <QHash>
 #include <QString>
@@ -54,7 +55,7 @@ private:
 
     void loadHighlighting(QXmlStreamReader &reader);
     void loadContexts(QXmlStreamReader &reader);
-    void assembleKeywordList(Rule *rule);
+    void assembleKeywordList(const Rule::Ptr &rule);
 
     QHash<QString, KeywordList> m_keywordLists;
     QVector<Context*> m_contexts;

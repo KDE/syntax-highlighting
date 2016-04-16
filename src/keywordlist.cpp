@@ -51,7 +51,7 @@ void KeywordList::load(QXmlStreamReader& reader)
         switch (reader.tokenType()) {
             case QXmlStreamReader::StartElement:
                 if (reader.name() == QLatin1String("item")) {
-                    m_keywords.insert(reader.readElementText());
+                    m_keywords.insert(reader.readElementText().trimmed());
                     reader.readNextStartElement();
                     break;
                 }

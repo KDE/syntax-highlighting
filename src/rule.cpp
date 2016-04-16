@@ -23,6 +23,37 @@
 
 using namespace KateSyntax;
 
+static int matchEscapedChar(const QString &text, int offset)
+{
+    if (text.at(offset) != QLatin1Char('\\') || text.size() < offset + 2)
+        return offset;
+
+    switch (text.at(offset + 1).toLatin1()) {
+        case 'a':
+        case 'b':
+        case 'e':
+        case 'f':
+        case 'n':
+        case 'r':
+        case 't':
+        case 'v':
+        case '"':
+        case '\'':
+        case '?':
+        case '\\':
+            return offset + 2;
+        case 'x':
+            // TODO \xff
+
+        case '0':
+            // TODO \007
+        default:
+            return offset;
+    }
+    return offset;
+}
+
+
 Rule::Rule() :
     m_firstNonSpace(false),
     m_lookAhead(false)
@@ -256,9 +287,18 @@ int HlCChar::doMatch(const QString& text, int offset)
     if (text.at(offset) != QLatin1Char('\'') || text.at(offset + 1) == QLatin1Char('\''))
         return offset;
 
-    // TODO escaped characters!
-    if (text.at(offset + 2) == QLatin1Char('\''))
+    auto newOffset = matchEscapedChar(text, offset + 1);
+    if (newOffset == offset + 1) {
+        if (text.at(newOffset) == QLatin1Char('\\'))
+            return offset;
+        else
+            ++newOffset;
+    }
+    if (newOffset >= text.size())
         return offset;
+
+    if (text.at(newOffset) == QLatin1Char('\''))
+        return newOffset + 1;
 
     return offset;
 }

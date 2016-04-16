@@ -63,6 +63,7 @@ private:
     QString m_section;
     QVector<QString> m_extensions;
     QVector<QString> m_mimetypes;
+    bool m_hidden;
 };
 
 }

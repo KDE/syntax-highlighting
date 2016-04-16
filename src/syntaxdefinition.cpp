@@ -25,7 +25,8 @@
 
 using namespace KateSyntax;
 
-SyntaxDefinition::SyntaxDefinition()
+SyntaxDefinition::SyntaxDefinition() :
+    m_hidden(false)
 {
 }
 
@@ -75,15 +76,16 @@ bool SyntaxDefinition::load(const QString& definitionFileName)
         if (reader.name() == QLatin1String("language")) {
             m_name = reader.attributes().value(QStringLiteral("name")).toString();
             m_section = reader.attributes().value(QStringLiteral("section")).toString();
+            m_hidden = reader.attributes().value(QStringLiteral("hidden")) == QLatin1String("true");
             const auto exts = reader.attributes().value(QStringLiteral("extensions")).toString();
-            foreach (const auto &ext, exts.split(QLatin1Char(';'))) {
+            foreach (const auto &ext, exts.split(QLatin1Char(';'), QString::SkipEmptyParts)) {
                 if (ext.startsWith(QLatin1String("*.")))
                     m_extensions.push_back(ext.mid(2));
                 else
                     m_extensions.push_back(ext);
             }
             const auto mts = reader.attributes().value(QStringLiteral("mimetypes")).toString();
-            foreach (const auto &mt, mts.split(QLatin1Char(';')))
+            foreach (const auto &mt, mts.split(QLatin1Char(';'), QString::SkipEmptyParts))
                 m_mimetypes.push_back(mt);
         }
 

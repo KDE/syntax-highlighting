@@ -6,4 +6,8 @@ static uint64_t intWithSuffix = 42ull;
 
 static float floatQualifier = 23.123f;
 
+//BEGIN region
+// TODO comment FIXME comment ### comment
+//END region
+
 #endif

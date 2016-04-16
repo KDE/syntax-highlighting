@@ -100,6 +100,8 @@ Rule* Rule::create(const QStringRef& name)
         rule = new KeywordListRule;
     else if (name == QLatin1String("RegExpr"))
         rule = new RegExpr;
+    else if (name == QLatin1String("StringDetect"))
+        rule = new StringDetect;
     else if (name == QLatin1String("WordDetect"))
         rule = new WordDetect;
     else
@@ -285,6 +287,21 @@ int RegExpr::doMatch(const QString& text, int offset)
     auto idx = m_regexp.indexIn(text, offset, QRegExp::CaretAtOffset);
     if (idx == offset)
         return offset + m_regexp.matchedLength();
+    return offset;
+}
+
+
+bool StringDetect::doLoad(QXmlStreamReader& reader)
+{
+    m_string = reader.attributes().value(QStringLiteral("String")).toString();
+    m_caseSensitivity = reader.attributes().value(QStringLiteral("insensitive")) != QLatin1String("true") ? Qt::CaseInsensitive : Qt::CaseSensitive;
+    return m_string.isEmpty();
+}
+
+int StringDetect::doMatch(const QString& text, int offset)
+{
+    if (text.midRef(offset, m_string.size()).compare(m_string, m_caseSensitivity) == 0)
+        return offset + m_string.size();
     return offset;
 }
 

@@ -141,6 +141,17 @@ private:
     QRegExp m_regexp;
 };
 
+class StringDetect : public Rule
+{
+protected:
+    bool doLoad(QXmlStreamReader & reader) override;
+    int doMatch(const QString & text, int offset) override;
+
+private:
+    QString m_string;
+    Qt::CaseSensitivity m_caseSensitivity;
+};
+
 class WordDetect : public Rule
 {
 protected:

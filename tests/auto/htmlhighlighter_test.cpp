@@ -61,7 +61,10 @@ private slots:
         qDebug() << inFile << outFile << refFile;
 
         HTMLHighlighter highlighter;
-        highlighter.setDefinition(m_repo.definitionForFileName(inFile));
+        auto def = m_repo.definitionForFileName(inFile);
+        QVERIFY(def);
+        qDebug() << "Using syntax" << def->name();
+        highlighter.setDefinition(def);
         highlighter.setOutputFile(outFile);
         highlighter.highlightFile(inFile);
 

@@ -180,7 +180,7 @@ bool Rule::doLoad(QXmlStreamReader& reader)
     return true;
 }
 
-int Rule::match(const QString &text, int offset)
+MatchResult Rule::match(const QString &text, int offset)
 {
     Q_ASSERT(!text.isEmpty());
     if (m_firstNonSpace && (offset > 0 || text.at(0).isSpace()))
@@ -190,13 +190,13 @@ int Rule::match(const QString &text, int offset)
         return offset;
 
     const auto result = doMatch(text, offset);
-    if (result == offset || result == text.size())
+    if (result.offset() == offset || result.offset() == text.size())
         return result;
 
     foreach (auto subRule, m_subRules) {
-        const auto subResult = subRule->match(text, result);
-        if (subResult > result)
-            return subResult;
+        const auto subResult = subRule->match(text, result.offset());
+        if (subResult.offset() > result.offset())
+            return MatchResult(subResult.offset(), result.captures());
     }
 
     return result;
@@ -263,7 +263,7 @@ bool AnyChar::doLoad(QXmlStreamReader& reader)
     return !m_chars.isEmpty();
 }
 
-int AnyChar::doMatch(const QString& text, int offset)
+MatchResult AnyChar::doMatch(const QString& text, int offset)
 {
     if (m_chars.contains(text.at(offset)))
         return offset + 1;
@@ -280,7 +280,7 @@ bool DetectChar::doLoad(QXmlStreamReader& reader)
     return true;
 }
 
-int DetectChar::doMatch(const QString& text, int offset)
+MatchResult DetectChar::doMatch(const QString& text, int offset)
 {
     if (text.at(offset) == m_char)
         return offset + 1;
@@ -299,7 +299,7 @@ bool Detect2Char::doLoad(QXmlStreamReader& reader)
     return true;
 }
 
-int Detect2Char::doMatch(const QString& text, int offset)
+MatchResult Detect2Char::doMatch(const QString& text, int offset)
 {
     if (text.size() - offset < 2)
         return offset;
@@ -309,7 +309,7 @@ int Detect2Char::doMatch(const QString& text, int offset)
 }
 
 
-int DetectIdentifier::doMatch(const QString& text, int offset)
+MatchResult DetectIdentifier::doMatch(const QString& text, int offset)
 {
     if (!text.at(offset).isLetter() && text.at(offset) != QLatin1Char('_'))
         return offset;
@@ -324,7 +324,7 @@ int DetectIdentifier::doMatch(const QString& text, int offset)
 }
 
 
-int DetectSpaces::doMatch(const QString& text, int offset)
+MatchResult DetectSpaces::doMatch(const QString& text, int offset)
 {
     while(offset < text.size() && text.at(offset).isSpace())
         ++offset;
@@ -332,7 +332,7 @@ int DetectSpaces::doMatch(const QString& text, int offset)
 }
 
 
-int Float::doMatch(const QString& text, int offset)
+MatchResult Float::doMatch(const QString& text, int offset)
 {
     auto newOffset = offset;
     while (newOffset < text.size() && text.at(newOffset).isDigit())
@@ -367,7 +367,7 @@ int Float::doMatch(const QString& text, int offset)
 }
 
 
-int HlCChar::doMatch(const QString& text, int offset)
+MatchResult HlCChar::doMatch(const QString& text, int offset)
 {
     if (text.size() < offset + 3)
         return offset;
@@ -392,7 +392,7 @@ int HlCChar::doMatch(const QString& text, int offset)
 }
 
 
-int HlCHex::doMatch(const QString& text, int offset)
+MatchResult HlCHex::doMatch(const QString& text, int offset)
 {
     if (text.size() < offset + 3)
         return offset;
@@ -413,7 +413,7 @@ int HlCHex::doMatch(const QString& text, int offset)
 }
 
 
-int HlCOct::doMatch(const QString& text, int offset)
+MatchResult HlCOct::doMatch(const QString& text, int offset)
 {
     if (text.size() < offset + 2)
         return offset;
@@ -432,7 +432,7 @@ int HlCOct::doMatch(const QString& text, int offset)
 }
 
 
-int HlCStringChar::doMatch(const QString& text, int offset)
+MatchResult HlCStringChar::doMatch(const QString& text, int offset)
 {
     return matchEscapedChar(text, offset);
 }
@@ -461,7 +461,7 @@ bool IncludeRules::doLoad(QXmlStreamReader& reader)
     return !m_contextName.isEmpty() || !m_defName.isEmpty();
 }
 
-int IncludeRules::doMatch(const QString& text, int offset)
+MatchResult IncludeRules::doMatch(const QString& text, int offset)
 {
     Q_UNUSED(text);
     qWarning() << "Unresolved include rule for" << m_contextName << "##" << m_defName;
@@ -469,7 +469,7 @@ int IncludeRules::doMatch(const QString& text, int offset)
 }
 
 
-int Int::doMatch(const QString& text, int offset)
+MatchResult Int::doMatch(const QString& text, int offset)
 {
     while(offset < text.size() && text.at(offset).isDigit())
         ++offset;
@@ -483,7 +483,7 @@ bool KeywordListRule::doLoad(QXmlStreamReader& reader)
     return !m_listName.isEmpty();
 }
 
-int KeywordListRule::doMatch(const QString& text, int offset)
+MatchResult KeywordListRule::doMatch(const QString& text, int offset)
 {
     if (offset > 0 && !isDelimiter(text.at(offset - 1)))
         return offset;
@@ -517,7 +517,7 @@ bool LineContinue::doLoad(QXmlStreamReader& reader)
     return true;
 }
 
-int LineContinue::doMatch(const QString& text, int offset)
+MatchResult LineContinue::doMatch(const QString& text, int offset)
 {
     if (offset == text.size() - 1 && text.at(offset) == m_char)
         return offset + 1;
@@ -536,7 +536,7 @@ bool RangeDetect::doLoad(QXmlStreamReader& reader)
     return true;
 }
 
-int RangeDetect::doMatch(const QString& text, int offset)
+MatchResult RangeDetect::doMatch(const QString& text, int offset)
 {
     if (text.size() - offset < 2)
         return offset;
@@ -561,13 +561,13 @@ bool RegExpr::doLoad(QXmlStreamReader& reader)
     return !m_regexp.isEmpty(); // m_regexp.isValid() would be better, but parses the regexp and thus is way too expensive
 }
 
-int RegExpr::doMatch(const QString& text, int offset)
+MatchResult RegExpr::doMatch(const QString& text, int offset)
 {
     Q_ASSERT(m_regexp.isValid());
 
     auto idx = m_regexp.indexIn(text, offset, QRegExp::CaretAtOffset);
     if (idx == offset)
-        return offset + m_regexp.matchedLength();
+        return MatchResult(offset + m_regexp.matchedLength(), m_regexp.capturedTexts());
     return offset;
 }
 
@@ -579,7 +579,7 @@ bool StringDetect::doLoad(QXmlStreamReader& reader)
     return !m_string.isEmpty();
 }
 
-int StringDetect::doMatch(const QString& text, int offset)
+MatchResult StringDetect::doMatch(const QString& text, int offset)
 {
     if (text.midRef(offset, m_string.size()).compare(m_string, m_caseSensitivity) == 0)
         return offset + m_string.size();
@@ -593,7 +593,7 @@ bool WordDetect::doLoad(QXmlStreamReader& reader)
     return !m_word.isEmpty();
 }
 
-int WordDetect::doMatch(const QString& text, int offset)
+MatchResult WordDetect::doMatch(const QString& text, int offset)
 {
     if (text.size() - offset < m_word.size())
         return offset;

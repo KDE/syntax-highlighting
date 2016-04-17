@@ -60,7 +60,8 @@ void AbstractHighlighter::highlightLine(const QString& text)
         int newOffset = 0;
         QString newFormat;
         foreach (auto rule, m_context.top()->rules()) {
-            newOffset = rule->match(text, offset);
+            const auto newResult = rule->match(text, offset);
+            newOffset = newResult.offset();
             if (newOffset <= offset)
                 continue;
 

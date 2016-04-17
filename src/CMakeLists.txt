@@ -4,6 +4,7 @@ set(kate_syntax_srcs
     contextswitch.cpp
     htmlhighlighter.cpp
     keywordlist.cpp
+    matchresult.cpp
     rule.cpp
     syntaxdefinition.cpp
     syntaxrepository.cpp

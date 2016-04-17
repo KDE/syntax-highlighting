@@ -20,6 +20,7 @@
 
 #include "keywordlist.h"
 #include "contextswitch.h"
+#include "matchresult.h"
 
 #include <QRegExp>
 #include <QString>
@@ -52,13 +53,13 @@ public:
     bool load(QXmlStreamReader &reader);
     void resolveContext();
 
-    int match(const QString &text, int offset);
+    MatchResult match(const QString &text, int offset);
 
     static Rule::Ptr create(const QStringRef &name);
 
 protected:
     virtual bool doLoad(QXmlStreamReader &reader);
-    virtual int doMatch(const QString &text, int offset) = 0;
+    virtual MatchResult doMatch(const QString &text, int offset) = 0;
 
     bool isDelimiter(QChar c) const;
 
@@ -80,7 +81,7 @@ class AnyChar : public Rule
 {
 protected:
     bool doLoad(QXmlStreamReader & reader) override;
-    int doMatch(const QString & text, int offset) override;
+    MatchResult doMatch(const QString & text, int offset) override;
 
 private:
     QString m_chars;
@@ -90,7 +91,7 @@ class DetectChar : public Rule
 {
 protected:
     bool doLoad(QXmlStreamReader & reader) override;
-    int doMatch(const QString & text, int offset) override;
+    MatchResult doMatch(const QString & text, int offset) override;
 
 private:
     QChar m_char;
@@ -100,7 +101,7 @@ class Detect2Char : public Rule
 {
 protected:
     bool doLoad(QXmlStreamReader & reader) override;
-    int doMatch(const QString & text, int offset) override;
+    MatchResult doMatch(const QString & text, int offset) override;
 
 private:
     QChar m_char1;
@@ -110,19 +111,19 @@ private:
 class DetectIdentifier : public Rule
 {
 protected:
-    int doMatch(const QString & text, int offset) override;
+    MatchResult doMatch(const QString & text, int offset) override;
 };
 
 class DetectSpaces : public Rule
 {
 protected:
-    int doMatch(const QString & text, int offset) override;
+    MatchResult doMatch(const QString & text, int offset) override;
 };
 
 class Float : public Rule
 {
 protected:
-    int doMatch(const QString & text, int offset) override;
+    MatchResult doMatch(const QString & text, int offset) override;
 };
 
 class IncludeRules : public Rule
@@ -133,7 +134,7 @@ public:
 
 protected:
     bool doLoad(QXmlStreamReader & reader) override;
-    int doMatch(const QString & text, int offset) override;
+    MatchResult doMatch(const QString & text, int offset) override;
 
 private:
     QString m_contextName;
@@ -144,38 +145,38 @@ private:
 class Int : public Rule
 {
 protected:
-    int doMatch(const QString & text, int offset) override;
+    MatchResult doMatch(const QString & text, int offset) override;
 };
 
 class HlCChar : public Rule
 {
 protected:
-    int doMatch(const QString & text, int offset) override;
+    MatchResult doMatch(const QString & text, int offset) override;
 };
 
 class HlCHex : public Rule
 {
 protected:
-    int doMatch(const QString & text, int offset) override;
+    MatchResult doMatch(const QString & text, int offset) override;
 };
 
 class HlCOct : public Rule
 {
 protected:
-    int doMatch(const QString & text, int offset) override;
+    MatchResult doMatch(const QString & text, int offset) override;
 };
 
 class HlCStringChar : public Rule
 {
 protected:
-    int doMatch(const QString & text, int offset) override;
+    MatchResult doMatch(const QString & text, int offset) override;
 };
 
 class KeywordListRule : public Rule
 {
 protected:
     bool doLoad(QXmlStreamReader & reader) override;
-    int doMatch(const QString & text, int offset) override;
+    MatchResult doMatch(const QString & text, int offset) override;
 
 private:
     QString m_listName;
@@ -186,7 +187,7 @@ class LineContinue : public Rule
 {
 protected:
     bool doLoad(QXmlStreamReader & reader) override;
-    int doMatch(const QString & text, int offset) override;
+    MatchResult doMatch(const QString & text, int offset) override;
 
 private:
     QChar m_char;
@@ -196,7 +197,7 @@ class RangeDetect : public Rule
 {
 protected:
     bool doLoad(QXmlStreamReader & reader) override;
-    int doMatch(const QString & text, int offset) override;
+    MatchResult doMatch(const QString & text, int offset) override;
 
 private:
     QChar m_begin;
@@ -207,7 +208,7 @@ class RegExpr : public Rule
 {
 protected:
     bool doLoad(QXmlStreamReader & reader) override;
-    int doMatch(const QString & text, int offset) override;
+    MatchResult doMatch(const QString & text, int offset) override;
 
 private:
     QRegExp m_regexp;
@@ -217,7 +218,7 @@ class StringDetect : public Rule
 {
 protected:
     bool doLoad(QXmlStreamReader & reader) override;
-    int doMatch(const QString & text, int offset) override;
+    MatchResult doMatch(const QString & text, int offset) override;
 
 private:
     QString m_string;
@@ -228,7 +229,7 @@ class WordDetect : public Rule
 {
 protected:
     bool doLoad(QXmlStreamReader & reader) override;
-    int doMatch(const QString & text, int offset) override;
+    MatchResult doMatch(const QString & text, int offset) override;
 
 private:
     QString m_word;

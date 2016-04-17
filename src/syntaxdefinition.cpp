@@ -76,9 +76,18 @@ KeywordList SyntaxDefinition::keywordList(const QString& name) const
     return m_keywordLists.value(name);
 }
 
+Format SyntaxDefinition::formatByName(const QString& name) const
+{
+    const auto it = m_formats.constFind(name);
+    if (it != m_formats.constEnd())
+        return it.value();
+
+    qWarning() << "Unknown format" << name << "in" << m_name;
+    return Format();
+}
+
 bool SyntaxDefinition::load(const QString& definitionFileName)
 {
-    qDebug() << "parsing" << definitionFileName;
     QFile file(definitionFileName);
     if (!file.open(QFile::ReadOnly))
         return false;

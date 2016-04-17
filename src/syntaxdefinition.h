@@ -54,6 +54,8 @@ public:
 
     KeywordList keywordList(const QString &name) const;
 
+    Format formatByName(const QString &name) const;
+
     bool load(const QString &definitionFileName);
     void assemble();
 

@@ -33,7 +33,7 @@ public:
     void setOutputFile(const QString &fileName);
 
 protected:
-    void setFormat(int offset, int length, const QString & format) override;
+    void setFormat(int offset, int length, const Format &format) override;
 
 private:
     QTextStream m_out;

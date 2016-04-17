@@ -16,6 +16,7 @@
 */
 
 #include "htmlhighlighter.h"
+#include "format.h"
 
 #include <QDebug>
 #include <QFile>
@@ -55,7 +56,10 @@ void HTMLHighlighter::highlightFile(const QString& fileName)
     m_out.device()->close();
 }
 
-void HTMLHighlighter::setFormat(int offset, int length, const QString& format)
+void HTMLHighlighter::setFormat(int offset, int length, const Format& format)
 {
-    m_out << "<" << format << ">" << m_currentLine.mid(offset, length) << "</" << format << ">";
+    if (format.name().isEmpty())
+        m_out << "<dsNormal>" << m_currentLine.midRef(offset, length) << "</dsNormal>";
+    else
+        m_out << "<" << format.name() << ">" << m_currentLine.midRef(offset, length) << "</" << format.name() << ">";
 }

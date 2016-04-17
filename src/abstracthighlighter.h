@@ -27,6 +27,7 @@ class QString;
 namespace KateSyntax {
 
 class Context;
+class ContextSwitch;
 class SyntaxDefinition;
 
 class KATESYNTAX_EXPORT AbstractHighlighter
@@ -42,7 +43,7 @@ public:
     virtual void setFormat(int offset, int length, const QString &format);
 
 private:
-    void switchContext(const QString &context, SyntaxDefinition *def);
+    void switchContext(const ContextSwitch &contextSwitch);
 
     SyntaxDefinition *m_definition;
     QStack<Context*> m_context;

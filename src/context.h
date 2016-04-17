@@ -19,6 +19,7 @@
 #define KATESYNTAX_CONTEXT_H
 
 #include "rule.h"
+#include "contextswitch.h"
 
 #include <QString>
 #include <QVector>
@@ -40,14 +41,15 @@ public:
 
     QString name() const;
     QString attribute() const;
-    QString lineEndContext() const;
+    ContextSwitch lineEndContext() const;
 
     bool fallthrough() const;
-    QString fallthroughContext() const;
+    ContextSwitch fallthroughContext() const;
 
     QVector<Rule::Ptr> rules() const;
 
     void load(QXmlStreamReader &reader);
+    void resolveContexts();
     void resolveIncludes();
 
 private:
@@ -64,8 +66,8 @@ private:
     SyntaxDefinition *m_def;
     QString m_name;
     QString m_attribute;
-    QString m_lineEndContext;
-    QString m_fallthroughContext;
+    ContextSwitch m_lineEndContext;
+    ContextSwitch m_fallthroughContext;
 
     QVector<Rule::Ptr> m_rules;
 

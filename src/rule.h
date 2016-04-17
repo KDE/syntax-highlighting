@@ -19,6 +19,7 @@
 #define KATESYNTAX_RULE_H
 
 #include "keywordlist.h"
+#include "contextswitch.h"
 
 #include <QRegExp>
 #include <QString>
@@ -44,10 +45,11 @@ public:
     void setSyntaxDefinition(SyntaxDefinition *def);
 
     QString attribute() const;
-    QString context() const;
+    ContextSwitch context() const;
     bool isLookAhead() const;
 
     bool load(QXmlStreamReader &reader);
+    void resolveContext();
 
     int match(const QString &text, int offset);
 
@@ -64,7 +66,7 @@ private:
 
     SyntaxDefinition *m_def;
     QString m_attribute;
-    QString m_context;
+    ContextSwitch m_context;
     QVector<Rule::Ptr> m_subRules;
     bool m_firstNonSpace;
     bool m_lookAhead;

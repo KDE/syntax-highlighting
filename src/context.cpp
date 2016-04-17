@@ -57,7 +57,7 @@ QString Context::attribute() const
     return m_attribute;
 }
 
-QString Context::lineEndContext() const
+ContextSwitch Context::lineEndContext() const
 {
     return m_lineEndContext;
 }
@@ -67,7 +67,7 @@ bool Context::fallthrough() const
     return m_fallthrough;
 }
 
-QString Context::fallthroughContext() const
+ContextSwitch Context::fallthroughContext() const
 {
     return m_fallthroughContext;
 }
@@ -84,12 +84,10 @@ void Context::load(QXmlStreamReader& reader)
 
     m_name = reader.attributes().value(QStringLiteral("name")).toString();
     m_attribute = reader.attributes().value(QStringLiteral("attribute")).toString();
-    m_lineEndContext = reader.attributes().value(QStringLiteral("lineEndContext")).toString();
-    if (m_lineEndContext.isEmpty())
-        m_lineEndContext = QStringLiteral("#stay");
+    m_lineEndContext.parse(reader.attributes().value(QStringLiteral("lineEndContext")));
     m_fallthrough = reader.attributes().value(QStringLiteral("fallthrough")) == QLatin1String("true");
-    m_fallthroughContext = reader.attributes().value(QStringLiteral("fallthroughContext")).toString();
-    if (m_fallthroughContext.isEmpty())
+    m_fallthroughContext.parse(reader.attributes().value(QStringLiteral("fallthroughContext")));
+    if (m_fallthroughContext.isStay())
         m_fallthrough = false;
 
     reader.readNext();
@@ -115,6 +113,14 @@ void Context::load(QXmlStreamReader& reader)
                 break;
         }
     }
+}
+
+void Context::resolveContexts()
+{
+    m_lineEndContext.resolve(m_def);
+    m_fallthroughContext.resolve(m_def);
+    foreach (auto rule, m_rules)
+        rule->resolveContext();
 }
 
 Context::ResolveState Context::resolveState()

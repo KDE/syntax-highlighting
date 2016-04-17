@@ -102,7 +102,7 @@ QString Rule::attribute() const
     return m_attribute;
 }
 
-QString Rule::context() const
+ContextSwitch Rule::context() const
 {
     return m_context;
 }
@@ -117,15 +117,14 @@ bool Rule::load(QXmlStreamReader &reader)
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
 
     m_attribute = reader.attributes().value(QStringLiteral("attribute")).toString();
-    m_context = reader.attributes().value(QStringLiteral("context")).toString();
-    if (m_context.isEmpty())
-        m_context = QStringLiteral("#stay");
+    if (reader.name() != QLatin1String("IncludeRules")) // IncludeRules uses this with a different semantic
+        m_context.parse(reader.attributes().value(QStringLiteral("context")));
     m_firstNonSpace = reader.attributes().value(QStringLiteral("firstNonSpace")) == QLatin1String("true");
     m_lookAhead = reader.attributes().value(QStringLiteral("lookAhead")) == QLatin1String("true");
 
     auto result = doLoad(reader);
 
-    if (m_lookAhead && m_context == QLatin1String("#stay"))
+    if (m_lookAhead && m_context.isStay())
         result = false;
 
     reader.readNext();
@@ -154,6 +153,13 @@ bool Rule::load(QXmlStreamReader &reader)
     }
 
     return result;
+}
+
+void Rule::resolveContext()
+{
+    m_context.resolve(m_def);
+    foreach (auto rule, m_subRules)
+        rule->resolveContext();
 }
 
 bool Rule::doLoad(QXmlStreamReader& reader)

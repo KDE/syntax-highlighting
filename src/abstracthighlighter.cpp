@@ -65,13 +65,13 @@ void AbstractHighlighter::highlightLine(const QString& text)
                 continue;
 
             if (rule->isLookAhead()) {
-                switchContext(rule->context(), rule->syntaxDefinition());
+                switchContext(rule->context());
                 isLookAhead = true;
                 break;
             }
 
             newFormat = rule->attribute().isEmpty() ? m_context.top()->attribute() : rule->attribute();
-            switchContext(rule->context(), rule->syntaxDefinition());
+            switchContext(rule->context());
             if (newOffset == text.size() && std::dynamic_pointer_cast<LineContinue>(rule))
                 lineContinuation = true;
             break;
@@ -81,7 +81,7 @@ void AbstractHighlighter::highlightLine(const QString& text)
 
         if (newOffset <= offset) { // no matching rule
             if (m_context.top()->fallthrough()) {
-                switchContext(m_context.top()->fallthroughContext(), m_context.top()->syntaxDefinition());
+                switchContext(m_context.top()->fallthroughContext());
                 continue;
             }
 
@@ -103,27 +103,18 @@ void AbstractHighlighter::highlightLine(const QString& text)
     if (beginOffset < offset)
         setFormat(beginOffset, text.size() - beginOffset, currentFormat);
 
-    while (m_context.top()->lineEndContext() != QLatin1String("#stay") && !lineContinuation)
-        switchContext(m_context.top()->lineEndContext(), m_context.top()->syntaxDefinition());
+    while (!m_context.top()->lineEndContext().isStay() && !lineContinuation)
+        switchContext(m_context.top()->lineEndContext());
 }
 
-void AbstractHighlighter::switchContext(const QString& contextName, SyntaxDefinition *def)
+void AbstractHighlighter::switchContext(const ContextSwitch &contextSwitch)
 {
-    Q_ASSERT(def);
-    Q_ASSERT(!m_context.isEmpty());
-
-    if (contextName == QLatin1String("#stay"))
-        return;
-
-    if (contextName == QLatin1String("#pop")) {
+    Q_ASSERT(m_context.size() >= contextSwitch.popCount());
+    for (int i = 0; i < contextSwitch.popCount(); ++i)
         m_context.pop();
-    } else {
-        auto newContext = def->contextByName(contextName);
-        if (!newContext)
-            qWarning() << "cannot find context" << contextName;
-        else
-            m_context.push(newContext);
-    }
+
+    if (contextSwitch.context())
+        m_context.push(contextSwitch.context());
 
     Q_ASSERT(!m_context.isEmpty());
     Q_ASSERT(m_context.top());

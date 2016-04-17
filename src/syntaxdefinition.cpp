@@ -166,6 +166,8 @@ void SyntaxDefinition::loadContexts(QXmlStreamReader& reader)
 
 void SyntaxDefinition::assemble()
 {
-    foreach (auto context, m_contexts)
+    foreach (auto context, m_contexts) {
+        context->resolveContexts();
         context->resolveIncludes();
+    }
 }

@@ -437,7 +437,7 @@ bool IncludeRules::doLoad(QXmlStreamReader& reader)
     if (splitted.size() > 1)
         m_defName = splitted.at(1).toString();
 
-    return !m_contextName.isEmpty();
+    return !m_contextName.isEmpty() || !m_defName.isEmpty();
 }
 
 int IncludeRules::doMatch(const QString& text, int offset)

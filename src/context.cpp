@@ -160,7 +160,10 @@ void Context::resolveIncludes()
                 ++it;
                 continue;
             }
-            context = def->contextByName(inc->contextName());
+            if (inc->contextName().isEmpty())
+                context = def->initialContext();
+            else
+                context = def->contextByName(inc->contextName());
         }
         if (!context) {
             qWarning() << "Unable to resolve include rule for definition" << inc->contextName() << "##" << inc->definitionName() << "in" << m_def->name();

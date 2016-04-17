@@ -53,6 +53,7 @@ void AbstractHighlighter::highlightLine(const QString& text)
     }
 
     Q_ASSERT(!m_context.isEmpty());
+    Q_ASSERT(!m_captureStack.isEmpty());
     int offset = 0, beginOffset = 0;
     auto currentFormat = m_context.top()->attribute();
     bool lineContinuation = false;
@@ -62,7 +63,7 @@ void AbstractHighlighter::highlightLine(const QString& text)
         int newOffset = 0;
         QString newFormat;
         foreach (auto rule, m_context.top()->rules()) {
-            const auto newResult = rule->match(text, offset);
+            const auto newResult = rule->match(text, offset, m_captureStack.top());
             newOffset = newResult.offset();
             if (newOffset <= offset)
                 continue;

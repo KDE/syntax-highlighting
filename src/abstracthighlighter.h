@@ -42,7 +42,7 @@ public:
     virtual void setFormat(int offset, int length, const QString &format);
 
 private:
-    void switchContext(const QString &context);
+    void switchContext(const QString &context, SyntaxDefinition *def);
 
     SyntaxDefinition *m_definition;
     QStack<Context*> m_context;

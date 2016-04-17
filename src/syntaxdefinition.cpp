@@ -120,7 +120,6 @@ void SyntaxDefinition::loadHighlighting(QXmlStreamReader& reader)
     while (!reader.atEnd()) {
         switch (reader.tokenType()) {
             case QXmlStreamReader::StartElement:
-                qDebug() << reader.name() << "begin";
                 if (reader.name() == QLatin1String("list")) {
                     KeywordList keywords;
                     keywords.load(reader);
@@ -132,7 +131,6 @@ void SyntaxDefinition::loadHighlighting(QXmlStreamReader& reader)
                 }
                 break;
             case QXmlStreamReader::EndElement:
-                qDebug() << reader.name() << "end";
                 return;
             default:
                 reader.readNext();

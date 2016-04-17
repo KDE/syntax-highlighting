@@ -35,6 +35,7 @@ public:
     Context();
     ~Context();
 
+    SyntaxDefinition* syntaxDefinition() const;
     void setSyntaxDefinition(SyntaxDefinition *def);
 
     QString name() const;

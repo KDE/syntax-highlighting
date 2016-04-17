@@ -17,7 +17,6 @@
 
 #include "keywordlist.h"
 
-#include <QDebug>
 #include <QXmlStreamReader>
 
 using namespace KateSyntax;

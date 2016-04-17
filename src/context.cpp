@@ -37,6 +37,11 @@ Context::~Context()
 {
 }
 
+SyntaxDefinition* Context::syntaxDefinition() const
+{
+    return m_def;
+}
+
 void Context::setSyntaxDefinition(SyntaxDefinition* def)
 {
     m_def = def;

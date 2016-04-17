@@ -63,7 +63,6 @@ void SyntaxRepository::load()
         auto def = new SyntaxDefinition;
         def->setSyntaxRepository(this);
         if (def->load(it.next())) {
-            qDebug() << def->name() << def->extensions();
             m_defs.push_back(def);
         }
     }

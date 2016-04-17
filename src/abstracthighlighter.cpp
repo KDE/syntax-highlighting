@@ -65,13 +65,13 @@ void AbstractHighlighter::highlightLine(const QString& text)
                 continue;
 
             if (rule->isLookAhead()) {
-                switchContext(rule->context());
+                switchContext(rule->context(), rule->syntaxDefinition());
                 isLookAhead = true;
                 break;
             }
 
             newFormat = rule->attribute().isEmpty() ? m_context.top()->attribute() : rule->attribute();
-            switchContext(rule->context());
+            switchContext(rule->context(), rule->syntaxDefinition());
             if (newOffset == text.size() && std::dynamic_pointer_cast<LineContinue>(rule))
                 lineContinuation = true;
             break;
@@ -81,7 +81,7 @@ void AbstractHighlighter::highlightLine(const QString& text)
 
         if (newOffset <= offset) { // no matching rule
             if (m_context.top()->fallthrough()) {
-                switchContext(m_context.top()->fallthroughContext());
+                switchContext(m_context.top()->fallthroughContext(), m_context.top()->syntaxDefinition());
                 continue;
             }
 
@@ -104,12 +104,12 @@ void AbstractHighlighter::highlightLine(const QString& text)
         setFormat(beginOffset, text.size() - beginOffset, currentFormat);
 
     while (m_context.top()->lineEndContext() != QLatin1String("#stay") && !lineContinuation)
-        switchContext(m_context.top()->lineEndContext());
+        switchContext(m_context.top()->lineEndContext(), m_context.top()->syntaxDefinition());
 }
 
-void AbstractHighlighter::switchContext(const QString& contextName)
+void AbstractHighlighter::switchContext(const QString& contextName, SyntaxDefinition *def)
 {
-    Q_ASSERT(m_definition);
+    Q_ASSERT(def);
     Q_ASSERT(!m_context.isEmpty());
 
     if (contextName == QLatin1String("#stay"))
@@ -118,7 +118,7 @@ void AbstractHighlighter::switchContext(const QString& contextName)
     if (contextName == QLatin1String("#pop")) {
         m_context.pop();
     } else {
-        auto newContext = m_definition->contextByName(contextName);
+        auto newContext = def->contextByName(contextName);
         if (!newContext)
             qWarning() << "cannot find context" << contextName;
         else

@@ -68,6 +68,7 @@ private:
     QString m_attribute;
     ContextSwitch m_context;
     QVector<Rule::Ptr> m_subRules;
+    int m_column;
     bool m_firstNonSpace;
     bool m_lookAhead;
 };

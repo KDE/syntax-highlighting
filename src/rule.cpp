@@ -78,6 +78,7 @@ static int matchEscapedChar(const QString &text, int offset)
 
 Rule::Rule() :
     m_def(nullptr),
+    m_column(-1),
     m_firstNonSpace(false),
     m_lookAhead(false)
 {
@@ -121,6 +122,10 @@ bool Rule::load(QXmlStreamReader &reader)
         m_context.parse(reader.attributes().value(QStringLiteral("context")));
     m_firstNonSpace = reader.attributes().value(QStringLiteral("firstNonSpace")) == QLatin1String("true");
     m_lookAhead = reader.attributes().value(QStringLiteral("lookAhead")) == QLatin1String("true");
+    bool colOk = false;
+    m_column = reader.attributes().value(QStringLiteral("column")).toInt(&colOk);
+    if (!colOk)
+        m_column = -1;
 
     auto result = doLoad(reader);
 
@@ -172,6 +177,9 @@ int Rule::match(const QString &text, int offset)
 {
     Q_ASSERT(!text.isEmpty());
     if (m_firstNonSpace && (offset > 0 || text.at(0).isSpace()))
+        return offset;
+
+    if (m_column >= 0 && offset != m_column)
         return offset;
 
     const auto result = doMatch(text, offset);

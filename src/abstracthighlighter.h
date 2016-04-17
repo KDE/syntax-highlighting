@@ -21,6 +21,7 @@
 #include "katesyntax_export.h"
 
 #include <QStack>
+#include <QStringList>
 
 class QString;
 
@@ -43,10 +44,11 @@ public:
     virtual void setFormat(int offset, int length, const QString &format);
 
 private:
-    void switchContext(const ContextSwitch &contextSwitch);
+    void switchContext(const ContextSwitch &contextSwitch, const QStringList &captures = QStringList());
 
     SyntaxDefinition *m_definition;
     QStack<Context*> m_context;
+    QStack<QStringList> m_captureStack;
 };
 }
 

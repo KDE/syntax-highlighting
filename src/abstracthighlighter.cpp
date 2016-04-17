@@ -37,9 +37,11 @@ void AbstractHighlighter::setDefinition(SyntaxDefinition* def)
 {
     m_definition = def;
     m_context.clear();
+    m_captureStack.clear();
     if (!m_definition)
         return;
     m_context.push(m_definition->initialContext());
+    m_captureStack.push(QStringList());
 }
 
 void AbstractHighlighter::highlightLine(const QString& text)
@@ -72,7 +74,7 @@ void AbstractHighlighter::highlightLine(const QString& text)
             }
 
             newFormat = rule->attribute().isEmpty() ? m_context.top()->attribute() : rule->attribute();
-            switchContext(rule->context());
+            switchContext(rule->context(), newResult.captures());
             if (newOffset == text.size() && std::dynamic_pointer_cast<LineContinue>(rule))
                 lineContinuation = true;
             break;
@@ -108,17 +110,24 @@ void AbstractHighlighter::highlightLine(const QString& text)
         switchContext(m_context.top()->lineEndContext());
 }
 
-void AbstractHighlighter::switchContext(const ContextSwitch &contextSwitch)
+void AbstractHighlighter::switchContext(const ContextSwitch &contextSwitch, const QStringList &captures)
 {
     Q_ASSERT(m_context.size() >= contextSwitch.popCount());
-    for (int i = 0; i < contextSwitch.popCount(); ++i)
-        m_context.pop();
+    Q_ASSERT(m_context.size() == m_captureStack.size());
 
-    if (contextSwitch.context())
+    for (int i = 0; i < contextSwitch.popCount(); ++i) {
+        m_context.pop();
+        m_captureStack.pop();
+    }
+
+    if (contextSwitch.context()) {
         m_context.push(contextSwitch.context());
+        m_captureStack.push(captures);
+    }
 
     Q_ASSERT(!m_context.isEmpty());
     Q_ASSERT(m_context.top());
+    Q_ASSERT(m_context.size() == m_captureStack.size());
 }
 
 void AbstractHighlighter::setFormat(int offset, int length, const QString& format)

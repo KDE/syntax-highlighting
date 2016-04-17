@@ -537,7 +537,7 @@ bool RegExpr::doLoad(QXmlStreamReader& reader)
     m_regexp.setPattern(reader.attributes().value(QStringLiteral("String")).toString());
     m_regexp.setMinimal(reader.attributes().value(QStringLiteral("minimal")) != QLatin1String("true"));
     m_regexp.setCaseSensitivity(reader.attributes().value(QStringLiteral("insensitive")) == QLatin1String("true") ? Qt::CaseInsensitive : Qt::CaseSensitive);
-    return m_regexp.isValid();
+    return !m_regexp.isEmpty(); // m_regexp.isValid() would be better, but parses the regexp and thus is way too expensive
 }
 
 int RegExpr::doMatch(const QString& text, int offset)

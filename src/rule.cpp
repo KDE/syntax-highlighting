@@ -291,6 +291,7 @@ bool DetectChar::doLoad(QXmlStreamReader& reader)
 
 MatchResult DetectChar::doMatch(const QString& text, int offset, const QStringList &captures)
 {
+    Q_UNUSED(captures); // TODO
     if (text.at(offset) == m_char)
         return offset + 1;
     return offset;
@@ -310,6 +311,7 @@ bool Detect2Char::doLoad(QXmlStreamReader& reader)
 
 MatchResult Detect2Char::doMatch(const QString& text, int offset, const QStringList &captures)
 {
+    Q_UNUSED(captures); // TODO
     if (text.size() - offset < 2)
         return offset;
     if (text.at(offset) == m_char1 && text.at(offset + 1) == m_char2)
@@ -480,6 +482,7 @@ MatchResult IncludeRules::doMatch(const QString& text, int offset, const QString
 
 MatchResult Int::doMatch(const QString& text, int offset, const QStringList &captures)
 {
+    Q_UNUSED(captures); // ### the doc says this can be dynamic, but how??
     while(offset < text.size() && text.at(offset).isDigit())
         ++offset;
     return offset;
@@ -594,6 +597,7 @@ bool StringDetect::doLoad(QXmlStreamReader& reader)
 
 MatchResult StringDetect::doMatch(const QString& text, int offset, const QStringList &captures)
 {
+    Q_UNUSED(captures); // TODO
     if (text.midRef(offset, m_string.size()).compare(m_string, m_caseSensitivity) == 0)
         return offset + m_string.size();
     return offset;
@@ -608,6 +612,7 @@ bool WordDetect::doLoad(QXmlStreamReader& reader)
 
 MatchResult WordDetect::doMatch(const QString& text, int offset, const QStringList &captures)
 {
+    Q_UNUSED(captures); // TODO
     if (text.size() - offset < m_word.size())
         return offset;
 

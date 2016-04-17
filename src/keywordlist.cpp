@@ -30,6 +30,11 @@ KeywordList::~KeywordList()
 {
 }
 
+bool KeywordList::isEmpty() const
+{
+    return m_keywords.isEmpty();
+}
+
 QString KeywordList::name() const
 {
     return m_name;

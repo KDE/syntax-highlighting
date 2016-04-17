@@ -16,6 +16,7 @@
 */
 
 #include "rule.h"
+#include "syntaxdefinition.h"
 
 #include <QDebug>
 #include <QString>
@@ -76,6 +77,7 @@ static int matchEscapedChar(const QString &text, int offset)
 
 
 Rule::Rule() :
+    m_def(nullptr),
     m_firstNonSpace(false),
     m_lookAhead(false)
 {
@@ -83,6 +85,16 @@ Rule::Rule() :
 
 Rule::~Rule()
 {
+}
+
+SyntaxDefinition* Rule::syntaxDefinition() const
+{
+    return m_def;
+}
+
+void Rule::setSyntaxDefinition(SyntaxDefinition* def)
+{
+    m_def = def;
 }
 
 QString Rule::attribute() const
@@ -122,9 +134,12 @@ bool Rule::load(QXmlStreamReader &reader)
             case QXmlStreamReader::StartElement:
             {
                 auto rule = Rule::create(reader.name());
-                if (rule && rule->load(reader)) {
-                    m_subRules.push_back(rule);
-                    reader.readNext();
+                if (rule) {
+                    rule->setSyntaxDefinition(m_def);
+                    if (rule->load(reader)) {
+                        m_subRules.push_back(rule);
+                        reader.readNext();
+                    }
                 } else {
                     reader.skipCurrentElement();
                 }
@@ -431,16 +446,6 @@ int Int::doMatch(const QString& text, int offset)
 }
 
 
-QString KeywordListRule::listName() const
-{
-    return m_listName;
-}
-
-void KeywordListRule::setKeywordList(const KeywordList &keywordList)
-{
-    m_keywordList = keywordList;
-}
-
 bool KeywordListRule::doLoad(QXmlStreamReader& reader)
 {
     m_listName = reader.attributes().value(QStringLiteral("String")).toString();
@@ -452,18 +457,21 @@ int KeywordListRule::doMatch(const QString& text, int offset)
     if (offset > 0 && !isDelimiter(text.at(offset - 1)))
         return offset;
 
-    int offset2 = offset;
-    int wordLen = 0;
-    int len = text.size();
-
-    while ((len > offset2) && !isDelimiter(text[offset2])) {
-        offset2++;
-        wordLen++;
+    if (m_keywordList.isEmpty()) {
+        Q_ASSERT(syntaxDefinition());
+        m_keywordList = syntaxDefinition()->keywordList(m_listName);
     }
 
+    auto newOffset = offset;
+    while (text.size() > newOffset && !isDelimiter(text.at(newOffset)))
+        ++newOffset;
+    if (newOffset == offset)
+        return offset;
+
     // TODO support case-insensitive keywords
-    if (m_keywordList.keywords().contains(text.mid(offset, wordLen)))
-        return offset2;
+    // TODO avoid the copy in mid()
+    if (m_keywordList.keywords().contains(text.mid(offset, newOffset - offset)))
+        return newOffset;
     return offset;
 }
 

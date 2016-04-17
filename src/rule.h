@@ -30,6 +30,8 @@ class QXmlStreamReader;
 
 namespace KateSyntax {
 
+class SyntaxDefinition;
+
 class Rule
 {
 public:
@@ -37,6 +39,9 @@ public:
     virtual ~Rule();
 
     typedef std::shared_ptr<Rule> Ptr;
+
+    SyntaxDefinition* syntaxDefinition() const;
+    void setSyntaxDefinition(SyntaxDefinition *def);
 
     QString attribute() const;
     QString context() const;
@@ -57,6 +62,7 @@ protected:
 private:
     Q_DISABLE_COPY(Rule)
 
+    SyntaxDefinition *m_def;
     QString m_attribute;
     QString m_context;
     QVector<Rule::Ptr> m_subRules;
@@ -157,10 +163,6 @@ protected:
 
 class KeywordListRule : public Rule
 {
-public:
-    QString listName() const;
-    void setKeywordList(const KeywordList &list);
-
 protected:
     bool doLoad(QXmlStreamReader & reader) override;
     int doMatch(const QString & text, int offset) override;

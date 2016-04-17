@@ -32,6 +32,8 @@ public:
     KeywordList();
     ~KeywordList();
 
+    bool isEmpty() const;
+
     QString name() const;
     QSet<QString> keywords() const;
 

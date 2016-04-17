@@ -25,12 +25,18 @@
 using namespace KateSyntax;
 
 Context::Context() :
+    m_def(nullptr),
     m_fallthrough(false)
 {
 }
 
 Context::~Context()
 {
+}
+
+void Context::setSyntaxDefinition(SyntaxDefinition* def)
+{
+    m_def = def;
 }
 
 QString Context::name() const
@@ -85,6 +91,7 @@ void Context::load(QXmlStreamReader& reader)
             {
                 auto rule = Rule::create(reader.name());
                 if (rule) {
+                    rule->setSyntaxDefinition(m_def);
                     if (rule->load(reader))
                         m_rules.push_back(rule);
                 } else {

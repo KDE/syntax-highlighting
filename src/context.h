@@ -27,11 +27,15 @@ class QXmlStreamReader;
 
 namespace KateSyntax {
 
+class SyntaxDefinition;
+
 class Context
 {
 public:
     Context();
     ~Context();
+
+    void setSyntaxDefinition(SyntaxDefinition *def);
 
     QString name() const;
     QString attribute() const;
@@ -47,6 +51,7 @@ public:
 private:
     Q_DISABLE_COPY(Context)
 
+    SyntaxDefinition *m_def;
     QString m_name;
     QString m_attribute;
     QString m_lineEndContext;

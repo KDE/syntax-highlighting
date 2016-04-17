@@ -47,15 +47,15 @@ public:
     Context* initialContext() const;
     Context* contextByName(const QString &name) const;
 
+    KeywordList keywordList(const QString &name) const;
+
     bool load(const QString &definitionFileName);
-    void assemble();
 
 private:
     Q_DISABLE_COPY(SyntaxDefinition)
 
     void loadHighlighting(QXmlStreamReader &reader);
     void loadContexts(QXmlStreamReader &reader);
-    void assembleKeywordList(const Rule::Ptr &rule);
 
     QHash<QString, KeywordList> m_keywordLists;
     QVector<Context*> m_contexts;

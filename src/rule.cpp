@@ -80,7 +80,8 @@ Rule::Rule() :
     m_def(nullptr),
     m_column(-1),
     m_firstNonSpace(false),
-    m_lookAhead(false)
+    m_lookAhead(false),
+    m_dynamic(false)
 {
 }
 
@@ -113,6 +114,11 @@ bool Rule::isLookAhead() const
     return m_lookAhead;
 }
 
+bool Rule::isDynamic() const
+{
+    return m_dynamic;
+}
+
 bool Rule::load(QXmlStreamReader &reader)
 {
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
@@ -126,6 +132,7 @@ bool Rule::load(QXmlStreamReader &reader)
     m_column = reader.attributes().value(QStringLiteral("column")).toInt(&colOk);
     if (!colOk)
         m_column = -1;
+    m_dynamic = reader.attributes().value(QStringLiteral("dynamic")) == QLatin1String("true");
 
     auto result = doLoad(reader);
 

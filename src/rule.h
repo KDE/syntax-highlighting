@@ -47,6 +47,7 @@ public:
     QString attribute() const;
     ContextSwitch context() const;
     bool isLookAhead() const;
+    bool isDynamic() const;
 
     bool load(QXmlStreamReader &reader);
     void resolveContext();
@@ -71,6 +72,7 @@ private:
     int m_column;
     bool m_firstNonSpace;
     bool m_lookAhead;
+    bool m_dynamic;
 };
 
 

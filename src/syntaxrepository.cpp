@@ -63,5 +63,6 @@ void SyntaxRepository::load()
 
 void SyntaxRepository::assemble()
 {
-    // TODO resolve include rules
+    foreach (auto def, m_defs)
+        def->assemble();
 }

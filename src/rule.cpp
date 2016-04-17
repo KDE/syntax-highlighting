@@ -417,6 +417,16 @@ int HlCStringChar::doMatch(const QString& text, int offset)
 }
 
 
+QString IncludeRules::contextName() const
+{
+    return m_contextName;
+}
+
+QString IncludeRules::definitionName() const
+{
+    return m_defName;
+}
+
 bool IncludeRules::doLoad(QXmlStreamReader& reader)
 {
     const auto s = reader.attributes().value(QLatin1String("context"));

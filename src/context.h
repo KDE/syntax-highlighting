@@ -47,9 +47,18 @@ public:
     QVector<Rule::Ptr> rules() const;
 
     void load(QXmlStreamReader &reader);
+    void resolveIncludes();
 
 private:
     Q_DISABLE_COPY(Context)
+
+    enum ResolveState {
+        Unknown,
+        Unresolved,
+        Resolving,
+        Resolved
+    };
+    ResolveState resolveState();
 
     SyntaxDefinition *m_def;
     QString m_name;
@@ -59,6 +68,7 @@ private:
 
     QVector<Rule::Ptr> m_rules;
 
+    ResolveState m_resolveState;
     bool m_fallthrough;
 };
 }

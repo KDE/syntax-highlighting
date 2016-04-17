@@ -122,6 +122,10 @@ protected:
 
 class IncludeRules : public Rule
 {
+public:
+    QString contextName() const;
+    QString definitionName() const;
+
 protected:
     bool doLoad(QXmlStreamReader & reader) override;
     int doMatch(const QString & text, int offset) override;
@@ -129,6 +133,7 @@ protected:
 private:
     QString m_contextName;
     QString m_defName;
+    bool m_processingMarker;
 };
 
 class Int : public Rule

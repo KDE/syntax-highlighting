@@ -154,3 +154,9 @@ void SyntaxDefinition::loadContexts(QXmlStreamReader& reader)
         }
     }
 }
+
+void SyntaxDefinition::assemble()
+{
+    foreach (auto context, m_contexts)
+        context->resolveIncludes();
+}

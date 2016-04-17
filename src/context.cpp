@@ -17,6 +17,7 @@
 
 #include "context.h"
 #include "rule.h"
+#include "syntaxdefinition.h"
 
 #include <QDebug>
 #include <QString>
@@ -26,6 +27,7 @@ using namespace KateSyntax;
 
 Context::Context() :
     m_def(nullptr),
+    m_resolveState(Unknown),
     m_fallthrough(false)
 {
 }
@@ -107,4 +109,56 @@ void Context::load(QXmlStreamReader& reader)
                 break;
         }
     }
+}
+
+Context::ResolveState Context::resolveState()
+{
+    if (m_resolveState == Unknown) {
+        foreach (auto rule, m_rules) {
+            auto inc = std::dynamic_pointer_cast<IncludeRules>(rule);
+            if (inc) {
+                m_resolveState = Unresolved;
+                return m_resolveState;
+            }
+        }
+        m_resolveState = Resolved;
+    }
+    return m_resolveState;
+}
+
+void Context::resolveIncludes()
+{
+    if (resolveState() == Resolved)
+        return;
+    if (resolveState() == Resolving) {
+        qWarning() << "Cyclic dependency!";
+        return;
+    }
+
+    Q_ASSERT(resolveState() == Unresolved);
+    m_resolveState = Resolving; // cycle guard
+
+    for (auto it = m_rules.begin(); it != m_rules.end();) {
+        auto inc = std::dynamic_pointer_cast<IncludeRules>(*it);
+        if (!inc) {
+            ++it;
+            continue;
+        }
+        if (inc->definitionName().isEmpty()) { // local include
+            auto context = m_def->contextByName(inc->contextName());
+            Q_ASSERT(context);
+            context->resolveIncludes();
+            it = m_rules.erase(it);
+            foreach (auto rule, context->rules()) {
+                it = m_rules.insert(it, rule);
+                ++it;
+            }
+        } else {
+            ++it;
+            qDebug() << "need to resolve" << inc->contextName() << inc->definitionName();
+            // TODO resolve global includes
+        }
+    }
+
+    m_resolveState = Resolved;
 }

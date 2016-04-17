@@ -32,6 +32,7 @@ public:
     SyntaxRepository();
     ~SyntaxRepository();
 
+    SyntaxDefinition* definitionForName(const QString &defName) const;
     SyntaxDefinition* definitionForFileName(const QString &fileName) const;
 
 private:

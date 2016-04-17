@@ -18,6 +18,7 @@
 #include "context.h"
 #include "rule.h"
 #include "syntaxdefinition.h"
+#include "syntaxrepository.h"
 
 #include <QDebug>
 #include <QString>
@@ -144,19 +145,28 @@ void Context::resolveIncludes()
             ++it;
             continue;
         }
+        Context* context = nullptr;
         if (inc->definitionName().isEmpty()) { // local include
-            auto context = m_def->contextByName(inc->contextName());
-            Q_ASSERT(context);
-            context->resolveIncludes();
-            it = m_rules.erase(it);
-            foreach (auto rule, context->rules()) {
-                it = m_rules.insert(it, rule);
-                ++it;
-            }
+            context = m_def->contextByName(inc->contextName());
         } else {
+            auto def = m_def->syntaxRepository()->definitionForName(inc->definitionName());
+            if (!def) {
+                qWarning() << "Unable to resolve external include rule for definition" << inc->definitionName() << "in" << m_def->name();
+                ++it;
+                continue;
+            }
+            context = def->contextByName(inc->contextName());
+        }
+        if (!context) {
+            qWarning() << "Unable to resolve include rule for definition" << inc->contextName() << "##" << inc->definitionName() << "in" << m_def->name();
             ++it;
-            qDebug() << "need to resolve" << inc->contextName() << inc->definitionName();
-            // TODO resolve global includes
+            continue;
+        }
+        context->resolveIncludes();
+        it = m_rules.erase(it);
+        foreach (auto rule, context->rules()) {
+            it = m_rules.insert(it, rule);
+            ++it;
         }
     }
 

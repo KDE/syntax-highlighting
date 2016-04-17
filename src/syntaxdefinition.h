@@ -34,12 +34,16 @@ namespace KateSyntax {
 class Context;
 class KeywordList;
 class Rule;
+class SyntaxRepository;
 
 class KATESYNTAX_EXPORT SyntaxDefinition
 {
 public:
     SyntaxDefinition();
     ~SyntaxDefinition();
+
+    SyntaxRepository* syntaxRepository() const;
+    void setSyntaxRepository(SyntaxRepository *repo);
 
     QString name() const;
     QVector<QString> extensions() const;
@@ -58,6 +62,7 @@ private:
     void loadHighlighting(QXmlStreamReader &reader);
     void loadContexts(QXmlStreamReader &reader);
 
+    SyntaxRepository *m_repo;
     QHash<QString, KeywordList> m_keywordLists;
     QVector<Context*> m_contexts;
 

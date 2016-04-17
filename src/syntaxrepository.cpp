@@ -34,6 +34,15 @@ SyntaxRepository::~SyntaxRepository()
 {
 }
 
+SyntaxDefinition* SyntaxRepository::definitionForName(const QString& defName) const
+{
+   foreach (auto def, m_defs) {
+        if (def->name() == defName)
+            return def;
+    }
+    return nullptr;
+}
+
 SyntaxDefinition* SyntaxRepository::definitionForFileName(const QString& fileName) const
 {
     QFileInfo fi(fileName);
@@ -52,6 +61,7 @@ void SyntaxRepository::load()
     QDirIterator it(QStringLiteral(":/kate-syntax"));
     while (it.hasNext()) {
         auto def = new SyntaxDefinition;
+        def->setSyntaxRepository(this);
         if (def->load(it.next())) {
             qDebug() << def->name() << def->extensions();
             m_defs.push_back(def);

@@ -26,6 +26,7 @@
 using namespace KateSyntax;
 
 SyntaxDefinition::SyntaxDefinition() :
+    m_repo(nullptr),
     m_hidden(false)
 {
 }
@@ -33,6 +34,16 @@ SyntaxDefinition::SyntaxDefinition() :
 SyntaxDefinition::~SyntaxDefinition()
 {
     qDeleteAll(m_contexts);
+}
+
+SyntaxRepository* SyntaxDefinition::syntaxRepository() const
+{
+    return m_repo;
+}
+
+void SyntaxDefinition::setSyntaxRepository(SyntaxRepository* repo)
+{
+    m_repo = repo;
 }
 
 QString SyntaxDefinition::name() const

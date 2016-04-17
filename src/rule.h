@@ -211,6 +211,7 @@ protected:
     MatchResult doMatch(const QString & text, int offset, const QStringList &captures) override;
 
 private:
+    QString m_pattern;
     QRegExp m_regexp;
 };
 

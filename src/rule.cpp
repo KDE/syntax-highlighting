@@ -75,6 +75,15 @@ static int matchEscapedChar(const QString &text, int offset)
     return offset;
 }
 
+static QString replaceCaptures(const QString &pattern, const QStringList &captures)
+{
+    auto result = pattern;
+    for (int i = 1; i < captures.size(); ++i) {
+        result.replace(QLatin1Char('%') + QString::number(i), captures.at(i));
+    }
+    return result;
+}
+
 
 Rule::Rule() :
     m_def(nullptr),
@@ -555,7 +564,8 @@ MatchResult RangeDetect::doMatch(const QString& text, int offset, const QStringL
 
 bool RegExpr::doLoad(QXmlStreamReader& reader)
 {
-    m_regexp.setPattern(reader.attributes().value(QStringLiteral("String")).toString());
+    m_pattern = reader.attributes().value(QStringLiteral("String")).toString();
+    m_regexp.setPattern(m_pattern);
     m_regexp.setMinimal(reader.attributes().value(QStringLiteral("minimal")) == QLatin1String("true"));
     m_regexp.setCaseSensitivity(reader.attributes().value(QStringLiteral("insensitive")) == QLatin1String("true") ? Qt::CaseInsensitive : Qt::CaseSensitive);
     return !m_regexp.isEmpty(); // m_regexp.isValid() would be better, but parses the regexp and thus is way too expensive
@@ -564,6 +574,9 @@ bool RegExpr::doLoad(QXmlStreamReader& reader)
 MatchResult RegExpr::doMatch(const QString& text, int offset, const QStringList &captures)
 {
     Q_ASSERT(m_regexp.isValid());
+
+    if (isDynamic())
+        m_regexp.setPattern(replaceCaptures(m_pattern, captures));
 
     auto idx = m_regexp.indexIn(text, offset, QRegExp::CaretAtOffset);
     if (idx == offset)

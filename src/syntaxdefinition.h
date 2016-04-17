@@ -22,6 +22,7 @@
 
 #include "keywordlist.h"
 #include "rule.h"
+#include "format.h"
 
 #include <QHash>
 #include <QString>
@@ -61,10 +62,12 @@ private:
 
     void loadHighlighting(QXmlStreamReader &reader);
     void loadContexts(QXmlStreamReader &reader);
+    void loadItemData(QXmlStreamReader &reader);
 
     SyntaxRepository *m_repo;
     QHash<QString, KeywordList> m_keywordLists;
     QVector<Context*> m_contexts;
+    QHash<QString, Format> m_formats;
 
     QString m_name;
     QString m_section;

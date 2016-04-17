@@ -126,6 +126,9 @@ void SyntaxDefinition::loadHighlighting(QXmlStreamReader& reader)
                     m_keywordLists.insert(keywords.name(), keywords);
                 } else if (reader.name() == QLatin1String("contexts")) {
                     loadContexts(reader);
+                    reader.readNext();
+                } else if (reader.name() == QLatin1String("itemDatas")) {
+                    loadItemData(reader);
                 } else {
                     reader.readNext();
                 }
@@ -152,6 +155,31 @@ void SyntaxDefinition::loadContexts(QXmlStreamReader& reader)
                     context->setSyntaxDefinition(this);
                     context->load(reader);
                     m_contexts.push_back(context);
+                }
+                reader.readNext();
+                break;
+            case QXmlStreamReader::EndElement:
+                return;
+            default:
+                reader.readNext();
+                break;
+        }
+    }
+}
+
+void SyntaxDefinition::loadItemData(QXmlStreamReader& reader)
+{
+    Q_ASSERT(reader.name() == QLatin1String("itemDatas"));
+    Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
+
+    while (!reader.atEnd()) {
+        switch (reader.tokenType()) {
+            case QXmlStreamReader::StartElement:
+                if (reader.name() == QLatin1String("itemData")) {
+                    Format f;
+                    f.load(reader);
+                    m_formats.insert(f.name(), f);
+                    reader.readNext();
                 }
                 reader.readNext();
                 break;

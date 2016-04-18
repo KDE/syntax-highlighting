@@ -25,7 +25,10 @@ Format::Format() :
     m_italic(false),
     m_bold(false),
     m_underline(false),
-    m_strikeout(false)
+    m_strikeout(false),
+    m_hasColor(false),
+    m_hasSelColor(false),
+    m_hasBgColor(false)
 {
 }
 
@@ -38,9 +41,29 @@ QString Format::name() const
     return m_name;
 }
 
+bool Format::isNormal() const
+{
+    return !m_hasColor && !m_hasSelColor && !m_hasBgColor && !m_bold && !m_italic && !m_underline && !m_strikeout;
+}
+
+bool Format::hasColor() const
+{
+    return m_hasColor;
+}
+
 QColor Format::color() const
 {
     return m_color;
+}
+
+bool Format::hasBackgroundColor() const
+{
+    return m_hasBgColor;
+}
+
+QColor Format::backgroundColor() const
+{
+    return m_backgroundColor;
 }
 
 void Format::load(QXmlStreamReader& reader)
@@ -48,11 +71,14 @@ void Format::load(QXmlStreamReader& reader)
     m_name = reader.attributes().value(QStringLiteral("name")).toString();
 
     auto colStr = reader.attributes().value(QStringLiteral("color"));
-    if (!colStr.isEmpty())
+    if ((m_hasColor = !colStr.isEmpty()))
         m_color = QColor(colStr.toString());
     colStr = reader.attributes().value(QStringLiteral("selColor"));
-    if (!colStr.isEmpty())
+    if ((m_hasSelColor = !colStr.isEmpty()))
         m_selColor = QColor(colStr.toString());
+    colStr = reader.attributes().value(QStringLiteral("backgroundColor"));
+    if ((m_hasBgColor = !colStr.isEmpty()))
+        m_backgroundColor = QColor(colStr.toString());
 
     m_italic = reader.attributes().value(QStringLiteral("italic")) == QLatin1String("true");
     m_bold = reader.attributes().value(QStringLiteral("bold")) == QLatin1String("true");

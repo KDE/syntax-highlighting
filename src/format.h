@@ -34,7 +34,12 @@ public:
     ~Format();
 
     QString name() const;
+    bool isNormal() const;
+
+    bool hasColor() const;
     QColor color() const;
+    bool hasBackgroundColor() const;
+    QColor backgroundColor() const;
 
     void load(QXmlStreamReader &reader);
 
@@ -42,10 +47,14 @@ private:
     QString m_name;
     QColor m_color;
     QColor m_selColor;
+    QColor m_backgroundColor;
     bool m_italic;
     bool m_bold;
     bool m_underline;
     bool m_strikeout;
+    bool m_hasColor;
+    bool m_hasSelColor;
+    bool m_hasBgColor;
 };
 }
 

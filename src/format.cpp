@@ -38,6 +38,11 @@ QString Format::name() const
     return m_name;
 }
 
+QColor Format::color() const
+{
+    return m_color;
+}
+
 void Format::load(QXmlStreamReader& reader)
 {
     m_name = reader.attributes().value(QStringLiteral("name")).toString();

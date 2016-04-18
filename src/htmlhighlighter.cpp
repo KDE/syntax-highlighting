@@ -45,13 +45,16 @@ void HTMLHighlighter::highlightFile(const QString& fileName)
         return;
     }
 
+    m_out << "<html><body><pre>\n";
+
     QTextStream in(&f);
     while (!in.atEnd()) {
         m_currentLine = in.readLine();
         highlightLine(m_currentLine);
-        m_out << "<br/>\n";
+        m_out << "\n";
     }
 
+    m_out << "</pre></body></html>\n";
     m_out.flush();
     m_out.device()->close();
 }
@@ -59,7 +62,7 @@ void HTMLHighlighter::highlightFile(const QString& fileName)
 void HTMLHighlighter::setFormat(int offset, int length, const Format& format)
 {
     if (format.name().isEmpty())
-        m_out << "<dsNormal>" << m_currentLine.midRef(offset, length) << "</dsNormal>";
+        m_out << m_currentLine.mid(offset, length).toHtmlEscaped();
     else
-        m_out << "<" << format.name() << ">" << m_currentLine.midRef(offset, length) << "</" << format.name() << ">";
+        m_out << "<span style=\"color:" << format.color().name() << "\">" << m_currentLine.mid(offset, length).toHtmlEscaped() << "</span>";
 }

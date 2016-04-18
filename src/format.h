@@ -18,6 +18,8 @@
 #ifndef KATESYNTAX_FORMAT_H
 #define KATESYNTAX_FORMAT_H
 
+#include "katesyntax_export.h"
+
 #include <QColor>
 #include <QString>
 
@@ -25,13 +27,14 @@ class QXmlStreamReader;
 
 namespace KateSyntax {
 
-class Format
+class KATESYNTAX_EXPORT Format
 {
 public:
     Format();
     ~Format();
 
     QString name() const;
+    QColor color() const;
 
     void load(QXmlStreamReader &reader);
 

@@ -19,16 +19,65 @@
 
 #include <syntaxrepository.h>
 #include <syntaxdefinition.h>
-#include <htmlhighlighter.h>
+#include <abstracthighlighter.h>
 
 #include <QDirIterator>
+#include <QFile>
 #include <QObject>
 #include <QProcess>
+#include <QTextStream>
 #include <QtTest/qtest.h>
 
 using namespace KateSyntax;
 
-class HTMLHighlighterTest : public QObject
+class TestHighlighter : public AbstractHighlighter
+{
+public:
+    void highlightFile(const QString &fileName)
+    {
+        QFile f(fileName);
+        if (!f.open(QFile::ReadOnly)) {
+            qWarning() << "Failed to open input file" << fileName << ":" << f.errorString();
+            return;
+        }
+
+        QTextStream in(&f);
+        while (!in.atEnd()) {
+            m_currentLine = in.readLine();
+            highlightLine(m_currentLine);
+            m_out << "<br/>\n";
+        }
+
+        m_out.flush();
+        m_out.device()->close();
+    }
+
+    void setOutputFile(const QString &fileName)
+    {
+        auto outFile = new QFile(fileName);
+        if (!outFile->open(QFile::WriteOnly | QFile::Truncate)) {
+            qWarning() << "Failed to open output file" << fileName << ":" << outFile->errorString();
+            return;
+        }
+        m_out.setDevice(outFile);
+    }
+
+protected:
+    void setFormat(int offset, int length, const Format &format) override
+    {
+        if (format.name().isEmpty())
+            m_out << "<dsNormal>" << m_currentLine.midRef(offset, length) << "</dsNormal>";
+        else
+            m_out << "<" << format.name() << ">" << m_currentLine.midRef(offset, length) << "</" << format.name() << ">";
+    }
+
+private:
+    QTextStream m_out;
+    QString m_currentLine;
+};
+
+
+class TestHighlighterTest : public QObject
 {
     Q_OBJECT
 private:
@@ -45,11 +94,11 @@ private slots:
         while (it.hasNext()) {
             const auto inFile = it.next();
             QTest::newRow(it.fileName().toUtf8()) << inFile
-                << (QStringLiteral(TESTBUILDDIR "/html.output/") + it.fileName() + QStringLiteral(".html"))
-                << (QStringLiteral(TESTSRCDIR "/html/") + it.fileName() + QStringLiteral(".html"));
+                << (QStringLiteral(TESTBUILDDIR "/output/") + it.fileName() + QStringLiteral(".html"))
+                << (QStringLiteral(TESTSRCDIR "/reference/") + it.fileName() + QStringLiteral(".ref.html"));
         }
 
-        QDir().mkpath(QStringLiteral(TESTBUILDDIR "/html.output/"));
+        QDir().mkpath(QStringLiteral(TESTBUILDDIR "/output/"));
     }
 
     void testHighlight()
@@ -60,7 +109,7 @@ private slots:
 
         qDebug() << inFile << outFile << refFile;
 
-        HTMLHighlighter highlighter;
+        TestHighlighter highlighter;
         auto def = m_repo.definitionForFileName(inFile);
         QVERIFY(def);
         qDebug() << "Using syntax" << def->name();
@@ -78,7 +127,8 @@ private slots:
 
 };
 
-QTEST_MAIN(HTMLHighlighterTest)
+QTEST_MAIN(TestHighlighterTest)
 
-#include "htmlhighlighter_test.moc"
+#include "testhighlighter.moc"
+
 

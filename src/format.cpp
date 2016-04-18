@@ -21,7 +21,46 @@
 
 using namespace KateSyntax;
 
+static Format::DefaultFormat stringToDefaultFormat(const QStringRef &str)
+{
+#define D(type) if (str == QLatin1String("ds" #type)) return Format:: type;
+    D(Normal)
+    D(Keyword)
+    D(Function)
+    D(Variable)
+    D(ControlFlow)
+    D(Operator)
+    D(BuiltIn)
+    D(Extension)
+    D(Preprocessor)
+    D(Attribute)
+    D(Char)
+    D(SpecialChar)
+    D(String)
+    D(VerbatimString)
+    D(SpecialString)
+    D(Import)
+    D(DataType)
+    D(DecVal)
+    D(BaseN)
+    D(Float)
+    D(Constant)
+    D(Comment)
+    D(Documentation)
+    D(Annotation)
+    D(CommentVar)
+    D(RegionMarker)
+    D(Information)
+    D(Warning)
+    D(Alert)
+    D(Error)
+    D(Others)
+#undef D
+    return Format::Normal;
+}
+
 Format::Format() :
+    m_default(Normal),
     m_italic(false),
     m_bold(false),
     m_underline(false),
@@ -69,6 +108,7 @@ QColor Format::backgroundColor() const
 void Format::load(QXmlStreamReader& reader)
 {
     m_name = reader.attributes().value(QStringLiteral("name")).toString();
+    m_default = stringToDefaultFormat(reader.attributes().value(QStringLiteral("defStyleNum")));
 
     auto colStr = reader.attributes().value(QStringLiteral("color"));
     if ((m_hasColor = !colStr.isEmpty()))

@@ -33,6 +33,40 @@ public:
     Format();
     ~Format();
 
+    enum DefaultFormat {
+        Normal,
+        Keyword,
+        Function,
+        Variable,
+        ControlFlow,
+        Operator,
+        BuiltIn,
+        Extension,
+        Preprocessor,
+        Attribute,
+        Char,
+        SpecialChar,
+        String,
+        VerbatimString,
+        SpecialString,
+        Import,
+        DataType,
+        DecVal,
+        BaseN,
+        Float,
+        Constant,
+        Comment,
+        Documentation,
+        Annotation,
+        CommentVar,
+        RegionMarker,
+        Information,
+        Warning,
+        Alert,
+        Error,
+        Others
+    };
+
     QString name() const;
     bool isNormal() const;
 
@@ -48,6 +82,7 @@ private:
     QColor m_color;
     QColor m_selColor;
     QColor m_backgroundColor;
+    DefaultFormat m_default;
     bool m_italic;
     bool m_bold;
     bool m_underline;

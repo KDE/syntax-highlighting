@@ -8,6 +8,7 @@ set(kate_syntax_srcs
     matchresult.cpp
     rule.cpp
     syntaxdefinition.cpp
+    syntaxhighlighter.cpp
     syntaxrepository.cpp
 )
 qt5_add_resources(kate_syntax_srcs ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/kate/data/syntax-data.qrc)

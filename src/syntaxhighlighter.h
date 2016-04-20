@@ -15,43 +15,30 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef KATESYNTAX_ABSTRACTHIGHLIGHTERM_H
-#define KATESYNTAX_ABSTRACTHIGHLIGHTERM_H
+#ifndef KATESYNTAX_QSYNTAXHIGHLIGHTER_H
+#define KATESYNTAX_QSYNTAXHIGHLIGHTER_H
 
 #include "katesyntax_export.h"
 
-#include <QStack>
-#include <QStringList>
+#include "abstracthighlighter.h"
 
-class QString;
+#include <QSyntaxHighlighter>
 
 namespace KateSyntax {
 
-class Context;
-class ContextSwitch;
-class Format;
-class SyntaxDefinition;
-
-class KATESYNTAX_EXPORT AbstractHighlighter
+class KATESYNTAX_EXPORT SyntaxHighlighter : public QSyntaxHighlighter, public AbstractHighlighter
 {
+    Q_OBJECT
 public:
-    AbstractHighlighter();
-    virtual ~AbstractHighlighter();
-
-    void setDefinition(SyntaxDefinition *def);
-
-    void highlightLine(const QString &text);
+    explicit SyntaxHighlighter(QObject *parent = nullptr);
+    ~SyntaxHighlighter();
 
 protected:
-    virtual void setFormat(int offset, int length, const Format &format);
+    void highlightBlock(const QString & text) override;
+    void setFormat(int offset, int length, const Format &format) override;
 
 private:
-    void switchContext(const ContextSwitch &contextSwitch, const QStringList &captures = QStringList());
-
-    SyntaxDefinition *m_definition;
-    QStack<Context*> m_context;
-    QStack<QStringList> m_captureStack;
 };
 }
 
-#endif // KATESYNTAX_ABSTRACTHIGHLIGHTERM_H
+#endif // KATESYNTAX_QSYNTAXHIGHLIGHTER_H

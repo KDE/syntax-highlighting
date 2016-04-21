@@ -27,6 +27,7 @@ using namespace KateSyntax;
 
 SyntaxDefinition::SyntaxDefinition() :
     m_repo(nullptr),
+    m_caseSensitive(Qt::CaseSensitive),
     m_hidden(false)
 {
 }
@@ -114,8 +115,11 @@ bool SyntaxDefinition::load(const QString& definitionFileName)
                 m_mimetypes.push_back(mt);
         }
 
-        if (reader.name() == QLatin1String("highlighting"))
+        else if (reader.name() == QLatin1String("highlighting"))
             loadHighlighting(reader);
+
+        else if (reader.name() == QLatin1String("general"))
+            loadGeneral(reader);
     }
 
     return true;
@@ -189,6 +193,38 @@ void SyntaxDefinition::loadItemData(QXmlStreamReader& reader)
                     f.load(reader);
                     m_formats.insert(f.name(), f);
                     reader.readNext();
+                }
+                reader.readNext();
+                break;
+            case QXmlStreamReader::EndElement:
+                return;
+            default:
+                reader.readNext();
+                break;
+        }
+    }
+}
+
+static bool attrToBool(const QStringRef &str)
+{
+    return str == QLatin1String("1") || str == QLatin1String("true");
+}
+
+void SyntaxDefinition::loadGeneral(QXmlStreamReader& reader)
+{
+    Q_ASSERT(reader.name() == QLatin1String("general"));
+    Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
+    reader.readNext();
+
+    while (!reader.atEnd()) {
+        switch (reader.tokenType()) {
+            case QXmlStreamReader::StartElement:
+                if (reader.name() == QLatin1String("keywords")) {
+                    m_caseSensitive = attrToBool(reader.attributes().value(QStringLiteral("casesensitive"))) ? Qt::CaseSensitive : Qt::CaseInsensitive;
+                    qDebug() << m_name << m_caseSensitive;
+                    // TODO custom delimiters
+                } else {
+                    reader.skipCurrentElement();
                 }
                 reader.readNext();
                 break;

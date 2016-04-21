@@ -46,7 +46,6 @@ void AbstractHighlighter::setDefinition(SyntaxDefinition* def)
 
 void AbstractHighlighter::highlightLine(const QString& text)
 {
-    qDebug() << text;
     if (!m_definition || text.isEmpty()) {
         setFormat(0, text.size(), Format());
         return;

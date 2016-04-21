@@ -65,6 +65,7 @@ private:
     void loadHighlighting(QXmlStreamReader &reader);
     void loadContexts(QXmlStreamReader &reader);
     void loadItemData(QXmlStreamReader &reader);
+    void loadGeneral(QXmlStreamReader &reader);
 
     SyntaxRepository *m_repo;
     QHash<QString, KeywordList> m_keywordLists;
@@ -75,6 +76,7 @@ private:
     QString m_section;
     QVector<QString> m_extensions;
     QVector<QString> m_mimetypes;
+    Qt::CaseSensitivity m_caseSensitive;
     bool m_hidden;
 };
 

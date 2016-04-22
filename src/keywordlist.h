@@ -35,13 +35,16 @@ public:
     bool isEmpty() const;
 
     QString name() const;
-    QSet<QString> keywords() const;
+
+    bool contains(const QStringRef &str) const;
 
     void load(QXmlStreamReader &reader);
+    void setCaseSensitivity(Qt::CaseSensitivity caseSensitive);
 
 private:
     QString m_name;
     QSet<QString> m_keywords;
+    Qt::CaseSensitivity m_caseSensitive;
 };
 }
 

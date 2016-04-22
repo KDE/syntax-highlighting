@@ -239,6 +239,9 @@ void SyntaxDefinition::loadGeneral(QXmlStreamReader& reader)
 
 void SyntaxDefinition::assemble()
 {
+    for (auto it = m_keywordLists.begin(); it != m_keywordLists.end(); ++it)
+        (*it).setCaseSensitivity(m_caseSensitive);
+
     foreach (auto context, m_contexts) {
         context->resolveContexts();
         context->resolveIncludes();

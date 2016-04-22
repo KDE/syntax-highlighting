@@ -21,7 +21,8 @@
 
 using namespace KateSyntax;
 
-KeywordList::KeywordList()
+KeywordList::KeywordList() :
+    m_caseSensitive(Qt::CaseSensitive)
 {
 }
 
@@ -39,9 +40,13 @@ QString KeywordList::name() const
     return m_name;
 }
 
-QSet<QString> KeywordList::keywords() const
+bool KeywordList::contains(const QStringRef &str) const
 {
-    return m_keywords;
+    // TODO avoid the copy in toString!
+
+    if (m_caseSensitive == Qt::CaseSensitive)
+        return m_keywords.contains(str.toString());
+    return m_keywords.contains(str.toString().toLower());
 }
 
 void KeywordList::load(QXmlStreamReader& reader)
@@ -69,4 +74,19 @@ void KeywordList::load(QXmlStreamReader& reader)
                 break;
         }
     }
+}
+
+void KeywordList::setCaseSensitivity(Qt::CaseSensitivity caseSensitive)
+{
+    // we turn the index into lower-case, so this isn't reversible
+    Q_ASSERT(m_caseSensitive != Qt::CaseInsensitive || caseSensitive == m_caseSensitive);
+    m_caseSensitive = caseSensitive;
+
+    if (m_caseSensitive == Qt::CaseSensitive)
+        return;
+
+    QSet<QString> lcWords;
+    foreach (const auto &kw, m_keywords)
+        lcWords.insert(kw.toLower());
+    m_keywords = lcWords;
 }

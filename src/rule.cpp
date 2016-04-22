@@ -511,9 +511,7 @@ MatchResult KeywordListRule::doMatch(const QString& text, int offset, const QStr
     if (newOffset == offset)
         return offset;
 
-    // TODO support case-insensitive keywords
-    // TODO avoid the copy in mid()
-    if (m_keywordList.keywords().contains(text.mid(offset, newOffset - offset)))
+    if (m_keywordList.contains(text.midRef(offset, newOffset - offset)))
         return newOffset;
     return offset;
 }

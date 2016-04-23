@@ -20,6 +20,7 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QFileInfo>
 #include <QTextStream>
 
 using namespace KateSyntax;
@@ -61,7 +62,13 @@ void HtmlHighlighter::highlightFile(const QString& fileName)
         return;
     }
 
-    *m_out << "<html><body><pre>\n";
+    *m_out << "<!DOCTYPE html>\n";
+    *m_out << "<html><head>\n";
+    *m_out << "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>\n";
+    QFileInfo fi(fileName);
+    *m_out << "<title>" << fi.fileName() << "</title>\n";
+    *m_out << "<meta name=\"generator\" content=\"KateSyntax\"/>\n";
+    *m_out << "</head><body><pre>\n";
 
     QTextStream in(&f);
     while (!in.atEnd()) {

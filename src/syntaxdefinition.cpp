@@ -23,6 +23,8 @@
 #include <QFile>
 #include <QXmlStreamReader>
 
+#include <algorithm>
+
 using namespace KateSyntax;
 
 SyntaxDefinition::SyntaxDefinition() :
@@ -228,7 +230,12 @@ void SyntaxDefinition::loadGeneral(QXmlStreamReader& reader)
                 if (reader.name() == QLatin1String("keywords")) {
                     m_caseSensitive = attrToBool(reader.attributes().value(QStringLiteral("casesensitive"))) ? Qt::CaseSensitive : Qt::CaseInsensitive;
                     m_delimiters += reader.attributes().value(QStringLiteral("additionalDeliminator"));
-                    // TODO custom delimiters
+                    std::sort(m_delimiters.begin(), m_delimiters.end());
+                    auto it = std::unique(m_delimiters.begin(), m_delimiters.end());
+                    m_delimiters.truncate(std::distance(m_delimiters.begin(), it));
+                    foreach (const auto c, reader.attributes().value(QLatin1String("weakDeliminator")))
+                        m_delimiters.remove(c);
+                    qDebug() << name() << m_delimiters;
                 } else {
                     reader.skipCurrentElement();
                 }

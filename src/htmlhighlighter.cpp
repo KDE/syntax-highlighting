@@ -87,17 +87,17 @@ void HtmlHighlighter::highlightFile(const QString& fileName)
 
 void HtmlHighlighter::setFormat(int offset, int length, const Format& format)
 {
-    if (!format.isNormal()) {
+    if (!format.isNormal(theme())) {
         *m_out << "<span style=\"";
-        if (format.hasColor())
-            *m_out << "color:" << format.color().name() << ";";
-        if (format.hasBackgroundColor())
-            *m_out << "background-color:" << format.backgroundColor().name() << ";";
+        if (format.hasColor(theme()))
+            *m_out << "color:" << format.color(theme()).name() << ";";
+        if (format.hasBackgroundColor(theme()))
+            *m_out << "background-color:" << format.backgroundColor(theme()).name() << ";";
         *m_out << "\">";
     }
 
     *m_out << m_currentLine.mid(offset, length).toHtmlEscaped();
 
-    if (!format.isNormal())
+    if (!format.isNormal(theme()))
         *m_out << "</span>";
 }

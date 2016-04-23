@@ -19,6 +19,7 @@
 #define KATESYNTAX_ABSTRACTHIGHLIGHTERM_H
 
 #include "katesyntax_export.h"
+#include "theme.h"
 
 #include <QStack>
 #include <QStringList>
@@ -41,9 +42,11 @@ public:
     SyntaxDefinition *definition() const;
     void setDefinition(SyntaxDefinition *def);
 
-    void highlightLine(const QString &text);
+    Theme theme() const;
+    void setTheme(const Theme &theme);
 
 protected:
+    void highlightLine(const QString &text);
     virtual void setFormat(int offset, int length, const Format &format);
 
 private:
@@ -52,6 +55,7 @@ private:
     SyntaxDefinition *m_definition;
     QStack<Context*> m_context;
     QStack<QStringList> m_captureStack;
+    Theme m_theme;
 };
 }
 

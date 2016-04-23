@@ -25,7 +25,8 @@
 using namespace KateSyntax;
 
 AbstractHighlighter::AbstractHighlighter() :
-    m_definition(nullptr)
+    m_definition(nullptr),
+    m_theme(Theme::defaultTheme())
 {
 }
 
@@ -47,6 +48,16 @@ void AbstractHighlighter::setDefinition(SyntaxDefinition* def)
         return;
     m_context.push(m_definition->initialContext());
     m_captureStack.push(QStringList());
+}
+
+Theme AbstractHighlighter::theme() const
+{
+    return m_theme;
+}
+
+void AbstractHighlighter::setTheme(const Theme &theme)
+{
+    m_theme = theme;
 }
 
 void AbstractHighlighter::highlightLine(const QString& text)

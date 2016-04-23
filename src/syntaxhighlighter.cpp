@@ -38,6 +38,6 @@ void SyntaxHighlighter::highlightBlock(const QString& text)
 
 void SyntaxHighlighter::setFormat(int offset, int length, const KateSyntax::Format& format)
 {
-    if (format.hasColor())
-        QSyntaxHighlighter::setFormat(offset, length, format.color());
+    if (format.hasColor(theme()))
+        QSyntaxHighlighter::setFormat(offset, length, format.color(theme()));
 }

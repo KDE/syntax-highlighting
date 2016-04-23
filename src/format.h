@@ -19,6 +19,7 @@
 #define KATESYNTAX_FORMAT_H
 
 #include "katesyntax_export.h"
+#include "theme.h"
 
 #include <QColor>
 #include <QString>
@@ -33,47 +34,13 @@ public:
     Format();
     ~Format();
 
-    enum DefaultFormat {
-        Normal,
-        Keyword,
-        Function,
-        Variable,
-        ControlFlow,
-        Operator,
-        BuiltIn,
-        Extension,
-        Preprocessor,
-        Attribute,
-        Char,
-        SpecialChar,
-        String,
-        VerbatimString,
-        SpecialString,
-        Import,
-        DataType,
-        DecVal,
-        BaseN,
-        Float,
-        Constant,
-        Comment,
-        Documentation,
-        Annotation,
-        CommentVar,
-        RegionMarker,
-        Information,
-        Warning,
-        Alert,
-        Error,
-        Others
-    };
-
     QString name() const;
-    bool isNormal() const;
+    bool isNormal(const Theme &theme) const;
 
-    bool hasColor() const;
-    QColor color() const;
-    bool hasBackgroundColor() const;
-    QColor backgroundColor() const;
+    bool hasColor(const Theme &theme) const;
+    QColor color(const Theme &theme) const;
+    bool hasBackgroundColor(const Theme &theme) const;
+    QColor backgroundColor(const Theme &theme) const;
 
     void load(QXmlStreamReader &reader);
 
@@ -82,7 +49,7 @@ private:
     QColor m_color;
     QColor m_selColor;
     QColor m_backgroundColor;
-    DefaultFormat m_default;
+    Theme::Style m_default;
     bool m_italic;
     bool m_bold;
     bool m_underline;

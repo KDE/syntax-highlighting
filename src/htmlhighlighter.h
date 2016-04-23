@@ -25,10 +25,10 @@
 
 namespace KateSyntax {
 
-class KATESYNTAX_EXPORT HTMLHighlighter : public AbstractHighlighter
+class KATESYNTAX_EXPORT HtmlHighlighter : public AbstractHighlighter
 {
 public:
-    HTMLHighlighter();
+    HtmlHighlighter();
     void highlightFile(const QString &fileName);
     void setOutputFile(const QString &fileName);
 

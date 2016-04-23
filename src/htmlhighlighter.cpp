@@ -23,11 +23,11 @@
 
 using namespace KateSyntax;
 
-HTMLHighlighter::HTMLHighlighter()
+HtmlHighlighter::HtmlHighlighter()
 {
 }
 
-void HTMLHighlighter::setOutputFile(const QString& fileName)
+void HtmlHighlighter::setOutputFile(const QString& fileName)
 {
     auto outFile = new QFile(fileName);
     if (!outFile->open(QFile::WriteOnly | QFile::Truncate)) {
@@ -37,7 +37,7 @@ void HTMLHighlighter::setOutputFile(const QString& fileName)
     m_out.setDevice(outFile);
 }
 
-void HTMLHighlighter::highlightFile(const QString& fileName)
+void HtmlHighlighter::highlightFile(const QString& fileName)
 {
     QFile f(fileName);
     if (!f.open(QFile::ReadOnly)) {
@@ -59,7 +59,7 @@ void HTMLHighlighter::highlightFile(const QString& fileName)
     m_out.device()->close();
 }
 
-void HTMLHighlighter::setFormat(int offset, int length, const Format& format)
+void HtmlHighlighter::setFormat(int offset, int length, const Format& format)
 {
     if (!format.isNormal()) {
         m_out << "<span style=\"";

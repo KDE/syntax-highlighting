@@ -60,7 +60,7 @@ private slots:
 
         qDebug() << inFile << outFile << refFile;
 
-        HTMLHighlighter highlighter;
+        HtmlHighlighter highlighter;
         auto def = m_repo.definitionForFileName(inFile);
         QVERIFY(def);
         qDebug() << "Using syntax" << def->name();

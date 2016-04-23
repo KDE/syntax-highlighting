@@ -19,26 +19,55 @@
 #include <syntaxrepository.h>
 
 #include <QApplication>
+#include <QCommandLineParser>
 #include <QFile>
 #include <QTextEdit>
+
+using namespace KateSyntax;
 
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
 
-    if (argc <= 1)
-        return 1;
+    QCommandLineParser parser;
+    parser.addHelpOption();
+    parser.addPositionalArgument(QStringLiteral("source"), app.tr("The source file to highlight."));
+    QCommandLineOption outputName(QStringList() << QStringLiteral("o") << QStringLiteral("output"),
+                                  app.tr("File to write HTML output to (default: stdout)."),
+                                  app.tr("output"));
+    parser.addOption(outputName);
+    QCommandLineOption syntaxName(QStringList() << QStringLiteral("s") << QStringLiteral("syntax"),
+                                  app.tr("Highlight using this syntax definition (default: auto-detect based on input file)."),
+                                  app.tr("syntax"));
+    parser.addOption(syntaxName);
+    parser.process(app);
 
-    QFile f(app.arguments().last());
+    if (parser.positionalArguments().size() != 1)
+        parser.showHelp(1);
+
+    const auto inFileName = parser.positionalArguments().at(0);
+    QFile f(inFileName);
     if (!f.open(QFile::ReadOnly))
         return 1;
 
     KateSyntax::SyntaxRepository repo;
 
+    SyntaxDefinition *def = nullptr;
+    if (parser.isSet(syntaxName)) {
+        def = repo.definitionForName(parser.value(syntaxName));
+    } else {
+        def = repo.definitionForFileName(inFileName);
+    }
+    if (!def)
+        qFatal("Unknown syntax.");
+
     QTextEdit edit;
+    edit.setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+    edit.setReadOnly(true);
+    edit.resize(1024, 1024);
     edit.show();
     auto hl = new KateSyntax::SyntaxHighlighter(&edit);
-    hl->setDefinition(repo.definitionForFileName(f.fileName()));
+    hl->setDefinition(def);
 
     edit.setPlainText(QString::fromUtf8(f.readAll()));
     hl->setDocument(edit.document());

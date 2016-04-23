@@ -258,9 +258,7 @@ Rule::Ptr Rule::create(const QStringRef& name)
 
 bool Rule::isDelimiter(QChar c) const
 {
-    // TODO: this is definition-global and configurable!
-    static const QString delimiters = QStringLiteral(".():!+,-<=>%&*/;?[]^{|}~\\ \t");
-    return delimiters.contains(c);
+    return m_def->isDelimiter(c);
 }
 
 

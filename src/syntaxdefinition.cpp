@@ -27,6 +27,7 @@ using namespace KateSyntax;
 
 SyntaxDefinition::SyntaxDefinition() :
     m_repo(nullptr),
+    m_delimiters(QStringLiteral(".():!+,-<=>%&*/;?[]^{|}~\\ \t")),
     m_caseSensitive(Qt::CaseSensitive),
     m_hidden(false)
 {
@@ -75,6 +76,11 @@ Context* SyntaxDefinition::contextByName(const QString& name) const
 KeywordList SyntaxDefinition::keywordList(const QString& name) const
 {
     return m_keywordLists.value(name);
+}
+
+bool SyntaxDefinition::isDelimiter(QChar c) const
+{
+    return m_delimiters.contains(c);
 }
 
 Format SyntaxDefinition::formatByName(const QString& name) const
@@ -221,7 +227,7 @@ void SyntaxDefinition::loadGeneral(QXmlStreamReader& reader)
             case QXmlStreamReader::StartElement:
                 if (reader.name() == QLatin1String("keywords")) {
                     m_caseSensitive = attrToBool(reader.attributes().value(QStringLiteral("casesensitive"))) ? Qt::CaseSensitive : Qt::CaseInsensitive;
-                    qDebug() << m_name << m_caseSensitive;
+                    m_delimiters += reader.attributes().value(QStringLiteral("additionalDeliminator"));
                     // TODO custom delimiters
                 } else {
                     reader.skipCurrentElement();

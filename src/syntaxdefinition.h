@@ -53,6 +53,7 @@ public:
     Context* contextByName(const QString &name) const;
 
     KeywordList keywordList(const QString &name) const;
+    bool isDelimiter(QChar c) const;
 
     Format formatByName(const QString &name) const;
 
@@ -71,6 +72,7 @@ private:
     QHash<QString, KeywordList> m_keywordLists;
     QVector<Context*> m_contexts;
     QHash<QString, Format> m_formats;
+    QString m_delimiters;
 
     QString m_name;
     QString m_section;

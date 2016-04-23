@@ -19,11 +19,31 @@ include(GenerateExportHeader)
 
 enable_testing()
 
+#
+# Version setup
+#
 set(KATESYNTAX_VERSION_MAJOR "0")
 set(KATESYNTAX_VERSION_MINOR "0")
 set(KATESYNTAX_VERSION_PATCH "1")
 set(KATESYNTAX_VERSION "${KATESYNTAX_VERSION_MAJOR}.${KATESYNTAX_VERSION_MINOR}.${KATESYNTAX_VERSION_PATCH}")
 set(KATESYNTAX_VERSION_STRING "${KATESYNTAX_VERSION}")
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
+  find_package(Git)
+  set_package_properties(Git PROPERTIES TYPE OPTIONAL PURPOSE "Determine exact build version.")
+  if(GIT_FOUND)
+    execute_process(
+      COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+      OUTPUT_VARIABLE _git_revision
+    )
+    string(REGEX REPLACE "\n" "" _git_revision "${_git_revision}")
+    set(KATESYNTAX_VERSION_STRING "${KATESYNTAX_VERSION_STRING} (revision: ${_git_revision})")
+  endif()
+endif()
+
+configure_file(config-katesyntax-version.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-katesyntax-version.h)
+
 
 #
 # Compiler & linker settings
@@ -85,6 +105,7 @@ set(
 #
 # Actually build the stuff
 #
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_subdirectory(src)
 add_subdirectory(tools)
 add_subdirectory(tests)

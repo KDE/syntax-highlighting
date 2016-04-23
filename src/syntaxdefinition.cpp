@@ -235,7 +235,6 @@ void SyntaxDefinition::loadGeneral(QXmlStreamReader& reader)
                     m_delimiters.truncate(std::distance(m_delimiters.begin(), it));
                     foreach (const auto c, reader.attributes().value(QLatin1String("weakDeliminator")))
                         m_delimiters.remove(c);
-                    qDebug() << name() << m_delimiters;
                 } else {
                     reader.skipCurrentElement();
                 }

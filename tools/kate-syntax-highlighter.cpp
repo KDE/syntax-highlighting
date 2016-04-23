@@ -15,6 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "config-katesyntax-version.h"
 
 #include <htmlhighlighter.h>
 #include <syntaxrepository.h>
@@ -33,8 +34,7 @@ int main(int argc, char **argv)
     QCoreApplication::setApplicationName(QStringLiteral("kate-syntax-highlighter"));
     QCoreApplication::setOrganizationDomain(QStringLiteral("kde.org"));
     QCoreApplication::setOrganizationName(QStringLiteral("KDE"));
-    // TODO: get version from CMake
-//     QCoreApplication::setApplicationVersion(QStringLiteral(KATESYNTAX_VERSION));
+    QCoreApplication::setApplicationVersion(QStringLiteral(KATESYNTAX_VERSION_STRING));
 
     QCommandLineParser parser;
     parser.setApplicationDescription(app.tr("Command line syntax highlighter using Kate syntax definitions."));

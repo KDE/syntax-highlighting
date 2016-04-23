@@ -42,6 +42,7 @@ public:
     QString name() const;
     QString attribute() const;
     ContextSwitch lineEndContext() const;
+    ContextSwitch lineEmptyContext() const;
 
     bool fallthrough() const;
     ContextSwitch fallthroughContext() const;
@@ -67,6 +68,7 @@ private:
     QString m_name;
     QString m_attribute;
     ContextSwitch m_lineEndContext;
+    ContextSwitch m_lineEmptyContext;
     ContextSwitch m_fallthroughContext;
 
     QVector<Rule::Ptr> m_rules;

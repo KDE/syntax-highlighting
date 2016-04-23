@@ -62,6 +62,11 @@ ContextSwitch Context::lineEndContext() const
     return m_lineEndContext;
 }
 
+ContextSwitch Context::lineEmptyContext() const
+{
+    return m_lineEmptyContext;
+}
+
 bool Context::fallthrough() const
 {
     return m_fallthrough;
@@ -85,6 +90,7 @@ void Context::load(QXmlStreamReader& reader)
     m_name = reader.attributes().value(QStringLiteral("name")).toString();
     m_attribute = reader.attributes().value(QStringLiteral("attribute")).toString();
     m_lineEndContext.parse(reader.attributes().value(QStringLiteral("lineEndContext")));
+    m_lineEmptyContext.parse(reader.attributes().value(QStringLiteral("lineEmptyContext")));
     m_fallthrough = reader.attributes().value(QStringLiteral("fallthrough")) == QLatin1String("true");
     m_fallthroughContext.parse(reader.attributes().value(QStringLiteral("fallthroughContext")));
     if (m_fallthroughContext.isStay())
@@ -118,6 +124,7 @@ void Context::load(QXmlStreamReader& reader)
 void Context::resolveContexts()
 {
     m_lineEndContext.resolve(m_def);
+    m_lineEmptyContext.resolve(m_def);
     m_fallthroughContext.resolve(m_def);
     foreach (auto rule, m_rules)
         rule->resolveContext();

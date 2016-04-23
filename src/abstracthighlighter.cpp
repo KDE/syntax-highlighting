@@ -67,8 +67,15 @@ void AbstractHighlighter::setTheme(const Theme &theme)
 
 void AbstractHighlighter::highlightLine(const QString& text)
 {
-    if (!m_definition || text.isEmpty()) {
+    if (!m_definition) {
         setFormat(0, text.size(), Format());
+        return;
+    }
+
+    if (text.isEmpty()) {
+        while (!m_context.top()->lineEmptyContext().isStay())
+            switchContext(m_context.top()->lineEmptyContext());
+        setFormat(0, 0, Format());
         return;
     }
 

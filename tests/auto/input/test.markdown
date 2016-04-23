@@ -23,3 +23,13 @@ Numbered list:
   2. item 2
 
 [link](http://kde.org)
+
+    code 1
+    code 2
+
+normal text
+
+> block quote _italic_
+> more block quote
+
+normal text

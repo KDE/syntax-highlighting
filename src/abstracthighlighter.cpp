@@ -42,6 +42,11 @@ SyntaxDefinition* AbstractHighlighter::definition() const
 void AbstractHighlighter::setDefinition(SyntaxDefinition* def)
 {
     m_definition = def;
+    reset();
+}
+
+void AbstractHighlighter::reset()
+{
     m_context.clear();
     m_captureStack.clear();
     if (!m_definition)

@@ -70,7 +70,6 @@ int main(int argc, char **argv)
     hl->setDefinition(def);
 
     edit.setPlainText(QString::fromUtf8(f.readAll()));
-    hl->setDocument(edit.document());
 
     return app.exec();
 }

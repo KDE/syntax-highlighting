@@ -33,11 +33,30 @@ SyntaxHighlighter::~SyntaxHighlighter()
 
 void SyntaxHighlighter::highlightBlock(const QString& text)
 {
+    if (currentBlock().position() == 0)
+        reset();
     highlightLine(text);
 }
 
 void SyntaxHighlighter::setFormat(int offset, int length, const KateSyntax::Format& format)
 {
+    if (format.isNormal(theme()) || offset == length)
+        return;
+
+    QTextCharFormat tf;
     if (format.hasColor(theme()))
-        QSyntaxHighlighter::setFormat(offset, length, format.color(theme()));
+        tf.setForeground(format.color(theme()));
+    if (format.hasBackgroundColor(theme()))
+        tf.setBackground(format.backgroundColor(theme()));
+
+    if (format.isBold(theme()))
+        tf.setFontWeight(QFont::Bold);
+    if (format.isItalic(theme()))
+        tf.setFontItalic(true);
+    if (format.isUnderline(theme()))
+        tf.setFontUnderline(true);
+    if (format.isStrikeThrough(theme()))
+        tf.setFontStrikeOut(true);
+
+    QSyntaxHighlighter::setFormat(offset, length, tf);
 }

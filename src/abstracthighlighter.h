@@ -47,6 +47,7 @@ public:
 
 protected:
     void highlightLine(const QString &text);
+    void reset();
     virtual void setFormat(int offset, int length, const Format &format);
 
 private:

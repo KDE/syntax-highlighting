@@ -56,6 +56,11 @@ SyntaxDefinition* SyntaxRepository::definitionForFileName(const QString& fileNam
     return nullptr;
 }
 
+QVector<SyntaxDefinition*> SyntaxRepository::definitions() const
+{
+    return m_defs;
+}
+
 void SyntaxRepository::load()
 {
     QDirIterator it(QStringLiteral(":/kate-syntax"));
@@ -66,8 +71,6 @@ void SyntaxRepository::load()
             m_defs.push_back(def);
         }
     }
-
-    qDebug() << "Found" << m_defs.size() << "syntax definitions.";
 }
 
 void SyntaxRepository::assemble()

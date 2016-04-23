@@ -1,4 +1,3 @@
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../src)
 configure_file(test-config.h.in ${CMAKE_CURRENT_BINARY_DIR}/test-config.h)
 
 add_executable(syntaxrepository_test syntaxrepository_test.cpp)

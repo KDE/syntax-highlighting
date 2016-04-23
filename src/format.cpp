@@ -83,7 +83,8 @@ QString Format::name() const
 
 bool Format::isNormal(const Theme &theme) const
 {
-    return !hasColor(theme) && !m_hasSelColor && !hasBackgroundColor(theme) && !isBold(theme) && !m_italic && !isUnderline(theme) && !m_strikeout;
+    return !hasColor(theme) && !m_hasSelColor && !hasBackgroundColor(theme)
+        && !isBold(theme) && !isItalic(theme) && !isUnderline(theme) && !isStrikeThrough(theme);
 }
 
 bool Format::hasColor(const Theme &theme) const
@@ -116,10 +117,22 @@ bool Format::isBold(const Theme &theme) const
     return m_bold || theme.isBold(m_default);
 }
 
+bool Format::isItalic(const Theme &theme) const
+{
+    // FIXME: an explicit false here should override theme
+    return m_italic || theme.isItalic(m_default);
+}
+
 bool Format::isUnderline(const Theme &theme) const
 {
     // FIXME: an explicit false here should override theme
     return m_underline || theme.isUnderline(m_default);
+}
+
+bool Format::isStrikeThrough(const Theme &theme) const
+{
+    // FIXME: an explicit false here should override theme
+    return m_strikeout || theme.isStrikeThrough(m_default);
 }
 
 void Format::load(QXmlStreamReader& reader)
@@ -140,5 +153,5 @@ void Format::load(QXmlStreamReader& reader)
     m_italic = reader.attributes().value(QStringLiteral("italic")) == QLatin1String("true");
     m_bold = reader.attributes().value(QStringLiteral("bold")) == QLatin1String("true");
     m_underline = reader.attributes().value(QStringLiteral("underline")) == QLatin1String("true");
-    m_strikeout = reader.attributes().value(QStringLiteral("strikeout")) == QLatin1String("true");
+    m_strikeout = reader.attributes().value(QStringLiteral("strikeOut")) == QLatin1String("true");
 }

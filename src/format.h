@@ -43,7 +43,9 @@ public:
     QColor backgroundColor(const Theme &theme) const;
 
     bool isBold(const Theme &theme) const;
+    bool isItalic(const Theme &theme) const;
     bool isUnderline(const Theme &theme) const;
+    bool isStrikeThrough(const Theme &theme) const;
 
     void load(QXmlStreamReader &reader);
 

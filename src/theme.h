@@ -52,7 +52,9 @@ public:
     QRgb backgroundColor(Style style) const;
 
     bool isBold(Style style) const;
+    bool isItalic(Style style) const;
     bool isUnderline(Style style) const;
+    bool isStrikeThrough(Style style) const;
 
     enum DefaultTheme {
         NormalTheme,

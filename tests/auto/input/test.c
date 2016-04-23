@@ -39,4 +39,18 @@ static const char* c5 = "multiline \
 
 #wrong
 
+/**
+ * Doxygen
+ * @param p1 text
+ * \brief <b>bold text</b>
+ * \dot
+ * a -> b
+ * \enddot
+ *
+ * \verbatim
+ * <dummy>
+ * \endverbatim
+ * <html>text</html>
+ */
+
 #endif

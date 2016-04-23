@@ -95,8 +95,12 @@ void HtmlHighlighter::setFormat(int offset, int length, const Format& format)
             *m_out << "background-color:" << format.backgroundColor(theme()).name() << ";";
         if (format.isBold(theme()))
             *m_out << "font-weight:bold;";
+        if (format.isItalic(theme()))
+            *m_out << "font-style:italic;";
         if (format.isUnderline(theme()))
             *m_out << "text-decoration:underline;";
+        if (format.isStrikeThrough(theme()))
+            *m_out << "text-decoration:line-through;";
         *m_out << "\">";
     }
 

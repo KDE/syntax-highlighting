@@ -593,9 +593,11 @@ bool StringDetect::doLoad(QXmlStreamReader& reader)
 
 MatchResult StringDetect::doMatch(const QString& text, int offset, const QStringList &captures)
 {
-    Q_UNUSED(captures); // TODO
-    if (text.midRef(offset, m_string.size()).compare(m_string, m_caseSensitivity) == 0)
-        return offset + m_string.size();
+    auto pattern = m_string;
+    if (isDynamic())
+        pattern = replaceCaptures(m_string, captures);
+    if (text.midRef(offset, pattern.size()).compare(pattern, m_caseSensitivity) == 0)
+        return offset + pattern.size();
     return offset;
 }
 

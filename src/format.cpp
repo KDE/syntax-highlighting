@@ -83,7 +83,7 @@ QString Format::name() const
 
 bool Format::isNormal(const Theme &theme) const
 {
-    return !hasColor(theme) && !m_hasSelColor && !hasBackgroundColor(theme) && !m_bold && !m_italic && !m_underline && !m_strikeout;
+    return !hasColor(theme) && !m_hasSelColor && !hasBackgroundColor(theme) && !isBold(theme) && !m_italic && !isUnderline(theme) && !m_strikeout;
 }
 
 bool Format::hasColor(const Theme &theme) const
@@ -108,6 +108,18 @@ QColor Format::backgroundColor(const Theme &theme) const
     if (m_hasBgColor)
         return m_backgroundColor;
     return QColor(theme.backgroundColor(m_default));
+}
+
+bool Format::isBold(const Theme &theme) const
+{
+    // FIXME: an explicit false here should override theme
+    return m_bold || theme.isBold(m_default);
+}
+
+bool Format::isUnderline(const Theme &theme) const
+{
+    // FIXME: an explicit false here should override theme
+    return m_underline || theme.isUnderline(m_default);
 }
 
 void Format::load(QXmlStreamReader& reader)

@@ -93,6 +93,10 @@ void HtmlHighlighter::setFormat(int offset, int length, const Format& format)
             *m_out << "color:" << format.color(theme()).name() << ";";
         if (format.hasBackgroundColor(theme()))
             *m_out << "background-color:" << format.backgroundColor(theme()).name() << ";";
+        if (format.isBold(theme()))
+            *m_out << "font-weight:bold;";
+        if (format.isUnderline(theme()))
+            *m_out << "text-decoration:underline;";
         *m_out << "\">";
     }
 

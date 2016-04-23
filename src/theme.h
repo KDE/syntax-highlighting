@@ -51,6 +51,9 @@ public:
     QRgb normalColor(Style style) const;
     QRgb backgroundColor(Style style) const;
 
+    bool isBold(Style style) const;
+    bool isUnderline(Style style) const;
+
     enum DefaultTheme {
         NormalTheme,
         DarkTheme

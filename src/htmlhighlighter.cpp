@@ -20,6 +20,7 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QTextStream>
 
 using namespace KateSyntax;
 
@@ -27,51 +28,68 @@ HtmlHighlighter::HtmlHighlighter()
 {
 }
 
+HtmlHighlighter::~HtmlHighlighter()
+{
+}
+
 void HtmlHighlighter::setOutputFile(const QString& fileName)
 {
-    auto outFile = new QFile(fileName);
-    if (!outFile->open(QFile::WriteOnly | QFile::Truncate)) {
-        qWarning() << "Failed to open output file" << fileName << ":" << outFile->errorString();
+    m_file.reset(new QFile(fileName));
+    if (!m_file->open(QFile::WriteOnly | QFile::Truncate)) {
+        qWarning() << "Failed to open output file" << fileName << ":" << m_file->errorString();
         return;
     }
-    m_out.setDevice(outFile);
+    m_out.reset(new QTextStream(m_file.get()));
+}
+
+void HtmlHighlighter::setOutputFile(FILE *fileHandle)
+{
+    m_out.reset(new QTextStream(fileHandle, QIODevice::WriteOnly));
+
 }
 
 void HtmlHighlighter::highlightFile(const QString& fileName)
 {
+    if (!m_out) {
+        qWarning() << "No output stream defined!";
+        return;
+    }
+
     QFile f(fileName);
     if (!f.open(QFile::ReadOnly)) {
         qWarning() << "Failed to open input file" << fileName << ":" << f.errorString();
         return;
     }
 
-    m_out << "<html><body><pre>\n";
+    *m_out << "<html><body><pre>\n";
 
     QTextStream in(&f);
     while (!in.atEnd()) {
         m_currentLine = in.readLine();
         highlightLine(m_currentLine);
-        m_out << "\n";
+        *m_out << "\n";
     }
 
-    m_out << "</pre></body></html>\n";
-    m_out.flush();
-    m_out.device()->close();
+    *m_out << "</pre></body></html>\n";
+    m_out->flush();
+
+    m_out.reset();
+    m_file.reset();
 }
 
 void HtmlHighlighter::setFormat(int offset, int length, const Format& format)
 {
     if (!format.isNormal()) {
-        m_out << "<span style=\"";
+        *m_out << "<span style=\"";
         if (format.hasColor())
-            m_out << "color:" << format.color().name() << ";";
+            *m_out << "color:" << format.color().name() << ";";
         if (format.hasBackgroundColor())
-            m_out << "background-color:" << format.backgroundColor().name() << ";";
-        m_out << "\">";
+            *m_out << "background-color:" << format.backgroundColor().name() << ";";
+        *m_out << "\">";
     }
 
-    m_out << m_currentLine.mid(offset, length).toHtmlEscaped();
+    *m_out << m_currentLine.mid(offset, length).toHtmlEscaped();
 
     if (!format.isNormal())
-        m_out << "</span>";
+        *m_out << "</span>";
 }

@@ -21,7 +21,10 @@
 #include "katesyntax_export.h"
 #include "abstracthighlighter.h"
 
-#include <QTextStream>
+#include <memory>
+
+class QFile;
+class QTextStream;
 
 namespace KateSyntax {
 
@@ -29,14 +32,19 @@ class KATESYNTAX_EXPORT HtmlHighlighter : public AbstractHighlighter
 {
 public:
     HtmlHighlighter();
+    ~HtmlHighlighter();
+
     void highlightFile(const QString &fileName);
+
     void setOutputFile(const QString &fileName);
+    void setOutputFile(FILE *fileHandle);
 
 protected:
     void setFormat(int offset, int length, const Format &format) override;
 
 private:
-    QTextStream m_out;
+    std::unique_ptr<QTextStream> m_out;
+    std::unique_ptr<QFile> m_file;
     QString m_currentLine;
 };
 }

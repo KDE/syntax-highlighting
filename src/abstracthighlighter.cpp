@@ -33,6 +33,11 @@ AbstractHighlighter::~AbstractHighlighter()
 {
 }
 
+SyntaxDefinition* AbstractHighlighter::definition() const
+{
+    return m_definition;
+}
+
 void AbstractHighlighter::setDefinition(SyntaxDefinition* def)
 {
     m_definition = def;

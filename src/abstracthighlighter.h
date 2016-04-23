@@ -38,6 +38,7 @@ public:
     AbstractHighlighter();
     virtual ~AbstractHighlighter();
 
+    SyntaxDefinition *definition() const;
     void setDefinition(SyntaxDefinition *def);
 
     void highlightLine(const QString &text);

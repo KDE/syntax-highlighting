@@ -103,9 +103,9 @@ void AbstractHighlighter::highlightLine(const QString& text)
                 break;
             }
 
+            switchContext(rule->context(), newResult.captures());
             newFormat = rule->attribute().isEmpty() ? m_context.top()->attribute() : rule->attribute();
             newLookupDef = rule->syntaxDefinition();
-            switchContext(rule->context(), newResult.captures());
             if (newOffset == text.size() && std::dynamic_pointer_cast<LineContinue>(rule))
                 lineContinuation = true;
             break;

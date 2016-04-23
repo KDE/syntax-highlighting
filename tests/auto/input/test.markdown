@@ -14,13 +14,13 @@ Formats: _italic_, **bold**, `monospace`, ~~strikeout~~
 
 Bullet list:
 
-  * item1
-  * item2
+* item1
+* item2
 
 Numbered list:
 
-  1. item 1
-  2. item 2
+1. item 1
+2. item 2
 
 [link](http://kde.org)
 
@@ -31,5 +31,9 @@ normal text
 
 > block quote _italic_
 > more block quote
+
+normal text
+
+Title: some text
 
 normal text

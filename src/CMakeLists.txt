@@ -24,3 +24,11 @@ target_include_directories(KateSyntax PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_
 target_link_libraries(KateSyntax LINK_PUBLIC Qt5::Gui)
 
 install(TARGETS KateSyntax EXPORT KateSyntaxTargets ${INSTALL_TARGETS_DEFAULT_ARGS})
+install(FILES
+    syntaxrepository.h
+    syntaxdefinition.h
+    abstracthighlighter.h
+    syntaxhighlighter.h
+    theme.h
+    ${CMAKE_CURRENT_BINARY_DIR}/katesyntax_export.h
+    DESTINATION ${INCLUDE_INSTALL_DIR})

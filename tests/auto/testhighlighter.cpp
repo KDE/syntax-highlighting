@@ -33,11 +33,18 @@ using namespace KateSyntax;
 class TestHighlighter : public AbstractHighlighter
 {
 public:
-    void highlightFile(const QString &fileName)
+    void highlightFile(const QString &inFileName, const QString &outFileName)
     {
-        QFile f(fileName);
+        QFile outFile(outFileName);
+        if (!outFile.open(QFile::WriteOnly | QFile::Truncate)) {
+            qWarning() << "Failed to open output file" << outFileName << ":" << outFile.errorString();
+            return;
+        }
+        m_out.setDevice(&outFile);
+
+        QFile f(inFileName);
         if (!f.open(QFile::ReadOnly)) {
-            qWarning() << "Failed to open input file" << fileName << ":" << f.errorString();
+            qWarning() << "Failed to open input file" << inFileName << ":" << f.errorString();
             return;
         }
 
@@ -49,17 +56,6 @@ public:
         }
 
         m_out.flush();
-        m_out.device()->close();
-    }
-
-    void setOutputFile(const QString &fileName)
-    {
-        auto outFile = new QFile(fileName);
-        if (!outFile->open(QFile::WriteOnly | QFile::Truncate)) {
-            qWarning() << "Failed to open output file" << fileName << ":" << outFile->errorString();
-            return;
-        }
-        m_out.setDevice(outFile);
     }
 
 protected:
@@ -80,22 +76,45 @@ private:
 class TestHighlighterTest : public QObject
 {
     Q_OBJECT
+public:
+    explicit TestHighlighterTest(QObject *parent = nullptr) : QObject(parent), m_repo(nullptr) {}
 private:
-        SyntaxRepository m_repo;
+        SyntaxRepository *m_repo;
 
 private slots:
+    void initTestCase()
+    {
+        m_repo = new SyntaxRepository;
+    }
+
+    void cleanupTestCase()
+    {
+        delete m_repo;
+        m_repo = nullptr;
+    }
+
     void testHighlight_data()
     {
         QTest::addColumn<QString>("inFile");
         QTest::addColumn<QString>("outFile");
         QTest::addColumn<QString>("refFile");
+        QTest::addColumn<QString>("syntax");
 
         QDirIterator it(QStringLiteral(TESTSRCDIR "/input"), QDir::Files | QDir::NoSymLinks | QDir::Readable);
         while (it.hasNext()) {
             const auto inFile = it.next();
+            if (inFile.endsWith(QLatin1String(".syntax")))
+                continue;
+
+            QString syntax;
+            QFile syntaxOverride(inFile + QStringLiteral(".syntax"));
+            if (syntaxOverride.exists() && syntaxOverride.open(QFile::ReadOnly))
+                syntax = QString::fromUtf8(syntaxOverride.readAll()).trimmed();
+
             QTest::newRow(it.fileName().toUtf8()) << inFile
-                << (QStringLiteral(TESTBUILDDIR "/output/") + it.fileName() + QStringLiteral(".html"))
-                << (QStringLiteral(TESTSRCDIR "/reference/") + it.fileName() + QStringLiteral(".ref.html"));
+                << (QStringLiteral(TESTBUILDDIR "/output/") + it.fileName() + QStringLiteral(".ref"))
+                << (QStringLiteral(TESTSRCDIR "/reference/") + it.fileName() + QStringLiteral(".ref"))
+                << syntax;
         }
 
         QDir().mkpath(QStringLiteral(TESTBUILDDIR "/output/"));
@@ -106,16 +125,18 @@ private slots:
         QFETCH(QString, inFile);
         QFETCH(QString, outFile);
         QFETCH(QString, refFile);
+        QFETCH(QString, syntax);
+        QVERIFY(m_repo);
 
-        qDebug() << inFile << outFile << refFile;
+        auto def = m_repo->definitionForFileName(inFile);
+        if (!syntax.isEmpty())
+            def = m_repo->definitionForName(syntax);
 
         TestHighlighter highlighter;
-        auto def = m_repo.definitionForFileName(inFile);
         QVERIFY(def);
         qDebug() << "Using syntax" << def->name();
         highlighter.setDefinition(def);
-        highlighter.setOutputFile(outFile);
-        highlighter.highlightFile(inFile);
+        highlighter.highlightFile(inFile, outFile);
 
         auto args = QStringList() << QStringLiteral("-u") << refFile << outFile;
         QProcess proc;

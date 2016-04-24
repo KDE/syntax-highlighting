@@ -31,22 +31,47 @@ using namespace KateSyntax;
 class HTMLHighlighterTest : public QObject
 {
     Q_OBJECT
+public:
+    explicit HTMLHighlighterTest(QObject *parent = nullptr) : QObject(parent), m_repo(nullptr) {}
+
 private:
-        SyntaxRepository m_repo;
+    SyntaxRepository *m_repo;
 
 private slots:
+    void initTestCase()
+    {
+        m_repo = new SyntaxRepository;
+    }
+
+    void cleanupTestCase()
+    {
+        delete m_repo;
+        m_repo = nullptr;
+    }
+
     void testHighlight_data()
     {
         QTest::addColumn<QString>("inFile");
         QTest::addColumn<QString>("outFile");
         QTest::addColumn<QString>("refFile");
+        QTest::addColumn<QString>("syntax");
 
         QDirIterator it(QStringLiteral(TESTSRCDIR "/input"), QDir::Files | QDir::NoSymLinks | QDir::Readable);
         while (it.hasNext()) {
             const auto inFile = it.next();
+            if (inFile.endsWith(QLatin1String(".syntax")))
+                continue;
+
+            QString syntax;
+            QFile syntaxOverride(inFile + QStringLiteral(".syntax"));
+            if (syntaxOverride.exists() && syntaxOverride.open(QFile::ReadOnly))
+                syntax = QString::fromUtf8(syntaxOverride.readAll()).trimmed();
+
+
             QTest::newRow(it.fileName().toUtf8()) << inFile
                 << (QStringLiteral(TESTBUILDDIR "/html.output/") + it.fileName() + QStringLiteral(".html"))
-                << (QStringLiteral(TESTSRCDIR "/html/") + it.fileName() + QStringLiteral(".html"));
+                << (QStringLiteral(TESTSRCDIR "/html/") + it.fileName() + QStringLiteral(".html"))
+                << syntax;
         }
 
         QDir().mkpath(QStringLiteral(TESTBUILDDIR "/html.output/"));
@@ -57,13 +82,14 @@ private slots:
         QFETCH(QString, inFile);
         QFETCH(QString, outFile);
         QFETCH(QString, refFile);
-
-        qDebug() << inFile << outFile << refFile;
+        QFETCH(QString, syntax);
+        QVERIFY(m_repo);
 
         HtmlHighlighter highlighter;
-        auto def = m_repo.definitionForFileName(inFile);
+        auto def = m_repo->definitionForFileName(inFile);
+        if (!syntax.isEmpty())
+            def = m_repo->definitionForName(syntax);
         QVERIFY(def);
-        qDebug() << "Using syntax" << def->name();
         highlighter.setDefinition(def);
         highlighter.setOutputFile(outFile);
         highlighter.highlightFile(inFile);

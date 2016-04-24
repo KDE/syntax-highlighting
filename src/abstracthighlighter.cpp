@@ -19,6 +19,7 @@
 #include "syntaxdefinition.h"
 #include "context.h"
 #include "rule.h"
+#include "format.h"
 
 #include <QDebug>
 

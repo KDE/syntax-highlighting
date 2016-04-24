@@ -20,10 +20,6 @@
 
 #include "katesyntax_export.h"
 
-#include "keywordlist.h"
-#include "rule.h"
-#include "format.h"
-
 #include <QHash>
 #include <QString>
 #include <QVector>
@@ -33,8 +29,8 @@ class QXmlStreamReader;
 namespace KateSyntax {
 
 class Context;
+class Format;
 class KeywordList;
-class Rule;
 class SyntaxRepository;
 
 class KATESYNTAX_EXPORT SyntaxDefinition

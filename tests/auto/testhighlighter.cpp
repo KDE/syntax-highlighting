@@ -20,6 +20,7 @@
 #include <syntaxrepository.h>
 #include <syntaxdefinition.h>
 #include <abstracthighlighter.h>
+#include <format.h>
 
 #include <QDirIterator>
 #include <QFile>

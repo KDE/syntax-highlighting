@@ -143,9 +143,6 @@ void Format::load(QXmlStreamReader& reader)
     auto colStr = reader.attributes().value(QStringLiteral("color"));
     if ((m_hasColor = !colStr.isEmpty()))
         m_color = QColor(colStr.toString());
-    colStr = reader.attributes().value(QStringLiteral("selColor"));
-    if ((m_hasSelColor = !colStr.isEmpty()))
-        m_selColor = QColor(colStr.toString());
     colStr = reader.attributes().value(QStringLiteral("backgroundColor"));
     if ((m_hasBgColor = !colStr.isEmpty()))
         m_backgroundColor = QColor(colStr.toString());

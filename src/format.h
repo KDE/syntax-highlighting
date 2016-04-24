@@ -52,7 +52,6 @@ public:
 private:
     QString m_name;
     QColor m_color;
-    QColor m_selColor;
     QColor m_backgroundColor;
     Theme::Style m_default;
     bool m_italic;

@@ -53,12 +53,14 @@ public:
 
     Format formatByName(const QString &name) const;
 
-    bool load(const QString &definitionFileName);
-    void assemble();
+    bool load();
+    bool loadMetaData(const QString &definitionFileName);
 
 private:
     Q_DISABLE_COPY(SyntaxDefinition)
 
+    bool isLoaded() const;
+    void loadLanguage(QXmlStreamReader &reader);
     void loadHighlighting(QXmlStreamReader &reader);
     void loadContexts(QXmlStreamReader &reader);
     void loadItemData(QXmlStreamReader &reader);
@@ -70,6 +72,7 @@ private:
     QHash<QString, Format> m_formats;
     QString m_delimiters;
 
+    QString m_fileName;
     QString m_name;
     QString m_section;
     QVector<QString> m_extensions;

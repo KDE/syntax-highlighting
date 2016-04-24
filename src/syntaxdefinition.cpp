@@ -96,9 +96,18 @@ Format SyntaxDefinition::formatByName(const QString& name) const
     return Format();
 }
 
-bool SyntaxDefinition::load(const QString& definitionFileName)
+bool SyntaxDefinition::isLoaded() const
 {
-    QFile file(definitionFileName);
+    return !m_contexts.isEmpty();
+}
+
+bool SyntaxDefinition::load()
+{
+    if (isLoaded())
+        return true;
+
+    Q_ASSERT(!m_fileName.isEmpty());
+    QFile file(m_fileName);
     if (!file.open(QFile::ReadOnly))
         return false;
 
@@ -108,30 +117,64 @@ bool SyntaxDefinition::load(const QString& definitionFileName)
         if (token != QXmlStreamReader::StartElement)
             continue;
 
-        if (reader.name() == QLatin1String("language")) {
-            m_name = reader.attributes().value(QStringLiteral("name")).toString();
-            m_section = reader.attributes().value(QStringLiteral("section")).toString();
-            m_hidden = reader.attributes().value(QStringLiteral("hidden")) == QLatin1String("true");
-            const auto exts = reader.attributes().value(QStringLiteral("extensions")).toString();
-            foreach (const auto &ext, exts.split(QLatin1Char(';'), QString::SkipEmptyParts)) {
-                if (ext.startsWith(QLatin1String("*.")))
-                    m_extensions.push_back(ext.mid(2));
-                else
-                    m_extensions.push_back(ext);
-            }
-            const auto mts = reader.attributes().value(QStringLiteral("mimetypes")).toString();
-            foreach (const auto &mt, mts.split(QLatin1Char(';'), QString::SkipEmptyParts))
-                m_mimetypes.push_back(mt);
-        }
-
-        else if (reader.name() == QLatin1String("highlighting"))
+        if (reader.name() == QLatin1String("highlighting"))
             loadHighlighting(reader);
 
         else if (reader.name() == QLatin1String("general"))
             loadGeneral(reader);
     }
 
+    for (auto it = m_keywordLists.begin(); it != m_keywordLists.end(); ++it)
+        (*it).setCaseSensitivity(m_caseSensitive);
+
+    foreach (auto context, m_contexts) {
+        context->resolveContexts();
+        context->resolveIncludes();
+    }
+
     return true;
+}
+
+bool SyntaxDefinition::loadMetaData(const QString& definitionFileName)
+{
+    m_fileName = definitionFileName;
+
+    QFile file(definitionFileName);
+    if (!file.open(QFile::ReadOnly))
+        return false;
+
+    QXmlStreamReader reader(&file);
+    while (!reader.atEnd()) {
+        const auto token = reader.readNext();
+        if (token != QXmlStreamReader::StartElement)
+            continue;
+        if (reader.name() == QLatin1String("language")) {
+            loadLanguage(reader);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void SyntaxDefinition::loadLanguage(QXmlStreamReader &reader)
+{
+    Q_ASSERT(reader.name() == QLatin1String("language"));
+    Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
+
+    m_name = reader.attributes().value(QStringLiteral("name")).toString();
+    m_section = reader.attributes().value(QStringLiteral("section")).toString();
+    m_hidden = reader.attributes().value(QStringLiteral("hidden")) == QLatin1String("true");
+    const auto exts = reader.attributes().value(QStringLiteral("extensions")).toString();
+    foreach (const auto &ext, exts.split(QLatin1Char(';'), QString::SkipEmptyParts)) {
+        if (ext.startsWith(QLatin1String("*.")))
+            m_extensions.push_back(ext.mid(2));
+        else
+            m_extensions.push_back(ext);
+    }
+    const auto mts = reader.attributes().value(QStringLiteral("mimetypes")).toString();
+    foreach (const auto &mt, mts.split(QLatin1Char(';'), QString::SkipEmptyParts))
+        m_mimetypes.push_back(mt);
 }
 
 void SyntaxDefinition::loadHighlighting(QXmlStreamReader& reader)
@@ -247,16 +290,5 @@ void SyntaxDefinition::loadGeneral(QXmlStreamReader& reader)
                 reader.readNext();
                 break;
         }
-    }
-}
-
-void SyntaxDefinition::assemble()
-{
-    for (auto it = m_keywordLists.begin(); it != m_keywordLists.end(); ++it)
-        (*it).setCaseSensitivity(m_caseSensitive);
-
-    foreach (auto context, m_contexts) {
-        context->resolveContexts();
-        context->resolveIncludes();
     }
 }

@@ -54,6 +54,12 @@ private slots:
         }
     }
 
+    void testLoadAll()
+    {
+        foreach (auto def, m_repo.definitions())
+            QVERIFY(def->load());
+    }
+
 };
 
 QTEST_MAIN(SyntaxRepositoryTest)

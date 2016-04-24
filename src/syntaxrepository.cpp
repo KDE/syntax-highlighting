@@ -27,7 +27,6 @@ using namespace KateSyntax;
 SyntaxRepository::SyntaxRepository()
 {
     load();
-    assemble();
 }
 
 SyntaxRepository::~SyntaxRepository()
@@ -38,8 +37,10 @@ SyntaxRepository::~SyntaxRepository()
 SyntaxDefinition* SyntaxRepository::definitionForName(const QString& defName) const
 {
    foreach (auto def, m_defs) {
-        if (def->name() == defName)
+        if (def->name() == defName) {
+            def->load();
             return def;
+        }
     }
     return nullptr;
 }
@@ -50,8 +51,10 @@ SyntaxDefinition* SyntaxRepository::definitionForFileName(const QString& fileNam
     const auto ext = fi.suffix();
 
     foreach (auto def, m_defs) {
-        if (def->extensions().contains(ext))
+        if (def->extensions().contains(ext)) {
+            def->load();
             return def;
+        }
     }
 
     return nullptr;
@@ -68,14 +71,8 @@ void SyntaxRepository::load()
     while (it.hasNext()) {
         auto def = new SyntaxDefinition;
         def->setSyntaxRepository(this);
-        if (def->load(it.next())) {
+        if (def->loadMetaData(it.next())) {
             m_defs.push_back(def);
         }
     }
-}
-
-void SyntaxRepository::assemble()
-{
-    foreach (auto def, m_defs)
-        def->assemble();
 }

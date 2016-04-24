@@ -38,7 +38,6 @@ public:
 
 private:
     void load();
-    void assemble();
 
     QVector<SyntaxDefinition*> m_defs;
 };

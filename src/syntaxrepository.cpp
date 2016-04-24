@@ -32,6 +32,7 @@ SyntaxRepository::SyntaxRepository()
 
 SyntaxRepository::~SyntaxRepository()
 {
+    qDeleteAll(m_defs);
 }
 
 SyntaxDefinition* SyntaxRepository::definitionForName(const QString& defName) const

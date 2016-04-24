@@ -32,11 +32,11 @@ struct ThemeData {
 
 static const ThemeData normal_default_theme[] {
     { 0x00000000, 0x00000000, false, false, false, false }, // Normal
-    { 0xff1f1c1b, 0x00000000, true , false, false, false }, // Keyword
+    { 0x00000000, 0x00000000, true , false, false, false }, // Keyword
     { 0xff644a9b, 0x00000000, false, false, false, false }, // Function
     { 0xff0057ae, 0x00000000, false, false, false, false }, // Variable
-    { 0xff1f1c1b, 0x00000000, true , false, false, false }, // ControlFlow
-    { 0xff1f1c1b, 0x00000000, false, false, false, false }, // Operator
+    { 0x00000000, 0x00000000, true , false, false, false }, // ControlFlow
+    { 0x00000000, 0x00000000, false, false, false, false }, // Operator
     { 0xff644a9b, 0x00000000, false, false, false, false }, // BuiltIn
     { 0xff0095ff, 0x00000000, true , false, false, false }, // Extension
     { 0xff006e28, 0x00000000, false, false, false, false }, // Preprocessor

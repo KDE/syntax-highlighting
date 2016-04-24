@@ -18,6 +18,8 @@
 #ifndef KATESYNTAX_THEME_H
 #define KATESYNTAX_THEME_H
 
+#include "katesyntax_export.h"
+
 #include <QColor>
 
 #include <memory>
@@ -26,7 +28,7 @@ namespace KateSyntax {
 
 struct ThemeData;
 
-class Theme
+class KATESYNTAX_EXPORT Theme
 {
 public:
     ~Theme();

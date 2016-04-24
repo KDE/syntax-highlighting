@@ -67,6 +67,8 @@ int main(int argc, char **argv)
     edit.resize(1024, 1024);
     edit.show();
     auto hl = new KateSyntax::SyntaxHighlighter(&edit);
+    if (app.palette().color(QPalette::Base).lightness() < 128)
+        hl->setTheme(Theme::defaultTheme(Theme::DarkTheme));
     hl->setDefinition(def);
 
     edit.setPlainText(QString::fromUtf8(f.readAll()));

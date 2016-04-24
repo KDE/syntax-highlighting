@@ -64,6 +64,41 @@ static const ThemeData normal_default_theme[] {
     { 0xff006e28, 0x00000000, false, false, false, false }, // Others
 };
 
+static const ThemeData dark_default_theme[] {
+    { 0x00000000, 0x00000000, false, false, false, false }, // Normal
+    { 0x00000000, 0x00000000, true , false, false, false }, // Keyword
+    { 0xfff67400, 0x00000000, false, false, false, false }, // Function
+    { 0xff2980b9, 0x00000000, false, false, false, false }, // Variable
+    { 0x00000000, 0x00000000, true , false, false, false }, // ControlFlow
+    { 0x00000000, 0x00000000, false, false, false, false }, // Operator
+    { 0xff7f8c8d, 0x00000000, false, false, false, false }, // BuiltIn
+    { 0xff0095ff, 0x00000000, true , false, false, false }, // Extension
+    { 0xff27ae60, 0x00000000, false, false, false, false }, // Preprocessor
+    { 0xff2980b9, 0x00000000, false, false, false, false }, // Attribute
+    { 0xff3daee9, 0x00000000, false, false, false, false }, // Char
+    { 0xff3daee9, 0x00000000, false, false, false, false }, // SpecialChar
+    { 0xffda4453, 0x00000000, false, false, false, false }, // String
+    { 0xffda4453, 0x00000000, false, false, false, false }, // VerbatimString
+    { 0xffda4453, 0x00000000, false, false, false, false }, // SpecialString
+    { 0xff7f8c8d, 0x00000000, false, false, false, false }, // Import
+    { 0xff2980b9, 0x00000000, false, false, false, false }, // DataType
+    { 0xfff67400, 0x00000000, false, false, false, false }, // DecVal
+    { 0xfff67400, 0x00000000, false, false, false, false }, // BaseN
+    { 0xfff67400, 0x00000000, false, false, false, false }, // Float
+    { 0x00000000, 0x00000000, false, false, false, false }, // Constant
+    { 0xffbdc3c7, 0x00000000, false, false, false, false }, // Comment
+    { 0xff607880, 0x00000000, false, false, false, false }, // Documentation
+    { 0xff7f8c8d, 0x00000000, false, false, false, false }, // Annotation
+    { 0xff7f8c8d, 0x00000000, false, false, false, false }, // CommentVar
+    { 0xff2980b9, 0xff153042, false, false, false, false }, // RegionMarker
+    { 0xfff67400, 0x00000000, false, false, false, false }, // Information
+    { 0xffda4453, 0x00000000, false, false, false, false }, // Warning
+    { 0xffda4453, 0xff4d1f24, true , false, false, false }, // Alert
+    { 0xffda4453, 0x00000000, false, false, true , false }, // Error
+    { 0xff27ae60, 0x00000000, false, false, false, false }, // Others
+};
+
+
 static void noDeleter(ThemeData*) {}
 
 }
@@ -84,7 +119,7 @@ Theme Theme::defaultTheme(Theme::DefaultTheme t)
             theme.m_data.reset(const_cast<ThemeData*>(normal_default_theme), noDeleter);
             break;
         case DarkTheme:
-            // TODO
+            theme.m_data.reset(const_cast<ThemeData*>(dark_default_theme), noDeleter);
             break;
     }
     return theme;

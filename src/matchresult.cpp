@@ -21,13 +21,25 @@ using namespace KateSyntax;
 
 MatchResult::MatchResult(int offset, const QStringList &captures) :
     m_captures(captures),
-    m_offset(offset)
+    m_offset(offset),
+    m_skipOffset(0)
+{
+}
+
+MatchResult::MatchResult(int offset, int skipOffset) :
+    m_offset(offset),
+    m_skipOffset(skipOffset)
 {
 }
 
 int MatchResult::offset() const
 {
     return m_offset;
+}
+
+int MatchResult::skipOffset() const
+{
+    return m_skipOffset;
 }
 
 QStringList MatchResult::captures() const

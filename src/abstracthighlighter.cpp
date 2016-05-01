@@ -86,6 +86,7 @@ void AbstractHighlighter::highlightLine(const QString& text)
     auto currentFormat = m_context.top()->attribute();
     auto currentLookupDef = m_context.top()->syntaxDefinition();
     bool lineContinuation = false;
+    QHash<Rule*, int> skipOffsets;
 
     do {
         bool isLookAhead = false;
@@ -93,8 +94,13 @@ void AbstractHighlighter::highlightLine(const QString& text)
         QString newFormat;
         auto newLookupDef = currentLookupDef;
         foreach (auto rule, m_context.top()->rules()) {
+            if (skipOffsets.value(rule.get()) > offset)
+                continue;
+
             const auto newResult = rule->match(text, offset, m_captureStack.top());
             newOffset = newResult.offset();
+            if (newResult.skipOffset() > newOffset)
+                skipOffsets.insert(rule.get(), newResult.skipOffset());
             if (newOffset <= offset)
                 continue;
 

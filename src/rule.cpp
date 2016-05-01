@@ -580,7 +580,7 @@ MatchResult RegExpr::doMatch(const QString& text, int offset, const QStringList 
     auto idx = m_regexp.indexIn(text, offset, QRegExp::CaretAtOffset);
     if (idx == offset)
         return MatchResult(offset + m_regexp.matchedLength(), m_regexp.capturedTexts());
-    return offset;
+    return MatchResult(offset, idx);
 }
 
 

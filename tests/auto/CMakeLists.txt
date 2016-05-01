@@ -11,3 +11,7 @@ target_link_libraries(testhighlighter_test KateSyntax Qt5::Test)
 add_executable(htmlhighlighter_test htmlhighlighter_test.cpp)
 add_test(NAME htmlhighlighter_test COMMAND htmlhighlighter_test)
 target_link_libraries(htmlhighlighter_test KateSyntax Qt5::Test)
+
+add_executable(highlighter_benchmark highlighter_benchmark.cpp)
+add_test(NAME highlighter_benchmark COMMAND highlighter_benchmark)
+target_link_libraries(highlighter_benchmark KateSyntax Qt5::Test)

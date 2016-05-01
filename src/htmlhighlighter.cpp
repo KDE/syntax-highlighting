@@ -63,6 +63,7 @@ void HtmlHighlighter::highlightFile(const QString& fileName)
         return;
     }
 
+    reset();
     *m_out << "<!DOCTYPE html>\n";
     *m_out << "<html><head>\n";
     *m_out << "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>\n";

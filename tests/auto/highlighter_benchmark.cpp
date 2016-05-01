@@ -19,12 +19,33 @@
 
 #include <syntaxrepository.h>
 #include <syntaxdefinition.h>
-#include <htmlhighlighter.h>
+#include <abstracthighlighter.h>
 
 #include <QObject>
 #include <QtTest/qtest.h>
 
 using namespace KateSyntax;
+
+class NullHighlighter : public AbstractHighlighter
+{
+public:
+    void highlightFile(const QString &inFileName)
+    {
+        QFile f(inFileName);
+        if (!f.open(QFile::ReadOnly)) {
+            qWarning() << "Failed to open input file" << inFileName << ":" << f.errorString();
+            return;
+        }
+
+        reset();
+        QTextStream in(&f);
+        while (!in.atEnd())
+            highlightLine(in.readLine());
+    }
+
+protected:
+    void setFormat(int, int, const Format&) override {}
+};
 
 class HighlighterBenchmark : public QObject
 {
@@ -61,13 +82,12 @@ private slots:
         QFETCH(QString, syntax);
         QVERIFY(m_repo);
 
-        HtmlHighlighter highlighter;
+        NullHighlighter highlighter;
         auto def = m_repo->definitionForFileName(inFile);
         if (!syntax.isEmpty())
             def = m_repo->definitionForName(syntax);
         QVERIFY(def);
         highlighter.setDefinition(def);
-        highlighter.setOutputFile(QStringLiteral("/dev/null"));
         QBENCHMARK {
             highlighter.highlightFile(inFile);
         }

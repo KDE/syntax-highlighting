@@ -17,6 +17,7 @@
 
 #include "config-katesyntax-version.h"
 
+#include <downloader.h>
 #include <htmlhighlighter.h>
 #include <syntaxrepository.h>
 #include <syntaxdefinition.h>
@@ -46,6 +47,10 @@ int main(int argc, char **argv)
                                 app.tr("List all available syntax definitions."));
     parser.addOption(listDefs);
 
+    QCommandLineOption updateDefs(QStringList() << QStringLiteral("u") << QStringLiteral("update"),
+                                  app.tr("Download new/updated syntax definitions."));
+    parser.addOption(updateDefs);
+
     QCommandLineOption outputName(QStringList() << QStringLiteral("o") << QStringLiteral("output"),
                                   app.tr("File to write HTML output to (default: stdout)."),
                                   app.tr("output"));
@@ -66,6 +71,16 @@ int main(int argc, char **argv)
             std::cout << qPrintable(def->name()) << std::endl;
         }
         return 0;
+    }
+
+    if (parser.isSet(updateDefs)) {
+        Downloader downloader(&repo);
+        QObject::connect(&downloader, &Downloader::informationMessage, [](const QString &msg) {
+            std::cout << qPrintable(msg) << std::endl;
+        });
+        QObject::connect(&downloader, &Downloader::done, &app, &QCoreApplication::quit);
+        downloader.start();
+        return app.exec();
     }
 
     if (parser.positionalArguments().size() != 1)

@@ -32,6 +32,7 @@ SyntaxDefinition::SyntaxDefinition() :
     m_repo(nullptr),
     m_delimiters(QStringLiteral(".():!+,-<=>%&*/;?[]^{|}~\\ \t")),
     m_caseSensitive(Qt::CaseSensitive),
+    m_version(0.0f),
     m_hidden(false)
 {
 }
@@ -59,6 +60,11 @@ QString SyntaxDefinition::name() const
 QVector<QString> SyntaxDefinition::extensions() const
 {
     return m_extensions;
+}
+
+float SyntaxDefinition::version() const
+{
+    return m_version;
 }
 
 Context* SyntaxDefinition::initialContext() const
@@ -164,6 +170,7 @@ void SyntaxDefinition::loadLanguage(QXmlStreamReader &reader)
 
     m_name = reader.attributes().value(QStringLiteral("name")).toString();
     m_section = reader.attributes().value(QStringLiteral("section")).toString();
+    m_version = reader.attributes().value(QStringLiteral("version")).toFloat();
     m_hidden = reader.attributes().value(QStringLiteral("hidden")) == QLatin1String("true");
     const auto exts = reader.attributes().value(QStringLiteral("extensions")).toString();
     foreach (const auto &ext, exts.split(QLatin1Char(';'), QString::SkipEmptyParts)) {

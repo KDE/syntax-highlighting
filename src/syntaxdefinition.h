@@ -44,6 +44,7 @@ public:
 
     QString name() const;
     QVector<QString> extensions() const;
+    float version() const;
 
     Context* initialContext() const;
     Context* contextByName(const QString &name) const;
@@ -78,6 +79,7 @@ private:
     QVector<QString> m_extensions;
     QVector<QString> m_mimetypes;
     Qt::CaseSensitivity m_caseSensitive;
+    float m_version;
     bool m_hidden;
 };
 

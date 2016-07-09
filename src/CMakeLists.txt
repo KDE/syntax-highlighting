@@ -2,6 +2,7 @@ set(kate_syntax_srcs
     abstracthighlighter.cpp
     context.cpp
     contextswitch.cpp
+    downloader.cpp
     format.cpp
     htmlhighlighter.cpp
     keywordlist.cpp
@@ -21,7 +22,7 @@ set_target_properties(KateSyntax PROPERTIES
     SOVERSION ${KATESYNTAX_VERSION}
 )
 target_include_directories(KateSyntax PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR};${CMAKE_CURRENT_BINARY_DIR};>")
-target_link_libraries(KateSyntax LINK_PUBLIC Qt5::Gui)
+target_link_libraries(KateSyntax LINK_PUBLIC Qt5::Gui LINK_PRIVATE Qt5::Network)
 
 install(TARGETS KateSyntax EXPORT KateSyntaxTargets ${INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES

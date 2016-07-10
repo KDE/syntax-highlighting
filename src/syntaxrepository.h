@@ -20,7 +20,7 @@
 
 #include "katesyntax_export.h"
 
-#include <QVector>
+#include <QHash>
 
 namespace KateSyntax {
 
@@ -38,8 +38,10 @@ public:
 
 private:
     void load();
+    void loadFolder(const QString &path);
+    void addDefinition(const SyntaxDefinition &def);
 
-    QVector<SyntaxDefinition> m_defs;
+    QHash<QString, SyntaxDefinition> m_defs;
 };
 
 }

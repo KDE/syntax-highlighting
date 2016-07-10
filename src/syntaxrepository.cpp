@@ -31,36 +31,35 @@ SyntaxRepository::SyntaxRepository()
 
 SyntaxRepository::~SyntaxRepository()
 {
-    qDeleteAll(m_defs);
 }
 
-SyntaxDefinition* SyntaxRepository::definitionForName(const QString& defName) const
+SyntaxDefinition SyntaxRepository::definitionForName(const QString& defName) const
 {
    foreach (auto def, m_defs) {
-        if (def->name() == defName) {
-            def->load();
+        if (def.name() == defName) {
+            def.load();
             return def;
         }
     }
-    return nullptr;
+    return SyntaxDefinition();
 }
 
-SyntaxDefinition* SyntaxRepository::definitionForFileName(const QString& fileName) const
+SyntaxDefinition SyntaxRepository::definitionForFileName(const QString& fileName) const
 {
     QFileInfo fi(fileName);
     const auto ext = fi.suffix();
 
     foreach (auto def, m_defs) {
-        if (def->extensions().contains(ext)) {
-            def->load();
+        if (def.extensions().contains(ext)) {
+            def.load();
             return def;
         }
     }
 
-    return nullptr;
+    return SyntaxDefinition();
 }
 
-QVector<SyntaxDefinition*> SyntaxRepository::definitions() const
+QVector<SyntaxDefinition> SyntaxRepository::definitions() const
 {
     return m_defs;
 }
@@ -69,9 +68,9 @@ void SyntaxRepository::load()
 {
     QDirIterator it(QStringLiteral(":/kate-syntax"));
     while (it.hasNext()) {
-        auto def = new SyntaxDefinition;
-        def->setSyntaxRepository(this);
-        if (def->loadMetaData(it.next())) {
+        SyntaxDefinition def;
+        def.setSyntaxRepository(this);
+        if (def.loadMetaData(it.next())) {
             m_defs.push_back(def);
         }
     }

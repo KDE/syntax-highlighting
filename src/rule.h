@@ -21,6 +21,7 @@
 #include "keywordlist.h"
 #include "contextswitch.h"
 #include "matchresult.h"
+#include "syntaxdefinition.h"
 
 #include <QRegExp>
 #include <QString>
@@ -32,8 +33,6 @@ class QXmlStreamReader;
 
 namespace KateSyntax {
 
-class SyntaxDefinition;
-
 class Rule
 {
 public:
@@ -42,8 +41,8 @@ public:
 
     typedef std::shared_ptr<Rule> Ptr;
 
-    SyntaxDefinition* syntaxDefinition() const;
-    void setSyntaxDefinition(SyntaxDefinition *def);
+    SyntaxDefinition syntaxDefinition() const;
+    void setSyntaxDefinition(const SyntaxDefinition &def);
 
     QString attribute() const;
     ContextSwitch context() const;
@@ -66,7 +65,7 @@ protected:
 private:
     Q_DISABLE_COPY(Rule)
 
-    SyntaxDefinition *m_def;
+    SyntaxDefinition m_def;
     QString m_attribute;
     ContextSwitch m_context;
     QVector<Rule::Ptr> m_subRules;

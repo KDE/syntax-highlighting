@@ -67,8 +67,8 @@ int main(int argc, char **argv)
 
     SyntaxRepository repo;
     if (parser.isSet(listDefs)) {
-        foreach (auto def, repo.definitions()) {
-            std::cout << qPrintable(def->name()) << std::endl;
+        foreach (const auto &def, repo.definitions()) {
+            std::cout << qPrintable(def.name()) << std::endl;
         }
         return 0;
     }
@@ -87,13 +87,13 @@ int main(int argc, char **argv)
         parser.showHelp(1);
     const auto inFileName = parser.positionalArguments().at(0);
 
-    SyntaxDefinition *def = nullptr;
+    SyntaxDefinition def;
     if (parser.isSet(syntaxName)) {
         def = repo.definitionForName(parser.value(syntaxName));
     } else {
         def = repo.definitionForFileName(inFileName);
     }
-    if (!def) {
+    if (!def.isValid()) {
         std::cerr << "Unknown syntax." << std::endl;
         return 1;
     }

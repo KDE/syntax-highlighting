@@ -16,7 +16,6 @@
 */
 
 #include "rule.h"
-#include "syntaxdefinition.h"
 
 #include <QDebug>
 #include <QString>
@@ -86,7 +85,6 @@ static QString replaceCaptures(const QString &pattern, const QStringList &captur
 
 
 Rule::Rule() :
-    m_def(nullptr),
     m_column(-1),
     m_firstNonSpace(false),
     m_lookAhead(false),
@@ -98,12 +96,12 @@ Rule::~Rule()
 {
 }
 
-SyntaxDefinition* Rule::syntaxDefinition() const
+SyntaxDefinition Rule::syntaxDefinition() const
 {
     return m_def;
 }
 
-void Rule::setSyntaxDefinition(SyntaxDefinition* def)
+void Rule::setSyntaxDefinition(const SyntaxDefinition &def)
 {
     m_def = def;
 }
@@ -258,7 +256,7 @@ Rule::Ptr Rule::create(const QStringRef& name)
 
 bool Rule::isDelimiter(QChar c) const
 {
-    return m_def->isDelimiter(c);
+    return m_def.isDelimiter(c);
 }
 
 
@@ -499,8 +497,8 @@ MatchResult KeywordListRule::doMatch(const QString& text, int offset, const QStr
         return offset;
 
     if (m_keywordList.isEmpty()) {
-        Q_ASSERT(syntaxDefinition());
-        m_keywordList = syntaxDefinition()->keywordList(m_listName);
+        Q_ASSERT(syntaxDefinition().isValid());
+        m_keywordList = syntaxDefinition().keywordList(m_listName);
     }
 
     auto newOffset = offset;

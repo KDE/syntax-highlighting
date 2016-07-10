@@ -32,14 +32,14 @@ public:
     SyntaxRepository();
     ~SyntaxRepository();
 
-    SyntaxDefinition* definitionForName(const QString &defName) const;
-    SyntaxDefinition* definitionForFileName(const QString &fileName) const;
-    QVector<SyntaxDefinition*> definitions() const;
+    SyntaxDefinition definitionForName(const QString &defName) const;
+    SyntaxDefinition definitionForFileName(const QString &fileName) const;
+    QVector<SyntaxDefinition> definitions() const;
 
 private:
     void load();
 
-    QVector<SyntaxDefinition*> m_defs;
+    QVector<SyntaxDefinition> m_defs;
 };
 
 }

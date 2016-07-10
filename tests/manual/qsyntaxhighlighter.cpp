@@ -52,13 +52,13 @@ int main(int argc, char **argv)
 
     KateSyntax::SyntaxRepository repo;
 
-    SyntaxDefinition *def = nullptr;
+    SyntaxDefinition def;
     if (parser.isSet(syntaxName)) {
         def = repo.definitionForName(parser.value(syntaxName));
     } else {
         def = repo.definitionForFileName(inFileName);
     }
-    if (!def)
+    if (!def.isValid())
         qFatal("Unknown syntax.");
 
     QTextEdit edit;

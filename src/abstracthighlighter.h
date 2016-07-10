@@ -19,6 +19,7 @@
 #define KATESYNTAX_ABSTRACTHIGHLIGHTERM_H
 
 #include "katesyntax_export.h"
+#include "syntaxdefinition.h"
 #include "theme.h"
 
 #include <QStack>
@@ -31,7 +32,6 @@ namespace KateSyntax {
 class Context;
 class ContextSwitch;
 class Format;
-class SyntaxDefinition;
 
 class KATESYNTAX_EXPORT AbstractHighlighter
 {
@@ -39,8 +39,8 @@ public:
     AbstractHighlighter();
     virtual ~AbstractHighlighter();
 
-    SyntaxDefinition *definition() const;
-    void setDefinition(SyntaxDefinition *def);
+    SyntaxDefinition definition() const;
+    void setDefinition(const SyntaxDefinition &def);
 
     Theme theme() const;
     void setTheme(const Theme &theme);
@@ -53,7 +53,7 @@ protected:
 private:
     void switchContext(const ContextSwitch &contextSwitch, const QStringList &captures = QStringList());
 
-    SyntaxDefinition *m_definition;
+    SyntaxDefinition m_definition;
     QStack<Context*> m_context;
     QStack<QStringList> m_captureStack;
     Theme m_theme;

@@ -20,6 +20,7 @@
 
 #include "rule.h"
 #include "contextswitch.h"
+#include "syntaxdefinition.h"
 
 #include <QString>
 #include <QVector>
@@ -28,16 +29,14 @@ class QXmlStreamReader;
 
 namespace KateSyntax {
 
-class SyntaxDefinition;
-
 class Context
 {
 public:
     Context();
     ~Context();
 
-    SyntaxDefinition* syntaxDefinition() const;
-    void setSyntaxDefinition(SyntaxDefinition *def);
+    SyntaxDefinition syntaxDefinition() const;
+    void setSyntaxDefinition(const SyntaxDefinition &def);
 
     QString name() const;
     QString attribute() const;
@@ -64,7 +63,7 @@ private:
     };
     ResolveState resolveState();
 
-    SyntaxDefinition *m_def;
+    SyntaxDefinition m_def;
     QString m_name;
     QString m_attribute;
     ContextSwitch m_lineEndContext;

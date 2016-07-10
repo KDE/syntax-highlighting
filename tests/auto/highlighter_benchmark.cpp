@@ -86,7 +86,7 @@ private slots:
         auto def = m_repo->definitionForFileName(inFile);
         if (!syntax.isEmpty())
             def = m_repo->definitionForName(syntax);
-        QVERIFY(def);
+        QVERIFY(def.isValid());
         highlighter.setDefinition(def);
         QBENCHMARK {
             highlighter.highlightFile(inFile);

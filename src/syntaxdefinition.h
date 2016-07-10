@@ -45,6 +45,8 @@ public:
 
     SyntaxDefinition& operator=(const SyntaxDefinition &rhs);
 
+    bool isValid() const;
+
     SyntaxRepository* syntaxRepository() const;
     void setSyntaxRepository(SyntaxRepository *repo);
 

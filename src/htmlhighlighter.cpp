@@ -69,7 +69,7 @@ void HtmlHighlighter::highlightFile(const QString& fileName)
     *m_out << "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>\n";
     QFileInfo fi(fileName);
     *m_out << "<title>" << fi.fileName() << "</title>\n";
-    *m_out << "<meta name=\"generator\" content=\"KateSyntax (" << definition()->name() << ")\"/>\n";
+    *m_out << "<meta name=\"generator\" content=\"KateSyntax (" << definition().name() << ")\"/>\n";
     *m_out << "</head><body><pre>\n";
 
     QTextStream in(&f);

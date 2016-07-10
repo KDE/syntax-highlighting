@@ -47,17 +47,17 @@ private slots:
 
         auto def = m_repo.definitionForFileName(fileName);
         if (defName.isEmpty()) {
-            QVERIFY(!def);
+            QVERIFY(!def.isValid());
         } else {
-            QVERIFY(def);
-            QCOMPARE(def->name(), defName);
+            QVERIFY(def.isValid());
+            QCOMPARE(def.name(), defName);
         }
     }
 
     void testLoadAll()
     {
         foreach (auto def, m_repo.definitions())
-            QVERIFY(def->load());
+            QVERIFY(def.load());
     }
 
 };

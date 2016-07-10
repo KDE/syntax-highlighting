@@ -17,7 +17,6 @@
 
 #include "context.h"
 #include "rule.h"
-#include "syntaxdefinition.h"
 #include "syntaxrepository.h"
 
 #include <QDebug>
@@ -27,7 +26,6 @@
 using namespace KateSyntax;
 
 Context::Context() :
-    m_def(nullptr),
     m_resolveState(Unknown),
     m_fallthrough(false)
 {
@@ -37,12 +35,12 @@ Context::~Context()
 {
 }
 
-SyntaxDefinition* Context::syntaxDefinition() const
+SyntaxDefinition Context::syntaxDefinition() const
 {
     return m_def;
 }
 
-void Context::setSyntaxDefinition(SyntaxDefinition* def)
+void Context::setSyntaxDefinition(const SyntaxDefinition &def)
 {
     m_def = def;
 }
@@ -165,21 +163,21 @@ void Context::resolveIncludes()
         }
         Context* context = nullptr;
         if (inc->definitionName().isEmpty()) { // local include
-            context = m_def->contextByName(inc->contextName());
+            context = m_def.contextByName(inc->contextName());
         } else {
-            auto def = m_def->syntaxRepository()->definitionForName(inc->definitionName());
-            if (!def) {
-                qWarning() << "Unable to resolve external include rule for definition" << inc->definitionName() << "in" << m_def->name();
+            auto def = m_def.syntaxRepository()->definitionForName(inc->definitionName());
+            if (!def.isValid()) {
+                qWarning() << "Unable to resolve external include rule for definition" << inc->definitionName() << "in" << m_def.name();
                 ++it;
                 continue;
             }
             if (inc->contextName().isEmpty())
-                context = def->initialContext();
+                context = def.initialContext();
             else
-                context = def->contextByName(inc->contextName());
+                context = def.contextByName(inc->contextName());
         }
         if (!context) {
-            qWarning() << "Unable to resolve include rule for definition" << inc->contextName() << "##" << inc->definitionName() << "in" << m_def->name();
+            qWarning() << "Unable to resolve include rule for definition" << inc->contextName() << "##" << inc->definitionName() << "in" << m_def.name();
             ++it;
             continue;
         }

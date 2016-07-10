@@ -134,8 +134,8 @@ private slots:
             def = m_repo->definitionForName(syntax);
 
         TestHighlighter highlighter;
-        QVERIFY(def);
-        qDebug() << "Using syntax" << def->name();
+        QVERIFY(def.isValid());
+        qDebug() << "Using syntax" << def.name();
         highlighter.setDefinition(def);
         highlighter.highlightFile(inFile, outFile);
 

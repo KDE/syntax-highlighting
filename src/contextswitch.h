@@ -37,7 +37,7 @@ public:
     Context* context() const;
 
     void parse(const QStringRef &contextInstr);
-    void resolve(SyntaxDefinition *def);
+    void resolve(const SyntaxDefinition &def);
 
 private:
     QString m_contextName;

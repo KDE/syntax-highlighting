@@ -95,6 +95,11 @@ SyntaxDefinition& SyntaxDefinition::operator=(const SyntaxDefinition &rhs)
     return *this;
 }
 
+bool SyntaxDefinition::isValid() const
+{
+    return d->repo && !d->fileName.isEmpty();
+}
+
 SyntaxRepository* SyntaxDefinition::syntaxRepository() const
 {
     return d->repo;
@@ -277,7 +282,7 @@ void SyntaxDefinitionPrivate::loadContexts(SyntaxDefinition *def, QXmlStreamRead
             case QXmlStreamReader::StartElement:
                 if (reader.name() == QLatin1String("context")) {
                     auto context = new Context;
-                    context->setSyntaxDefinition(def);
+                    context->setSyntaxDefinition(*def);
                     context->load(reader);
                     contexts.push_back(context);
                 }

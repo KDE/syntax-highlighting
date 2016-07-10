@@ -16,7 +16,6 @@
 */
 
 #include "abstracthighlighter.h"
-#include "syntaxdefinition.h"
 #include "context.h"
 #include "rule.h"
 #include "format.h"
@@ -26,7 +25,6 @@
 using namespace KateSyntax;
 
 AbstractHighlighter::AbstractHighlighter() :
-    m_definition(nullptr),
     m_theme(Theme::defaultTheme())
 {
 }
@@ -35,12 +33,12 @@ AbstractHighlighter::~AbstractHighlighter()
 {
 }
 
-SyntaxDefinition* AbstractHighlighter::definition() const
+SyntaxDefinition AbstractHighlighter::definition() const
 {
     return m_definition;
 }
 
-void AbstractHighlighter::setDefinition(SyntaxDefinition* def)
+void AbstractHighlighter::setDefinition(const SyntaxDefinition &def)
 {
     m_definition = def;
     reset();
@@ -50,9 +48,9 @@ void AbstractHighlighter::reset()
 {
     m_context.clear();
     m_captureStack.clear();
-    if (!m_definition)
+    if (!m_definition.isValid())
         return;
-    m_context.push(m_definition->initialContext());
+    m_context.push(m_definition.initialContext());
     m_captureStack.push(QStringList());
 }
 
@@ -68,7 +66,7 @@ void AbstractHighlighter::setTheme(const Theme &theme)
 
 void AbstractHighlighter::highlightLine(const QString& text)
 {
-    if (!m_definition) {
+    if (!m_definition.isValid()) {
         setFormat(0, text.size(), Format());
         return;
     }
@@ -133,7 +131,7 @@ void AbstractHighlighter::highlightLine(const QString& text)
 
         if (newFormat != currentFormat /*|| currentLookupDef != newLookupDef*/) {
             if (offset > 0)
-                setFormat(beginOffset, offset - beginOffset, currentLookupDef->formatByName(currentFormat));
+                setFormat(beginOffset, offset - beginOffset, currentLookupDef.formatByName(currentFormat));
             beginOffset = offset;
             currentFormat = newFormat;
             currentLookupDef = newLookupDef;
@@ -144,7 +142,7 @@ void AbstractHighlighter::highlightLine(const QString& text)
     } while (offset < text.size());
 
     if (beginOffset < offset)
-        setFormat(beginOffset, text.size() - beginOffset, currentLookupDef->formatByName(currentFormat));
+        setFormat(beginOffset, text.size() - beginOffset, currentLookupDef.formatByName(currentFormat));
 
     while (!m_context.top()->lineEndContext().isStay() && !lineContinuation)
         switchContext(m_context.top()->lineEndContext());

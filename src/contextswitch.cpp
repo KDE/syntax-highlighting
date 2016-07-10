@@ -67,11 +67,11 @@ void ContextSwitch::parse(const QStringRef& contextInstr)
     m_contextName = contextInstr.toString();
 }
 
-void ContextSwitch::resolve(SyntaxDefinition* def)
+void ContextSwitch::resolve(const SyntaxDefinition &def)
 {
     if (!m_contextName.isEmpty()) {
-        m_context = def->contextByName(m_contextName);
+        m_context = def.contextByName(m_contextName);
         if (!m_context)
-            qWarning() << "cannot find context" << m_contextName << "in" << def->name();
+            qWarning() << "cannot find context" << m_contextName << "in" << def.name();
     }
 }

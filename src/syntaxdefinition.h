@@ -20,10 +20,11 @@
 
 #include "katesyntax_export.h"
 
-#include <QHash>
-#include <QString>
-#include <QVector>
+#include <QExplicitlySharedDataPointer>
 
+class QChar;
+class QString;
+template <typename T> class QVector;
 class QXmlStreamReader;
 
 namespace KateSyntax {
@@ -33,11 +34,16 @@ class Format;
 class KeywordList;
 class SyntaxRepository;
 
+class SyntaxDefinitionPrivate;
+
 class KATESYNTAX_EXPORT SyntaxDefinition
 {
 public:
     SyntaxDefinition();
+    SyntaxDefinition(const SyntaxDefinition &other);
     ~SyntaxDefinition();
+
+    SyntaxDefinition& operator=(const SyntaxDefinition &rhs);
 
     SyntaxRepository* syntaxRepository() const;
     void setSyntaxRepository(SyntaxRepository *repo);
@@ -58,29 +64,7 @@ public:
     bool loadMetaData(const QString &definitionFileName);
 
 private:
-    Q_DISABLE_COPY(SyntaxDefinition)
-
-    bool isLoaded() const;
-    void loadLanguage(QXmlStreamReader &reader);
-    void loadHighlighting(QXmlStreamReader &reader);
-    void loadContexts(QXmlStreamReader &reader);
-    void loadItemData(QXmlStreamReader &reader);
-    void loadGeneral(QXmlStreamReader &reader);
-
-    SyntaxRepository *m_repo;
-    QHash<QString, KeywordList> m_keywordLists;
-    QVector<Context*> m_contexts;
-    QHash<QString, Format> m_formats;
-    QString m_delimiters;
-
-    QString m_fileName;
-    QString m_name;
-    QString m_section;
-    QVector<QString> m_extensions;
-    QVector<QString> m_mimetypes;
-    Qt::CaseSensitivity m_caseSensitive;
-    float m_version;
-    bool m_hidden;
+    QExplicitlySharedDataPointer<SyntaxDefinitionPrivate> d;
 };
 
 }

@@ -56,7 +56,7 @@ public:
 private:
     SyntaxRepository *m_repo;
 
-private slots:
+private Q_SLOTS:
     void initTestCase()
     {
         m_repo = new SyntaxRepository;

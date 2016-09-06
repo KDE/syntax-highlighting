@@ -37,7 +37,7 @@ public:
 private:
     SyntaxRepository *m_repo;
 
-private slots:
+private Q_SLOTS:
     void initTestCase()
     {
         m_repo = new SyntaxRepository;
@@ -68,7 +68,7 @@ private slots:
                 syntax = QString::fromUtf8(syntaxOverride.readAll()).trimmed();
 
 
-            QTest::newRow(it.fileName().toUtf8()) << inFile
+            QTest::newRow(it.fileName().toUtf8().constData()) << inFile
                 << (QStringLiteral(TESTBUILDDIR "/html.output/") + it.fileName() + QStringLiteral(".html"))
                 << (QStringLiteral(TESTSRCDIR "/html/") + it.fileName() + QStringLiteral(".html"))
                 << syntax;

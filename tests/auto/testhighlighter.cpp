@@ -82,7 +82,7 @@ public:
 private:
         SyntaxRepository *m_repo;
 
-private slots:
+private Q_SLOTS:
     void initTestCase()
     {
         m_repo = new SyntaxRepository;
@@ -112,7 +112,7 @@ private slots:
             if (syntaxOverride.exists() && syntaxOverride.open(QFile::ReadOnly))
                 syntax = QString::fromUtf8(syntaxOverride.readAll()).trimmed();
 
-            QTest::newRow(it.fileName().toUtf8()) << inFile
+            QTest::newRow(it.fileName().toUtf8().constData()) << inFile
                 << (QStringLiteral(TESTBUILDDIR "/output/") + it.fileName() + QStringLiteral(".ref"))
                 << (QStringLiteral(TESTSRCDIR "/reference/") + it.fileName() + QStringLiteral(".ref"))
                 << syntax;

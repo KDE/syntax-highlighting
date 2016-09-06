@@ -29,7 +29,7 @@ class SyntaxRepositoryTest : public QObject
 private:
         SyntaxRepository m_repo;
 
-private slots:
+private Q_SLOTS:
     void testDefinitionByExtension_data()
     {
         QTest::addColumn<QString>("fileName");

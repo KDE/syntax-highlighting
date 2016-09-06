@@ -40,7 +40,7 @@ public:
 
     void start();
 
-signals:
+Q_SIGNALS:
     void informationMessage(const QString &msg);
     void done();
 

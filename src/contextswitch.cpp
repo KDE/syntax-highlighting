@@ -17,6 +17,7 @@
 
 #include "contextswitch.h"
 #include "syntaxdefinition.h"
+#include "syntaxrepository.h"
 
 #include <QDebug>
 
@@ -34,7 +35,7 @@ ContextSwitch::~ContextSwitch()
 
 bool ContextSwitch::isStay() const
 {
-    return m_popCount == 0 && !m_context && m_contextName.isEmpty();
+    return m_popCount == 0 && !m_context && m_contextName.isEmpty() && m_defName.isEmpty();
 }
 
 int ContextSwitch::popCount() const
@@ -64,13 +65,26 @@ void ContextSwitch::parse(const QStringRef& contextInstr)
         return;
     }
 
-    m_contextName = contextInstr.toString();
+    const auto idx = contextInstr.indexOf(QLatin1String("##"));
+    if (idx >= 0) {
+        m_contextName = contextInstr.left(idx).toString();
+        m_defName = contextInstr.mid(idx + 2).toString();
+    } else {
+        m_contextName = contextInstr.toString();
+    }
 }
 
 void ContextSwitch::resolve(const SyntaxDefinition &def)
 {
+    auto d = def;
+    if (!m_defName.isEmpty()) {
+        d = def.syntaxRepository()->definitionForName(m_defName);
+        if (m_contextName.isEmpty())
+            m_context = d.initialContext();
+    }
+
     if (!m_contextName.isEmpty()) {
-        m_context = def.contextByName(m_contextName);
+        m_context = d.contextByName(m_contextName);
         if (!m_context)
             qWarning() << "cannot find context" << m_contextName << "in" << def.name();
     }

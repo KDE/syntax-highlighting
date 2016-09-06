@@ -40,6 +40,7 @@ public:
     void resolve(const SyntaxDefinition &def);
 
 private:
+    QString m_defName;
     QString m_contextName;
     Context *m_context;
     int m_popCount;

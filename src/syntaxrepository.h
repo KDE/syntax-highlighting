@@ -18,7 +18,7 @@
 #ifndef KATESYNTAX_SYNTAXREPOSITORY_H
 #define KATESYNTAX_SYNTAXREPOSITORY_H
 
-#include "katesyntax_export.h"
+#include "kf5syntaxhighlighting_export.h"
 
 #include <QHash>
 
@@ -26,7 +26,7 @@ namespace KateSyntax {
 
 class SyntaxDefinition;
 
-class KATESYNTAX_EXPORT SyntaxRepository
+class KF5SYNTAXHIGHLIGHTING_EXPORT SyntaxRepository
 {
 public:
     SyntaxRepository();

@@ -18,7 +18,7 @@
 #ifndef KATESYNTAX_ABSTRACTHIGHLIGHTERM_H
 #define KATESYNTAX_ABSTRACTHIGHLIGHTERM_H
 
-#include "katesyntax_export.h"
+#include "kf5syntaxhighlighting_export.h"
 #include "syntaxdefinition.h"
 #include "theme.h"
 
@@ -33,7 +33,7 @@ class Context;
 class ContextSwitch;
 class Format;
 
-class KATESYNTAX_EXPORT AbstractHighlighter
+class KF5SYNTAXHIGHLIGHTING_EXPORT AbstractHighlighter
 {
 public:
     AbstractHighlighter();

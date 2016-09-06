@@ -18,7 +18,7 @@
 #ifndef KATESYNTAX_THEME_H
 #define KATESYNTAX_THEME_H
 
-#include "katesyntax_export.h"
+#include "kf5syntaxhighlighting_export.h"
 
 #include <QColor>
 
@@ -28,7 +28,7 @@ namespace KateSyntax {
 
 struct ThemeData;
 
-class KATESYNTAX_EXPORT Theme
+class KF5SYNTAXHIGHLIGHTING_EXPORT Theme
 {
 public:
     ~Theme();

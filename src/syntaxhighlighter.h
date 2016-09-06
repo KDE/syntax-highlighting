@@ -18,7 +18,7 @@
 #ifndef KATESYNTAX_QSYNTAXHIGHLIGHTER_H
 #define KATESYNTAX_QSYNTAXHIGHLIGHTER_H
 
-#include "katesyntax_export.h"
+#include "kf5syntaxhighlighting_export.h"
 
 #include "abstracthighlighter.h"
 
@@ -26,7 +26,7 @@
 
 namespace KateSyntax {
 
-class KATESYNTAX_EXPORT SyntaxHighlighter : public QSyntaxHighlighter, public AbstractHighlighter
+class KF5SYNTAXHIGHLIGHTING_EXPORT SyntaxHighlighter : public QSyntaxHighlighter, public AbstractHighlighter
 {
     Q_OBJECT
 public:

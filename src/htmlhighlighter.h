@@ -18,7 +18,7 @@
 #ifndef KATESYNTAX_HTMLHIGHLIGHTER_H
 #define KATESYNTAX_HTMLHIGHLIGHTER_H
 
-#include "katesyntax_export.h"
+#include "kf5syntaxhighlighting_export.h"
 #include "abstracthighlighter.h"
 
 #include <memory>
@@ -28,7 +28,7 @@ class QTextStream;
 
 namespace KateSyntax {
 
-class KATESYNTAX_EXPORT HtmlHighlighter : public AbstractHighlighter
+class KF5SYNTAXHIGHLIGHTING_EXPORT HtmlHighlighter : public AbstractHighlighter
 {
 public:
     HtmlHighlighter();

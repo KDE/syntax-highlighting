@@ -18,7 +18,7 @@
 #ifndef KATESYNTAX_FORMAT_H
 #define KATESYNTAX_FORMAT_H
 
-#include "katesyntax_export.h"
+#include "kf5syntaxhighlighting_export.h"
 #include "theme.h"
 
 #include <QColor>
@@ -28,7 +28,7 @@ class QXmlStreamReader;
 
 namespace KateSyntax {
 
-class KATESYNTAX_EXPORT Format
+class KF5SYNTAXHIGHLIGHTING_EXPORT Format
 {
 public:
     Format();

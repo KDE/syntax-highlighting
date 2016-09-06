@@ -18,7 +18,7 @@
 #ifndef KATESYNTAX_SYNTAXDEFINITION_H
 #define KATESYNTAX_SYNTAXDEFINITION_H
 
-#include "katesyntax_export.h"
+#include "kf5syntaxhighlighting_export.h"
 
 #include <QExplicitlySharedDataPointer>
 
@@ -36,7 +36,7 @@ class SyntaxRepository;
 
 class SyntaxDefinitionPrivate;
 
-class KATESYNTAX_EXPORT SyntaxDefinition
+class KF5SYNTAXHIGHLIGHTING_EXPORT SyntaxDefinition
 {
 public:
     SyntaxDefinition();

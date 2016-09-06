@@ -1,4 +1,4 @@
-set(kate_syntax_srcs
+set(syntax_highlighting_srcs
     abstracthighlighter.cpp
     context.cpp
     contextswitch.cpp
@@ -13,24 +13,24 @@ set(kate_syntax_srcs
     syntaxrepository.cpp
     theme.cpp
 )
-qt5_add_resources(kate_syntax_srcs ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/kate/data/syntax-data.qrc)
+qt5_add_resources(syntax_highlighting_srcs ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/kate/data/syntax-data.qrc)
 
-add_library(KateSyntax SHARED ${kate_syntax_srcs})
-generate_export_header(KateSyntax)
-set_target_properties(KateSyntax PROPERTIES
+add_library(KF5SyntaxHighlighting SHARED ${syntax_highlighting_srcs})
+generate_export_header(KF5SyntaxHighlighting)
+set_target_properties(KF5SyntaxHighlighting PROPERTIES
     VERSION ${SyntaxHighlighting_VERSION_STRING}
     SOVERSION ${SyntaxHighlighting_SOVERSION}
     EXPORT_NAME SyntaxHighlighting
 )
-target_include_directories(KateSyntax PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR};${CMAKE_CURRENT_BINARY_DIR};>")
-target_link_libraries(KateSyntax LINK_PUBLIC Qt5::Gui LINK_PRIVATE Qt5::Network)
+target_include_directories(KF5SyntaxHighlighting PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR};${CMAKE_CURRENT_BINARY_DIR};>")
+target_link_libraries(KF5SyntaxHighlighting LINK_PUBLIC Qt5::Gui LINK_PRIVATE Qt5::Network)
 
-install(TARGETS KateSyntax EXPORT KF5SyntaxHighlightingTargets ${INSTALL_TARGETS_DEFAULT_ARGS})
+install(TARGETS KF5SyntaxHighlighting EXPORT KF5SyntaxHighlightingTargets ${INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES
     syntaxrepository.h
     syntaxdefinition.h
     abstracthighlighter.h
     syntaxhighlighter.h
     theme.h
-    ${CMAKE_CURRENT_BINARY_DIR}/katesyntax_export.h
+    ${CMAKE_CURRENT_BINARY_DIR}/kf5syntaxhighlighting_export.h
     DESTINATION ${INCLUDE_INSTALL_DIR})

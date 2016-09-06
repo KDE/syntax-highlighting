@@ -18,7 +18,7 @@
 #ifndef KATESYNTAX_DOWNLOADER_H
 #define KATESYNTAX_DOWNLOADER_H
 
-#include "katesyntax_export.h"
+#include "kf5syntaxhighlighting_export.h"
 
 #include <QObject>
 
@@ -31,7 +31,7 @@ namespace KateSyntax {
 
 class SyntaxRepository;
 
-class KATESYNTAX_EXPORT Downloader : public QObject
+class KF5SYNTAXHIGHLIGHTING_EXPORT Downloader : public QObject
 {
     Q_OBJECT
 public:

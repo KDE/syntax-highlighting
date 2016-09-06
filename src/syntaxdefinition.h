@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef KATESYNTAX_SYNTAXDEFINITION_H
-#define KATESYNTAX_SYNTAXDEFINITION_H
+#ifndef SYNTAXHIGHLIGHTING_SYNTAXDEFINITION_H
+#define SYNTAXHIGHLIGHTING_SYNTAXDEFINITION_H
 
 #include "kf5syntaxhighlighting_export.h"
 

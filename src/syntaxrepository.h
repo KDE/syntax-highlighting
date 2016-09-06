@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef KATESYNTAX_SYNTAXREPOSITORY_H
-#define KATESYNTAX_SYNTAXREPOSITORY_H
+#ifndef SYNTAXHIGHLIGHTING_SYNTAXREPOSITORY_H
+#define SYNTAXHIGHLIGHTING_SYNTAXREPOSITORY_H
 
 #include "kf5syntaxhighlighting_export.h"
 
@@ -46,4 +46,4 @@ private:
 
 }
 
-#endif // KATESYNTAX_SYNTAXREPOSITORY_H
+#endif // SYNTAXHIGHLIGHTING_SYNTAXREPOSITORY_H

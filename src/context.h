@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef KATESYNTAX_CONTEXT_H
-#define KATESYNTAX_CONTEXT_H
+#ifndef SYNTAXHIGHLIGHTING_CONTEXT_H
+#define SYNTAXHIGHLIGHTING_CONTEXT_H
 
 #include "rule.h"
 #include "contextswitch.h"
@@ -77,4 +77,4 @@ private:
 };
 }
 
-#endif // KATESYNTAX_CONTEXT_H
+#endif // SYNTAXHIGHLIGHTING_CONTEXT_H

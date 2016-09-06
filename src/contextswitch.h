@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef KATESYNTAX_CONTEXTSWITCH_H
-#define KATESYNTAX_CONTEXTSWITCH_H
+#ifndef SYNTAXHIGHLIGHTING_CONTEXTSWITCH_H
+#define SYNTAXHIGHLIGHTING_CONTEXTSWITCH_H
 
 #include <QString>
 
@@ -47,4 +47,4 @@ private:
 };
 }
 
-#endif // KATESYNTAX_CONTEXTSWITCH_H
+#endif // SYNTAXHIGHLIGHTING_CONTEXTSWITCH_H

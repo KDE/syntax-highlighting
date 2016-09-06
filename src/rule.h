@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef KATESYNTAX_RULE_H
-#define KATESYNTAX_RULE_H
+#ifndef SYNTAXHIGHLIGHTING_RULE_H
+#define SYNTAXHIGHLIGHTING_RULE_H
 
 #include "keywordlist.h"
 #include "contextswitch.h"
@@ -237,4 +237,4 @@ private:
 
 }
 
-#endif // KATESYNTAX_RULE_H
+#endif // SYNTAXHIGHLIGHTING_RULE_H

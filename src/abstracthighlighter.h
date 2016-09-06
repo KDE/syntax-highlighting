@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef KATESYNTAX_ABSTRACTHIGHLIGHTERM_H
-#define KATESYNTAX_ABSTRACTHIGHLIGHTERM_H
+#ifndef SYNTAXHIGHLIGHTING_ABSTRACTHIGHLIGHTERM_H
+#define SYNTAXHIGHLIGHTING_ABSTRACTHIGHLIGHTERM_H
 
 #include "kf5syntaxhighlighting_export.h"
 #include "syntaxdefinition.h"
@@ -60,4 +60,4 @@ private:
 };
 }
 
-#endif // KATESYNTAX_ABSTRACTHIGHLIGHTERM_H
+#endif // SYNTAXHIGHLIGHTING_ABSTRACTHIGHLIGHTERM_H

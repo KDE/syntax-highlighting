@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef KATESYNTAX_HTMLHIGHLIGHTER_H
-#define KATESYNTAX_HTMLHIGHLIGHTER_H
+#ifndef SYNTAXHIGHLIGHTING_HTMLHIGHLIGHTER_H
+#define SYNTAXHIGHLIGHTING_HTMLHIGHLIGHTER_H
 
 #include "kf5syntaxhighlighting_export.h"
 #include "abstracthighlighter.h"
@@ -49,4 +49,4 @@ private:
 };
 }
 
-#endif // KATESYNTAX_HTMLHIGHLIGHTER_H
+#endif // SYNTAXHIGHLIGHTING_HTMLHIGHLIGHTER_H

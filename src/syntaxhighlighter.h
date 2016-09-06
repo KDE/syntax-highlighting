@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef KATESYNTAX_QSYNTAXHIGHLIGHTER_H
-#define KATESYNTAX_QSYNTAXHIGHLIGHTER_H
+#ifndef SYNTAXHIGHLIGHTING_QSYNTAXHIGHLIGHTER_H
+#define SYNTAXHIGHLIGHTING_QSYNTAXHIGHLIGHTER_H
 
 #include "kf5syntaxhighlighting_export.h"
 
@@ -41,4 +41,4 @@ private:
 };
 }
 
-#endif // KATESYNTAX_QSYNTAXHIGHLIGHTER_H
+#endif // SYNTAXHIGHLIGHTING_QSYNTAXHIGHLIGHTER_H

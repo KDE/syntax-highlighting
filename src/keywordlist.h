@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef KATESYNTAX_KEYWORDLIST_H
-#define KATESYNTAX_KEYWORDLIST_H
+#ifndef SYNTAXHIGHLIGHTING_KEYWORDLIST_H
+#define SYNTAXHIGHLIGHTING_KEYWORDLIST_H
 
 #include <QSet>
 #include <QString>
@@ -48,4 +48,4 @@ private:
 };
 }
 
-#endif // KATESYNTAX_KEYWORDLIST_H
+#endif // SYNTAXHIGHLIGHTING_KEYWORDLIST_H

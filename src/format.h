@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef KATESYNTAX_FORMAT_H
-#define KATESYNTAX_FORMAT_H
+#ifndef SYNTAXHIGHLIGHTING_FORMAT_H
+#define SYNTAXHIGHLIGHTING_FORMAT_H
 
 #include "kf5syntaxhighlighting_export.h"
 #include "theme.h"
@@ -64,4 +64,4 @@ private:
 };
 }
 
-#endif // KATESYNTAX_FORMAT_H
+#endif // SYNTAXHIGHLIGHTING_FORMAT_H

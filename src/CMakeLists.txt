@@ -33,4 +33,4 @@ install(FILES
     syntaxhighlighter.h
     theme.h
     ${CMAKE_CURRENT_BINARY_DIR}/kf5syntaxhighlighting_export.h
-    DESTINATION ${INCLUDE_INSTALL_DIR})
+    DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF5}/SyntaxHighlighting)

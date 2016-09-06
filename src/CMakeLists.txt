@@ -34,3 +34,12 @@ install(FILES
     theme.h
     ${CMAKE_CURRENT_BINARY_DIR}/kf5syntaxhighlighting_export.h
     DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF5}/SyntaxHighlighting)
+
+ecm_generate_pri_file(
+    BASE_NAME SyntaxHighlighting LIB_NAME
+    KF5SyntaxHighlighting
+    DEPS "gui"
+    FILENAME_VAR PRI_FILENAME
+    INCLUDE_INSTALL_DIR ${KDE_INSTALL_INCLUDEDIR_KF5}/SyntaxHighlighting
+)
+install(FILES ${PRI_FILENAME} DESTINATION ${ECM_MKSPECS_INSTALL_DIR})

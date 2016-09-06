@@ -1,106 +1,37 @@
-project(KateSyntax)
+project(SyntaxHighlighting)
 
 cmake_minimum_required(VERSION 2.8.12)
+
+find_package(ECM 5.26.0 REQUIRED NO_MODULE)
+set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 if(POLICY CMP0063)
     cmake_policy(SET CMP0063 NEW)
 endif()
 
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-if(NOT DEFINED CMAKE_INSTALL_RPATH_USE_LINK_PATH)
-    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-endif()
-if(NOT DEFINED CMAKE_MACOSX_RPATH)
-    set(CMAKE_MACOSX_RPATH TRUE)
-endif()
-
 include(FeatureSummary)
 include(GenerateExportHeader)
+include(ECMSetupVersion)
+include(ECMGenerateHeaders)
+include(ECMPackageConfigHelpers)
+include(KDEInstallDirs)
+include(KDEFrameworkCompilerSettings)
+include(KDECMakeSettings)
 
-enable_testing()
+set(KF5_VERSION "5.27")
 
-#
-# Version setup
-#
-set(KATESYNTAX_VERSION_MAJOR "0")
-set(KATESYNTAX_VERSION_MINOR "0")
-set(KATESYNTAX_VERSION_PATCH "1")
-set(KATESYNTAX_VERSION "${KATESYNTAX_VERSION_MAJOR}.${KATESYNTAX_VERSION_MINOR}.${KATESYNTAX_VERSION_PATCH}")
-set(KATESYNTAX_VERSION_STRING "${KATESYNTAX_VERSION}")
-
-if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
-  find_package(Git)
-  set_package_properties(Git PROPERTIES TYPE OPTIONAL PURPOSE "Determine exact build version.")
-  if(GIT_FOUND)
-    execute_process(
-      COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-      OUTPUT_VARIABLE _git_revision
-    )
-    string(REGEX REPLACE "\n" "" _git_revision "${_git_revision}")
-    set(KATESYNTAX_VERSION_STRING "${KATESYNTAX_VERSION_STRING} (revision: ${_git_revision})")
-  endif()
-endif()
-
-configure_file(config-katesyntax-version.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-katesyntax-version.h)
-
-
-#
-# Compiler & linker settings
-#
-set(CMAKE_C_VISIBILITY_PRESET hidden)
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
-
-if(CMAKE_COMPILER_IS_GNUCXX OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Wall -Werror=return-type -std=c++0x -pedantic")
-endif()
-
-if(CMAKE_SYSTEM_NAME MATCHES Linux OR CMAKE_SYSTEM_NAME STREQUAL GNU)
-    if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-        set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--fatal-warnings -Wl,--no-undefined ${CMAKE_SHARED_LINKER_FLAGS}")
-        set(CMAKE_MODULE_LINKER_FLAGS "-Wl,--fatal-warnings -Wl,--no-undefined ${CMAKE_MODULE_LINKER_FLAGS}")
-    endif()
-endif()
+ecm_setup_version(${KF5_VERSION}
+    VARIABLE_PREFIX SyntaxHighlighting
+    VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/syntax_highlighting_version.h"
+    PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KF5SyntaxHighlightingConfigVersion.cmake"
+)
 
 #
 # Dependencies
 #
-find_package(Qt5 NO_MODULE REQUIRED COMPONENTS Gui Network Test)
-find_package(Qt5 NO_MODULE QUIET OPTIONAL_COMPONENTS Widgets)
-add_definitions(-DQT_DEPRECATED_WARNINGS)
-add_definitions(-DQT_USE_FAST_CONCATENATION -DQT_NO_CAST_TO_ASCII -DQT_NO_URL_CAST_FROM_STRING -DQT_NO_CAST_FROM_ASCII)
-
+set(REQUIRED_QT_VERSION "5.6.0")
+find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED COMPONENTS Gui Network Test)
+find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE QUIET OPTIONAL_COMPONENTS Widgets)
 set_package_properties(Qt5 PROPERTIES URL "http://qt-project.org/")
-
-#
-# Installation settings
-#
-set(BIN_INSTALL_DIR "bin")
-set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)")
-set(LIB_INSTALL_DIR "lib${LIB_SUFFIX}")
-set(INCLUDE_INSTALL_DIR "include/KateSyntax")
-set(CMAKECONFIG_INSTALL_DIR ${LIB_INSTALL_DIR}/cmake/KateSyntax)
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${LIB_INSTALL_DIR})
-
-# set RPATH only when installing to a non-default location and not set in cache
-if(NOT CMAKE_INSTALL_RPATH)
-    list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}" _isSystemPlatformLibDir)
-    list(FIND CMAKE_C_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}" _isSystemCLibDir)
-    list(FIND CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}" _isSystemCxxLibDir)
-    if(${_isSystemPlatformLibDir} EQUAL -1 AND ${_isSystemCLibDir} EQUAL -1 AND ${_isSystemCxxLibDir} EQUAL -1)
-        set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}")
-    endif()
-endif()
-
-set(
-    INSTALL_TARGETS_DEFAULT_ARGS
-    RUNTIME DESTINATION ${BIN_INSTALL_DIR}
-    LIBRARY DESTINATION ${LIB_INSTALL_DIR}
-    ARCHIVE DESTINATION ${LIB_INSTALL_DIR} COMPONENT Devel
-)
 
 #
 # Actually build the stuff
@@ -113,27 +44,27 @@ add_subdirectory(tests)
 #
 # CMake package config file generation
 #
-include(CMakePackageConfigHelpers)
-configure_package_config_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/KateSyntaxConfig.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/KateSyntaxConfig.cmake
-    INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR}
-    PATH_VARS INCLUDE_INSTALL_DIR
-)
+set(CMAKECONFIG_INSTALL_DIR "${CMAKECONFIG_INSTALL_PREFIX}/KF5SyntaxHighlighting")
 
-write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/KateSyntaxConfigVersion.cmake
-    VERSION ${KATESYNTAX_VERSION}
-    COMPATIBILITY SameMajorVersion
+ecm_configure_package_config_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/KF5SyntaxHighlightingConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/KF5SyntaxHighlightingConfig.cmake"
+    INSTALL_DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
 )
 
 install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/KateSyntaxConfig.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/KateSyntaxConfigVersion.cmake
-    DESTINATION ${CMAKECONFIG_INSTALL_DIR}
-)
+        "${CMAKE_CURRENT_BINARY_DIR}/KF5SyntaxHighlightingConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/KF5SyntaxHighlightingConfigVersion.cmake"
+        DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
+        COMPONENT Devel)
 
-install(EXPORT KateSyntaxTargets DESTINATION "${CMAKECONFIG_INSTALL_DIR}" FILE KateSyntaxTarget.cmake)
+install(EXPORT KF5SyntaxHighlightingTargets
+        DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
+        FILE KF5SyntaxHighlightingTargets.cmake
+        NAMESPACE KF5::)
 
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/syntax_highlighting_version.h"
+        DESTINATION "${INCLUDE_INSTALL_DIR}"
+        COMPONENT Devel)
 
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)

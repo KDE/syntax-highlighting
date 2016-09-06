@@ -18,13 +18,14 @@ qt5_add_resources(kate_syntax_srcs ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/kate/
 add_library(KateSyntax SHARED ${kate_syntax_srcs})
 generate_export_header(KateSyntax)
 set_target_properties(KateSyntax PROPERTIES
-    VERSION ${KATESYNTAX_VERSION}
-    SOVERSION ${KATESYNTAX_VERSION}
+    VERSION ${SyntaxHighlighting_VERSION_STRING}
+    SOVERSION ${SyntaxHighlighting_SOVERSION}
+    EXPORT_NAME SyntaxHighlighting
 )
 target_include_directories(KateSyntax PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR};${CMAKE_CURRENT_BINARY_DIR};>")
 target_link_libraries(KateSyntax LINK_PUBLIC Qt5::Gui LINK_PRIVATE Qt5::Network)
 
-install(TARGETS KateSyntax EXPORT KateSyntaxTargets ${INSTALL_TARGETS_DEFAULT_ARGS})
+install(TARGETS KateSyntax EXPORT KF5SyntaxHighlightingTargets ${INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES
     syntaxrepository.h
     syntaxdefinition.h

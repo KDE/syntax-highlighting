@@ -24,7 +24,7 @@
 #include <QObject>
 #include <QtTest/qtest.h>
 
-using namespace KateSyntax;
+using namespace SyntaxHighlighting;
 
 class NullHighlighter : public AbstractHighlighter
 {

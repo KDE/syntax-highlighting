@@ -27,7 +27,7 @@
 
 #include <iostream>
 
-using namespace KateSyntax;
+using namespace SyntaxHighlighting;
 
 int main(int argc, char **argv)
 {

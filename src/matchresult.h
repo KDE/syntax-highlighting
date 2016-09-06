@@ -20,7 +20,7 @@
 
 #include <QStringList>
 
-namespace KateSyntax {
+namespace SyntaxHighlighting {
 
 class MatchResult
 {

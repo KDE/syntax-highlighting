@@ -20,7 +20,7 @@
 
 #include <QString>
 
-namespace KateSyntax {
+namespace SyntaxHighlighting {
 
 class Context;
 class SyntaxDefinition;

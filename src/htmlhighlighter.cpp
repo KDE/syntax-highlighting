@@ -24,7 +24,7 @@
 #include <QFileInfo>
 #include <QTextStream>
 
-using namespace KateSyntax;
+using namespace SyntaxHighlighting;
 
 HtmlHighlighter::HtmlHighlighter()
 {

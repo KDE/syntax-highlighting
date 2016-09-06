@@ -23,7 +23,7 @@
 #include <QFileInfo>
 #include <QStandardPaths>
 
-using namespace KateSyntax;
+using namespace SyntaxHighlighting;
 
 SyntaxRepository::SyntaxRepository()
 {

@@ -29,7 +29,7 @@
 #include <QTextStream>
 #include <QtTest/qtest.h>
 
-using namespace KateSyntax;
+using namespace SyntaxHighlighting;
 
 class TestHighlighter : public AbstractHighlighter
 {

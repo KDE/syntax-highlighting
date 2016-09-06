@@ -21,7 +21,7 @@
 #include <QObject>
 #include <QtTest/qtest.h>
 
-using namespace KateSyntax;
+using namespace SyntaxHighlighting;
 
 class SyntaxRepositoryTest : public QObject
 {

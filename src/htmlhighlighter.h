@@ -26,7 +26,7 @@
 class QFile;
 class QTextStream;
 
-namespace KateSyntax {
+namespace SyntaxHighlighting {
 
 class KF5SYNTAXHIGHLIGHTING_EXPORT HtmlHighlighter : public AbstractHighlighter
 {

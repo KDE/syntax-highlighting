@@ -27,7 +27,7 @@ class QNetworkReply;
 class QUrl;
 class QXmlStreamReader;
 
-namespace KateSyntax {
+namespace SyntaxHighlighting {
 
 class SyntaxRepository;
 

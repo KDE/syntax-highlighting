@@ -29,7 +29,7 @@
 #include <QTimer>
 #include <QXmlStreamReader>
 
-using namespace KateSyntax;
+using namespace SyntaxHighlighting;
 
 Downloader::Downloader(SyntaxRepository *repo, QObject *parent) :
     QObject(parent),

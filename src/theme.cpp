@@ -17,9 +17,9 @@
 
 #include "theme.h"
 
-using namespace KateSyntax;
+using namespace SyntaxHighlighting;
 
-namespace KateSyntax {
+namespace SyntaxHighlighting {
 
 struct ThemeData {
     QRgb normalColor;

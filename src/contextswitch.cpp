@@ -21,7 +21,7 @@
 
 #include <QDebug>
 
-using namespace KateSyntax;
+using namespace SyntaxHighlighting;
 
 ContextSwitch::ContextSwitch() :
     m_context(nullptr),

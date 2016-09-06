@@ -27,7 +27,7 @@ class QString;
 template <typename T> class QVector;
 class QXmlStreamReader;
 
-namespace KateSyntax {
+namespace SyntaxHighlighting {
 
 class Context;
 class Format;

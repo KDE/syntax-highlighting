@@ -24,7 +24,7 @@
 
 #include <memory>
 
-namespace KateSyntax {
+namespace SyntaxHighlighting {
 
 struct ThemeData;
 

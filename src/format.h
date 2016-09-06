@@ -26,7 +26,7 @@
 
 class QXmlStreamReader;
 
-namespace KateSyntax {
+namespace SyntaxHighlighting {
 
 class KF5SYNTAXHIGHLIGHTING_EXPORT Format
 {

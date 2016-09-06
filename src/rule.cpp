@@ -21,7 +21,7 @@
 #include <QString>
 #include <QXmlStreamReader>
 
-using namespace KateSyntax;
+using namespace SyntaxHighlighting;
 
 static bool isOctalChar(QChar c)
 {

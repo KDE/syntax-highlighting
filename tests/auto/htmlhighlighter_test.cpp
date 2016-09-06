@@ -26,7 +26,7 @@
 #include <QProcess>
 #include <QtTest/qtest.h>
 
-using namespace KateSyntax;
+using namespace SyntaxHighlighting;
 
 class HTMLHighlighterTest : public QObject
 {

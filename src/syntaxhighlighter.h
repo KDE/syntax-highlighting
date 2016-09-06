@@ -24,7 +24,7 @@
 
 #include <QSyntaxHighlighter>
 
-namespace KateSyntax {
+namespace SyntaxHighlighting {
 
 class KF5SYNTAXHIGHLIGHTING_EXPORT SyntaxHighlighter : public QSyntaxHighlighter, public AbstractHighlighter
 {

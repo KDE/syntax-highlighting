@@ -23,7 +23,7 @@
 #include <QFile>
 #include <QTextEdit>
 
-using namespace KateSyntax;
+using namespace SyntaxHighlighting;
 
 int main(int argc, char **argv)
 {
@@ -50,7 +50,7 @@ int main(int argc, char **argv)
     if (!f.open(QFile::ReadOnly))
         return 1;
 
-    KateSyntax::SyntaxRepository repo;
+    SyntaxHighlighting::SyntaxRepository repo;
 
     SyntaxDefinition def;
     if (parser.isSet(syntaxName)) {
@@ -66,7 +66,7 @@ int main(int argc, char **argv)
     edit.setReadOnly(true);
     edit.resize(1024, 1024);
     edit.show();
-    auto hl = new KateSyntax::SyntaxHighlighter(&edit);
+    auto hl = new SyntaxHighlighting::SyntaxHighlighter(&edit);
     if (app.palette().color(QPalette::Base).lightness() < 128)
         hl->setTheme(Theme::defaultTheme(Theme::DarkTheme));
     hl->setDefinition(def);

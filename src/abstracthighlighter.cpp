@@ -22,7 +22,7 @@
 
 #include <QDebug>
 
-using namespace KateSyntax;
+using namespace SyntaxHighlighting;
 
 AbstractHighlighter::AbstractHighlighter() :
     m_theme(Theme::defaultTheme())

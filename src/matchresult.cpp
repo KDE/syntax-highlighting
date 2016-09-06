@@ -17,7 +17,7 @@
 
 #include "matchresult.h"
 
-using namespace KateSyntax;
+using namespace SyntaxHighlighting;
 
 MatchResult::MatchResult(int offset, const QStringList &captures) :
     m_captures(captures),

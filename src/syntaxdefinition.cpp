@@ -28,9 +28,9 @@
 
 #include <algorithm>
 
-using namespace KateSyntax;
+using namespace SyntaxHighlighting;
 
-namespace KateSyntax {
+namespace SyntaxHighlighting {
 class SyntaxDefinitionPrivate : public QSharedData
 {
 public:

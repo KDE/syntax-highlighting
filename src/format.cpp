@@ -20,7 +20,7 @@
 #include <QDebug>
 #include <QXmlStreamReader>
 
-using namespace KateSyntax;
+using namespace SyntaxHighlighting;
 
 static Theme::Style stringToDefaultFormat(const QStringRef &str)
 {

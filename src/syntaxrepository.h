@@ -22,7 +22,7 @@
 
 #include <QHash>
 
-namespace KateSyntax {
+namespace SyntaxHighlighting {
 
 class SyntaxDefinition;
 

@@ -19,7 +19,7 @@
 
 #include <QXmlStreamReader>
 
-using namespace KateSyntax;
+using namespace SyntaxHighlighting;
 
 KeywordList::KeywordList() :
     m_caseSensitive(Qt::CaseSensitive)

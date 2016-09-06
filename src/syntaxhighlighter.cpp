@@ -20,7 +20,7 @@
 
 #include <QDebug>
 
-using namespace KateSyntax;
+using namespace SyntaxHighlighting;
 
 SyntaxHighlighter::SyntaxHighlighter(QObject* parent) :
     QSyntaxHighlighter(parent)
@@ -38,7 +38,7 @@ void SyntaxHighlighter::highlightBlock(const QString& text)
     highlightLine(text);
 }
 
-void SyntaxHighlighter::setFormat(int offset, int length, const KateSyntax::Format& format)
+void SyntaxHighlighter::setFormat(int offset, int length, const SyntaxHighlighting::Format& format)
 {
     if (format.isNormal(theme()) || offset == length)
         return;

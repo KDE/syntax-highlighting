@@ -31,7 +31,7 @@
 
 class QXmlStreamReader;
 
-namespace KateSyntax {
+namespace SyntaxHighlighting {
 
 class Rule
 {

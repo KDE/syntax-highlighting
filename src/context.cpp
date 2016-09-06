@@ -23,7 +23,7 @@
 #include <QString>
 #include <QXmlStreamReader>
 
-using namespace KateSyntax;
+using namespace SyntaxHighlighting;
 
 Context::Context() :
     m_resolveState(Unknown),

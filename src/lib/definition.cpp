@@ -286,6 +286,11 @@ bool Definition::loadMetaData(const QString& definitionFileName)
     return false;
 }
 
+static bool attrToBool(const QStringRef &str)
+{
+    return str == QLatin1String("1") || str == QLatin1String("true");
+}
+
 bool DefinitionPrivate::loadLanguage(QXmlStreamReader &reader)
 {
     Q_ASSERT(reader.name() == QLatin1String("language"));
@@ -313,6 +318,8 @@ bool DefinitionPrivate::loadLanguage(QXmlStreamReader &reader)
     const auto mts = reader.attributes().value(QStringLiteral("mimetype")).toString();
     foreach (const auto &mt, mts.split(QLatin1Char(';'), QString::SkipEmptyParts))
         mimetypes.push_back(mt);
+    if (reader.attributes().hasAttribute(QStringLiteral("casesensitive")))
+        caseSensitive = attrToBool(reader.attributes().value(QStringLiteral("casesensitive"))) ? Qt::CaseSensitive : Qt::CaseInsensitive;
     return true;
 }
 
@@ -396,11 +403,6 @@ void DefinitionPrivate::loadItemData(QXmlStreamReader& reader)
     }
 }
 
-static bool attrToBool(const QStringRef &str)
-{
-    return str == QLatin1String("1") || str == QLatin1String("true");
-}
-
 void DefinitionPrivate::loadGeneral(QXmlStreamReader& reader)
 {
     Q_ASSERT(reader.name() == QLatin1String("general"));
@@ -411,7 +413,8 @@ void DefinitionPrivate::loadGeneral(QXmlStreamReader& reader)
         switch (reader.tokenType()) {
             case QXmlStreamReader::StartElement:
                 if (reader.name() == QLatin1String("keywords")) {
-                    caseSensitive = attrToBool(reader.attributes().value(QStringLiteral("casesensitive"))) ? Qt::CaseSensitive : Qt::CaseInsensitive;
+                    if (reader.attributes().hasAttribute(QStringLiteral("casesensitive")))
+                        caseSensitive = attrToBool(reader.attributes().value(QStringLiteral("casesensitive"))) ? Qt::CaseSensitive : Qt::CaseInsensitive;
                     delimiters += reader.attributes().value(QStringLiteral("additionalDeliminator"));
                     std::sort(delimiters.begin(), delimiters.end());
                     auto it = std::unique(delimiters.begin(), delimiters.end());

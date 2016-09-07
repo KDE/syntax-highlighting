@@ -18,6 +18,7 @@
 #include <repository.h>
 #include <definition.h>
 
+#include <QFileInfo>
 #include <QObject>
 #include <QtTest/qtest.h>
 
@@ -76,6 +77,9 @@ private Q_SLOTS:
         QCOMPARE(def.section(), QLatin1String("Other"));
         QCOMPARE(def.license(), QLatin1String("LGPL"));
         QVERIFY(def.author().contains(QLatin1String("Dominik")));
+        QFileInfo fi(def.filePath());
+        QVERIFY(fi.isAbsolute());
+        QVERIFY(def.filePath().endsWith(QLatin1String("alert.xml")));
 
         def = m_repo.definitionForName(QLatin1String("C++"));
         QCOMPARE(def.section(), QLatin1String("Sources"));

@@ -108,6 +108,11 @@ bool Definition::isValid() const
     return d->repo && !d->fileName.isEmpty();
 }
 
+QString Definition::filePath() const
+{
+    return d->fileName;
+}
+
 Repository* Definition::repository() const
 {
     return d->repo;

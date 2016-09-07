@@ -48,6 +48,10 @@ public:
 
     /** Checks whether this object refers to a valid syntax definition. */
     bool isValid() const;
+    /** Returns the full path to the definition XML file containing
+     *  the syntax definition. Note that this can be a path to QRC content.
+     */
+    QString filePath() const;
 
     /** Name of the syntax.
      *  Used for internal references, prefer translatedName() for display.

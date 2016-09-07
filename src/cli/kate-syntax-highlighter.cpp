@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "syntax_highlighting_version.h"
+#include "syntaxhighlighting_version.h"
 
 #include <downloader.h>
 #include <htmlhighlighter.h>

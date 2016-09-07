@@ -18,11 +18,11 @@ include(KDEInstallDirs)
 include(KDEFrameworkCompilerSettings)
 include(KDECMakeSettings)
 
-set(KF5_VERSION "5.27")
+set(KF5_VERSION "5.27.0")
 
 ecm_setup_version(${KF5_VERSION}
     VARIABLE_PREFIX SyntaxHighlighting
-    VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/syntax_highlighting_version.h"
+    VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/syntaxhighlighting_version.h"
     PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KF5SyntaxHighlightingConfigVersion.cmake"
 )
 
@@ -65,7 +65,7 @@ install(EXPORT KF5SyntaxHighlightingTargets
         FILE KF5SyntaxHighlightingTargets.cmake
         NAMESPACE KF5::)
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/syntax_highlighting_version.h"
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/syntaxhighlighting_version.h"
         DESTINATION "${INCLUDE_INSTALL_DIR}"
         COMPONENT Devel)
 

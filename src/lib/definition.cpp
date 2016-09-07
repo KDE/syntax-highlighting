@@ -15,6 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "syntaxhighlighting_version.h"
+
 #include "definition.h"
 #include "definitionref_p.h"
 #include "context.h"
@@ -40,11 +42,12 @@ public:
     ~DefinitionPrivate();
 
     bool isLoaded() const;
-    void loadLanguage(QXmlStreamReader &reader);
+    bool loadLanguage(QXmlStreamReader &reader);
     void loadHighlighting(Definition *def, QXmlStreamReader &reader);
     void loadContexts(Definition *def, QXmlStreamReader &reader);
     void loadItemData(QXmlStreamReader &reader);
     void loadGeneral(QXmlStreamReader &reader);
+    bool checkKateVersion(const QStringRef &verStr);
 
     Repository *repo;
     QHash<QString, KeywordList> keywordLists;
@@ -276,18 +279,20 @@ bool Definition::loadMetaData(const QString& definitionFileName)
         if (token != QXmlStreamReader::StartElement)
             continue;
         if (reader.name() == QLatin1String("language")) {
-            d->loadLanguage(reader);
-            return true;
+            return d->loadLanguage(reader);
         }
     }
 
     return false;
 }
 
-void DefinitionPrivate::loadLanguage(QXmlStreamReader &reader)
+bool DefinitionPrivate::loadLanguage(QXmlStreamReader &reader)
 {
     Q_ASSERT(reader.name() == QLatin1String("language"));
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
+
+    if (!checkKateVersion(reader.attributes().value(QStringLiteral("kateversion"))))
+        return false;
 
     name = reader.attributes().value(QStringLiteral("name")).toString();
     section = reader.attributes().value(QStringLiteral("section")).toString();
@@ -308,6 +313,7 @@ void DefinitionPrivate::loadLanguage(QXmlStreamReader &reader)
     const auto mts = reader.attributes().value(QStringLiteral("mimetype")).toString();
     foreach (const auto &mt, mts.split(QLatin1Char(';'), QString::SkipEmptyParts))
         mimetypes.push_back(mt);
+    return true;
 }
 
 void DefinitionPrivate::loadHighlighting(Definition *def, QXmlStreamReader& reader)
@@ -424,6 +430,24 @@ void DefinitionPrivate::loadGeneral(QXmlStreamReader& reader)
                 break;
         }
     }
+}
+
+bool DefinitionPrivate::checkKateVersion(const QStringRef& verStr)
+{
+    const auto idx = verStr.indexOf(QLatin1Char('.'));
+    if (idx <= 0) {
+        qWarning() << "Skipping" << fileName << "due to having no valid kateversion attribute:" << verStr;
+        return false;
+    }
+    const auto major = verStr.left(idx).toInt();
+    const auto minor = verStr.mid(idx + 1).toInt();
+
+    if (major > SyntaxHighlighting_VERSION_MAJOR || (major == SyntaxHighlighting_VERSION_MAJOR && minor > SyntaxHighlighting_VERSION_MINOR)) {
+        qWarning() << "Skipping" << fileName << "due to being too new, version:" << verStr;
+        return false;
+    }
+
+    return true;
 }
 
 DefinitionRef::DefinitionRef()

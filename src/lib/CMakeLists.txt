@@ -1,3 +1,5 @@
+ecm_create_qm_loader(syntax_highlighting_QM_LOADER syntaxhighlighting)
+
 set(syntax_highlighting_srcs
     abstracthighlighter.cpp
     context.cpp
@@ -12,6 +14,7 @@ set(syntax_highlighting_srcs
     syntaxhighlighter.cpp
     repository.cpp
     theme.cpp
+    ${syntax_highlighting_QM_LOADER}
 )
 qt5_add_resources(syntax_highlighting_srcs ${SyntaxHighlighting_BINARY_DIR}/data/syntax-data.qrc)
 

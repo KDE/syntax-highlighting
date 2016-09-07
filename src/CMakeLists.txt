@@ -13,7 +13,7 @@ set(syntax_highlighting_srcs
     syntaxrepository.cpp
     theme.cpp
 )
-qt5_add_resources(syntax_highlighting_srcs ${CMAKE_CURRENT_SOURCE_DIR}/../data/syntax-data.qrc)
+qt5_add_resources(syntax_highlighting_srcs ${SyntaxHighlighting_SOURCE_DIR}/data/syntax-data.qrc)
 
 add_library(KF5SyntaxHighlighting SHARED ${syntax_highlighting_srcs})
 generate_export_header(KF5SyntaxHighlighting)

@@ -64,6 +64,28 @@ private Q_SLOTS:
             QVERIFY(!def.translatedSection().isEmpty());
         }
     }
+
+    void testMetaData()
+    {
+        auto def = m_repo.definitionForName(QLatin1String("Alerts"));
+        QVERIFY(def.isValid());
+        QVERIFY(def.extensions().isEmpty());
+        QVERIFY(def.mimeTypes().isEmpty());
+        QVERIFY(def.version() >= 1.11f);
+        QVERIFY(def.isHidden());
+        QCOMPARE(def.section(), QLatin1String("Other"));
+        QCOMPARE(def.license(), QLatin1String("LGPL"));
+        QVERIFY(def.author().contains(QLatin1String("Dominik")));
+
+        def = m_repo.definitionForName(QLatin1String("C++"));
+        QCOMPARE(def.section(), QLatin1String("Sources"));
+        QCOMPARE(def.indenter(), QLatin1String("cstyle"));
+        QCOMPARE(def.style(), QLatin1String("C++"));
+        QVERIFY(def.mimeTypes().contains(QLatin1String("text/x-c++hdr")));
+        QEXPECT_FAIL("", "fix wrong assumptions on how extension patterns look like", Continue);
+        QVERIFY(def.extensions().contains(QLatin1String("*.h")));
+        QCOMPARE(def.priority(), 9);
+    }
 };
 
 QTEST_MAIN(RepositoryTest)

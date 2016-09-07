@@ -55,10 +55,15 @@ public:
     QString fileName;
     QString name;
     QString section;
+    QString style;
+    QString indenter;
+    QString author;
+    QString license;
     QVector<QString> mimetypes;
     QVector<QString> extensions;
     Qt::CaseSensitivity caseSensitive;
     float version;
+    int priority;
     bool hidden;
 };
 }
@@ -68,6 +73,7 @@ DefinitionPrivate::DefinitionPrivate() :
     delimiters(QStringLiteral(".():!+,-<=>%&*/;?[]^{|}~\\ \t")),
     caseSensitive(Qt::CaseSensitive),
     version(0.0f),
+    priority(0),
     hidden(false)
 {
 }
@@ -145,6 +151,36 @@ QVector<QString> Definition::extensions() const
 float Definition::version() const
 {
     return d->version;
+}
+
+int Definition::priority() const
+{
+    return d->priority;
+}
+
+bool Definition::isHidden() const
+{
+    return d->hidden;
+}
+
+QString Definition::style() const
+{
+    return d->style;
+}
+
+QString Definition::indenter() const
+{
+    return d->indenter;
+}
+
+QString Definition::author() const
+{
+    return d->author;
+}
+
+QString Definition::license() const
+{
+    return d->license;
 }
 
 Context* Definition::initialContext() const
@@ -251,7 +287,12 @@ void DefinitionPrivate::loadLanguage(QXmlStreamReader &reader)
     name = reader.attributes().value(QStringLiteral("name")).toString();
     section = reader.attributes().value(QStringLiteral("section")).toString();
     version = reader.attributes().value(QStringLiteral("version")).toFloat();
+    priority = reader.attributes().value(QStringLiteral("priority")).toInt();
     hidden = reader.attributes().value(QStringLiteral("hidden")) == QLatin1String("true");
+    style = reader.attributes().value(QStringLiteral("style")).toString();
+    indenter = reader.attributes().value(QStringLiteral("indenter")).toString();
+    author = reader.attributes().value(QStringLiteral("author")).toString();
+    license = reader.attributes().value(QStringLiteral("license")).toString();
     const auto exts = reader.attributes().value(QStringLiteral("extensions")).toString();
     foreach (const auto &ext, exts.split(QLatin1Char(';'), QString::SkipEmptyParts)) {
         if (ext.startsWith(QLatin1String("*.")))
@@ -259,7 +300,7 @@ void DefinitionPrivate::loadLanguage(QXmlStreamReader &reader)
         else
             extensions.push_back(ext);
     }
-    const auto mts = reader.attributes().value(QStringLiteral("mimetypes")).toString();
+    const auto mts = reader.attributes().value(QStringLiteral("mimetype")).toString();
     foreach (const auto &mt, mts.split(QLatin1Char(';'), QString::SkipEmptyParts))
         mimetypes.push_back(mt);
 }

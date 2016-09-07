@@ -65,7 +65,22 @@ public:
     QVector<QString> mimeTypes() const;
     /** File extensions associated with this syntax definition. */
     QVector<QString> extensions() const;
+    /** Returns the definition version. */
     float version() const;
+    /** Returns the definition priority. */
+    int priority() const;
+    /** Returns @c true if this is an internal definition that should not be
+     * displayed to the user.
+     */
+    bool isHidden() const;
+    /** TODO ??? */
+    QString style() const;
+    /** Indention style to be used for this syntax. */
+    QString indenter() const;
+    /** Name and email of the author of this syntax definition. */
+    QString author() const;
+    /** License of this syntax definition. */
+    QString license() const;
 
     // FIXME everything below is internal -> do not export this
     Repository* repository() const;

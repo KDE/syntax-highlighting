@@ -20,12 +20,17 @@
 
 #include "kf5syntaxhighlighting_export.h"
 
-#include <QHash>
+#include <memory>
+
+class QString;
+template <typename T> class QVector;
 
 namespace SyntaxHighlighting {
 
+class RepositoryPrivate;
 class SyntaxDefinition;
 
+/** Holds all syntax definitions found on the system or compiled in. */
 class KF5SYNTAXHIGHLIGHTING_EXPORT Repository
 {
 public:
@@ -41,7 +46,7 @@ private:
     void loadFolder(const QString &path);
     void addDefinition(const SyntaxDefinition &def);
 
-    QHash<QString, SyntaxDefinition> m_defs;
+    std::unique_ptr<RepositoryPrivate> d;
 };
 
 }

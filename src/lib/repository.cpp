@@ -25,7 +25,16 @@
 
 using namespace SyntaxHighlighting;
 
-Repository::Repository()
+namespace SyntaxHighlighting {
+class RepositoryPrivate
+{
+public:
+    QHash<QString, SyntaxDefinition> m_defs;
+};
+}
+
+Repository::Repository() :
+    d(new RepositoryPrivate)
 {
     load();
 }
@@ -36,7 +45,7 @@ Repository::~Repository()
 
 SyntaxDefinition Repository::definitionForName(const QString& defName) const
 {
-    auto def = m_defs.value(defName);
+    auto def = d->m_defs.value(defName);
     if (def.isValid())
         def.load();
     return def;
@@ -47,7 +56,7 @@ SyntaxDefinition Repository::definitionForFileName(const QString& fileName) cons
     QFileInfo fi(fileName);
     const auto ext = fi.suffix();
 
-    for (auto it = m_defs.constBegin(); it != m_defs.constEnd(); ++it) {
+    for (auto it = d->m_defs.constBegin(); it != d->m_defs.constEnd(); ++it) {
         auto def = it.value();
         if (def.extensions().contains(ext)) {
             def.load();
@@ -61,8 +70,8 @@ SyntaxDefinition Repository::definitionForFileName(const QString& fileName) cons
 QVector<SyntaxDefinition> Repository::definitions() const
 {
     QVector<SyntaxDefinition> defs;
-    defs.reserve(m_defs.size());
-    for (auto it = m_defs.constBegin(); it != m_defs.constEnd(); ++it)
+    defs.reserve(d->m_defs.size());
+    for (auto it = d->m_defs.constBegin(); it != d->m_defs.constEnd(); ++it)
         defs.push_back(it.value());
     return defs;
 }
@@ -88,13 +97,13 @@ void Repository::loadFolder(const QString &path)
 
 void Repository::addDefinition(const SyntaxDefinition &def)
 {
-    const auto it = m_defs.constFind(def.name());
-    if (it == m_defs.constEnd()) {
-        m_defs.insert(def.name(), def);
+    const auto it = d->m_defs.constFind(def.name());
+    if (it == d->m_defs.constEnd()) {
+        d->m_defs.insert(def.name(), def);
         return;
     }
 
     if (it.value().version() >= def.version())
         return;
-    m_defs.insert(def.name(), def);
+    d->m_defs.insert(def.name(), def);
 }

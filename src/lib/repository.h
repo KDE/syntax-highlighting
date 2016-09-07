@@ -20,6 +20,7 @@
 
 #include "kf5syntaxhighlighting_export.h"
 
+#include <qglobal.h>
 #include <memory>
 
 class QString;
@@ -42,6 +43,8 @@ public:
     QVector<Definition> definitions() const;
 
 private:
+    Q_DISABLE_COPY(Repository)
+
     std::unique_ptr<RepositoryPrivate> d;
 };
 

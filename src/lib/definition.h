@@ -73,7 +73,7 @@ public:
      * displayed to the user.
      */
     bool isHidden() const;
-    /** TODO ??? */
+    /** Generalized language style, used for indention. */
     QString style() const;
     /** Indention style to be used for this syntax. */
     QString indenter() const;

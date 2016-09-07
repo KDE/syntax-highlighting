@@ -72,7 +72,7 @@ void SyntaxRepository::load()
     foreach (const auto &dir, QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation)) {
         loadFolder(dir + QStringLiteral("/KateSyntax"));
     }
-    loadFolder(QStringLiteral(":/kate-syntax"));
+    loadFolder(QStringLiteral(":/syntaxhighlighting/syntax"));
 }
 
 void SyntaxRepository::loadFolder(const QString &path)

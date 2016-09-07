@@ -98,7 +98,7 @@ Rule::~Rule()
 
 Definition Rule::syntaxDefinition() const
 {
-    return m_def;
+    return m_def.definition();
 }
 
 void Rule::setDefinition(const Definition &def)
@@ -153,7 +153,7 @@ bool Rule::load(QXmlStreamReader &reader)
             {
                 auto rule = Rule::create(reader.name());
                 if (rule) {
-                    rule->setDefinition(m_def);
+                    rule->setDefinition(m_def.definition());
                     if (rule->load(reader)) {
                         m_subRules.push_back(rule);
                         reader.readNext();
@@ -176,7 +176,7 @@ bool Rule::load(QXmlStreamReader &reader)
 
 void Rule::resolveContext()
 {
-    m_context.resolve(m_def);
+    m_context.resolve(m_def.definition());
     foreach (auto rule, m_subRules)
         rule->resolveContext();
 }
@@ -256,7 +256,7 @@ Rule::Ptr Rule::create(const QStringRef& name)
 
 bool Rule::isDelimiter(QChar c) const
 {
-    return m_def.isDelimiter(c);
+    return m_def.definition().isDelimiter(c);
 }
 
 

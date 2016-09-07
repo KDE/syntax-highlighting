@@ -20,7 +20,7 @@
 
 #include "kf5syntaxhighlighting_export.h"
 
-#include <QExplicitlySharedDataPointer>
+#include <memory>
 
 class QChar;
 class QString;
@@ -66,7 +66,8 @@ public:
     bool loadMetaData(const QString &definitionFileName);
 
 private:
-    QExplicitlySharedDataPointer<DefinitionPrivate> d;
+    friend class DefinitionRef;
+    std::shared_ptr<DefinitionPrivate> d;
 };
 
 }

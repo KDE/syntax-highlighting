@@ -21,6 +21,7 @@
 #include "rule.h"
 #include "contextswitch.h"
 #include "definition.h"
+#include "definitionref_p.h"
 
 #include <QString>
 #include <QVector>
@@ -63,7 +64,7 @@ private:
     };
     ResolveState resolveState();
 
-    Definition m_def;
+    DefinitionRef m_def;
     QString m_name;
     QString m_attribute;
     ContextSwitch m_lineEndContext;

@@ -16,6 +16,7 @@
 */
 
 #include "definition.h"
+#include "definitionref_p.h"
 #include "context.h"
 #include "rule.h"
 #include "format.h"
@@ -31,7 +32,7 @@
 using namespace SyntaxHighlighting;
 
 namespace SyntaxHighlighting {
-class DefinitionPrivate : public QSharedData
+class DefinitionPrivate
 {
 public:
     DefinitionPrivate();
@@ -356,4 +357,31 @@ void DefinitionPrivate::loadGeneral(QXmlStreamReader& reader)
                 break;
         }
     }
+}
+
+DefinitionRef::DefinitionRef()
+{
+}
+
+DefinitionRef::DefinitionRef(const Definition &def) :
+    d(def.d)
+{
+}
+
+DefinitionRef::~DefinitionRef()
+{
+}
+
+DefinitionRef& DefinitionRef::operator=(const Definition &def)
+{
+    d = def.d;
+    return *this;
+}
+
+Definition DefinitionRef::definition() const
+{
+    Definition def;
+    if (!d.expired())
+        def.d = d.lock();
+    return def;
 }

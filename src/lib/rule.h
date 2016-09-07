@@ -22,6 +22,7 @@
 #include "contextswitch.h"
 #include "matchresult.h"
 #include "definition.h"
+#include "definitionref_p.h"
 
 #include <QRegularExpression>
 #include <QString>
@@ -65,7 +66,7 @@ protected:
 private:
     Q_DISABLE_COPY(Rule)
 
-    Definition m_def;
+    DefinitionRef m_def;
     QString m_attribute;
     ContextSwitch m_context;
     QVector<Rule::Ptr> m_subRules;

@@ -37,7 +37,7 @@ Context::~Context()
 
 Definition Context::syntaxDefinition() const
 {
-    return m_def;
+    return m_def.definition();
 }
 
 void Context::setDefinition(const Definition &def)
@@ -101,7 +101,7 @@ void Context::load(QXmlStreamReader& reader)
             {
                 auto rule = Rule::create(reader.name());
                 if (rule) {
-                    rule->setDefinition(m_def);
+                    rule->setDefinition(m_def.definition());
                     if (rule->load(reader))
                         m_rules.push_back(rule);
                 } else {
@@ -121,9 +121,10 @@ void Context::load(QXmlStreamReader& reader)
 
 void Context::resolveContexts()
 {
-    m_lineEndContext.resolve(m_def);
-    m_lineEmptyContext.resolve(m_def);
-    m_fallthroughContext.resolve(m_def);
+    const auto def = m_def.definition();
+    m_lineEndContext.resolve(def);
+    m_lineEmptyContext.resolve(def);
+    m_fallthroughContext.resolve(def);
     foreach (auto rule, m_rules)
         rule->resolveContext();
 }
@@ -163,11 +164,11 @@ void Context::resolveIncludes()
         }
         Context* context = nullptr;
         if (inc->definitionName().isEmpty()) { // local include
-            context = m_def.contextByName(inc->contextName());
+            context = m_def.definition().contextByName(inc->contextName());
         } else {
-            auto def = m_def.repository()->definitionForName(inc->definitionName());
+            auto def = m_def.definition().repository()->definitionForName(inc->definitionName());
             if (!def.isValid()) {
-                qWarning() << "Unable to resolve external include rule for definition" << inc->definitionName() << "in" << m_def.name();
+                qWarning() << "Unable to resolve external include rule for definition" << inc->definitionName() << "in" << m_def.definition().name();
                 ++it;
                 continue;
             }
@@ -177,7 +178,7 @@ void Context::resolveIncludes()
                 context = def.contextByName(inc->contextName());
         }
         if (!context) {
-            qWarning() << "Unable to resolve include rule for definition" << inc->contextName() << "##" << inc->definitionName() << "in" << m_def.name();
+            qWarning() << "Unable to resolve include rule for definition" << inc->contextName() << "##" << inc->definitionName() << "in" << m_def.definition().name();
             ++it;
             continue;
         }

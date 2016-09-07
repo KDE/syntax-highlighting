@@ -563,9 +563,12 @@ bool RegExpr::doLoad(QXmlStreamReader& reader)
 {
     m_pattern = reader.attributes().value(QStringLiteral("String")).toString();
     m_regexp.setPattern(m_pattern);
-    m_regexp.setMinimal(reader.attributes().value(QStringLiteral("minimal")) == QLatin1String("true"));
-    m_regexp.setCaseSensitivity(reader.attributes().value(QStringLiteral("insensitive")) == QLatin1String("true") ? Qt::CaseInsensitive : Qt::CaseSensitive);
-    return !m_regexp.isEmpty(); // m_regexp.isValid() would be better, but parses the regexp and thus is way too expensive
+    const auto isMinimal = reader.attributes().value(QStringLiteral("minimal")) == QLatin1String("true");
+    const auto isCaseInsensitive = reader.attributes().value(QStringLiteral("insensitive")) == QLatin1String("true");
+    m_regexp.setPatternOptions(
+        (isMinimal ? QRegularExpression::InvertedGreedinessOption : QRegularExpression::NoPatternOption) |
+        (isCaseInsensitive ? QRegularExpression::CaseInsensitiveOption : QRegularExpression::NoPatternOption));
+    return !m_pattern.isEmpty(); // m_regexp.isValid() would be better, but parses the regexp and thus is way too expensive
 }
 
 MatchResult RegExpr::doMatch(const QString& text, int offset, const QStringList &captures)
@@ -575,10 +578,10 @@ MatchResult RegExpr::doMatch(const QString& text, int offset, const QStringList 
     if (isDynamic())
         m_regexp.setPattern(replaceCaptures(m_pattern, captures));
 
-    auto idx = m_regexp.indexIn(text, offset, QRegExp::CaretAtOffset);
-    if (idx == offset)
-        return MatchResult(offset + m_regexp.matchedLength(), m_regexp.capturedTexts());
-    return MatchResult(offset, idx);
+    auto result = m_regexp.match(text, offset, QRegularExpression::NormalMatch, QRegularExpression::DontCheckSubjectStringMatchOption);
+    if (result.capturedStart() == offset)
+        return MatchResult(offset + result.capturedLength(), result.capturedTexts());
+    return MatchResult(offset, result.capturedStart());
 }
 
 

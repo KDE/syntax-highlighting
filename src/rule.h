@@ -23,7 +23,7 @@
 #include "matchresult.h"
 #include "syntaxdefinition.h"
 
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QString>
 #include <QVector>
 
@@ -211,7 +211,7 @@ protected:
 
 private:
     QString m_pattern;
-    QRegExp m_regexp;
+    QRegularExpression m_regexp;
 };
 
 class StringDetect : public Rule

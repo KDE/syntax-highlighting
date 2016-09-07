@@ -20,7 +20,7 @@
 #include <downloader.h>
 #include <htmlhighlighter.h>
 #include <repository.h>
-#include <syntaxdefinition.h>
+#include <definition.h>
 
 #include <QCommandLineParser>
 #include <QCoreApplication>
@@ -87,7 +87,7 @@ int main(int argc, char **argv)
         parser.showHelp(1);
     const auto inFileName = parser.positionalArguments().at(0);
 
-    SyntaxDefinition def;
+    Definition def;
     if (parser.isSet(syntaxName)) {
         def = repo.definitionForName(parser.value(syntaxName));
     } else {

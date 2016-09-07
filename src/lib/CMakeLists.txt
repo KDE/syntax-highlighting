@@ -8,7 +8,7 @@ set(syntax_highlighting_srcs
     keywordlist.cpp
     matchresult.cpp
     rule.cpp
-    syntaxdefinition.cpp
+    definition.cpp
     syntaxhighlighter.cpp
     repository.cpp
     theme.cpp
@@ -28,7 +28,7 @@ target_link_libraries(KF5SyntaxHighlighting LINK_PUBLIC Qt5::Gui LINK_PRIVATE Qt
 ecm_generate_headers(SyntaxHighlighting_HEADERS
     HEADER_NAMES
         AbstractHighlighter
-        SyntaxDefinition
+        Definition
         Repository
         Theme
     REQUIRED_HEADERS SyntaxHighlighting_HEADERS

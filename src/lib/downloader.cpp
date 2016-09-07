@@ -16,7 +16,7 @@
 */
 
 #include "downloader.h"
-#include "syntaxdefinition.h"
+#include "definition.h"
 #include "repository.h"
 
 #include <QDebug>

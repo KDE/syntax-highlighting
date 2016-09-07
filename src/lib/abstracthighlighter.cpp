@@ -33,12 +33,12 @@ AbstractHighlighter::~AbstractHighlighter()
 {
 }
 
-SyntaxDefinition AbstractHighlighter::definition() const
+Definition AbstractHighlighter::definition() const
 {
     return m_definition;
 }
 
-void AbstractHighlighter::setDefinition(const SyntaxDefinition &def)
+void AbstractHighlighter::setDefinition(const Definition &def)
 {
     m_definition = def;
     reset();

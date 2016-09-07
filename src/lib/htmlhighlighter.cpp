@@ -17,7 +17,7 @@
 
 #include "htmlhighlighter.h"
 #include "format.h"
-#include "syntaxdefinition.h"
+#include "definition.h"
 
 #include <QDebug>
 #include <QFile>

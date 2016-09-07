@@ -28,7 +28,7 @@ template <typename T> class QVector;
 namespace SyntaxHighlighting {
 
 class RepositoryPrivate;
-class SyntaxDefinition;
+class Definition;
 
 /** Holds all syntax definitions found on the system or compiled in. */
 class KF5SYNTAXHIGHLIGHTING_EXPORT Repository
@@ -37,9 +37,9 @@ public:
     Repository();
     ~Repository();
 
-    SyntaxDefinition definitionForName(const QString &defName) const;
-    SyntaxDefinition definitionForFileName(const QString &fileName) const;
-    QVector<SyntaxDefinition> definitions() const;
+    Definition definitionForName(const QString &defName) const;
+    Definition definitionForFileName(const QString &fileName) const;
+    QVector<Definition> definitions() const;
 
 private:
     std::unique_ptr<RepositoryPrivate> d;

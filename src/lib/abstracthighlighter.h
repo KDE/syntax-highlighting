@@ -19,7 +19,7 @@
 #define SYNTAXHIGHLIGHTING_ABSTRACTHIGHLIGHTERM_H
 
 #include "kf5syntaxhighlighting_export.h"
-#include "syntaxdefinition.h"
+#include "definition.h"
 #include "theme.h"
 
 #include <QStack>
@@ -39,8 +39,8 @@ public:
     AbstractHighlighter();
     virtual ~AbstractHighlighter();
 
-    SyntaxDefinition definition() const;
-    void setDefinition(const SyntaxDefinition &def);
+    Definition definition() const;
+    void setDefinition(const Definition &def);
 
     Theme theme() const;
     void setTheme(const Theme &theme);
@@ -53,7 +53,7 @@ protected:
 private:
     void switchContext(const ContextSwitch &contextSwitch, const QStringList &captures = QStringList());
 
-    SyntaxDefinition m_definition;
+    Definition m_definition;
     QStack<Context*> m_context;
     QStack<QStringList> m_captureStack;
     Theme m_theme;

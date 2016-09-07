@@ -16,7 +16,7 @@
 */
 
 #include "contextswitch.h"
-#include "syntaxdefinition.h"
+#include "definition.h"
 #include "repository.h"
 
 #include <QDebug>
@@ -74,7 +74,7 @@ void ContextSwitch::parse(const QStringRef& contextInstr)
     }
 }
 
-void ContextSwitch::resolve(const SyntaxDefinition &def)
+void ContextSwitch::resolve(const Definition &def)
 {
     auto d = def;
     if (!m_defName.isEmpty()) {

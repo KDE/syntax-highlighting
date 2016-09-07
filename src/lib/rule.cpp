@@ -96,12 +96,12 @@ Rule::~Rule()
 {
 }
 
-SyntaxDefinition Rule::syntaxDefinition() const
+Definition Rule::syntaxDefinition() const
 {
     return m_def;
 }
 
-void Rule::setSyntaxDefinition(const SyntaxDefinition &def)
+void Rule::setDefinition(const Definition &def)
 {
     m_def = def;
 }
@@ -153,7 +153,7 @@ bool Rule::load(QXmlStreamReader &reader)
             {
                 auto rule = Rule::create(reader.name());
                 if (rule) {
-                    rule->setSyntaxDefinition(m_def);
+                    rule->setDefinition(m_def);
                     if (rule->load(reader)) {
                         m_subRules.push_back(rule);
                         reader.readNext();

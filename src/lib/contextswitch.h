@@ -23,7 +23,7 @@
 namespace SyntaxHighlighting {
 
 class Context;
-class SyntaxDefinition;
+class Definition;
 
 class ContextSwitch
 {
@@ -37,7 +37,7 @@ public:
     Context* context() const;
 
     void parse(const QStringRef &contextInstr);
-    void resolve(const SyntaxDefinition &def);
+    void resolve(const Definition &def);
 
 private:
     QString m_defName;

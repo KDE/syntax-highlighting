@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 
     SyntaxHighlighting::Repository repo;
 
-    SyntaxDefinition def;
+    Definition def;
     if (parser.isSet(syntaxName)) {
         def = repo.definitionForName(parser.value(syntaxName));
     } else {

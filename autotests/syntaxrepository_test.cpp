@@ -16,7 +16,7 @@
 */
 
 #include <repository.h>
-#include <syntaxdefinition.h>
+#include <definition.h>
 
 #include <QObject>
 #include <QtTest/qtest.h>

@@ -16,7 +16,7 @@
 */
 
 #include "repository.h"
-#include "syntaxdefinition.h"
+#include "definition.h"
 
 #include <QDebug>
 #include <QDirIterator>
@@ -31,9 +31,9 @@ class RepositoryPrivate
 public:
     void load(Repository *repo);
     void loadFolder(Repository *repo, const QString &path);
-    void addDefinition(const SyntaxDefinition &def);
+    void addDefinition(const Definition &def);
 
-    QHash<QString, SyntaxDefinition> m_defs;
+    QHash<QString, Definition> m_defs;
 };
 }
 
@@ -47,7 +47,7 @@ Repository::~Repository()
 {
 }
 
-SyntaxDefinition Repository::definitionForName(const QString& defName) const
+Definition Repository::definitionForName(const QString& defName) const
 {
     auto def = d->m_defs.value(defName);
     if (def.isValid())
@@ -55,7 +55,7 @@ SyntaxDefinition Repository::definitionForName(const QString& defName) const
     return def;
 }
 
-SyntaxDefinition Repository::definitionForFileName(const QString& fileName) const
+Definition Repository::definitionForFileName(const QString& fileName) const
 {
     QFileInfo fi(fileName);
     const auto ext = fi.suffix();
@@ -68,12 +68,12 @@ SyntaxDefinition Repository::definitionForFileName(const QString& fileName) cons
         }
     }
 
-    return SyntaxDefinition();
+    return Definition();
 }
 
-QVector<SyntaxDefinition> Repository::definitions() const
+QVector<Definition> Repository::definitions() const
 {
-    QVector<SyntaxDefinition> defs;
+    QVector<Definition> defs;
     defs.reserve(d->m_defs.size());
     for (auto it = d->m_defs.constBegin(); it != d->m_defs.constEnd(); ++it)
         defs.push_back(it.value());
@@ -92,14 +92,14 @@ void RepositoryPrivate::loadFolder(Repository *repo, const QString &path)
 {
     QDirIterator it(path);
     while (it.hasNext()) {
-        SyntaxDefinition def;
+        Definition def;
         def.setRepository(repo);
         if (def.loadMetaData(it.next()))
             addDefinition(def);
     }
 }
 
-void RepositoryPrivate::addDefinition(const SyntaxDefinition &def)
+void RepositoryPrivate::addDefinition(const Definition &def)
 {
     const auto it = m_defs.constFind(def.name());
     if (it == m_defs.constEnd()) {

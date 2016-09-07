@@ -18,7 +18,7 @@
 #include "test-config.h"
 
 #include <repository.h>
-#include <syntaxdefinition.h>
+#include <definition.h>
 #include <abstracthighlighter.h>
 
 #include <QObject>

@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_SYNTAXDEFINITION_H
-#define SYNTAXHIGHLIGHTING_SYNTAXDEFINITION_H
+#ifndef SYNTAXHIGHLIGHTING_DEFINITION_H
+#define SYNTAXHIGHLIGHTING_DEFINITION_H
 
 #include "kf5syntaxhighlighting_export.h"
 
@@ -34,16 +34,16 @@ class Format;
 class KeywordList;
 class Repository;
 
-class SyntaxDefinitionPrivate;
+class DefinitionPrivate;
 
-class KF5SYNTAXHIGHLIGHTING_EXPORT SyntaxDefinition
+class KF5SYNTAXHIGHLIGHTING_EXPORT Definition
 {
 public:
-    SyntaxDefinition();
-    SyntaxDefinition(const SyntaxDefinition &other);
-    ~SyntaxDefinition();
+    Definition();
+    Definition(const Definition &other);
+    ~Definition();
 
-    SyntaxDefinition& operator=(const SyntaxDefinition &rhs);
+    Definition& operator=(const Definition &rhs);
 
     bool isValid() const;
 
@@ -66,7 +66,7 @@ public:
     bool loadMetaData(const QString &definitionFileName);
 
 private:
-    QExplicitlySharedDataPointer<SyntaxDefinitionPrivate> d;
+    QExplicitlySharedDataPointer<DefinitionPrivate> d;
 };
 
 }

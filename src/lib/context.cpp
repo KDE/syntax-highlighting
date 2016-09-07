@@ -35,12 +35,12 @@ Context::~Context()
 {
 }
 
-SyntaxDefinition Context::syntaxDefinition() const
+Definition Context::syntaxDefinition() const
 {
     return m_def;
 }
 
-void Context::setSyntaxDefinition(const SyntaxDefinition &def)
+void Context::setDefinition(const Definition &def)
 {
     m_def = def;
 }
@@ -101,7 +101,7 @@ void Context::load(QXmlStreamReader& reader)
             {
                 auto rule = Rule::create(reader.name());
                 if (rule) {
-                    rule->setSyntaxDefinition(m_def);
+                    rule->setDefinition(m_def);
                     if (rule->load(reader))
                         m_rules.push_back(rule);
                 } else {

@@ -20,7 +20,7 @@
 
 #include "rule.h"
 #include "contextswitch.h"
-#include "syntaxdefinition.h"
+#include "definition.h"
 
 #include <QString>
 #include <QVector>
@@ -35,8 +35,8 @@ public:
     Context();
     ~Context();
 
-    SyntaxDefinition syntaxDefinition() const;
-    void setSyntaxDefinition(const SyntaxDefinition &def);
+    Definition syntaxDefinition() const;
+    void setDefinition(const Definition &def);
 
     QString name() const;
     QString attribute() const;
@@ -63,7 +63,7 @@ private:
     };
     ResolveState resolveState();
 
-    SyntaxDefinition m_def;
+    Definition m_def;
     QString m_name;
     QString m_attribute;
     ContextSwitch m_lineEndContext;

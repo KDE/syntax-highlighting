@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "syntaxdefinition.h"
+#include "definition.h"
 #include "context.h"
 #include "rule.h"
 #include "format.h"
@@ -31,16 +31,16 @@
 using namespace SyntaxHighlighting;
 
 namespace SyntaxHighlighting {
-class SyntaxDefinitionPrivate : public QSharedData
+class DefinitionPrivate : public QSharedData
 {
 public:
-    SyntaxDefinitionPrivate();
-    ~SyntaxDefinitionPrivate();
+    DefinitionPrivate();
+    ~DefinitionPrivate();
 
     bool isLoaded() const;
     void loadLanguage(QXmlStreamReader &reader);
-    void loadHighlighting(SyntaxDefinition *def, QXmlStreamReader &reader);
-    void loadContexts(SyntaxDefinition *def, QXmlStreamReader &reader);
+    void loadHighlighting(Definition *def, QXmlStreamReader &reader);
+    void loadContexts(Definition *def, QXmlStreamReader &reader);
     void loadItemData(QXmlStreamReader &reader);
     void loadGeneral(QXmlStreamReader &reader);
 
@@ -61,7 +61,7 @@ public:
 };
 }
 
-SyntaxDefinitionPrivate::SyntaxDefinitionPrivate() :
+DefinitionPrivate::DefinitionPrivate() :
     repo(nullptr),
     delimiters(QStringLiteral(".():!+,-<=>%&*/;?[]^{|}~\\ \t")),
     caseSensitive(Qt::CaseSensitive),
@@ -70,68 +70,68 @@ SyntaxDefinitionPrivate::SyntaxDefinitionPrivate() :
 {
 }
 
-SyntaxDefinitionPrivate::~SyntaxDefinitionPrivate()
+DefinitionPrivate::~DefinitionPrivate()
 {
     qDeleteAll(contexts);
 }
 
-SyntaxDefinition::SyntaxDefinition() :
-    d(new SyntaxDefinitionPrivate)
+Definition::Definition() :
+    d(new DefinitionPrivate)
 {
 }
 
-SyntaxDefinition::SyntaxDefinition(const SyntaxDefinition &other) :
+Definition::Definition(const Definition &other) :
     d(other.d)
 {
 }
 
-SyntaxDefinition::~SyntaxDefinition()
+Definition::~Definition()
 {
 }
 
-SyntaxDefinition& SyntaxDefinition::operator=(const SyntaxDefinition &rhs)
+Definition& Definition::operator=(const Definition &rhs)
 {
     d = rhs.d;
     return *this;
 }
 
-bool SyntaxDefinition::isValid() const
+bool Definition::isValid() const
 {
     return d->repo && !d->fileName.isEmpty();
 }
 
-Repository* SyntaxDefinition::repository() const
+Repository* Definition::repository() const
 {
     return d->repo;
 }
 
-void SyntaxDefinition::setRepository(Repository* repo)
+void Definition::setRepository(Repository* repo)
 {
     d->repo = repo;
 }
 
-QString SyntaxDefinition::name() const
+QString Definition::name() const
 {
     return d->name;
 }
 
-QVector<QString> SyntaxDefinition::extensions() const
+QVector<QString> Definition::extensions() const
 {
     return d->extensions;
 }
 
-float SyntaxDefinition::version() const
+float Definition::version() const
 {
     return d->version;
 }
 
-Context* SyntaxDefinition::initialContext() const
+Context* Definition::initialContext() const
 {
     Q_ASSERT(!d->contexts.isEmpty());
     return d->contexts.first();
 }
 
-Context* SyntaxDefinition::contextByName(const QString& name) const
+Context* Definition::contextByName(const QString& name) const
 {
     foreach (auto context, d->contexts) {
         if (context->name() == name)
@@ -140,17 +140,17 @@ Context* SyntaxDefinition::contextByName(const QString& name) const
     return nullptr;
 }
 
-KeywordList SyntaxDefinition::keywordList(const QString& name) const
+KeywordList Definition::keywordList(const QString& name) const
 {
     return d->keywordLists.value(name);
 }
 
-bool SyntaxDefinition::isDelimiter(QChar c) const
+bool Definition::isDelimiter(QChar c) const
 {
     return d->delimiters.contains(c);
 }
 
-Format SyntaxDefinition::formatByName(const QString& name) const
+Format Definition::formatByName(const QString& name) const
 {
     const auto it = d->formats.constFind(name);
     if (it != d->formats.constEnd())
@@ -160,12 +160,12 @@ Format SyntaxDefinition::formatByName(const QString& name) const
     return Format();
 }
 
-bool SyntaxDefinitionPrivate::isLoaded() const
+bool DefinitionPrivate::isLoaded() const
 {
     return !contexts.isEmpty();
 }
 
-bool SyntaxDefinition::load()
+bool Definition::load()
 {
     if (d->isLoaded())
         return true;
@@ -199,7 +199,7 @@ bool SyntaxDefinition::load()
     return true;
 }
 
-bool SyntaxDefinition::loadMetaData(const QString& definitionFileName)
+bool Definition::loadMetaData(const QString& definitionFileName)
 {
     d->fileName = definitionFileName;
 
@@ -221,7 +221,7 @@ bool SyntaxDefinition::loadMetaData(const QString& definitionFileName)
     return false;
 }
 
-void SyntaxDefinitionPrivate::loadLanguage(QXmlStreamReader &reader)
+void DefinitionPrivate::loadLanguage(QXmlStreamReader &reader)
 {
     Q_ASSERT(reader.name() == QLatin1String("language"));
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
@@ -242,7 +242,7 @@ void SyntaxDefinitionPrivate::loadLanguage(QXmlStreamReader &reader)
         mimetypes.push_back(mt);
 }
 
-void SyntaxDefinitionPrivate::loadHighlighting(SyntaxDefinition *def, QXmlStreamReader& reader)
+void DefinitionPrivate::loadHighlighting(Definition *def, QXmlStreamReader& reader)
 {
     Q_ASSERT(reader.name() == QLatin1String("highlighting"));
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
@@ -272,7 +272,7 @@ void SyntaxDefinitionPrivate::loadHighlighting(SyntaxDefinition *def, QXmlStream
     }
 }
 
-void SyntaxDefinitionPrivate::loadContexts(SyntaxDefinition *def, QXmlStreamReader& reader)
+void DefinitionPrivate::loadContexts(Definition *def, QXmlStreamReader& reader)
 {
     Q_ASSERT(reader.name() == QLatin1String("contexts"));
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
@@ -282,7 +282,7 @@ void SyntaxDefinitionPrivate::loadContexts(SyntaxDefinition *def, QXmlStreamRead
             case QXmlStreamReader::StartElement:
                 if (reader.name() == QLatin1String("context")) {
                     auto context = new Context;
-                    context->setSyntaxDefinition(*def);
+                    context->setDefinition(*def);
                     context->load(reader);
                     contexts.push_back(context);
                 }
@@ -297,7 +297,7 @@ void SyntaxDefinitionPrivate::loadContexts(SyntaxDefinition *def, QXmlStreamRead
     }
 }
 
-void SyntaxDefinitionPrivate::loadItemData(QXmlStreamReader& reader)
+void DefinitionPrivate::loadItemData(QXmlStreamReader& reader)
 {
     Q_ASSERT(reader.name() == QLatin1String("itemDatas"));
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
@@ -327,7 +327,7 @@ static bool attrToBool(const QStringRef &str)
     return str == QLatin1String("1") || str == QLatin1String("true");
 }
 
-void SyntaxDefinitionPrivate::loadGeneral(QXmlStreamReader& reader)
+void DefinitionPrivate::loadGeneral(QXmlStreamReader& reader)
 {
     Q_ASSERT(reader.name() == QLatin1String("general"));
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);

@@ -40,6 +40,7 @@ set_package_properties(Qt5 PROPERTIES URL "http://qt-project.org/")
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_subdirectory(src)
 add_subdirectory(tools)
+add_subdirectory(autotests)
 add_subdirectory(tests)
 
 #

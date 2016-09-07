@@ -36,6 +36,7 @@ class Repository;
 
 class DefinitionPrivate;
 
+/** Represents syntax definition. */
 class KF5SYNTAXHIGHLIGHTING_EXPORT Definition
 {
 public:
@@ -45,14 +46,30 @@ public:
 
     Definition& operator=(const Definition &rhs);
 
+    /** Checks whether this object refers to a valid syntax definition. */
     bool isValid() const;
 
-    Repository* repository() const;
-    void setRepository(Repository *repo);
-
+    /** Name of the syntax.
+     *  Used for internal references, prefer translatedName() for display.
+     */
     QString name() const;
+    /** Translated name for display. */
+    QString translatedName() const;
+    /** The group this syntax definition belongs to.
+     *  For display, consider translatedSection().
+     */
+    QString section() const;
+    /** Translated group name for display. */
+    QString translatedSection() const;
+    /** Mime types associated with this syntax definition. */
+    QVector<QString> mimeTypes() const;
+    /** File extensions associated with this syntax definition. */
     QVector<QString> extensions() const;
     float version() const;
+
+    // FIXME everything below is internal -> do not export this
+    Repository* repository() const;
+    void setRepository(Repository *repo);
 
     Context* initialContext() const;
     Context* contextByName(const QString &name) const;

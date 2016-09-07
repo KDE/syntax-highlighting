@@ -21,6 +21,7 @@
 #include "rule.h"
 #include "format.h"
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <QFile>
 #include <QHash>
@@ -54,8 +55,8 @@ public:
     QString fileName;
     QString name;
     QString section;
-    QVector<QString> extensions;
     QVector<QString> mimetypes;
+    QVector<QString> extensions;
     Qt::CaseSensitivity caseSensitive;
     float version;
     bool hidden;
@@ -114,6 +115,26 @@ void Definition::setRepository(Repository* repo)
 QString Definition::name() const
 {
     return d->name;
+}
+
+QString Definition::translatedName() const
+{
+    return QCoreApplication::instance()->translate("Language", d->name.toUtf8().constData());
+}
+
+QString Definition::section() const
+{
+    return d->section;
+}
+
+QString Definition::translatedSection() const
+{
+    return QCoreApplication::instance()->translate("Language Section", d->section.toUtf8().constData());
+}
+
+QVector<QString> Definition::mimeTypes() const
+{
+    return d->mimetypes;
 }
 
 QVector<QString> Definition::extensions() const

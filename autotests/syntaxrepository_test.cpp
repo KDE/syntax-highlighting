@@ -56,10 +56,14 @@ private Q_SLOTS:
 
     void testLoadAll()
     {
-        foreach (auto def, m_repo.definitions())
+        foreach (auto def, m_repo.definitions()) {
             QVERIFY(def.load());
+            QVERIFY(!def.name().isEmpty());
+            QVERIFY(!def.translatedName().isEmpty());
+            QVERIFY(!def.section().isEmpty());
+            QVERIFY(!def.translatedSection().isEmpty());
+        }
     }
-
 };
 
 QTEST_MAIN(RepositoryTest)

@@ -29,6 +29,10 @@ namespace SyntaxHighlighting {
 class RepositoryPrivate
 {
 public:
+    void load(Repository *repo);
+    void loadFolder(Repository *repo, const QString &path);
+    void addDefinition(const SyntaxDefinition &def);
+
     QHash<QString, SyntaxDefinition> m_defs;
 };
 }
@@ -36,7 +40,7 @@ public:
 Repository::Repository() :
     d(new RepositoryPrivate)
 {
-    load();
+    d->load(this);
 }
 
 Repository::~Repository()
@@ -76,34 +80,34 @@ QVector<SyntaxDefinition> Repository::definitions() const
     return defs;
 }
 
-void Repository::load()
+void RepositoryPrivate::load(Repository *repo)
 {
     foreach (const auto &dir, QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation)) {
-        loadFolder(dir + QStringLiteral("/KateSyntax"));
+        loadFolder(repo, dir + QStringLiteral("/KateSyntax"));
     }
-    loadFolder(QStringLiteral(":/syntaxhighlighting/syntax"));
+    loadFolder(repo, QStringLiteral(":/syntaxhighlighting/syntax"));
 }
 
-void Repository::loadFolder(const QString &path)
+void RepositoryPrivate::loadFolder(Repository *repo, const QString &path)
 {
     QDirIterator it(path);
     while (it.hasNext()) {
         SyntaxDefinition def;
-        def.setRepository(this);
+        def.setRepository(repo);
         if (def.loadMetaData(it.next()))
             addDefinition(def);
     }
 }
 
-void Repository::addDefinition(const SyntaxDefinition &def)
+void RepositoryPrivate::addDefinition(const SyntaxDefinition &def)
 {
-    const auto it = d->m_defs.constFind(def.name());
-    if (it == d->m_defs.constEnd()) {
-        d->m_defs.insert(def.name(), def);
+    const auto it = m_defs.constFind(def.name());
+    if (it == m_defs.constEnd()) {
+        m_defs.insert(def.name(), def);
         return;
     }
 
     if (it.value().version() >= def.version())
         return;
-    d->m_defs.insert(def.name(), def);
+    m_defs.insert(def.name(), def);
 }

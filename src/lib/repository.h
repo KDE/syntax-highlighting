@@ -42,10 +42,6 @@ public:
     QVector<SyntaxDefinition> definitions() const;
 
 private:
-    void load();
-    void loadFolder(const QString &path);
-    void addDefinition(const SyntaxDefinition &def);
-
     std::unique_ptr<RepositoryPrivate> d;
 };
 

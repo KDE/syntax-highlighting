@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "syntaxrepository.h"
+#include "repository.h"
 #include "syntaxdefinition.h"
 
 #include <QDebug>
@@ -25,16 +25,16 @@
 
 using namespace SyntaxHighlighting;
 
-SyntaxRepository::SyntaxRepository()
+Repository::Repository()
 {
     load();
 }
 
-SyntaxRepository::~SyntaxRepository()
+Repository::~Repository()
 {
 }
 
-SyntaxDefinition SyntaxRepository::definitionForName(const QString& defName) const
+SyntaxDefinition Repository::definitionForName(const QString& defName) const
 {
     auto def = m_defs.value(defName);
     if (def.isValid())
@@ -42,7 +42,7 @@ SyntaxDefinition SyntaxRepository::definitionForName(const QString& defName) con
     return def;
 }
 
-SyntaxDefinition SyntaxRepository::definitionForFileName(const QString& fileName) const
+SyntaxDefinition Repository::definitionForFileName(const QString& fileName) const
 {
     QFileInfo fi(fileName);
     const auto ext = fi.suffix();
@@ -58,7 +58,7 @@ SyntaxDefinition SyntaxRepository::definitionForFileName(const QString& fileName
     return SyntaxDefinition();
 }
 
-QVector<SyntaxDefinition> SyntaxRepository::definitions() const
+QVector<SyntaxDefinition> Repository::definitions() const
 {
     QVector<SyntaxDefinition> defs;
     defs.reserve(m_defs.size());
@@ -67,7 +67,7 @@ QVector<SyntaxDefinition> SyntaxRepository::definitions() const
     return defs;
 }
 
-void SyntaxRepository::load()
+void Repository::load()
 {
     foreach (const auto &dir, QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation)) {
         loadFolder(dir + QStringLiteral("/KateSyntax"));
@@ -75,18 +75,18 @@ void SyntaxRepository::load()
     loadFolder(QStringLiteral(":/syntaxhighlighting/syntax"));
 }
 
-void SyntaxRepository::loadFolder(const QString &path)
+void Repository::loadFolder(const QString &path)
 {
     QDirIterator it(path);
     while (it.hasNext()) {
         SyntaxDefinition def;
-        def.setSyntaxRepository(this);
+        def.setRepository(this);
         if (def.loadMetaData(it.next()))
             addDefinition(def);
     }
 }
 
-void SyntaxRepository::addDefinition(const SyntaxDefinition &def)
+void Repository::addDefinition(const SyntaxDefinition &def)
 {
     const auto it = m_defs.constFind(def.name());
     if (it == m_defs.constEnd()) {

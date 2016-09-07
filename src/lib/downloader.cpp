@@ -17,7 +17,7 @@
 
 #include "downloader.h"
 #include "syntaxdefinition.h"
-#include "syntaxrepository.h"
+#include "repository.h"
 
 #include <QDebug>
 #include <QDir>
@@ -31,7 +31,7 @@
 
 using namespace SyntaxHighlighting;
 
-Downloader::Downloader(SyntaxRepository *repo, QObject *parent) :
+Downloader::Downloader(Repository *repo, QObject *parent) :
     QObject(parent),
     m_repo(repo),
     m_nam(new QNetworkAccessManager(this)),

@@ -32,7 +32,7 @@ namespace SyntaxHighlighting {
 class Context;
 class Format;
 class KeywordList;
-class SyntaxRepository;
+class Repository;
 
 class SyntaxDefinitionPrivate;
 
@@ -47,8 +47,8 @@ public:
 
     bool isValid() const;
 
-    SyntaxRepository* syntaxRepository() const;
-    void setSyntaxRepository(SyntaxRepository *repo);
+    Repository* repository() const;
+    void setRepository(Repository *repo);
 
     QString name() const;
     QVector<QString> extensions() const;

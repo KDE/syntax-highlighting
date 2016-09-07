@@ -44,7 +44,7 @@ public:
     void loadItemData(QXmlStreamReader &reader);
     void loadGeneral(QXmlStreamReader &reader);
 
-    SyntaxRepository *repo;
+    Repository *repo;
     QHash<QString, KeywordList> keywordLists;
     QVector<Context*> contexts;
     QHash<QString, Format> formats;
@@ -100,12 +100,12 @@ bool SyntaxDefinition::isValid() const
     return d->repo && !d->fileName.isEmpty();
 }
 
-SyntaxRepository* SyntaxDefinition::syntaxRepository() const
+Repository* SyntaxDefinition::repository() const
 {
     return d->repo;
 }
 
-void SyntaxDefinition::setSyntaxRepository(SyntaxRepository* repo)
+void SyntaxDefinition::setRepository(Repository* repo)
 {
     d->repo = repo;
 }

@@ -19,7 +19,7 @@
 
 #include <downloader.h>
 #include <htmlhighlighter.h>
-#include <syntaxrepository.h>
+#include <repository.h>
 #include <syntaxdefinition.h>
 
 #include <QCommandLineParser>
@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 
     parser.process(app);
 
-    SyntaxRepository repo;
+    Repository repo;
     if (parser.isSet(listDefs)) {
         foreach (const auto &def, repo.definitions()) {
             std::cout << qPrintable(def.name()) << std::endl;

@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_SYNTAXREPOSITORY_H
-#define SYNTAXHIGHLIGHTING_SYNTAXREPOSITORY_H
+#ifndef SYNTAXHIGHLIGHTING_REPOSITORY_H
+#define SYNTAXHIGHLIGHTING_REPOSITORY_H
 
 #include "kf5syntaxhighlighting_export.h"
 
@@ -26,11 +26,11 @@ namespace SyntaxHighlighting {
 
 class SyntaxDefinition;
 
-class KF5SYNTAXHIGHLIGHTING_EXPORT SyntaxRepository
+class KF5SYNTAXHIGHLIGHTING_EXPORT Repository
 {
 public:
-    SyntaxRepository();
-    ~SyntaxRepository();
+    Repository();
+    ~Repository();
 
     SyntaxDefinition definitionForName(const QString &defName) const;
     SyntaxDefinition definitionForFileName(const QString &fileName) const;
@@ -46,4 +46,4 @@ private:
 
 }
 
-#endif // SYNTAXHIGHLIGHTING_SYNTAXREPOSITORY_H
+#endif // SYNTAXHIGHLIGHTING_REPOSITORY_H

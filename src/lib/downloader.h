@@ -29,13 +29,13 @@ class QXmlStreamReader;
 
 namespace SyntaxHighlighting {
 
-class SyntaxRepository;
+class Repository;
 
 class KF5SYNTAXHIGHLIGHTING_EXPORT Downloader : public QObject
 {
     Q_OBJECT
 public:
-    explicit Downloader(SyntaxRepository *repo, QObject *parent = nullptr);
+    explicit Downloader(Repository *repo, QObject *parent = nullptr);
     ~Downloader();
 
     void start();
@@ -51,7 +51,7 @@ private:
     void downloadDefinitionFinished(QNetworkReply *reply);
     void checkDone();
 
-    SyntaxRepository *m_repo;
+    Repository *m_repo;
     QNetworkAccessManager *m_nam;
     QString m_downloadLocation;
     int m_pendingDownloads;

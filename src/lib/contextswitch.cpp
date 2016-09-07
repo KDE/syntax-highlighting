@@ -17,7 +17,7 @@
 
 #include "contextswitch.h"
 #include "syntaxdefinition.h"
-#include "syntaxrepository.h"
+#include "repository.h"
 
 #include <QDebug>
 
@@ -78,7 +78,7 @@ void ContextSwitch::resolve(const SyntaxDefinition &def)
 {
     auto d = def;
     if (!m_defName.isEmpty()) {
-        d = def.syntaxRepository()->definitionForName(m_defName);
+        d = def.repository()->definitionForName(m_defName);
         if (m_contextName.isEmpty())
             m_context = d.initialContext();
     }

@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <syntaxrepository.h>
+#include <repository.h>
 #include <syntaxdefinition.h>
 
 #include <QObject>
@@ -23,11 +23,11 @@
 
 using namespace SyntaxHighlighting;
 
-class SyntaxRepositoryTest : public QObject
+class RepositoryTest : public QObject
 {
     Q_OBJECT
 private:
-        SyntaxRepository m_repo;
+        Repository m_repo;
 
 private Q_SLOTS:
     void testDefinitionByExtension_data()
@@ -62,6 +62,6 @@ private Q_SLOTS:
 
 };
 
-QTEST_MAIN(SyntaxRepositoryTest)
+QTEST_MAIN(RepositoryTest)
 
 #include "syntaxrepository_test.moc"

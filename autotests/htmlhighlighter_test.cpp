@@ -17,7 +17,7 @@
 
 #include "test-config.h"
 
-#include <syntaxrepository.h>
+#include <repository.h>
 #include <syntaxdefinition.h>
 #include <htmlhighlighter.h>
 
@@ -35,12 +35,12 @@ public:
     explicit HTMLHighlighterTest(QObject *parent = nullptr) : QObject(parent), m_repo(nullptr) {}
 
 private:
-    SyntaxRepository *m_repo;
+    Repository *m_repo;
 
 private Q_SLOTS:
     void initTestCase()
     {
-        m_repo = new SyntaxRepository;
+        m_repo = new Repository;
     }
 
     void cleanupTestCase()

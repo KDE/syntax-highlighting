@@ -16,7 +16,7 @@
 */
 
 #include <syntaxhighlighter.h>
-#include <syntaxrepository.h>
+#include <repository.h>
 
 #include <QApplication>
 #include <QCommandLineParser>
@@ -50,7 +50,7 @@ int main(int argc, char **argv)
     if (!f.open(QFile::ReadOnly))
         return 1;
 
-    SyntaxHighlighting::SyntaxRepository repo;
+    SyntaxHighlighting::Repository repo;
 
     SyntaxDefinition def;
     if (parser.isSet(syntaxName)) {

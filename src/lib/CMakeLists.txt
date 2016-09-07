@@ -10,7 +10,7 @@ set(syntax_highlighting_srcs
     rule.cpp
     syntaxdefinition.cpp
     syntaxhighlighter.cpp
-    syntaxrepository.cpp
+    repository.cpp
     theme.cpp
 )
 qt5_add_resources(syntax_highlighting_srcs ${SyntaxHighlighting_BINARY_DIR}/data/syntax-data.qrc)
@@ -29,7 +29,7 @@ ecm_generate_headers(SyntaxHighlighting_HEADERS
     HEADER_NAMES
         AbstractHighlighter
         SyntaxDefinition
-        SyntaxRepository
+        Repository
         Theme
     REQUIRED_HEADERS SyntaxHighlighting_HEADERS
 )

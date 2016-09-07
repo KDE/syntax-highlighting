@@ -17,7 +17,7 @@
 
 #include "context.h"
 #include "rule.h"
-#include "syntaxrepository.h"
+#include "repository.h"
 
 #include <QDebug>
 #include <QString>
@@ -165,7 +165,7 @@ void Context::resolveIncludes()
         if (inc->definitionName().isEmpty()) { // local include
             context = m_def.contextByName(inc->contextName());
         } else {
-            auto def = m_def.syntaxRepository()->definitionForName(inc->definitionName());
+            auto def = m_def.repository()->definitionForName(inc->definitionName());
             if (!def.isValid()) {
                 qWarning() << "Unable to resolve external include rule for definition" << inc->definitionName() << "in" << m_def.name();
                 ++it;

@@ -173,16 +173,21 @@ void AbstractHighlighter::highlightLine(const QString& text)
     if (beginOffset < offset)
         setFormat(beginOffset, text.size() - beginOffset, currentLookupDef.formatByName(currentFormat));
 
-    while (!m_context.top()->lineEndContext().isStay() && !lineContinuation)
-        switchContext(m_context.top()->lineEndContext());
+    while (!m_context.top()->lineEndContext().isStay() && !lineContinuation) {
+        if (!switchContext(m_context.top()->lineEndContext()))
+            break;
+    }
 }
 
-void AbstractHighlighter::switchContext(const ContextSwitch &contextSwitch, const QStringList &captures)
+bool AbstractHighlighter::switchContext(const ContextSwitch &contextSwitch, const QStringList &captures)
 {
-    Q_ASSERT(m_context.size() >= contextSwitch.popCount());
+    Q_ASSERT(!m_context.isEmpty());
     Q_ASSERT(m_context.size() == m_captureStack.size());
 
     for (int i = 0; i < contextSwitch.popCount(); ++i) {
+        // never pop the initial context
+        if (m_context.size() == 1)
+            return false;
         m_context.pop();
         m_captureStack.pop();
     }
@@ -195,6 +200,8 @@ void AbstractHighlighter::switchContext(const ContextSwitch &contextSwitch, cons
     Q_ASSERT(!m_context.isEmpty());
     Q_ASSERT(m_context.top());
     Q_ASSERT(m_context.size() == m_captureStack.size());
+
+    return true;
 }
 
 void AbstractHighlighter::setFormat(int offset, int length, const Format& format)

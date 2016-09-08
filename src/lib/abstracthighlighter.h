@@ -51,7 +51,7 @@ protected:
     virtual void setFormat(int offset, int length, const Format &format);
 
 private:
-    void switchContext(const ContextSwitch &contextSwitch, const QStringList &captures = QStringList());
+    bool switchContext(const ContextSwitch &contextSwitch, const QStringList &captures = QStringList());
 
     Definition m_definition;
     QStack<Context*> m_context;

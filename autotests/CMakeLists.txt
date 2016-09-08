@@ -15,3 +15,7 @@ target_link_libraries(htmlhighlighter_test KF5SyntaxHighlighting Qt5::Test)
 add_executable(highlighter_benchmark highlighter_benchmark.cpp)
 add_test(NAME highlighter_benchmark COMMAND highlighter_benchmark)
 target_link_libraries(highlighter_benchmark KF5SyntaxHighlighting Qt5::Test)
+
+add_executable(repository_benchmark repository_benchmark.cpp)
+add_test(NAME repository_benchmark COMMAND repository_benchmark)
+target_link_libraries(repository_benchmark KF5SyntaxHighlighting Qt5::Test)

@@ -39,6 +39,10 @@ private Q_SLOTS:
         QTest::newRow("empty") << QString() << QString();
         QTest::newRow("qml") << QStringLiteral("/bla/foo.qml") << QStringLiteral("QML");
         QTest::newRow("glsl") << QStringLiteral("flat.frag") << QStringLiteral("GLSL");
+        // the following ones are defined in multiple syntax definitions
+        QTest::newRow("c") << QStringLiteral("test.c") << QStringLiteral("C");
+        QTest::newRow("c++") << QStringLiteral("test.cpp") << QStringLiteral("C++");
+        QTest::newRow("markdown") << QStringLiteral("test.md") << QStringLiteral("Markdown");
     }
 
     void testDefinitionByExtension()

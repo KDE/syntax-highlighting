@@ -68,16 +68,24 @@ Definition Repository::definitionForFileName(const QString& fileName) const
     QFileInfo fi(fileName);
     const auto ext = fi.suffix();
 
+    QVector<Definition> candidates;
     for (auto it = d->m_defs.constBegin(); it != d->m_defs.constEnd(); ++it) {
         auto def = it.value();
         // FIXME: this is way too simple, there are other patterns too, see KateWildcardMatcher
-        if (def.extensions().contains(QLatin1String("*.") + ext)) {
-            def.load();
-            return def; // TODO order results by priority
-        }
+        if (def.extensions().contains(QLatin1String("*.") + ext))
+            candidates.push_back(def);
     }
 
-    return Definition();
+    if (candidates.isEmpty())
+        return Definition();
+
+    std::partial_sort(candidates.begin(), candidates.begin() + 1, candidates.end(), [](const Definition &lhs, const Definition &rhs) {
+        return lhs.priority() > rhs.priority();
+    });
+
+    auto def = candidates.at(0);
+    def.load();
+    return def;
 }
 
 QVector<Definition> Repository::definitions() const

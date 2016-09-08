@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 
     // text attributes
     const QStringList textAttributes = QStringList() << QStringLiteral("name") << QStringLiteral("section") << QStringLiteral("mimetype")
-            << QStringLiteral("extensions") << QStringLiteral("version") << QStringLiteral("priority") << QStringLiteral("style")
+            << QStringLiteral("extensions") << QStringLiteral("style")
             << QStringLiteral("author") << QStringLiteral("license") << QStringLiteral("indenter");
 
     // index all given highlightings
@@ -127,6 +127,10 @@ int main(int argc, char *argv[])
         Q_FOREACH (const QString &attribute, textAttributes) {
             hl[attribute] = xml.attributes().value(attribute).toString();
         }
+
+        // numerical attributes
+        hl[QStringLiteral("version")] = xml.attributes().value(QLatin1String("version")).toFloat();
+        hl[QStringLiteral("priority")] = xml.attributes().value(QLatin1String("priority")).toInt();
 
         // add boolean one
         const QString hidden = xml.attributes().value(QLatin1String("hidden")).toString();

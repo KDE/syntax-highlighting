@@ -34,6 +34,7 @@ public:
     void addDefinition(const Definition &def);
 
     QHash<QString, Definition> m_defs;
+    QVector<Definition> m_sortedDefs;
 };
 }
 
@@ -74,11 +75,7 @@ Definition Repository::definitionForFileName(const QString& fileName) const
 
 QVector<Definition> Repository::definitions() const
 {
-    QVector<Definition> defs;
-    defs.reserve(d->m_defs.size());
-    for (auto it = d->m_defs.constBegin(); it != d->m_defs.constEnd(); ++it)
-        defs.push_back(it.value());
-    return defs;
+    return d->m_sortedDefs;
 }
 
 void RepositoryPrivate::load(Repository *repo)
@@ -87,6 +84,16 @@ void RepositoryPrivate::load(Repository *repo)
         loadFolder(repo, dir + QStringLiteral("/KateSyntax"));
     }
     loadFolder(repo, QStringLiteral(":/syntaxhighlighting/syntax"));
+
+    m_sortedDefs.reserve(m_defs.size());
+    for (auto it = m_defs.constBegin(); it != m_defs.constEnd(); ++it)
+        m_sortedDefs.push_back(it.value());
+    std::sort(m_sortedDefs.begin(), m_sortedDefs.end(), [](const Definition &left, const Definition &right) {
+        auto comparison = left.translatedSection().compare(right.translatedSection(), Qt::CaseInsensitive);
+        if (comparison == 0)
+            comparison = left.translatedName().compare(right.translatedName(), Qt::CaseInsensitive);
+        return comparison < 0;
+    });
 }
 
 void RepositoryPrivate::loadFolder(Repository *repo, const QString &path)

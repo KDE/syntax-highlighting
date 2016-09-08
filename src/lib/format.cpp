@@ -16,6 +16,7 @@
 */
 
 #include "format.h"
+#include "xml_p.h"
 
 #include <QDebug>
 #include <QXmlStreamReader>
@@ -147,8 +148,8 @@ void Format::load(QXmlStreamReader& reader)
     if ((m_hasBgColor = !colStr.isEmpty()))
         m_backgroundColor = QColor(colStr.toString());
 
-    m_italic = reader.attributes().value(QStringLiteral("italic")) == QLatin1String("true");
-    m_bold = reader.attributes().value(QStringLiteral("bold")) == QLatin1String("true");
-    m_underline = reader.attributes().value(QStringLiteral("underline")) == QLatin1String("true");
-    m_strikeout = reader.attributes().value(QStringLiteral("strikeOut")) == QLatin1String("true");
+    m_italic = Xml::attrToBool(reader.attributes().value(QStringLiteral("italic")));
+    m_bold = Xml::attrToBool(reader.attributes().value(QStringLiteral("bold")));
+    m_underline = Xml::attrToBool(reader.attributes().value(QStringLiteral("underline")));
+    m_strikeout = Xml::attrToBool(reader.attributes().value(QStringLiteral("strikeOut")));
 }

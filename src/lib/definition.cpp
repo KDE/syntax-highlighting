@@ -22,6 +22,7 @@
 #include "context.h"
 #include "rule.h"
 #include "format.h"
+#include "xml_p.h"
 
 #include <QCoreApplication>
 #include <QDebug>
@@ -310,11 +311,6 @@ bool Definition::loadMetaData(const QString &fileName, const QJsonObject &obj)
     return true;
 }
 
-static bool attrToBool(const QStringRef &str)
-{
-    return str == QLatin1String("1") || str == QLatin1String("true");
-}
-
 bool DefinitionPrivate::loadLanguage(QXmlStreamReader &reader)
 {
     Q_ASSERT(reader.name() == QLatin1String("language"));
@@ -339,7 +335,7 @@ bool DefinitionPrivate::loadLanguage(QXmlStreamReader &reader)
     foreach (const auto &mt, mts.split(QLatin1Char(';'), QString::SkipEmptyParts))
         mimetypes.push_back(mt);
     if (reader.attributes().hasAttribute(QStringLiteral("casesensitive")))
-        caseSensitive = attrToBool(reader.attributes().value(QStringLiteral("casesensitive"))) ? Qt::CaseSensitive : Qt::CaseInsensitive;
+        caseSensitive = Xml::attrToBool(reader.attributes().value(QStringLiteral("casesensitive"))) ? Qt::CaseSensitive : Qt::CaseInsensitive;
     return true;
 }
 
@@ -434,7 +430,7 @@ void DefinitionPrivate::loadGeneral(QXmlStreamReader& reader)
             case QXmlStreamReader::StartElement:
                 if (reader.name() == QLatin1String("keywords")) {
                     if (reader.attributes().hasAttribute(QStringLiteral("casesensitive")))
-                        caseSensitive = attrToBool(reader.attributes().value(QStringLiteral("casesensitive"))) ? Qt::CaseSensitive : Qt::CaseInsensitive;
+                        caseSensitive = Xml::attrToBool(reader.attributes().value(QStringLiteral("casesensitive"))) ? Qt::CaseSensitive : Qt::CaseInsensitive;
                     delimiters += reader.attributes().value(QStringLiteral("additionalDeliminator"));
                     std::sort(delimiters.begin(), delimiters.end());
                     auto it = std::unique(delimiters.begin(), delimiters.end());

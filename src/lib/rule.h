@@ -141,7 +141,6 @@ protected:
 private:
     QString m_contextName;
     QString m_defName;
-    bool m_processingMarker;
 };
 
 class Int : public Rule

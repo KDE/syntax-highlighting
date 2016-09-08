@@ -27,6 +27,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QHash>
+#include <QJsonObject>
 #include <QVector>
 #include <QXmlStreamReader>
 
@@ -284,6 +285,29 @@ bool Definition::loadMetaData(const QString& definitionFileName)
     }
 
     return false;
+}
+
+bool Definition::loadMetaData(const QString &fileName, const QJsonObject &obj)
+{
+    d->name     = obj.value(QLatin1String("name")).toString();
+    d->section  = obj.value(QLatin1String("section")).toString();
+    d->version  = obj.value(QLatin1String("version")).toDouble();
+    d->priority = obj.value(QLatin1String("priority")).toInt();
+    d->style    = obj.value(QLatin1String("style")).toString();
+    d->author   = obj.value(QLatin1String("author")).toString();
+    d->license  = obj.value(QLatin1String("license")).toString();
+    d->indenter = obj.value(QLatin1String("indenter")).toString();
+    d->hidden   = obj.value(QLatin1String("hidden")).toBool();
+    d->fileName = fileName;
+
+    const auto exts = obj.value(QLatin1String("extensions")).toString();
+    foreach (const auto &ext, exts.split(QLatin1Char(';'), QString::SkipEmptyParts))
+        d->extensions.push_back(ext);
+    const auto mts = obj.value(QLatin1String("mimetype")).toString();
+    foreach (const auto &mt, mts.split(QLatin1Char(';'), QString::SkipEmptyParts))
+        d->mimetypes.push_back(mt);
+
+    return true;
 }
 
 static bool attrToBool(const QStringRef &str)

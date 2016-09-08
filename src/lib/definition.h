@@ -23,6 +23,7 @@
 #include <memory>
 
 class QChar;
+class QJsonObject;
 class QString;
 template <typename T> class QVector;
 class QXmlStreamReader;
@@ -100,6 +101,7 @@ public:
 
     bool load();
     bool loadMetaData(const QString &definitionFileName);
+    bool loadMetaData(const QString &fileName, const QJsonObject &obj);
 
 private:
     friend class DefinitionRef;

@@ -20,7 +20,10 @@
 
 #include <QDebug>
 #include <QDirIterator>
+#include <QFile>
 #include <QFileInfo>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QStandardPaths>
 
 using namespace SyntaxHighlighting;
@@ -31,6 +34,7 @@ class RepositoryPrivate
 public:
     void load(Repository *repo);
     void loadFolder(Repository *repo, const QString &path);
+    bool loadFolderFromIndex(Repository *repo, const QString &path);
     void addDefinition(const Definition &def);
 
     QHash<QString, Definition> m_defs;
@@ -101,6 +105,9 @@ void RepositoryPrivate::load(Repository *repo)
 
 void RepositoryPrivate::loadFolder(Repository *repo, const QString &path)
 {
+    if (loadFolderFromIndex(repo, path))
+        return;
+
     QDirIterator it(path);
     while (it.hasNext()) {
         Definition def;
@@ -108,6 +115,27 @@ void RepositoryPrivate::loadFolder(Repository *repo, const QString &path)
         if (def.loadMetaData(it.next()))
             addDefinition(def);
     }
+}
+
+bool RepositoryPrivate::loadFolderFromIndex(Repository *repo, const QString &path)
+{
+    QFile indexFile(path + QLatin1String("/index.json"));
+    if (!indexFile.open(QFile::ReadOnly))
+        return false;
+
+    const auto indexDoc(QJsonDocument::fromBinaryData(indexFile.readAll()));
+    const auto index = indexDoc.object();
+    for (auto it = index.begin(); it != index.end(); ++it) {
+        if (!it.value().isObject())
+            continue;
+        const auto fileName = QString(path + QLatin1Char('/') + it.key());
+        const auto defMap = it.value().toObject();
+        Definition def;
+        def.setRepository(repo);
+        if (def.loadMetaData(fileName, defMap))
+            addDefinition(def);
+    }
+    return true;
 }
 
 void RepositoryPrivate::addDefinition(const Definition &def)

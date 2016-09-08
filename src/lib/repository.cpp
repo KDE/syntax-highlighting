@@ -87,9 +87,14 @@ QVector<Definition> Repository::definitions() const
 
 void RepositoryPrivate::load(Repository *repo)
 {
-    foreach (const auto &dir, QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation)) {
-        loadFolder(repo, dir + QStringLiteral("/KateSyntax"));
-    }
+    auto dirs = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("org.kde.syntax-highlighting/syntax"), QStandardPaths::LocateDirectory);
+    foreach (const auto &dir, dirs)
+        loadFolder(repo, dir);
+    // backward compatiblity with kate
+    dirs = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("katepart5/syntax"), QStandardPaths::LocateDirectory);
+    foreach (const auto &dir, dirs)
+        loadFolder(repo, dir);
+
     loadFolder(repo, QStringLiteral(":/syntaxhighlighting/syntax"));
 
     m_sortedDefs.reserve(m_defs.size());

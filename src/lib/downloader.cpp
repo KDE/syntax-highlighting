@@ -39,7 +39,7 @@ Downloader::Downloader(Repository *repo, QObject *parent) :
 {
     Q_ASSERT(repo);
 
-    m_downloadLocation = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QStringLiteral("/KateSyntax");
+    m_downloadLocation = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QStringLiteral("/org.kde.syntax-highlighting/syntax");
     QDir().mkpath(m_downloadLocation);
     Q_ASSERT(QFile::exists(m_downloadLocation));
 }

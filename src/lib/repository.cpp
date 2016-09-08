@@ -119,7 +119,7 @@ void RepositoryPrivate::loadFolder(Repository *repo, const QString &path)
 
 bool RepositoryPrivate::loadFolderFromIndex(Repository *repo, const QString &path)
 {
-    QFile indexFile(path + QLatin1String("/index.json"));
+    QFile indexFile(path + QLatin1String("/index.katesyntax"));
     if (!indexFile.open(QFile::ReadOnly))
         return false;
 

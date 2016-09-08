@@ -82,13 +82,18 @@ private Q_SLOTS:
         QVERIFY(def.filePath().endsWith(QLatin1String("alert.xml")));
 
         def = m_repo.definitionForName(QLatin1String("C++"));
+        QVERIFY(def.isValid());
         QCOMPARE(def.section(), QLatin1String("Sources"));
         QCOMPARE(def.indenter(), QLatin1String("cstyle"));
         QCOMPARE(def.style(), QLatin1String("C++"));
         QVERIFY(def.mimeTypes().contains(QLatin1String("text/x-c++hdr")));
-        QEXPECT_FAIL("", "fix wrong assumptions on how extension patterns look like", Continue);
         QVERIFY(def.extensions().contains(QLatin1String("*.h")));
         QCOMPARE(def.priority(), 9);
+
+        def = m_repo.definitionForName(QLatin1String("Apache Configuration"));
+        QVERIFY(def.isValid());
+        QVERIFY(def.extensions().contains(QLatin1String("httpd.conf")));
+        QVERIFY(def.extensions().contains(QLatin1String(".htaccess*")));
     }
 };
 

@@ -62,9 +62,10 @@ Definition Repository::definitionForFileName(const QString& fileName) const
 
     for (auto it = d->m_defs.constBegin(); it != d->m_defs.constEnd(); ++it) {
         auto def = it.value();
-        if (def.extensions().contains(ext)) {
+        // FIXME: this is way too simple, there are other patterns too, see KateWildcardMatcher
+        if (def.extensions().contains(QLatin1String("*.") + ext)) {
             def.load();
-            return def;
+            return def; // TODO order results by priority
         }
     }
 

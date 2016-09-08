@@ -309,12 +309,8 @@ bool DefinitionPrivate::loadLanguage(QXmlStreamReader &reader)
     author = reader.attributes().value(QStringLiteral("author")).toString();
     license = reader.attributes().value(QStringLiteral("license")).toString();
     const auto exts = reader.attributes().value(QStringLiteral("extensions")).toString();
-    foreach (const auto &ext, exts.split(QLatin1Char(';'), QString::SkipEmptyParts)) {
-        if (ext.startsWith(QLatin1String("*.")))
-            extensions.push_back(ext.mid(2));
-        else
-            extensions.push_back(ext);
-    }
+    foreach (const auto &ext, exts.split(QLatin1Char(';'), QString::SkipEmptyParts))
+        extensions.push_back(ext);
     const auto mts = reader.attributes().value(QStringLiteral("mimetype")).toString();
     foreach (const auto &mt, mts.split(QLatin1Char(';'), QString::SkipEmptyParts))
         mimetypes.push_back(mt);

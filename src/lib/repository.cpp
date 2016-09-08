@@ -38,9 +38,12 @@ public:
 };
 }
 
+static void initResource() { Q_INIT_RESOURCE(syntax_data); }
+
 Repository::Repository() :
     d(new RepositoryPrivate)
 {
+    initResource();
     d->load(this);
 }
 

@@ -24,6 +24,20 @@
 
 using namespace SyntaxHighlighting;
 
+/**
+ * Returns the index of the first non-space character. If the line is empty,
+ * or only contains white spaces, -1 is returned.
+ */
+static inline int firstNonSpaceChar(const QString & text)
+{
+    for (int i = 0; i < text.length(); ++i) {
+        if (!text[i].isSpace()) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 AbstractHighlighter::AbstractHighlighter() :
     m_theme(Theme::defaultTheme())
 {
@@ -80,6 +94,10 @@ void AbstractHighlighter::highlightLine(const QString& text)
 
     Q_ASSERT(!m_context.isEmpty());
     Q_ASSERT(!m_captureStack.isEmpty());
+    int firstNonSpace = firstNonSpaceChar(text);
+    if (firstNonSpace < 0) {
+        firstNonSpace = text.size();
+    }
     int offset = 0, beginOffset = 0;
     auto currentFormat = m_context.top()->attribute();
     auto currentLookupDef = m_context.top()->syntaxDefinition();
@@ -94,6 +112,16 @@ void AbstractHighlighter::highlightLine(const QString& text)
         foreach (auto rule, m_context.top()->rules()) {
             if (skipOffsets.value(rule.get()) > offset)
                 continue;
+
+            // filter out rules that only match for leading whitespace
+            if (rule->firstNonSpace() && (offset > firstNonSpace)) {
+                continue;
+            }
+
+            // filter out rules that require a specific column
+            if ((rule->requiredColumn() >= 0) && (rule->requiredColumn() != offset)) {
+                continue;
+            }
 
             const auto newResult = rule->match(text, offset, m_captureStack.top());
             newOffset = newResult.offset();

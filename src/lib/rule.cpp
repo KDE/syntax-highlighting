@@ -126,6 +126,16 @@ bool Rule::isDynamic() const
     return m_dynamic;
 }
 
+bool Rule::firstNonSpace() const
+{
+    return m_firstNonSpace;
+}
+
+int Rule::requiredColumn() const
+{
+    return m_column;
+}
+
 bool Rule::load(QXmlStreamReader &reader)
 {
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
@@ -190,11 +200,6 @@ bool Rule::doLoad(QXmlStreamReader& reader)
 MatchResult Rule::match(const QString &text, int offset, const QStringList &captures)
 {
     Q_ASSERT(!text.isEmpty());
-    if (m_firstNonSpace && (offset > 0 || text.at(0).isSpace()))
-        return offset;
-
-    if (m_column >= 0 && offset != m_column)
-        return offset;
 
     const auto result = doMatch(text, offset, captures);
     if (result.offset() == offset || result.offset() == text.size())

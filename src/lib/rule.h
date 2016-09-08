@@ -49,6 +49,8 @@ public:
     ContextSwitch context() const;
     bool isLookAhead() const;
     bool isDynamic() const;
+    bool firstNonSpace() const;
+    int requiredColumn() const;
 
     bool load(QXmlStreamReader &reader);
     void resolveContext();

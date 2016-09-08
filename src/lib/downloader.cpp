@@ -15,6 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "syntaxhighlighting_version.h"
 #include "downloader.h"
 #include "definition.h"
 #include "repository.h"
@@ -50,7 +51,12 @@ Downloader::~Downloader()
 
 void Downloader::start()
 {
-    QNetworkRequest req(QUrl(QStringLiteral("https://www.kate-editor.org/syntax/update-5.24.xml")));
+    const QString url = QLatin1String("https://www.kate-editor.org/syntax/update-")
+                      + QString::number(SyntaxHighlighting_VERSION_MAJOR)
+                      + QLatin1Char('.')
+                      + QString::number(SyntaxHighlighting_VERSION_MINOR)
+                      + QLatin1String(".xml");
+    auto req = QNetworkRequest(QUrl(url));
     req.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
     auto reply = m_nam->get(req);
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {

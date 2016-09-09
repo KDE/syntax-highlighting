@@ -183,6 +183,9 @@ void Context::resolveIncludes()
             continue;
         }
         context->resolveIncludes();
+        if (inc->includeAttribute()) {
+            m_attribute = context->attribute();
+        }
         it = m_rules.erase(it);
         foreach (auto rule, context->rules()) {
             it = m_rules.insert(it, rule);

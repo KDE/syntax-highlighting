@@ -16,6 +16,7 @@
 */
 
 #include "rule.h"
+#include "xml_p.h"
 
 #include <QDebug>
 #include <QString>
@@ -460,6 +461,11 @@ QString IncludeRules::definitionName() const
     return m_defName;
 }
 
+bool IncludeRules::includeAttribute() const
+{
+    return m_includeAttribute;
+}
+
 bool IncludeRules::doLoad(QXmlStreamReader& reader)
 {
     const auto s = reader.attributes().value(QLatin1String("context"));
@@ -469,6 +475,7 @@ bool IncludeRules::doLoad(QXmlStreamReader& reader)
     m_contextName = splitted.at(0).toString();
     if (splitted.size() > 1)
         m_defName = splitted.at(1).toString();
+    m_includeAttribute = Xml::attrToBool(reader.attributes().value(QLatin1String("includeAttrib")));
 
     return !m_contextName.isEmpty() || !m_defName.isEmpty();
 }
@@ -562,7 +569,6 @@ MatchResult RangeDetect::doMatch(const QString& text, int offset, const QStringL
     }
     return offset;
 }
-
 
 bool RegExpr::doLoad(QXmlStreamReader& reader)
 {

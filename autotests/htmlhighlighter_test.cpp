@@ -99,7 +99,6 @@ private Q_SLOTS:
         proc.setProcessChannelMode(QProcess::ForwardedChannels);
         proc.start(QStringLiteral("diff"), args);
         QVERIFY(proc.waitForFinished());
-        QEXPECT_FAIL("example.rmd", "attribute lookup for included rules broken", Continue);
         QEXPECT_FAIL("test_syntax.sql", "keywords and no whitespace delimiters broken", Continue);
         QEXPECT_FAIL("or1200_du.v", "???", Continue);
         QEXPECT_FAIL("or1200_dc_fsm.v", "???", Continue);

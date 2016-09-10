@@ -74,7 +74,7 @@ public:
 }
 
 DefinitionPrivate::DefinitionPrivate() :
-    repo(nullptr),
+    repo(Q_NULLPTR),
     delimiters(QStringLiteral(".():!+,-<=>%&*/;?[]^{|}~\\ \t")),
     caseSensitive(Qt::CaseSensitive),
     version(0.0f),
@@ -205,7 +205,7 @@ Context* Definition::contextByName(const QString& name) const
         if (context->name() == name)
             return context;
     }
-    return nullptr;
+    return Q_NULLPTR;
 }
 
 KeywordList Definition::keywordList(const QString& name) const

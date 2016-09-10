@@ -35,7 +35,7 @@ class KF5SYNTAXHIGHLIGHTING_EXPORT Downloader : public QObject
 {
     Q_OBJECT
 public:
-    explicit Downloader(Repository *repo, QObject *parent = nullptr);
+    explicit Downloader(Repository *repo, QObject *parent = Q_NULLPTR);
     ~Downloader();
 
     void start();

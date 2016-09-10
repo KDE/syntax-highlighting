@@ -24,7 +24,7 @@
 using namespace SyntaxHighlighting;
 
 ContextSwitch::ContextSwitch() :
-    m_context(nullptr),
+    m_context(Q_NULLPTR),
     m_popCount(0)
 {
 }

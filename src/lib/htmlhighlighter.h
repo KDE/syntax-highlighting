@@ -42,7 +42,7 @@ public:
     void setOutputFile(FILE *fileHandle);
 
 protected:
-    void setFormat(int offset, int length, const Format &format) override;
+    void setFormat(int offset, int length, const Format &format) Q_DECL_OVERRIDE;
 
 private:
     std::unique_ptr<QTextStream> m_out;

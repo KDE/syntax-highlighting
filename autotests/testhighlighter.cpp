@@ -60,7 +60,7 @@ public:
     }
 
 protected:
-    void setFormat(int offset, int length, const Format &format) override
+    void setFormat(int offset, int length, const Format &format) Q_DECL_OVERRIDE
     {
         if (format.name().isEmpty())
             m_out << "<dsNormal>" << m_currentLine.midRef(offset, length) << "</dsNormal>";
@@ -78,7 +78,7 @@ class TestHighlighterTest : public QObject
 {
     Q_OBJECT
 public:
-    explicit TestHighlighterTest(QObject *parent = nullptr) : QObject(parent), m_repo(nullptr) {}
+    explicit TestHighlighterTest(QObject *parent = Q_NULLPTR) : QObject(parent), m_repo(Q_NULLPTR) {}
 private:
         Repository *m_repo;
 
@@ -91,7 +91,7 @@ private Q_SLOTS:
     void cleanupTestCase()
     {
         delete m_repo;
-        m_repo = nullptr;
+        m_repo = Q_NULLPTR;
     }
 
     void testHighlight_data()

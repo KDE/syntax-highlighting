@@ -180,7 +180,7 @@ void Context::resolveIncludes()
             ++it;
             continue;
         }
-        Context* context = nullptr;
+        Context* context = Q_NULLPTR;
         if (inc->definitionName().isEmpty()) { // local include
             context = m_def.definition().contextByName(inc->contextName());
         } else {

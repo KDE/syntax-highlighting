@@ -217,7 +217,7 @@ MatchResult Rule::match(const QString &text, int offset, const QStringList &capt
 
 Rule::Ptr Rule::create(const QStringRef& name)
 {
-    Rule *rule = nullptr;
+    Rule *rule = Q_NULLPTR;
     if (name == QLatin1String("AnyChar"))
         rule = new AnyChar;
     else if (name == QLatin1String("DetectChar"))

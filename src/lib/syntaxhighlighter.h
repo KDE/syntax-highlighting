@@ -30,12 +30,12 @@ class KF5SYNTAXHIGHLIGHTING_EXPORT SyntaxHighlighter : public QSyntaxHighlighter
 {
     Q_OBJECT
 public:
-    explicit SyntaxHighlighter(QObject *parent = nullptr);
+    explicit SyntaxHighlighter(QObject *parent = Q_NULLPTR);
     ~SyntaxHighlighter();
 
 protected:
-    void highlightBlock(const QString & text) override;
-    void setFormat(int offset, int length, const Format &format) override;
+    void highlightBlock(const QString & text) Q_DECL_OVERRIDE;
+    void setFormat(int offset, int length, const Format &format) Q_DECL_OVERRIDE;
 
 private:
 };

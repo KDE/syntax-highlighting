@@ -16,8 +16,9 @@
 */
 
 #include "htmlhighlighter.h"
-#include "format.h"
 #include "definition.h"
+#include "format.h"
+#include "syntaxhighlighting_logging.h"
 
 #include <QDebug>
 #include <QFile>
@@ -38,7 +39,7 @@ void HtmlHighlighter::setOutputFile(const QString& fileName)
 {
     m_file.reset(new QFile(fileName));
     if (!m_file->open(QFile::WriteOnly | QFile::Truncate)) {
-        qWarning() << "Failed to open output file" << fileName << ":" << m_file->errorString();
+        qCWarning(Log) << "Failed to open output file" << fileName << ":" << m_file->errorString();
         return;
     }
     m_out.reset(new QTextStream(m_file.get()));
@@ -53,13 +54,13 @@ void HtmlHighlighter::setOutputFile(FILE *fileHandle)
 void HtmlHighlighter::highlightFile(const QString& fileName)
 {
     if (!m_out) {
-        qWarning() << "No output stream defined!";
+        qCWarning(Log) << "No output stream defined!";
         return;
     }
 
     QFile f(fileName);
     if (!f.open(QFile::ReadOnly)) {
-        qWarning() << "Failed to open input file" << fileName << ":" << f.errorString();
+        qCWarning(Log) << "Failed to open input file" << fileName << ":" << f.errorString();
         return;
     }
 

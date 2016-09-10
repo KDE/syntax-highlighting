@@ -15,13 +15,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "syntaxhighlighting_version.h"
 
 #include "definition.h"
 #include "definitionref_p.h"
+
 #include "context.h"
-#include "rule.h"
 #include "format.h"
+#include "rule.h"
+#include "syntaxhighlighting_logging.h"
+#include "syntaxhighlighting_version.h"
 #include "xml_p.h"
 
 #include <QCoreApplication>
@@ -454,14 +456,14 @@ bool DefinitionPrivate::checkKateVersion(const QStringRef& verStr)
 {
     const auto idx = verStr.indexOf(QLatin1Char('.'));
     if (idx <= 0) {
-        qWarning() << "Skipping" << fileName << "due to having no valid kateversion attribute:" << verStr;
+        qCWarning(Log) << "Skipping" << fileName << "due to having no valid kateversion attribute:" << verStr;
         return false;
     }
     const auto major = verStr.left(idx).toInt();
     const auto minor = verStr.mid(idx + 1).toInt();
 
     if (major > SyntaxHighlighting_VERSION_MAJOR || (major == SyntaxHighlighting_VERSION_MAJOR && minor > SyntaxHighlighting_VERSION_MINOR)) {
-        qWarning() << "Skipping" << fileName << "due to being too new, version:" << verStr;
+        qCWarning(Log) << "Skipping" << fileName << "due to being too new, version:" << verStr;
         return false;
     }
 

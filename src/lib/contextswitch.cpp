@@ -18,6 +18,7 @@
 #include "contextswitch.h"
 #include "definition.h"
 #include "repository.h"
+#include "syntaxhighlighting_logging.h"
 
 #include <QDebug>
 
@@ -87,6 +88,6 @@ void ContextSwitch::resolve(const Definition &def)
     if (!m_contextName.isEmpty()) {
         m_context = d.contextByName(m_contextName);
         if (!m_context)
-            qWarning() << "cannot find context" << m_contextName << "in" << def.name();
+            qCWarning(Log) << "cannot find context" << m_contextName << "in" << def.name();
     }
 }

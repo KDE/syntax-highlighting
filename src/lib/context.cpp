@@ -19,6 +19,7 @@
 #include "format.h"
 #include "repository.h"
 #include "rule.h"
+#include "syntaxhighlighting_logging.h"
 
 #include <QDebug>
 #include <QString>
@@ -94,7 +95,7 @@ Format Context::formatByName(const QString &name) const
             return format;
     }
 
-    qWarning() << "Unknown format" << name << "in context" << m_name << "of definition" << m_def.definition().name();
+    qCWarning(Log) << "Unknown format" << name << "in context" << m_name << "of definition" << m_def.definition().name();
     return format;
 }
 
@@ -167,7 +168,7 @@ void Context::resolveIncludes()
     if (resolveState() == Resolved)
         return;
     if (resolveState() == Resolving) {
-        qWarning() << "Cyclic dependency!";
+        qCWarning(Log) << "Cyclic dependency!";
         return;
     }
 
@@ -186,7 +187,7 @@ void Context::resolveIncludes()
         } else {
             auto def = m_def.definition().repository()->definitionForName(inc->definitionName());
             if (!def.isValid()) {
-                qWarning() << "Unable to resolve external include rule for definition" << inc->definitionName() << "in" << m_def.definition().name();
+                qCWarning(Log) << "Unable to resolve external include rule for definition" << inc->definitionName() << "in" << m_def.definition().name();
                 ++it;
                 continue;
             }
@@ -197,7 +198,7 @@ void Context::resolveIncludes()
                 context = def.contextByName(inc->contextName());
         }
         if (!context) {
-            qWarning() << "Unable to resolve include rule for definition" << inc->contextName() << "##" << inc->definitionName() << "in" << m_def.definition().name();
+            qCWarning(Log) << "Unable to resolve include rule for definition" << inc->contextName() << "##" << inc->definitionName() << "in" << m_def.definition().name();
             ++it;
             continue;
         }

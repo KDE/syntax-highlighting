@@ -16,6 +16,7 @@
 */
 
 #include "rule.h"
+#include "syntaxhighlighting_logging.h"
 #include "xml_p.h"
 
 #include <QDebug>
@@ -255,7 +256,7 @@ Rule::Ptr Rule::create(const QStringRef& name)
     else if (name == QLatin1String("WordDetect"))
         rule = new WordDetect;
     else
-        qWarning() << "Unknown rule type:" << name;
+        qCWarning(Log) << "Unknown rule type:" << name;
 
     return Ptr(rule);
 }
@@ -270,7 +271,7 @@ bool AnyChar::doLoad(QXmlStreamReader& reader)
 {
     m_chars = reader.attributes().value(QStringLiteral("String")).toString();
     if (m_chars.size() == 1)
-        qDebug() << "AnyChar rule with just one char: use DetectChar instead.";
+        qCDebug(Log) << "AnyChar rule with just one char: use DetectChar instead.";
     return !m_chars.isEmpty();
 }
 
@@ -492,7 +493,7 @@ bool IncludeRules::doLoad(QXmlStreamReader& reader)
 MatchResult IncludeRules::doMatch(const QString& text, int offset, const QStringList&)
 {
     Q_UNUSED(text);
-    qWarning() << "Unresolved include rule for" << m_contextName << "##" << m_defName;
+    qCWarning(Log) << "Unresolved include rule for" << m_contextName << "##" << m_defName;
     return offset;
 }
 

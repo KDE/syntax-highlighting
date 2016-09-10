@@ -15,10 +15,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "syntaxhighlighting_version.h"
 #include "downloader.h"
 #include "definition.h"
 #include "repository.h"
+#include "syntaxhighlighting_logging.h"
+#include "syntaxhighlighting_version.h"
 
 #include <QDebug>
 #include <QDir>
@@ -67,7 +68,7 @@ void Downloader::start()
 void Downloader::definitionListDownloadFinished(QNetworkReply *reply)
 {
     if (reply->error() != QNetworkReply::NoError) {
-        qWarning() << reply->error();
+        qCWarning(Log) << reply->error();
         emit done(); // TODO return error
         return;
     }
@@ -129,7 +130,7 @@ void Downloader::downloadDefinitionFinished(QNetworkReply *reply)
 {
     --m_pendingDownloads;
     if (reply->error() != QNetworkReply::NoError) {
-        qWarning() << "Failed to download definition file" << reply->url() << reply->error();
+        qCWarning(Log) << "Failed to download definition file" << reply->url() << reply->error();
         checkDone();
         return;
     }
@@ -145,7 +146,7 @@ void Downloader::downloadDefinitionFinished(QNetworkReply *reply)
 
     QFile file(m_downloadLocation + QLatin1Char('/') + reply->url().fileName());
     if (!file.open(QFile::WriteOnly)) {
-        qWarning() << "Failed to open" << file.fileName() << file.error();
+        qCWarning(Log) << "Failed to open" << file.fileName() << file.error();
     } else {
         file.write(reply->readAll());
     }

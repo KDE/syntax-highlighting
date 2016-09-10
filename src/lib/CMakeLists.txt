@@ -16,6 +16,11 @@ set(syntax_highlighting_srcs
     theme.cpp
     ${syntax_highlighting_QM_LOADER}
 )
+ecm_qt_declare_logging_category(syntax_highlighting_srcs
+    HEADER syntaxhighlighting_logging.h
+    IDENTIFIER SyntaxHighlighting::Log
+    CATEGORY_NAME org.kde.syntax-highlighting
+)
 
 add_library(KF5SyntaxHighlighting SHARED ${syntax_highlighting_srcs})
 generate_export_header(KF5SyntaxHighlighting)

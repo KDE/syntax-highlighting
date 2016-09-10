@@ -77,6 +77,11 @@ Format::~Format()
 {
 }
 
+bool Format::isValid() const
+{
+    return !m_name.isEmpty();
+}
+
 QString Format::name() const
 {
     return m_name;

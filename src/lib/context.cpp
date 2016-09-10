@@ -16,8 +16,9 @@
 */
 
 #include "context.h"
-#include "rule.h"
+#include "format.h"
 #include "repository.h"
+#include "rule.h"
 
 #include <QDebug>
 #include <QString>
@@ -78,6 +79,22 @@ ContextSwitch Context::fallthroughContext() const
 QVector<Rule::Ptr> Context::rules() const
 {
     return m_rules;
+}
+
+Format Context::formatByName(const QString &name) const
+{
+    auto format = m_def.definition().formatByName(name);
+    if (format.isValid())
+        return format;
+
+    // TODO we can avoid multiple lookups in the same definition here, many rules will share definitions
+    foreach (auto rule, m_rules) {
+        format = rule->syntaxDefinition().formatByName(name);
+        if (format.isValid())
+            return format;
+    }
+
+    return format;
 }
 
 void Context::load(QXmlStreamReader& reader)

@@ -34,6 +34,8 @@ public:
     Format();
     ~Format();
 
+    bool isValid() const;
+
     QString name() const;
     bool isNormal(const Theme &theme) const;
 

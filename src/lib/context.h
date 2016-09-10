@@ -49,6 +49,12 @@ public:
 
     QVector<Rule::Ptr> rules() const;
 
+    /** Attempts to find the format named @p name in the
+     *  enclosing definition, or the source definition of any
+     *  included rule.
+     */
+    Format formatByName(const QString &name) const;
+
     void load(QXmlStreamReader &reader);
     void resolveContexts();
     void resolveIncludes();

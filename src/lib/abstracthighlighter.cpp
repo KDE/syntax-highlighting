@@ -100,7 +100,7 @@ void AbstractHighlighter::highlightLine(const QString& text)
     }
     int offset = 0, beginOffset = 0;
     auto currentFormat = m_context.top()->attribute();
-    auto currentLookupDef = m_context.top()->syntaxDefinition();
+    auto currentLookupContext = m_context.top();
     bool lineContinuation = false;
     QHash<Rule*, int> skipOffsets;
 
@@ -108,7 +108,7 @@ void AbstractHighlighter::highlightLine(const QString& text)
         bool isLookAhead = false;
         int newOffset = 0;
         QString newFormat;
-        auto newLookupDef = currentLookupDef;
+        auto newLookupContext = currentLookupContext;
         foreach (auto rule, m_context.top()->rules()) {
             if (skipOffsets.value(rule.get()) > offset)
                 continue;
@@ -137,9 +137,9 @@ void AbstractHighlighter::highlightLine(const QString& text)
                 break;
             }
 
+            newLookupContext = m_context.top();
             switchContext(rule->context(), newResult.captures());
             newFormat = rule->attribute().isEmpty() ? m_context.top()->attribute() : rule->attribute();
-            newLookupDef = rule->syntaxDefinition();
             if (newOffset == text.size() && std::dynamic_pointer_cast<LineContinue>(rule))
                 lineContinuation = true;
             break;
@@ -155,15 +155,15 @@ void AbstractHighlighter::highlightLine(const QString& text)
 
             newOffset = offset + 1;
             newFormat = m_context.top()->attribute();
-            newLookupDef = m_context.top()->syntaxDefinition();
+            newLookupContext = m_context.top();
         }
 
         if (newFormat != currentFormat /*|| currentLookupDef != newLookupDef*/) {
             if (offset > 0)
-                setFormat(beginOffset, offset - beginOffset, currentLookupDef.formatByName(currentFormat));
+                setFormat(beginOffset, offset - beginOffset, currentLookupContext->formatByName(currentFormat));
             beginOffset = offset;
             currentFormat = newFormat;
-            currentLookupDef = newLookupDef;
+            currentLookupContext = newLookupContext;
         }
         Q_ASSERT(newOffset > offset);
         offset = newOffset;
@@ -171,7 +171,7 @@ void AbstractHighlighter::highlightLine(const QString& text)
     } while (offset < text.size());
 
     if (beginOffset < offset)
-        setFormat(beginOffset, text.size() - beginOffset, currentLookupDef.formatByName(currentFormat));
+        setFormat(beginOffset, text.size() - beginOffset, currentLookupContext->formatByName(currentFormat));
 
     while (!m_context.top()->lineEndContext().isStay() && !lineContinuation) {
         if (!switchContext(m_context.top()->lineEndContext()))

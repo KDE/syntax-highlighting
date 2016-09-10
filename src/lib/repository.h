@@ -26,40 +26,80 @@
 class QString;
 template <typename T> class QVector;
 
-/** @namespce SyntaxHighlighting
- *  Syntax highlighting engine for Kate syntax definitions.
+/**
+ * @namespce SyntaxHighlighting
+ *
+ * Syntax highlighting engine for Kate syntax definitions.
+ * In order to access the syntax highlighting Definition files, use the
+ * class Repository.
+ *
+ * @see Repository
  */
 namespace SyntaxHighlighting {
 
 class RepositoryPrivate;
 class Definition;
 
-/** Holds all syntax definitions found on the system or compiled in. */
+/**
+ * @brief Syntax highlighting repository.
+ *
+ * @section repo_intro Introduction
+ *
+ * The Repository gives access to all syntax Definition%s available on the
+ * system, typically described in *.xml files. The Defintion files are read
+ * from the resouce that is compiled into the executable, and from the file
+ * system. If a Definition exists in the resource and on the file system,
+ * then the one from the file system is chosen.
+ *
+ * @section repo_access Accessing the Definitions
+ *
+ * Typically, only one instance of the Repository is needed. This single
+ * instance can be thought of as a singleton you keep alive throughout the
+ * lifetime of your application.
+ *
+ * @see Definition
+ */
 class KF5SYNTAXHIGHLIGHTING_EXPORT Repository
 {
 public:
-    /** Create a new syntax definition repository.
-     *  This will read the meta data information of all available syntax
-     *  definition, which is a moderately expensive operation, it's therefore
-     *  recommended to keep a single instance of Repository around as long
-     *  as you need highlighting in your application.
+    /**
+     * Create a new syntax definition repository.
+     * This will read the meta data information of all available syntax
+     * definition, which is a moderately expensive operation, it's therefore
+     * recommended to keep a single instance of Repository around as long
+     * as you need highlighting in your application.
      */
     Repository();
     ~Repository();
 
-    /** Returns the definition named @p defName.
-     *  Note: This uses untranslated names.
+    /**
+     * Returns the Definition named @p defName.
+     *
+     * If no Definition is found, Definition::isValid() of the returned instance
+     * returns false.
+     *
+     * @note This uses case sensitive, untranslated names. For instance,
+     *       the javascript.xml definition file sets its name to @e JavaScript.
+     *       Therefore, only the string "JavaScript" will return a valid
+     *       Definition file.
      */
     Definition definitionForName(const QString &defName) const;
-    /** Returns the best matching definition for a file named @p fileName.
-     *  This matches the file name against the supported file name patterns
-     *  of the definition, if multiple matches are found, the one with the
-     *  highest priority is returned.
+
+    /**
+     * Returns the best matching Definition for the file named @p fileName.
+     * The match is performed based on the \e extensions and @e mimetype of
+     * the definition files. If multiple matches are found, the one with the
+     * highest priority is returned.
+     *
+     * If no match is found, Definition::isValid() of the returned instance
+     * returns false.
      */
     Definition definitionForFileName(const QString &fileName) const;
-    /** Returns all available definition.
-     *  Definitions are ordered by translated section and translated names,
-     *  for consistent displaying.
+
+    /**
+     * Returns all available Definition%s.
+     * Definition%ss are ordered by translated section and translated names,
+     * for consistent displaying.
      */
     QVector<Definition> definitions() const;
 

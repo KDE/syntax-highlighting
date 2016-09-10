@@ -190,6 +190,7 @@ void Context::resolveIncludes()
                 ++it;
                 continue;
             }
+            def.load();
             if (inc->contextName().isEmpty())
                 context = def.initialContext();
             else

@@ -57,10 +57,7 @@ Repository::~Repository()
 
 Definition Repository::definitionForName(const QString& defName) const
 {
-    auto def = d->m_defs.value(defName);
-    if (def.isValid())
-        def.load();
-    return def;
+    return d->m_defs.value(defName);
 }
 
 Definition Repository::definitionForFileName(const QString& fileName) const
@@ -83,9 +80,7 @@ Definition Repository::definitionForFileName(const QString& fileName) const
         return lhs.priority() > rhs.priority();
     });
 
-    auto def = candidates.at(0);
-    def.load();
-    return def;
+    return candidates.at(0);
 }
 
 QVector<Definition> Repository::definitions() const

@@ -76,6 +76,8 @@ Definition AbstractHighlighter::definition() const
 void AbstractHighlighter::setDefinition(const Definition &def)
 {
     d->m_definition = def;
+    if (d->m_definition.isValid())
+        d->m_definition.load();
     reset();
 }
 

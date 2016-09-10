@@ -95,7 +95,6 @@ private:
     friend class ContextSwitch;
     friend class DefinitionRef;
     friend class KeywordListRule;
-    friend class Repository;
     friend class RepositoryPrivate;
     friend class RepositoryTest;
     friend class Rule;

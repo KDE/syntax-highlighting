@@ -79,6 +79,7 @@ void ContextSwitch::resolve(const Definition &def)
     auto d = def;
     if (!m_defName.isEmpty()) {
         d = def.repository()->definitionForName(m_defName);
+        d.load();
         if (m_contextName.isEmpty())
             m_context = d.initialContext();
     }

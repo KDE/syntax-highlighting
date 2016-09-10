@@ -4,21 +4,29 @@ Syntax highlighting engine for Kate syntax definitions
 
 ## Introduction
 
-This is meant to be a stand-alone implementation of the Kate syntax highlighting engine,
-focussed on a sufficiently complete feature coverage for read-only syntax highlighting.
+This is a stand-alone implementation of the Kate syntax highlighting engine.
+It's meant as a building block for text editors as well as for simple highlighted
+text rendering (e.g. as HTML), supporting both integration with a custom editor
+as well as a ready-to-use QSyntaxHighlighter sub-class.
 
-Output "formats" include:
+## Syntax Definition Files
 
-* QSyntaxHighlighter
-* HTML
+This library uses Kate syntax definition files for the actual highlighting,
+the file format is documented [https://docs.kde.org/stable5/en/applications/katepart/highlight.html](here).
 
+More than 250 syntax definition files are included, additional ones are
+picked up from the file system if present, so you can easily extend this
+by application-specific syntax definitions for example.
 
 ## Out of scope
 
-This is not something to build an actual text editor with, as it doesn't cover any of the
-features you want for this, such as:
+To not turn this into yet another text editor, the following things are considered
+out of scope:
 
-* dynamic re-highlighting of changed areas
-* code folding
-* any of the not highlighting related properties in Kate's syntax definitions
+* code folding, beyond providing folding range information
+* auto completion
+* spell checking
 * user interface for configuration
+* management of text buffers or doucments
+
+If you need any of this, check out KTextEditor.

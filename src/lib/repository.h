@@ -26,6 +26,9 @@
 class QString;
 template <typename T> class QVector;
 
+/** @namespce SyntaxHighlighting
+ *  Syntax highlighting engine for Kate syntax definitions.
+ */
 namespace SyntaxHighlighting {
 
 class RepositoryPrivate;

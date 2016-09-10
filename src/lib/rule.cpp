@@ -333,7 +333,7 @@ MatchResult DetectIdentifier::doMatch(const QString& text, int offset, const QSt
             return i;
     }
 
-    return offset + 1;
+    return text.size();
 }
 
 

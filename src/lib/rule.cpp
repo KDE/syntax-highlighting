@@ -347,6 +347,9 @@ MatchResult DetectSpaces::doMatch(const QString& text, int offset, const QString
 
 MatchResult Float::doMatch(const QString& text, int offset, const QStringList&)
 {
+    if (offset > 0 && !isDelimiter(text.at(offset - 1)))
+        return offset;
+
     auto newOffset = offset;
     while (newOffset < text.size() && text.at(newOffset).isDigit())
         ++newOffset;
@@ -407,6 +410,9 @@ MatchResult HlCChar::doMatch(const QString& text, int offset, const QStringList&
 
 MatchResult HlCHex::doMatch(const QString& text, int offset, const QStringList&)
 {
+    if (offset > 0 && !isDelimiter(text.at(offset - 1)))
+        return offset;
+
     if (text.size() < offset + 3)
         return offset;
 
@@ -428,6 +434,9 @@ MatchResult HlCHex::doMatch(const QString& text, int offset, const QStringList&)
 
 MatchResult HlCOct::doMatch(const QString& text, int offset, const QStringList&)
 {
+    if (offset > 0 && !isDelimiter(text.at(offset - 1)))
+        return offset;
+
     if (text.size() < offset + 2)
         return offset;
 
@@ -490,6 +499,9 @@ MatchResult IncludeRules::doMatch(const QString& text, int offset, const QString
 
 MatchResult Int::doMatch(const QString& text, int offset, const QStringList &captures)
 {
+    if (offset > 0 && !isDelimiter(text.at(offset - 1)))
+        return offset;
+
     Q_UNUSED(captures); // ### the doc says this can be dynamic, but how??
     while(offset < text.size() && text.at(offset).isDigit())
         ++offset;

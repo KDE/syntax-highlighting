@@ -40,7 +40,7 @@ void SyntaxHighlighter::highlightBlock(const QString& text)
 
 void SyntaxHighlighter::setFormat(int offset, int length, const SyntaxHighlighting::Format& format)
 {
-    if (format.isNormal(theme()) || offset == length)
+    if (format.isNormal(theme()) || length == 0)
         return;
 
     QTextCharFormat tf;

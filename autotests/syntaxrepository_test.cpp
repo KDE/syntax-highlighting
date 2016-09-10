@@ -22,7 +22,7 @@
 #include <QObject>
 #include <QtTest/qtest.h>
 
-using namespace SyntaxHighlighting;
+namespace SyntaxHighlighting {
 
 class RepositoryTest : public QObject
 {
@@ -100,7 +100,8 @@ private Q_SLOTS:
         QVERIFY(def.extensions().contains(QLatin1String(".htaccess*")));
     }
 };
+}
 
-QTEST_MAIN(RepositoryTest)
+QTEST_MAIN(SyntaxHighlighting::RepositoryTest)
 
 #include "syntaxrepository_test.moc"

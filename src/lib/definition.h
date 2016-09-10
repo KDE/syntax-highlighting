@@ -41,10 +41,12 @@ class DefinitionPrivate;
 class KF5SYNTAXHIGHLIGHTING_EXPORT Definition
 {
 public:
+    /** Create an empty (invalid) Definition instance.
+     *  Use Repository to obtain valid instances.
+     */
     Definition();
     Definition(const Definition &other);
     ~Definition();
-
     Definition& operator=(const Definition &rhs);
 
     /** Checks whether this object refers to a valid syntax definition. */
@@ -87,7 +89,18 @@ public:
     /** License of this syntax definition. */
     QString license() const;
 
-    // FIXME everything below is internal -> do not export this
+private:
+    friend class AbstractHighlighter;
+    friend class Context;
+    friend class ContextSwitch;
+    friend class DefinitionRef;
+    friend class KeywordListRule;
+    friend class Repository;
+    friend class RepositoryPrivate;
+    friend class RepositoryTest;
+    friend class Rule;
+
+    // stuff needed by our friends, but should not be used externally
     Repository* repository() const;
     void setRepository(Repository *repo);
 
@@ -103,8 +116,6 @@ public:
     bool loadMetaData(const QString &definitionFileName);
     bool loadMetaData(const QString &fileName, const QJsonObject &obj);
 
-private:
-    friend class DefinitionRef;
     std::shared_ptr<DefinitionPrivate> d;
 };
 

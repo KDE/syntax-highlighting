@@ -27,6 +27,6 @@ out of scope:
 * auto completion
 * spell checking
 * user interface for configuration
-* management of text buffers or doucments
+* management of text buffers or documents
 
 If you need any of this, check out KTextEditor.

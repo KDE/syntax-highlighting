@@ -224,7 +224,6 @@ Format Definition::formatByName(const QString& name) const
     if (it != d->formats.constEnd())
         return it.value();
 
-    qWarning() << "Unknown format" << name << "in" << d->name;
     return Format();
 }
 

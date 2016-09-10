@@ -94,6 +94,7 @@ Format Context::formatByName(const QString &name) const
             return format;
     }
 
+    qWarning() << "Unknown format" << name << "in context" << m_name << "of definition" << m_def.definition().name();
     return format;
 }
 

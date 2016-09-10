@@ -56,7 +56,7 @@ protected:
     void highlightLine(const QString &text);
     void reset();
     /** Reimplement this to apply formats to your output. */
-    virtual void setFormat(int offset, int length, const Format &format);
+    virtual void setFormat(int offset, int length, const Format &format) = 0;
 
 private:
     Q_DISABLE_COPY(AbstractHighlighter)

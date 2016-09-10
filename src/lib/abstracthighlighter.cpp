@@ -226,8 +226,3 @@ bool AbstractHighlighterPrivate::switchContext(const ContextSwitch &contextSwitc
 
     return true;
 }
-
-void AbstractHighlighter::setFormat(int offset, int length, const Format& format)
-{
-    qDebug() << offset << length << format.name();
-}

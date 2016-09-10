@@ -100,8 +100,6 @@ private Q_SLOTS:
         proc.start(QStringLiteral("diff"), args);
         QVERIFY(proc.waitForFinished());
         QEXPECT_FAIL("test_syntax.sql", "keywords and no whitespace delimiters broken", Continue);
-        QEXPECT_FAIL("light52_muldiv.vhdl", "???", Continue);
-        QEXPECT_FAIL("light52_tb.vhdl", "???", Continue);
         QCOMPARE(proc.exitCode(), 0);
     }
 

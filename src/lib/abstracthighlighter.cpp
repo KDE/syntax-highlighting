@@ -132,7 +132,7 @@ void AbstractHighlighter::highlightLine(const QString& text)
 
             if (rule->isLookAhead()) {
                 Q_ASSERT(!rule->context().isStay());
-                switchContext(rule->context());
+                switchContext(rule->context(), newResult.captures());
                 isLookAhead = true;
                 break;
             }

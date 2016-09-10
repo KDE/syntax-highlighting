@@ -17,6 +17,7 @@
 
 #include "syntaxhighlighting_version.h"
 
+#include <definition.h>
 #include <downloader.h>
 #include <htmlhighlighter.h>
 #include <repository.h>
@@ -24,6 +25,7 @@
 
 #include <QCommandLineParser>
 #include <QCoreApplication>
+#include <QVector>
 
 #include <iostream>
 

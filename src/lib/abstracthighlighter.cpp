@@ -17,12 +17,33 @@
 
 #include "abstracthighlighter.h"
 #include "context.h"
-#include "rule.h"
 #include "format.h"
+#include "rule.h"
+#include "theme.h"
 
 #include <QDebug>
+#include <QStack>
 
 using namespace SyntaxHighlighting;
+
+namespace SyntaxHighlighting {
+class AbstractHighlighterPrivate
+{
+public:
+    AbstractHighlighterPrivate();
+    bool switchContext(const ContextSwitch &contextSwitch, const QStringList &captures = QStringList());
+
+    Definition m_definition;
+    QStack<Context*> m_context;
+    QStack<QStringList> m_captureStack;
+    Theme m_theme;
+};
+}
+
+AbstractHighlighterPrivate::AbstractHighlighterPrivate() :
+    m_theme(Theme::defaultTheme())
+{
+}
 
 /**
  * Returns the index of the first non-space character. If the line is empty,
@@ -39,7 +60,7 @@ static inline int firstNonSpaceChar(const QString & text)
 }
 
 AbstractHighlighter::AbstractHighlighter() :
-    m_theme(Theme::defaultTheme())
+    d(new AbstractHighlighterPrivate)
 {
 }
 
@@ -49,58 +70,58 @@ AbstractHighlighter::~AbstractHighlighter()
 
 Definition AbstractHighlighter::definition() const
 {
-    return m_definition;
+    return d->m_definition;
 }
 
 void AbstractHighlighter::setDefinition(const Definition &def)
 {
-    m_definition = def;
+    d->m_definition = def;
     reset();
 }
 
 void AbstractHighlighter::reset()
 {
-    m_context.clear();
-    m_captureStack.clear();
-    if (!m_definition.isValid())
+    d->m_context.clear();
+    d->m_captureStack.clear();
+    if (!d->m_definition.isValid())
         return;
-    m_context.push(m_definition.initialContext());
-    m_captureStack.push(QStringList());
+    d->m_context.push(d->m_definition.initialContext());
+    d->m_captureStack.push(QStringList());
 }
 
 Theme AbstractHighlighter::theme() const
 {
-    return m_theme;
+    return d->m_theme;
 }
 
 void AbstractHighlighter::setTheme(const Theme &theme)
 {
-    m_theme = theme;
+    d->m_theme = theme;
 }
 
 void AbstractHighlighter::highlightLine(const QString& text)
 {
-    if (!m_definition.isValid()) {
+    if (!d->m_definition.isValid()) {
         setFormat(0, text.size(), Format());
         return;
     }
 
     if (text.isEmpty()) {
-        while (!m_context.top()->lineEmptyContext().isStay())
-            switchContext(m_context.top()->lineEmptyContext());
+        while (!d->m_context.top()->lineEmptyContext().isStay())
+            d->switchContext(d->m_context.top()->lineEmptyContext());
         setFormat(0, 0, Format());
         return;
     }
 
-    Q_ASSERT(!m_context.isEmpty());
-    Q_ASSERT(!m_captureStack.isEmpty());
+    Q_ASSERT(!d->m_context.isEmpty());
+    Q_ASSERT(!d->m_captureStack.isEmpty());
     int firstNonSpace = firstNonSpaceChar(text);
     if (firstNonSpace < 0) {
         firstNonSpace = text.size();
     }
     int offset = 0, beginOffset = 0;
-    auto currentFormat = m_context.top()->attribute();
-    auto currentLookupContext = m_context.top();
+    auto currentFormat = d->m_context.top()->attribute();
+    auto currentLookupContext = d->m_context.top();
     bool lineContinuation = false;
     QHash<Rule*, int> skipOffsets;
 
@@ -109,7 +130,7 @@ void AbstractHighlighter::highlightLine(const QString& text)
         int newOffset = 0;
         QString newFormat;
         auto newLookupContext = currentLookupContext;
-        foreach (auto rule, m_context.top()->rules()) {
+        foreach (auto rule, d->m_context.top()->rules()) {
             if (skipOffsets.value(rule.get()) > offset)
                 continue;
 
@@ -123,7 +144,7 @@ void AbstractHighlighter::highlightLine(const QString& text)
                 continue;
             }
 
-            const auto newResult = rule->match(text, offset, m_captureStack.top());
+            const auto newResult = rule->match(text, offset, d->m_captureStack.top());
             newOffset = newResult.offset();
             if (newResult.skipOffset() > newOffset)
                 skipOffsets.insert(rule.get(), newResult.skipOffset());
@@ -132,14 +153,14 @@ void AbstractHighlighter::highlightLine(const QString& text)
 
             if (rule->isLookAhead()) {
                 Q_ASSERT(!rule->context().isStay());
-                switchContext(rule->context(), newResult.captures());
+                d->switchContext(rule->context(), newResult.captures());
                 isLookAhead = true;
                 break;
             }
 
-            newLookupContext = m_context.top();
-            switchContext(rule->context(), newResult.captures());
-            newFormat = rule->attribute().isEmpty() ? m_context.top()->attribute() : rule->attribute();
+            newLookupContext = d->m_context.top();
+            d->switchContext(rule->context(), newResult.captures());
+            newFormat = rule->attribute().isEmpty() ? d->m_context.top()->attribute() : rule->attribute();
             if (newOffset == text.size() && std::dynamic_pointer_cast<LineContinue>(rule))
                 lineContinuation = true;
             break;
@@ -148,14 +169,14 @@ void AbstractHighlighter::highlightLine(const QString& text)
             continue;
 
         if (newOffset <= offset) { // no matching rule
-            if (m_context.top()->fallthrough()) {
-                switchContext(m_context.top()->fallthroughContext());
+            if (d->m_context.top()->fallthrough()) {
+                d->switchContext(d->m_context.top()->fallthroughContext());
                 continue;
             }
 
             newOffset = offset + 1;
-            newFormat = m_context.top()->attribute();
-            newLookupContext = m_context.top();
+            newFormat = d->m_context.top()->attribute();
+            newLookupContext = d->m_context.top();
         }
 
         if (newFormat != currentFormat /*|| currentLookupDef != newLookupDef*/) {
@@ -173,13 +194,13 @@ void AbstractHighlighter::highlightLine(const QString& text)
     if (beginOffset < offset)
         setFormat(beginOffset, text.size() - beginOffset, currentLookupContext->formatByName(currentFormat));
 
-    while (!m_context.top()->lineEndContext().isStay() && !lineContinuation) {
-        if (!switchContext(m_context.top()->lineEndContext()))
+    while (!d->m_context.top()->lineEndContext().isStay() && !lineContinuation) {
+        if (!d->switchContext(d->m_context.top()->lineEndContext()))
             break;
     }
 }
 
-bool AbstractHighlighter::switchContext(const ContextSwitch &contextSwitch, const QStringList &captures)
+bool AbstractHighlighterPrivate::switchContext(const ContextSwitch &contextSwitch, const QStringList &captures)
 {
     Q_ASSERT(!m_context.isEmpty());
     Q_ASSERT(m_context.size() == m_captureStack.size());

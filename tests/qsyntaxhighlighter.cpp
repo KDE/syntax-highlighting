@@ -16,7 +16,9 @@
 */
 
 #include <syntaxhighlighter.h>
+#include <definition.h>
 #include <repository.h>
+#include <theme.h>
 
 #include <QApplication>
 #include <QCommandLineParser>

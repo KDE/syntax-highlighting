@@ -19,19 +19,19 @@
 #define SYNTAXHIGHLIGHTING_ABSTRACTHIGHLIGHTERM_H
 
 #include "kf5syntaxhighlighting_export.h"
-#include "definition.h"
-#include "theme.h"
 
-#include <QStack>
-#include <QStringList>
+#include <qglobal.h>
+
+#include <memory>
 
 class QString;
 
 namespace SyntaxHighlighting {
 
-class Context;
-class ContextSwitch;
+class AbstractHighlighterPrivate;
+class Definition;
 class Format;
+class Theme;
 
 /** Abstract base class for highlighters. */
 class KF5SYNTAXHIGHLIGHTING_EXPORT AbstractHighlighter
@@ -59,12 +59,8 @@ protected:
     virtual void setFormat(int offset, int length, const Format &format);
 
 private:
-    bool switchContext(const ContextSwitch &contextSwitch, const QStringList &captures = QStringList());
-
-    Definition m_definition;
-    QStack<Context*> m_context;
-    QStack<QStringList> m_captureStack;
-    Theme m_theme;
+    Q_DISABLE_COPY(AbstractHighlighter)
+    std::unique_ptr<AbstractHighlighterPrivate> d;
 };
 }
 

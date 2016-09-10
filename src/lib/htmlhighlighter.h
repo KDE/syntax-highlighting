@@ -21,6 +21,8 @@
 #include "kf5syntaxhighlighting_export.h"
 #include "abstracthighlighter.h"
 
+#include <QString>
+
 #include <memory>
 
 class QFile;

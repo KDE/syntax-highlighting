@@ -38,16 +38,33 @@ class Definition;
 class KF5SYNTAXHIGHLIGHTING_EXPORT Repository
 {
 public:
+    /** Create a new syntax definition repository.
+     *  This will read the meta data information of all available syntax
+     *  definition, which is a moderately expensive operation, it's therefore
+     *  recommended to keep a single instance of Repository around as long
+     *  as you need highlighting in your application.
+     */
     Repository();
     ~Repository();
 
+    /** Returns the definition named @p defName.
+     *  Note: This uses untranslated names.
+     */
     Definition definitionForName(const QString &defName) const;
+    /** Returns the best matching definition for a file named @p fileName.
+     *  This matches the file name against the supported file name patterns
+     *  of the definition, if multiple matches are found, the one with the
+     *  highest priority is returned.
+     */
     Definition definitionForFileName(const QString &fileName) const;
+    /** Returns all available definition.
+     *  Definitions are ordered by translated section and translated names,
+     *  for consistent displaying.
+     */
     QVector<Definition> definitions() const;
 
 private:
     Q_DISABLE_COPY(Repository)
-
     std::unique_ptr<RepositoryPrivate> d;
 };
 

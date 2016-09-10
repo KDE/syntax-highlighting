@@ -20,6 +20,7 @@
 
 #include <QFileInfo>
 #include <QObject>
+#include <QStandardPaths>
 #include <QtTest/qtest.h>
 
 namespace SyntaxHighlighting {
@@ -31,6 +32,11 @@ private:
         Repository m_repo;
 
 private Q_SLOTS:
+    void initTestCase()
+    {
+        QStandardPaths::enableTestMode(true);
+    }
+
     void testDefinitionByExtension_data()
     {
         QTest::addColumn<QString>("fileName");

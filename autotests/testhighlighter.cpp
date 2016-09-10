@@ -26,6 +26,7 @@
 #include <QFile>
 #include <QObject>
 #include <QProcess>
+#include <QStandardPaths>
 #include <QTextStream>
 #include <QtTest/qtest.h>
 
@@ -85,6 +86,7 @@ private:
 private Q_SLOTS:
     void initTestCase()
     {
+        QStandardPaths::enableTestMode(true);
         m_repo = new Repository;
     }
 

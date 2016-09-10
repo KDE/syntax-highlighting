@@ -24,6 +24,7 @@
 #include <QDirIterator>
 #include <QObject>
 #include <QProcess>
+#include <QStandardPaths>
 #include <QtTest/qtest.h>
 
 using namespace SyntaxHighlighting;
@@ -40,6 +41,7 @@ private:
 private Q_SLOTS:
     void initTestCase()
     {
+        QStandardPaths::enableTestMode(true);
         m_repo = new Repository;
     }
 

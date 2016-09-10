@@ -33,21 +33,29 @@ class Context;
 class ContextSwitch;
 class Format;
 
+/** Abstract base class for highlighters. */
 class KF5SYNTAXHIGHLIGHTING_EXPORT AbstractHighlighter
 {
 public:
     AbstractHighlighter();
     virtual ~AbstractHighlighter();
 
+    /** The syntax definition used for highlighting. */
     Definition definition() const;
+    /** Sets the syntax definition used for highlighting. */
     void setDefinition(const Definition &def);
 
     Theme theme() const;
     void setTheme(const Theme &theme);
 
 protected:
+    /** Highlight the given line. Call this from your derived class
+     *  where appropriate. This will result in any number of setFormat()
+     *  calls as a result.
+     */
     void highlightLine(const QString &text);
     void reset();
+    /** Reimplement this to apply formats to your output. */
     virtual void setFormat(int offset, int length, const Format &format);
 
 private:

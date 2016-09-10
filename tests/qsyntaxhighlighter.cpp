@@ -31,14 +31,14 @@ int main(int argc, char **argv)
 
     QCommandLineParser parser;
     parser.addHelpOption();
-    parser.addPositionalArgument(QStringLiteral("source"), app.tr("The source file to highlight."));
+    parser.addPositionalArgument(QStringLiteral("source"), QStringLiteral("The source file to highlight."));
     QCommandLineOption outputName(QStringList() << QStringLiteral("o") << QStringLiteral("output"),
-                                  app.tr("File to write HTML output to (default: stdout)."),
-                                  app.tr("output"));
+                                  QStringLiteral("File to write HTML output to (default: stdout)."),
+                                  QStringLiteral("output"));
     parser.addOption(outputName);
     QCommandLineOption syntaxName(QStringList() << QStringLiteral("s") << QStringLiteral("syntax"),
-                                  app.tr("Highlight using this syntax definition (default: auto-detect based on input file)."),
-                                  app.tr("syntax"));
+                                  QStringLiteral("Highlight using this syntax definition (default: auto-detect based on input file)."),
+                                  QStringLiteral("syntax"));
     parser.addOption(syntaxName);
     parser.process(app);
 

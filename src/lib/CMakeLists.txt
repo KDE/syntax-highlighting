@@ -1,4 +1,4 @@
-ecm_create_qm_loader(syntax_highlighting_QM_LOADER syntaxhighlighting)
+ecm_create_qm_loader(syntax_highlighting_QM_LOADER syntaxhighlighting5_qt)
 
 set(syntax_highlighting_srcs
     abstracthighlighter.cpp

@@ -39,6 +39,13 @@ find_package(Perl REQUIRED)
 set_package_properties(Perl PROPERTIES PURPOSE "Auto-generate PHP syntax definition files.")
 
 #
+# Translations
+#
+if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/po")
+    ecm_install_po_files_as_qm(po)
+endif()
+
+#
 # Actually build the stuff
 #
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

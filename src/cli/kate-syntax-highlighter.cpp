@@ -38,27 +38,28 @@ int main(int argc, char **argv)
     QCoreApplication::setApplicationVersion(QStringLiteral(SyntaxHighlighting_VERSION_STRING));
 
     QCommandLineParser parser;
-    parser.setApplicationDescription(app.tr("Command line syntax highlighter using Kate syntax definitions."));
+    parser.setApplicationDescription(app.translate("SyntaxHighlightingCLI", "Command line syntax highlighter using Kate syntax definitions."));
     parser.addHelpOption();
     parser.addVersionOption();
-    parser.addPositionalArgument(QStringLiteral("source"), app.tr("The source file to highlight."));
+    parser.addPositionalArgument(app.translate("SyntaxHighlightingCLI", "source"),
+                                 app.translate("SyntaxHighlightingCLI", "The source file to highlight."));
 
     QCommandLineOption listDefs(QStringList() << QStringLiteral("l") << QStringLiteral("list"),
-                                app.tr("List all available syntax definitions."));
+                                app.translate("SyntaxHighlightingCLI", "List all available syntax definitions."));
     parser.addOption(listDefs);
 
     QCommandLineOption updateDefs(QStringList() << QStringLiteral("u") << QStringLiteral("update"),
-                                  app.tr("Download new/updated syntax definitions."));
+                                  app.translate("SyntaxHighlightingCLI", "Download new/updated syntax definitions."));
     parser.addOption(updateDefs);
 
     QCommandLineOption outputName(QStringList() << QStringLiteral("o") << QStringLiteral("output"),
-                                  app.tr("File to write HTML output to (default: stdout)."),
-                                  app.tr("output"));
+                                  app.translate("SyntaxHighlightingCLI", "File to write HTML output to (default: stdout)."),
+                                  app.translate("SyntaxHighlightingCLI", "output"));
     parser.addOption(outputName);
 
     QCommandLineOption syntaxName(QStringList() << QStringLiteral("s") << QStringLiteral("syntax"),
-                                  app.tr("Highlight using this syntax definition (default: auto-detect based on input file)."),
-                                  app.tr("syntax"));
+                                  app.translate("SyntaxHighlightingCLI", "Highlight using this syntax definition (default: auto-detect based on input file)."),
+                                  app.translate("SyntaxHighlightingCLI", "syntax"));
     parser.addOption(syntaxName);
 
     // TODO select style

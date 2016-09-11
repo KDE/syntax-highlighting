@@ -80,5 +80,6 @@ install(EXPORT KF5SyntaxHighlightingTargets
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/syntaxhighlighting_version.h"
         DESTINATION "${INCLUDE_INSTALL_DIR}"
         COMPONENT Devel)
+install(FILES org_kde_syntax-highlighting.categories DESTINATION ${KDE_INSTALL_CONFDIR})
 
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)

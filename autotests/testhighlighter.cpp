@@ -44,6 +44,7 @@ public:
             return;
         }
         m_out.setDevice(&outFile);
+        m_out.setCodec("UTF-8");
 
         QFile f(inFileName);
         if (!f.open(QFile::ReadOnly)) {
@@ -52,6 +53,7 @@ public:
         }
 
         QTextStream in(&f);
+        in.setCodec("UTF-8");
         State state;
         while (!in.atEnd()) {
             m_currentLine = in.readLine();

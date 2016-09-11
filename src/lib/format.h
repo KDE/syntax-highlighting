@@ -19,29 +19,59 @@
 #define SYNTAXHIGHLIGHTING_FORMAT_H
 
 #include "kf5syntaxhighlighting_export.h"
-#include "theme.h"
 
-#include <QColor>
-#include <QString>
+#include <memory>
 
+class QColor;
+class QString;
 class QXmlStreamReader;
 
 namespace SyntaxHighlighting {
 
+class FormatPrivate;
+class Theme;
+
+/** Describes the format to be used for a specific text fragment.
+ *  The actual format used for displaying is merged from the format information
+ *  in the syntax definition file, and a theme.
+ *
+ *  @see Theme
+ */
 class KF5SYNTAXHIGHLIGHTING_EXPORT Format
 {
 public:
+    /** Creates an empty/invalid format. */
     Format();
     ~Format();
 
+    /** Returns @c true if this is a valid format, ie. one that
+     *  was read from a syntax definition file.
+     */
     bool isValid() const;
 
+    /** The name of this format as used in the syntax definition file. */
     QString name() const;
+
+    /** Returns @c true if the combination of this format and the theme @p theme
+     *  do not change the default text format in any way.
+     */
     bool isNormal(const Theme &theme) const;
 
+    /** Returns @c true if the combination of this format and the theme @p theme
+     *  change the foreground color.
+     */
     bool hasColor(const Theme &theme) const;
+    /** Returns the foreground color of the combination of this format and the
+     *  given theme.
+     */
     QColor color(const Theme &theme) const;
+    /** Returns @c true if the combination of this format and the theme @p theme
+     *  change the background color.
+     */
     bool hasBackgroundColor(const Theme &theme) const;
+    /** Returns the background color of the combination of this format and the
+     *  given theme.
+     */
     QColor backgroundColor(const Theme &theme) const;
 
     bool isBold(const Theme &theme) const;
@@ -49,20 +79,10 @@ public:
     bool isUnderline(const Theme &theme) const;
     bool isStrikeThrough(const Theme &theme) const;
 
-    void load(QXmlStreamReader &reader);
-
 private:
-    QString m_name;
-    QColor m_color;
-    QColor m_backgroundColor;
-    Theme::Style m_default;
-    bool m_italic;
-    bool m_bold;
-    bool m_underline;
-    bool m_strikeout;
-    bool m_hasColor;
-    bool m_hasSelColor;
-    bool m_hasBgColor;
+    friend class DefinitionPrivate;
+    void load(QXmlStreamReader &reader);
+    std::shared_ptr<FormatPrivate> d;
 };
 }
 

@@ -19,6 +19,7 @@
 #include "definition.h"
 #include "format.h"
 #include "state.h"
+#include "theme.h"
 #include "syntaxhighlighting_logging.h"
 
 #include <QDebug>

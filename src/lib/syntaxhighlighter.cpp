@@ -18,6 +18,7 @@
 #include "syntaxhighlighter.h"
 #include "format.h"
 #include "state.h"
+#include "theme.h"
 
 #include <QDebug>
 

@@ -16,12 +16,33 @@
 */
 
 #include "format.h"
+#include "theme.h"
 #include "xml_p.h"
 
+#include <QColor>
 #include <QDebug>
 #include <QXmlStreamReader>
 
 using namespace SyntaxHighlighting;
+
+namespace SyntaxHighlighting {
+class FormatPrivate
+{
+public:
+    FormatPrivate();
+    QString name;
+    QColor color;
+    QColor backgroundColor;
+    Theme::Style defaultStyle;
+    bool italic;
+    bool bold;
+    bool underline;
+    bool strikeout;
+    bool hasColor;
+    bool hasSelColor;
+    bool hasBgColor;
+};
+}
 
 static Theme::Style stringToDefaultFormat(const QStringRef &str)
 {
@@ -61,15 +82,19 @@ static Theme::Style stringToDefaultFormat(const QStringRef &str)
     return Theme::Normal;
 }
 
-Format::Format() :
-    m_default(Theme::Normal),
-    m_italic(false),
-    m_bold(false),
-    m_underline(false),
-    m_strikeout(false),
-    m_hasColor(false),
-    m_hasSelColor(false),
-    m_hasBgColor(false)
+FormatPrivate::FormatPrivate() :
+    defaultStyle(Theme::Normal),
+    italic(false),
+    bold(false),
+    underline(false),
+    strikeout(false),
+    hasColor(false),
+    hasSelColor(false),
+    hasBgColor(false)
+{
+}
+
+Format::Format() : d(new FormatPrivate)
 {
 }
 
@@ -79,82 +104,82 @@ Format::~Format()
 
 bool Format::isValid() const
 {
-    return !m_name.isEmpty();
+    return !d->name.isEmpty();
 }
 
 QString Format::name() const
 {
-    return m_name;
+    return d->name;
 }
 
 bool Format::isNormal(const Theme &theme) const
 {
-    return !hasColor(theme) && !m_hasSelColor && !hasBackgroundColor(theme)
+    return !hasColor(theme) && !d->hasSelColor && !hasBackgroundColor(theme)
         && !isBold(theme) && !isItalic(theme) && !isUnderline(theme) && !isStrikeThrough(theme);
 }
 
 bool Format::hasColor(const Theme &theme) const
 {
-    return m_hasColor || (theme.normalColor(m_default) & 0xff000000);
+    return d->hasColor || (theme.normalColor(d->defaultStyle) & 0xff000000);
 }
 
 QColor Format::color(const Theme &theme) const
 {
-    if (m_hasColor)
-        return m_color;
-    return QColor(theme.normalColor(m_default));
+    if (d->hasColor)
+        return d->color;
+    return QColor(theme.normalColor(d->defaultStyle));
 }
 
 bool Format::hasBackgroundColor(const Theme &theme) const
 {
-    return m_hasBgColor || (theme.backgroundColor(m_default) & 0xff000000);
+    return d->hasBgColor || (theme.backgroundColor(d->defaultStyle) & 0xff000000);
 }
 
 QColor Format::backgroundColor(const Theme &theme) const
 {
-    if (m_hasBgColor)
-        return m_backgroundColor;
-    return QColor(theme.backgroundColor(m_default));
+    if (d->hasBgColor)
+        return d->backgroundColor;
+    return QColor(theme.backgroundColor(d->defaultStyle));
 }
 
 bool Format::isBold(const Theme &theme) const
 {
     // FIXME: an explicit false here should override theme
-    return m_bold || theme.isBold(m_default);
+    return d->bold || theme.isBold(d->defaultStyle);
 }
 
 bool Format::isItalic(const Theme &theme) const
 {
     // FIXME: an explicit false here should override theme
-    return m_italic || theme.isItalic(m_default);
+    return d->italic || theme.isItalic(d->defaultStyle);
 }
 
 bool Format::isUnderline(const Theme &theme) const
 {
     // FIXME: an explicit false here should override theme
-    return m_underline || theme.isUnderline(m_default);
+    return d->underline || theme.isUnderline(d->defaultStyle);
 }
 
 bool Format::isStrikeThrough(const Theme &theme) const
 {
     // FIXME: an explicit false here should override theme
-    return m_strikeout || theme.isStrikeThrough(m_default);
+    return d->strikeout || theme.isStrikeThrough(d->defaultStyle);
 }
 
 void Format::load(QXmlStreamReader& reader)
 {
-    m_name = reader.attributes().value(QStringLiteral("name")).toString();
-    m_default = stringToDefaultFormat(reader.attributes().value(QStringLiteral("defStyleNum")));
+    d->name = reader.attributes().value(QStringLiteral("name")).toString();
+    d->defaultStyle = stringToDefaultFormat(reader.attributes().value(QStringLiteral("defStyleNum")));
 
     auto colStr = reader.attributes().value(QStringLiteral("color"));
-    if ((m_hasColor = !colStr.isEmpty()))
-        m_color = QColor(colStr.toString());
+    if ((d->hasColor = !colStr.isEmpty()))
+        d->color = QColor(colStr.toString());
     colStr = reader.attributes().value(QStringLiteral("backgroundColor"));
-    if ((m_hasBgColor = !colStr.isEmpty()))
-        m_backgroundColor = QColor(colStr.toString());
+    if ((d->hasBgColor = !colStr.isEmpty()))
+        d->backgroundColor = QColor(colStr.toString());
 
-    m_italic = Xml::attrToBool(reader.attributes().value(QStringLiteral("italic")));
-    m_bold = Xml::attrToBool(reader.attributes().value(QStringLiteral("bold")));
-    m_underline = Xml::attrToBool(reader.attributes().value(QStringLiteral("underline")));
-    m_strikeout = Xml::attrToBool(reader.attributes().value(QStringLiteral("strikeOut")));
+    d->italic = Xml::attrToBool(reader.attributes().value(QStringLiteral("italic")));
+    d->bold = Xml::attrToBool(reader.attributes().value(QStringLiteral("bold")));
+    d->underline = Xml::attrToBool(reader.attributes().value(QStringLiteral("underline")));
+    d->strikeout = Xml::attrToBool(reader.attributes().value(QStringLiteral("strikeOut")));
 }

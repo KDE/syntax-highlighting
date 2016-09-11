@@ -43,6 +43,7 @@ public:
     QStringList topCaptures() const;
 
 private:
+    friend class State;
     QStack<Context*> m_contextStack;
     QStack<QStringList> m_captureStack;
 };

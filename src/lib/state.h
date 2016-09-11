@@ -42,6 +42,8 @@ public:
     ~State();
     State& operator=(const State &rhs);
 
+    bool operator==(const State &other);
+
 private:
     friend class StateData;
     QExplicitlySharedDataPointer<StateData> d;

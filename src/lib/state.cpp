@@ -88,3 +88,8 @@ State& State::operator=(const State &other)
     d = other.d;
     return *this;
 }
+
+bool State::operator==(const State &other)
+{
+    return d->m_contextStack == other.d->m_contextStack && d->m_captureStack == other.d->m_captureStack;
+}

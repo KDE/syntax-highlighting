@@ -20,6 +20,8 @@
 
 #include <QDebug>
 
+Q_DECLARE_METATYPE(QTextBlock)
+
 using namespace SyntaxHighlighting;
 
 namespace SyntaxHighlighting {
@@ -34,6 +36,7 @@ public:
 SyntaxHighlighter::SyntaxHighlighter(QObject* parent) :
     QSyntaxHighlighter(parent)
 {
+    qRegisterMetaType<QTextBlock>();
 }
 
 SyntaxHighlighter::~SyntaxHighlighter()
@@ -45,12 +48,25 @@ void SyntaxHighlighter::highlightBlock(const QString& text)
     State state;
     if (currentBlock().position() > 0) {
         const auto prevBlock = currentBlock().previous();
-        const auto data = dynamic_cast<TextBlockUserData*>(prevBlock.userData());
-        if (data)
-            state = data->state;
+        const auto prevData = dynamic_cast<TextBlockUserData*>(prevBlock.userData());
+        if (prevData)
+            state = prevData->state;
     }
     state = highlightLine(text, state);
-    setCurrentBlockUserData(new TextBlockUserData(state));
+
+    const auto data = dynamic_cast<TextBlockUserData*>(currentBlockUserData());
+    if (!data) { // first time we highlight this
+        setCurrentBlockUserData(new TextBlockUserData(state));
+        return;
+    }
+
+    if (data->state == state) // we ended up in the same state, so we are done here
+        return;
+    data->state = state;
+
+    const auto nextBlock = currentBlock().next();
+    if (nextBlock.isValid())
+        QMetaObject::invokeMethod(this, "rehighlightBlock", Qt::QueuedConnection, Q_ARG(QTextBlock, nextBlock));
 }
 
 void SyntaxHighlighter::setFormat(int offset, int length, const SyntaxHighlighting::Format& format)

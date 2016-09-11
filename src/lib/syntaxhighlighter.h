@@ -21,17 +21,20 @@
 #include "kf5syntaxhighlighting_export.h"
 
 #include "abstracthighlighter.h"
-#include "state.h"
 
 #include <QSyntaxHighlighter>
 
 namespace SyntaxHighlighting {
 
+/** A QSyntaxHighlighter implementation for use with QTextDocument.
+ *  This supports partial re-highlighting during editing.
+ */
 class KF5SYNTAXHIGHLIGHTING_EXPORT SyntaxHighlighter : public QSyntaxHighlighter, public AbstractHighlighter
 {
     Q_OBJECT
 public:
     explicit SyntaxHighlighter(QObject *parent = Q_NULLPTR);
+    explicit SyntaxHighlighter(QTextDocument *document);
     ~SyntaxHighlighter();
 
 protected:

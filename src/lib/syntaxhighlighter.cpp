@@ -17,6 +17,7 @@
 
 #include "syntaxhighlighter.h"
 #include "format.h"
+#include "state.h"
 
 #include <QDebug>
 
@@ -35,6 +36,12 @@ public:
 
 SyntaxHighlighter::SyntaxHighlighter(QObject* parent) :
     QSyntaxHighlighter(parent)
+{
+    qRegisterMetaType<QTextBlock>();
+}
+
+SyntaxHighlighter::SyntaxHighlighter(QTextDocument *document) :
+    QSyntaxHighlighter(document)
 {
     qRegisterMetaType<QTextBlock>();
 }

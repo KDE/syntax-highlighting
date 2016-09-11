@@ -15,10 +15,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "context.h"
+#include "context_p.h"
 #include "format.h"
 #include "repository.h"
-#include "rule.h"
+#include "rule_p.h"
 #include "syntaxhighlighting_logging.h"
 
 #include <QDebug>

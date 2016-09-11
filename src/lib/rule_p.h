@@ -15,12 +15,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_RULE_H
-#define SYNTAXHIGHLIGHTING_RULE_H
+#ifndef SYNTAXHIGHLIGHTING_RULE_P_H
+#define SYNTAXHIGHLIGHTING_RULE_P_H
 
-#include "keywordlist.h"
-#include "contextswitch.h"
-#include "matchresult.h"
+#include "keywordlist_p.h"
+#include "contextswitch_p.h"
+#include "matchresult_p.h"
 #include "definition.h"
 #include "definitionref_p.h"
 
@@ -241,4 +241,4 @@ private:
 
 }
 
-#endif // SYNTAXHIGHLIGHTING_RULE_H
+#endif // SYNTAXHIGHLIGHTING_RULE_P_H

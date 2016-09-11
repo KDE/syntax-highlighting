@@ -18,7 +18,7 @@
 #include "state.h"
 #include "state_p.h"
 
-#include "context.h"
+#include "context_p.h"
 
 #include <QStringList>
 

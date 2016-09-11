@@ -16,9 +16,9 @@
 */
 
 #include "abstracthighlighter.h"
-#include "context.h"
+#include "context_p.h"
 #include "format.h"
-#include "rule.h"
+#include "rule_p.h"
 #include "state.h"
 #include "state_p.h"
 #include "theme.h"

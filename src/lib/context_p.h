@@ -15,11 +15,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_CONTEXT_H
-#define SYNTAXHIGHLIGHTING_CONTEXT_H
+#ifndef SYNTAXHIGHLIGHTING_CONTEXT_P_H
+#define SYNTAXHIGHLIGHTING_CONTEXT_P_H
 
-#include "rule.h"
-#include "contextswitch.h"
+#include "rule_p.h"
+#include "contextswitch_p.h"
 #include "definition.h"
 #include "definitionref_p.h"
 
@@ -84,4 +84,4 @@ private:
 };
 }
 
-#endif // SYNTAXHIGHLIGHTING_CONTEXT_H
+#endif // SYNTAXHIGHLIGHTING_CONTEXT_P_H

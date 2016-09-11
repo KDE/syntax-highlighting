@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "matchresult.h"
+#include "matchresult_p.h"
 
 using namespace SyntaxHighlighting;
 

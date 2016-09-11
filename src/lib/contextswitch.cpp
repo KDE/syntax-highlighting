@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "contextswitch.h"
+#include "contextswitch_p.h"
 #include "definition.h"
 #include "repository.h"
 #include "syntaxhighlighting_logging.h"

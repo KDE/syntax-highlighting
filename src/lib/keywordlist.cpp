@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "keywordlist.h"
+#include "keywordlist_p.h"
 
 #include <QXmlStreamReader>
 

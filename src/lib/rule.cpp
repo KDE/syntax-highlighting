@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "rule.h"
+#include "rule_p.h"
 #include "syntaxhighlighting_logging.h"
 #include "xml_p.h"
 

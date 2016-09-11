@@ -19,9 +19,9 @@
 #include "definition.h"
 #include "definitionref_p.h"
 
-#include "context.h"
+#include "context_p.h"
 #include "format.h"
-#include "rule.h"
+#include "rule_p.h"
 #include "syntaxhighlighting_logging.h"
 #include "syntaxhighlighting_version.h"
 #include "xml_p.h"

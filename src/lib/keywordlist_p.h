@@ -15,36 +15,37 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_CONTEXTSWITCH_H
-#define SYNTAXHIGHLIGHTING_CONTEXTSWITCH_H
+#ifndef SYNTAXHIGHLIGHTING_KEYWORDLIST_P_H
+#define SYNTAXHIGHLIGHTING_KEYWORDLIST_P_H
 
+#include <QSet>
 #include <QString>
+#include <QVector>
+
+class QXmlStreamReader;
 
 namespace SyntaxHighlighting {
 
-class Context;
-class Definition;
-
-class ContextSwitch
+class KeywordList
 {
 public:
-    ContextSwitch();
-    ~ContextSwitch();
+    KeywordList();
+    ~KeywordList();
 
-    bool isStay() const;
+    bool isEmpty() const;
 
-    int popCount() const;
-    Context* context() const;
+    QString name() const;
 
-    void parse(const QStringRef &contextInstr);
-    void resolve(const Definition &def);
+    bool contains(const QStringRef &str) const;
+
+    void load(QXmlStreamReader &reader);
+    void setCaseSensitivity(Qt::CaseSensitivity caseSensitive);
 
 private:
-    QString m_defName;
-    QString m_contextName;
-    Context *m_context;
-    int m_popCount;
+    QString m_name;
+    QSet<QString> m_keywords;
+    Qt::CaseSensitivity m_caseSensitive;
 };
 }
 
-#endif // SYNTAXHIGHLIGHTING_CONTEXTSWITCH_H
+#endif // SYNTAXHIGHLIGHTING_KEYWORDLIST_P_H

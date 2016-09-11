@@ -21,14 +21,11 @@
 #include "kf5syntaxhighlighting_export.h"
 
 #include <QObject>
-
-class QNetworkAccessManager;
-class QNetworkReply;
-class QUrl;
-class QXmlStreamReader;
+#include <memory>
 
 namespace SyntaxHighlighting {
 
+class DownloaderPrivate;
 class Repository;
 
 class KF5SYNTAXHIGHLIGHTING_EXPORT Downloader : public QObject
@@ -45,16 +42,7 @@ Q_SIGNALS:
     void done();
 
 private:
-    void definitionListDownloadFinished(QNetworkReply *reply);
-    void updateDefinition(QXmlStreamReader &parser);
-    void downloadDefinition(const QUrl &url);
-    void downloadDefinitionFinished(QNetworkReply *reply);
-    void checkDone();
-
-    Repository *m_repo;
-    QNetworkAccessManager *m_nam;
-    QString m_downloadLocation;
-    int m_pendingDownloads;
+    std::unique_ptr<DownloaderPrivate> d;
 };
 }
 

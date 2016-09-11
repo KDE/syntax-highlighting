@@ -65,7 +65,6 @@ int main(int argc, char **argv)
 
     QTextEdit edit;
     edit.setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
-    edit.setReadOnly(true);
     edit.resize(1024, 1024);
     edit.show();
     auto hl = new SyntaxHighlighting::SyntaxHighlighter(&edit);

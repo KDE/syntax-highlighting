@@ -22,6 +22,15 @@
 
 using namespace SyntaxHighlighting;
 
+namespace SyntaxHighlighting {
+class TextBlockUserData : public QTextBlockUserData
+{
+public:
+    explicit TextBlockUserData(const State &s) : state(s) {}
+    State state;
+};
+}
+
 SyntaxHighlighter::SyntaxHighlighter(QObject* parent) :
     QSyntaxHighlighter(parent)
 {
@@ -33,9 +42,15 @@ SyntaxHighlighter::~SyntaxHighlighter()
 
 void SyntaxHighlighter::highlightBlock(const QString& text)
 {
-    if (currentBlock().position() == 0)
-        m_state = State();
-    m_state = highlightLine(text, m_state);
+    State state;
+    if (currentBlock().position() > 0) {
+        const auto prevBlock = currentBlock().previous();
+        const auto data = dynamic_cast<TextBlockUserData*>(prevBlock.userData());
+        if (data)
+            state = data->state;
+    }
+    state = highlightLine(text, state);
+    setCurrentBlockUserData(new TextBlockUserData(state));
 }
 
 void SyntaxHighlighter::setFormat(int offset, int length, const SyntaxHighlighting::Format& format)

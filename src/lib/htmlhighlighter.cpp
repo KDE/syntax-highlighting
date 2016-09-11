@@ -18,6 +18,7 @@
 #include "htmlhighlighter.h"
 #include "definition.h"
 #include "format.h"
+#include "state.h"
 #include "syntaxhighlighting_logging.h"
 
 #include <QDebug>
@@ -64,7 +65,7 @@ void HtmlHighlighter::highlightFile(const QString& fileName)
         return;
     }
 
-    reset();
+    State state;
     *m_out << "<!DOCTYPE html>\n";
     *m_out << "<html><head>\n";
     *m_out << "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>\n";
@@ -76,7 +77,7 @@ void HtmlHighlighter::highlightFile(const QString& fileName)
     QTextStream in(&f);
     while (!in.atEnd()) {
         m_currentLine = in.readLine();
-        highlightLine(m_currentLine);
+        state = highlightLine(m_currentLine, state);
         *m_out << "\n";
     }
 

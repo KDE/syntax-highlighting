@@ -34,8 +34,8 @@ SyntaxHighlighter::~SyntaxHighlighter()
 void SyntaxHighlighter::highlightBlock(const QString& text)
 {
     if (currentBlock().position() == 0)
-        reset();
-    highlightLine(text);
+        m_state = State();
+    m_state = highlightLine(text, m_state);
 }
 
 void SyntaxHighlighter::setFormat(int offset, int length, const SyntaxHighlighting::Format& format)

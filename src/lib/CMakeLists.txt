@@ -11,8 +11,9 @@ set(syntax_highlighting_srcs
     matchresult.cpp
     rule.cpp
     definition.cpp
-    syntaxhighlighter.cpp
     repository.cpp
+    state.cpp
+    syntaxhighlighter.cpp
     theme.cpp
     ${syntax_highlighting_QM_LOADER}
 )

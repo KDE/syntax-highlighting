@@ -15,32 +15,38 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_QSYNTAXHIGHLIGHTER_H
-#define SYNTAXHIGHLIGHTING_QSYNTAXHIGHLIGHTER_H
+#ifndef SYNTAXHIGHLIGHTING_STATE_H
+#define SYNTAXHIGHLIGHTING_STATE_H
 
 #include "kf5syntaxhighlighting_export.h"
 
-#include "abstracthighlighter.h"
-#include "state.h"
-
-#include <QSyntaxHighlighter>
+#include <QExplicitlySharedDataPointer>
 
 namespace SyntaxHighlighting {
 
-class KF5SYNTAXHIGHLIGHTING_EXPORT SyntaxHighlighter : public QSyntaxHighlighter, public AbstractHighlighter
-{
-    Q_OBJECT
-public:
-    explicit SyntaxHighlighter(QObject *parent = Q_NULLPTR);
-    ~SyntaxHighlighter();
+class StateData;
 
-protected:
-    void highlightBlock(const QString & text) Q_DECL_OVERRIDE;
-    void setFormat(int offset, int length, const Format &format) Q_DECL_OVERRIDE;
+/** Opaque handle to the state of the higlighting engine.
+ *  This needs to be fed into AbstractHighlighter for every line of text
+ *  and allows concrete highlighter implementations to store state per
+ *  line for fast re-highlighting of specific lines (e.g. during editing).
+ */
+class KF5SYNTAXHIGHLIGHTING_EXPORT State
+{
+public:
+    /** Creates an initial state, ie. what should be used for the first line
+     *  in a document.
+     */
+    State();
+    State(const State &other);
+    ~State();
+    State& operator=(const State &rhs);
 
 private:
-    State m_state; // TODO store this in QTextBlockUserData instead!
+    friend class StateData;
+    QExplicitlySharedDataPointer<StateData> d;
 };
+
 }
 
-#endif // SYNTAXHIGHLIGHTING_QSYNTAXHIGHLIGHTER_H
+#endif // SYNTAXHIGHLIGHTING_STATE_H

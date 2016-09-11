@@ -31,6 +31,7 @@ namespace SyntaxHighlighting {
 class AbstractHighlighterPrivate;
 class Definition;
 class Format;
+class State;
 class Theme;
 
 /** Abstract base class for highlighters. */
@@ -52,9 +53,16 @@ protected:
     /** Highlight the given line. Call this from your derived class
      *  where appropriate. This will result in any number of setFormat()
      *  calls as a result.
+     *  @param text A string containing the text of the line to highlight.
+     *  @param state The highlighting state handle returned by the call
+     *   to highlightLine() for the previous line.
+     *  @returns The state of the highlighing engine after processing the
+     *   given line. This needs to passed into highlightLine() in for the
+     *   the next line. You can store the state for efficient partial
+     *   re-highlighting for example during editing.
      */
-    void highlightLine(const QString &text);
-    void reset();
+    State highlightLine(const QString &text, const State &state);
+
     /** Reimplement this to apply formats to your output. */
     virtual void setFormat(int offset, int length, const Format &format) = 0;
 

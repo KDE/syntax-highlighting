@@ -17,9 +17,10 @@
 
 #include "test-config.h"
 
-#include <repository.h>
-#include <definition.h>
 #include <abstracthighlighter.h>
+#include <definition.h>
+#include <repository.h>
+#include <state.h>
 
 #include <QObject>
 #include <QtTest/qtest.h>
@@ -37,10 +38,10 @@ public:
             return;
         }
 
-        reset();
         QTextStream in(&f);
+        State state;
         while (!in.atEnd())
-            highlightLine(in.readLine());
+            state = highlightLine(in.readLine(), state);
     }
 
 protected:

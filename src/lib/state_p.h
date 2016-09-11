@@ -15,32 +15,38 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_QSYNTAXHIGHLIGHTER_H
-#define SYNTAXHIGHLIGHTING_QSYNTAXHIGHLIGHTER_H
+#ifndef SYNTAXHIGHLIGHTING_STATE_P_H
+#define SYNTAXHIGHLIGHTING_STATE_P_H
 
-#include "kf5syntaxhighlighting_export.h"
+#include <QSharedData>
+#include <QStack>
 
-#include "abstracthighlighter.h"
-#include "state.h"
+QT_BEGIN_NAMESPACE
+class QStringList;
+QT_END_NAMESPACE
 
-#include <QSyntaxHighlighter>
-
-namespace SyntaxHighlighting {
-
-class KF5SYNTAXHIGHLIGHTING_EXPORT SyntaxHighlighter : public QSyntaxHighlighter, public AbstractHighlighter
+namespace SyntaxHighlighting
 {
-    Q_OBJECT
-public:
-    explicit SyntaxHighlighter(QObject *parent = Q_NULLPTR);
-    ~SyntaxHighlighter();
 
-protected:
-    void highlightBlock(const QString & text) Q_DECL_OVERRIDE;
-    void setFormat(int offset, int length, const Format &format) Q_DECL_OVERRIDE;
+class Context;
+
+class StateData : public QSharedData
+{
+public:
+    static StateData* get(State &state);
+
+    bool isEmpty() const;
+    int size() const;
+    void push(Context *context, const QStringList &captures);
+    void pop();
+    Context* topContext() const;
+    QStringList topCaptures() const;
 
 private:
-    State m_state; // TODO store this in QTextBlockUserData instead!
+    QStack<Context*> m_contextStack;
+    QStack<QStringList> m_captureStack;
 };
+
 }
 
-#endif // SYNTAXHIGHLIGHTING_QSYNTAXHIGHLIGHTER_H
+#endif

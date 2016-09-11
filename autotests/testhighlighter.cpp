@@ -17,10 +17,11 @@
 
 #include "test-config.h"
 
-#include <repository.h>
-#include <definition.h>
 #include <abstracthighlighter.h>
+#include <definition.h>
 #include <format.h>
+#include <repository.h>
+#include <state.h>
 
 #include <QDirIterator>
 #include <QFile>
@@ -51,9 +52,10 @@ public:
         }
 
         QTextStream in(&f);
+        State state;
         while (!in.atEnd()) {
             m_currentLine = in.readLine();
-            highlightLine(m_currentLine);
+            state = highlightLine(m_currentLine, state);
             m_out << "<br/>\n";
         }
 

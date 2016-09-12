@@ -45,9 +45,9 @@ class Definition;
  *
  * @section repo_intro Introduction
  *
- * The Repository gives access to all syntax Definition%s available on the
- * system, typically described in *.xml files. The Defintion files are read
- * from the resouce that is compiled into the executable, and from the file
+ * The Repository gives access to all syntax Definitions available on the
+ * system, typically described in *.xml files. The Definition files are read
+ * from the resource that is compiled into the executable, and from the file
  * system. If a Definition exists in the resource and on the file system,
  * then the one from the file system is chosen.
  *

@@ -79,6 +79,11 @@ public:
     bool isUnderline(const Theme &theme) const;
     bool isStrikeThrough(const Theme &theme) const;
 
+    /**
+     * Returns whether characters with this format should be spell checked.
+     */
+    bool spellCheck() const;
+
 private:
     friend class DefinitionPrivate;
     void load(QXmlStreamReader &reader);

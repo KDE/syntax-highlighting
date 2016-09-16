@@ -38,6 +38,7 @@ public:
     bool bold;
     bool underline;
     bool strikeout;
+    bool spellCheck;
 
     // flags indicating wheter the itemData contains this info
     bool hasItalic;
@@ -94,6 +95,7 @@ FormatPrivate::FormatPrivate()
     , bold(false)
     , underline(false)
     , strikeout(false)
+    , spellCheck(true)
     , hasItalic(false)
     , hasBold(false)
     , hasUnderline(false)
@@ -168,6 +170,10 @@ bool Format::isStrikeThrough(const Theme &theme) const
 {
     return d->hasStrikeout ? d->strikeout : theme.isStrikeThrough(d->defaultStyle);
 }
+
+bool Format::spellCheck() const
+{
+    return d->spellCheck;
 }
 
 void Format::load(QXmlStreamReader& reader)
@@ -209,5 +215,10 @@ void Format::load(QXmlStreamReader& reader)
     if (!ref.isEmpty()) {
         d->hasStrikeout = true;
         d->strikeout = Xml::attrToBool(ref);
+    }
+
+    ref = reader.attributes().value(QStringLiteral("spellChecking"));
+    if (!ref.isEmpty()) {
+        d->spellCheck = Xml::attrToBool(ref);
     }
 }

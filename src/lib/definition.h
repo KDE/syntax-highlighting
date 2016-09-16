@@ -21,12 +21,11 @@
 #include "kf5syntaxhighlighting_export.h"
 
 #include <memory>
+#include <QChar>
+#include <QString>
 
-class QChar;
 class QJsonObject;
-class QString;
 template <typename T> class QVector;
-class QXmlStreamReader;
 
 namespace SyntaxHighlighting {
 
@@ -37,16 +36,60 @@ class Repository;
 
 class DefinitionPrivate;
 
-/** Represents syntax definition. */
+/**
+ * Represents a syntax definition.
+ *
+ * @section def_intro Introduction to Definitions
+ *
+ * A Definition is the short term for a syntax highlighting definition. It
+ * typically is defined in terms of an XML syntax highlighting file, containing
+ * all information about a particular syntax highlighting. This includes the
+ * highlighting of keywords, information about code folding regions, and
+ * indentation preferences.
+ *
+ * @section def_info General Information
+ *
+ * Each Definition contains a non-translated unique name() and a section().
+ * In addition, for putting this information e.g. into menus, the functions
+ * translatedName() and translatedSection() are provided. However, if isHidden()
+ * returns @e true, the Definition should not be visible in the UI. The location
+ * of the Definition can be obtained through filePath(), which either is the
+ * location on disk or a path to a compiled-in Qt resource.
+ *
+ * The supported files of a Definition are defined by the list of extensions(),
+ * and additionally by the list of mimeTypes(). Note, that extensions() returns
+ * wildcards that need to be matched against the filename of the file that
+ * requires highlighting. If multiple Definition%s match the file, then the one
+ * with higher priority() wins.
+ *
+ * @see Repository
+ */
 class KF5SYNTAXHIGHLIGHTING_EXPORT Definition
 {
 public:
-    /** Create an empty (invalid) Definition instance.
-     *  Use Repository to obtain valid instances.
+    /**
+     * Default constructor, creating an empty (invalid) Definition instance.
+     * isValid() for this instance returns @e false.
+     *
+     * Use the Repository instead to obtain valid instances.
      */
     Definition();
+
+    /**
+     * Copy constructor.
+     * Both this definition as well as @p other share the Definition data.
+     */
     Definition(const Definition &other);
+
+    /**
+     * Destructor.
+     */
     ~Definition();
+
+    /**
+     * Assignment operator.
+     * Both this definitino as well as @p rhs share the Definition data.
+     */
     Definition& operator=(const Definition &rhs);
 
     /** Checks whether this object refers to a valid syntax definition. */
@@ -70,11 +113,17 @@ public:
     QString translatedSection() const;
     /** Mime types associated with this syntax definition. */
     QVector<QString> mimeTypes() const;
-    /** File extensions associated with this syntax definition. */
+    /**
+     * File extensions associated with this syntax definition.
+     * The returned list contains wildcards.
+     */
     QVector<QString> extensions() const;
     /** Returns the definition version. */
     float version() const;
-    /** Returns the definition priority. */
+    /**
+     * Returns the definition priority.
+     * A Definition with higher priority wins over Definitions with lower priorities.
+     */
     int priority() const;
     /** Returns @c true if this is an internal definition that should not be
      * displayed to the user.

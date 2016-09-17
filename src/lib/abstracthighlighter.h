@@ -38,7 +38,6 @@ class Theme;
 class KF5SYNTAXHIGHLIGHTING_EXPORT AbstractHighlighter
 {
 public:
-    AbstractHighlighter();
     virtual ~AbstractHighlighter();
 
     /** The syntax definition used for highlighting. */
@@ -46,10 +45,14 @@ public:
     /** Sets the syntax definition used for highlighting. */
     void setDefinition(const Definition &def);
 
+    /** Returns the currently selected theme for highlighting. */
     Theme theme() const;
+    /** Sets the theme used for highlighting. */
     void setTheme(const Theme &theme);
 
 protected:
+    AbstractHighlighter();
+
     /** Highlight the given line. Call this from your derived class
      *  where appropriate. This will result in any number of setFormat()
      *  calls as a result.

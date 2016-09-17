@@ -74,9 +74,21 @@ public:
      */
     QColor backgroundColor(const Theme &theme) const;
 
+    /** Returns @c true if the combination of this format and the given theme
+     *  results in bold text formatting.
+     */
     bool isBold(const Theme &theme) const;
+    /** Returns @c true if the combination of this format and the given theme
+     *  results in italic text formatting.
+     */
     bool isItalic(const Theme &theme) const;
+    /** Returns @c true if the combination of this format and the given theme
+     *  results in underlined text.
+     */
     bool isUnderline(const Theme &theme) const;
+    /** Returns @c true if the combination of this format and the given theme
+     *  results in striked through text.
+     */
     bool isStrikeThrough(const Theme &theme) const;
 
     /**

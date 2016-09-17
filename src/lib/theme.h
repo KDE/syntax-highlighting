@@ -28,11 +28,19 @@ namespace SyntaxHighlighting {
 
 struct ThemeData;
 
+/** Color theme definition used for highlighting.
+ *  To determine the final output of highlighting a global theme (represented
+ *  by this class) and specific formating instructions of the corresponding
+ *  syntax definition (represented by the Format class) are merged.
+ *
+ *  @see Format
+ */
 class KF5SYNTAXHIGHLIGHTING_EXPORT Theme
 {
 public:
     ~Theme();
 
+    /** Default styles that can be referenced from syntax definition XML files. */
     enum Style {
         Normal,
         Keyword,
@@ -67,18 +75,32 @@ public:
         Others
     };
 
+    /** Returns the text color to be used for @p style.
+     *  @c 0 is returned for styles that do not specify a text color,
+     *  use the default text color in that case.
+     */
     QRgb normalColor(Style style) const;
+    /** Returns the background color to be used for @p style.
+     *  @c 0 is returned for styles that do not specify a background color,
+     *  use the default background color in that case.
+     */
     QRgb backgroundColor(Style style) const;
 
+    /** Returns whether the given style should be shown in bold. */
     bool isBold(Style style) const;
+    /** Returns whether the given style should be shown in italic. */
     bool isItalic(Style style) const;
+    /** Returns whether the given style should be shown underlined. */
     bool isUnderline(Style style) const;
+    /** Returns whether the given style should be shown striked through. */
     bool isStrikeThrough(Style style) const;
 
+    /** Built-in default theme types. */
     enum DefaultTheme {
         NormalTheme,
         DarkTheme
     };
+    /** Returns a default theme instance of the given type. */
     static Theme defaultTheme(DefaultTheme t = NormalTheme);
 
 private:

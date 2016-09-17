@@ -17,6 +17,7 @@
 
 #include "repository.h"
 #include "definition.h"
+#include "definition_p.h"
 
 #include <QDebug>
 #include <QDirIterator>
@@ -119,8 +120,9 @@ void RepositoryPrivate::loadFolder(Repository *repo, const QString &path)
     QDirIterator it(path);
     while (it.hasNext()) {
         Definition def;
-        def.setRepository(repo);
-        if (def.loadMetaData(it.next()))
+        auto defData = DefinitionData::get(def);
+        defData->repo = repo;
+        if (defData->loadMetaData(it.next()))
             addDefinition(def);
     }
 }
@@ -139,8 +141,9 @@ bool RepositoryPrivate::loadFolderFromIndex(Repository *repo, const QString &pat
         const auto fileName = QString(path + QLatin1Char('/') + it.key());
         const auto defMap = it.value().toObject();
         Definition def;
-        def.setRepository(repo);
-        if (def.loadMetaData(fileName, defMap))
+        auto defData = DefinitionData::get(def);
+        defData->repo = repo;
+        if (defData->loadMetaData(fileName, defMap))
             addDefinition(def);
     }
     return true;

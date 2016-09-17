@@ -94,11 +94,6 @@ Repository* Definition::repository() const
     return d->repo;
 }
 
-void Definition::setRepository(Repository* repo)
-{
-    d->repo = repo;
-}
-
 QString Definition::name() const
 {
     return d->name;
@@ -237,9 +232,9 @@ bool Definition::load()
     return true;
 }
 
-bool Definition::loadMetaData(const QString& definitionFileName)
+bool DefinitionData::loadMetaData(const QString& definitionFileName)
 {
-    d->fileName = definitionFileName;
+    fileName = definitionFileName;
 
     QFile file(definitionFileName);
     if (!file.open(QFile::ReadOnly))
@@ -251,32 +246,32 @@ bool Definition::loadMetaData(const QString& definitionFileName)
         if (token != QXmlStreamReader::StartElement)
             continue;
         if (reader.name() == QLatin1String("language")) {
-            return d->loadLanguage(reader);
+            return loadLanguage(reader);
         }
     }
 
     return false;
 }
 
-bool Definition::loadMetaData(const QString &fileName, const QJsonObject &obj)
+bool DefinitionData::loadMetaData(const QString &file, const QJsonObject &obj)
 {
-    d->name     = obj.value(QLatin1String("name")).toString();
-    d->section  = obj.value(QLatin1String("section")).toString();
-    d->version  = obj.value(QLatin1String("version")).toDouble();
-    d->priority = obj.value(QLatin1String("priority")).toInt();
-    d->style    = obj.value(QLatin1String("style")).toString();
-    d->author   = obj.value(QLatin1String("author")).toString();
-    d->license  = obj.value(QLatin1String("license")).toString();
-    d->indenter = obj.value(QLatin1String("indenter")).toString();
-    d->hidden   = obj.value(QLatin1String("hidden")).toBool();
-    d->fileName = fileName;
+    name     = obj.value(QLatin1String("name")).toString();
+    section  = obj.value(QLatin1String("section")).toString();
+    version  = obj.value(QLatin1String("version")).toDouble();
+    priority = obj.value(QLatin1String("priority")).toInt();
+    style    = obj.value(QLatin1String("style")).toString();
+    author   = obj.value(QLatin1String("author")).toString();
+    license  = obj.value(QLatin1String("license")).toString();
+    indenter = obj.value(QLatin1String("indenter")).toString();
+    hidden   = obj.value(QLatin1String("hidden")).toBool();
+    fileName = file;
 
     const auto exts = obj.value(QLatin1String("extensions")).toString();
     foreach (const auto &ext, exts.split(QLatin1Char(';'), QString::SkipEmptyParts))
-        d->extensions.push_back(ext);
+        extensions.push_back(ext);
     const auto mts = obj.value(QLatin1String("mimetype")).toString();
     foreach (const auto &mt, mts.split(QLatin1Char(';'), QString::SkipEmptyParts))
-        d->mimetypes.push_back(mt);
+        mimetypes.push_back(mt);
 
     return true;
 }

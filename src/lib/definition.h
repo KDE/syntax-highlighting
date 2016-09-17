@@ -145,13 +145,11 @@ private:
     friend class DefinitionData;
     friend class DefinitionRef;
     friend class KeywordListRule;
-    friend class RepositoryPrivate;
     friend class RepositoryTest;
     friend class Rule;
 
     // stuff needed by our friends, but should not be used externally
     Repository* repository() const;
-    void setRepository(Repository *repo);
 
     Context* initialContext() const;
     Context* contextByName(const QString &name) const;
@@ -162,8 +160,6 @@ private:
     Format formatByName(const QString &name) const;
 
     bool load();
-    bool loadMetaData(const QString &definitionFileName);
-    bool loadMetaData(const QString &fileName, const QJsonObject &obj);
 
     std::shared_ptr<DefinitionData> d;
 };

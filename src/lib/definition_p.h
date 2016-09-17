@@ -40,6 +40,9 @@ public:
     static DefinitionData* get(const Definition &def);
 
     bool isLoaded() const;
+    bool loadMetaData(const QString &definitionFileName);
+    bool loadMetaData(const QString &fileName, const QJsonObject &obj);
+
     bool loadLanguage(QXmlStreamReader &reader);
     void loadHighlighting(Definition *def, QXmlStreamReader &reader);
     void loadContexts(Definition *def, QXmlStreamReader &reader);

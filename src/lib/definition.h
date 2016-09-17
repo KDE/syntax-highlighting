@@ -34,7 +34,7 @@ class Format;
 class KeywordList;
 class Repository;
 
-class DefinitionPrivate;
+class DefinitionData;
 
 /**
  * Represents a syntax definition.
@@ -142,6 +142,7 @@ private:
     friend class AbstractHighlighter;
     friend class Context;
     friend class ContextSwitch;
+    friend class DefinitionData;
     friend class DefinitionRef;
     friend class KeywordListRule;
     friend class RepositoryPrivate;
@@ -164,7 +165,7 @@ private:
     bool loadMetaData(const QString &definitionFileName);
     bool loadMetaData(const QString &fileName, const QJsonObject &obj);
 
-    std::shared_ptr<DefinitionPrivate> d;
+    std::shared_ptr<DefinitionData> d;
 };
 
 }

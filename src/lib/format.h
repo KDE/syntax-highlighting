@@ -85,7 +85,7 @@ public:
     bool spellCheck() const;
 
 private:
-    friend class DefinitionPrivate;
+    friend class DefinitionData;
     void load(QXmlStreamReader &reader);
     std::shared_ptr<FormatPrivate> d;
 };

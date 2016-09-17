@@ -44,7 +44,7 @@ public:
     Definition definition() const;
 
 private:
-    std::weak_ptr<DefinitionPrivate> d;
+    std::weak_ptr<DefinitionData> d;
 };
 
 }

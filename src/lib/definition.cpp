@@ -17,6 +17,7 @@
 
 
 #include "definition.h"
+#include "definition_p.h"
 #include "definitionref_p.h"
 
 #include "context_p.h"
@@ -38,44 +39,7 @@
 
 using namespace SyntaxHighlighting;
 
-namespace SyntaxHighlighting {
-class DefinitionPrivate
-{
-public:
-    DefinitionPrivate();
-    ~DefinitionPrivate();
-
-    bool isLoaded() const;
-    bool loadLanguage(QXmlStreamReader &reader);
-    void loadHighlighting(Definition *def, QXmlStreamReader &reader);
-    void loadContexts(Definition *def, QXmlStreamReader &reader);
-    void loadItemData(QXmlStreamReader &reader);
-    void loadGeneral(QXmlStreamReader &reader);
-    bool checkKateVersion(const QStringRef &verStr);
-
-    Repository *repo;
-    QHash<QString, KeywordList> keywordLists;
-    QVector<Context*> contexts;
-    QHash<QString, Format> formats;
-    QString delimiters;
-
-    QString fileName;
-    QString name;
-    QString section;
-    QString style;
-    QString indenter;
-    QString author;
-    QString license;
-    QVector<QString> mimetypes;
-    QVector<QString> extensions;
-    Qt::CaseSensitivity caseSensitive;
-    float version;
-    int priority;
-    bool hidden;
-};
-}
-
-DefinitionPrivate::DefinitionPrivate() :
+DefinitionData::DefinitionData() :
     repo(Q_NULLPTR),
     delimiters(QStringLiteral(".():!+,-<=>%&*/;?[]^{|}~\\ \t")),
     caseSensitive(Qt::CaseSensitive),
@@ -85,13 +49,18 @@ DefinitionPrivate::DefinitionPrivate() :
 {
 }
 
-DefinitionPrivate::~DefinitionPrivate()
+DefinitionData::~DefinitionData()
 {
     qDeleteAll(contexts);
 }
 
+DefinitionData* DefinitionData::get(const Definition &def)
+{
+    return def.d.get();
+}
+
 Definition::Definition() :
-    d(new DefinitionPrivate)
+    d(new DefinitionData)
 {
 }
 
@@ -229,7 +198,7 @@ Format Definition::formatByName(const QString& name) const
     return Format();
 }
 
-bool DefinitionPrivate::isLoaded() const
+bool DefinitionData::isLoaded() const
 {
     return !contexts.isEmpty();
 }
@@ -312,7 +281,7 @@ bool Definition::loadMetaData(const QString &fileName, const QJsonObject &obj)
     return true;
 }
 
-bool DefinitionPrivate::loadLanguage(QXmlStreamReader &reader)
+bool DefinitionData::loadLanguage(QXmlStreamReader &reader)
 {
     Q_ASSERT(reader.name() == QLatin1String("language"));
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
@@ -340,7 +309,7 @@ bool DefinitionPrivate::loadLanguage(QXmlStreamReader &reader)
     return true;
 }
 
-void DefinitionPrivate::loadHighlighting(Definition *def, QXmlStreamReader& reader)
+void DefinitionData::loadHighlighting(Definition *def, QXmlStreamReader& reader)
 {
     Q_ASSERT(reader.name() == QLatin1String("highlighting"));
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
@@ -370,7 +339,7 @@ void DefinitionPrivate::loadHighlighting(Definition *def, QXmlStreamReader& read
     }
 }
 
-void DefinitionPrivate::loadContexts(Definition *def, QXmlStreamReader& reader)
+void DefinitionData::loadContexts(Definition *def, QXmlStreamReader& reader)
 {
     Q_ASSERT(reader.name() == QLatin1String("contexts"));
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
@@ -395,7 +364,7 @@ void DefinitionPrivate::loadContexts(Definition *def, QXmlStreamReader& reader)
     }
 }
 
-void DefinitionPrivate::loadItemData(QXmlStreamReader& reader)
+void DefinitionData::loadItemData(QXmlStreamReader& reader)
 {
     Q_ASSERT(reader.name() == QLatin1String("itemDatas"));
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
@@ -420,7 +389,7 @@ void DefinitionPrivate::loadItemData(QXmlStreamReader& reader)
     }
 }
 
-void DefinitionPrivate::loadGeneral(QXmlStreamReader& reader)
+void DefinitionData::loadGeneral(QXmlStreamReader& reader)
 {
     Q_ASSERT(reader.name() == QLatin1String("general"));
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
@@ -452,7 +421,7 @@ void DefinitionPrivate::loadGeneral(QXmlStreamReader& reader)
     }
 }
 
-bool DefinitionPrivate::checkKateVersion(const QStringRef& verStr)
+bool DefinitionData::checkKateVersion(const QStringRef& verStr)
 {
     const auto idx = verStr.indexOf(QLatin1Char('.'));
     if (idx <= 0) {

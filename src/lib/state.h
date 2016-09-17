@@ -42,6 +42,11 @@ public:
     ~State();
     State& operator=(const State &rhs);
 
+    /** Compares two states.
+     *  For two equal states and identical text input, AbstractHighlighter
+     *  guarantees to produce equal results. This can be used to only
+     *  re-highight as many lines as necessary during editing.
+     */
     bool operator==(const State &other);
 
 private:

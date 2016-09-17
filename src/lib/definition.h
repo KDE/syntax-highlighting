@@ -87,7 +87,7 @@ public:
 
     /**
      * Assignment operator.
-     * Both this definitino as well as @p rhs share the Definition data.
+     * Both this definition as well as @p rhs share the Definition data.
      */
     Definition& operator=(const Definition &rhs);
 

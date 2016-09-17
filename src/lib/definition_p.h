@@ -43,6 +43,8 @@ public:
     bool loadMetaData(const QString &definitionFileName);
     bool loadMetaData(const QString &fileName, const QJsonObject &obj);
 
+    void clear();
+
     bool loadLanguage(QXmlStreamReader &reader);
     void loadHighlighting(Definition *def, QXmlStreamReader &reader);
     void loadContexts(Definition *def, QXmlStreamReader &reader);

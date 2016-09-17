@@ -15,8 +15,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <repository.h>
+#include <abstracthighlighter.h>
 #include <definition.h>
+#include <repository.h>
+#include <state.h>
 
 #include <QFileInfo>
 #include <QObject>
@@ -24,6 +26,18 @@
 #include <QtTest/qtest.h>
 
 namespace SyntaxHighlighting {
+
+class NullHighlighter : public AbstractHighlighter
+{
+public:
+    using AbstractHighlighter::highlightLine;
+    void setFormat(int offset, int length, const Format &format) Q_DECL_OVERRIDE
+    {
+        Q_UNUSED(offset);
+        Q_UNUSED(length);
+        Q_UNUSED(format);
+    }
+};
 
 class RepositoryTest : public QObject
 {
@@ -104,6 +118,25 @@ private Q_SLOTS:
         QVERIFY(def.isValid());
         QVERIFY(def.extensions().contains(QLatin1String("httpd.conf")));
         QVERIFY(def.extensions().contains(QLatin1String(".htaccess*")));
+    }
+
+    void testReload()
+    {
+        auto def = m_repo.definitionForName(QLatin1String("QML"));
+        QVERIFY(!m_repo.definitions().isEmpty());
+        QVERIFY(def.isValid());
+
+        NullHighlighter hl;
+        hl.setDefinition(def);
+        hl.highlightLine(QLatin1String("/* TODO this should not crash */"), State());
+
+        m_repo.reload();
+        QVERIFY(!m_repo.definitions().isEmpty());
+        QVERIFY(!def.isValid());
+
+        hl.highlightLine(QLatin1String("/* TODO this should not crash */"), State());
+        QVERIFY(hl.definition().isValid());
+        QCOMPARE(hl.definition().name(), QLatin1String("QML"));
     }
 };
 }

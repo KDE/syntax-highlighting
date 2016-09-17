@@ -138,7 +138,7 @@ public:
     QString license() const;
 
 private:
-    friend class AbstractHighlighter;
+    friend class AbstractHighlighterPrivate;
     friend class Context;
     friend class ContextSwitch;
     friend class DefinitionData;

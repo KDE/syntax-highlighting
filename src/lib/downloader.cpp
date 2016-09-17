@@ -41,6 +41,7 @@ public:
     QNetworkAccessManager *nam;
     QString downloadLocation;
     int pendingDownloads;
+    bool needsReload;
 
     void definitionListDownloadFinished(QNetworkReply *reply);
     void updateDefinition(QXmlStreamReader &parser);
@@ -108,6 +109,7 @@ void DownloaderPrivate::downloadDefinition(const QUrl& downloadUrl)
         downloadDefinitionFinished(reply);
     });
     ++pendingDownloads;
+    needsReload = true;
 }
 
 void DownloaderPrivate::downloadDefinitionFinished(QNetworkReply *reply)
@@ -139,10 +141,13 @@ void DownloaderPrivate::downloadDefinitionFinished(QNetworkReply *reply)
 
 void DownloaderPrivate::checkDone()
 {
-    if (pendingDownloads == 0)
-        emit QTimer::singleShot(0, q, &Downloader::done);
-}
+    if (pendingDownloads == 0) {
+        if (needsReload)
+            repo->reload();
 
+        emit QTimer::singleShot(0, q, &Downloader::done);
+    }
+}
 
 
 Downloader::Downloader(Repository *repo, QObject *parent)
@@ -155,6 +160,7 @@ Downloader::Downloader(Repository *repo, QObject *parent)
     d->repo = repo;
     d->nam = new QNetworkAccessManager(this);
     d->pendingDownloads = 0;
+    d->needsReload = false;
 
     d->downloadLocation = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QStringLiteral("/org.kde.syntax-highlighting/syntax");
     QDir().mkpath(d->downloadLocation);

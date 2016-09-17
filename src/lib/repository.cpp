@@ -18,6 +18,7 @@
 #include "repository.h"
 #include "definition.h"
 #include "definition_p.h"
+#include "syntaxhighlighting_logging.h"
 
 #include <QDebug>
 #include <QDirIterator>
@@ -160,4 +161,14 @@ void RepositoryPrivate::addDefinition(const Definition &def)
     if (it.value().version() >= def.version())
         return;
     m_defs.insert(def.name(), def);
+}
+
+void Repository::reload()
+{
+    qCDebug(Log) << "Reloading syntax definitions!";
+    foreach (auto def, d->m_sortedDefs)
+        DefinitionData::get(def)->clear();
+    d->m_defs.clear();
+    d->m_sortedDefs.clear();
+    d->load(this);
 }

@@ -19,9 +19,11 @@
 #include "context_p.h"
 #include "definition_p.h"
 #include "format.h"
+#include "repository.h"
 #include "rule_p.h"
 #include "state.h"
 #include "state_p.h"
+#include "syntaxhighlighting_logging.h"
 #include "theme.h"
 
 #include <QDebug>
@@ -34,6 +36,7 @@ class AbstractHighlighterPrivate
 {
 public:
     AbstractHighlighterPrivate();
+    void ensureDefinitionLoaded();
     bool switchContext(StateData* data, const ContextSwitch &contextSwitch, const QStringList &captures);
 
     Definition m_definition;
@@ -44,6 +47,18 @@ public:
 AbstractHighlighterPrivate::AbstractHighlighterPrivate() :
     m_theme(Theme::defaultTheme())
 {
+}
+
+void AbstractHighlighterPrivate::ensureDefinitionLoaded()
+{
+    auto defData = DefinitionData::get(m_definition);
+    if (Q_UNLIKELY(!m_definition.isValid() && defData->repo && !m_definition.name().isEmpty())) {
+        qCDebug(Log) << "Definition became invalid, trying re-lookup.";
+        m_definition = defData->repo->definitionForName(m_definition.name());
+    }
+
+    if (m_definition.isValid())
+        m_definition.load();
 }
 
 /**
@@ -77,8 +92,6 @@ Definition AbstractHighlighter::definition() const
 void AbstractHighlighter::setDefinition(const Definition &def)
 {
     d->m_definition = def;
-    if (d->m_definition.isValid())
-        d->m_definition.load();
 }
 
 Theme AbstractHighlighter::theme() const
@@ -93,6 +106,7 @@ void AbstractHighlighter::setTheme(const Theme &theme)
 
 State AbstractHighlighter::highlightLine(const QString& text, const State &state)
 {
+    d->ensureDefinitionLoaded();
     if (!d->m_definition.isValid()) {
         setFormat(0, text.size(), Format());
         return State();

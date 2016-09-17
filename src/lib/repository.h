@@ -103,6 +103,13 @@ public:
      */
     QVector<Definition> definitions() const;
 
+    /**
+     * Reloads the repository.
+     * This is a moderately expensive operations and should thus only be
+     * triggered when the installed syntax definition files changed.
+     */
+    void reload();
+
 private:
     Q_DISABLE_COPY(Repository)
     std::unique_ptr<RepositoryPrivate> d;

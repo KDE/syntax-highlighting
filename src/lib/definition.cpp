@@ -81,7 +81,7 @@ Definition& Definition::operator=(const Definition &rhs)
 
 bool Definition::isValid() const
 {
-    return d->repo && !d->fileName.isEmpty();
+    return d->repo && !d->fileName.isEmpty() && !d->name.isEmpty();
 }
 
 QString Definition::filePath() const
@@ -225,6 +225,29 @@ bool Definition::load()
     }
 
     return true;
+}
+
+void DefinitionData::clear()
+{
+    // keep only name and repo, so we can re-lookup to make references persist over repo reloads
+    keywordLists.clear();
+    qDeleteAll(contexts);
+    contexts.clear();
+    formats.clear();
+
+    fileName.clear();
+    section.clear();
+    style.clear();
+    indenter.clear();
+    author.clear();
+    license.clear();
+    mimetypes.clear();
+    extensions.clear();
+    delimiters = QStringLiteral(".():!+,-<=>%&*/;?[]^{|}~\\ \t");
+    caseSensitive = Qt::CaseSensitive,
+    version = 0.0f;
+    priority = 0;
+    hidden = false;
 }
 
 bool DefinitionData::loadMetaData(const QString& definitionFileName)

@@ -35,8 +35,12 @@ target_link_libraries(KF5SyntaxHighlighting LINK_PUBLIC Qt5::Gui LINK_PRIVATE Qt
 
 ecm_generate_headers(SyntaxHighlighting_HEADERS
     HEADER_NAMES
+        AbstractHighlighter
         Definition
+        Format
         Repository
+        SyntaxHighlighter
+        Theme
     REQUIRED_HEADERS SyntaxHighlighting_HEADERS
 )
 

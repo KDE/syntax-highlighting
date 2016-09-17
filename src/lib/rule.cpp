@@ -16,6 +16,7 @@
 */
 
 #include "rule_p.h"
+#include "definition_p.h"
 #include "syntaxhighlighting_logging.h"
 #include "xml_p.h"
 
@@ -263,7 +264,8 @@ Rule::Ptr Rule::create(const QStringRef& name)
 
 bool Rule::isDelimiter(QChar c) const
 {
-    return m_def.definition().isDelimiter(c);
+    auto defData = DefinitionData::get(m_def.definition());
+    return defData->isDelimiter(c);
 }
 
 
@@ -522,8 +524,10 @@ MatchResult KeywordListRule::doMatch(const QString& text, int offset, const QStr
         return offset;
 
     if (m_keywordList.isEmpty()) {
-        Q_ASSERT(syntaxDefinition().isValid());
-        m_keywordList = syntaxDefinition().keywordList(m_listName);
+        const auto def = syntaxDefinition();
+        Q_ASSERT(def.isValid());
+        auto defData = DefinitionData::get(def);
+        m_keywordList = defData->keywordList(m_listName);
     }
 
     auto newOffset = offset;

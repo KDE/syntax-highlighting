@@ -50,6 +50,9 @@ public:
     void loadGeneral(QXmlStreamReader &reader);
     bool checkKateVersion(const QStringRef &verStr);
 
+    KeywordList keywordList(const QString &name) const;
+    bool isDelimiter(QChar c) const;
+
     Repository *repo;
     QHash<QString, KeywordList> keywordLists;
     QVector<Context*> contexts;

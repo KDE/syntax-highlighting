@@ -174,14 +174,14 @@ Context* Definition::contextByName(const QString& name) const
     return Q_NULLPTR;
 }
 
-KeywordList Definition::keywordList(const QString& name) const
+KeywordList DefinitionData::keywordList(const QString& name) const
 {
-    return d->keywordLists.value(name);
+    return keywordLists.value(name);
 }
 
-bool Definition::isDelimiter(QChar c) const
+bool DefinitionData::isDelimiter(QChar c) const
 {
-    return d->delimiters.contains(c);
+    return delimiters.contains(c);
 }
 
 Format Definition::formatByName(const QString& name) const

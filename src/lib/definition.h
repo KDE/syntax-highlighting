@@ -144,18 +144,13 @@ private:
     friend class ContextSwitch;
     friend class DefinitionData;
     friend class DefinitionRef;
-    friend class KeywordListRule;
     friend class RepositoryTest;
-    friend class Rule;
 
     // stuff needed by our friends, but should not be used externally
     Repository* repository() const;
 
     Context* initialContext() const;
     Context* contextByName(const QString &name) const;
-
-    KeywordList keywordList(const QString &name) const;
-    bool isDelimiter(QChar c) const;
 
     Format formatByName(const QString &name) const;
 

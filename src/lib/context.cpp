@@ -16,6 +16,7 @@
 */
 
 #include "context_p.h"
+#include "definition_p.h"
 #include "format.h"
 #include "repository.h"
 #include "rule_p.h"
@@ -84,13 +85,15 @@ QVector<Rule::Ptr> Context::rules() const
 
 Format Context::formatByName(const QString &name) const
 {
-    auto format = m_def.definition().formatByName(name);
+    auto defData = DefinitionData::get(m_def.definition());
+    auto format = defData->formatByName(name);
     if (format.isValid())
         return format;
 
     // TODO we can avoid multiple lookups in the same definition here, many rules will share definitions
     foreach (auto rule, m_rules) {
-        format = rule->syntaxDefinition().formatByName(name);
+        auto defData = DefinitionData::get(rule->syntaxDefinition());
+        format = defData->formatByName(name);
         if (format.isValid())
             return format;
     }

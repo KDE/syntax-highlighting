@@ -152,8 +152,6 @@ private:
     Context* initialContext() const;
     Context* contextByName(const QString &name) const;
 
-    Format formatByName(const QString &name) const;
-
     bool load();
 
     std::shared_ptr<DefinitionData> d;

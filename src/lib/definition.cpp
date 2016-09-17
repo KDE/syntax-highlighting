@@ -184,10 +184,10 @@ bool DefinitionData::isDelimiter(QChar c) const
     return delimiters.contains(c);
 }
 
-Format Definition::formatByName(const QString& name) const
+Format DefinitionData::formatByName(const QString& name) const
 {
-    const auto it = d->formats.constFind(name);
-    if (it != d->formats.constEnd())
+    const auto it = formats.constFind(name);
+    if (it != formats.constEnd())
         return it.value();
 
     return Format();

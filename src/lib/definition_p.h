@@ -53,6 +53,8 @@ public:
     KeywordList keywordList(const QString &name) const;
     bool isDelimiter(QChar c) const;
 
+    Format formatByName(const QString &name) const;
+
     Repository *repo;
     QHash<QString, KeywordList> keywordLists;
     QVector<Context*> contexts;

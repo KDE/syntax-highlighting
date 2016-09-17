@@ -53,6 +53,9 @@ public:
     KeywordList keywordList(const QString &name) const;
     bool isDelimiter(QChar c) const;
 
+    Context* initialContext() const;
+    Context* contextByName(const QString &name) const;
+
     Format formatByName(const QString &name) const;
 
     Repository *repo;

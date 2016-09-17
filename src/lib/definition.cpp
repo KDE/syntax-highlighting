@@ -89,11 +89,6 @@ QString Definition::filePath() const
     return d->fileName;
 }
 
-Repository* Definition::repository() const
-{
-    return d->repo;
-}
-
 QString Definition::name() const
 {
     return d->name;
@@ -159,15 +154,15 @@ QString Definition::license() const
     return d->license;
 }
 
-Context* Definition::initialContext() const
+Context* DefinitionData::initialContext() const
 {
-    Q_ASSERT(!d->contexts.isEmpty());
-    return d->contexts.first();
+    Q_ASSERT(!contexts.isEmpty());
+    return contexts.first();
 }
 
-Context* Definition::contextByName(const QString& name) const
+Context* DefinitionData::contextByName(const QString& name) const
 {
-    foreach (auto context, d->contexts) {
+    foreach (auto context, contexts) {
         if (context->name() == name)
             return context;
     }

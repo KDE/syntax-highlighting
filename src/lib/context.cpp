@@ -185,20 +185,22 @@ void Context::resolveIncludes()
             continue;
         }
         Context* context = Q_NULLPTR;
+        auto myDefData = DefinitionData::get(m_def.definition());
         if (inc->definitionName().isEmpty()) { // local include
-            context = m_def.definition().contextByName(inc->contextName());
+            context = myDefData->contextByName(inc->contextName());
         } else {
-            auto def = m_def.definition().repository()->definitionForName(inc->definitionName());
+            auto def = myDefData->repo->definitionForName(inc->definitionName());
             if (!def.isValid()) {
                 qCWarning(Log) << "Unable to resolve external include rule for definition" << inc->definitionName() << "in" << m_def.definition().name();
                 ++it;
                 continue;
             }
             def.load();
+            auto defData = DefinitionData::get(def);
             if (inc->contextName().isEmpty())
-                context = def.initialContext();
+                context = defData->initialContext();
             else
-                context = def.contextByName(inc->contextName());
+                context = defData->contextByName(inc->contextName());
         }
         if (!context) {
             qCWarning(Log) << "Unable to resolve include rule for definition" << inc->contextName() << "##" << inc->definitionName() << "in" << m_def.definition().name();

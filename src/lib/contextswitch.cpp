@@ -17,6 +17,7 @@
 
 #include "contextswitch_p.h"
 #include "definition.h"
+#include "definition_p.h"
 #include "repository.h"
 #include "syntaxhighlighting_logging.h"
 
@@ -79,14 +80,14 @@ void ContextSwitch::resolve(const Definition &def)
 {
     auto d = def;
     if (!m_defName.isEmpty()) {
-        d = def.repository()->definitionForName(m_defName);
+        d = DefinitionData::get(def)->repo->definitionForName(m_defName);
         d.load();
         if (m_contextName.isEmpty())
-            m_context = d.initialContext();
+            m_context = DefinitionData::get(d)->initialContext();
     }
 
     if (!m_contextName.isEmpty()) {
-        m_context = d.contextByName(m_contextName);
+        m_context = DefinitionData::get(d)->contextByName(m_contextName);
         if (!m_context)
             qCWarning(Log) << "cannot find context" << m_contextName << "in" << def.name();
     }

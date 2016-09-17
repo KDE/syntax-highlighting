@@ -17,6 +17,7 @@
 
 #include "abstracthighlighter.h"
 #include "context_p.h"
+#include "definition_p.h"
 #include "format.h"
 #include "rule_p.h"
 #include "state.h"
@@ -100,7 +101,7 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
     auto newState = state;
     auto stateData = StateData::get(newState);
     if (stateData->isEmpty())
-        stateData->push(d->m_definition.initialContext(), QStringList());
+        stateData->push(DefinitionData::get(d->m_definition)->initialContext(), QStringList());
 
     if (text.isEmpty()) {
         while (!stateData->topContext()->lineEmptyContext().isStay())

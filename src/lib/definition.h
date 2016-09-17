@@ -146,11 +146,6 @@ private:
     friend class RepositoryTest;
 
     // stuff needed by our friends, but should not be used externally
-    Repository* repository() const;
-
-    Context* initialContext() const;
-    Context* contextByName(const QString &name) const;
-
     bool load();
 
     std::shared_ptr<DefinitionData> d;

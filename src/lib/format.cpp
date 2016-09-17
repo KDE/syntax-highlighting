@@ -132,12 +132,12 @@ bool Format::isNormal(const Theme &theme) const
 
 bool Format::hasColor(const Theme &theme) const
 {
-    return d->hasColor || (theme.normalColor(d->defaultStyle) & 0xff000000);
+    return d->hasColor || (theme.textColor(d->defaultStyle) & 0xff000000);
 }
 
 QColor Format::color(const Theme &theme) const
 {
-    return d->hasColor ? d->color : QColor(theme.normalColor(d->defaultStyle));
+    return d->hasColor ? d->color : QColor(theme.textColor(d->defaultStyle));
 }
 
 bool Format::hasBackgroundColor(const Theme &theme) const

@@ -22,7 +22,7 @@ using namespace SyntaxHighlighting;
 namespace SyntaxHighlighting {
 
 struct ThemeData {
-    QRgb normalColor;
+    QRgb textColor;
     QRgb backgroundColor;
     bool bold;
     bool italic;
@@ -125,10 +125,10 @@ Theme Theme::defaultTheme(Theme::DefaultTheme t)
     return theme;
 }
 
-QRgb Theme::normalColor(Theme::Style style) const
+QRgb Theme::textColor(Theme::Style style) const
 {
     Q_ASSERT(m_data);
-    return m_data.get()[style].normalColor;
+    return m_data.get()[style].textColor;
 }
 
 QRgb Theme::backgroundColor(Theme::Style style) const

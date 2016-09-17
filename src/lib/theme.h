@@ -79,7 +79,7 @@ public:
      *  @c 0 is returned for styles that do not specify a text color,
      *  use the default text color in that case.
      */
-    QRgb normalColor(Style style) const;
+    QRgb textColor(Style style) const;
     /** Returns the background color to be used for @p style.
      *  @c 0 is returned for styles that do not specify a background color,
      *  use the default background color in that case.

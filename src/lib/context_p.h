@@ -36,7 +36,7 @@ public:
     Context();
     ~Context();
 
-    Definition syntaxDefinition() const;
+    Definition definition() const;
     void setDefinition(const Definition &def);
 
     QString name() const;

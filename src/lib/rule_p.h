@@ -42,7 +42,7 @@ public:
 
     typedef std::shared_ptr<Rule> Ptr;
 
-    Definition syntaxDefinition() const;
+    Definition definition() const;
     void setDefinition(const Definition &def);
 
     QString attribute() const;

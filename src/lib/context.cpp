@@ -38,7 +38,7 @@ Context::~Context()
 {
 }
 
-Definition Context::syntaxDefinition() const
+Definition Context::definition() const
 {
     return m_def.definition();
 }
@@ -92,7 +92,7 @@ Format Context::formatByName(const QString &name) const
 
     // TODO we can avoid multiple lookups in the same definition here, many rules will share definitions
     foreach (auto rule, m_rules) {
-        auto defData = DefinitionData::get(rule->syntaxDefinition());
+        auto defData = DefinitionData::get(rule->definition());
         format = defData->formatByName(name);
         if (format.isValid())
             return format;

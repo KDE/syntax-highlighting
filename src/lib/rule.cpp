@@ -99,7 +99,7 @@ Rule::~Rule()
 {
 }
 
-Definition Rule::syntaxDefinition() const
+Definition Rule::definition() const
 {
     return m_def.definition();
 }
@@ -524,7 +524,7 @@ MatchResult KeywordListRule::doMatch(const QString& text, int offset, const QStr
         return offset;
 
     if (m_keywordList.isEmpty()) {
-        const auto def = syntaxDefinition();
+        const auto def = definition();
         Q_ASSERT(def.isValid());
         auto defData = DefinitionData::get(def);
         m_keywordList = defData->keywordList(m_listName);

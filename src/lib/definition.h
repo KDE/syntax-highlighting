@@ -21,10 +21,9 @@
 #include "kf5syntaxhighlighting_export.h"
 
 #include <memory>
-#include <QChar>
-#include <QString>
 
 class QJsonObject;
+class QString;
 template <typename T> class QVector;
 
 namespace SyntaxHighlighting {

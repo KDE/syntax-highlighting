@@ -128,13 +128,14 @@ private Q_SLOTS:
 
         NullHighlighter hl;
         hl.setDefinition(def);
-        hl.highlightLine(QLatin1String("/* TODO this should not crash */"), State());
+        auto oldState = hl.highlightLine(QLatin1String("/* TODO this should not crash */"), State());
 
         m_repo.reload();
         QVERIFY(!m_repo.definitions().isEmpty());
         QVERIFY(!def.isValid());
 
         hl.highlightLine(QLatin1String("/* TODO this should not crash */"), State());
+        hl.highlightLine(QLatin1String("/* FIXME neither should this crash */"), oldState);
         QVERIFY(hl.definition().isValid());
         QCOMPARE(hl.definition().name(), QLatin1String("QML"));
     }

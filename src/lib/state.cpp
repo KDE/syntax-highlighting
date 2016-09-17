@@ -24,6 +24,11 @@
 
 using namespace SyntaxHighlighting;
 
+StateData::StateData() :
+    m_defData(Q_NULLPTR)
+{
+}
+
 StateData* StateData::get(State &state)
 {
     state.d.detach();
@@ -34,6 +39,12 @@ bool StateData::isEmpty() const
 {
     Q_ASSERT(m_contextStack.size() == m_captureStack.size());
     return m_contextStack.isEmpty();
+}
+
+void StateData::clear()
+{
+    m_contextStack.clear();
+    m_captureStack.clear();
 }
 
 int StateData::size() const
@@ -91,5 +102,5 @@ State& State::operator=(const State &other)
 
 bool State::operator==(const State &other)
 {
-    return d->m_contextStack == other.d->m_contextStack && d->m_captureStack == other.d->m_captureStack;
+    return d->m_contextStack == other.d->m_contextStack && d->m_captureStack == other.d->m_captureStack && d->m_defData == other.d->m_defData;
 }

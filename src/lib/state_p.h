@@ -29,19 +29,23 @@ namespace SyntaxHighlighting
 {
 
 class Context;
+class DefinitionData;
 
 class StateData : public QSharedData
 {
 public:
+    StateData();
     static StateData* get(State &state);
 
     bool isEmpty() const;
+    void clear();
     int size() const;
     void push(Context *context, const QStringList &captures);
     void pop();
     Context* topContext() const;
     QStringList topCaptures() const;
 
+    DefinitionData *m_defData;
 private:
     friend class State;
     QStack<Context*> m_contextStack;

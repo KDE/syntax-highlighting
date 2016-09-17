@@ -106,17 +106,27 @@ void AbstractHighlighter::setTheme(const Theme &theme)
 
 State AbstractHighlighter::highlightLine(const QString& text, const State &state)
 {
+    // verify definition, deal with no highlighting being enabled
     d->ensureDefinitionLoaded();
     if (!d->m_definition.isValid()) {
         setFormat(0, text.size(), Format());
         return State();
     }
 
+    // verify/intialize state
+    auto defData = DefinitionData::get(d->m_definition);
     auto newState = state;
     auto stateData = StateData::get(newState);
-    if (stateData->isEmpty())
-        stateData->push(DefinitionData::get(d->m_definition)->initialContext(), QStringList());
+    if (stateData->m_defData && defData != stateData->m_defData) {
+        qCDebug(Log) << "Got invalid state, resetting.";
+        stateData->clear();
+    }
+    if (stateData->isEmpty()) {
+        stateData->push(defData->initialContext(), QStringList());
+        stateData->m_defData = defData;
+    }
 
+    // process empty lines
     if (text.isEmpty()) {
         while (!stateData->topContext()->lineEmptyContext().isStay())
             d->switchContext(stateData, stateData->topContext()->lineEmptyContext(), QStringList());

@@ -226,14 +226,17 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
 bool AbstractHighlighterPrivate::switchContext(StateData *data, const ContextSwitch &contextSwitch, const QStringList &captures)
 {
     for (int i = 0; i < contextSwitch.popCount(); ++i) {
-        // never pop the initial context
-        if (data->size() == 1)
+        // don't pop the last context if we can't push one
+        if (data->size() == 1 && !contextSwitch.context())
             return false;
+        if (data->size() == 0)
+            break;
         data->pop();
     }
 
     if (contextSwitch.context())
         data->push(contextSwitch.context(), captures);
 
+    Q_ASSERT(!data->isEmpty());
     return true;
 }

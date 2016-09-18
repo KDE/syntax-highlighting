@@ -65,7 +65,6 @@ void StateData::pop()
 {
     m_contextStack.pop();
     m_captureStack.pop();
-    Q_ASSERT(!isEmpty());
 }
 
 Context* StateData::topContext() const

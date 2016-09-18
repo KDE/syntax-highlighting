@@ -91,8 +91,6 @@ private Q_SLOTS:
             NullHighlighter hl;
             State initialState;
             hl.setDefinition(def);
-            if (def.name() == QLatin1String("Kconfig")) // FIXME this ends in an infinite loop!
-                continue;
             const auto state = hl.highlightLine(QLatin1String("This should not crash } ] ) !"), initialState);
             QVERIFY(state != initialState);
         }

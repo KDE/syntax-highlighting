@@ -1,5 +1,9 @@
 configure_file(test-config.h.in ${CMAKE_CURRENT_BINARY_DIR}/test-config.h)
 
+add_executable(wildcardmatcher_test wildcardmatcher_test.cpp ${CMAKE_SOURCE_DIR}/src/lib/wildcardmatcher.cpp)
+add_test(NAME wildcardmatcher_test COMMAND wildcardmatcher_test)
+target_link_libraries(wildcardmatcher_test KF5SyntaxHighlighting Qt5::Test)
+
 add_executable(syntaxrepository_test syntaxrepository_test.cpp)
 add_test(NAME syntaxrepository_test COMMAND syntaxrepository_test)
 target_link_libraries(syntaxrepository_test KF5SyntaxHighlighting Qt5::Test)

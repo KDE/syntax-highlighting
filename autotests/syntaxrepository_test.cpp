@@ -63,6 +63,10 @@ private Q_SLOTS:
         QTest::newRow("c") << QStringLiteral("test.c") << QStringLiteral("C");
         QTest::newRow("c++") << QStringLiteral("test.cpp") << QStringLiteral("C++");
         QTest::newRow("markdown") << QStringLiteral("test.md") << QStringLiteral("Markdown");
+
+        QTest::newRow("Makefile 1") << QStringLiteral("Makefile") << QStringLiteral("Makefile");
+        QTest::newRow("Makefile 2") << QStringLiteral("/some/path/to/Makefile") << QStringLiteral("Makefile");
+        QTest::newRow("Makefile 3") << QStringLiteral("Makefile.am") << QStringLiteral("Makefile");
     }
 
     void testDefinitionByExtension()

@@ -19,6 +19,7 @@
 #include "definition.h"
 #include "definition_p.h"
 #include "syntaxhighlighting_logging.h"
+#include "wildcardmatcher_p.h"
 
 #include <QDebug>
 #include <QDirIterator>
@@ -65,14 +66,17 @@ Definition Repository::definitionForName(const QString& defName) const
 Definition Repository::definitionForFileName(const QString& fileName) const
 {
     QFileInfo fi(fileName);
-    const auto ext = fi.suffix();
+    const auto name = fi.fileName();
 
     QVector<Definition> candidates;
     for (auto it = d->m_defs.constBegin(); it != d->m_defs.constEnd(); ++it) {
         auto def = it.value();
-        // FIXME: this is way too simple, there are other patterns too, see KateWildcardMatcher
-        if (def.extensions().contains(QLatin1String("*.") + ext))
-            candidates.push_back(def);
+        foreach (const auto &pattern, def.extensions()) {
+            if (WildcardMatcher::exactMatch(name, pattern)) {
+                candidates.push_back(def);
+                break;
+            }
+        }
     }
 
     if (candidates.isEmpty())

@@ -49,6 +49,9 @@ int main(int argc, char **argv)
     QCommandLineOption listDefs(QStringList() << QStringLiteral("l") << QStringLiteral("list"),
                                 app.translate("SyntaxHighlightingCLI", "List all available syntax definitions."));
     parser.addOption(listDefs);
+    QCommandLineOption listThemes(QStringList() << QStringLiteral("list-themes"),
+                                  app.translate("SyntaxHighlightingCLI", "List all available themes."));
+    parser.addOption(listThemes);
 
     QCommandLineOption updateDefs(QStringList() << QStringLiteral("u") << QStringLiteral("update"),
                                   app.translate("SyntaxHighlightingCLI", "Download new/updated syntax definitions."));
@@ -76,6 +79,12 @@ int main(int argc, char **argv)
         foreach (const auto &def, repo.definitions()) {
             std::cout << qPrintable(def.name()) << std::endl;
         }
+        return 0;
+    }
+
+    if (parser.isSet(listThemes)) {
+        foreach (const auto &theme, repo.themes())
+            std::cout << qPrintable(theme.name()) << std::endl;
         return 0;
     }
 

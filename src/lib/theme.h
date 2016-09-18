@@ -101,8 +101,15 @@ public:
 
     /**
      * Returns the unique name of this Theme.
+     * @see translatedName()
      */
     QString name() const;
+
+    /**
+     * Returns the translated name of this Theme. The translated name can be
+     * used in the user interface.
+     */
+    QString translatedName() const;
 
     /**
      * Returns @c true if this Theme is read-only.

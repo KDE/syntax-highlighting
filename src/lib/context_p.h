@@ -37,7 +37,7 @@ public:
     ~Context();
 
     Definition definition() const;
-    void setDefinition(const Definition &def);
+    void setDefinition(const DefinitionRef &def);
 
     QString name() const;
     QString attribute() const;

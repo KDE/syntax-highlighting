@@ -67,6 +67,7 @@ Definition::Definition() :
 Definition::Definition(const Definition &other) :
     d(other.d)
 {
+    d->q = *this;
 }
 
 Definition::~Definition()
@@ -210,7 +211,7 @@ bool Definition::load()
             continue;
 
         if (reader.name() == QLatin1String("highlighting"))
-            d->loadHighlighting(this, reader);
+            d->loadHighlighting(reader);
 
         else if (reader.name() == QLatin1String("general"))
             d->loadGeneral(reader);
@@ -322,7 +323,7 @@ bool DefinitionData::loadLanguage(QXmlStreamReader &reader)
     return true;
 }
 
-void DefinitionData::loadHighlighting(Definition *def, QXmlStreamReader& reader)
+void DefinitionData::loadHighlighting(QXmlStreamReader& reader)
 {
     Q_ASSERT(reader.name() == QLatin1String("highlighting"));
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
@@ -335,7 +336,7 @@ void DefinitionData::loadHighlighting(Definition *def, QXmlStreamReader& reader)
                     keywords.load(reader);
                     keywordLists.insert(keywords.name(), keywords);
                 } else if (reader.name() == QLatin1String("contexts")) {
-                    loadContexts(def, reader);
+                    loadContexts(reader);
                     reader.readNext();
                 } else if (reader.name() == QLatin1String("itemDatas")) {
                     loadItemData(reader);
@@ -352,7 +353,7 @@ void DefinitionData::loadHighlighting(Definition *def, QXmlStreamReader& reader)
     }
 }
 
-void DefinitionData::loadContexts(Definition *def, QXmlStreamReader& reader)
+void DefinitionData::loadContexts(QXmlStreamReader& reader)
 {
     Q_ASSERT(reader.name() == QLatin1String("contexts"));
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
@@ -362,7 +363,7 @@ void DefinitionData::loadContexts(Definition *def, QXmlStreamReader& reader)
             case QXmlStreamReader::StartElement:
                 if (reader.name() == QLatin1String("context")) {
                     auto context = new Context;
-                    context->setDefinition(*def);
+                    context->setDefinition(q);
                     context->load(reader);
                     contexts.push_back(context);
                 }

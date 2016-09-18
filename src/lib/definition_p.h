@@ -18,6 +18,8 @@
 #ifndef SYNTAXHIGHLIGHTING_DEFINITION_P_H
 #define SYNTAXHIGHLIGHTING_DEFINITION_P_H
 
+#include "definitionref_p.h"
+
 #include <QHash>
 #include <QString>
 #include <QVector>
@@ -46,8 +48,8 @@ public:
     void clear();
 
     bool loadLanguage(QXmlStreamReader &reader);
-    void loadHighlighting(Definition *def, QXmlStreamReader &reader);
-    void loadContexts(Definition *def, QXmlStreamReader &reader);
+    void loadHighlighting(QXmlStreamReader &reader);
+    void loadContexts(QXmlStreamReader &reader);
     void loadItemData(QXmlStreamReader &reader);
     void loadGeneral(QXmlStreamReader &reader);
     bool checkKateVersion(const QStringRef &verStr);
@@ -59,6 +61,8 @@ public:
     Context* contextByName(const QString &name) const;
 
     Format formatByName(const QString &name) const;
+
+    DefinitionRef q;
 
     Repository *repo;
     QHash<QString, KeywordList> keywordLists;

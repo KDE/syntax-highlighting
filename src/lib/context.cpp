@@ -43,7 +43,7 @@ Definition Context::definition() const
     return m_def.definition();
 }
 
-void Context::setDefinition(const Definition &def)
+void Context::setDefinition(const DefinitionRef &def)
 {
     m_def = def;
 }

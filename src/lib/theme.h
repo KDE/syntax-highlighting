@@ -21,47 +21,13 @@
 #include "kf5syntaxhighlighting_export.h"
 
 #include <QColor>
+#include <qobjectdefs.h>
 
 #include <memory>
 
 namespace SyntaxHighlighting {
 
 class ThemeData;
-
-/** Default styles that can be referenced from syntax definition XML files. */
-enum TextStyle {
-    Normal = 0,
-    Keyword,
-    Function,
-    Variable,
-    ControlFlow,
-    Operator,
-    BuiltIn,
-    Extension,
-    Preprocessor,
-    Attribute,
-    Char,
-    SpecialChar,
-    String,
-    VerbatimString,
-    SpecialString,
-    Import,
-    DataType,
-    DecVal,
-    BaseN,
-    Float,
-    Constant,
-    Comment,
-    Documentation,
-    Annotation,
-    CommentVar,
-    RegionMarker,
-    Information,
-    Warning,
-    Alert,
-    Error,
-    Others
-};
 
 /**
  * Color theme definition used for highlighting.
@@ -105,7 +71,44 @@ enum TextStyle {
  */
 class KF5SYNTAXHIGHLIGHTING_EXPORT Theme
 {
+    Q_GADGET
 public:
+    /** Default styles that can be referenced from syntax definition XML files. */
+    enum TextStyle {
+        Normal = 0,
+        Keyword,
+        Function,
+        Variable,
+        ControlFlow,
+        Operator,
+        BuiltIn,
+        Extension,
+        Preprocessor,
+        Attribute,
+        Char,
+        SpecialChar,
+        String,
+        VerbatimString,
+        SpecialString,
+        Import,
+        DataType,
+        DecVal,
+        BaseN,
+        Float,
+        Constant,
+        Comment,
+        Documentation,
+        Annotation,
+        CommentVar,
+        RegionMarker,
+        Information,
+        Warning,
+        Alert,
+        Error,
+        Others
+    };
+    Q_ENUM(TextStyle)
+
     /**
      * Default constructor, creating an invalid Theme, see isValid().
      */

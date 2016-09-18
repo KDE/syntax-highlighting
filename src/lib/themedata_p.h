@@ -81,37 +81,37 @@ public:
      * @c 0 is returned for styles that do not specify a text color,
      * use the default text color in that case.
      */
-    QRgb textColor(TextStyle style) const;
+    QRgb textColor(Theme::TextStyle style) const;
 
     /**
      * Returns the text color for selected to be used for @p style.
      * @c 0 is returned for styles that do not specify a selected text color,
      * use the textColor() in that case.
      */
-    QRgb selectedTextColor(TextStyle style) const;
+    QRgb selectedTextColor(Theme::TextStyle style) const;
 
     /**
      * Returns the background color to be used for @p style.
      * @c 0 is returned for styles that do not specify a background color,
      * use the default background color in that case.
      */
-    QRgb backgroundColor(TextStyle style) const;
+    QRgb backgroundColor(Theme::TextStyle style) const;
 
     /**
      * Returns the background color for selected text to be used for @p style.
      * @c 0 is returned for styles that do not specify a selected background
      * color, use the default backgroundColor() in that case.
      */
-    QRgb selectedBackgroundColor(TextStyle style) const;
+    QRgb selectedBackgroundColor(Theme::TextStyle style) const;
 
     /** Returns whether the given style should be shown in bold. */
-    bool isBold(TextStyle style) const;
+    bool isBold(Theme::TextStyle style) const;
     /** Returns whether the given style should be shown in italic. */
-    bool isItalic(TextStyle style) const;
+    bool isItalic(Theme::TextStyle style) const;
     /** Returns whether the given style should be shown underlined. */
-    bool isUnderline(TextStyle style) const;
+    bool isUnderline(Theme::TextStyle style) const;
     /** Returns whether the given style should be shown striked through. */
-    bool isStrikeThrough(TextStyle style) const;
+    bool isStrikeThrough(Theme::TextStyle style) const;
 
 private:
     int m_revision;
@@ -119,7 +119,7 @@ private:
     QString m_author;
     QString m_license;
     bool m_readOnly;
-    TextStyleData m_textStyles[Others + 1];
+    TextStyleData m_textStyles[Theme::Others + 1];
 };
 
 }

@@ -22,6 +22,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
+#include <QMetaEnum>
 
 #include <QDebug>
 
@@ -99,38 +100,14 @@ bool ThemeData::load(const QString &filePath)
     m_readOnly = metadata.value(QLatin1String("read-only")).toBool();
 
     // read text styles
+    static const auto idx = Theme::staticMetaObject.indexOfEnumerator("TextStyle");
+    Q_ASSERT(idx >= 0);
+    const auto metaEnum = Theme::staticMetaObject.enumerator(idx);
     const QJsonObject textStyles = obj.value(QLatin1String("text-styles")).toObject();
-    m_textStyles[Normal] = readThemeData(textStyles.value(QLatin1String("Normal")).toObject());
-    m_textStyles[Keyword] = readThemeData(textStyles.value(QLatin1String("Keyword")).toObject());
-    m_textStyles[Function] = readThemeData(textStyles.value(QLatin1String("Function")).toObject());
-    m_textStyles[Variable] = readThemeData(textStyles.value(QLatin1String("Variable")).toObject());
-    m_textStyles[ControlFlow] = readThemeData(textStyles.value(QLatin1String("ControlFlow")).toObject());
-    m_textStyles[Operator] = readThemeData(textStyles.value(QLatin1String("Operator")).toObject());
-    m_textStyles[BuiltIn] = readThemeData(textStyles.value(QLatin1String("BuiltIn")).toObject());
-    m_textStyles[Extension] = readThemeData(textStyles.value(QLatin1String("Extension")).toObject());
-    m_textStyles[Preprocessor] = readThemeData(textStyles.value(QLatin1String("Preprocessor")).toObject());
-    m_textStyles[Attribute] = readThemeData(textStyles.value(QLatin1String("Attribute")).toObject());
-    m_textStyles[Char] = readThemeData(textStyles.value(QLatin1String("Char")).toObject());
-    m_textStyles[SpecialChar] = readThemeData(textStyles.value(QLatin1String("SpecialChar")).toObject());
-    m_textStyles[String] = readThemeData(textStyles.value(QLatin1String("String")).toObject());
-    m_textStyles[VerbatimString] = readThemeData(textStyles.value(QLatin1String("VerbatimString")).toObject());
-    m_textStyles[SpecialString] = readThemeData(textStyles.value(QLatin1String("SpecialString")).toObject());
-    m_textStyles[Import] = readThemeData(textStyles.value(QLatin1String("Import")).toObject());
-    m_textStyles[DataType] = readThemeData(textStyles.value(QLatin1String("DataType")).toObject());
-    m_textStyles[DecVal] = readThemeData(textStyles.value(QLatin1String("DecVal")).toObject());
-    m_textStyles[BaseN] = readThemeData(textStyles.value(QLatin1String("BaseN")).toObject());
-    m_textStyles[Float] = readThemeData(textStyles.value(QLatin1String("Float")).toObject());
-    m_textStyles[Constant] = readThemeData(textStyles.value(QLatin1String("Constant")).toObject());
-    m_textStyles[Comment] = readThemeData(textStyles.value(QLatin1String("Comment")).toObject());
-    m_textStyles[Documentation] = readThemeData(textStyles.value(QLatin1String("Documentation")).toObject());
-    m_textStyles[Annotation] = readThemeData(textStyles.value(QLatin1String("Annotation")).toObject());
-    m_textStyles[CommentVar] = readThemeData(textStyles.value(QLatin1String("CommentVar")).toObject());
-    m_textStyles[RegionMarker] = readThemeData(textStyles.value(QLatin1String("RegionMarker")).toObject());
-    m_textStyles[Information] = readThemeData(textStyles.value(QLatin1String("Information")).toObject());
-    m_textStyles[Warning] = readThemeData(textStyles.value(QLatin1String("Warning")).toObject());
-    m_textStyles[Alert] = readThemeData(textStyles.value(QLatin1String("Alert")).toObject());
-    m_textStyles[Error] = readThemeData(textStyles.value(QLatin1String("Error")).toObject());
-    m_textStyles[Others] = readThemeData(textStyles.value(QLatin1String("Others")).toObject());
+    for (int i = 0; i < metaEnum.keyCount(); ++i) {
+        Q_ASSERT(i == metaEnum.value(i));
+        m_textStyles[i] = readThemeData(textStyles.value(QLatin1String(metaEnum.key(i))).toObject());
+    }
 
     return true;
 }
@@ -145,50 +122,50 @@ bool ThemeData::isReadOnly() const
     return m_readOnly;
 }
 
-QRgb ThemeData::textColor(TextStyle style) const
+QRgb ThemeData::textColor(Theme::TextStyle style) const
 {
-    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Others));
+    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Theme::Others));
     return m_textStyles[style].textColor;
 }
 
-QRgb ThemeData::selectedTextColor(TextStyle style) const
+QRgb ThemeData::selectedTextColor(Theme::TextStyle style) const
 {
-    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Others));
+    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Theme::Others));
     return m_textStyles[style].selectedTextColor;
 }
 
-QRgb ThemeData::backgroundColor(TextStyle style) const
+QRgb ThemeData::backgroundColor(Theme::TextStyle style) const
 {
-    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Others));
+    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Theme::Others));
     return m_textStyles[style].backgroundColor;
 }
 
-QRgb ThemeData::selectedBackgroundColor(TextStyle style) const
+QRgb ThemeData::selectedBackgroundColor(Theme::TextStyle style) const
 {
-    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Others));
+    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Theme::Others));
     return m_textStyles[style].selectedBackgroundColor;
 }
 
-bool ThemeData::isBold(TextStyle style) const
+bool ThemeData::isBold(Theme::TextStyle style) const
 {
-    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Others));
+    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Theme::Others));
     return m_textStyles[style].bold;
 }
 
-bool ThemeData::isItalic(TextStyle style) const
+bool ThemeData::isItalic(Theme::TextStyle style) const
 {
-    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Others));
+    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Theme::Others));
     return m_textStyles[style].italic;
 }
 
-bool ThemeData::isUnderline(TextStyle style) const
+bool ThemeData::isUnderline(Theme::TextStyle style) const
 {
-    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Others));
+    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Theme::Others));
     return m_textStyles[style].underline;
 }
 
-bool ThemeData::isStrikeThrough(TextStyle style) const
+bool ThemeData::isStrikeThrough(Theme::TextStyle style) const
 {
-    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Others));
+    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Theme::Others));
     return m_textStyles[style].strikeThrough;
 }

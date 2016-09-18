@@ -21,6 +21,7 @@
 
 #include <QColor>
 #include <QDebug>
+#include <QMetaEnum>
 #include <QXmlStreamReader>
 
 using namespace SyntaxHighlighting;
@@ -35,7 +36,7 @@ public:
     QColor selColor;
     QColor backgroundColor;
     QColor selBackgroundColor;
-    TextStyle defaultStyle;
+    Theme::TextStyle defaultStyle;
     bool italic;
     bool bold;
     bool underline;
@@ -54,46 +55,24 @@ public:
 };
 }
 
-static TextStyle stringToDefaultFormat(const QStringRef &str)
+static Theme::TextStyle stringToDefaultFormat(const QStringRef &str)
 {
-#define D(type) if (str == QLatin1String("ds" #type)) return type;
-    D(Normal)
-    D(Keyword)
-    D(Function)
-    D(Variable)
-    D(ControlFlow)
-    D(Operator)
-    D(BuiltIn)
-    D(Extension)
-    D(Preprocessor)
-    D(Attribute)
-    D(Char)
-    D(SpecialChar)
-    D(String)
-    D(VerbatimString)
-    D(SpecialString)
-    D(Import)
-    D(DataType)
-    D(DecVal)
-    D(BaseN)
-    D(Float)
-    D(Constant)
-    D(Comment)
-    D(Documentation)
-    D(Annotation)
-    D(CommentVar)
-    D(RegionMarker)
-    D(Information)
-    D(Warning)
-    D(Alert)
-    D(Error)
-    D(Others)
-#undef D
-    return Normal;
+    if (!str.startsWith(QLatin1String("ds")))
+        return Theme::Normal;
+
+    static const auto idx = Theme::staticMetaObject.indexOfEnumerator("TextStyle");
+    Q_ASSERT(idx >= 0);
+    const auto metaEnum = Theme::staticMetaObject.enumerator(idx);
+
+    bool ok = false;
+    const auto value = metaEnum.keyToValue(str.mid(2).toLatin1().constData(), &ok);
+    if (!ok || value < 0)
+        return Theme::Normal;
+    return static_cast<Theme::TextStyle>(value);
 }
 
 FormatPrivate::FormatPrivate()
-    : defaultStyle(Normal)
+    : defaultStyle(Theme::Normal)
     , italic(false)
     , bold(false)
     , underline(false)

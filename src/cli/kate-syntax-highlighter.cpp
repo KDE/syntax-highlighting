@@ -21,7 +21,7 @@
 #include <definitiondownloader.h>
 #include <htmlhighlighter.h>
 #include <repository.h>
-#include <definition.h>
+#include <theme.h>
 
 #include <QCommandLineParser>
 #include <QCoreApplication>
@@ -64,7 +64,10 @@ int main(int argc, char **argv)
                                   app.translate("SyntaxHighlightingCLI", "syntax"));
     parser.addOption(syntaxName);
 
-    // TODO select style
+    QCommandLineOption themeName(QStringList() << QStringLiteral("t") << QStringLiteral("theme"),
+                                 app.translate("SyntaxHighlightingCLI", "Color theme to use for highlighting."),
+                                 app.translate("SyntaxHighlightingCLI", "theme"), QStringLiteral("Default"));
+    parser.addOption(themeName);
 
     parser.process(app);
 
@@ -107,6 +110,7 @@ int main(int argc, char **argv)
         highlighter.setOutputFile(parser.value(outputName));
     else
         highlighter.setOutputFile(stdout);
+    highlighter.setTheme(repo.theme(parser.value(themeName)));
     highlighter.highlightFile(inFileName);
 
     return 0;

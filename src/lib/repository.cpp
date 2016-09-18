@@ -18,6 +18,8 @@
 #include "repository.h"
 #include "definition.h"
 #include "definition_p.h"
+#include "theme.h"
+#include "themedata_p.h"
 #include "syntaxhighlighting_logging.h"
 #include "wildcardmatcher_p.h"
 
@@ -42,10 +44,15 @@ public:
 
     QHash<QString, Definition> m_defs;
     QVector<Definition> m_sortedDefs;
+
+    QVector<Theme> m_themes;
 };
 }
 
-static void initResource() { Q_INIT_RESOURCE(syntax_data); }
+static void initResource() {
+    Q_INIT_RESOURCE(syntax_data);
+    Q_INIT_RESOURCE(theme_data);
+}
 
 Repository::Repository() :
     d(new RepositoryPrivate)
@@ -94,6 +101,22 @@ QVector<Definition> Repository::definitions() const
     return d->m_sortedDefs;
 }
 
+QVector<Theme> Repository::themes() const
+{
+    return d->m_themes;
+}
+
+Theme Repository::theme(const QString &themeName) const
+{
+    for (auto theme : d->m_themes) {
+        if (theme.name() == themeName) {
+            return theme;
+        }
+    }
+
+    return Theme();
+}
+
 void RepositoryPrivate::load(Repository *repo)
 {
     auto dirs = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("org.kde.syntax-highlighting/syntax"), QStandardPaths::LocateDirectory);
@@ -115,6 +138,16 @@ void RepositoryPrivate::load(Repository *repo)
             comparison = left.translatedName().compare(right.translatedName(), Qt::CaseInsensitive);
         return comparison < 0;
     });
+
+    // load themes
+    const QString themePath = QStringLiteral(":/syntaxhighlighting/themes");
+    QDirIterator it(themePath);
+    while (it.hasNext()) {
+        std::shared_ptr<ThemeData> themeData = std::make_shared<ThemeData>();
+        if (themeData->load(it.next())) {
+            m_themes.push_back(Theme(themeData));
+        }
+    }
 }
 
 void RepositoryPrivate::loadFolder(Repository *repo, const QString &path)
@@ -174,5 +207,8 @@ void Repository::reload()
         DefinitionData::get(def)->clear();
     d->m_defs.clear();
     d->m_sortedDefs.clear();
+
+    d->m_themes.clear();
+
     d->load(this);
 }

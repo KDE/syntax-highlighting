@@ -44,8 +44,7 @@ public:
 };
 }
 
-AbstractHighlighterPrivate::AbstractHighlighterPrivate() :
-    m_theme(Theme::defaultTheme())
+AbstractHighlighterPrivate::AbstractHighlighterPrivate()
 {
 }
 

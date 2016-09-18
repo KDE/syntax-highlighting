@@ -22,6 +22,7 @@
 #include <format.h>
 #include <repository.h>
 #include <state.h>
+#include <theme.h>
 
 #include <QDirIterator>
 #include <QFile>
@@ -140,6 +141,9 @@ private Q_SLOTS:
             def = m_repo->definitionForName(syntax);
 
         TestHighlighter highlighter;
+        highlighter.setTheme(m_repo->theme(QLatin1String("Default")));
+        QVERIFY(highlighter.theme().isValid());
+
         QVERIFY(def.isValid());
         qDebug() << "Using syntax" << def.name();
         highlighter.setDefinition(def);

@@ -19,6 +19,7 @@
 
 #include <repository.h>
 #include <definition.h>
+#include <theme.h>
 #include <htmlhighlighter.h>
 
 #include <QDirIterator>
@@ -88,6 +89,9 @@ private Q_SLOTS:
         QVERIFY(m_repo);
 
         HtmlHighlighter highlighter;
+        highlighter.setTheme(m_repo->theme(QLatin1String("Default")));
+        QVERIFY(highlighter.theme().isValid());
+
         auto def = m_repo->definitionForFileName(inFile);
         if (!syntax.isEmpty())
             def = m_repo->definitionForName(syntax);

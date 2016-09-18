@@ -37,8 +37,9 @@ template <typename T> class QVector;
  */
 namespace SyntaxHighlighting {
 
-class RepositoryPrivate;
 class Definition;
+class RepositoryPrivate;
+class Theme;
 
 /**
  * @brief Syntax highlighting repository.
@@ -102,6 +103,19 @@ public:
      * for consistent displaying.
      */
     QVector<Definition> definitions() const;
+
+    /**
+     * Returns all available color themes.
+     * The returned list should never be empty.
+     */
+    QVector<Theme> themes() const;
+
+    /**
+     * Returns the theme called @p themeName.
+     * If the requested theme cannot be found, the retunred Theme is invalid,
+     * see Theme::isValid().
+     */
+    Theme theme(const QString &themeName) const;
 
     /**
      * Reloads the repository.

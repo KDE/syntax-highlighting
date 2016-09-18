@@ -33,7 +33,7 @@ public:
     QString name;
     QColor color;
     QColor backgroundColor;
-    Theme::Style defaultStyle;
+    TextStyle defaultStyle;
     bool italic;
     bool bold;
     bool underline;
@@ -51,9 +51,9 @@ public:
 };
 }
 
-static Theme::Style stringToDefaultFormat(const QStringRef &str)
+static TextStyle stringToDefaultFormat(const QStringRef &str)
 {
-#define D(type) if (str == QLatin1String("ds" #type)) return Theme:: type;
+#define D(type) if (str == QLatin1String("ds" #type)) return type;
     D(Normal)
     D(Keyword)
     D(Function)
@@ -86,11 +86,11 @@ static Theme::Style stringToDefaultFormat(const QStringRef &str)
     D(Error)
     D(Others)
 #undef D
-    return Theme::Normal;
+    return Normal;
 }
 
 FormatPrivate::FormatPrivate()
-    : defaultStyle(Theme::Normal)
+    : defaultStyle(Normal)
     , italic(false)
     , bold(false)
     , underline(false)

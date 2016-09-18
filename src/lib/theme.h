@@ -28,6 +28,41 @@ namespace SyntaxHighlighting {
 
 struct ThemeData;
 
+/** Default styles that can be referenced from syntax definition XML files. */
+enum TextStyle {
+    Normal = 0,
+    Keyword,
+    Function,
+    Variable,
+    ControlFlow,
+    Operator,
+    BuiltIn,
+    Extension,
+    Preprocessor,
+    Attribute,
+    Char,
+    SpecialChar,
+    String,
+    VerbatimString,
+    SpecialString,
+    Import,
+    DataType,
+    DecVal,
+    BaseN,
+    Float,
+    Constant,
+    Comment,
+    Documentation,
+    Annotation,
+    CommentVar,
+    RegionMarker,
+    Information,
+    Warning,
+    Alert,
+    Error,
+    Others
+};
+
 /** Color theme definition used for highlighting.
  *  To determine the final output of highlighting a global theme (represented
  *  by this class) and specific formating instructions of the corresponding
@@ -38,73 +73,73 @@ struct ThemeData;
 class KF5SYNTAXHIGHLIGHTING_EXPORT Theme
 {
 public:
+    /**
+     * Default constructor, creating an invalid Theme, see isValid().
+     */
+    Theme();
+
+    /**
+     * Copy constructor, sharing the Theme data with @p copy.
+     */
+    Theme(const Theme &copy);
+
+    /**
+     * Destructor.
+     */
     ~Theme();
 
-    /** Default styles that can be referenced from syntax definition XML files. */
-    enum Style {
-        Normal,
-        Keyword,
-        Function,
-        Variable,
-        ControlFlow,
-        Operator,
-        BuiltIn,
-        Extension,
-        Preprocessor,
-        Attribute,
-        Char,
-        SpecialChar,
-        String,
-        VerbatimString,
-        SpecialString,
-        Import,
-        DataType,
-        DecVal,
-        BaseN,
-        Float,
-        Constant,
-        Comment,
-        Documentation,
-        Annotation,
-        CommentVar,
-        RegionMarker,
-        Information,
-        Warning,
-        Alert,
-        Error,
-        Others
-    };
+    /**
+     * Assignment operator, sharing the Theme data with @p other.
+     */
+    Theme &operator=(const Theme &other);
+
+    /**
+     * Returns @c true if this is a valid Theme.
+     * If the theme is invalid, none of the returned colors are well-defined.
+     */
+    bool isValid() const;
+
+    /**
+     * Returns the unique name of this Theme.
+     */
+    QString name() const;
+
+    /**
+     * Returns @c true if this Theme is read-only.
+     * Typically, themes that are shipped by default are read-only.
+     */
+    bool isReadOnly() const;
 
     /** Returns the text color to be used for @p style.
      *  @c 0 is returned for styles that do not specify a text color,
      *  use the default text color in that case.
      */
-    QRgb textColor(Style style) const;
+    QRgb textColor(TextStyle style) const;
     /** Returns the background color to be used for @p style.
      *  @c 0 is returned for styles that do not specify a background color,
      *  use the default background color in that case.
      */
-    QRgb backgroundColor(Style style) const;
+    QRgb backgroundColor(TextStyle style) const;
 
     /** Returns whether the given style should be shown in bold. */
-    bool isBold(Style style) const;
+    bool isBold(TextStyle style) const;
     /** Returns whether the given style should be shown in italic. */
-    bool isItalic(Style style) const;
+    bool isItalic(TextStyle style) const;
     /** Returns whether the given style should be shown underlined. */
-    bool isUnderline(Style style) const;
+    bool isUnderline(TextStyle style) const;
     /** Returns whether the given style should be shown striked through. */
-    bool isStrikeThrough(Style style) const;
+    bool isStrikeThrough(TextStyle style) const;
 
-    /** Built-in default theme types. */
-    enum DefaultTheme {
-        NormalTheme,
-        DarkTheme
-    };
-    /** Returns a default theme instance of the given type. */
-    static Theme defaultTheme(DefaultTheme t = NormalTheme);
+public:
+    /**
+     * Constructor taking a shared ThemeData instance.
+     */
+    Theme(std::shared_ptr<ThemeData> data);
 
 private:
-    Theme();
+    /**
+     * Shared data holder.
+     */
     std::shared_ptr<ThemeData> m_data;
 };
 

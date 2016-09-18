@@ -16,94 +16,22 @@
 */
 
 #include "theme.h"
+#include "themedata_p.h"
 
 using namespace SyntaxHighlighting;
 
-namespace SyntaxHighlighting {
-
-struct ThemeData {
-    QRgb textColor;
-    QRgb backgroundColor;
-    bool bold;
-    bool italic;
-    bool underline;
-    bool strikeThrough;
-};
-
-static const ThemeData normal_default_theme[] {
-    { 0x00000000, 0x00000000, false, false, false, false }, // Normal
-    { 0x00000000, 0x00000000, true , false, false, false }, // Keyword
-    { 0xff644a9b, 0x00000000, false, false, false, false }, // Function
-    { 0xff0057ae, 0x00000000, false, false, false, false }, // Variable
-    { 0x00000000, 0x00000000, true , false, false, false }, // ControlFlow
-    { 0x00000000, 0x00000000, false, false, false, false }, // Operator
-    { 0xff644a9b, 0x00000000, false, false, false, false }, // BuiltIn
-    { 0xff0095ff, 0x00000000, true , false, false, false }, // Extension
-    { 0xff006e28, 0x00000000, false, false, false, false }, // Preprocessor
-    { 0xff0057ae, 0x00000000, false, false, false, false }, // Attribute
-    { 0xff924c9d, 0x00000000, false, false, false, false }, // Char
-    { 0xff3daee9, 0x00000000, false, false, false, false }, // SpecialChar
-    { 0xffbf0303, 0x00000000, false, false, false, false }, // String
-    { 0xff0057ae, 0x00000000, false, false, false, false }, // VerbatimString
-    { 0xffff5500, 0x00000000, false, false, false, false }, // SpecialString
-    { 0xffff5500, 0x00000000, false, false, false, false }, // Import
-    { 0xff0057ae, 0x00000000, false, false, false, false }, // DataType
-    { 0xffb08000, 0x00000000, false, false, false, false }, // DecVal
-    { 0xffb08000, 0x00000000, false, false, false, false }, // BaseN
-    { 0xffb08000, 0x00000000, false, false, false, false }, // Float
-    { 0xffaa5500, 0x00000000, false, false, false, false }, // Constant
-    { 0xff898887, 0x00000000, false, false, false, false }, // Comment
-    { 0xff607880, 0x00000000, false, false, false, false }, // Documentation
-    { 0xffca60ca, 0x00000000, false, false, false, false }, // Annotation
-    { 0xff0095ff, 0x00000000, false, false, false, false }, // CommentVar
-    { 0xff0057ae, 0xffe0e9f8, false, false, false, false }, // RegionMarker
-    { 0xffb08000, 0x00000000, false, false, false, false }, // Information
-    { 0xffbf0303, 0x00000000, false, false, false, false }, // Warning
-    { 0xffbf0303, 0xfff7e6e6, true , false, false, false }, // Alert
-    { 0xffbf0303, 0x00000000, false, false, true , false }, // Error
-    { 0xff006e28, 0x00000000, false, false, false, false }, // Others
-};
-
-static const ThemeData dark_default_theme[] {
-    { 0x00000000, 0x00000000, false, false, false, false }, // Normal
-    { 0x00000000, 0x00000000, true , false, false, false }, // Keyword
-    { 0xfff67400, 0x00000000, false, false, false, false }, // Function
-    { 0xff2980b9, 0x00000000, false, false, false, false }, // Variable
-    { 0x00000000, 0x00000000, true , false, false, false }, // ControlFlow
-    { 0x00000000, 0x00000000, false, false, false, false }, // Operator
-    { 0xff7f8c8d, 0x00000000, false, false, false, false }, // BuiltIn
-    { 0xff0095ff, 0x00000000, true , false, false, false }, // Extension
-    { 0xff27ae60, 0x00000000, false, false, false, false }, // Preprocessor
-    { 0xff2980b9, 0x00000000, false, false, false, false }, // Attribute
-    { 0xff3daee9, 0x00000000, false, false, false, false }, // Char
-    { 0xff3daee9, 0x00000000, false, false, false, false }, // SpecialChar
-    { 0xffda4453, 0x00000000, false, false, false, false }, // String
-    { 0xffda4453, 0x00000000, false, false, false, false }, // VerbatimString
-    { 0xffda4453, 0x00000000, false, false, false, false }, // SpecialString
-    { 0xff7f8c8d, 0x00000000, false, false, false, false }, // Import
-    { 0xff2980b9, 0x00000000, false, false, false, false }, // DataType
-    { 0xfff67400, 0x00000000, false, false, false, false }, // DecVal
-    { 0xfff67400, 0x00000000, false, false, false, false }, // BaseN
-    { 0xfff67400, 0x00000000, false, false, false, false }, // Float
-    { 0x00000000, 0x00000000, false, false, false, false }, // Constant
-    { 0xffbdc3c7, 0x00000000, false, false, false, false }, // Comment
-    { 0xff607880, 0x00000000, false, false, false, false }, // Documentation
-    { 0xff7f8c8d, 0x00000000, false, false, false, false }, // Annotation
-    { 0xff7f8c8d, 0x00000000, false, false, false, false }, // CommentVar
-    { 0xff2980b9, 0xff153042, false, false, false, false }, // RegionMarker
-    { 0xfff67400, 0x00000000, false, false, false, false }, // Information
-    { 0xffda4453, 0x00000000, false, false, false, false }, // Warning
-    { 0xffda4453, 0xff4d1f24, true , false, false, false }, // Alert
-    { 0xffda4453, 0x00000000, false, false, true , false }, // Error
-    { 0xff27ae60, 0x00000000, false, false, false, false }, // Others
-};
-
-
-static void noDeleter(ThemeData*) {}
-
-}
 
 Theme::Theme()
+{
+}
+
+Theme::Theme(const Theme &copy)
+{
+    m_data = copy.m_data;
+}
+
+Theme::Theme(std::shared_ptr<ThemeData> data)
+    : m_data(data)
 {
 }
 
@@ -111,52 +39,53 @@ Theme::~Theme()
 {
 }
 
-Theme Theme::defaultTheme(Theme::DefaultTheme t)
+Theme &Theme::operator=(const Theme &other)
 {
-    Theme theme;
-    switch (t) {
-        case NormalTheme:
-            theme.m_data.reset(const_cast<ThemeData*>(normal_default_theme), noDeleter);
-            break;
-        case DarkTheme:
-            theme.m_data.reset(const_cast<ThemeData*>(dark_default_theme), noDeleter);
-            break;
-    }
-    return theme;
+    m_data = other.m_data;
+    return *this;
 }
 
-QRgb Theme::textColor(Theme::Style style) const
+bool Theme::isValid() const
 {
-    Q_ASSERT(m_data);
-    return m_data.get()[style].textColor;
+    return m_data.get();
 }
 
-QRgb Theme::backgroundColor(Theme::Style style) const
+QString Theme::name() const
 {
-    Q_ASSERT(m_data);
-    return m_data.get()[style].backgroundColor;
+    return m_data ? m_data->name() : QString();
 }
 
-bool Theme::isBold(Theme::Style style) const
+bool Theme::isReadOnly() const
 {
-    Q_ASSERT(m_data);
-    return m_data.get()[style].bold;
+    return m_data ? m_data->isReadOnly() : false;
 }
 
-bool Theme::isItalic(Theme::Style style) const
+QRgb Theme::textColor(TextStyle style) const
 {
-    Q_ASSERT(m_data);
-    return m_data.get()[style].italic;
+    return m_data ? m_data->textColor(style) : qRgb(255, 255, 255);
 }
 
-bool Theme::isUnderline(Theme::Style style) const
+QRgb Theme::backgroundColor(TextStyle style) const
 {
-    Q_ASSERT(m_data);
-    return m_data.get()[style].underline;
+    return m_data ? m_data->backgroundColor(style) : qRgb(0, 0, 0);
 }
 
-bool Theme::isStrikeThrough(Theme::Style style) const
+bool Theme::isBold(TextStyle style) const
 {
-    Q_ASSERT(m_data);
-    return m_data.get()[style].strikeThrough;
+    return m_data ? m_data->isBold(style) : false;
+}
+
+bool Theme::isItalic(TextStyle style) const
+{
+    return m_data ? m_data->isItalic(style) : false;
+}
+
+bool Theme::isUnderline(TextStyle style) const
+{
+    return m_data ? m_data->isUnderline(style) : false;
+}
+
+bool Theme::isStrikeThrough(TextStyle style) const
+{
+    return m_data ? m_data->isStrikeThrough(style) : false;
 }

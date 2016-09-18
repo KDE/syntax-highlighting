@@ -16,6 +16,7 @@ set(syntax_highlighting_srcs
     syntaxhighlighter.cpp
     theme.cpp
     wildcardmatcher.cpp
+    themedata.cpp
     ${syntax_highlighting_QM_LOADER}
 )
 ecm_qt_declare_logging_category(syntax_highlighting_srcs
@@ -24,7 +25,9 @@ ecm_qt_declare_logging_category(syntax_highlighting_srcs
     CATEGORY_NAME org.kde.syntax-highlighting
 )
 
-add_library(KF5SyntaxHighlighting SHARED ${syntax_highlighting_srcs})
+qt5_add_resources(themes_QRC ${CMAKE_SOURCE_DIR}/data/themes/theme-data.qrc)
+
+add_library(KF5SyntaxHighlighting SHARED ${syntax_highlighting_srcs} ${themes_QRC})
 generate_export_header(KF5SyntaxHighlighting)
 set_target_properties(KF5SyntaxHighlighting PROPERTIES
     VERSION ${SyntaxHighlighting_VERSION_STRING}

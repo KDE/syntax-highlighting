@@ -55,7 +55,7 @@ static inline QRgb readColor(const QJsonValue &val)
  */
 static inline bool readBool(const QJsonValue &val)
 {
-    return val.isBool() : val.toBool() : false;
+    return val.isBool() ? val.toBool() : false;
 }
 
 static inline TextStyleData readThemeData(const QJsonObject &obj)

@@ -39,6 +39,7 @@ ecm_generate_headers(SyntaxHighlighting_HEADERS
         Definition
         Format
         Repository
+        State
         SyntaxHighlighter
         Theme
     REQUIRED_HEADERS SyntaxHighlighting_HEADERS

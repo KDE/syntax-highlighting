@@ -44,6 +44,7 @@ public:
     Definition definition() const;
 
 private:
+    friend class DefinitionData;
     std::weak_ptr<DefinitionData> d;
 };
 

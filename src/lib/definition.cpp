@@ -70,6 +70,11 @@ Definition::Definition(const Definition &other) :
     d->q = *this;
 }
 
+Definition::Definition(const std::shared_ptr<DefinitionData> &dd) :
+    d(dd)
+{
+}
+
 Definition::~Definition()
 {
 }
@@ -474,8 +479,7 @@ DefinitionRef& DefinitionRef::operator=(const Definition &def)
 
 Definition DefinitionRef::definition() const
 {
-    Definition def;
     if (!d.expired())
-        def.d = d.lock();
-    return def;
+        return Definition(d.lock());
+    return Definition();
 }

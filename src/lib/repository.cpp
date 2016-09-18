@@ -49,9 +49,9 @@ public:
 };
 }
 
-static void initResource() {
+static void initResource()
+{
     Q_INIT_RESOURCE(syntax_data);
-    Q_INIT_RESOURCE(theme_data);
 }
 
 Repository::Repository() :

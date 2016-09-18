@@ -62,22 +62,22 @@ bool Theme::isReadOnly() const
 
 QRgb Theme::textColor(TextStyle style) const
 {
-    return m_data ? m_data->textColor(style) : qRgb(255, 255, 255);
+    return m_data ? m_data->textColor(style) : 0;
 }
 
 QRgb Theme::selectedTextColor(TextStyle style) const
 {
-    return m_data ? m_data->selectedTextColor(style) : qRgb(255, 255, 255);
+    return m_data ? m_data->selectedTextColor(style) : 0;
 }
 
 QRgb Theme::backgroundColor(TextStyle style) const
 {
-    return m_data ? m_data->backgroundColor(style) : qRgb(0, 0, 0);
+    return m_data ? m_data->backgroundColor(style) : 0;
 }
 
 QRgb Theme::selectedBackgroundColor(TextStyle style) const
 {
-    return m_data ? m_data->selectedBackgroundColor(style) : qRgb(0, 0, 0);
+    return m_data ? m_data->selectedBackgroundColor(style) : 0;
 }
 
 bool Theme::isBold(TextStyle style) const

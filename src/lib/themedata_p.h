@@ -84,11 +84,25 @@ public:
     QRgb textColor(TextStyle style) const;
 
     /**
+     * Returns the text color for selected to be used for @p style.
+     * @c 0 is returned for styles that do not specify a selected text color,
+     * use the textColor() in that case.
+     */
+    QRgb selectedTextColor(TextStyle style) const;
+
+    /**
      * Returns the background color to be used for @p style.
      * @c 0 is returned for styles that do not specify a background color,
      * use the default background color in that case.
      */
     QRgb backgroundColor(TextStyle style) const;
+
+    /**
+     * Returns the background color for selected text to be used for @p style.
+     * @c 0 is returned for styles that do not specify a selected background
+     * color, use the default backgroundColor() in that case.
+     */
+    QRgb selectedBackgroundColor(TextStyle style) const;
 
     /** Returns whether the given style should be shown in bold. */
     bool isBold(TextStyle style) const;

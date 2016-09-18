@@ -110,16 +110,33 @@ public:
      */
     bool isReadOnly() const;
 
-    /** Returns the text color to be used for @p style.
-     *  @c 0 is returned for styles that do not specify a text color,
-     *  use the default text color in that case.
+    /**
+     * Returns the text color to be used for @p style.
+     * @c 0 is returned for styles that do not specify a text color,
+     * use the default text color in that case.
      */
     QRgb textColor(TextStyle style) const;
-    /** Returns the background color to be used for @p style.
-     *  @c 0 is returned for styles that do not specify a background color,
-     *  use the default background color in that case.
+
+    /**
+     * Returns the selected text color to be used for @p style.
+     * @c 0 is returned for styles that do not specify a selected text color,
+     * use the default textColor() in that case.
+     */
+    QRgb selectedTextColor(TextStyle style) const;
+
+    /**
+     * Returns the background color to be used for @p style.
+     * @c 0 is returned for styles that do not specify a background color,
+     * use the default background color in that case.
      */
     QRgb backgroundColor(TextStyle style) const;
+
+    /**
+     * Returns the background color to be used for selected text for @p style.
+     * @c 0 is returned for styles that do not specify a background color,
+     * use the default backgroundColor() in that case.
+     */
+    QRgb selectedBackgroundColor(TextStyle style) const;
 
     /** Returns whether the given style should be shown in bold. */
     bool isBold(TextStyle style) const;

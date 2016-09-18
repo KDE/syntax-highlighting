@@ -151,10 +151,22 @@ QRgb ThemeData::textColor(TextStyle style) const
     return m_textStyles[style].textColor;
 }
 
+QRgb ThemeData::selectedTextColor(TextStyle style) const
+{
+    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Others));
+    return m_textStyles[style].selectedTextColor;
+}
+
 QRgb ThemeData::backgroundColor(TextStyle style) const
 {
     Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Others));
     return m_textStyles[style].backgroundColor;
+}
+
+QRgb ThemeData::selectedBackgroundColor(TextStyle style) const
+{
+    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Others));
+    return m_textStyles[style].selectedBackgroundColor;
 }
 
 bool ThemeData::isBold(TextStyle style) const

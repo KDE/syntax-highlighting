@@ -83,8 +83,8 @@ void SyntaxHighlighter::setFormat(int offset, int length, const SyntaxHighlighti
         return;
 
     QTextCharFormat tf;
-    if (format.hasColor(theme()))
-        tf.setForeground(format.color(theme()));
+    if (format.hasTextColor(theme()))
+        tf.setForeground(format.textColor(theme()));
     if (format.hasBackgroundColor(theme()))
         tf.setBackground(format.backgroundColor(theme()));
 

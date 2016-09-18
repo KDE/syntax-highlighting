@@ -95,8 +95,8 @@ void HtmlHighlighter::setFormat(int offset, int length, const Format& format)
 {
     if (!format.isNormal(theme())) {
         *m_out << "<span style=\"";
-        if (format.hasColor(theme()))
-            *m_out << "color:" << format.color(theme()).name() << ";";
+        if (format.hasTextColor(theme()))
+            *m_out << "color:" << format.textColor(theme()).name() << ";";
         if (format.hasBackgroundColor(theme()))
             *m_out << "background-color:" << format.backgroundColor(theme()).name() << ";";
         if (format.isBold(theme()))

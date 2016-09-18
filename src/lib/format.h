@@ -60,11 +60,11 @@ public:
     /** Returns @c true if the combination of this format and the theme @p theme
      *  change the foreground color.
      */
-    bool hasColor(const Theme &theme) const;
+    bool hasTextColor(const Theme &theme) const;
     /** Returns the foreground color of the combination of this format and the
      *  given theme.
      */
-    QColor color(const Theme &theme) const;
+    QColor textColor(const Theme &theme) const;
     /** Returns @c true if the combination of this format and the theme @p theme
      *  change the background color.
      */

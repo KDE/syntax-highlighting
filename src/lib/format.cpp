@@ -126,16 +126,16 @@ QString Format::name() const
 
 bool Format::isNormal(const Theme &theme) const
 {
-    return !hasColor(theme) && !d->hasSelColor && !hasBackgroundColor(theme)
+    return !hasTextColor(theme) && !d->hasSelColor && !hasBackgroundColor(theme)
         && !isBold(theme) && !isItalic(theme) && !isUnderline(theme) && !isStrikeThrough(theme);
 }
 
-bool Format::hasColor(const Theme &theme) const
+bool Format::hasTextColor(const Theme &theme) const
 {
     return d->hasColor || (theme.textColor(d->defaultStyle) & 0xff000000);
 }
 
-QColor Format::color(const Theme &theme) const
+QColor Format::textColor(const Theme &theme) const
 {
     return d->hasColor ? d->color : QColor(theme.textColor(d->defaultStyle));
 }

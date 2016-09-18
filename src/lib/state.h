@@ -26,7 +26,7 @@ namespace SyntaxHighlighting {
 
 class StateData;
 
-/** Opaque handle to the state of the higlighting engine.
+/** Opaque handle to the state of the highlighting engine.
  *  This needs to be fed into AbstractHighlighter for every line of text
  *  and allows concrete highlighter implementations to store state per
  *  line for fast re-highlighting of specific lines (e.g. during editing).
@@ -42,12 +42,16 @@ public:
     ~State();
     State& operator=(const State &rhs);
 
-    /** Compares two states.
+    /** Compares two states for equality.
      *  For two equal states and identical text input, AbstractHighlighter
      *  guarantees to produce equal results. This can be used to only
-     *  re-highight as many lines as necessary during editing.
+     *  re-highlight as many lines as necessary during editing.
      */
-    bool operator==(const State &other);
+    bool operator==(const State &other) const;
+    /** Compares two states for inequality.
+     *  This is the opposite of operator==().
+     */
+    bool operator!=(const State &other) const;
 
 private:
     friend class StateData;

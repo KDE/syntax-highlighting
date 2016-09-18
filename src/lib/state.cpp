@@ -100,7 +100,12 @@ State& State::operator=(const State &other)
     return *this;
 }
 
-bool State::operator==(const State &other)
+bool State::operator==(const State &other) const
 {
     return d->m_contextStack == other.d->m_contextStack && d->m_captureStack == other.d->m_captureStack && d->m_defData == other.d->m_defData;
+}
+
+bool State::operator!=(const State &other) const
+{
+    return !(*this == other);
 }

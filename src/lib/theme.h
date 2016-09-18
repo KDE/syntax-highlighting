@@ -26,7 +26,7 @@
 
 namespace SyntaxHighlighting {
 
-struct ThemeData;
+class ThemeData;
 
 /** Default styles that can be referenced from syntax definition XML files. */
 enum TextStyle {

@@ -12,7 +12,7 @@ as well as a ready-to-use QSyntaxHighlighter sub-class.
 ## Syntax Definition Files
 
 This library uses Kate syntax definition files for the actual highlighting,
-the file format is documented [https://docs.kde.org/stable5/en/applications/katepart/highlight.html](here).
+the file format is documented [here](https://docs.kde.org/stable5/en/applications/katepart/highlight.html).
 
 More than 250 syntax definition files are included, additional ones are
 picked up from the file system if present, so you can easily extend this
@@ -29,4 +29,4 @@ out of scope:
 * user interface for configuration
 * management of text buffers or documents
 
-If you need any of this, check out KTextEditor.
+If you need any of this, check out [KTextEditor](https://api.kde.org/frameworks/ktexteditor/html/).

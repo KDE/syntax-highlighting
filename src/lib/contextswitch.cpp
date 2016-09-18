@@ -81,9 +81,10 @@ void ContextSwitch::resolve(const Definition &def)
     auto d = def;
     if (!m_defName.isEmpty()) {
         d = DefinitionData::get(def)->repo->definitionForName(m_defName);
-        d.load();
+        auto data = DefinitionData::get(d);
+        data->load();
         if (m_contextName.isEmpty())
-            m_context = DefinitionData::get(d)->initialContext();
+            m_context = data->initialContext();
     }
 
     if (!m_contextName.isEmpty()) {

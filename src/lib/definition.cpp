@@ -194,13 +194,13 @@ bool DefinitionData::isLoaded() const
     return !contexts.isEmpty();
 }
 
-bool Definition::load()
+bool DefinitionData::load()
 {
-    if (d->isLoaded())
+    if (isLoaded())
         return true;
 
-    Q_ASSERT(!d->fileName.isEmpty());
-    QFile file(d->fileName);
+    Q_ASSERT(!fileName.isEmpty());
+    QFile file(fileName);
     if (!file.open(QFile::ReadOnly))
         return false;
 
@@ -211,16 +211,16 @@ bool Definition::load()
             continue;
 
         if (reader.name() == QLatin1String("highlighting"))
-            d->loadHighlighting(reader);
+            loadHighlighting(reader);
 
         else if (reader.name() == QLatin1String("general"))
-            d->loadGeneral(reader);
+            loadGeneral(reader);
     }
 
-    for (auto it = d->keywordLists.begin(); it != d->keywordLists.end(); ++it)
-        (*it).setCaseSensitivity(d->caseSensitive);
+    for (auto it = keywordLists.begin(); it != keywordLists.end(); ++it)
+        (*it).setCaseSensitivity(caseSensitive);
 
-    foreach (auto context, d->contexts) {
+    foreach (auto context, contexts) {
         context->resolveContexts();
         context->resolveIncludes();
     }

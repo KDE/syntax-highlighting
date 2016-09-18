@@ -195,8 +195,8 @@ void Context::resolveIncludes()
                 ++it;
                 continue;
             }
-            def.load();
             auto defData = DefinitionData::get(def);
+            defData->load();
             if (inc->contextName().isEmpty())
                 context = defData->initialContext();
             else

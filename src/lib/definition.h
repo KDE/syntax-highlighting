@@ -138,15 +138,8 @@ public:
     QString license() const;
 
 private:
-    friend class AbstractHighlighterPrivate;
-    friend class Context;
-    friend class ContextSwitch;
     friend class DefinitionData;
     friend class DefinitionRef;
-    friend class RepositoryTest;
-
-    // stuff needed by our friends, but should not be used externally
-    bool load();
 
     std::shared_ptr<DefinitionData> d;
 };

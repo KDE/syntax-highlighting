@@ -47,6 +47,7 @@ public:
 
     void clear();
 
+    bool load();
     bool loadLanguage(QXmlStreamReader &reader);
     void loadHighlighting(QXmlStreamReader &reader);
     void loadContexts(QXmlStreamReader &reader);

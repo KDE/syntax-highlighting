@@ -63,12 +63,45 @@ enum TextStyle {
     Others
 };
 
-/** Color theme definition used for highlighting.
- *  To determine the final output of highlighting a global theme (represented
- *  by this class) and specific formating instructions of the corresponding
- *  syntax definition (represented by the Format class) are merged.
+/**
+ * Color theme definition used for highlighting.
  *
- *  @see Format
+ * @section theme_intro Introduction
+ *
+ * The Theme provides a full color theme for painting the highlighted text.
+ * One Theme is defined either as a *.theme file on disk, or as a file compiled
+ * into the SyntaxHighlighting library by using Qt's resource system. Each
+ * Theme has a unique name(), including a translatedName() if put into the UI.
+ * Themes shipped by default are typically read-only, see isReadOnly().
+ *
+ * A Theme defines two sets of colors:
+ * - Text colors, including foreground and background colors, colors for
+ *   selected text, and properties such as bold and italic. These colors are
+ *   used e.g. by the SyntaxHighlighter.
+ * - Editor colors, including a background color for the entire editor widget,
+ *   the line number color, code folding colors, etc.
+ *
+ * @section theme_text_colors Text Colors and the Class Format
+ *
+ * The text colors are used for syntax highlighting.
+ * // TODO: elaborate more and explain relation to Format class
+ *
+ * @section theme_editor_colors Editor Colors
+ *
+ * If you want to use the SyntaxHighlighting framework to write your own text
+ * editor, you also need to paint the background of the editing widget. In
+ * addition, the editor may support showing line numbers, a folding bar, a
+ * highlight for the current text line, and similar features. All these colors
+ * are defined in terms of the "editor colors".
+ *
+ * @section theme_access Accessing a Theme
+ *
+ * All available Theme%s are accessed through the Repository. These themes are
+ * typically valid themes. If you create a Theme on your own, isValid() will
+ * return @e false, and all colors provided by this Theme are in fact invalid
+ * and therefore unusable.
+ *
+ * @see Format
  */
 class KF5SYNTAXHIGHLIGHTING_EXPORT Theme
 {

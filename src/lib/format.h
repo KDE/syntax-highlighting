@@ -65,6 +65,10 @@ public:
      *  given theme.
      */
     QColor textColor(const Theme &theme) const;
+    /** Returns the foreground color for selected text of the combination of
+     *  this format and the given theme.
+     */
+    QColor selectedTextColor(const Theme &theme) const;
     /** Returns @c true if the combination of this format and the theme @p theme
      *  change the background color.
      */
@@ -73,6 +77,10 @@ public:
      *  given theme.
      */
     QColor backgroundColor(const Theme &theme) const;
+    /** Returns the background color of selected text of the combination of
+     *  this format and the given theme.
+     */
+    QColor selectedBackgroundColor(const Theme &theme) const;
 
     /** Returns @c true if the combination of this format and the given theme
      *  results in bold text formatting.

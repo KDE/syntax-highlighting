@@ -32,7 +32,9 @@ public:
     FormatPrivate();
     QString name;
     QColor color;
+    QColor selColor;
     QColor backgroundColor;
+    QColor selBackgroundColor;
     TextStyle defaultStyle;
     bool italic;
     bool bold;
@@ -48,6 +50,7 @@ public:
     bool hasColor;
     bool hasSelColor;
     bool hasBgColor;
+    bool hasSelBgColor;
 };
 }
 
@@ -103,6 +106,7 @@ FormatPrivate::FormatPrivate()
     , hasColor(false)
     , hasSelColor(false)
     , hasBgColor(false)
+    , hasSelBgColor(false)
 {
 }
 
@@ -140,6 +144,11 @@ QColor Format::textColor(const Theme &theme) const
     return d->hasColor ? d->color : QColor(theme.textColor(d->defaultStyle));
 }
 
+QColor Format::selectedTextColor(const Theme &theme) const
+{
+    return d->hasSelColor ? d->selColor : QColor(theme.selectedTextColor(d->defaultStyle));
+}
+
 bool Format::hasBackgroundColor(const Theme &theme) const
 {
     return d->hasBgColor || (theme.backgroundColor(d->defaultStyle) & 0xff000000);
@@ -149,6 +158,12 @@ QColor Format::backgroundColor(const Theme &theme) const
 {
     return d->hasBgColor ? d->backgroundColor
                          : QColor(theme.backgroundColor(d->defaultStyle));
+}
+
+QColor Format::selectedBackgroundColor(const Theme &theme) const
+{
+    return d->hasSelBgColor ? d->selBackgroundColor
+                            : QColor(theme.selectedBackgroundColor(d->defaultStyle));
 }
 
 bool Format::isBold(const Theme &theme) const
@@ -187,10 +202,22 @@ void Format::load(QXmlStreamReader& reader)
         d->color = QColor(ref.toString());
     }
 
+    ref = reader.attributes().value(QStringLiteral("selColor"));
+    if (!ref.isEmpty()) {
+        d->hasSelColor = true;
+        d->selColor = QColor(ref.toString());
+    }
+
     ref = reader.attributes().value(QStringLiteral("backgroundColor"));
     if (!ref.isEmpty()) {
         d->hasBgColor = true;
         d->backgroundColor = QColor(ref.toString());
+    }
+
+    ref = reader.attributes().value(QStringLiteral("selBackgroundColor"));
+    if (!ref.isEmpty()) {
+        d->hasSelBgColor = true;
+        d->selBackgroundColor = QColor(ref.toString());
     }
 
     ref = reader.attributes().value(QStringLiteral("italic"));

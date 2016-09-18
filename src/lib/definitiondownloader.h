@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_DOWNLOADER_H
-#define SYNTAXHIGHLIGHTING_DOWNLOADER_H
+#ifndef SYNTAXHIGHLIGHTING_DEFINITIONDOWNLOADER_H
+#define SYNTAXHIGHLIGHTING_DEFINITIONDOWNLOADER_H
 
 #include "kf5syntaxhighlighting_export.h"
 
@@ -25,15 +25,15 @@
 
 namespace SyntaxHighlighting {
 
-class DownloaderPrivate;
+class DefinitionDownloaderPrivate;
 class Repository;
 
-class KF5SYNTAXHIGHLIGHTING_EXPORT Downloader : public QObject
+class KF5SYNTAXHIGHLIGHTING_EXPORT DefinitionDownloader : public QObject
 {
     Q_OBJECT
 public:
-    explicit Downloader(Repository *repo, QObject *parent = Q_NULLPTR);
-    ~Downloader();
+    explicit DefinitionDownloader(Repository *repo, QObject *parent = Q_NULLPTR);
+    ~DefinitionDownloader();
 
     void start();
 
@@ -42,8 +42,8 @@ Q_SIGNALS:
     void done();
 
 private:
-    std::unique_ptr<DownloaderPrivate> d;
+    std::unique_ptr<DefinitionDownloaderPrivate> d;
 };
 }
 
-#endif // SYNTAXHIGHLIGHTING_DOWNLOADER_H
+#endif // SYNTAXHIGHLIGHTING_DEFINITIONDOWNLOADER_H

@@ -18,7 +18,7 @@
 #include "syntaxhighlighting_version.h"
 
 #include <definition.h>
-#include <downloader.h>
+#include <definitiondownloader.h>
 #include <htmlhighlighter.h>
 #include <repository.h>
 #include <definition.h>
@@ -77,11 +77,11 @@ int main(int argc, char **argv)
     }
 
     if (parser.isSet(updateDefs)) {
-        Downloader downloader(&repo);
-        QObject::connect(&downloader, &Downloader::informationMessage, [](const QString &msg) {
+        DefinitionDownloader downloader(&repo);
+        QObject::connect(&downloader, &DefinitionDownloader::informationMessage, [](const QString &msg) {
             std::cout << qPrintable(msg) << std::endl;
         });
-        QObject::connect(&downloader, &Downloader::done, &app, &QCoreApplication::quit);
+        QObject::connect(&downloader, &DefinitionDownloader::done, &app, &QCoreApplication::quit);
         downloader.start();
         return app.exec();
     }

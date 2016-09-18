@@ -4,7 +4,7 @@ set(syntax_highlighting_srcs
     abstracthighlighter.cpp
     context.cpp
     contextswitch.cpp
-    downloader.cpp
+    definitiondownloader.cpp
     format.cpp
     htmlhighlighter.cpp
     keywordlist.cpp

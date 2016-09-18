@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "downloader.h"
+#include "definitiondownloader.h"
 #include "definition.h"
 #include "repository.h"
 #include "syntaxhighlighting_logging.h"
@@ -33,10 +33,10 @@
 
 using namespace SyntaxHighlighting;
 
-class SyntaxHighlighting::DownloaderPrivate
+class SyntaxHighlighting::DefinitionDownloaderPrivate
 {
 public:
-    Downloader *q;
+    DefinitionDownloader *q;
     Repository *repo;
     QNetworkAccessManager *nam;
     QString downloadLocation;
@@ -50,7 +50,7 @@ public:
     void checkDone();
 };
 
-void DownloaderPrivate::definitionListDownloadFinished(QNetworkReply *reply)
+void DefinitionDownloaderPrivate::definitionListDownloadFinished(QNetworkReply *reply)
 {
     if (reply->error() != QNetworkReply::NoError) {
         qCWarning(Log) << reply->error();
@@ -75,7 +75,7 @@ void DownloaderPrivate::definitionListDownloadFinished(QNetworkReply *reply)
     checkDone();
 }
 
-void DownloaderPrivate::updateDefinition(QXmlStreamReader &parser)
+void DefinitionDownloaderPrivate::updateDefinition(QXmlStreamReader &parser)
 {
     const auto name = parser.attributes().value(QLatin1String("name"));
     if (name.isEmpty())
@@ -95,7 +95,7 @@ void DownloaderPrivate::updateDefinition(QXmlStreamReader &parser)
     }
 }
 
-void DownloaderPrivate::downloadDefinition(const QUrl& downloadUrl)
+void DefinitionDownloaderPrivate::downloadDefinition(const QUrl& downloadUrl)
 {
     if (!downloadUrl.isValid())
         return;
@@ -112,7 +112,7 @@ void DownloaderPrivate::downloadDefinition(const QUrl& downloadUrl)
     needsReload = true;
 }
 
-void DownloaderPrivate::downloadDefinitionFinished(QNetworkReply *reply)
+void DefinitionDownloaderPrivate::downloadDefinitionFinished(QNetworkReply *reply)
 {
     --pendingDownloads;
     if (reply->error() != QNetworkReply::NoError) {
@@ -139,20 +139,20 @@ void DownloaderPrivate::downloadDefinitionFinished(QNetworkReply *reply)
     checkDone();
 }
 
-void DownloaderPrivate::checkDone()
+void DefinitionDownloaderPrivate::checkDone()
 {
     if (pendingDownloads == 0) {
         if (needsReload)
             repo->reload();
 
-        emit QTimer::singleShot(0, q, &Downloader::done);
+        emit QTimer::singleShot(0, q, &DefinitionDownloader::done);
     }
 }
 
 
-Downloader::Downloader(Repository *repo, QObject *parent)
+DefinitionDownloader::DefinitionDownloader(Repository *repo, QObject *parent)
     : QObject(parent)
-    , d(new DownloaderPrivate())
+    , d(new DefinitionDownloaderPrivate())
 {
     Q_ASSERT(repo);
 
@@ -167,11 +167,11 @@ Downloader::Downloader(Repository *repo, QObject *parent)
     Q_ASSERT(QFile::exists(d->downloadLocation));
 }
 
-Downloader::~Downloader()
+DefinitionDownloader::~DefinitionDownloader()
 {
 }
 
-void Downloader::start()
+void DefinitionDownloader::start()
 {
     const QString url = QLatin1String("https://www.kate-editor.org/syntax/update-")
                       + QString::number(SyntaxHighlighting_VERSION_MAJOR)

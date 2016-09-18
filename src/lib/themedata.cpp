@@ -32,29 +32,44 @@ ThemeData::ThemeData()
 {
 }
 
+/**
+ * Convert QJsonValue @p val into a color, if possible. Valid colors are only
+ * in hex format: #rrggbb. On error, returns 0x00000000.
+ */
 static inline QRgb readColor(const QJsonValue &val)
 {
+    const QRgb unsetColor = 0;
+    if (!val.isString()) {
+        return unsetColor;
+    }
     const QString str = val.toString();
     if (str.isEmpty() || str[0] != QLatin1Char('#')) {
-        return 0x00000000;
+        return unsetColor;
     }
     const QColor color(str);
-    return color.isValid() ? color.rgb() : 0x00000000;
+    return color.isValid() ? color.rgb() : unsetColor;
+}
+
+/**
+ * Convert QJsonValue @p val into a bool, if possible. On error, returns false.
+ */
+static inline bool readBool(const QJsonValue &val)
+{
+    return val.isBool() : val.toBool() : false;
 }
 
 static inline TextStyleData readThemeData(const QJsonObject &obj)
 {
     TextStyleData td;
 
-    // TODO / FIXME: properly set default values first.
     td.textColor = readColor(obj.value(QLatin1String("text-color")));
     td.backgroundColor = readColor(obj.value(QLatin1String("background-color")));
     td.selectedTextColor = readColor(obj.value(QLatin1String("selected-text-color")));
     td.selectedBackgroundColor = readColor(obj.value(QLatin1String("selected-background-color")));
-    td.bold = obj.value(QLatin1String("bold")).toBool();
-    td.italic = obj.value(QLatin1String("italic")).toBool();
-    td.underline = obj.value(QLatin1String("underline")).toBool();
-    td.strikeThrough = obj.value(QLatin1String("strike-through")).toBool();
+    td.bold = readBool(obj.value(QLatin1String("bold")));
+    td.italic = readBool(obj.value(QLatin1String("italic")));
+    td.underline = readBool(obj.value(QLatin1String("underline")));
+    td.strikeThrough = readBool(obj.value(QLatin1String("strike-through")));
 
     return td;
 }

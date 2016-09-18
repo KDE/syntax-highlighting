@@ -41,7 +41,7 @@ using namespace SyntaxHighlighting;
 
 DefinitionData::DefinitionData() :
     repo(Q_NULLPTR),
-    delimiters(QStringLiteral(".():!+,-<=>%&*/;?[]^{|}~\\ \t")),
+    delimiters(QStringLiteral("\t !%&()*+,-./:;<=>?[\\]^{|}~")), // must be sorted!
     caseSensitive(Qt::CaseSensitive),
     version(0.0f),
     priority(0),
@@ -182,7 +182,7 @@ KeywordList DefinitionData::keywordList(const QString& name) const
 
 bool DefinitionData::isDelimiter(QChar c) const
 {
-    return delimiters.contains(c);
+    return std::binary_search(delimiters.constBegin(), delimiters.constEnd(), c);
 }
 
 Format DefinitionData::formatByName(const QString& name) const
@@ -230,6 +230,7 @@ bool DefinitionData::load()
         context->resolveIncludes();
     }
 
+    Q_ASSERT(std::is_sorted(delimiters.constBegin(), delimiters.constEnd()));
     return true;
 }
 
@@ -249,7 +250,7 @@ void DefinitionData::clear()
     license.clear();
     mimetypes.clear();
     extensions.clear();
-    delimiters = QStringLiteral(".():!+,-<=>%&*/;?[]^{|}~\\ \t");
+    delimiters = QStringLiteral("\t !%&()*+,-./:;<=>?[\\]^{|}~"); // must be sorted!
     caseSensitive = Qt::CaseSensitive,
     version = 0.0f;
     priority = 0;

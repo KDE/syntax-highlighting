@@ -8,6 +8,10 @@ add_executable(syntaxrepository_test syntaxrepository_test.cpp)
 add_test(NAME syntaxrepository_test COMMAND syntaxrepository_test)
 target_link_libraries(syntaxrepository_test KF5SyntaxHighlighting Qt5::Test)
 
+add_executable(theme_test theme_test.cpp)
+add_test(NAME theme_test COMMAND theme_test)
+target_link_libraries(theme_test KF5SyntaxHighlighting Qt5::Test)
+
 add_executable(testhighlighter_test testhighlighter.cpp)
 add_test(NAME testhighlighter_test COMMAND testhighlighter_test)
 target_link_libraries(testhighlighter_test KF5SyntaxHighlighting Qt5::Test)

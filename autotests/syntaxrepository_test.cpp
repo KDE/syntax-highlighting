@@ -19,7 +19,6 @@
 #include <definition.h>
 #include <repository.h>
 #include <state.h>
-#include <theme.h>
 
 #include <QFileInfo>
 #include <QObject>
@@ -149,18 +148,6 @@ private Q_SLOTS:
         hl.highlightLine(QLatin1String("/* FIXME neither should this crash */"), oldState);
         QVERIFY(hl.definition().isValid());
         QCOMPARE(hl.definition().name(), QLatin1String("QML"));
-    }
-
-    void testThemes()
-    {
-        QVERIFY(!m_repo.themes().isEmpty());
-        Q_FOREACH (const auto theme, m_repo.themes()) {
-            QVERIFY(theme.isValid());
-            QVERIFY(!theme.name().isEmpty());
-            QVERIFY(!theme.filePath().isEmpty());
-            QVERIFY(QFileInfo::exists(theme.filePath()));
-            QVERIFY(m_repo.theme(theme.name()).isValid());
-        }
     }
 };
 }

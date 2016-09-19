@@ -157,6 +157,8 @@ private Q_SLOTS:
         Q_FOREACH (const auto theme, m_repo.themes()) {
             QVERIFY(theme.isValid());
             QVERIFY(!theme.name().isEmpty());
+            QVERIFY(!theme.filePath().isEmpty());
+            QVERIFY(QFileInfo::exists(theme.filePath()));
             QVERIFY(m_repo.theme(theme.name()).isValid());
         }
     }

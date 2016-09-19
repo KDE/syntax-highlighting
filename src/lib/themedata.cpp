@@ -89,6 +89,8 @@ bool ThemeData::load(const QString &filePath)
         return false;
     }
 
+    m_filePath = filePath;
+
     QJsonObject obj = jsonDoc.object();
 
     // read metadata
@@ -120,6 +122,11 @@ QString ThemeData::name() const
 bool ThemeData::isReadOnly() const
 {
     return m_readOnly;
+}
+
+QString ThemeData::filePath() const
+{
+    return m_filePath;
 }
 
 QRgb ThemeData::textColor(Theme::TextStyle style) const

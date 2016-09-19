@@ -154,6 +154,15 @@ public:
     bool isReadOnly() const;
 
     /**
+     * Returns the full path and filename to this Theme.
+     * Themes from the Qt resource return the Qt resource path.
+     * Themes from disk return the local path.
+     *
+     * If the theme is invalid (isValid()), an empty string is returned.
+     */
+    QString filePath() const;
+
+    /**
      * Returns the text color to be used for @p style.
      * @c 0 is returned for styles that do not specify a text color,
      * use the default text color in that case.

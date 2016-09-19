@@ -67,6 +67,11 @@ bool Theme::isReadOnly() const
     return m_data ? m_data->isReadOnly() : false;
 }
 
+QString Theme::filePath() const
+{
+    return m_data ? m_data->filePath() : QString();
+}
+
 QRgb Theme::textColor(TextStyle style) const
 {
     return m_data ? m_data->textColor(style) : 0;

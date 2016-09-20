@@ -74,7 +74,10 @@ void HtmlHighlighter::highlightFile(const QString& fileName)
     QFileInfo fi(fileName);
     *m_out << "<title>" << fi.fileName() << "</title>\n";
     *m_out << "<meta name=\"generator\" content=\"KF5::SyntaxHighlighting (" << definition().name() << ")\"/>\n";
-    *m_out << "</head><body><pre>\n";
+    *m_out << "</head><body";
+    if (theme().textColor(Theme::Normal))
+        *m_out << " style=\"color:" << QColor(theme().textColor(Theme::Normal)).name() << "\"";
+    *m_out << "><pre>\n";
 
     QTextStream in(&f);
     in.setCodec("UTF-8");

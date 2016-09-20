@@ -113,13 +113,24 @@ public:
      */
     QRgb selectedBackgroundColor(Theme::TextStyle style) const;
 
-    /** Returns whether the given style should be shown in bold. */
+    /**
+     * Returns whether the given style should be shown in bold.
+     */
     bool isBold(Theme::TextStyle style) const;
-    /** Returns whether the given style should be shown in italic. */
+
+    /**
+     * Returns whether the given style should be shown in italic.
+     */
     bool isItalic(Theme::TextStyle style) const;
-    /** Returns whether the given style should be shown underlined. */
+
+    /**
+     * Returns whether the given style should be shown underlined.
+     */
     bool isUnderline(Theme::TextStyle style) const;
-    /** Returns whether the given style should be shown striked through. */
+
+    /**
+     * Returns whether the given style should be shown striked through.
+     */
     bool isStrikeThrough(Theme::TextStyle style) const;
 
 private:

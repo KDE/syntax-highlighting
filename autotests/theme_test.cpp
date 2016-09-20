@@ -70,8 +70,7 @@ private Q_SLOTS:
     {
         QTest::addColumn<QString>("themeName");
         QTest::newRow("default") << "Default";
-        // TODO this breaks isNormal below
-//         QTest::newRow("dark") << "Breeze Dark";
+        QTest::newRow("dark") << "Breeze Dark";
     }
 
     void testFormat()
@@ -84,32 +83,34 @@ private Q_SLOTS:
         const auto t = m_repo.theme(themeName);
         QVERIFY(t.isValid());
         collector.setTheme(t);
-        collector.highlightLine(QLatin1String("normal + property"), State());
+        collector.highlightLine(QLatin1String("normal + property real foo: 3.14"), State());
 
-        QVERIFY(collector.formatMap.size() >= 3);
+        QVERIFY(collector.formatMap.size() >= 4);
         qDebug() << collector.formatMap.keys();
 
         // normal text
         auto f = collector.formatMap.value(QLatin1String("Normal Text"));
         QVERIFY(f.isValid());
-
-        QVERIFY(f.isNormal(t)); // ### is this correct? breaks for dark themes
-        QVERIFY(!f.hasTextColor(t)); // ### same here
+        QVERIFY(f.isDefaultTextStyle(t));
+        QVERIFY(!f.hasTextColor(t));
+        QVERIFY(!f.hasBackgroundColor(t));
 
         // visually identical to normal text
         f = collector.formatMap.value(QLatin1String("Symbol"));
         QVERIFY(f.isValid());
-
-        QVERIFY(f.isNormal(t));
+        QVERIFY(f.isDefaultTextStyle(t));
         QVERIFY(!f.hasTextColor(t));
 
         // visually different to normal text
         f = collector.formatMap.value(QLatin1String("Keywords"));
         QVERIFY(f.isValid());
-
-        QVERIFY(!f.isNormal(t));
-        QVERIFY(!f.hasTextColor(t));
+        QVERIFY(!f.isDefaultTextStyle(t));
         QVERIFY(f.isBold(t));
+
+        f = collector.formatMap.value(QLatin1String("Float"));
+        QVERIFY(f.isValid());
+        QVERIFY(!f.isDefaultTextStyle(t));
+        QVERIFY(f.hasTextColor(t));
     }
 };
 }

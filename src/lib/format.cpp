@@ -107,15 +107,22 @@ QString Format::name() const
     return d->name;
 }
 
-bool Format::isNormal(const Theme &theme) const
+bool Format::isDefaultTextStyle(const Theme &theme) const
 {
-    return !hasTextColor(theme) && !d->hasSelColor && !hasBackgroundColor(theme)
-        && !isBold(theme) && !isItalic(theme) && !isUnderline(theme) && !isStrikeThrough(theme);
+    return (!hasTextColor(theme))
+        && (!hasBackgroundColor(theme))
+        && (selectedTextColor(theme) == theme.selectedTextColor(Theme::Normal))
+        && (selectedBackgroundColor(theme) == theme.selectedBackgroundColor(Theme::Normal))
+        && (isBold(theme) == theme.isBold(Theme::Normal))
+        && (isItalic(theme) == theme.isItalic(Theme::Normal))
+        && (isUnderline(theme) == theme.isUnderline(Theme::Normal))
+        && (isStrikeThrough(theme) == theme.isStrikeThrough(Theme::Normal));
 }
 
 bool Format::hasTextColor(const Theme &theme) const
 {
-    return d->hasColor || (theme.textColor(d->defaultStyle) & 0xff000000);
+    return textColor(theme) != theme.textColor(Theme::Normal)
+        && (d->hasColor || theme.textColor(d->defaultStyle));
 }
 
 QColor Format::textColor(const Theme &theme) const
@@ -130,7 +137,8 @@ QColor Format::selectedTextColor(const Theme &theme) const
 
 bool Format::hasBackgroundColor(const Theme &theme) const
 {
-    return d->hasBgColor || (theme.backgroundColor(d->defaultStyle) & 0xff000000);
+    return backgroundColor(theme) != theme.backgroundColor(Theme::Normal)
+         && (d->hasBgColor || theme.backgroundColor(d->defaultStyle));
 }
 
 QColor Format::backgroundColor(const Theme &theme) const

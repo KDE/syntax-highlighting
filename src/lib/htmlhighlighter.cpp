@@ -93,7 +93,7 @@ void HtmlHighlighter::highlightFile(const QString& fileName)
 
 void HtmlHighlighter::setFormat(int offset, int length, const Format& format)
 {
-    if (!format.isNormal(theme())) {
+    if (!format.isDefaultTextStyle(theme())) {
         *m_out << "<span style=\"";
         if (format.hasTextColor(theme()))
             *m_out << "color:" << format.textColor(theme()).name() << ";";
@@ -112,6 +112,6 @@ void HtmlHighlighter::setFormat(int offset, int length, const Format& format)
 
     *m_out << m_currentLine.mid(offset, length).toHtmlEscaped();
 
-    if (!format.isNormal(theme()))
+    if (!format.isDefaultTextStyle(theme()))
         *m_out << "</span>";
 }

@@ -54,11 +54,15 @@ public:
 
     /** Returns @c true if the combination of this format and the theme @p theme
      *  do not change the default text format in any way.
+     *  This is useful for output formats where changing formating implies cost,
+     *  and thus benefit from optimizing the default case of not having any format
+     *  applied. If you make use of this, make sure to set the default text style
+     *  to what the corresponding theme sets for Theme::Normal.
      */
-    bool isNormal(const Theme &theme) const;
+    bool isDefaultTextStyle(const Theme &theme) const;
 
     /** Returns @c true if the combination of this format and the theme @p theme
-     *  change the foreground color.
+     *  change the foreground color compared to the default format.
      */
     bool hasTextColor(const Theme &theme) const;
     /** Returns the foreground color of the combination of this format and the
@@ -70,7 +74,7 @@ public:
      */
     QColor selectedTextColor(const Theme &theme) const;
     /** Returns @c true if the combination of this format and the theme @p theme
-     *  change the background color.
+     *  change the background color compared to the default format.
      */
     bool hasBackgroundColor(const Theme &theme) const;
     /** Returns the background color of the combination of this format and the

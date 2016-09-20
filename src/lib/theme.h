@@ -190,13 +190,24 @@ public:
      */
     QRgb selectedBackgroundColor(TextStyle style) const;
 
-    /** Returns whether the given style should be shown in bold. */
+    /**
+     * Returns whether the given style should be shown in bold.
+     */
     bool isBold(TextStyle style) const;
-    /** Returns whether the given style should be shown in italic. */
+
+    /**
+     * Returns whether the given style should be shown in italic.
+     */
     bool isItalic(TextStyle style) const;
-    /** Returns whether the given style should be shown underlined. */
+
+    /**
+     * Returns whether the given style should be shown underlined.
+     */
     bool isUnderline(TextStyle style) const;
-    /** Returns whether the given style should be shown striked through. */
+
+    /**
+     * Returns whether the given style should be shown striked through.
+     */
     bool isStrikeThrough(TextStyle style) const;
 
 public:

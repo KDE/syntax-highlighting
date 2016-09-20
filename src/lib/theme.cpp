@@ -111,3 +111,43 @@ bool Theme::isStrikeThrough(TextStyle style) const
 {
     return m_data ? m_data->isStrikeThrough(style) : false;
 }
+
+QRgb Theme::areaBackgroundColor() const
+{
+    return m_data ? m_data->areaBackgroundColor() : 0;
+}
+
+QRgb Theme::codeFoldingColor() const
+{
+    return m_data ? m_data->codeFoldingColor() : 0;
+}
+
+QRgb Theme::brackedMatchingColor() const
+{
+    return m_data ? m_data->brackedMatchingColor() : 0;
+}
+
+QRgb Theme::currentLineColor() const
+{
+    return m_data ? m_data->currentLineColor() : 0;
+}
+
+QRgb Theme::iconBorderColor() const
+{
+    return m_data ? m_data->iconBorderColor() : 0;
+}
+
+QRgb Theme::indentationLineColor() const
+{
+    return m_data ? m_data->indentationLineColor() : 0;
+}
+
+QRgb Theme::lineNumberColor() const
+{
+    return m_data ? m_data->lineNumberColor() : 0;
+}
+
+QRgb Theme::currentLineNumberColor() const
+{
+    return m_data ? m_data->currentLineNumberColor() : 0;
+}

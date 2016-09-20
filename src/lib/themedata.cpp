@@ -29,7 +29,16 @@
 using namespace SyntaxHighlighting;
 
 ThemeData::ThemeData()
-    : m_readOnly(true)
+    : m_revision(0)
+    , m_readOnly(true)
+    , m_areaBackgroundColor(0)
+    , m_codeFoldingColor(0)
+    , m_brackedMatchingColor(0)
+    , m_currentLineColor(0)
+    , m_iconBorderColor(0)
+    , m_indentationLineColor(0)
+    , m_lineNumberColor(0)
+    , m_currentLineNumberColor(0)
 {
 }
 
@@ -111,6 +120,17 @@ bool ThemeData::load(const QString &filePath)
         m_textStyles[i] = readThemeData(textStyles.value(QLatin1String(metaEnum.key(i))).toObject());
     }
 
+    // read editor area colors
+    const QJsonObject editorColors = obj.value(QLatin1String("editor-colors")).toObject();
+    m_areaBackgroundColor = readColor(obj.value(QLatin1String("background-color")));
+    m_codeFoldingColor = readColor(obj.value(QLatin1String("code-folding")));
+    m_brackedMatchingColor = readColor(obj.value(QLatin1String("bracket-matching")));
+    m_currentLineColor = readColor(obj.value(QLatin1String("current-line")));
+    m_iconBorderColor = readColor(obj.value(QLatin1String("icon-border")));
+    m_indentationLineColor = readColor(obj.value(QLatin1String("indentation-line")));
+    m_lineNumberColor = readColor(obj.value(QLatin1String("line-numbers")));
+    m_currentLineNumberColor = readColor(obj.value(QLatin1String("current-line-number")));
+
     return true;
 }
 
@@ -175,4 +195,44 @@ bool ThemeData::isStrikeThrough(Theme::TextStyle style) const
 {
     Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Theme::Others));
     return m_textStyles[style].strikeThrough;
+}
+
+QRgb ThemeData::areaBackgroundColor() const
+{
+    return m_areaBackgroundColor;
+}
+
+QRgb ThemeData::codeFoldingColor() const
+{
+    return m_codeFoldingColor;
+}
+
+QRgb ThemeData::brackedMatchingColor() const
+{
+    return m_brackedMatchingColor;
+}
+
+QRgb ThemeData::currentLineColor() const
+{
+    return m_currentLineColor;
+}
+
+QRgb ThemeData::iconBorderColor() const
+{
+    return m_iconBorderColor;
+}
+
+QRgb ThemeData::indentationLineColor() const
+{
+    return m_indentationLineColor;
+}
+
+QRgb ThemeData::lineNumberColor() const
+{
+    return m_lineNumberColor;
+}
+
+QRgb ThemeData::currentLineNumberColor() const
+{
+    return m_currentLineNumberColor;
 }

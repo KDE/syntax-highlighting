@@ -133,6 +133,49 @@ public:
      */
     bool isStrikeThrough(Theme::TextStyle style) const;
 
+public:
+    /**
+     * Returns the background color that should be used to fill the text area.
+     */
+    QRgb areaBackgroundColor() const;
+
+    /**
+     * Returns the code folding color. This is used for a possible code folding
+     * border as well as highlighting color for the background of the text of
+     * of a code folding region.
+     */
+    QRgb codeFoldingColor() const;
+
+    /**
+     * Returns the background color used for bracket matching.
+     */
+    QRgb brackedMatchingColor() const;
+
+    /**
+     * Returns the background color for highlighting the current text line.
+     */
+    QRgb currentLineColor() const;
+
+    /**
+     * Returns the background color of the icon border.
+     */
+    QRgb iconBorderColor() const;
+
+    /**
+     * Returns the color for vertical indentation lines.
+     */
+    QRgb indentationLineColor() const;
+
+    /**
+     * Returns the foreground color for the line numbers.
+     */
+    QRgb lineNumberColor() const;
+
+    /**
+     * Returns the foreground color for the current line number.
+     */
+    QRgb currentLineNumberColor() const;
+
 private:
     int m_revision;
     QString m_name;
@@ -140,7 +183,19 @@ private:
     QString m_license;
     QString m_filePath;
     bool m_readOnly;
+
+    //! TextStyles
     TextStyleData m_textStyles[Theme::Others + 1];
+
+    //! Editor area colors
+    QRgb m_areaBackgroundColor;
+    QRgb m_codeFoldingColor;
+    QRgb m_brackedMatchingColor;
+    QRgb m_currentLineColor;
+    QRgb m_iconBorderColor;
+    QRgb m_indentationLineColor;
+    QRgb m_lineNumberColor;
+    QRgb m_currentLineNumberColor;
 };
 
 }

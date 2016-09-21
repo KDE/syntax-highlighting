@@ -28,6 +28,7 @@
 namespace SyntaxHighlighting {
 
 class ThemeData;
+class RepositoryPrivate;
 
 /**
  * Color theme definition used for highlighting.
@@ -253,11 +254,12 @@ public:
      */
     QRgb currentLineNumberColor() const;
 
-public:
+private:
     /**
      * Constructor taking a shared ThemeData instance.
      */
     Theme(std::shared_ptr<ThemeData> data);
+    friend class RepositoryPrivate;
 
 private:
     /**

@@ -1,4 +1,5 @@
 configure_file(test-config.h.in ${CMAKE_CURRENT_BINARY_DIR}/test-config.h)
+configure_file(update-reference-data.sh.in ${CMAKE_CURRENT_BINARY_DIR}/update-reference-data.sh)
 
 add_executable(wildcardmatcher_test wildcardmatcher_test.cpp ${CMAKE_SOURCE_DIR}/src/lib/wildcardmatcher.cpp)
 add_test(NAME wildcardmatcher_test COMMAND wildcardmatcher_test)

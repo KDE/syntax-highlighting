@@ -152,6 +152,6 @@ private Q_SLOTS:
 };
 }
 
-QTEST_MAIN(SyntaxHighlighting::RepositoryTest)
+QTEST_GUILESS_MAIN(SyntaxHighlighting::RepositoryTest)
 
 #include "syntaxrepository_test.moc"

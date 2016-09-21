@@ -82,6 +82,6 @@ private Q_SLOTS:
     }
 };
 
-QTEST_MAIN(WildcardMatcherTest)
+QTEST_GUILESS_MAIN(WildcardMatcherTest)
 
 #include "wildcardmatcher_test.moc"

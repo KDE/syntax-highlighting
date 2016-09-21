@@ -96,7 +96,7 @@ private Q_SLOTS:
 
 };
 
-QTEST_MAIN(HighlighterBenchmark)
+QTEST_GUILESS_MAIN(HighlighterBenchmark)
 
 #include "highlighter_benchmark.moc"
 

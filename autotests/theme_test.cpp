@@ -130,7 +130,7 @@ private Q_SLOTS:
 };
 }
 
-QTEST_MAIN(SyntaxHighlighting::ThemeTest)
+QTEST_GUILESS_MAIN(SyntaxHighlighting::ThemeTest)
 
 #include "theme_test.moc"
 

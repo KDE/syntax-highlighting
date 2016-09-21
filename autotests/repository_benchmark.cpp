@@ -35,6 +35,6 @@ private Q_SLOTS:
 
 };
 
-QTEST_MAIN(RepositoryBenchmark)
+QTEST_GUILESS_MAIN(RepositoryBenchmark)
 
 #include "repository_benchmark.moc"

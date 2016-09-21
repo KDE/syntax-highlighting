@@ -110,7 +110,7 @@ private Q_SLOTS:
 
 };
 
-QTEST_MAIN(HTMLHighlighterTest)
+QTEST_GUILESS_MAIN(HTMLHighlighterTest)
 
 #include "htmlhighlighter_test.moc"
 

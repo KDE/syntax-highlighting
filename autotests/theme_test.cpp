@@ -112,6 +112,21 @@ private Q_SLOTS:
         QVERIFY(!f.isDefaultTextStyle(t));
         QVERIFY(f.hasTextColor(t));
     }
+
+    void testDefaultTheme()
+    {
+        Theme t = m_repo.theme(QLatin1String("Default"));
+        QVERIFY(t.isValid());
+
+        QCOMPARE(t.areaBackgroundColor()   , QColor("#ffffff").rgb());
+        QCOMPARE(t.codeFoldingColor()      , QColor("#94caef").rgb());
+        QCOMPARE(t.brackedMatchingColor()  , QColor("#ffff00").rgb());
+        QCOMPARE(t.currentLineColor    ()  , QColor("#f8f7f6").rgb());
+        QCOMPARE(t.iconBorderColor()       , QColor("#f0f0f0").rgb());
+        QCOMPARE(t.indentationLineColor()  , QColor("#d2d2d2").rgb());
+        QCOMPARE(t.lineNumberColor()       , QColor("#a0a0a0").rgb());
+        QCOMPARE(t.currentLineNumberColor(), QColor("#1e1e1e").rgb());
+    }
 };
 }
 

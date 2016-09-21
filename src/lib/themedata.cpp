@@ -122,14 +122,14 @@ bool ThemeData::load(const QString &filePath)
 
     // read editor area colors
     const QJsonObject editorColors = obj.value(QLatin1String("editor-colors")).toObject();
-    m_areaBackgroundColor = readColor(obj.value(QLatin1String("background-color")));
-    m_codeFoldingColor = readColor(obj.value(QLatin1String("code-folding")));
-    m_brackedMatchingColor = readColor(obj.value(QLatin1String("bracket-matching")));
-    m_currentLineColor = readColor(obj.value(QLatin1String("current-line")));
-    m_iconBorderColor = readColor(obj.value(QLatin1String("icon-border")));
-    m_indentationLineColor = readColor(obj.value(QLatin1String("indentation-line")));
-    m_lineNumberColor = readColor(obj.value(QLatin1String("line-numbers")));
-    m_currentLineNumberColor = readColor(obj.value(QLatin1String("current-line-number")));
+    m_areaBackgroundColor = readColor(editorColors.value(QLatin1String("background-color")));
+    m_codeFoldingColor = readColor(editorColors.value(QLatin1String("code-folding")));
+    m_brackedMatchingColor = readColor(editorColors.value(QLatin1String("bracket-matching")));
+    m_currentLineColor = readColor(editorColors.value(QLatin1String("current-line")));
+    m_iconBorderColor = readColor(editorColors.value(QLatin1String("icon-border")));
+    m_indentationLineColor = readColor(editorColors.value(QLatin1String("indentation-line")));
+    m_lineNumberColor = readColor(editorColors.value(QLatin1String("line-numbers")));
+    m_currentLineNumberColor = readColor(editorColors.value(QLatin1String("current-line-number")));
 
     return true;
 }

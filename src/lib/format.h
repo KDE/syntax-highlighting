@@ -20,6 +20,8 @@
 
 #include "kf5syntaxhighlighting_export.h"
 
+#include <QTypeInfo>
+
 #include <memory>
 
 class QColor;
@@ -114,5 +116,7 @@ private:
     std::shared_ptr<FormatPrivate> d;
 };
 }
+
+Q_DECLARE_TYPEINFO(SyntaxHighlighting::Format, Q_MOVABLE_TYPE);
 
 #endif // SYNTAXHIGHLIGHTING_FORMAT_H

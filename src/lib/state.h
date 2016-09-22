@@ -21,6 +21,7 @@
 #include "kf5syntaxhighlighting_export.h"
 
 #include <QExplicitlySharedDataPointer>
+#include <QTypeInfo>
 
 namespace SyntaxHighlighting {
 
@@ -59,5 +60,7 @@ private:
 };
 
 }
+
+Q_DECLARE_TYPEINFO(SyntaxHighlighting::State, Q_MOVABLE_TYPE);
 
 #endif // SYNTAXHIGHLIGHTING_STATE_H

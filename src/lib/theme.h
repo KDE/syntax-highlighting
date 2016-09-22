@@ -22,6 +22,7 @@
 
 #include <QColor>
 #include <qobjectdefs.h>
+#include <QTypeInfo>
 
 #include <memory>
 
@@ -269,5 +270,7 @@ private:
 };
 
 }
+
+Q_DECLARE_TYPEINFO(SyntaxHighlighting::Theme, Q_MOVABLE_TYPE);
 
 #endif // SYNTAXHIGHLIGHTING_THEME_H

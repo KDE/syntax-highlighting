@@ -20,6 +20,8 @@
 
 #include "kf5syntaxhighlighting_export.h"
 
+#include <QTypeInfo>
+
 #include <memory>
 
 class QJsonObject;
@@ -145,5 +147,7 @@ private:
 };
 
 }
+
+Q_DECLARE_TYPEINFO(SyntaxHighlighting::Definition, Q_MOVABLE_TYPE);
 
 #endif

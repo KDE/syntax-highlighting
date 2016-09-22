@@ -35,6 +35,8 @@ set(REQUIRED_QT_VERSION "5.6.0")
 find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED COMPONENTS Gui Network Test)
 find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE QUIET OPTIONAL_COMPONENTS Widgets XmlPatterns)
 set_package_properties(Qt5 PROPERTIES URL "http://qt-project.org/")
+set_package_properties(Qt5Widgets PROPERTIES PURPOSE "Manual test for QSyntaxHighlighter.")
+set_package_properties(Qt5XmlPatterns PROPERTIES PURPOSE "Compile-time validation of syntax definition files.")
 
 find_package(Perl REQUIRED)
 set_package_properties(Perl PROPERTIES PURPOSE "Auto-generate PHP syntax definition files.")

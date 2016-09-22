@@ -33,7 +33,6 @@ namespace SyntaxHighlighting {
 class Context;
 class Format;
 class KeywordList;
-class Repository;
 
 class DefinitionData;
 

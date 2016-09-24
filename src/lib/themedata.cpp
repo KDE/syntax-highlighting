@@ -17,6 +17,7 @@
 */
 
 #include "themedata_p.h"
+#include "syntaxhighlighting_logging.h"
 
 #include <QFile>
 #include <QJsonDocument>
@@ -104,6 +105,7 @@ bool ThemeData::load(const QString &filePath)
     QJsonParseError parseError;
     QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData, &parseError);
     if (parseError.error != QJsonParseError::NoError) {
+        qCWarning(Log) << "Failed to parse theme file" << filePath << ":" << parseError.errorString();
         return false;
     }
 

@@ -60,14 +60,6 @@ static inline QRgb readColor(const QJsonValue &val)
     return color.isValid() ? color.rgb() : unsetColor;
 }
 
-/**
- * Convert QJsonValue @p val into a bool, if possible. On error, returns false.
- */
-static inline bool readBool(const QJsonValue &val)
-{
-    return val.isBool() ? val.toBool() : false;
-}
-
 static inline TextStyleData readThemeData(const QJsonObject &obj)
 {
     TextStyleData td;
@@ -76,10 +68,27 @@ static inline TextStyleData readThemeData(const QJsonObject &obj)
     td.backgroundColor = readColor(obj.value(QLatin1String("background-color")));
     td.selectedTextColor = readColor(obj.value(QLatin1String("selected-text-color")));
     td.selectedBackgroundColor = readColor(obj.value(QLatin1String("selected-background-color")));
-    td.bold = readBool(obj.value(QLatin1String("bold")));
-    td.italic = readBool(obj.value(QLatin1String("italic")));
-    td.underline = readBool(obj.value(QLatin1String("underline")));
-    td.strikeThrough = readBool(obj.value(QLatin1String("strike-through")));
+
+    auto val = obj.value(QLatin1String("bold"));
+    if (val.isBool()) {
+        td.bold = val.toBool();
+        td.hasBold = true;
+    }
+    val = obj.value(QLatin1String("italic"));
+    if (val.isBool()) {
+        td.italic = val.toBool();
+        td.hasItalic = true;
+    }
+    val = obj.value(QLatin1String("underline"));
+    if (val.isBool()) {
+        td.underline = val.toBool();
+        td.hasUnderline = true;
+    }
+    val = obj.value(QLatin1String("strike-through"));
+    if (val.isBool()) {
+        td.strikeThrough = val.toBool();
+        td.hasStrikeThrough = true;
+    }
 
     return td;
 }

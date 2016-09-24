@@ -35,16 +35,25 @@ public:
         , italic(false)
         , underline(false)
         , strikeThrough(false)
+        , hasBold(false)
+        , hasItalic(false)
+        , hasUnderline(false)
+        , hasStrikeThrough(false)
     {}
 
     QRgb textColor;
     QRgb backgroundColor;
     QRgb selectedTextColor;
     QRgb selectedBackgroundColor;
-    bool bold;
-    bool italic;
-    bool underline;
-    bool strikeThrough;
+    bool bold :1;
+    bool italic :1;
+    bool underline :1;
+    bool strikeThrough :1;
+
+    bool hasBold :1;
+    bool hasItalic :1;
+    bool hasUnderline :1;
+    bool hasStrikeThrough :1;
 };
 
 }

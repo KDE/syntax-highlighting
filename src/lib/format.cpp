@@ -36,12 +36,6 @@ public:
     TextStyleData style;
     Theme::TextStyle defaultStyle;
     bool spellCheck;
-
-    // flags indicating wheter the itemData contains this info
-    bool hasItalic;
-    bool hasBold;
-    bool hasUnderline;
-    bool hasStrikeout;
 };
 }
 
@@ -64,10 +58,6 @@ static Theme::TextStyle stringToDefaultFormat(const QStringRef &str)
 FormatPrivate::FormatPrivate()
     : defaultStyle(Theme::Normal)
     , spellCheck(true)
-    , hasItalic(false)
-    , hasBold(false)
-    , hasUnderline(false)
-    , hasStrikeout(false)
 {
 }
 
@@ -136,22 +126,22 @@ QColor Format::selectedBackgroundColor(const Theme &theme) const
 
 bool Format::isBold(const Theme &theme) const
 {
-    return d->hasBold ? d->style.bold : theme.isBold(d->defaultStyle);
+    return d->style.hasBold ? d->style.bold : theme.isBold(d->defaultStyle);
 }
 
 bool Format::isItalic(const Theme &theme) const
 {
-    return d->hasItalic ? d->style.italic : theme.isItalic(d->defaultStyle);
+    return d->style.hasItalic ? d->style.italic : theme.isItalic(d->defaultStyle);
 }
 
 bool Format::isUnderline(const Theme &theme) const
 {
-    return d->hasUnderline ? d->style.underline : theme.isUnderline(d->defaultStyle);
+    return d->style.hasUnderline ? d->style.underline : theme.isUnderline(d->defaultStyle);
 }
 
 bool Format::isStrikeThrough(const Theme &theme) const
 {
-    return d->hasStrikeout ? d->style.strikeThrough : theme.isStrikeThrough(d->defaultStyle);
+    return d->style.hasStrikeThrough ? d->style.strikeThrough : theme.isStrikeThrough(d->defaultStyle);
 }
 
 bool Format::spellCheck() const
@@ -186,25 +176,25 @@ void Format::load(QXmlStreamReader& reader)
 
     ref = reader.attributes().value(QStringLiteral("italic"));
     if (!ref.isEmpty()) {
-        d->hasItalic = true;
+        d->style.hasItalic = true;
         d->style.italic = Xml::attrToBool(ref);
     }
 
     ref = reader.attributes().value(QStringLiteral("bold"));
     if (!ref.isEmpty()) {
-        d->hasBold = true;
+        d->style.hasBold = true;
         d->style.bold = Xml::attrToBool(ref);
     }
 
     ref = reader.attributes().value(QStringLiteral("underline"));
     if (!ref.isEmpty()) {
-        d->hasUnderline = true;
+        d->style.hasUnderline = true;
         d->style.underline = Xml::attrToBool(ref);
     }
 
     ref = reader.attributes().value(QStringLiteral("strikeOut"));
     if (!ref.isEmpty()) {
-        d->hasStrikeout = true;
+        d->style.hasStrikeThrough = true;
         d->style.strikeThrough = Xml::attrToBool(ref);
     }
 

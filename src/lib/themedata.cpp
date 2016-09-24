@@ -165,6 +165,11 @@ QString ThemeData::name() const
     return m_name;
 }
 
+int ThemeData::revision() const
+{
+    return m_revision;
+}
+
 bool ThemeData::isReadOnly() const
 {
     return m_readOnly;

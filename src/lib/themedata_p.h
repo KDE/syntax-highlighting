@@ -50,6 +50,8 @@ public:
      */
     QString name() const;
 
+    int revision() const;
+
     /**
      * Returns @c true if this Theme is read-only.
      * Typically, themes that are shipped by default are read-only.

@@ -71,6 +71,7 @@ private Q_SLOTS:
         QTest::addColumn<QString>("themeName");
         QTest::newRow("default") << "Default";
         QTest::newRow("dark") << "Breeze Dark";
+        QTest::newRow("print") << "Printing";
     }
 
     void testFormat()

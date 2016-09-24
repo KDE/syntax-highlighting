@@ -117,6 +117,14 @@ public:
      */
     Theme theme(const QString &themeName) const;
 
+    /** Built-in default theme types. */
+    enum DefaultTheme {
+        LightTheme,
+        DarkTheme
+    };
+    /** Returns a default theme instance of the given type. */
+    Theme defaultTheme(DefaultTheme t = LightTheme);
+
     /**
      * Reloads the repository.
      * This is a moderately expensive operations and should thus only be

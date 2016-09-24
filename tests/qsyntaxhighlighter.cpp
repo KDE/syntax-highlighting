@@ -69,8 +69,8 @@ int main(int argc, char **argv)
     edit.show();
     auto hl = new SyntaxHighlighting::SyntaxHighlighter(&edit);
     hl->setTheme((app.palette().color(QPalette::Base).lightness() < 128)
-        ? repo.theme(QLatin1String("Breeze Dark"))
-        : repo.theme(QLatin1String("Default")));
+        ? repo.defaultTheme(Repository::DarkTheme)
+        : repo.defaultTheme(Repository::LightTheme));
     hl->setDefinition(def);
 
     edit.setPlainText(QString::fromUtf8(f.readAll()));

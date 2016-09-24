@@ -89,7 +89,7 @@ private Q_SLOTS:
         QVERIFY(m_repo);
 
         HtmlHighlighter highlighter;
-        highlighter.setTheme(m_repo->theme(QLatin1String("Default")));
+        highlighter.setTheme(m_repo->defaultTheme());
         QVERIFY(highlighter.theme().isValid());
 
         auto def = m_repo->definitionForFileName(inFile);

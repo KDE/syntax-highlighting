@@ -141,7 +141,7 @@ private Q_SLOTS:
             def = m_repo->definitionForName(syntax);
 
         TestHighlighter highlighter;
-        highlighter.setTheme(m_repo->theme(QLatin1String("Default")));
+        highlighter.setTheme(m_repo->defaultTheme());
         QVERIFY(highlighter.theme().isValid());
 
         QVERIFY(def.isValid());

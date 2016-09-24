@@ -117,6 +117,13 @@ Theme Repository::theme(const QString &themeName) const
     return Theme();
 }
 
+Theme Repository::defaultTheme(Repository::DefaultTheme t)
+{
+    if (t == DarkTheme)
+        return theme(QLatin1String("Breeze Dark"));
+    return theme(QLatin1String("Default"));
+}
+
 void RepositoryPrivate::load(Repository *repo)
 {
     auto dirs = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("org.kde.syntax-highlighting/syntax"), QStandardPaths::LocateDirectory);

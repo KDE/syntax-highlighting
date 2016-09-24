@@ -142,6 +142,16 @@ bool ThemeData::load(const QString &filePath)
     m_lineNumberColor = readColor(editorColors.value(QLatin1String("line-numbers")));
     m_currentLineNumberColor = readColor(editorColors.value(QLatin1String("current-line-number")));
 
+    // read per-definition style overrides
+    const auto customStyles = obj.value(QLatin1String("custom-styles")).toObject();
+    for (auto it = customStyles.begin(); it != customStyles.end(); ++it) {
+        const auto obj = it.value().toObject();
+        QHash<QString, TextStyleData> overrideStyle;
+        for (auto it2 = obj.begin(); it2 != obj.end(); ++it2)
+            overrideStyle.insert(it2.key(), readThemeData(it2.value().toObject()));
+        m_textStyleOverrides.insert(it.key(), overrideStyle);
+    }
+
     return true;
 }
 
@@ -246,4 +256,9 @@ QRgb ThemeData::lineNumberColor() const
 QRgb ThemeData::currentLineNumberColor() const
 {
     return m_currentLineNumberColor;
+}
+
+TextStyleData ThemeData::textStyleOverride(const QString& definitionName, const QString& attributeName) const
+{
+    return m_textStyleOverrides.value(definitionName).value(attributeName);
 }

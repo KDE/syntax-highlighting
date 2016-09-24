@@ -20,33 +20,9 @@
 #define SYNTAXHIGHLIGHTING_THEMEDATA_H
 
 #include "theme.h"
+#include "textstyledata_p.h"
 
 namespace SyntaxHighlighting {
-
-class TextStyleData
-{
-public:
-    // Constructor initializing all data.
-    TextStyleData()
-        : textColor(0x0)
-        , backgroundColor(0x0)
-        , selectedTextColor(0x0)
-        , selectedBackgroundColor(0x0)
-        , bold(false)
-        , italic(false)
-        , underline(false)
-        , strikeThrough(false)
-    {}
-
-    QRgb textColor;
-    QRgb backgroundColor;
-    QRgb selectedTextColor;
-    QRgb selectedBackgroundColor;
-    bool bold;
-    bool italic;
-    bool underline;
-    bool strikeThrough;
-};
 
 /**
  * Data container for a Theme.

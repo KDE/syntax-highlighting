@@ -394,6 +394,7 @@ void DefinitionData::loadItemData(QXmlStreamReader& reader)
             case QXmlStreamReader::StartElement:
                 if (reader.name() == QLatin1String("itemData")) {
                     Format f;
+                    f.setDefinition(q);
                     f.load(reader);
                     formats.insert(f.name(), f);
                     reader.readNext();

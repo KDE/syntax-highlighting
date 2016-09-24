@@ -261,6 +261,7 @@ private:
      */
     Theme(std::shared_ptr<ThemeData> data);
     friend class RepositoryPrivate;
+    friend class ThemeData;
 
 private:
     /**

@@ -29,6 +29,11 @@
 
 using namespace SyntaxHighlighting;
 
+ThemeData* ThemeData::get(const Theme &theme)
+{
+    return theme.m_data.get();
+}
+
 ThemeData::ThemeData()
     : m_revision(0)
     , m_readOnly(true)

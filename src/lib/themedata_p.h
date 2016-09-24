@@ -32,6 +32,8 @@ namespace SyntaxHighlighting {
 class ThemeData
 {
 public:
+    static ThemeData* get(const Theme &theme);
+
     /**
      * Default constructor, creating an uninitialized ThemeData instance.
      */

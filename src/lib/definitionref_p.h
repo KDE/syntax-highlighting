@@ -23,6 +23,7 @@
 namespace SyntaxHighlighting {
 
 class Definition;
+class DefinitionData;
 class DefinitionPrivate;
 
 /** Weak reference for Definition instances.

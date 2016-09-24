@@ -30,6 +30,7 @@ class QXmlStreamReader;
 
 namespace SyntaxHighlighting {
 
+class DefinitionRef;
 class FormatPrivate;
 class Theme;
 
@@ -112,6 +113,7 @@ public:
 
 private:
     friend class DefinitionData;
+    void setDefinition(const DefinitionRef &def);
     void load(QXmlStreamReader &reader);
     std::shared_ptr<FormatPrivate> d;
 };

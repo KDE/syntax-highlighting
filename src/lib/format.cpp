@@ -16,6 +16,7 @@
 */
 
 #include "format.h"
+#include "textstyledata_p.h"
 #include "theme.h"
 #include "xml_p.h"
 
@@ -32,15 +33,8 @@ class FormatPrivate
 public:
     FormatPrivate();
     QString name;
-    QColor color;
-    QColor selColor;
-    QColor backgroundColor;
-    QColor selBackgroundColor;
+    TextStyleData style;
     Theme::TextStyle defaultStyle;
-    bool italic;
-    bool bold;
-    bool underline;
-    bool strikeout;
     bool spellCheck;
 
     // flags indicating wheter the itemData contains this info
@@ -48,10 +42,6 @@ public:
     bool hasBold;
     bool hasUnderline;
     bool hasStrikeout;
-    bool hasColor;
-    bool hasSelColor;
-    bool hasBgColor;
-    bool hasSelBgColor;
 };
 }
 
@@ -73,19 +63,11 @@ static Theme::TextStyle stringToDefaultFormat(const QStringRef &str)
 
 FormatPrivate::FormatPrivate()
     : defaultStyle(Theme::Normal)
-    , italic(false)
-    , bold(false)
-    , underline(false)
-    , strikeout(false)
     , spellCheck(true)
     , hasItalic(false)
     , hasBold(false)
     , hasUnderline(false)
     , hasStrikeout(false)
-    , hasColor(false)
-    , hasSelColor(false)
-    , hasBgColor(false)
-    , hasSelBgColor(false)
 {
 }
 
@@ -122,55 +104,54 @@ bool Format::isDefaultTextStyle(const Theme &theme) const
 bool Format::hasTextColor(const Theme &theme) const
 {
     return textColor(theme) != theme.textColor(Theme::Normal)
-        && (d->hasColor || theme.textColor(d->defaultStyle));
+        && (d->style.textColor || theme.textColor(d->defaultStyle));
 }
 
 QColor Format::textColor(const Theme &theme) const
 {
-    return d->hasColor ? d->color : QColor(theme.textColor(d->defaultStyle));
+    return d->style.textColor ? d->style.textColor : theme.textColor(d->defaultStyle);
 }
 
 QColor Format::selectedTextColor(const Theme &theme) const
 {
-    return d->hasSelColor ? d->selColor : QColor(theme.selectedTextColor(d->defaultStyle));
+    return d->style.selectedTextColor ? d->style.selectedTextColor : theme.selectedTextColor(d->defaultStyle);
 }
 
 bool Format::hasBackgroundColor(const Theme &theme) const
 {
     return backgroundColor(theme) != theme.backgroundColor(Theme::Normal)
-         && (d->hasBgColor || theme.backgroundColor(d->defaultStyle));
+         && (d->style.backgroundColor || theme.backgroundColor(d->defaultStyle));
 }
 
 QColor Format::backgroundColor(const Theme &theme) const
 {
-    return d->hasBgColor ? d->backgroundColor
-                         : QColor(theme.backgroundColor(d->defaultStyle));
+    return d->style.backgroundColor ? d->style.backgroundColor : theme.backgroundColor(d->defaultStyle);
 }
 
 QColor Format::selectedBackgroundColor(const Theme &theme) const
 {
-    return d->hasSelBgColor ? d->selBackgroundColor
-                            : QColor(theme.selectedBackgroundColor(d->defaultStyle));
+    return d->style.selectedBackgroundColor ? d->style.selectedBackgroundColor
+                            : theme.selectedBackgroundColor(d->defaultStyle);
 }
 
 bool Format::isBold(const Theme &theme) const
 {
-    return d->hasBold ? d->bold : theme.isBold(d->defaultStyle);
+    return d->hasBold ? d->style.bold : theme.isBold(d->defaultStyle);
 }
 
 bool Format::isItalic(const Theme &theme) const
 {
-    return d->hasItalic ? d->italic : theme.isItalic(d->defaultStyle);
+    return d->hasItalic ? d->style.italic : theme.isItalic(d->defaultStyle);
 }
 
 bool Format::isUnderline(const Theme &theme) const
 {
-    return d->hasUnderline ? d->underline : theme.isUnderline(d->defaultStyle);
+    return d->hasUnderline ? d->style.underline : theme.isUnderline(d->defaultStyle);
 }
 
 bool Format::isStrikeThrough(const Theme &theme) const
 {
-    return d->hasStrikeout ? d->strikeout : theme.isStrikeThrough(d->defaultStyle);
+    return d->hasStrikeout ? d->style.strikeThrough : theme.isStrikeThrough(d->defaultStyle);
 }
 
 bool Format::spellCheck() const
@@ -185,50 +166,46 @@ void Format::load(QXmlStreamReader& reader)
 
     QStringRef ref = reader.attributes().value(QStringLiteral("color"));
     if (!ref.isEmpty()) {
-        d->hasColor = true;
-        d->color = QColor(ref.toString());
+        d->style.textColor = QColor(ref.toString()).rgba();
     }
 
     ref = reader.attributes().value(QStringLiteral("selColor"));
     if (!ref.isEmpty()) {
-        d->hasSelColor = true;
-        d->selColor = QColor(ref.toString());
+        d->style.selectedTextColor = QColor(ref.toString()).rgba();
     }
 
     ref = reader.attributes().value(QStringLiteral("backgroundColor"));
     if (!ref.isEmpty()) {
-        d->hasBgColor = true;
-        d->backgroundColor = QColor(ref.toString());
+        d->style.backgroundColor = QColor(ref.toString()).rgba();
     }
 
     ref = reader.attributes().value(QStringLiteral("selBackgroundColor"));
     if (!ref.isEmpty()) {
-        d->hasSelBgColor = true;
-        d->selBackgroundColor = QColor(ref.toString());
+        d->style.selectedBackgroundColor = QColor(ref.toString()).rgba();
     }
 
     ref = reader.attributes().value(QStringLiteral("italic"));
     if (!ref.isEmpty()) {
         d->hasItalic = true;
-        d->italic = Xml::attrToBool(ref);
+        d->style.italic = Xml::attrToBool(ref);
     }
 
     ref = reader.attributes().value(QStringLiteral("bold"));
     if (!ref.isEmpty()) {
         d->hasBold = true;
-        d->bold = Xml::attrToBool(ref);
+        d->style.bold = Xml::attrToBool(ref);
     }
 
     ref = reader.attributes().value(QStringLiteral("underline"));
     if (!ref.isEmpty()) {
         d->hasUnderline = true;
-        d->underline = Xml::attrToBool(ref);
+        d->style.underline = Xml::attrToBool(ref);
     }
 
     ref = reader.attributes().value(QStringLiteral("strikeOut"));
     if (!ref.isEmpty()) {
         d->hasStrikeout = true;
-        d->strikeout = Xml::attrToBool(ref);
+        d->style.strikeThrough = Xml::attrToBool(ref);
     }
 
     ref = reader.attributes().value(QStringLiteral("spellChecking"));

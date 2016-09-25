@@ -210,9 +210,9 @@ void RepositoryPrivate::loadThemeFolder(const QString &path)
 {
     QDirIterator it(path);
     while (it.hasNext()) {
-        std::shared_ptr<ThemeData> themeData = std::make_shared<ThemeData>();
+        auto themeData = std::unique_ptr<ThemeData>(new ThemeData);
         if (themeData->load(it.next()))
-            addTheme(Theme(themeData));
+            addTheme(Theme(themeData.release()));
     }
 }
 

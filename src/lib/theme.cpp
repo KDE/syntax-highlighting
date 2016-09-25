@@ -31,7 +31,7 @@ Theme::Theme(const Theme &copy)
     m_data = copy.m_data;
 }
 
-Theme::Theme(std::shared_ptr<ThemeData> data)
+Theme::Theme(ThemeData* data)
     : m_data(data)
 {
 }
@@ -48,7 +48,7 @@ Theme &Theme::operator=(const Theme &other)
 
 bool Theme::isValid() const
 {
-    return m_data.get();
+    return m_data.data();
 }
 
 QString Theme::name() const

@@ -31,7 +31,7 @@ using namespace SyntaxHighlighting;
 
 ThemeData* ThemeData::get(const Theme &theme)
 {
-    return theme.m_data.get();
+    return theme.m_data.data();
 }
 
 ThemeData::ThemeData()

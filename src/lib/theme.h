@@ -21,10 +21,9 @@
 #include "kf5syntaxhighlighting_export.h"
 
 #include <QColor>
+#include <QExplicitlySharedDataPointer>
 #include <qobjectdefs.h>
 #include <QTypeInfo>
-
-#include <memory>
 
 namespace SyntaxHighlighting {
 
@@ -259,7 +258,7 @@ private:
     /**
      * Constructor taking a shared ThemeData instance.
      */
-    Theme(std::shared_ptr<ThemeData> data);
+    Theme(ThemeData* data);
     friend class RepositoryPrivate;
     friend class ThemeData;
 
@@ -267,7 +266,7 @@ private:
     /**
      * Shared data holder.
      */
-    std::shared_ptr<ThemeData> m_data;
+    QExplicitlySharedDataPointer<ThemeData> m_data;
 };
 
 }

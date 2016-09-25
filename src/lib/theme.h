@@ -176,9 +176,10 @@ public:
         MarkError,
         //! Background color for text templates (snippets).
         TemplateBackground,
-        //! Background color for all placeholders in text templates.
+        //! Background color for all editable placeholders in text templates.
         TemplatePlaceholder,
-        //! Background color for the current placeholder in text templates.
+        //! Background color for the currently active placeholder in text
+        //! templates.
         TemplateFocusedPlaceholder,
         //! Background color for read-only placeholders in text templates.
         TemplateReadOnlyPlaceholder

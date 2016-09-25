@@ -156,9 +156,9 @@ bool ThemeData::load(const QString &filePath)
     m_editorColors[Theme::MarkWarning] = readColor(editorColors.value(QLatin1String("mark-warning")));
     m_editorColors[Theme::MarkError] = readColor(editorColors.value(QLatin1String("mark-error")));
     m_editorColors[Theme::TemplateBackground] = readColor(editorColors.value(QLatin1String("template-background")));
-    m_editorColors[Theme::TemplatePlaceholder] = readColor(editorColors.value(QLatin1String("template-editable-placeholder")));
-    m_editorColors[Theme::TemplateFocusedPlaceholder] = readColor(editorColors.value(QLatin1String("template-focused-editable-placeholder")));
-    m_editorColors[Theme::TemplateReadOnlyPlaceholder] = readColor(editorColors.value(QLatin1String("template-not-editable-placeholder")));
+    m_editorColors[Theme::TemplatePlaceholder] = readColor(editorColors.value(QLatin1String("template-placeholder")));
+    m_editorColors[Theme::TemplateFocusedPlaceholder] = readColor(editorColors.value(QLatin1String("template-focused-placeholder")));
+    m_editorColors[Theme::TemplateReadOnlyPlaceholder] = readColor(editorColors.value(QLatin1String("template-read-only-placeholder")));
 
     // read per-definition style overrides
     const auto customStyles = obj.value(QLatin1String("custom-styles")).toObject();

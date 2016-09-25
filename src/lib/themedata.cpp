@@ -38,6 +38,7 @@ ThemeData::ThemeData()
     : m_revision(0)
     , m_readOnly(true)
 {
+    memset(m_editorColors, 0, sizeof(m_editorColors));
 }
 
 /**

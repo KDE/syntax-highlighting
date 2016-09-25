@@ -118,46 +118,10 @@ public:
 
 public:
     /**
-     * Returns the background color that should be used to fill the text area.
+     * Returns the editor color for the requested @p role.
      */
-    QRgb areaBackgroundColor() const;
+    QRgb editorColor(Theme::EditorColorRole role) const;
 
-    /**
-     * Returns the code folding color. This is used for a possible code folding
-     * border as well as highlighting color for the background of the text of
-     * of a code folding region.
-     */
-    QRgb codeFoldingColor() const;
-
-    /**
-     * Returns the background color used for bracket matching.
-     */
-    QRgb brackedMatchingColor() const;
-
-    /**
-     * Returns the background color for highlighting the current text line.
-     */
-    QRgb currentLineColor() const;
-
-    /**
-     * Returns the background color of the icon border.
-     */
-    QRgb iconBorderColor() const;
-
-    /**
-     * Returns the color for vertical indentation lines.
-     */
-    QRgb indentationLineColor() const;
-
-    /**
-     * Returns the foreground color for the line numbers.
-     */
-    QRgb lineNumberColor() const;
-
-    /**
-     * Returns the foreground color for the current line number.
-     */
-    QRgb currentLineNumberColor() const;
 
     TextStyleData textStyleOverride(const QString &definitionName, const QString &attributeName) const;
 
@@ -177,14 +141,7 @@ private:
     QHash<QString, QHash<QString, TextStyleData> > m_textStyleOverrides;
 
     //! Editor area colors
-    QRgb m_areaBackgroundColor;
-    QRgb m_codeFoldingColor;
-    QRgb m_brackedMatchingColor;
-    QRgb m_currentLineColor;
-    QRgb m_iconBorderColor;
-    QRgb m_indentationLineColor;
-    QRgb m_lineNumberColor;
-    QRgb m_currentLineNumberColor;
+    QRgb m_editorColors[Theme::TemplateReadOnlyPlaceholder + 1];
 };
 
 }

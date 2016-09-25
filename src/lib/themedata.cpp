@@ -37,14 +37,6 @@ ThemeData* ThemeData::get(const Theme &theme)
 ThemeData::ThemeData()
     : m_revision(0)
     , m_readOnly(true)
-    , m_areaBackgroundColor(0)
-    , m_codeFoldingColor(0)
-    , m_brackedMatchingColor(0)
-    , m_currentLineColor(0)
-    , m_iconBorderColor(0)
-    , m_indentationLineColor(0)
-    , m_lineNumberColor(0)
-    , m_currentLineNumberColor(0)
 {
 }
 
@@ -138,14 +130,34 @@ bool ThemeData::load(const QString &filePath)
 
     // read editor area colors
     const QJsonObject editorColors = obj.value(QLatin1String("editor-colors")).toObject();
-    m_areaBackgroundColor = readColor(editorColors.value(QLatin1String("background-color")));
-    m_codeFoldingColor = readColor(editorColors.value(QLatin1String("code-folding")));
-    m_brackedMatchingColor = readColor(editorColors.value(QLatin1String("bracket-matching")));
-    m_currentLineColor = readColor(editorColors.value(QLatin1String("current-line")));
-    m_iconBorderColor = readColor(editorColors.value(QLatin1String("icon-border")));
-    m_indentationLineColor = readColor(editorColors.value(QLatin1String("indentation-line")));
-    m_lineNumberColor = readColor(editorColors.value(QLatin1String("line-numbers")));
-    m_currentLineNumberColor = readColor(editorColors.value(QLatin1String("current-line-number")));
+    m_editorColors[Theme::BackgroundColor] = readColor(editorColors.value(QLatin1String("background-color")));
+    m_editorColors[Theme::TextSelection] = readColor(editorColors.value(QLatin1String("selection")));
+    m_editorColors[Theme::CurrentLine] = readColor(editorColors.value(QLatin1String("current-line")));
+    m_editorColors[Theme::SearchHighlight] = readColor(editorColors.value(QLatin1String("search-highlight")));
+    m_editorColors[Theme::ReplaceHighlight] = readColor(editorColors.value(QLatin1String("replace-highlight")));
+    m_editorColors[Theme::BracketMatching] = readColor(editorColors.value(QLatin1String("bracket-matching")));
+    m_editorColors[Theme::TabMarker] = readColor(editorColors.value(QLatin1String("tab-marker")));
+    m_editorColors[Theme::SpellChecking] = readColor(editorColors.value(QLatin1String("spell-checking")));
+    m_editorColors[Theme::IndentationLine] = readColor(editorColors.value(QLatin1String("indentation-line")));
+    m_editorColors[Theme::IconBorder] = readColor(editorColors.value(QLatin1String("icon-border")));
+    m_editorColors[Theme::CodeFolding] = readColor(editorColors.value(QLatin1String("code-folding")));
+    m_editorColors[Theme::LineNumbers] = readColor(editorColors.value(QLatin1String("line-numbers")));
+    m_editorColors[Theme::CurrentLineNumber] = readColor(editorColors.value(QLatin1String("current-line-number")));
+    m_editorColors[Theme::WordWrapMarker] = readColor(editorColors.value(QLatin1String("word-wrap-marker")));
+    m_editorColors[Theme::ModifiedLines] = readColor(editorColors.value(QLatin1String("modified-lines")));
+    m_editorColors[Theme::SavedLines] = readColor(editorColors.value(QLatin1String("saved-lines")));
+    m_editorColors[Theme::Separator] = readColor(editorColors.value(QLatin1String("separator")));
+    m_editorColors[Theme::MarkBookmark] = readColor(editorColors.value(QLatin1String("mark-bookmark")));
+    m_editorColors[Theme::MarkBreakpointActive] = readColor(editorColors.value(QLatin1String("mark-breakpoint-active")));
+    m_editorColors[Theme::MarkBreakpointReached] = readColor(editorColors.value(QLatin1String("mark-breakpoint-reached")));
+    m_editorColors[Theme::MarkBreakpointDisabled] = readColor(editorColors.value(QLatin1String("mark-breakpoint-disabled")));
+    m_editorColors[Theme::MarkExecution] = readColor(editorColors.value(QLatin1String("mark-execution")));
+    m_editorColors[Theme::MarkWarning] = readColor(editorColors.value(QLatin1String("mark-warning")));
+    m_editorColors[Theme::MarkError] = readColor(editorColors.value(QLatin1String("mark-error")));
+    m_editorColors[Theme::TemplateBackground] = readColor(editorColors.value(QLatin1String("template-background")));
+    m_editorColors[Theme::TemplatePlaceholder] = readColor(editorColors.value(QLatin1String("template-editable-placeholder")));
+    m_editorColors[Theme::TemplateFocusedPlaceholder] = readColor(editorColors.value(QLatin1String("template-focused-editable-placeholder")));
+    m_editorColors[Theme::TemplateReadOnlyPlaceholder] = readColor(editorColors.value(QLatin1String("template-not-editable-placeholder")));
 
     // read per-definition style overrides
     const auto customStyles = obj.value(QLatin1String("custom-styles")).toObject();
@@ -228,44 +240,10 @@ bool ThemeData::isStrikeThrough(Theme::TextStyle style) const
     return m_textStyles[style].strikeThrough;
 }
 
-QRgb ThemeData::areaBackgroundColor() const
+QRgb ThemeData::editorColor(Theme::EditorColorRole role) const
 {
-    return m_areaBackgroundColor;
-}
-
-QRgb ThemeData::codeFoldingColor() const
-{
-    return m_codeFoldingColor;
-}
-
-QRgb ThemeData::brackedMatchingColor() const
-{
-    return m_brackedMatchingColor;
-}
-
-QRgb ThemeData::currentLineColor() const
-{
-    return m_currentLineColor;
-}
-
-QRgb ThemeData::iconBorderColor() const
-{
-    return m_iconBorderColor;
-}
-
-QRgb ThemeData::indentationLineColor() const
-{
-    return m_indentationLineColor;
-}
-
-QRgb ThemeData::lineNumberColor() const
-{
-    return m_lineNumberColor;
-}
-
-QRgb ThemeData::currentLineNumberColor() const
-{
-    return m_currentLineNumberColor;
+    Q_ASSERT(static_cast<int>(role) >= 0 && static_cast<int>(role) <= static_cast<int>(Theme::TemplateReadOnlyPlaceholder));
+    return m_editorColors[role];
 }
 
 TextStyleData ThemeData::textStyleOverride(const QString& definitionName, const QString& attributeName) const

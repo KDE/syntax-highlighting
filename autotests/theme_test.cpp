@@ -119,14 +119,14 @@ private Q_SLOTS:
         Theme t = m_repo.theme(QLatin1String("Default"));
         QVERIFY(t.isValid());
 
-        QCOMPARE(t.areaBackgroundColor()   , QColor("#ffffff").rgb());
-        QCOMPARE(t.codeFoldingColor()      , QColor("#94caef").rgb());
-        QCOMPARE(t.brackedMatchingColor()  , QColor("#ffff00").rgb());
-        QCOMPARE(t.currentLineColor    ()  , QColor("#f8f7f6").rgb());
-        QCOMPARE(t.iconBorderColor()       , QColor("#f0f0f0").rgb());
-        QCOMPARE(t.indentationLineColor()  , QColor("#d2d2d2").rgb());
-        QCOMPARE(t.lineNumberColor()       , QColor("#a0a0a0").rgb());
-        QCOMPARE(t.currentLineNumberColor(), QColor("#1e1e1e").rgb());
+        QCOMPARE(t.editorColor(Theme::BackgroundColor)  , QColor("#ffffff").rgb());
+        QCOMPARE(t.editorColor(Theme::CodeFolding)      , QColor("#94caef").rgb());
+        QCOMPARE(t.editorColor(Theme::BracketMatching)  , QColor("#ffff00").rgb());
+        QCOMPARE(t.editorColor(Theme::CurrentLine)      , QColor("#f8f7f6").rgb());
+        QCOMPARE(t.editorColor(Theme::IconBorder)       , QColor("#f0f0f0").rgb());
+        QCOMPARE(t.editorColor(Theme::IndentationLine)  , QColor("#d2d2d2").rgb());
+        QCOMPARE(t.editorColor(Theme::LineNumbers)      , QColor("#a0a0a0").rgb());
+        QCOMPARE(t.editorColor(Theme::CurrentLineNumber), QColor("#1e1e1e").rgb());
     }
 
     void testInvalidTheme()

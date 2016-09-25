@@ -110,6 +110,39 @@ public:
     };
     Q_ENUM(TextStyle)
 
+    /** Editor color roles, used to paint line numbers, editor background etc. */
+    enum EditorColorRole {
+        BackgroundColor = 0,
+        TextSelection,
+        CurrentLine,
+        SearchHighlight,
+        ReplaceHighlight,
+        BracketMatching,
+        TabMarker,
+        SpellChecking,
+        IndentationLine,
+        IconBorder,
+        CodeFolding,
+        LineNumbers,
+        CurrentLineNumber,
+        WordWrapMarker,
+        ModifiedLines,
+        SavedLines,
+        Separator,
+        MarkBookmark,
+        MarkBreakpointActive,
+        MarkBreakpointReached,
+        MarkBreakpointDisabled,
+        MarkExecution,
+        MarkWarning,
+        MarkError,
+        TemplateBackground,
+        TemplatePlaceholder,
+        TemplateFocusedPlaceholder,
+        TemplateReadOnlyPlaceholder
+    };
+    Q_ENUM(EditorColorRole)
+
     /**
      * Default constructor, creating an invalid Theme, see isValid().
      */
@@ -213,46 +246,9 @@ public:
 
 public:
     /**
-     * Returns the background color that should be used to fill the text area.
+     * Returns the editor color for the requested @p role.
      */
-    QRgb areaBackgroundColor() const;
-
-    /**
-     * Returns the code folding color. This is used for a possible code folding
-     * border as well as highlighting color for the background of the text of
-     * of a code folding region.
-     */
-    QRgb codeFoldingColor() const;
-
-    /**
-     * Returns the background color used for bracket matching.
-     */
-    QRgb brackedMatchingColor() const;
-
-    /**
-     * Returns the background color for highlighting the current text line.
-     */
-    QRgb currentLineColor() const;
-
-    /**
-     * Returns the background color of the icon border.
-     */
-    QRgb iconBorderColor() const;
-
-    /**
-     * Returns the color for vertical indentation lines.
-     */
-    QRgb indentationLineColor() const;
-
-    /**
-     * Returns the foreground color for the line numbers.
-     */
-    QRgb lineNumberColor() const;
-
-    /**
-     * Returns the foreground color for the current line number.
-     */
-    QRgb currentLineNumberColor() const;
+    QRgb editorColor(EditorColorRole role) const;
 
 private:
     /**

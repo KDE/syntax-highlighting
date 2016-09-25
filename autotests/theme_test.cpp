@@ -128,6 +128,21 @@ private Q_SLOTS:
         QCOMPARE(t.lineNumberColor()       , QColor("#a0a0a0").rgb());
         QCOMPARE(t.currentLineNumberColor(), QColor("#1e1e1e").rgb());
     }
+
+    void testInvalidTheme()
+    {
+        // somewhat complicated way to get proper Format objects
+        FormatCollector collector;
+        collector.setDefinition(m_repo.definitionForName(QLatin1String("QML")));
+        collector.highlightLine(QLatin1String("normal + property real foo: 3.14"), State());
+
+        QVERIFY(collector.formatMap.size() >= 4);
+        auto f = collector.formatMap.value(QLatin1String("Normal Text"));
+        QVERIFY(f.isValid());
+        QVERIFY(f.isDefaultTextStyle(Theme()));
+        QVERIFY(!f.hasTextColor(Theme()));
+        QVERIFY(!f.hasBackgroundColor(Theme()));
+    }
 };
 }
 

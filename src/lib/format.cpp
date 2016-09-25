@@ -70,7 +70,9 @@ FormatPrivate::FormatPrivate()
 TextStyleData FormatPrivate::styleOverride(const Theme &theme) const
 {
     const auto themeData = ThemeData::get(theme);
-    return themeData->textStyleOverride(definition.definition().name(), name);
+    if (themeData)
+        return themeData->textStyleOverride(definition.definition().name(), name);
+    return TextStyleData();
 }
 
 Format::Format() : d(new FormatPrivate)

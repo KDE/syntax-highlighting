@@ -66,6 +66,10 @@ Repository::Repository() :
 
 Repository::~Repository()
 {
+    // reset repo so we can detect in still alive definition instances
+    // that the repo was deleted
+    foreach (const auto &def, d->m_sortedDefs)
+        DefinitionData::get(def)->repo = Q_NULLPTR;
 }
 
 Definition Repository::definitionForName(const QString& defName) const

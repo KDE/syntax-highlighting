@@ -17,8 +17,10 @@
 
 #include <abstracthighlighter.h>
 #include <definition.h>
+#include <format.h>
 #include <repository.h>
 #include <state.h>
+#include <theme.h>
 
 #include <QFileInfo>
 #include <QObject>
@@ -35,7 +37,9 @@ public:
     {
         Q_UNUSED(offset);
         Q_UNUSED(length);
-        Q_UNUSED(format);
+        // only here to ensure we don't crash
+        format.isDefaultTextStyle(theme());
+        format.textColor(theme());
     }
 };
 
@@ -148,6 +152,18 @@ private Q_SLOTS:
         hl.highlightLine(QLatin1String("/* FIXME neither should this crash */"), oldState);
         QVERIFY(hl.definition().isValid());
         QCOMPARE(hl.definition().name(), QLatin1String("QML"));
+    }
+
+    void testLifetime()
+    {
+        // common mistake with value-type like Repo API, make sure this doesn'T crash
+        NullHighlighter hl;
+        {
+            Repository repo;
+            hl.setDefinition(repo.definitionForName(QLatin1String("C++")));
+            hl.setTheme(repo.defaultTheme());
+        }
+        hl.highlightLine(QLatin1String("/**! @todo this should not crash .*/"), State());
     }
 };
 }

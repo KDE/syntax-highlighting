@@ -20,7 +20,7 @@
 
 #include "kf5syntaxhighlighting_export.h"
 
-#include <qglobal.h>
+#include <QObject>
 
 #include <memory>
 
@@ -74,5 +74,7 @@ private:
     std::unique_ptr<AbstractHighlighterPrivate> d;
 };
 }
+
+Q_DECLARE_INTERFACE(SyntaxHighlighting::AbstractHighlighter, "org.kde.SyntaxHighlighting.AbstractHighlighter")
 
 #endif // SYNTAXHIGHLIGHTING_ABSTRACTHIGHLIGHTERM_H

@@ -8,7 +8,7 @@
   <!ENTITY label     "((&varname;)\s*:\s*)?">
 
 ]>
-<language name="VHDL" version="1.12" kateversion="3.0" section="Hardware" extensions="*.vhdl;*.vhd" mimetype="text/x-vhdl" author="Rocky Scaletta (rocky@purdue.edu), Stefan Endrullis (stefan@endrullis.de), Florent Ouchet (outchy@users.sourceforge.net), Chris Higgs (chiggs.99@gmail.com), Jan Michel (jan@mueschelsoft.de)">
+<language name="VHDL" version="2" kateversion="3.0" section="Hardware" extensions="*.vhdl;*.vhd" mimetype="text/x-vhdl" author="Rocky Scaletta (rocky@purdue.edu), Stefan Endrullis (stefan@endrullis.de), Florent Ouchet (outchy@users.sourceforge.net), Chris Higgs (chiggs.99@gmail.com), Jan Michel (jan@mueschelsoft.de), Luigi Calligaris (luigi.calligaris@stfc.ac.uk)">
   <highlighting>
     <list name="keywordsToplevel">
       <item> file </item>
@@ -328,11 +328,32 @@
 
       <context name="arch_decl" attribute="Normal Text" lineEndContext="#stay">
         <IncludeRules context="preDetection"/>
-        <keyword attribute="Signal" context="signal"         insensitive="true" String="signals"/>
-        <StringDetect attribute="Control" context="entity"   insensitive="true" String="component"/>
-        <StringDetect attribute="Control" context="#pop#pop" insensitive="true" String="begin"/>
+        <keyword attribute="Signal" context="signal"          insensitive="true" String="signals"/>
+        <StringDetect attribute="Control" context="archfunc1" insensitive="true" String="function" beginRegion="ArchFunctionRegion1"/>
+        <StringDetect attribute="Control" context="entity"    insensitive="true" String="component"/>
+        <StringDetect attribute="Control" context="#pop#pop"  insensitive="true" String="begin"/>
         <IncludeRules context="generalDetection"/>
       </context>
+
+      <context name="archfunc1" attribute="Normal Text" lineEndContext="#stay" dynamic="true">
+        <IncludeRules context="preDetection"/>
+        <RegExpr attribute="Redirection" context="archfunc2" beginRegion="RegionFunction" insensitive="true" String="&bos;begin&eos;" />
+        <RegExpr attribute="Keyword"   context="#pop" insensitive="true" endRegion="ArchFunctionRegion1" dynamic="true" String="&bos;end(\s+function)?(\s+%2)?&eos;" />
+        <RegExpr attribute="Name" context="#stay" insensitive="true" String="&bos;%2&eos;"  dynamic="true"/>
+        <IncludeRules context="generalDetection"/>
+      </context>
+
+      <context name="archfunc2" attribute="Normal Text" lineEndContext="#stay" dynamic="true">
+        <IncludeRules context="preDetection"/>
+        <RegExpr attribute="Redirection" context="#pop" insensitive="true" dynamic="true" lookAhead="true" endRegion="RegionFunction"
+                 String="&bos;end(\s+function)?&eos;"/>
+        <!--<RegExpr attribute="Error" context="#pop" insensitive="true" dynamic="true" lookAhead="true" endRegion="RegionFunction"
+                 String="&bos;end\s+function(\s+&varname;)?&eos;"/>-->
+        <RegExpr attribute="Process" context="#stay" insensitive="true"
+                 String="&bos;begin&eos;"/>
+        <IncludeRules context="proc_rules"/>
+      </context>
+
 
 <!-- parts of architecture body -->
       <context name="detect_arch_parts" attribute="Normal Text" lineEndContext="#stay" dynamic="true">
@@ -614,8 +635,6 @@
         <DetectChar attribute="Normal Text" lookAhead="true" context="#pop" char=";" endRegion="sig"/>
         <IncludeRules context="generalDetection"/>
       </context>
-
-
     </contexts>
     <itemDatas>
       <itemData name="Normal Text" defStyleNum="dsNormal"/>

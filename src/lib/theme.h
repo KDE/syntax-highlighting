@@ -74,7 +74,11 @@ class KF5SYNTAXHIGHLIGHTING_EXPORT Theme
 {
     Q_GADGET
 public:
-    /** Default styles that can be referenced from syntax definition XML files. */
+    /**
+     * Default styles that can be referenced from syntax definition XML files.
+     * Make sure to choose readable colors with good contrast especially in
+     * combination with the EditorColorRole%s.
+     */
     enum TextStyle {
         Normal = 0,
         Keyword,
@@ -110,35 +114,73 @@ public:
     };
     Q_ENUM(TextStyle)
 
-    /** Editor color roles, used to paint line numbers, editor background etc. */
+    /**
+     * Editor color roles, used to paint line numbers, editor background etc.
+     * The colors typically should have good contrast with the colors used
+     * in the TextStyle%s.
+     */
     enum EditorColorRole {
+        //! Background color for the editing area.
         BackgroundColor = 0,
+        //! Background color for selected text.
         TextSelection,
+        //! Background color for the line of the current text cursor.
         CurrentLine,
+        //! Background color for matching text while searching.
         SearchHighlight,
+        //! Background color for replaced text for a search & replace action.
         ReplaceHighlight,
+        //! Background color for matching bracket pairs (including quotes)
         BracketMatching,
+        //! Foreground color for visualizing tabs and trailing spaces.
         TabMarker,
+        //! Color used to underline spell check errors.
         SpellChecking,
+        //! Color used to draw vertical indentation levels, typically a line.
         IndentationLine,
+        //! Background color for the icon border.
         IconBorder,
+        //! Background colors for code folding regions in the text area, as well
+        //! as code folding indicators in the code folding border.
         CodeFolding,
+        //! Foreground color for drawing the line numbers. This should have a
+        //! good contrast with the IconBorder background color.
         LineNumbers,
+        //! Foreground color for drawing the current line number. This should
+        //! have a good contrast with the IconBorder background color.
         CurrentLineNumber,
+        //! Color used in the icon border to indicate dynamically wrapped lines.
+        //! This color should have a good contrast with the IconBorder
+        //! background color.
         WordWrapMarker,
+        //! Color used to draw a vertical line for marking changed lines.
         ModifiedLines,
+        //! Color used to draw a vertical line for marking saved lines.
         SavedLines,
+        //! Line color used to draw separator lines, e.g. at column 80 in the
+        //! text editor area.
         Separator,
+        //! Background color for bookmarks.
         MarkBookmark,
+        //! Background color for active breakpoints.
         MarkBreakpointActive,
+        //! Background color for a reached breakpoint.
         MarkBreakpointReached,
+        //! Background color for inactive (disabled) breakpoints.
         MarkBreakpointDisabled,
+        //! Background color for marking the current execution position.
         MarkExecution,
+        //! Background color for general warning marks.
         MarkWarning,
+        //! Background color for general error marks.
         MarkError,
+        //! Background color for text templates (snippets).
         TemplateBackground,
+        //! Background color for all placeholders in text templates.
         TemplatePlaceholder,
+        //! Background color for the current placeholder in text templates.
         TemplateFocusedPlaceholder,
+        //! Background color for read-only placeholders in text templates.
         TemplateReadOnlyPlaceholder
     };
     Q_ENUM(EditorColorRole)

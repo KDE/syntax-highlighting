@@ -2,8 +2,8 @@
 macro(generate_php_syntax_definition targetFile srcFile)
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${targetFile}
-        COMMAND ${PERL_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/generators/generate-php.pl < ${CMAKE_CURRENT_SOURCE_DIR}/${srcFile} > ${CMAKE_CURRENT_BINARY_DIR}/${targetFile}
-        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/generators/generate-php.pl ${CMAKE_CURRENT_SOURCE_DIR}/${srcFile}
+        COMMAND ${PERL_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/generators/generate-php.pl < ${CMAKE_CURRENT_SOURCE_DIR}/syntax/${srcFile} > ${CMAKE_CURRENT_BINARY_DIR}/${targetFile}
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/generators/generate-php.pl ${CMAKE_CURRENT_SOURCE_DIR}/syntax/${srcFile}
     )
 endmacro()
 
@@ -12,7 +12,7 @@ generate_php_syntax_definition(css-php.xml css.xml)
 generate_php_syntax_definition(html-php.xml html.xml)
 
 # find all definitions
-file(GLOB src_defs "${CMAKE_CURRENT_SOURCE_DIR}/*.xml")
+file(GLOB src_defs "${CMAKE_CURRENT_SOURCE_DIR}/syntax/*.xml")
 set(defs
     ${src_defs}
     ${CMAKE_CURRENT_BINARY_DIR}/html-php.xml

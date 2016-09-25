@@ -141,7 +141,7 @@ void RepositoryPrivate::load(Repository *repo)
     foreach (const auto &dir, dirs)
         loadSyntaxFolder(repo, dir);
 
-    loadSyntaxFolder(repo, QStringLiteral(":/syntaxhighlighting/syntax"));
+    loadSyntaxFolder(repo, QStringLiteral(":/org.kde.syntax-highlighting/syntax"));
 
     m_sortedDefs.reserve(m_defs.size());
     for (auto it = m_defs.constBegin(); it != m_defs.constEnd(); ++it)
@@ -157,7 +157,7 @@ void RepositoryPrivate::load(Repository *repo)
     dirs = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("org.kde.syntax-highlighting/themes"), QStandardPaths::LocateDirectory);
     foreach (const auto &dir, dirs)
         loadThemeFolder(dir);
-    loadThemeFolder(QStringLiteral(":/syntaxhighlighting/themes"));
+    loadThemeFolder(QStringLiteral(":/org.kde.syntax-highlighting/themes"));
 }
 
 void RepositoryPrivate::loadSyntaxFolder(Repository *repo, const QString &path)

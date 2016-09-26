@@ -80,36 +80,79 @@ public:
      * combination with the EditorColorRole%s.
      */
     enum TextStyle {
+        //! Default text style for normal text and source code without
+        //! special highlighting.
         Normal = 0,
+        //! Text style for language keywords.
         Keyword,
+        //! Text style for function definitions and function calls.
         Function,
+        //! Text style for variables, if applicable. For instance, variables in
+        //! PHP typically start with a '$', so all identifiers folliwng the
+        //! pattern $foo are highlighted as variable.
         Variable,
+        //! Text style for control flow highlighting, such as @e if, @e then,
+        //! @e else, @e return, or @e continue.
         ControlFlow,
+        //! Text style for operators such as +, -, *, / and :: etc.
         Operator,
+        //! Text style for built-in language classes and functions.
         BuiltIn,
+        //! Text style for well-known extensions, such as Qt or boost.
         Extension,
+        //! Text style for preprocessor statements.
         Preprocessor,
+        //! Text style for attributes of functions or objects, e.g. \@override
+        //! in Java, or __declspec(...) and __attribute__((...)) in C++.
         Attribute,
+        //! Text style for single characters such as 'a'.
         Char,
+        //! Text style for escaped characters in strings, such as "hello\n".
         SpecialChar,
+        //! Text style for strings, for instance "hello world".
         String,
+        //! Text style for verbatim strings such as HERE docs.
         VerbatimString,
+        //! Text style for special strings such as regular expressions in
+        //! ECMAScript or the LaTeX math mode.
         SpecialString,
+        //! Text style for includes, imports, modules, or LaTeX packages.
         Import,
+        //! Text style for data types such as int, char, float etc.
         DataType,
+        //! Text style for decimal values.
         DecVal,
+        //! Text style for numbers with base other than 10.
         BaseN,
+        //! Text style for floating point numbers.
         Float,
+        //! Text style for language constants, e.g. True, False, None in Python
+        //! or nullptr in C/C++.
         Constant,
+        //! Text style for normal comments.
         Comment,
+        //! Text style for comments that reflect API documentation, such as
+        //! doxygen /** */ comments.
         Documentation,
+        //! Text style for annotations in comments, such as \@param in Doxygen
+        //! or JavaDoc.
         Annotation,
+        //! Text style that refers to variables in a comment, such as after
+        //! \@param \<identifier\> in Doxygen or JavaDoc.
         CommentVar,
+        //! Text style for region markers, typically defined by BEGIN/END.
         RegionMarker,
+        //! Text style for information, such as the keyword \@note in Doxygen.
         Information,
+        //! Text style for warnings, such as the keyword \@warning in Doxygen.
         Warning,
+        //! Text style for comment specials such as TODO and WARNING in
+        //! comments.
         Alert,
+        //! Text style indicating wrong syntax.
         Error,
+        //! Text style for attributes that do not match any of the other default
+        //! styles.
         Others
     };
     Q_ENUM(TextStyle)

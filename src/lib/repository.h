@@ -117,12 +117,21 @@ public:
      */
     Theme theme(const QString &themeName) const;
 
-    /** Built-in default theme types. */
+    /**
+     * Built-in default theme types.
+     * @see defaultTheme()
+     */
     enum DefaultTheme {
+        //! Theme with a light background color.
         LightTheme,
+        //! Theme with a dark background color.
         DarkTheme
     };
-    /** Returns a default theme instance of the given type. */
+
+    /**
+     * Returns a default theme instance of the given type.
+     * The returned Theme is guaranteed to be a valid theme.
+     */
     Theme defaultTheme(DefaultTheme t = LightTheme);
 
     /**

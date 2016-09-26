@@ -59,7 +59,8 @@ class RepositoryPrivate;
  * editor, you also need to paint the background of the editing widget. In
  * addition, the editor may support showing line numbers, a folding bar, a
  * highlight for the current text line, and similar features. All these colors
- * are defined in terms of the "editor colors".
+ * are defined in terms of the "editor colors" and accessible by calling
+ * editorColor() with the desired enum EditorColorRole.
  *
  * @section theme_access Accessing a Theme
  *

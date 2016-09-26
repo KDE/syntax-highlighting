@@ -24,7 +24,6 @@
 
 #include <memory>
 
-class QJsonObject;
 class QString;
 template <typename T> class QVector;
 

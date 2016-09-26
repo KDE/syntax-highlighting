@@ -26,6 +26,7 @@
 
 QT_BEGIN_NAMESPACE
 class QXmlStreamReader;
+class QJsonObject;
 QT_END_NAMESPACE
 
 namespace SyntaxHighlighting {

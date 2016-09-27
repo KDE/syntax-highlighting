@@ -91,6 +91,16 @@ public:
      */
     Definition& operator=(const Definition &rhs);
 
+    /**
+     * Checks two definitions for equality.
+     */
+    bool operator==(const Definition &other) const;
+
+    /**
+     * Checks two definitions for inequality.
+     */
+    bool operator!=(const Definition &other) const;
+
     /** Checks whether this object refers to a valid syntax definition. */
     bool isValid() const;
     /** Returns the full path to the definition XML file containing

@@ -85,6 +85,16 @@ Definition& Definition::operator=(const Definition &rhs)
     return *this;
 }
 
+bool Definition::operator==(const Definition &other) const
+{
+    return d->fileName == other.d->fileName;
+}
+
+bool Definition::operator!=(const Definition& other) const
+{
+    return d->fileName != other.d->fileName;
+}
+
 bool Definition::isValid() const
 {
     return d->repo && !d->fileName.isEmpty() && !d->name.isEmpty();

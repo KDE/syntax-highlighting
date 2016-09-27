@@ -42,13 +42,25 @@ public:
 
     /** The syntax definition used for highlighting. */
     Definition definition() const;
-    /** Sets the syntax definition used for highlighting. */
-    void setDefinition(const Definition &def);
+
+    /**
+     * Sets the syntax definition used for highlighting.
+     *
+     * Subclasses can re-implement this method to e.g. trigger
+     * re-highlighting or clear internal data structures if needed.
+     */
+    virtual void setDefinition(const Definition &def);
 
     /** Returns the currently selected theme for highlighting. */
     Theme theme() const;
-    /** Sets the theme used for highlighting. */
-    void setTheme(const Theme &theme);
+
+    /**
+     * Sets the theme used for highlighting.
+     *
+     * Subclasses can re-implement this method to e.g. trigger
+     * re-highlighing or to do general palette color setup.
+     */
+    virtual void setTheme(const Theme &theme);
 
 protected:
     AbstractHighlighter();

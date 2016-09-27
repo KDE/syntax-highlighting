@@ -37,6 +37,8 @@ public:
     explicit SyntaxHighlighter(QTextDocument *document);
     ~SyntaxHighlighter();
 
+    void setDefinition(const Definition &def) Q_DECL_OVERRIDE;
+
 protected:
     void highlightBlock(const QString & text) Q_DECL_OVERRIDE;
     void setFormat(int offset, int length, const Format &format) Q_DECL_OVERRIDE;

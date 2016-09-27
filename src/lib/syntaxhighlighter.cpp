@@ -16,6 +16,7 @@
 */
 
 #include "syntaxhighlighter.h"
+#include "definition.h"
 #include "format.h"
 #include "state.h"
 #include "theme.h"
@@ -49,6 +50,14 @@ SyntaxHighlighter::SyntaxHighlighter(QTextDocument *document) :
 
 SyntaxHighlighter::~SyntaxHighlighter()
 {
+}
+
+void SyntaxHighlighter::setDefinition(const Definition& def)
+{
+    const auto needsRehighlight = definition() != def;
+    AbstractHighlighter::setDefinition(def);
+    if (needsRehighlight)
+        rehighlight();
 }
 
 void SyntaxHighlighter::highlightBlock(const QString& text)

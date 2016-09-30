@@ -29,7 +29,16 @@
 
 using namespace SyntaxHighlighting;
 
+class SyntaxHighlighting::HtmlHighlighterPrivate
+{
+public:
+    std::unique_ptr<QTextStream> out;
+    std::unique_ptr<QFile> file;
+    QString currentLine;
+};
+
 HtmlHighlighter::HtmlHighlighter()
+    : d(new HtmlHighlighterPrivate())
 {
 }
 
@@ -39,24 +48,24 @@ HtmlHighlighter::~HtmlHighlighter()
 
 void HtmlHighlighter::setOutputFile(const QString& fileName)
 {
-    m_file.reset(new QFile(fileName));
-    if (!m_file->open(QFile::WriteOnly | QFile::Truncate)) {
-        qCWarning(Log) << "Failed to open output file" << fileName << ":" << m_file->errorString();
+    d->file.reset(new QFile(fileName));
+    if (!d->file->open(QFile::WriteOnly | QFile::Truncate)) {
+        qCWarning(Log) << "Failed to open output file" << fileName << ":" << d->file->errorString();
         return;
     }
-    m_out.reset(new QTextStream(m_file.get()));
-    m_out->setCodec("UTF-8");
+    d->out.reset(new QTextStream(d->file.get()));
+    d->out->setCodec("UTF-8");
 }
 
 void HtmlHighlighter::setOutputFile(FILE *fileHandle)
 {
-    m_out.reset(new QTextStream(fileHandle, QIODevice::WriteOnly));
-    m_out->setCodec("UTF-8");
+    d->out.reset(new QTextStream(fileHandle, QIODevice::WriteOnly));
+    d->out->setCodec("UTF-8");
 }
 
 void HtmlHighlighter::highlightFile(const QString& fileName)
 {
-    if (!m_out) {
+    if (!d->out) {
         qCWarning(Log) << "No output stream defined!";
         return;
     }
@@ -68,53 +77,53 @@ void HtmlHighlighter::highlightFile(const QString& fileName)
     }
 
     State state;
-    *m_out << "<!DOCTYPE html>\n";
-    *m_out << "<html><head>\n";
-    *m_out << "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>\n";
+    *d->out << "<!DOCTYPE html>\n";
+    *d->out << "<html><head>\n";
+    *d->out << "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>\n";
     QFileInfo fi(fileName);
-    *m_out << "<title>" << fi.fileName() << "</title>\n";
-    *m_out << "<meta name=\"generator\" content=\"KF5::SyntaxHighlighting (" << definition().name() << ")\"/>\n";
-    *m_out << "</head><body";
+    *d->out << "<title>" << fi.fileName() << "</title>\n";
+    *d->out << "<meta name=\"generator\" content=\"KF5::SyntaxHighlighting (" << definition().name() << ")\"/>\n";
+    *d->out << "</head><body";
     if (theme().textColor(Theme::Normal))
-        *m_out << " style=\"color:" << QColor(theme().textColor(Theme::Normal)).name() << "\"";
-    *m_out << "><pre>\n";
+        *d->out << " style=\"color:" << QColor(theme().textColor(Theme::Normal)).name() << "\"";
+    *d->out << "><pre>\n";
 
     QTextStream in(&f);
     in.setCodec("UTF-8");
     while (!in.atEnd()) {
-        m_currentLine = in.readLine();
-        state = highlightLine(m_currentLine, state);
-        *m_out << "\n";
+        d->currentLine = in.readLine();
+        state = highlightLine(d->currentLine, state);
+        *d->out << "\n";
     }
 
-    *m_out << "</pre></body></html>\n";
-    m_out->flush();
+    *d->out << "</pre></body></html>\n";
+    d->out->flush();
 
-    m_out.reset();
-    m_file.reset();
+    d->out.reset();
+    d->file.reset();
 }
 
 void HtmlHighlighter::setFormat(int offset, int length, const Format& format)
 {
     if (!format.isDefaultTextStyle(theme())) {
-        *m_out << "<span style=\"";
+        *d->out << "<span style=\"";
         if (format.hasTextColor(theme()))
-            *m_out << "color:" << format.textColor(theme()).name() << ";";
+            *d->out << "color:" << format.textColor(theme()).name() << ";";
         if (format.hasBackgroundColor(theme()))
-            *m_out << "background-color:" << format.backgroundColor(theme()).name() << ";";
+            *d->out << "background-color:" << format.backgroundColor(theme()).name() << ";";
         if (format.isBold(theme()))
-            *m_out << "font-weight:bold;";
+            *d->out << "font-weight:bold;";
         if (format.isItalic(theme()))
-            *m_out << "font-style:italic;";
+            *d->out << "font-style:italic;";
         if (format.isUnderline(theme()))
-            *m_out << "text-decoration:underline;";
+            *d->out << "text-decoration:underline;";
         if (format.isStrikeThrough(theme()))
-            *m_out << "text-decoration:line-through;";
-        *m_out << "\">";
+            *d->out << "text-decoration:line-through;";
+        *d->out << "\">";
     }
 
-    *m_out << m_currentLine.mid(offset, length).toHtmlEscaped();
+    *d->out << d->currentLine.mid(offset, length).toHtmlEscaped();
 
     if (!format.isDefaultTextStyle(theme()))
-        *m_out << "</span>";
+        *d->out << "</span>";
 }

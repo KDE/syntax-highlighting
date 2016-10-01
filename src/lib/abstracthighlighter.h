@@ -34,13 +34,52 @@ class Format;
 class State;
 class Theme;
 
-/** Abstract base class for highlighters. */
+/**
+ * Abstract base class for highlighters.
+ *
+ * @section abshl_intro Introduction
+ *
+ * The AbstractHighlighter provides an interface to highlight text.
+ *
+ * The SyntaxHighlighting framework already ships with one implementation,
+ * namely the SyntaxHighlighter, which also derives from QSyntaxHighlighter,
+ * meaning that it can be used to highlight a QTextDocument or a QML TextEdit.
+ * In order to use the SyntaxHighlighter, just call setDefinition() and
+ * setTheme(), and the associated documents will automatically be highlighted.
+ *
+ * However, if you want to use the SyntaxHighlighting framework to implement
+ * your own syntax highlighter, you need to sublcass from AbstractHighlighter.
+
+ * @section abshl_impl Implementing your own Syntax Highlighter
+ *
+ * In order to implement your own syntax highlighter, you need to inherit from
+ * AbstractHighlighter. Then, pass each text line that needs to be highlighted
+ * in order to highlightLine(). Internally, highlightLine() uses the Definition
+ * initially set through setDefinition() and the State of the previous text line
+ * to parse and highlight the given text line. For each highlighting change,
+ * highlightLine() will call setFormat(). Therefore, reimplement setFormat() to
+ * get notified of the Format that is valid in the range starting at the given
+ * offset with the specified length.
+ *
+ * The Format class itself depends on the current Theme. A theme must be
+ * initially set once such that the Format%s instances can be queried for
+ * concrete colors.
+ *
+ * Optionally, you can also reimplement setTheme() and setDefinition() to get
+ * notified whenever the Definition or the Theme changes.
+ *
+ * @see SyntaxHighlighter
+ */
 class KF5SYNTAXHIGHLIGHTING_EXPORT AbstractHighlighter
 {
 public:
     virtual ~AbstractHighlighter();
 
-    /** The syntax definition used for highlighting. */
+    /**
+     * Returns the syntax definition used for highlighting.
+     *
+     * @see setDefinition()
+     */
     Definition definition() const;
 
     /**
@@ -65,20 +104,27 @@ public:
 protected:
     AbstractHighlighter();
 
-    /** Highlight the given line. Call this from your derived class
-     *  where appropriate. This will result in any number of setFormat()
-     *  calls as a result.
-     *  @param text A string containing the text of the line to highlight.
-     *  @param state The highlighting state handle returned by the call
-     *   to highlightLine() for the previous line.
-     *  @returns The state of the highlighing engine after processing the
-     *   given line. This needs to passed into highlightLine() in for the
-     *   the next line. You can store the state for efficient partial
-     *   re-highlighting for example during editing.
+    /**
+     * Highlight the given line. Call this from your derived class
+     * where appropriate. This will result in any number of setFormat()
+     * calls as a result.
+     * @param text A string containing the text of the line to highlight.
+     * @param state The highlighting state handle returned by the call
+     *        to highlightLine() for the previous line.
+     * @returns The state of the highlighing engine after processing the
+     *        given line. This needs to passed into highlightLine() in for the
+     *        the next line. You can store the state for efficient partial
+     *        re-highlighting for example during editing.
+     *
+     * @see setForma()
      */
     State highlightLine(const QString &text, const State &state);
 
-    /** Reimplement this to apply formats to your output. */
+    /**
+     * Reimplement this to apply formats to your output.
+     *
+     * @see highlightLine()
+     */
     virtual void setFormat(int offset, int length, const Format &format) = 0;
 
 private:

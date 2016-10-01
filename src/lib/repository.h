@@ -52,11 +52,22 @@ class Theme;
  * system. If a Definition exists in the resource and on the file system,
  * then the one from the file system is chosen.
  *
- * @section repo_access Accessing the Definitions
+ * @section repo_access Definitions and Themes
  *
  * Typically, only one instance of the Repository is needed. This single
  * instance can be thought of as a singleton you keep alive throughout the
- * lifetime of your application.
+ * lifetime of your application. Then, either call definitionForName() with the
+ * given language name (e.g. "QML" or "Java"), or definitionForFileName() to
+ * obtain a Definition based on the filename/mimetype of the file. The
+ * function definitions() returns a list of all available syntax Definition%s.
+ *
+ * In addition to Definitions, the Repository also provides a list of Themes.
+ * A Theme is defined by a set of default text style colors as well as editor
+ * colors. These colors together provide all required colros for drawing all
+ * primitives of a text editor. All available Theme%s can be queried through
+ * themes(), and a Theme with a specific name is obtained through theme().
+ * Additionally, defaultTheme() provides a way to obtain a default theme for
+ * either a light or a black color theme.
  *
  * @see Definition
  */

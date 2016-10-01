@@ -49,7 +49,7 @@ class Theme;
  *
  * However, if you want to use the SyntaxHighlighting framework to implement
  * your own syntax highlighter, you need to sublcass from AbstractHighlighter.
-
+ *
  * @section abshl_impl Implementing your own Syntax Highlighter
  *
  * In order to implement your own syntax highlighter, you need to inherit from

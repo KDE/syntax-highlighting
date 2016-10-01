@@ -69,7 +69,7 @@ class Theme;
  * Additionally, defaultTheme() provides a way to obtain a default theme for
  * either a light or a black color theme.
  *
- * @see Definition
+ * @see Definition, Theme, AbstractHighlighter
  */
 class KF5SYNTAXHIGHLIGHTING_EXPORT Repository
 {

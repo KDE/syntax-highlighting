@@ -23,7 +23,7 @@
 #include <repository.h>
 #include <state.h>
 
-#include <QDirIterator>
+#include <QDir>
 #include <QFile>
 #include <QObject>
 #include <QProcess>
@@ -129,9 +129,9 @@ private Q_SLOTS:
         QTest::addColumn<QString>("refFile");
         QTest::addColumn<QString>("syntax");
 
-        QDirIterator it(QStringLiteral(TESTSRCDIR "/input"), QDir::Files | QDir::NoSymLinks | QDir::Readable);
-        while (it.hasNext()) {
-            const auto inFile = it.next();
+        QDir dir(QStringLiteral(TESTSRCDIR "/input"));
+        foreach (const auto &fileName, dir.entryList(QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Name)) {
+            const auto inFile = dir.absoluteFilePath(fileName);
             if (inFile.endsWith(QLatin1String(".syntax")))
                 continue;
 
@@ -140,9 +140,9 @@ private Q_SLOTS:
             if (syntaxOverride.exists() && syntaxOverride.open(QFile::ReadOnly))
                 syntax = QString::fromUtf8(syntaxOverride.readAll()).trimmed();
 
-            QTest::newRow(it.fileName().toUtf8().constData()) << inFile
-                << (QStringLiteral(TESTBUILDDIR "/folding.out/") + it.fileName() + QStringLiteral(".fold"))
-                << (QStringLiteral(TESTSRCDIR "/folding/") + it.fileName() + QStringLiteral(".fold"))
+            QTest::newRow(fileName.toUtf8().constData()) << inFile
+                << (QStringLiteral(TESTBUILDDIR "/folding.out/") + fileName + QStringLiteral(".fold"))
+                << (QStringLiteral(TESTSRCDIR "/folding/") + fileName + QStringLiteral(".fold"))
                 << syntax;
         }
 

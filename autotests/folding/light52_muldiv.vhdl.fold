@@ -81,7 +81,7 @@ use ieee.numeric_std.all;
 use work.light52_pkg.all;
 use work.light52_ucode_pkg.all;
 
-entity <beginfold id='111'>light52_muldiv</beginfold id='111'> is
+entity <beginfold id='65'>light52_muldiv</beginfold id='65'> is
     generic (
         SEQUENTIAL_MULTIPLIER : boolean := false
     );
@@ -102,44 +102,44 @@ entity <beginfold id='111'>light52_muldiv</beginfold id='111'> is
         mul_ready :             out std_logic;
         div_ready :             out std_logic
     );
-<endfold id='111'>end entity light52_muldiv;</endfold id='111'>
+<endfold id='65'>end entity light52_muldiv;</endfold id='65'>
 
-<beginfold id='100'>architecture sequential of light52_muldiv is</beginfold id='100'>
+<beginfold id='54'>architecture sequential of light52_muldiv is</beginfold id='54'>
 
-signal bit_ctr :            integer range 0 to 8<endfold id='113'>;</endfold id='113'>
+signal bit_ctr :            integer range 0 to 8<endfold id='67'>;</endfold id='67'>
 
-signal b_shift_reg :        t_word<endfold id='113'>;</endfold id='113'>
+signal b_shift_reg :        t_word<endfold id='67'>;</endfold id='67'>
 
-signal den_ge_256 :         std_logic<endfold id='113'>;</endfold id='113'>
-signal num_ge_den :         std_logic<endfold id='113'>;</endfold id='113'>
-signal sub_num :            std_logic<endfold id='113'>;</endfold id='113'>
+signal den_ge_256 :         std_logic<endfold id='67'>;</endfold id='67'>
+signal num_ge_den :         std_logic<endfold id='67'>;</endfold id='67'>
+signal sub_num :            std_logic<endfold id='67'>;</endfold id='67'>
 
-signal denominator :        t_byte<endfold id='113'>;</endfold id='113'>
-signal rem_reg :            t_byte<endfold id='113'>;</endfold id='113'>
-signal quot_reg :           t_byte<endfold id='113'>;</endfold id='113'>
-signal prod_reg :           t_word<endfold id='113'>;</endfold id='113'>
-signal ready :              std_logic<endfold id='113'>;</endfold id='113'>
+signal denominator :        t_byte<endfold id='67'>;</endfold id='67'>
+signal rem_reg :            t_byte<endfold id='67'>;</endfold id='67'>
+signal quot_reg :           t_byte<endfold id='67'>;</endfold id='67'>
+signal prod_reg :           t_word<endfold id='67'>;</endfold id='67'>
+signal ready :              std_logic<endfold id='67'>;</endfold id='67'>
 
-signal load_regs :          std_logic<endfold id='113'>;</endfold id='113'>
+signal load_regs :          std_logic<endfold id='67'>;</endfold id='67'>
 
 begin
 
 -- Control logic ---------------------------------------------------------------
 
-control_counter: <beginfold id='104'>process</beginfold id='104'>(clk)
+control_counter: <beginfold id='58'>process</beginfold id='58'>(clk)
 begin
-    if clk'event and clk='1' <beginfold id='108'>then</beginfold id='108'>
-        if reset='1' <beginfold id='108'>then</beginfold id='108'>
+    if clk'event and clk='1' <beginfold id='62'>then</beginfold id='62'>
+        if reset='1' <beginfold id='62'>then</beginfold id='62'>
             bit_ctr <= 8;
         else
-            if load_regs='1' <beginfold id='108'>then</beginfold id='108'>
+            if load_regs='1' <beginfold id='62'>then</beginfold id='62'>
                 bit_ctr <= 0;
             elsif bit_ctr /= 8 then
                 bit_ctr <= bit_ctr + 1;
-            <endfold id='108'>end if;</endfold id='108'>
-        <endfold id='108'>end if;</endfold id='108'>
-    <endfold id='108'>end if;</endfold id='108'>
-<endfold id='104'>end process control_counter</endfold id='104'>;
+            <endfold id='62'>end if;</endfold id='62'>
+        <endfold id='62'>end if;</endfold id='62'>
+    <endfold id='62'>end if;</endfold id='62'>
+<endfold id='58'>end process control_counter</endfold id='58'>;
 
 -- Internal signal ready is asserted after 8 cycles.
 -- The sequential multiplier will use this signal too, IF it takes 8 cycles.
@@ -153,40 +153,40 @@ ready <= '1' when bit_ctr >= 8 else '0';
 -- 8 cycles to complete. We can get away with this because we deal with unsigned
 -- numbers only.
 
-divider_registers: <beginfold id='104'>process</beginfold id='104'>(clk)
+divider_registers: <beginfold id='58'>process</beginfold id='58'>(clk)
 begin
-    if clk'event and clk='1' <beginfold id='108'>then</beginfold id='108'>
+    if clk'event and clk='1' <beginfold id='62'>then</beginfold id='62'>
         -- denominator shift register
-        if load_regs='1' <beginfold id='108'>then</beginfold id='108'>
+        if load_regs='1' <beginfold id='62'>then</beginfold id='62'>
             b_shift_reg <= "0" & data_b & "0000000";
             -- Division overflow can be determined upon loading B reg data.
             -- OV will be raised only on div-by-zero.
-            if data_b=X"00" <beginfold id='108'>then</beginfold id='108'>
+            if data_b=X"00" <beginfold id='62'>then</beginfold id='62'>
                 div_ov_out <= '1';
             else
                 div_ov_out <= '0';
-            <endfold id='108'>end if;</endfold id='108'>
+            <endfold id='62'>end if;</endfold id='62'>
         else
             b_shift_reg <= "0" & b_shift_reg(b_shift_reg'high downto 1);
-        <endfold id='108'>end if;</endfold id='108'>
+        <endfold id='62'>end if;</endfold id='62'>
         
         -- numerator register
-        if load_regs='1' <beginfold id='108'>then</beginfold id='108'> 
+        if load_regs='1' <beginfold id='62'>then</beginfold id='62'> 
             rem_reg <= data_a;
         elsif bit_ctr/=8 and sub_num='1' then 
             rem_reg <= rem_reg - denominator;
-        <endfold id='108'>end if;</endfold id='108'>
+        <endfold id='62'>end if;</endfold id='62'>
 
         --- quotient register
-        if load_regs='1' <beginfold id='108'>then</beginfold id='108'>
+        if load_regs='1' <beginfold id='62'>then</beginfold id='62'>
             quot_reg <= (others => '0');
         elsif bit_ctr/=8 then
             quot_reg <= quot_reg(quot_reg'high-1 downto 0) & sub_num;
-        <endfold id='108'>end if;</endfold id='108'>
+        <endfold id='62'>end if;</endfold id='62'>
         
         load_regs <= start;
-    <endfold id='108'>end if;</endfold id='108'>
-<endfold id='104'>end process divider_registers</endfold id='104'>;
+    <endfold id='62'>end if;</endfold id='62'>
+<endfold id='58'>end process divider_registers</endfold id='58'>;
 
 denominator <= b_shift_reg(7 downto 0);
 
@@ -208,14 +208,14 @@ div_ready <= ready;
 ---- Multiplier logic ----------------------------------------------------------
 
 ---- Combinational multiplier -----------------------------
-multiplier_combinational: if not SEQUENTIAL_MULTIPLIER <beginfold id='103'>generate</beginfold id='103'>
+multiplier_combinational: if not SEQUENTIAL_MULTIPLIER <beginfold id='57'>generate</beginfold id='57'>
 
-registered_combinational_multiplier:<beginfold id='104'>process</beginfold id='104'>(clk)
+registered_combinational_multiplier:<beginfold id='58'>process</beginfold id='58'>(clk)
 begin
-    if clk'event and clk='1' <beginfold id='108'>then</beginfold id='108'>
+    if clk'event and clk='1' <beginfold id='62'>then</beginfold id='62'>
         prod_reg <= data_a * data_b; -- t_byte is unsigned
-    <endfold id='108'>end if;</endfold id='108'>
-<endfold id='104'>end process registered_combinational_multiplier</endfold id='104'>;
+    <endfold id='62'>end if;</endfold id='62'>
+<endfold id='58'>end process registered_combinational_multiplier</endfold id='58'>;
 
 -- The multiplier output is valid in the cycle after the operands are loaded,
 -- so by the time MUL is executed it's already done.
@@ -224,16 +224,16 @@ mul_ready <= '1';
 mul_ov_out <= '1' when prod_reg(15 downto 8)/=X"00" else '0';
 prod_out <= prod_reg;
 
-<endfold id='103'>end generate multiplier_combinational</endfold id='103'>;
+<endfold id='57'>end generate multiplier_combinational</endfold id='57'>;
 
 ---- Sequential multiplier --------------------------------
-multiplier_sequential: if SEQUENTIAL_MULTIPLIER <beginfold id='103'>generate</beginfold id='103'>
+multiplier_sequential: if SEQUENTIAL_MULTIPLIER <beginfold id='57'>generate</beginfold id='57'>
 
 assert false
 report "Sequential multiplier implementation not done yet."&
        " Use combinational implementation."
 severity failure;
 
-<endfold id='103'>end generate multiplier_sequential</endfold id='103'>;
+<endfold id='57'>end generate multiplier_sequential</endfold id='57'>;
 
-<endfold id='100'>end sequential;</endfold id='100'>
+<endfold id='54'>end sequential;</endfold id='54'>

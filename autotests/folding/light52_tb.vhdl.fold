@@ -52,61 +52,61 @@ use work.obj_code_pkg.all;
 use work.light52_tb_pkg.all;
 use work.txt_util.all;
 
-entity <beginfold id='111'>light52_tb</beginfold id='111'> is
+entity <beginfold id='65'>light52_tb</beginfold id='65'> is
 generic (BCD : boolean := true);
-<endfold id='111'>end;</endfold id='111'>
+<endfold id='65'>end;</endfold id='65'>
 
 
-<beginfold id='100'>architecture testbench of light52_tb is</beginfold id='100'>
+<beginfold id='54'>architecture testbench of light52_tb is</beginfold id='54'>
 
 --------------------------------------------------------------------------------
 -- Simulation parameters
 -- FIXME these should be in parameter package
 
 -- Simulated clock period is the same as the usual target, the DE-1 board
-constant T : time := 20 ns<endfold id='113'>;</endfold id='113'> -- 50MHz
-constant SIMULATION_LENGTH : integer := 400000<endfold id='113'>;</endfold id='113'>
+constant T : time := 20 ns<endfold id='67'>;</endfold id='67'> -- 50MHz
+constant SIMULATION_LENGTH : integer := 400000<endfold id='67'>;</endfold id='67'>
 
 --------------------------------------------------------------------------------
 -- MPU interface 
 
-signal clk :                std_logic := '0'<endfold id='113'>;</endfold id='113'>
-signal reset :              std_logic := '1'<endfold id='113'>;</endfold id='113'>
+signal clk :                std_logic := '0'<endfold id='67'>;</endfold id='67'>
+signal reset :              std_logic := '1'<endfold id='67'>;</endfold id='67'>
 
-signal p0_out :             std_logic_vector(7 downto 0)<endfold id='113'>;</endfold id='113'>
-signal p1_out :             std_logic_vector(7 downto 0)<endfold id='113'>;</endfold id='113'>
-signal p2_in :              std_logic_vector(7 downto 0)<endfold id='113'>;</endfold id='113'>
-signal p3_in :              std_logic_vector(7 downto 0)<endfold id='113'>;</endfold id='113'>
+signal p0_out :             std_logic_vector(7 downto 0)<endfold id='67'>;</endfold id='67'>
+signal p1_out :             std_logic_vector(7 downto 0)<endfold id='67'>;</endfold id='67'>
+signal p2_in :              std_logic_vector(7 downto 0)<endfold id='67'>;</endfold id='67'>
+signal p3_in :              std_logic_vector(7 downto 0)<endfold id='67'>;</endfold id='67'>
 
-signal external_irq :       std_logic_vector(7 downto 0)<endfold id='113'>;</endfold id='113'>
+signal external_irq :       std_logic_vector(7 downto 0)<endfold id='67'>;</endfold id='67'>
 
-signal txd, rxd :           std_logic<endfold id='113'>;</endfold id='113'>
+signal txd, rxd :           std_logic<endfold id='67'>;</endfold id='67'>
 
 --------------------------------------------------------------------------------
 -- Logging signals & simulation control 
 
 -- Asserted high to disable the clock and terminate the simulation.
-signal done :               std_logic := '0'<endfold id='113'>;</endfold id='113'>
+signal done :               std_logic := '0'<endfold id='67'>;</endfold id='67'>
 
 -- Log file
 file log_file: TEXT open write_mode is "hw_sim_log.txt";
 -- Console output log file
 file con_file: TEXT open write_mode is "hw_sim_console_log.txt";
 -- Info record needed by the logging fuctions
-signal log_info :           t_log_info<endfold id='113'>;</endfold id='113'>
+signal log_info :           t_log_info<endfold id='67'>;</endfold id='67'>
 
 begin
 
 ---- UUT instantiation ---------------------------------------------------------
 
-<beginfold id='102'>uut: entity work.light52_mcu</beginfold id='102'>
-    <beginfold id='105'>generic map (</beginfold id='105'>
+<beginfold id='56'>uut: entity work.light52_mcu</beginfold id='56'>
+    <beginfold id='59'>generic map (</beginfold id='59'>
         IMPLEMENT_BCD_INSTRUCTIONS => BCD,
         CODE_ROM_SIZE =>    work.obj_code_pkg.XCODE_SIZE,
         XDATA_RAM_SIZE =>   work.obj_code_pkg.XDATA_SIZE,
         OBJ_CODE =>         work.obj_code_pkg.object_code
-    <endfold id='105'>)</endfold id='105'>
-    <beginfold id='105'>port map (</beginfold id='105'>
+    <endfold id='59'>)</endfold id='59'>
+    <beginfold id='59'>port map (</beginfold id='59'>
         clk             => clk,
         reset           => reset,
         
@@ -119,7 +119,7 @@ begin
         p1_out          => p1_out,
         p2_in           => p2_in,
         p3_in           => p3_in
-    <endfold id='105'>)</endfold id='105'><endfold id='102'>;</endfold id='102'>
+    <endfold id='59'>)</endfold id='59'><endfold id='56'>;</endfold id='56'>
     
     -- UART is looped back in the test bench.
     rxd <= txd;
@@ -132,17 +132,17 @@ begin
     external_irq <= p1_out;
 
     ---- Master clock: free running clock used as main module clock ------------
-    run_master_clock: <beginfold id='104'>process</beginfold id='104'>(done, clk)
+    run_master_clock: <beginfold id='58'>process</beginfold id='58'>(done, clk)
     begin
-        if done = '0' <beginfold id='108'>then</beginfold id='108'>
+        if done = '0' <beginfold id='62'>then</beginfold id='62'>
             clk <= not clk after T/2;
-        <endfold id='108'>end if;</endfold id='108'>
-    <endfold id='104'>end process run_master_clock</endfold id='104'>;
+        <endfold id='62'>end if;</endfold id='62'>
+    <endfold id='58'>end process run_master_clock</endfold id='58'>;
 
 
     ---- Main simulation process: reset MCU and wait for fixed period ----------
 
-    drive_uut: <beginfold id='104'>process</beginfold id='104'>
+    drive_uut: <beginfold id='58'>process</beginfold id='58'>
     begin
         -- Leave reset asserted for a few clock cycles...
         reset <= '1';
@@ -160,11 +160,11 @@ begin
         done <= '1';
         wait;
         
-    <endfold id='104'>end process drive_uut</endfold id='104'>;
+    <endfold id='58'>end process drive_uut</endfold id='58'>;
 
 
     -- Logging process: launch logger functions --------------------------------
-    log_execution: <beginfold id='104'>process</beginfold id='104'>
+    log_execution: <beginfold id='58'>process</beginfold id='58'>
     begin
         -- Log cpu activity until done='1'.
         log_cpu_activity(clk, reset, done, "/uut",
@@ -175,6 +175,6 @@ begin
         log_flush_console(log_info, con_file);
         
         wait;
-    <endfold id='104'>end process log_execution</endfold id='104'>;
+    <endfold id='58'>end process log_execution</endfold id='58'>;
 
-<endfold id='100'>end architecture testbench;</endfold id='100'>
+<endfold id='54'>end architecture testbench;</endfold id='54'>

@@ -33,7 +33,7 @@ class FormatCollector : public AbstractHighlighter
 {
 public:
     using AbstractHighlighter::highlightLine;
-    void setFormat(int offset, int length, const Format &format) Q_DECL_OVERRIDE
+    void applyFormat(int offset, int length, const Format &format) Q_DECL_OVERRIDE
     {
         Q_UNUSED(offset);
         Q_UNUSED(length);

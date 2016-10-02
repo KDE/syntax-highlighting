@@ -112,7 +112,7 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
     // verify definition, deal with no highlighting being enabled
     d->ensureDefinitionLoaded();
     if (!d->m_definition.isValid()) {
-        setFormat(0, text.size(), Format());
+        applyFormat(0, text.size(), Format());
         return State();
     }
 
@@ -133,7 +133,7 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
     if (text.isEmpty()) {
         while (!stateData->topContext()->lineEmptyContext().isStay())
             d->switchContext(stateData, stateData->topContext()->lineEmptyContext(), QStringList());
-        setFormat(0, 0, Format());
+        applyFormat(0, 0, Format());
         return newState;
     }
 
@@ -204,7 +204,7 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
 
         if (newFormat != currentFormat /*|| currentLookupDef != newLookupDef*/) {
             if (offset > 0)
-                setFormat(beginOffset, offset - beginOffset, currentLookupContext->formatByName(currentFormat));
+                applyFormat(beginOffset, offset - beginOffset, currentLookupContext->formatByName(currentFormat));
             beginOffset = offset;
             currentFormat = newFormat;
             currentLookupContext = newLookupContext;
@@ -215,7 +215,7 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
     } while (offset < text.size());
 
     if (beginOffset < offset)
-        setFormat(beginOffset, text.size() - beginOffset, currentLookupContext->formatByName(currentFormat));
+        applyFormat(beginOffset, text.size() - beginOffset, currentLookupContext->formatByName(currentFormat));
 
     while (!stateData->topContext()->lineEndContext().isStay() && !lineContinuation) {
         if (!d->switchContext(stateData, stateData->topContext()->lineEndContext(), QStringList()))

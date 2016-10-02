@@ -66,7 +66,7 @@ public:
     }
 
 protected:
-    void setFormat(int offset, int length, const Format &format) Q_DECL_OVERRIDE
+    void applyFormat(int offset, int length, const Format &format) Q_DECL_OVERRIDE
     {
         if (format.name().isEmpty())
             m_out << "<dsNormal>" << m_currentLine.midRef(offset, length) << "</dsNormal>";

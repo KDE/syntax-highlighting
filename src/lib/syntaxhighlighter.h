@@ -41,7 +41,7 @@ public:
 
 protected:
     void highlightBlock(const QString & text) Q_DECL_OVERRIDE;
-    void setFormat(int offset, int length, const Format &format) Q_DECL_OVERRIDE;
+    void applyFormat(int offset, int length, const Format &format) Q_DECL_OVERRIDE;
 };
 }
 

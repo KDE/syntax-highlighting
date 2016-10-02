@@ -86,7 +86,7 @@ void SyntaxHighlighter::highlightBlock(const QString& text)
         QMetaObject::invokeMethod(this, "rehighlightBlock", Qt::QueuedConnection, Q_ARG(QTextBlock, nextBlock));
 }
 
-void SyntaxHighlighter::setFormat(int offset, int length, const SyntaxHighlighting::Format& format)
+void SyntaxHighlighter::applyFormat(int offset, int length, const SyntaxHighlighting::Format& format)
 {
     if (format.isDefaultTextStyle(theme()) || length == 0)
         return;

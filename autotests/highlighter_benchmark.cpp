@@ -45,7 +45,7 @@ public:
     }
 
 protected:
-    void setFormat(int, int, const Format&) Q_DECL_OVERRIDE {}
+    void applyFormat(int, int, const Format&) Q_DECL_OVERRIDE {}
 };
 
 class HighlighterBenchmark : public QObject

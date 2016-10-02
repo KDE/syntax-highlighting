@@ -57,7 +57,7 @@ class Theme;
  * in order to highlightLine(). Internally, highlightLine() uses the Definition
  * initially set through setDefinition() and the State of the previous text line
  * to parse and highlight the given text line. For each highlighting change,
- * highlightLine() will call setFormat(). Therefore, reimplement setFormat() to
+ * highlightLine() will call applyFormat(). Therefore, reimplement applyFormat() to
  * get notified of the Format that is valid in the range starting at the given
  * offset with the specified length.
  *
@@ -106,7 +106,7 @@ protected:
 
     /**
      * Highlight the given line. Call this from your derived class
-     * where appropriate. This will result in any number of setFormat()
+     * where appropriate. This will result in any number of applyFormat()
      * calls as a result.
      * @param text A string containing the text of the line to highlight.
      * @param state The highlighting state handle returned by the call
@@ -116,7 +116,7 @@ protected:
      *        the next line. You can store the state for efficient partial
      *        re-highlighting for example during editing.
      *
-     * @see setForma()
+     * @see applyFormat()
      */
     State highlightLine(const QString &text, const State &state);
 
@@ -125,7 +125,7 @@ protected:
      *
      * @see highlightLine()
      */
-    virtual void setFormat(int offset, int length, const Format &format) = 0;
+    virtual void applyFormat(int offset, int length, const Format &format) = 0;
 
 private:
     Q_DISABLE_COPY(AbstractHighlighter)

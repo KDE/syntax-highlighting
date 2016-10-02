@@ -64,6 +64,8 @@ public:
 
     Format formatByName(const QString &name) const;
 
+    quint16 foldingRegionId(const QString &foldName);
+
     DefinitionRef q;
 
     Repository *repo;

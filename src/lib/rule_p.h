@@ -18,11 +18,12 @@
 #ifndef SYNTAXHIGHLIGHTING_RULE_P_H
 #define SYNTAXHIGHLIGHTING_RULE_P_H
 
-#include "keywordlist_p.h"
 #include "contextswitch_p.h"
-#include "matchresult_p.h"
 #include "definition.h"
 #include "definitionref_p.h"
+#include "foldingregion.h"
+#include "keywordlist_p.h"
+#include "matchresult_p.h"
 
 #include <QRegularExpression>
 #include <QString>
@@ -52,6 +53,9 @@ public:
     bool firstNonSpace() const;
     int requiredColumn() const;
 
+    FoldingRegion beginRegion() const;
+    FoldingRegion endRegion() const;
+
     bool load(QXmlStreamReader &reader);
     void resolveContext();
 
@@ -73,6 +77,8 @@ private:
     ContextSwitch m_context;
     QVector<Rule::Ptr> m_subRules;
     int m_column;
+    FoldingRegion m_beginRegion;
+    FoldingRegion m_endRegion;
     bool m_firstNonSpace;
     bool m_lookAhead;
     bool m_dynamic;

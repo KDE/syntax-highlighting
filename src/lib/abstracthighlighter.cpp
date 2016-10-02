@@ -18,6 +18,7 @@
 #include "abstracthighlighter.h"
 #include "context_p.h"
 #include "definition_p.h"
+#include "foldingregion.h"
 #include "format.h"
 #include "repository.h"
 #include "rule_p.h"
@@ -174,6 +175,12 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
             if (newOffset <= offset)
                 continue;
 
+            // apply folding
+            if (rule->endRegion().isValid())
+                applyFolding(offset, newOffset - offset, rule->endRegion());
+            if (rule->beginRegion().isValid())
+                applyFolding(offset, newOffset - offset, rule->beginRegion());
+
             if (rule->isLookAhead()) {
                 Q_ASSERT(!rule->context().isStay());
                 d->switchContext(stateData, rule->context(), newResult.captures());
@@ -241,4 +248,11 @@ bool AbstractHighlighterPrivate::switchContext(StateData *data, const ContextSwi
 
     Q_ASSERT(!data->isEmpty());
     return true;
+}
+
+void AbstractHighlighter::applyFolding(int offset, int length, FoldingRegion region)
+{
+    Q_UNUSED(offset);
+    Q_UNUSED(length);
+    Q_UNUSED(region);
 }

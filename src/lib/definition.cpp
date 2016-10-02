@@ -22,6 +22,7 @@
 
 #include "context_p.h"
 #include "format.h"
+#include "repository_p.h"
 #include "rule_p.h"
 #include "syntaxhighlighting_logging.h"
 #include "syntaxhighlighting_version.h"
@@ -468,6 +469,11 @@ bool DefinitionData::checkKateVersion(const QStringRef& verStr)
     }
 
     return true;
+}
+
+quint16 DefinitionData::foldingRegionId(const QString &foldName)
+{
+    return RepositoryPrivate::get(repo)->foldingRegionId(name, foldName);
 }
 
 DefinitionRef::DefinitionRef()

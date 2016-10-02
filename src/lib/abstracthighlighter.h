@@ -30,6 +30,7 @@ namespace SyntaxHighlighting {
 
 class AbstractHighlighterPrivate;
 class Definition;
+class FoldingRegion;
 class Format;
 class State;
 class Theme;
@@ -126,6 +127,11 @@ protected:
      * @see highlightLine()
      */
     virtual void applyFormat(int offset, int length, const Format &format) = 0;
+
+    /**
+     * Reimplement this to apply folding to your output.
+     */
+    virtual void applyFolding(int offset, int length, FoldingRegion region);
 
 private:
     Q_DISABLE_COPY(AbstractHighlighter)

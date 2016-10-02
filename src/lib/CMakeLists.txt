@@ -5,6 +5,7 @@ set(syntax_highlighting_srcs
     context.cpp
     contextswitch.cpp
     definitiondownloader.cpp
+    foldingregion.cpp
     format.cpp
     htmlhighlighter.cpp
     keywordlist.cpp
@@ -42,6 +43,7 @@ ecm_generate_headers(SyntaxHighlighting_HEADERS
     HEADER_NAMES
         AbstractHighlighter
         Definition
+        FoldingRegion
         Format
         Repository
         State

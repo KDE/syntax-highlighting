@@ -154,6 +154,7 @@ public:
 
 private:
     Q_DISABLE_COPY(Repository)
+    friend class RepositoryPrivate;
     std::unique_ptr<RepositoryPrivate> d;
 };
 

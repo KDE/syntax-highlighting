@@ -139,6 +139,16 @@ int Rule::requiredColumn() const
     return m_column;
 }
 
+FoldingRegion Rule::beginRegion() const
+{
+    return m_beginRegion;
+}
+
+FoldingRegion Rule::endRegion() const
+{
+    return m_endRegion;
+}
+
 bool Rule::load(QXmlStreamReader &reader)
 {
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
@@ -153,6 +163,13 @@ bool Rule::load(QXmlStreamReader &reader)
     if (!colOk)
         m_column = -1;
     m_dynamic = reader.attributes().value(QStringLiteral("dynamic")) == QLatin1String("true");
+
+    auto regionName = reader.attributes().value(QLatin1String("beginRegion"));
+    if (!regionName.isEmpty())
+        m_beginRegion = FoldingRegion(FoldingRegion::Begin, DefinitionData::get(m_def.definition())->foldingRegionId(regionName.toString()));
+    regionName = reader.attributes().value(QLatin1String("endRegion"));
+    if (!regionName.isEmpty())
+        m_endRegion = FoldingRegion(FoldingRegion::End, DefinitionData::get(m_def.definition())->foldingRegionId(regionName.toString()));
 
     auto result = doLoad(reader);
 

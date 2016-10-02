@@ -32,6 +32,10 @@ class Theme;
 class RepositoryPrivate
 {
 public:
+    RepositoryPrivate();
+
+    static RepositoryPrivate* get(Repository *repo);
+
     void load(Repository *repo);
     void loadSyntaxFolder(Repository *repo, const QString &path);
     bool loadSyntaxFolderFromIndex(Repository *repo, const QString &path);
@@ -40,10 +44,15 @@ public:
     void loadThemeFolder(const QString &path);
     void addTheme(const Theme &theme);
 
+    quint16 foldingRegionId(const QString &defName, const QString &foldName);
+
     QHash<QString, Definition> m_defs;
     QVector<Definition> m_sortedDefs;
 
     QVector<Theme> m_themes;
+
+    QHash<QPair<QString, QString>, quint16> m_foldingRegionIds;
+    quint16 m_foldingRegionId;
 };
 }
 

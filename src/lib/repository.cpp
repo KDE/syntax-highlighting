@@ -39,6 +39,16 @@ static void initResource()
     Q_INIT_RESOURCE(syntax_data);
 }
 
+RepositoryPrivate::RepositoryPrivate() :
+    m_foldingRegionId(0)
+{
+}
+
+RepositoryPrivate* RepositoryPrivate::get(Repository *repo)
+{
+    return repo->d.get();
+}
+
 Repository::Repository() :
     d(new RepositoryPrivate)
 {
@@ -221,6 +231,15 @@ void RepositoryPrivate::addTheme(const Theme &theme)
         *it = theme;
 }
 
+quint16 RepositoryPrivate::foldingRegionId(const QString &defName, const QString &foldName)
+{
+    const auto it = m_foldingRegionIds.constFind(qMakePair(defName, foldName));
+    if (it != m_foldingRegionIds.constEnd())
+        return it.value();
+    m_foldingRegionIds.insert(qMakePair(defName, foldName), ++m_foldingRegionId);
+    return m_foldingRegionId;
+}
+
 void Repository::reload()
 {
     qCDebug(Log) << "Reloading syntax definitions!";
@@ -230,6 +249,9 @@ void Repository::reload()
     d->m_sortedDefs.clear();
 
     d->m_themes.clear();
+
+    d->m_foldingRegionId = 0;
+    d->m_foldingRegionIds.clear();
 
     d->load(this);
 }

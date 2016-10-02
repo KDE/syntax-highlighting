@@ -16,6 +16,7 @@
 */
 
 #include "repository.h"
+#include "repository_p.h"
 #include "definition.h"
 #include "definition_p.h"
 #include "theme.h"
@@ -32,25 +33,6 @@
 #include <QStandardPaths>
 
 using namespace SyntaxHighlighting;
-
-namespace SyntaxHighlighting {
-class RepositoryPrivate
-{
-public:
-    void load(Repository *repo);
-    void loadSyntaxFolder(Repository *repo, const QString &path);
-    bool loadSyntaxFolderFromIndex(Repository *repo, const QString &path);
-    void addDefinition(const Definition &def);
-
-    void loadThemeFolder(const QString &path);
-    void addTheme(const Theme &theme);
-
-    QHash<QString, Definition> m_defs;
-    QVector<Definition> m_sortedDefs;
-
-    QVector<Theme> m_themes;
-};
-}
 
 static void initResource()
 {

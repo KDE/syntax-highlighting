@@ -25,6 +25,7 @@
 #include <memory>
 
 class QString;
+class QStringList;
 template <typename T> class QVector;
 
 namespace SyntaxHighlighting {
@@ -148,10 +149,27 @@ public:
     QString license() const;
 
     /**
-     * Returns whether indentation based folding is enabled.
-     * An example for indentation based folding is Python.
+     * Returns whether indentation-based folding is enabled.
+     * An example for indentation-based folding is Python.
+     * When indentation-based folding is enabled, make sure to also check
+     * foldingIgnoreList() for lines that should be treated as empty.
+     *
+     * @see foldingIgnoreList()
      */
     bool hasIndentationBasedFolding() const;
+
+    /**
+     * If hasIndentationBasedFolding() returns @c true, this function returns
+     * a list of regular expressions that represent empty lines. That is, all
+     * lines matching entirely one of the regular expressions should be treated
+     * as empty lines when calculating the indentation-based folding ranges.
+     *
+     * @note This list is only of relevance, if hasIndentationBasedFolding()
+     *       returns @c true.
+     *
+     * @see hasIndentationBasedFolding()
+     */
+    QStringList foldingIgnoreList() const;
 
 private:
     friend class DefinitionData;

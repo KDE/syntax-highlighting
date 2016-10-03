@@ -33,6 +33,7 @@
 #include <QFile>
 #include <QHash>
 #include <QJsonObject>
+#include <QStringList>
 #include <QVector>
 #include <QXmlStreamReader>
 
@@ -175,6 +176,11 @@ QString Definition::license() const
 bool Definition::hasIndentationBasedFolding() const
 {
     return d->indentationBasedFolding;
+}
+
+QStringList Definition::foldingIgnoreList() const
+{
+    return d->foldingIgnoreList;
 }
 
 Context* DefinitionData::initialContext() const
@@ -453,8 +459,39 @@ void DefinitionData::loadGeneral(QXmlStreamReader& reader)
                 } else if (reader.name() == QLatin1String("folding")) {
                     if (reader.attributes().hasAttribute(QStringLiteral("indentationsensitive")))
                         indentationBasedFolding = Xml::attrToBool(reader.attributes().value(QStringLiteral("indentationsensitive")));
+                } else if (reader.name() == QLatin1String("emptyLines")) {
+                    loadFoldingIgnoreList(reader);
                 } else {
                     reader.skipCurrentElement();
+                }
+                reader.readNext();
+                break;
+            case QXmlStreamReader::EndElement:
+                --elementRefCounter;
+                if (elementRefCounter == 0)
+                    return;
+            default:
+                reader.readNext();
+                break;
+        }
+    }
+}
+
+void DefinitionData::loadFoldingIgnoreList(QXmlStreamReader& reader)
+{
+    Q_ASSERT(reader.name() == QLatin1String("emptyLines"));
+    Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
+    reader.readNext();
+
+    // reference counter to count XML child elements, to not return too early
+    int elementRefCounter = 1;
+
+    while (!reader.atEnd()) {
+        switch (reader.tokenType()) {
+            case QXmlStreamReader::StartElement:
+                ++elementRefCounter;
+                if (reader.name() == QLatin1String("emptyLine")) {
+                    foldingIgnoreList << reader.attributes().value(QStringLiteral("regexpr")).toString();
                 }
                 reader.readNext();
                 break;

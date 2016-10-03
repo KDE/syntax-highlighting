@@ -433,9 +433,14 @@ void DefinitionData::loadGeneral(QXmlStreamReader& reader)
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
     reader.readNext();
 
+    // reference counter to count XML child elements, to not return too early
+    int elementRefCounter = 1;
+
     while (!reader.atEnd()) {
         switch (reader.tokenType()) {
             case QXmlStreamReader::StartElement:
+                ++elementRefCounter;
+
                 if (reader.name() == QLatin1String("keywords")) {
                     if (reader.attributes().hasAttribute(QStringLiteral("casesensitive")))
                         caseSensitive = Xml::attrToBool(reader.attributes().value(QStringLiteral("casesensitive"))) ? Qt::CaseSensitive : Qt::CaseInsensitive;
@@ -454,7 +459,9 @@ void DefinitionData::loadGeneral(QXmlStreamReader& reader)
                 reader.readNext();
                 break;
             case QXmlStreamReader::EndElement:
-                return;
+                --elementRefCounter;
+                if (elementRefCounter == 0)
+                    return;
             default:
                 reader.readNext();
                 break;

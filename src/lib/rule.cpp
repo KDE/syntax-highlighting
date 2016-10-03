@@ -156,13 +156,13 @@ bool Rule::load(QXmlStreamReader &reader)
     m_attribute = reader.attributes().value(QStringLiteral("attribute")).toString();
     if (reader.name() != QLatin1String("IncludeRules")) // IncludeRules uses this with a different semantic
         m_context.parse(reader.attributes().value(QStringLiteral("context")));
-    m_firstNonSpace = reader.attributes().value(QStringLiteral("firstNonSpace")) == QLatin1String("true");
-    m_lookAhead = reader.attributes().value(QStringLiteral("lookAhead")) == QLatin1String("true");
+    m_firstNonSpace = Xml::attrToBool(reader.attributes().value(QStringLiteral("firstNonSpace")));
+    m_lookAhead = Xml::attrToBool(reader.attributes().value(QStringLiteral("lookAhead")));
     bool colOk = false;
     m_column = reader.attributes().value(QStringLiteral("column")).toInt(&colOk);
     if (!colOk)
         m_column = -1;
-    m_dynamic = reader.attributes().value(QStringLiteral("dynamic")) == QLatin1String("true");
+    m_dynamic = Xml::attrToBool(reader.attributes().value(QStringLiteral("dynamic")));
 
     auto regionName = reader.attributes().value(QLatin1String("beginRegion"));
     if (!regionName.isEmpty())
@@ -608,8 +608,8 @@ bool RegExpr::doLoad(QXmlStreamReader& reader)
 {
     m_pattern = reader.attributes().value(QStringLiteral("String")).toString();
     m_regexp.setPattern(m_pattern);
-    const auto isMinimal = reader.attributes().value(QStringLiteral("minimal")) == QLatin1String("true");
-    const auto isCaseInsensitive = reader.attributes().value(QStringLiteral("insensitive")) == QLatin1String("true");
+    const auto isMinimal = Xml::attrToBool(reader.attributes().value(QStringLiteral("minimal")));
+    const auto isCaseInsensitive = Xml::attrToBool(reader.attributes().value(QStringLiteral("insensitive")));
     m_regexp.setPatternOptions(
         (isMinimal ? QRegularExpression::InvertedGreedinessOption : QRegularExpression::NoPatternOption) |
         (isCaseInsensitive ? QRegularExpression::CaseInsensitiveOption : QRegularExpression::NoPatternOption));
@@ -633,7 +633,7 @@ MatchResult RegExpr::doMatch(const QString& text, int offset, const QStringList 
 bool StringDetect::doLoad(QXmlStreamReader& reader)
 {
     m_string = reader.attributes().value(QStringLiteral("String")).toString();
-    m_caseSensitivity = reader.attributes().value(QStringLiteral("insensitive")) == QLatin1String("true") ? Qt::CaseInsensitive : Qt::CaseSensitive;
+    m_caseSensitivity = Xml::attrToBool(reader.attributes().value(QStringLiteral("insensitive"))) ? Qt::CaseInsensitive : Qt::CaseSensitive;
     return !m_string.isEmpty();
 }
 

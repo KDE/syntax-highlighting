@@ -330,7 +330,7 @@ bool DefinitionData::loadLanguage(QXmlStreamReader &reader)
     section = reader.attributes().value(QStringLiteral("section")).toString();
     version = reader.attributes().value(QStringLiteral("version")).toFloat();
     priority = reader.attributes().value(QStringLiteral("priority")).toInt();
-    hidden = reader.attributes().value(QStringLiteral("hidden")) == QLatin1String("true");
+    hidden = Xml::attrToBool(reader.attributes().value(QStringLiteral("hidden")));
     style = reader.attributes().value(QStringLiteral("style")).toString();
     indenter = reader.attributes().value(QStringLiteral("indenter")).toString();
     author = reader.attributes().value(QStringLiteral("author")).toString();

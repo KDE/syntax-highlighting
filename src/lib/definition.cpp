@@ -43,6 +43,7 @@ using namespace SyntaxHighlighting;
 DefinitionData::DefinitionData() :
     repo(Q_NULLPTR),
     delimiters(QStringLiteral("\t !%&()*+,-./:;<=>?[\\]^{|}~")), // must be sorted!
+    indentationBasedFolding(false),
     caseSensitive(Qt::CaseSensitive),
     version(0.0f),
     priority(0),
@@ -169,6 +170,11 @@ QString Definition::author() const
 QString Definition::license() const
 {
     return d->license;
+}
+
+bool Definition::hasIndentationBasedFolding() const
+{
+    return d->indentationBasedFolding;
 }
 
 Context* DefinitionData::initialContext() const
@@ -439,6 +445,9 @@ void DefinitionData::loadGeneral(QXmlStreamReader& reader)
                     delimiters.truncate(std::distance(delimiters.begin(), it));
                     foreach (const auto c, reader.attributes().value(QLatin1String("weakDeliminator")))
                         delimiters.remove(c);
+                } else if (reader.name() == QLatin1String("folding")) {
+                    if (reader.attributes().hasAttribute(QStringLiteral("indentationsensitive")))
+                        indentationBasedFolding = Xml::attrToBool(reader.attributes().value(QStringLiteral("indentationsensitive")));
                 } else {
                     reader.skipCurrentElement();
                 }

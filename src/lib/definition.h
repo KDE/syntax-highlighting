@@ -147,6 +147,12 @@ public:
     /** License of this syntax definition. */
     QString license() const;
 
+    /**
+     * Returns whether indentation based folding is enabled.
+     * An example for indentation based folding is Python.
+     */
+    bool hasIndentationBasedFolding() const;
+
 private:
     friend class DefinitionData;
     friend class DefinitionRef;

@@ -21,6 +21,7 @@
 #include "repository.h"
 #include "rule_p.h"
 #include "syntaxhighlighting_logging.h"
+#include "xml_p.h"
 
 #include <QDebug>
 #include <QString>
@@ -28,9 +29,10 @@
 
 using namespace SyntaxHighlighting;
 
-Context::Context() :
-    m_resolveState(Unknown),
-    m_fallthrough(false)
+Context::Context()
+    : m_resolveState(Unknown)
+    , m_fallthrough(false)
+    , m_indentationBasedFolding(false)
 {
 }
 
@@ -78,6 +80,14 @@ ContextSwitch Context::fallthroughContext() const
     return m_fallthroughContext;
 }
 
+bool Context::hasIndentationBasedFolding() const
+{
+    if (!m_def.definition().hasIndentationBasedFolding())
+        return false;
+
+    return m_indentationBasedFolding;
+}
+
 QVector<Rule::Ptr> Context::rules() const
 {
     return m_rules;
@@ -115,6 +125,8 @@ void Context::load(QXmlStreamReader& reader)
     m_fallthroughContext.parse(reader.attributes().value(QStringLiteral("fallthroughContext")));
     if (m_fallthroughContext.isStay())
         m_fallthrough = false;
+    if (reader.attributes().hasAttribute(QStringLiteral("noIndentationBasedFolding")))
+        m_indentationBasedFolding = !Xml::attrToBool(reader.attributes().value(QStringLiteral("noIndentationBasedFolding")));
 
     reader.readNext();
     while (!reader.atEnd()) {

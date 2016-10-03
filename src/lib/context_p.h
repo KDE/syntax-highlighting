@@ -47,6 +47,12 @@ public:
     bool fallthrough() const;
     ContextSwitch fallthroughContext() const;
 
+    /**
+     * Returns @c true, when indentationBasedFolding is enabled for the
+     * associated Definition and when "noIndentationBasedFolding" is NOT set.
+     */
+    bool hasIndentationBasedFolding() const;
+
     QVector<Rule::Ptr> rules() const;
 
     /** Attempts to find the format named @p name in the
@@ -81,6 +87,7 @@ private:
 
     ResolveState m_resolveState;
     bool m_fallthrough;
+    bool m_indentationBasedFolding;
 };
 }
 

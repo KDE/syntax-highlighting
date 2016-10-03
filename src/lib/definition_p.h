@@ -73,6 +73,7 @@ public:
     QVector<Context*> contexts;
     QHash<QString, Format> formats;
     QString delimiters;
+    bool indentationBasedFolding;
 
     QString fileName;
     QString name;

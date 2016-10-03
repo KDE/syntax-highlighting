@@ -134,6 +134,17 @@ private Q_SLOTS:
         QVERIFY(def.extensions().contains(QLatin1String(".htaccess*")));
     }
 
+    void testFoldingMetaData()
+    {
+        auto def = m_repo.definitionForName(QLatin1String("C++"));
+        QVERIFY(def.isValid());
+        QVERIFY(!def.hasIndentationBasedFolding());
+
+        def = m_repo.definitionForName(QLatin1String("Python"));
+        QVERIFY(def.isValid());
+        QVERIFY(def.hasIndentationBasedFolding());
+    }
+
     void testReload()
     {
         auto def = m_repo.definitionForName(QLatin1String("QML"));

@@ -105,21 +105,13 @@ class FoldingTest : public QObject
 {
     Q_OBJECT
 public:
-    explicit FoldingTest(QObject *parent = Q_NULLPTR) : QObject(parent), m_repo(Q_NULLPTR) {}
+    explicit FoldingTest(QObject *parent = Q_NULLPTR) : QObject(parent) {}
 private:
-        Repository *m_repo;
 
 private Q_SLOTS:
     void initTestCase()
     {
         QStandardPaths::enableTestMode(true);
-        m_repo = new Repository;
-    }
-
-    void cleanupTestCase()
-    {
-        delete m_repo;
-        m_repo = Q_NULLPTR;
     }
 
     void testFolding_data()
@@ -155,11 +147,12 @@ private Q_SLOTS:
         QFETCH(QString, outFile);
         QFETCH(QString, refFile);
         QFETCH(QString, syntax);
-        QVERIFY(m_repo);
 
-        auto def = m_repo->definitionForFileName(inFile);
+        Repository m_repo;
+
+        auto def = m_repo.definitionForFileName(inFile);
         if (!syntax.isEmpty())
-            def = m_repo->definitionForName(syntax);
+            def = m_repo.definitionForName(syntax);
 
         FoldingHighlighter highlighter;
 

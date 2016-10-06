@@ -68,7 +68,7 @@
 // Data cache FSM for cache line of 16 bytes (4x singleword)
 //
 
-<beginfold id='70'>module</beginfold id='70'> or1200_dc_fsm
+<beginfold id='1'>module</beginfold id='1'> or1200_dc_fsm
   (
    // Clock and reset
    clk, rst,
@@ -361,8 +361,8 @@
    //
    // Main DC FSM
    //
-   always @(posedge clk or `OR1200_RST_EVENT rst) <beginfold id='70'>begin</beginfold id='70'>
-      if (rst == `OR1200_RST_VALUE) <beginfold id='70'>begin</beginfold id='70'>
+   always @(posedge clk or `OR1200_RST_EVENT rst) <beginfold id='1'>begin</beginfold id='1'>
+      if (rst == `OR1200_RST_VALUE) <beginfold id='1'>begin</beginfold id='1'>
 	 state <=  `OR1200_DCFSM_IDLE;
 	 addr_r <=  32'd0;
 	 hitmiss_eval <=  1'b0;
@@ -375,47 +375,47 @@
 	 did_early_load_ack <= 1'b0;
 	 cache_spr_block_flush <= 1'b0;
 	 cache_spr_block_writeback <= 1'b0;
-      <endfold id='70'>end</endfold id='70'>
+      <endfold id='1'>end</endfold id='1'>
       else
-	<beginfold id='70'>case</beginfold id='70'> (state)	// synopsys parallel_case
+	<beginfold id='1'>case</beginfold id='1'> (state)	// synopsys parallel_case
 	  
-          `OR1200_DCFSM_IDLE : <beginfold id='70'>begin</beginfold id='70'>
+          `OR1200_DCFSM_IDLE : <beginfold id='1'>begin</beginfold id='1'>
 	     if (dc_en & (dc_block_flush | dc_block_writeback))
-	       <beginfold id='70'>begin</beginfold id='70'>
+	       <beginfold id='1'>begin</beginfold id='1'>
 		  cache_spr_block_flush <= dc_block_flush;
 		  cache_spr_block_writeback <= dc_block_writeback;
 		  hitmiss_eval <= 1'b1;
 		  state <= `OR1200_DCFSM_FLUSH5;
 		  addr_r <=  spr_dat_i;
-	       <endfold id='70'>end</endfold id='70'>
+	       <endfold id='1'>end</endfold id='1'>
 	     else if (dc_en & dcqmem_cycstb_i)
-	       <beginfold id='70'>begin</beginfold id='70'>
+	       <beginfold id='1'>begin</beginfold id='1'>
 		  state <= `OR1200_DCFSM_CLOADSTORE;
 		  hitmiss_eval <=  1'b1;
 		  store <=  dcqmem_we_i;
 		  load <=  !dcqmem_we_i;
-	       <endfold id='70'>end</endfold id='70'>
+	       <endfold id='1'>end</endfold id='1'>
 	     
 	     
-          <endfold id='70'>end</endfold id='70'> // case: `OR1200_DCFSM_IDLE
+          <endfold id='1'>end</endfold id='1'> // case: `OR1200_DCFSM_IDLE
 	  
-          `OR1200_DCFSM_CLOADSTORE: <beginfold id='70'>begin</beginfold id='70'>
+          `OR1200_DCFSM_CLOADSTORE: <beginfold id='1'>begin</beginfold id='1'>
 	     hitmiss_eval <=  1'b0;
-	     if (hitmiss_eval) <beginfold id='70'>begin</beginfold id='70'>
+	     if (hitmiss_eval) <beginfold id='1'>begin</beginfold id='1'>
                 cache_inhibit <=  dcqmem_ci_i; // Check for cache inhibit here
                 cache_miss <=  tagcomp_miss;
 		cache_dirty_needs_writeback <= dirty;
 		addr_r <=  lsu_addr;
-             <endfold id='70'>end</endfold id='70'>
+             <endfold id='1'>end</endfold id='1'>
 
 	     // Evaluate any cache line load/stores in first cycle:
 			     //
 	     if (hitmiss_eval & tagcomp_miss & !(store & writethrough) &
 		 !dcqmem_ci_i)
-	       <beginfold id='70'>begin</beginfold id='70'>
+	       <beginfold id='1'>begin</beginfold id='1'>
 		  // Miss - first either:
 		  //  1) write back dirty line 
-		  if (dirty) <beginfold id='70'>begin</beginfold id='70'>
+		  if (dirty) <beginfold id='1'>begin</beginfold id='1'>
 		     // Address for writeback
 		     addr_r <=  {tag, lsu_addr[`OR1200_DCINDXH:2],2'd0};
 		     load <= 1'b0;
@@ -423,17 +423,17 @@
 `ifdef OR1200_VERBOSE		     
 		     $display("%t: dcache miss and dirty", $time);
 `endif
-		  <endfold id='70'>end</endfold id='70'>
+		  <endfold id='1'>end</endfold id='1'>
 		  //  2) load requested line
-		  else <beginfold id='70'>begin</beginfold id='70'>
+		  else <beginfold id='1'>begin</beginfold id='1'>
 		     addr_r <=  lsu_addr;
 		     load <= 1'b1;
 		     store <= 1'b0;
-		  <endfold id='70'>end</endfold id='70'> // else: !if(dirty)
+		  <endfold id='1'>end</endfold id='1'> // else: !if(dirty)
 		  state <= `OR1200_DCFSM_LOOP2;		  
 		  // Set the counter for the burst accesses
 		  cnt <=  ((1 << `OR1200_DCLS) - 4);
-	       <endfold id='70'>end</endfold id='70'>
+	       <endfold id='1'>end</endfold id='1'>
              else if (// Strobe goes low
 		      !dcqmem_cycstb_i |
 		      // Cycle finishes
@@ -441,42 +441,42 @@
 		      // Cache hit in first cycle....
 		      (hitmiss_eval & !tagcomp_miss & !dcqmem_ci_i &
 		      // .. and you're not doing a writethrough store..
-		      !(store & writethrough))) <beginfold id='70'>begin</beginfold id='70'>
+		      !(store & writethrough))) <beginfold id='1'>begin</beginfold id='1'>
                 state <=  `OR1200_DCFSM_IDLE;
                 load <=  1'b0;
 		store <= 1'b0;
 		cache_inhibit <= 1'b0;
 		cache_dirty_needs_writeback <= 1'b0;
-             <endfold id='70'>end</endfold id='70'>	     
-          <endfold id='70'>end</endfold id='70'> // case: `OR1200_DCFSM_CLOADSTORE	  
+             <endfold id='1'>end</endfold id='1'>	     
+          <endfold id='1'>end</endfold id='1'> // case: `OR1200_DCFSM_CLOADSTORE	  
 	  
-          `OR1200_DCFSM_LOOP2 : <beginfold id='70'>begin</beginfold id='70'> // loop/abort	     
-             if (!dc_en| biudata_error) <beginfold id='70'>begin</beginfold id='70'>
+          `OR1200_DCFSM_LOOP2 : <beginfold id='1'>begin</beginfold id='1'> // loop/abort	     
+             if (!dc_en| biudata_error) <beginfold id='1'>begin</beginfold id='1'>
                 state <=  `OR1200_DCFSM_IDLE;
                 load <=  1'b0;
 		store <= 1'b0;
 		cnt <= `OR1200_DCLS'd0;
-             <endfold id='70'>end</endfold id='70'>
-             if (biudata_valid & (|cnt)) <beginfold id='70'>begin</beginfold id='70'>
+             <endfold id='1'>end</endfold id='1'>
+             if (biudata_valid & (|cnt)) <beginfold id='1'>begin</beginfold id='1'>
                 cnt <=  cnt - 4;
                 addr_r[`OR1200_DCLS-1:2] <=  addr_r[`OR1200_DCLS-1:2] + 1;
-             <endfold id='70'>end</endfold id='70'>
-	     else if (biudata_valid & !(|cnt)) <beginfold id='70'>begin</beginfold id='70'>
+             <endfold id='1'>end</endfold id='1'>
+	     else if (biudata_valid & !(|cnt)) <beginfold id='1'>begin</beginfold id='1'>
 		state <= `OR1200_DCFSM_LOOP3;
 		addr_r <=  lsu_addr;
 		load <= 1'b0;
 		store <= 1'b0;
-	     <endfold id='70'>end</endfold id='70'>
+	     <endfold id='1'>end</endfold id='1'>
 
 	     // Track if we did an early ack during a load
 	     if (load_miss_ack)
 	       did_early_load_ack <= 1'b1;
 	     
 
-          <endfold id='70'>end</endfold id='70'> // case: `OR1200_DCFSM_LOOP2
+          <endfold id='1'>end</endfold id='1'> // case: `OR1200_DCFSM_LOOP2
 	  
-	  `OR1200_DCFSM_LOOP3: <beginfold id='70'>begin</beginfold id='70'> // figure out next step
-	     if (cache_dirty_needs_writeback) <beginfold id='70'>begin</beginfold id='70'>
+	  `OR1200_DCFSM_LOOP3: <beginfold id='1'>begin</beginfold id='1'> // figure out next step
+	     if (cache_dirty_needs_writeback) <beginfold id='1'>begin</beginfold id='1'>
 		// Just did store of the dirty line so now load new one
 		load <= 1'b1;
 		// Set the counter for the burst accesses
@@ -485,38 +485,38 @@
 		addr_r <=  lsu_addr;
 		cache_dirty_needs_writeback <= 1'b0;
 		state <= `OR1200_DCFSM_LOOP2;
-	     <endfold id='70'>end</endfold id='70'> // if (cache_dirty_needs_writeback)
-	     else if (cache_spr_block_flush | cache_spr_block_writeback) <beginfold id='70'>begin</beginfold id='70'>
+	     <endfold id='1'>end</endfold id='1'> // if (cache_dirty_needs_writeback)
+	     else if (cache_spr_block_flush | cache_spr_block_writeback) <beginfold id='1'>begin</beginfold id='1'>
 		// Just wrote back the line to memory, we're finished.
 		cache_spr_block_flush <= 1'b0;
 		cache_spr_block_writeback <= 1'b0;
 		state <= `OR1200_DCFSM_WAITSPRCS7;
-	     <endfold id='70'>end</endfold id='70'>
-	     else <beginfold id='70'>begin</beginfold id='70'>
+	     <endfold id='1'>end</endfold id='1'>
+	     else <beginfold id='1'>begin</beginfold id='1'>
 		// Just loaded a new line, finish up
 		did_early_load_ack <= 1'b0;
 		state <= `OR1200_DCFSM_LOOP4;
-	     <endfold id='70'>end</endfold id='70'>
-	  <endfold id='70'>end</endfold id='70'> // case: `OR1200_DCFSM_LOOP3
+	     <endfold id='1'>end</endfold id='1'>
+	  <endfold id='1'>end</endfold id='1'> // case: `OR1200_DCFSM_LOOP3
 
-	  `OR1200_DCFSM_LOOP4: <beginfold id='70'>begin</beginfold id='70'>
+	  `OR1200_DCFSM_LOOP4: <beginfold id='1'>begin</beginfold id='1'>
 	     state <=  `OR1200_DCFSM_IDLE;
-	  <endfold id='70'>end</endfold id='70'>
+	  <endfold id='1'>end</endfold id='1'>
 
-	  `OR1200_DCFSM_FLUSH5: <beginfold id='70'>begin</beginfold id='70'>
+	  `OR1200_DCFSM_FLUSH5: <beginfold id='1'>begin</beginfold id='1'>
 	     hitmiss_eval <= 1'b0;
 	     if (hitmiss_eval & !tag_v)
-	       <beginfold id='70'>begin</beginfold id='70'>
+	       <beginfold id='1'>begin</beginfold id='1'>
 		  // Not even cached, just ignore
 		  cache_spr_block_flush <= 1'b0;
 		  cache_spr_block_writeback <= 1'b0;
 		  state <=  `OR1200_DCFSM_WAITSPRCS7;
-	       <endfold id='70'>end</endfold id='70'>
+	       <endfold id='1'>end</endfold id='1'>
 	     else if (hitmiss_eval & tag_v)
-	       <beginfold id='70'>begin</beginfold id='70'>
+	       <beginfold id='1'>begin</beginfold id='1'>
 		  // Tag is valid - what do we do?
 		  if ((cache_spr_block_flush | cache_spr_block_writeback) & 
-		      dirty) <beginfold id='70'>begin</beginfold id='70'>
+		      dirty) <beginfold id='1'>begin</beginfold id='1'>
 		     // Need to writeback
 		     // Address for writeback (spr_dat_i has already changed so
 		     // use line number from addr_r)
@@ -529,35 +529,35 @@
 		     state <= `OR1200_DCFSM_LOOP2;		  
 		     // Set the counter for the burst accesses
 		     cnt <=  ((1 << `OR1200_DCLS) - 4);
-		  <endfold id='70'>end</endfold id='70'>
+		  <endfold id='1'>end</endfold id='1'>
 		  else if (cache_spr_block_flush & !dirty)
-		    <beginfold id='70'>begin</beginfold id='70'>
+		    <beginfold id='1'>begin</beginfold id='1'>
 		       // Line not dirty, just need to invalidate
 		       state <=  `OR1200_DCFSM_INV6;
-		    <endfold id='70'>end</endfold id='70'> // else: !if(dirty)
+		    <endfold id='1'>end</endfold id='1'> // else: !if(dirty)
 		  else if (cache_spr_block_writeback & !dirty)
-		    <beginfold id='70'>begin</beginfold id='70'>
+		    <beginfold id='1'>begin</beginfold id='1'>
 		       // Nothing to do - line is valid but not dirty
 		       cache_spr_block_writeback <= 1'b0;
 		       state <=  `OR1200_DCFSM_WAITSPRCS7;
-		    <endfold id='70'>end</endfold id='70'>
-	  <endfold id='70'>end</endfold id='70'> // if (hitmiss_eval & tag_v)
-	  <endfold id='70'>end</endfold id='70'>
-	  `OR1200_DCFSM_INV6: <beginfold id='70'>begin</beginfold id='70'>
+		    <endfold id='1'>end</endfold id='1'>
+	  <endfold id='1'>end</endfold id='1'> // if (hitmiss_eval & tag_v)
+	  <endfold id='1'>end</endfold id='1'>
+	  `OR1200_DCFSM_INV6: <beginfold id='1'>begin</beginfold id='1'>
 	     cache_spr_block_flush <= 1'b0;
 	     // Wait until SPR CS goes low before going back to idle
 	     if (!spr_cswe)
 	       state <=  `OR1200_DCFSM_IDLE;
-	  <endfold id='70'>end</endfold id='70'>
-	  `OR1200_DCFSM_WAITSPRCS7: <beginfold id='70'>begin</beginfold id='70'>
+	  <endfold id='1'>end</endfold id='1'>
+	  `OR1200_DCFSM_WAITSPRCS7: <beginfold id='1'>begin</beginfold id='1'>
 	     // Wait until SPR CS goes low before going back to idle
 	     if (!spr_cswe)
 	       state <=  `OR1200_DCFSM_IDLE;
-	  <endfold id='70'>end</endfold id='70'>
+	  <endfold id='1'>end</endfold id='1'>
 
-	<endfold id='70'>endcase</endfold id='70'> // case (state)
+	<endfold id='1'>endcase</endfold id='1'> // case (state)
       
-   <endfold id='70'>end</endfold id='70'> // always @ (posedge clk or `OR1200_RST_EVENT rst)
+   <endfold id='1'>end</endfold id='1'> // always @ (posedge clk or `OR1200_RST_EVENT rst)
    
 
-<endfold id='70'>endmodule</endfold id='70'>
+<endfold id='1'>endmodule</endfold id='1'>

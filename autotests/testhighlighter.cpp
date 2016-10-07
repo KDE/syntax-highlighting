@@ -87,6 +87,7 @@ public:
     explicit TestHighlighterTest(QObject *parent = Q_NULLPTR) : QObject(parent), m_repo(Q_NULLPTR) {}
 private:
         Repository *m_repo;
+        QSet<QString> m_coveredDefinitions;
 
 private Q_SLOTS:
     void initTestCase()
@@ -97,6 +98,24 @@ private Q_SLOTS:
 
     void cleanupTestCase()
     {
+        QFile coveredList(QLatin1String(TESTBUILDDIR "/covered-definitions.txt"));
+        QFile uncoveredList(QLatin1String(TESTBUILDDIR "/uncovered-definition.txt"));
+        QVERIFY(coveredList.open(QFile::WriteOnly));
+        QVERIFY(uncoveredList.open(QFile::WriteOnly));
+
+        int count = 0;
+        foreach (const auto &def, m_repo->definitions()) {
+            if (def.isHidden())
+                continue;
+            ++count;
+            if (m_coveredDefinitions.contains(def.name()))
+                coveredList.write(def.name().toUtf8() + '\n');
+            else
+                uncoveredList.write(def.name().toUtf8() + '\n');
+        }
+
+        qDebug() << "Syntax definitions with test coverage:" << ((float)m_coveredDefinitions.size() * 100.0f / (float)count) << "%";
+
         delete m_repo;
         m_repo = Q_NULLPTR;
     }
@@ -146,6 +165,7 @@ private Q_SLOTS:
 
         QVERIFY(def.isValid());
         qDebug() << "Using syntax" << def.name();
+        m_coveredDefinitions.insert(def.name());
         highlighter.setDefinition(def);
         highlighter.highlightFile(inFile, outFile);
 

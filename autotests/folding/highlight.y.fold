@@ -1,0 +1,54 @@
+/* Yacc / Bison hl test file.
+ * It won't compile :-) Sure !
+ */
+
+<beginfold id='1'>%{</beginfold id='1'>
+
+#include <iostream>
+using namespace std;
+
+extern KateParser *parser;
+
+<endfold id='1'>%}</endfold id='1'>
+
+<beginfold id='2'>%</beginfold id='2'>locations
+
+%union <beginfold id='4'>{</beginfold id='4'> 
+   int int_val;
+   double double_val;
+   bool bool_val;
+   char *string_val;
+   char *ident_val;
+   struct var *v;
+   void *ptr;
+<endfold id='4'>}</endfold id='4'>
+
+%token <int_val>      TOK_NOT_EQUAL  "!="
+%token <int_val>      TOK_LESSER_E   "<="
+%token <int_val>      TOK_GREATER_E  ">="
+%token <int_val>      TOK_EQUAL_2    "=="
+
+%type <int_val>       type type_proc
+
+<endfold id='2'>%%</endfold id='2'><beginfold id='3'>%%</beginfold id='3'>
+
+prog<beginfold id='6'>:</beginfold id='6'>                 KW_PROGRAM ident <beginfold id='7'>{</beginfold id='7'> parser->start($2); <endfold id='7'>}</endfold id='7'> prog_beg_glob_decl instructions <beginfold id='7'>{</beginfold id='7'> parser->endproc(0); <endfold id='7'>}</endfold id='7'> dev_procedures KW_ENDP <endfold id='6'>;</endfold id='6'>
+
+number<beginfold id='6'>:</beginfold id='6'>               integer_number
+                      | TOK_DOUBLE
+                      <beginfold id='7'>{</beginfold id='7'>
+                         $$ = new var;
+                         $$->type = KW_REEL;
+                         $$->cl = var::LITTERAL;
+                         $$->real = $<int_val>1;
+                      <endfold id='7'>}</endfold id='7'><endfold id='6'>;</endfold id='6'>
+
+<endfold id='3'>%%</endfold id='3'><beginfold id='5'>%%</beginfold id='5'>
+
+#include <stdio.h>
+
+int main(void)
+<beginfold id='11'>{</beginfold id='11'>
+  puts("Hello, World!");
+  return 0;
+<endfold id='11'>}</endfold id='11'>

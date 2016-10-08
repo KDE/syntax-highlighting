@@ -308,12 +308,22 @@ bool DetectChar::doLoad(QXmlStreamReader& reader)
     if (s.isEmpty())
         return false;
     m_char = s.at(0);
+    if (isDynamic()) {
+        m_captureIndex = m_char.digitValue();
+    }
     return true;
 }
 
 MatchResult DetectChar::doMatch(const QString& text, int offset, const QStringList &captures)
 {
-    Q_UNUSED(captures); // TODO
+    if (isDynamic()) {
+        if (captures.size() <= m_captureIndex || captures.at(m_captureIndex).isEmpty())
+            return offset;
+        if (text.at(offset) == captures.at(m_captureIndex).at(0))
+            return offset + 1;
+        return offset;
+    }
+
     if (text.at(offset) == m_char)
         return offset + 1;
     return offset;

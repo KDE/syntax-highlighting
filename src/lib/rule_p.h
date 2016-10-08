@@ -103,6 +103,7 @@ protected:
 
 private:
     QChar m_char;
+    int m_captureIndex;
 };
 
 class Detect2Char : public Rule

@@ -1,0 +1,94 @@
+<rfc>Return-Path:</rfc><email> <kwrite-devel-bounces@kde.org></email><br/>
+<other>X-Sieve:</other><Normal Text> CMU Sieve 2.3</Normal Text><br/>
+<other>X-Virus-Scanned:</other><Normal Text> amavisd-new at site</Normal Text><br/>
+<other>Authentication-Results:</other><Normal Text> linux.site (amavisd-new); dkim=pass (1024-bit key)</Normal Text><br/>
+<Normal Text>	header.d=kde.org</Normal Text><br/>
+<rfc>Received:</rfc><Normal Text> from postbox.kde.org (localhost.localdomain [127.0.0.1])</Normal Text><br/>
+<Normal Text>	by postbox.kde.org (Postfix) with ESMTP id 3167DB6E75;</Normal Text><br/>
+<Normal Text>	Wed,  5 Oct 2016 20:21:47 +0000 (UTC)</Normal Text><br/>
+<other>DKIM-Signature:</other><Normal Text> v=1; a=rsa-sha256; c=simple/simple; d=kde.org; s=default;</Normal Text><br/>
+<Normal Text>	t=1475698907; bh=6i+3UfR6HLC54wVtp5SF4sVWvQn63jzu9vD2zJal/kY=;</Normal Text><br/>
+<Normal Text>	h=From:To:Subject:Date:Reply-To:List-Id:List-Unsubscribe:List-Post:</Normal Text><br/>
+<Normal Text>	 List-Help:List-Subscribe:From;</Normal Text><br/>
+<Normal Text>	b=M5nfHbmJe/4DPuidrJ901dUzX3FmpVpyUrPM961Or9bKrMO+z9gaTUwbfPR74Rq8B</Normal Text><br/>
+<Normal Text>	 Rv66yf3ZaDuRZxv/ARPzpr8qnDTtf13WRFZ/ySdqqqQJKeBqCAd7/wbR0kHhypvpwe</Normal Text><br/>
+<Normal Text>	 z4nY6+bNnjvFelPXR56o16b+/Ib2GTYJ9hwiG97U=</Normal Text><br/>
+<other>X-Original-To:</other><Normal Text> </Normal Text><email>kwrite-devel@kde.org</email><br/>
+<other>Delivered-To:</other><Normal Text> </Normal Text><email>kwrite-devel@localhost.kde.org</email><br/>
+<other>Received-SPF:</other><Normal Text> Neutral (access neither permitted nor denied) identity=mailfrom;</Normal Text><br/>
+<Normal Text> client-ip=85.214.234.26; helo=h2265959.stratoserver.net;</Normal Text><br/>
+<Normal Text> envelope-from=</Normal Text><email>vkrause@kde.org</email><Normal Text>; receiver=</Normal Text><email>kwrite-devel@kde.org</email><br/>
+<rfc-main>From: Volker Krause <vkrause@kde.org></rfc-main><br/>
+<rfc-main>To: kwrite-devel@kde.org</rfc-main><br/>
+<rfc-main>Subject: Highlighting semantics: line end context switches when popping back</rfc-main><br/>
+<Normal Text> into previous line context stack</Normal Text><br/>
+<rfc-main>Date: Wed, 05 Oct 2016 22:19:17 +0200</rfc-main><br/>
+<rfc>Message-ID:</rfc><email> <2420385.jiZKTgWtgY@vkpc5></email><br/>
+<other>Organization:</other><Normal Text> KDE</Normal Text><br/>
+<other>User-Agent:</other><Normal Text> KMail/4.14.10 (Linux/4.1.13-5-default; KDE/4.14.16; x86_64;</Normal Text><br/>
+<Normal Text> git-91275a7; 2015-12-13)</Normal Text><br/>
+<other>MIME-Version:</other><Normal Text> 1.0</Normal Text><br/>
+<common>Content-Type:</common><Normal Text> multipart/signed; boundary=</Normal Text><string>"nextPart1575059.2yRQ5x6HOo"</string><Normal Text>;</Normal Text><br/>
+<Normal Text> micalg=</Normal Text><string>"pgp-sha1"; protocol="application/pgp-signature"</string><br/>
+<other>X-BeenThere:</other><Normal Text> </Normal Text><email>kwrite-devel@kde.org</email><br/>
+<other>X-Mailman-Version:</other><Normal Text> 2.1.16</Normal Text><br/>
+<common>Precedence:</common><Normal Text> list</Normal Text><br/>
+<rfc>Reply-To:</rfc><Normal Text> </Normal Text><email>kwrite-devel@kde.org</email><br/>
+<other>List-Id:</other><Normal Text> Kate/KWrite Mailing List <kwrite-devel.kde.org></Normal Text><br/>
+<common>List-Unsubscribe:</common><Normal Text> <https://mail.kde.org/mailman/options/kwrite-devel>,</Normal Text><br/>
+<Normal Text> <mailto:</Normal Text><email>kwrite-devel-request@kde.org</email><Normal Text>?subject=unsubscribe></Normal Text><br/>
+<common>List-Post:</common><Normal Text> <mailto:</Normal Text><email>kwrite-devel@kde.org</email><Normal Text>></Normal Text><br/>
+<common>List-Help:</common><Normal Text> <mailto:</Normal Text><email>kwrite-devel-request@kde.org</email><Normal Text>?subject=help></Normal Text><br/>
+<other>List-Subscribe:</other><Normal Text> <https://mail.kde.org/mailman/listinfo/kwrite-devel>,</Normal Text><br/>
+<Normal Text> <mailto:</Normal Text><email>kwrite-devel-request@kde.org</email><Normal Text>?subject=subscribe></Normal Text><br/>
+<other>Errors-To:</other><Normal Text> </Normal Text><email>kwrite-devel-bounces@kde.org</email><br/>
+<rfc>Sender:</rfc><Normal Text> </Normal Text><email>"KWrite-Devel" <kwrite-devel-bounces@kde.org></email><br/>
+<dsNormal></dsNormal><br/>
+<dsNormal></dsNormal><br/>
+<marker>--</marker><Normal Text>nextPart1575059.2yRQ5x6HOo</Normal Text><br/>
+<common>Content-Transfer-Encoding:</common><Normal Text> 7Bit</Normal Text><br/>
+<common>Content-Type:</common><Normal Text> text/plain; charset=</Normal Text><string>"us-ascii"</string><br/>
+<dsNormal></dsNormal><br/>
+<Normal Text>Hi,</Normal Text><br/>
+<dsNormal></dsNormal><br/>
+<Normal Text>when trying to add the unit test for the new Praat highlighting to</Normal Text><br/>
+<other>KF5:</other><Normal Text>:SyntaxHighlighting it turned out that the output doesn't match at all</Normal Text><br/>
+<Normal Text>that of Kate. We managed to trace this back to the following rather surprising</Normal Text><br/>
+<Normal Text>(and apparently undocumented) behavior in Kate:</Normal Text><br/>
+<dsNormal></dsNormal><br/>
+<Normal Text>When a context switch (anywhere in a line) pops more contexts than were on the</Normal Text><br/>
+<Normal Text>stack when starting the line, it executes line end context switches of the</Normal Text><br/>
+<Normal Text>previous line contexts.</Normal Text><br/>
+<dsNormal></dsNormal><br/>
+<indent6>| | | | | | The corresponding code is in KateHighlighting::generateContextStack(),</indent6><br/>
+<indent5>| | > | > KF5::SyntaxHighlighting doesn't do this (yet), Praat is apparently the first</indent5><br/>
+<indent3>> | > format we have tests for that uses this behavior.</indent3><br/>
+<dsNormal></dsNormal><br/>
+<indent1>> Does anyone remember why we do this, or happens to know which highlighting</indent1><br/>
+<indent1>> files besides Praat rely on this?</indent1><br/>
+<dsNormal></dsNormal><br/>
+<indent2>> > Archeology can trace this back to the dark CVS ages even, one reference</indent2><br/>
+<indent2>> > Dominik has dug up is a 10 year old SVN commit</indent2><br/>
+<indent2>> > (https://quickgit.kde.org/?p=kdelibs.git&a=commit&h=90ef47f582277745f727d89f05f72f1e1705fdc4</indent2><br/>
+<indent2>> >), where Christoph claims to understand what this code does ;)</indent2><br/>
+<dsNormal></dsNormal><br/>
+<indent3>> > > As this is highly unexpected and hard to reason about behavior, Dominik and I</indent3><br/>
+<indent4>> > > > were wondering if we can possibly drop this, and rather fix affected</indent4><br/>
+<indent5>> > > > > highlighting files instead?</indent5><br/>
+<dsNormal></dsNormal><br/>
+<Normal Text>Regards,</Normal Text><br/>
+<Normal Text>Volker</Normal Text><br/>
+<marker>--</marker><Normal Text>nextPart1575059.2yRQ5x6HOo</Normal Text><br/>
+<common>Content-Type:</common><Normal Text> application/pgp-signature; name=</Normal Text><string>"signature.asc"</string><br/>
+<other>Content-Description:</other><Normal Text> This is a digitally signed message part.</Normal Text><br/>
+<common>Content-Transfer-Encoding:</common><Normal Text> 7Bit</Normal Text><br/>
+<dsNormal></dsNormal><br/>
+<marker>-----BEGIN PGP SIGNATURE-----</marker><br/>
+<other>Version:</other><Normal Text> GnuPG v2</Normal Text><br/>
+<dsNormal></dsNormal><br/>
+<base64>iD8DBQBX9WBIf5bM1k0S0kcRAireAJ4lCWa08Y5yU1ezIvKVCAfnkhcUbACgou0O</base64><br/>
+<base64>X4c+lkPI0tti59KV1vetaeU=</base64><br/>
+<Normal Text>=VqDS</Normal Text><br/>
+<marker>-----END PGP SIGNATURE-----</marker><br/>
+<dsNormal></dsNormal><br/>
+<marker>--</marker><Normal Text>nextPart1575059.2yRQ5x6HOo--</Normal Text><br/>

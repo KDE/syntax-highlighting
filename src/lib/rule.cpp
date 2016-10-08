@@ -77,11 +77,17 @@ static int matchEscapedChar(const QString &text, int offset)
     return offset;
 }
 
-static QString replaceCaptures(const QString &pattern, const QStringList &captures)
+static QString quoteCapture(const QString &capture)
+{
+    auto quoted = capture;
+    return quoted.replace(QRegularExpression(QStringLiteral("(\\W)")), QStringLiteral("\\\\1"));
+}
+
+static QString replaceCaptures(const QString &pattern, const QStringList &captures, bool quote)
 {
     auto result = pattern;
     for (int i = 1; i < captures.size(); ++i) {
-        result.replace(QLatin1Char('%') + QString::number(i), captures.at(i));
+        result.replace(QLatin1Char('%') + QString::number(i), quote ? quoteCapture(captures.at(i)) : captures.at(i));
     }
     return result;
 }
@@ -643,7 +649,7 @@ MatchResult RegExpr::doMatch(const QString& text, int offset, const QStringList 
     Q_ASSERT(m_regexp.isValid());
 
     if (isDynamic())
-        m_regexp.setPattern(replaceCaptures(m_pattern, captures));
+        m_regexp.setPattern(replaceCaptures(m_pattern, captures, true));
 
     auto result = m_regexp.match(text, offset, QRegularExpression::NormalMatch, QRegularExpression::DontCheckSubjectStringMatchOption);
     if (result.capturedStart() == offset)
@@ -663,7 +669,7 @@ MatchResult StringDetect::doMatch(const QString& text, int offset, const QString
 {
     auto pattern = m_string;
     if (isDynamic())
-        pattern = replaceCaptures(m_string, captures);
+        pattern = replaceCaptures(m_string, captures, false);
     if (text.midRef(offset, pattern.size()).compare(pattern, m_caseSensitivity) == 0)
         return offset + pattern.size();
     return offset;

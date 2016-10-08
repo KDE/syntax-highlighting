@@ -36,7 +36,10 @@ public:
 
     QString name() const;
 
+    /** Checks if @p str is a keyword in this list. */
     bool contains(const QStringRef &str) const;
+    /** Checks if @p str is a keyword in this list, overriding the global case-sensitivity setting. */
+    bool contains(const QStringRef &str, Qt::CaseSensitivity caseSensitivityOverride) const;
 
     void load(QXmlStreamReader &reader);
     void setCaseSensitivity(Qt::CaseSensitivity caseSensitive);
@@ -44,6 +47,7 @@ public:
 private:
     QString m_name;
     QSet<QString> m_keywords;
+    mutable QSet<QString> m_lowerCaseKeywords;
     Qt::CaseSensitivity m_caseSensitive;
 };
 }

@@ -531,7 +531,14 @@ MatchResult Int::doMatch(const QString& text, int offset, const QStringList &cap
 
 bool KeywordListRule::doLoad(QXmlStreamReader& reader)
 {
-    m_listName = reader.attributes().value(QStringLiteral("String")).toString();
+    m_listName = reader.attributes().value(QLatin1String("String")).toString();
+    if (reader.attributes().hasAttribute(QLatin1String("insensitive"))) {
+        m_hasCaseSensitivityOverride = true;
+        m_caseSensitivityOverride = Xml::attrToBool(reader.attributes().value(QLatin1String("insensitive"))) ?
+            Qt::CaseInsensitive : Qt::CaseSensitive;
+    } else {
+        m_hasCaseSensitivityOverride = false;
+    }
     return !m_listName.isEmpty();
 }
 
@@ -553,8 +560,13 @@ MatchResult KeywordListRule::doMatch(const QString& text, int offset, const QStr
     if (newOffset == offset)
         return offset;
 
-    if (m_keywordList.contains(text.midRef(offset, newOffset - offset)))
-        return newOffset;
+    if (m_hasCaseSensitivityOverride) {
+        if (m_keywordList.contains(text.midRef(offset, newOffset - offset), m_caseSensitivityOverride))
+            return newOffset;
+    } else {
+        if (m_keywordList.contains(text.midRef(offset, newOffset - offset)))
+            return newOffset;
+    }
     return offset;
 }
 

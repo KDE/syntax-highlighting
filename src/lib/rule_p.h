@@ -190,6 +190,8 @@ protected:
 private:
     QString m_listName;
     KeywordList m_keywordList;
+    bool m_hasCaseSensitivityOverride;
+    Qt::CaseSensitivity m_caseSensitivityOverride;
 };
 
 class LineContinue : public Rule

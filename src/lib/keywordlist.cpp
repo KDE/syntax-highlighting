@@ -17,6 +17,7 @@
 
 #include "keywordlist_p.h"
 
+#include <QDebug>
 #include <QXmlStreamReader>
 
 using namespace SyntaxHighlighting;
@@ -42,11 +43,20 @@ QString KeywordList::name() const
 
 bool KeywordList::contains(const QStringRef &str) const
 {
-    // TODO avoid the copy in toString!
+    return contains(str, m_caseSensitive);
+}
 
-    if (m_caseSensitive == Qt::CaseSensitive)
+bool KeywordList::contains(const QStringRef &str, Qt::CaseSensitivity caseSensitivityOverride) const
+{
+    if (Q_UNLIKELY(caseSensitivityOverride == Qt::CaseInsensitive && m_lowerCaseKeywords.isEmpty())) {
+        foreach (const auto &kw, m_keywords)
+            m_lowerCaseKeywords.insert(kw.toLower());
+    }
+
+    // TODO avoid the copy in toString!
+    if (caseSensitivityOverride == Qt::CaseSensitive)
         return m_keywords.contains(str.toString());
-    return m_keywords.contains(str.toString().toLower());
+    return m_lowerCaseKeywords.contains(str.toString().toLower());
 }
 
 void KeywordList::load(QXmlStreamReader& reader)
@@ -78,15 +88,5 @@ void KeywordList::load(QXmlStreamReader& reader)
 
 void KeywordList::setCaseSensitivity(Qt::CaseSensitivity caseSensitive)
 {
-    // we turn the index into lower-case, so this isn't reversible
-    Q_ASSERT(m_caseSensitive != Qt::CaseInsensitive || caseSensitive == m_caseSensitive);
     m_caseSensitive = caseSensitive;
-
-    if (m_caseSensitive == Qt::CaseSensitive)
-        return;
-
-    QSet<QString> lcWords;
-    foreach (const auto &kw, m_keywords)
-        lcWords.insert(kw.toLower());
-    m_keywords = lcWords;
 }

@@ -175,11 +175,13 @@ QString Definition::license() const
 
 bool Definition::indentationBasedFoldingEnabled() const
 {
+    d->load();
     return d->indentationBasedFolding;
 }
 
 QStringList Definition::foldingIgnoreList() const
 {
+    d->load();
     return d->foldingIgnoreList;
 }
 

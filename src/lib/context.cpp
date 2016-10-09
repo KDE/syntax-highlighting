@@ -32,7 +32,7 @@ using namespace SyntaxHighlighting;
 Context::Context()
     : m_resolveState(Unknown)
     , m_fallthrough(false)
-    , m_indentationBasedFolding(false)
+    , m_noIndentationBasedFolding(false)
 {
 }
 
@@ -82,10 +82,10 @@ ContextSwitch Context::fallthroughContext() const
 
 bool Context::indentationBasedFoldingEnabled() const
 {
-    if (!m_def.definition().indentationBasedFoldingEnabled())
+    if (m_noIndentationBasedFolding)
         return false;
 
-    return m_indentationBasedFolding;
+    return m_def.definition().indentationBasedFoldingEnabled();
 }
 
 QVector<Rule::Ptr> Context::rules() const
@@ -125,8 +125,7 @@ void Context::load(QXmlStreamReader& reader)
     m_fallthroughContext.parse(reader.attributes().value(QStringLiteral("fallthroughContext")));
     if (m_fallthroughContext.isStay())
         m_fallthrough = false;
-    if (reader.attributes().hasAttribute(QStringLiteral("noIndentationBasedFolding")))
-        m_indentationBasedFolding = !Xml::attrToBool(reader.attributes().value(QStringLiteral("noIndentationBasedFolding")));
+    m_noIndentationBasedFolding = Xml::attrToBool(reader.attributes().value(QStringLiteral("noIndentationBasedFolding")));
 
     reader.readNext();
     while (!reader.atEnd()) {

@@ -87,7 +87,7 @@ private:
 
     ResolveState m_resolveState;
     bool m_fallthrough;
-    bool m_indentationBasedFolding;
+    bool m_noIndentationBasedFolding;
 };
 }
 

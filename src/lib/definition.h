@@ -156,18 +156,18 @@ public:
      *
      * @see foldingIgnoreList()
      */
-    bool hasIndentationBasedFolding() const;
+    bool indentationBasedFoldingEnabled() const;
 
     /**
-     * If hasIndentationBasedFolding() returns @c true, this function returns
+     * If indentationBasedFoldingEnabled() returns @c true, this function returns
      * a list of regular expressions that represent empty lines. That is, all
      * lines matching entirely one of the regular expressions should be treated
      * as empty lines when calculating the indentation-based folding ranges.
      *
-     * @note This list is only of relevance, if hasIndentationBasedFolding()
+     * @note This list is only of relevance, if indentationBasedFoldingEnabled()
      *       returns @c true.
      *
-     * @see hasIndentationBasedFolding()
+     * @see indentationBasedFoldingEnabled()
      */
     QStringList foldingIgnoreList() const;
 

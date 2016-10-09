@@ -138,11 +138,11 @@ private Q_SLOTS:
     {
         auto def = m_repo.definitionForName(QLatin1String("C++"));
         QVERIFY(def.isValid());
-        QVERIFY(!def.hasIndentationBasedFolding());
+        QVERIFY(!def.indentationBasedFoldingEnabled());
 
         def = m_repo.definitionForName(QLatin1String("Python"));
         QVERIFY(def.isValid());
-        QVERIFY(def.hasIndentationBasedFolding());
+        QVERIFY(def.indentationBasedFoldingEnabled());
         QCOMPARE(def.foldingIgnoreList(), QStringList() << QLatin1String("(?:\\s+|\\s*#.*)"));
     }
 

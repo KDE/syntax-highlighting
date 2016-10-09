@@ -173,7 +173,7 @@ QString Definition::license() const
     return d->license;
 }
 
-bool Definition::hasIndentationBasedFolding() const
+bool Definition::indentationBasedFoldingEnabled() const
 {
     return d->indentationBasedFolding;
 }

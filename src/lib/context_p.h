@@ -51,7 +51,7 @@ public:
      * Returns @c true, when indentationBasedFolding is enabled for the
      * associated Definition and when "noIndentationBasedFolding" is NOT set.
      */
-    bool hasIndentationBasedFolding() const;
+    bool indentationBasedFoldingEnabled() const;
 
     QVector<Rule::Ptr> rules() const;
 

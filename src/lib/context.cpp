@@ -80,9 +80,9 @@ ContextSwitch Context::fallthroughContext() const
     return m_fallthroughContext;
 }
 
-bool Context::hasIndentationBasedFolding() const
+bool Context::indentationBasedFoldingEnabled() const
 {
-    if (!m_def.definition().hasIndentationBasedFolding())
+    if (!m_def.definition().indentationBasedFoldingEnabled())
         return false;
 
     return m_indentationBasedFolding;

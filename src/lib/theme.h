@@ -341,7 +341,7 @@ private:
     /**
      * Constructor taking a shared ThemeData instance.
      */
-    Theme(ThemeData* data);
+    explicit Theme(ThemeData* data);
     friend class RepositoryPrivate;
     friend class ThemeData;
 

@@ -38,7 +38,7 @@ class DefinitionRef
 {
 public:
     DefinitionRef();
-    DefinitionRef(const Definition &def);
+    explicit DefinitionRef(const Definition &def);
     ~DefinitionRef();
     DefinitionRef& operator=(const Definition &def);
 

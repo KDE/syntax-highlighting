@@ -154,7 +154,7 @@ public:
      * When indentation-based folding is enabled, make sure to also check
      * foldingIgnoreList() for lines that should be treated as empty.
      *
-     * @see foldingIgnoreList()
+     * @see foldingIgnoreList(), State::indentationBasedFoldingEnabled()
      */
     bool indentationBasedFoldingEnabled() const;
 

@@ -62,7 +62,7 @@ public:
      *
      * @see Definition::indentationBasedFoldingEnabled()
      */
-    bool indentionBasedFoldingEnabled() const;
+    bool indentationBasedFoldingEnabled() const;
 
 private:
     friend class StateData;

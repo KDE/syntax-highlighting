@@ -109,7 +109,7 @@ bool State::operator!=(const State &other) const
     return !(*this == other);
 }
 
-bool State::indentionBasedFoldingEnabled() const
+bool State::indentationBasedFoldingEnabled() const
 {
     if (d->m_contextStack.isEmpty())
         return false;

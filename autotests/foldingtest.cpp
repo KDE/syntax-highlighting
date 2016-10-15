@@ -55,16 +55,16 @@ public:
         QTextStream in(&f);
         in.setCodec("UTF-8");
         State state;
-        bool indentionFoldEnabled = definition().indentationBasedFoldingEnabled();
-        if (indentionFoldEnabled)
+        bool indentationFoldEnabled = definition().indentationBasedFoldingEnabled();
+        if (indentationFoldEnabled)
             m_out << "<indentfold>";
         while (!in.atEnd()) {
             const auto currentLine = in.readLine();
             state = highlightLine(currentLine, state);
 
-            if (indentionFoldEnabled != state.indentionBasedFoldingEnabled()) {
-                indentionFoldEnabled = state.indentionBasedFoldingEnabled();
-                if (indentionFoldEnabled)
+            if (indentationFoldEnabled != state.indentationBasedFoldingEnabled()) {
+                indentationFoldEnabled = state.indentationBasedFoldingEnabled();
+                if (indentationFoldEnabled)
                     m_out << "<indentfold>";
                 else
                     m_out << "</indentfold>";

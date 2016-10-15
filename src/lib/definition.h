@@ -139,9 +139,9 @@ public:
      * displayed to the user.
      */
     bool isHidden() const;
-    /** Generalized language style, used for indention. */
+    /** Generalized language style, used for indentation. */
     QString style() const;
-    /** Indention style to be used for this syntax. */
+    /** Indentation style to be used for this syntax. */
     QString indenter() const;
     /** Name and email of the author of this syntax definition. */
     QString author() const;

@@ -112,7 +112,7 @@ public:
     bool isUnderline(Theme::TextStyle style) const;
 
     /**
-     * Returns whether the given style should be shown striked through.
+     * Returns whether the given style should be shown struck through.
      */
     bool isStrikeThrough(Theme::TextStyle style) const;
 

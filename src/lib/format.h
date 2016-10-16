@@ -57,7 +57,7 @@ public:
 
     /** Returns @c true if the combination of this format and the theme @p theme
      *  do not change the default text format in any way.
-     *  This is useful for output formats where changing formating implies cost,
+     *  This is useful for output formats where changing formatting implies cost,
      *  and thus benefit from optimizing the default case of not having any format
      *  applied. If you make use of this, make sure to set the default text style
      *  to what the corresponding theme sets for Theme::Normal.
@@ -102,7 +102,7 @@ public:
      */
     bool isUnderline(const Theme &theme) const;
     /** Returns @c true if the combination of this format and the given theme
-     *  results in striked through text.
+     *  results in struck through text.
      */
     bool isStrikeThrough(const Theme &theme) const;
 

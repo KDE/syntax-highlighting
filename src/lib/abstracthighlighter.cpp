@@ -117,7 +117,7 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
         return State();
     }
 
-    // verify/intialize state
+    // verify/initialize state
     auto defData = DefinitionData::get(d->m_definition);
     auto newState = state;
     auto stateData = StateData::get(newState);

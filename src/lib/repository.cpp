@@ -128,7 +128,7 @@ void RepositoryPrivate::load(Repository *repo)
     auto dirs = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("org.kde.syntax-highlighting/syntax"), QStandardPaths::LocateDirectory);
     foreach (const auto &dir, dirs)
         loadSyntaxFolder(repo, dir);
-    // backward compatiblity with kate
+    // backward compatibility with Kate
     dirs = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("katepart5/syntax"), QStandardPaths::LocateDirectory);
     foreach (const auto &dir, dirs)
         loadSyntaxFolder(repo, dir);

@@ -89,7 +89,7 @@ public:
         //! Text style for function definitions and function calls.
         Function,
         //! Text style for variables, if applicable. For instance, variables in
-        //! PHP typically start with a '$', so all identifiers folliwng the
+        //! PHP typically start with a '$', so all identifiers following the
         //! pattern $foo are highlighted as variable.
         Variable,
         //! Text style for control flow highlighting, such as @e if, @e then,
@@ -275,7 +275,7 @@ public:
     bool isReadOnly() const;
 
     /**
-     * Returns the full path and filename to this Theme.
+     * Returns the full path and file name to this Theme.
      * Themes from the Qt resource return the Qt resource path.
      * Themes from disk return the local path.
      *
@@ -327,7 +327,7 @@ public:
     bool isUnderline(TextStyle style) const;
 
     /**
-     * Returns whether the given style should be shown striked through.
+     * Returns whether the given style should be shown struck through.
      */
     bool isStrikeThrough(TextStyle style) const;
 

@@ -129,7 +129,7 @@ public:
      */
     QVector<QString> extensions() const;
     /** Returns the definition version. */
-    float version() const;
+    int version() const;
     /**
      * Returns the definition priority.
      * A Definition with higher priority wins over Definitions with lower priorities.

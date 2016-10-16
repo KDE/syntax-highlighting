@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
         }
 
         // numerical attributes
-        hl[QStringLiteral("version")] = xml.attributes().value(QLatin1String("version")).toFloat();
+        hl[QStringLiteral("version")] = xml.attributes().value(QLatin1String("version")).toInt();
         hl[QStringLiteral("priority")] = xml.attributes().value(QLatin1String("priority")).toInt();
 
         // add boolean one

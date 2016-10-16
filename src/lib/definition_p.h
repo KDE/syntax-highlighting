@@ -87,7 +87,7 @@ public:
     QVector<QString> mimetypes;
     QVector<QString> extensions;
     Qt::CaseSensitivity caseSensitive;
-    float version;
+    int version;
     int priority;
     bool hidden;
 };

@@ -138,7 +138,7 @@ QVector<QString> Definition::extensions() const
     return d->extensions;
 }
 
-float Definition::version() const
+int Definition::version() const
 {
     return d->version;
 }
@@ -307,7 +307,7 @@ bool DefinitionData::loadMetaData(const QString &file, const QJsonObject &obj)
 {
     name     = obj.value(QLatin1String("name")).toString();
     section  = obj.value(QLatin1String("section")).toString();
-    version  = obj.value(QLatin1String("version")).toDouble();
+    version  = obj.value(QLatin1String("version")).toInt();
     priority = obj.value(QLatin1String("priority")).toInt();
     style    = obj.value(QLatin1String("style")).toString();
     author   = obj.value(QLatin1String("author")).toString();
@@ -336,6 +336,7 @@ bool DefinitionData::loadLanguage(QXmlStreamReader &reader)
 
     name = reader.attributes().value(QStringLiteral("name")).toString();
     section = reader.attributes().value(QStringLiteral("section")).toString();
+    // toFloat instead of toInt for backward compatibility with old Kate files
     version = reader.attributes().value(QStringLiteral("version")).toFloat();
     priority = reader.attributes().value(QStringLiteral("priority")).toInt();
     hidden = Xml::attrToBool(reader.attributes().value(QStringLiteral("hidden")));

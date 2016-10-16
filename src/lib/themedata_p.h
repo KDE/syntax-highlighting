@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_THEMEDATA_H
-#define SYNTAXHIGHLIGHTING_THEMEDATA_H
+#ifndef SYNTAXHIGHLIGHTING_THEMEDATA_P_H
+#define SYNTAXHIGHLIGHTING_THEMEDATA_P_H
 
 #include "theme.h"
 #include "textstyledata_p.h"
@@ -148,4 +148,4 @@ private:
 
 Q_DECLARE_TYPEINFO(SyntaxHighlighting::TextStyleData, Q_MOVABLE_TYPE);
 
-#endif // SYNTAXHIGHLIGHTING_THEMEDATA_H
+#endif // SYNTAXHIGHLIGHTING_THEMEDATA_P_H

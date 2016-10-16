@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_MATCHRESULTM_P_H
-#define SYNTAXHIGHLIGHTING_MATCHRESULTM_P_H
+#ifndef SYNTAXHIGHLIGHTING_MATCHRESULT_P_H
+#define SYNTAXHIGHLIGHTING_MATCHRESULT_P_H
 
 #include <QStringList>
 
@@ -39,4 +39,4 @@ private:
 };
 }
 
-#endif // SYNTAXHIGHLIGHTING_MATCHRESULTM_P_H
+#endif // SYNTAXHIGHLIGHTING_MATCHRESULT_P_H

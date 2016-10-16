@@ -101,7 +101,7 @@ Format Context::formatByName(const QString &name) const
         return format;
 
     // TODO we can avoid multiple lookups in the same definition here, many rules will share definitions
-    foreach (auto rule, m_rules) {
+    foreach (const auto &rule, m_rules) {
         auto defData = DefinitionData::get(rule->definition());
         format = defData->formatByName(name);
         if (format.isValid())
@@ -158,14 +158,14 @@ void Context::resolveContexts()
     m_lineEndContext.resolve(def);
     m_lineEmptyContext.resolve(def);
     m_fallthroughContext.resolve(def);
-    foreach (auto rule, m_rules)
+    foreach (const auto &rule, m_rules)
         rule->resolveContext();
 }
 
 Context::ResolveState Context::resolveState()
 {
     if (m_resolveState == Unknown) {
-        foreach (auto rule, m_rules) {
+        foreach (const auto &rule, m_rules) {
             auto inc = std::dynamic_pointer_cast<IncludeRules>(rule);
             if (inc) {
                 m_resolveState = Unresolved;
@@ -223,7 +223,7 @@ void Context::resolveIncludes()
             m_attribute = context->attribute();
         }
         it = m_rules.erase(it);
-        foreach (auto rule, context->rules()) {
+        foreach (const auto &rule, context->rules()) {
             it = m_rules.insert(it, rule);
             ++it;
         }

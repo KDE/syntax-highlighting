@@ -154,7 +154,7 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
         int newOffset = 0;
         QString newFormat;
         auto newLookupContext = currentLookupContext;
-        foreach (auto rule, stateData->topContext()->rules()) {
+        foreach (const auto &rule, stateData->topContext()->rules()) {
             if (skipOffsets.value(rule.get()) > offset)
                 continue;
 

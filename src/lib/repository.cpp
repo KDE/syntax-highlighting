@@ -243,7 +243,7 @@ quint16 RepositoryPrivate::foldingRegionId(const QString &defName, const QString
 void Repository::reload()
 {
     qCDebug(Log) << "Reloading syntax definitions!";
-    foreach (auto def, d->m_sortedDefs)
+    foreach (const auto &def, d->m_sortedDefs)
         DefinitionData::get(def)->clear();
     d->m_defs.clear();
     d->m_sortedDefs.clear();

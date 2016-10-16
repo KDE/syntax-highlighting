@@ -213,7 +213,7 @@ bool Rule::load(QXmlStreamReader &reader)
 void Rule::resolveContext()
 {
     m_context.resolve(m_def.definition());
-    foreach (auto rule, m_subRules)
+    foreach (const auto &rule, m_subRules)
         rule->resolveContext();
 }
 
@@ -231,7 +231,7 @@ MatchResult Rule::match(const QString &text, int offset, const QStringList &capt
     if (result.offset() == offset || result.offset() == text.size())
         return result;
 
-    foreach (auto subRule, m_subRules) {
+    foreach (const auto &subRule, m_subRules) {
         const auto subResult = subRule->match(text, result.offset(), QStringList());
         if (subResult.offset() > result.offset())
             return MatchResult(subResult.offset(), result.captures());

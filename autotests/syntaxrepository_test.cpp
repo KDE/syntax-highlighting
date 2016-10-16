@@ -89,7 +89,7 @@ private Q_SLOTS:
 
     void testLoadAll()
     {
-        foreach (auto def, m_repo.definitions()) {
+        foreach (const auto &def, m_repo.definitions()) {
             QVERIFY(!def.name().isEmpty());
             QVERIFY(!def.translatedName().isEmpty());
             QVERIFY(!def.section().isEmpty());

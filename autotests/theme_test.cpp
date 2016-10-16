@@ -57,7 +57,7 @@ private Q_SLOTS:
     void testThemes()
     {
         QVERIFY(!m_repo.themes().isEmpty());
-        Q_FOREACH (const auto theme, m_repo.themes()) {
+        Q_FOREACH (const auto &theme, m_repo.themes()) {
             QVERIFY(theme.isValid());
             QVERIFY(!theme.name().isEmpty());
             QVERIFY(!theme.filePath().isEmpty());

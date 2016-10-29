@@ -22,11 +22,12 @@
 #include "textstyledata_p.h"
 #include "theme.h"
 
+#include <QSharedData>
 #include <QString>
 
 namespace SyntaxHighlighting {
 
-class FormatPrivate
+class FormatPrivate : public QSharedData
 {
 public:
     FormatPrivate();

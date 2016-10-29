@@ -20,9 +20,8 @@
 
 #include "kf5syntaxhighlighting_export.h"
 
+#include <QExplicitlySharedDataPointer>
 #include <QTypeInfo>
-
-#include <memory>
 
 class QColor;
 class QString;
@@ -118,7 +117,7 @@ private:
     friend class DefinitionData;
     void setDefinition(const DefinitionRef &def);
     void load(QXmlStreamReader &reader);
-    std::shared_ptr<FormatPrivate> d;
+    QExplicitlySharedDataPointer<FormatPrivate> d;
 };
 }
 

@@ -114,9 +114,7 @@ public:
     bool spellCheck() const;
 
 private:
-    friend class DefinitionData;
-    void setDefinition(const DefinitionRef &def);
-    void load(QXmlStreamReader &reader);
+    friend class FormatPrivate;
     QExplicitlySharedDataPointer<FormatPrivate> d;
 };
 }

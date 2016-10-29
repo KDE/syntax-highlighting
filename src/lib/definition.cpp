@@ -22,6 +22,7 @@
 
 #include "context_p.h"
 #include "format.h"
+#include "format_p.h"
 #include "repository_p.h"
 #include "rule_p.h"
 #include "syntaxhighlighting_logging.h"
@@ -420,8 +421,9 @@ void DefinitionData::loadItemData(QXmlStreamReader& reader)
             case QXmlStreamReader::StartElement:
                 if (reader.name() == QLatin1String("itemData")) {
                     Format f;
-                    f.setDefinition(q);
-                    f.load(reader);
+                    auto formatData = FormatPrivate::get(f);
+                    formatData->definition = q;
+                    formatData->load(reader);
                     formats.insert(f.name(), f);
                     reader.readNext();
                 }

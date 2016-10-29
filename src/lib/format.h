@@ -45,7 +45,10 @@ class KF5SYNTAXHIGHLIGHTING_EXPORT Format
 public:
     /** Creates an empty/invalid format. */
     Format();
+    Format(const Format &other);
     ~Format();
+
+    Format& operator=(const Format &other);
 
     /** Returns @c true if this is a valid format, ie. one that
      *  was read from a syntax definition file.

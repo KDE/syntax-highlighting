@@ -65,8 +65,19 @@ Format::Format() : d(new FormatPrivate)
 {
 }
 
+Format::Format(const Format &other) :
+    d(other.d)
+{
+}
+
 Format::~Format()
 {
+}
+
+Format& Format::operator=(const Format& other)
+{
+    d = other.d;
+    return *this;
 }
 
 bool Format::isValid() const

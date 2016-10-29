@@ -92,6 +92,8 @@ void CodeEditor::openFile(const QString& fileName)
         return;
     }
 
+    clear();
+
     const auto def = m_repository.definitionForFileName(fileName);
     m_highlighter->setDefinition(def);
 

@@ -114,6 +114,7 @@ public:
 
 protected:
     AbstractHighlighter();
+    AbstractHighlighter(AbstractHighlighterPrivate *dd);
 
     /**
      * Highlight the given line. Call this from your derived class
@@ -165,9 +166,12 @@ protected:
      */
     virtual void applyFolding(int offset, int length, FoldingRegion region);
 
+protected:
+    AbstractHighlighterPrivate *d_ptr;
+
 private:
+    Q_DECLARE_PRIVATE(AbstractHighlighter)
     Q_DISABLE_COPY(AbstractHighlighter)
-    std::unique_ptr<AbstractHighlighterPrivate> d;
 };
 }
 

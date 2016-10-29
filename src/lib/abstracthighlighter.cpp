@@ -16,6 +16,7 @@
 */
 
 #include "abstracthighlighter.h"
+#include "abstracthighlighter_p.h"
 #include "context_p.h"
 #include "definition_p.h"
 #include "foldingregion.h"
@@ -31,21 +32,11 @@
 
 using namespace SyntaxHighlighting;
 
-namespace SyntaxHighlighting {
-
-class AbstractHighlighterPrivate
+AbstractHighlighterPrivate::AbstractHighlighterPrivate()
 {
-public:
-    AbstractHighlighterPrivate();
-    void ensureDefinitionLoaded();
-    bool switchContext(StateData* data, const ContextSwitch &contextSwitch, const QStringList &captures);
-
-    Definition m_definition;
-    Theme m_theme;
-};
 }
 
-AbstractHighlighterPrivate::AbstractHighlighterPrivate()
+AbstractHighlighterPrivate::~AbstractHighlighterPrivate()
 {
 }
 
@@ -80,36 +71,48 @@ static inline int firstNonSpaceChar(const QString & text)
 }
 
 AbstractHighlighter::AbstractHighlighter() :
-    d(new AbstractHighlighterPrivate)
+    d_ptr(new AbstractHighlighterPrivate)
+{
+}
+
+AbstractHighlighter::AbstractHighlighter(AbstractHighlighterPrivate *dd) :
+    d_ptr(dd)
 {
 }
 
 AbstractHighlighter::~AbstractHighlighter()
 {
+    delete d_ptr;
 }
 
 Definition AbstractHighlighter::definition() const
 {
-    return d->m_definition;
+    Q_D(const AbstractHighlighter);
+    return d_ptr->m_definition;
 }
 
 void AbstractHighlighter::setDefinition(const Definition &def)
 {
+    Q_D(AbstractHighlighter);
     d->m_definition = def;
 }
 
 Theme AbstractHighlighter::theme() const
 {
+    Q_D(const AbstractHighlighter);
     return d->m_theme;
 }
 
 void AbstractHighlighter::setTheme(const Theme &theme)
 {
+    Q_D(AbstractHighlighter);
     d->m_theme = theme;
 }
 
 State AbstractHighlighter::highlightLine(const QString& text, const State &state)
 {
+    Q_D(AbstractHighlighter);
+
     // verify definition, deal with no highlighting being enabled
     d->ensureDefinitionLoaded();
     if (!d->m_definition.isValid()) {

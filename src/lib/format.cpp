@@ -16,6 +16,7 @@
 */
 
 #include "format.h"
+#include "format_p.h"
 #include "definition.h"
 #include "definitionref_p.h"
 #include "textstyledata_p.h"
@@ -29,21 +30,6 @@
 #include <QXmlStreamReader>
 
 using namespace SyntaxHighlighting;
-
-namespace SyntaxHighlighting {
-class FormatPrivate
-{
-public:
-    FormatPrivate();
-    TextStyleData styleOverride(const Theme &theme) const;
-
-    DefinitionRef definition;
-    QString name;
-    TextStyleData style;
-    Theme::TextStyle defaultStyle;
-    bool spellCheck;
-};
-}
 
 static Theme::TextStyle stringToDefaultFormat(const QStringRef &str)
 {

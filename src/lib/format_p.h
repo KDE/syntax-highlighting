@@ -40,6 +40,7 @@ public:
     QString name;
     TextStyleData style;
     Theme::TextStyle defaultStyle;
+    quint16 id;
     bool spellCheck;
 };
 

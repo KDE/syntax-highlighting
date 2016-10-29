@@ -32,6 +32,8 @@
 #include <QJsonObject>
 #include <QStandardPaths>
 
+#include <limits>
+
 using namespace SyntaxHighlighting;
 
 static void initResource()
@@ -40,7 +42,8 @@ static void initResource()
 }
 
 RepositoryPrivate::RepositoryPrivate() :
-    m_foldingRegionId(0)
+    m_foldingRegionId(0),
+    m_formatId(0)
 {
 }
 
@@ -240,6 +243,12 @@ quint16 RepositoryPrivate::foldingRegionId(const QString &defName, const QString
     return m_foldingRegionId;
 }
 
+quint16 RepositoryPrivate::nextFormatId()
+{
+    Q_ASSERT(m_formatId < std::numeric_limits<quint16>::max());
+    return ++m_formatId;
+}
+
 void Repository::reload()
 {
     qCDebug(Log) << "Reloading syntax definitions!";
@@ -252,6 +261,8 @@ void Repository::reload()
 
     d->m_foldingRegionId = 0;
     d->m_foldingRegionIds.clear();
+
+    d->m_formatId = 0;
 
     d->load(this);
 }

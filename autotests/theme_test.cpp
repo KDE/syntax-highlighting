@@ -95,23 +95,27 @@ private Q_SLOTS:
         QVERIFY(f.isDefaultTextStyle(t));
         QVERIFY(!f.hasTextColor(t));
         QVERIFY(!f.hasBackgroundColor(t));
+        QVERIFY(f.id() > 0);
 
         // visually identical to normal text
         f = collector.formatMap.value(QLatin1String("Symbol"));
         QVERIFY(f.isValid());
         QVERIFY(f.isDefaultTextStyle(t));
         QVERIFY(!f.hasTextColor(t));
+        QVERIFY(f.id() > 0);
 
         // visually different to normal text
         f = collector.formatMap.value(QLatin1String("Keywords"));
         QVERIFY(f.isValid());
         QVERIFY(!f.isDefaultTextStyle(t));
         QVERIFY(f.isBold(t));
+        QVERIFY(f.id() > 0);
 
         f = collector.formatMap.value(QLatin1String("Float"));
         QVERIFY(f.isValid());
         QVERIFY(!f.isDefaultTextStyle(t));
         QVERIFY(f.hasTextColor(t));
+        QVERIFY(f.id() > 0);
     }
 
     void testDefaultTheme()

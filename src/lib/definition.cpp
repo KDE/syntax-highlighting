@@ -424,6 +424,7 @@ void DefinitionData::loadItemData(QXmlStreamReader& reader)
                     auto formatData = FormatPrivate::get(f);
                     formatData->definition = q;
                     formatData->load(reader);
+                    formatData->id = RepositoryPrivate::get(repo)->nextFormatId();
                     formats.insert(f.name(), f);
                     reader.readNext();
                 }

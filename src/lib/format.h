@@ -57,6 +57,14 @@ public:
     /** The name of this format as used in the syntax definition file. */
     QString name() const;
 
+    /** Returns a unique identifier of this format.
+     *  This is useful for efficient storing of formats in a text line. The
+     *  identifier is unique per Repository instance, but will change when
+     *  the repository is reloaded (which also invalidatess the corresponding
+     *  Definition anyway).
+     */
+    quint16 id() const;
+
     /** Returns @c true if the combination of this format and the theme @p theme
      *  do not change the default text format in any way.
      *  This is useful for output formats where changing formatting implies cost,

@@ -49,6 +49,7 @@ static Theme::TextStyle stringToDefaultFormat(const QStringRef &str)
 
 FormatPrivate::FormatPrivate()
     : defaultStyle(Theme::Normal)
+    , id(0)
     , spellCheck(true)
 {
 }
@@ -93,6 +94,11 @@ bool Format::isValid() const
 QString Format::name() const
 {
     return d->name;
+}
+
+quint16 Format::id() const
+{
+    return d->id;
 }
 
 bool Format::isDefaultTextStyle(const Theme &theme) const

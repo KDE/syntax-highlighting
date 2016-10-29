@@ -33,6 +33,11 @@ FoldingRegion::FoldingRegion(Type type, quint16 id) :
 {
 }
 
+bool FoldingRegion::operator==(const FoldingRegion &other) const
+{
+    return m_id == other.m_id && m_type == other.m_type;
+}
+
 bool FoldingRegion::isValid() const
 {
     return type() != None;

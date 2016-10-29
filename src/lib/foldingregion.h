@@ -46,6 +46,9 @@ public:
      */
     FoldingRegion();
 
+    /** Compares two FoldingRegion instances for equality. */
+    bool operator==(const FoldingRegion &other) const;
+
     /**
      * Returns @c true if this is a valid folding region.
      * A valid FoldingRegion is defined by a type() other than Type::None.

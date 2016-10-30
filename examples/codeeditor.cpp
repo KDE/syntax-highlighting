@@ -205,11 +205,14 @@ void CodeEditor::sidebarPaintEvent(QPaintEvent *event)
     auto blockNumber = block.blockNumber();
     int top = blockBoundingGeometry(block).translated(contentOffset()).top();
     int bottom = top + blockBoundingRect(block).height();
+    const int currentBlockNumber = textCursor().blockNumber();
 
     while (block.isValid() && top <= event->rect().bottom()) {
         if (block.isVisible() && bottom >= event->rect().top()) {
             const auto number = QString::number(blockNumber + 1);
-            painter.setPen(m_highlighter->theme().editorColor(SyntaxHighlighting::Theme::LineNumbers));
+            painter.setPen(m_highlighter->theme().editorColor(
+                (blockNumber == currentBlockNumber) ? SyntaxHighlighting::Theme::CurrentLineNumber
+                                                    : SyntaxHighlighting::Theme::LineNumbers));
             painter.drawText(0, top, m_sideBar->width() - 2, fontMetrics().height(), Qt::AlignRight, number);
         }
 

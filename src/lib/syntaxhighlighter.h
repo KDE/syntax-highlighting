@@ -26,8 +26,11 @@
 
 namespace SyntaxHighlighting {
 
+class SyntaxHighlighterPrivate;
+
 /** A QSyntaxHighlighter implementation for use with QTextDocument.
- *  This supports partial re-highlighting during editing.
+ *  This supports partial re-highlighting during editing and
+ *  tracks syntax-based code folding regions.
  */
 class KF5SYNTAXHIGHLIGHTING_EXPORT SyntaxHighlighter : public QSyntaxHighlighter, public AbstractHighlighter
 {
@@ -39,9 +42,35 @@ public:
 
     void setDefinition(const Definition &def) Q_DECL_OVERRIDE;
 
+    /** Returns whether there is a folding region beginning at @p startBlock.
+     *  This only considers syntax-based folding regions,
+     *  not indention-based ones as e.g. found in Python.
+     *
+     *  @see findFoldingRegionEnd
+     */
+    bool startsFoldingRegion(const QTextBlock &startBlock) const;
+
+    /** Finds the end of the folding region starting at @p startBlock.
+     *  If multiple folding regions begin at @p startBlock, the end of
+     *  the last/innermost one is returned.
+     *  This returns an invalid block if no folding region end is found,
+     *  which typically indicates an unterminated region and thus folding
+     *  until the document end.
+     *  This method performs a sequential search starting at @p startBlock
+     *  for the matching folding region end, which is a potentially expensive
+     *  operation.
+     *
+     *  @see startsFoldingRegion
+     */
+    QTextBlock findFoldingRegionEnd(const QTextBlock &startBlock) const;
+
 protected:
     void highlightBlock(const QString & text) Q_DECL_OVERRIDE;
     void applyFormat(int offset, int length, const Format &format) Q_DECL_OVERRIDE;
+    void applyFolding(int offset, int length, FoldingRegion region) Q_DECL_OVERRIDE;
+
+private:
+    Q_DECLARE_PRIVATE_D(AbstractHighlighter::d_ptr, SyntaxHighlighter)
 };
 }
 

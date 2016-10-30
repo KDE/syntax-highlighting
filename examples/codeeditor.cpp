@@ -18,6 +18,7 @@
 #include "codeeditor.h"
 
 #include <definition.h>
+#include <foldingregion.h>
 #include <syntaxhighlighter.h>
 #include <theme.h>
 
@@ -39,6 +40,7 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
+    void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
 private:
     CodeEditor *m_codeEditor;
@@ -58,6 +60,17 @@ QSize CodeEditorSidebar::sizeHint() const
 void CodeEditorSidebar::paintEvent(QPaintEvent *event)
 {
     m_codeEditor->sidebarPaintEvent(event);
+}
+
+void CodeEditorSidebar::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->x() >= width() - m_codeEditor->fontMetrics().lineSpacing()) {
+        auto block = m_codeEditor->blockAtPosition(event->y());
+        if (!block.isValid() || !m_codeEditor->isFoldable(block))
+            return;
+        m_codeEditor->toggleFold(block);
+    }
+    QWidget::mouseReleaseEvent(event);
 }
 
 
@@ -195,7 +208,7 @@ int CodeEditor::sidebarWidth() const
         ++digits;
         count /= 10;
     }
-    return 4 + fontMetrics().width(QLatin1Char('9')) * digits;
+    return 4 + fontMetrics().width(QLatin1Char('9')) * digits + fontMetrics().lineSpacing();
 }
 
 void CodeEditor::sidebarPaintEvent(QPaintEvent *event)
@@ -209,13 +222,36 @@ void CodeEditor::sidebarPaintEvent(QPaintEvent *event)
     int bottom = top + blockBoundingRect(block).height();
     const int currentBlockNumber = textCursor().blockNumber();
 
+    const auto foldingMarkerSize = fontMetrics().lineSpacing();
+
     while (block.isValid() && top <= event->rect().bottom()) {
         if (block.isVisible() && bottom >= event->rect().top()) {
             const auto number = QString::number(blockNumber + 1);
             painter.setPen(m_highlighter->theme().editorColor(
                 (blockNumber == currentBlockNumber) ? SyntaxHighlighting::Theme::CurrentLineNumber
                                                     : SyntaxHighlighting::Theme::LineNumbers));
-            painter.drawText(0, top, m_sideBar->width() - 2, fontMetrics().height(), Qt::AlignRight, number);
+            painter.drawText(0, top, m_sideBar->width() - 2 - foldingMarkerSize, fontMetrics().height(), Qt::AlignRight, number);
+        }
+
+        // folding marker
+        if (block.isVisible() && isFoldable(block)) {
+            QPolygonF polygon;
+            if (isFolded(block)) {
+                polygon << QPointF(foldingMarkerSize * 0.4, foldingMarkerSize * 0.25);
+                polygon << QPointF(foldingMarkerSize * 0.4, foldingMarkerSize * 0.75);
+                polygon << QPointF(foldingMarkerSize * 0.8, foldingMarkerSize * 0.5);
+            } else {
+                polygon << QPointF(foldingMarkerSize * 0.25, foldingMarkerSize * 0.4);
+                polygon << QPointF(foldingMarkerSize * 0.75, foldingMarkerSize * 0.4);
+                polygon << QPointF(foldingMarkerSize * 0.5, foldingMarkerSize * 0.8);
+            }
+            painter.save();
+            painter.setRenderHint(QPainter::Antialiasing);
+            painter.setPen(Qt::NoPen);
+            painter.setBrush(QColor(m_highlighter->theme().editorColor(SyntaxHighlighting::Theme::CodeFolding)));
+            painter.translate(m_sideBar->width() - foldingMarkerSize, top);
+            painter.drawPolygon(polygon);
+            painter.restore();
         }
 
         block = block.next();
@@ -251,6 +287,70 @@ void CodeEditor::highlightCurrentLine()
     QList<QTextEdit::ExtraSelection> extraSelections;
     extraSelections.append(selection);
     setExtraSelections(extraSelections);
+}
+
+QTextBlock CodeEditor::blockAtPosition(int y) const
+{
+    auto block = firstVisibleBlock();
+    if (!block.isValid())
+        return QTextBlock();
+
+    int top = blockBoundingGeometry(block).translated(contentOffset()).top();
+    int bottom = top + blockBoundingRect(block).height();
+    do {
+        if (top <= y && y <= bottom)
+            return block;
+        block = block.next();
+        top = bottom;
+        bottom = top + blockBoundingRect(block).height();
+    } while (block.isValid());
+    return QTextBlock();
+}
+
+bool CodeEditor::isFoldable(const QTextBlock &block) const
+{
+    return m_highlighter->startsFoldingRegion(block);
+}
+
+bool CodeEditor::isFolded(const QTextBlock &block) const
+{
+    if (!block.isValid())
+        return false;
+    const auto nextBlock = block.next();
+    if (!nextBlock.isValid())
+        return false;
+    return !nextBlock.isVisible();
+}
+
+void CodeEditor::toggleFold(const QTextBlock &startBlock)
+{
+    // we also want to fold the last line of the region, therefore the ".next()"
+    const auto endBlock = m_highlighter->findFoldingRegionEnd(startBlock).next();
+
+    if (isFolded(startBlock)) {
+        // unfold
+        auto block = startBlock.next();
+        while (block.isValid() && !block.isVisible()) {
+            block.setVisible(true);
+            block.setLineCount(block.layout()->lineCount());
+            block = block.next();
+        }
+
+    } else {
+        // fold
+        auto block = startBlock.next();
+        while (block.isValid() && block != endBlock) {
+            block.setVisible(false);
+            block.setLineCount(0);
+            block = block.next();
+        }
+    }
+
+    // redraw document
+    document()->markContentsDirty(startBlock.position(), endBlock.position() - startBlock.position() + 1);
+
+    // update scrollbars
+    emit document()->documentLayout()->documentSizeChanged(document()->documentLayout()->documentSize());
 }
 
 #include "codeeditor.moc"

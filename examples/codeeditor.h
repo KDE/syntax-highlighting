@@ -50,6 +50,11 @@ private:
     void updateSidebarArea(const QRect &rect, int dy);
     void highlightCurrentLine();
 
+    QTextBlock blockAtPosition(int y) const;
+    bool isFoldable(const QTextBlock &block) const;
+    bool isFolded(const QTextBlock &block) const;
+    void toggleFold(const QTextBlock &block);
+
     SyntaxHighlighting::Repository m_repository;
     SyntaxHighlighting::SyntaxHighlighter *m_highlighter;
     CodeEditorSidebar *m_sideBar;

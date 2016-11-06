@@ -27,9 +27,9 @@
 
 Q_DECLARE_METATYPE(QTextBlock)
 
-using namespace SyntaxHighlighting;
+using namespace KSyntaxHighlighting;
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 class TextBlockUserData : public QTextBlockUserData
 {
 public:
@@ -148,7 +148,7 @@ void SyntaxHighlighter::highlightBlock(const QString& text)
         QMetaObject::invokeMethod(this, "rehighlightBlock", Qt::QueuedConnection, Q_ARG(QTextBlock, nextBlock));
 }
 
-void SyntaxHighlighter::applyFormat(int offset, int length, const SyntaxHighlighting::Format& format)
+void SyntaxHighlighter::applyFormat(int offset, int length, const KSyntaxHighlighting::Format& format)
 {
     if (format.isDefaultTextStyle(theme()) || length == 0)
         return;

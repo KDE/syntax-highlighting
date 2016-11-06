@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_CONTEXT_P_H
-#define SYNTAXHIGHLIGHTING_CONTEXT_P_H
+#ifndef KSYNTAXHIGHLIGHTING_CONTEXT_P_H
+#define KSYNTAXHIGHLIGHTING_CONTEXT_P_H
 
 #include "rule_p.h"
 #include "contextswitch_p.h"
@@ -28,7 +28,7 @@
 
 class QXmlStreamReader;
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 class Context
 {
@@ -91,4 +91,4 @@ private:
 };
 }
 
-#endif // SYNTAXHIGHLIGHTING_CONTEXT_P_H
+#endif // KSYNTAXHIGHLIGHTING_CONTEXT_P_H

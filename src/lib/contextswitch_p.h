@@ -15,12 +15,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_CONTEXTSWITCH_P_H
-#define SYNTAXHIGHLIGHTING_CONTEXTSWITCH_P_H
+#ifndef KSYNTAXHIGHLIGHTING_CONTEXTSWITCH_P_H
+#define KSYNTAXHIGHLIGHTING_CONTEXTSWITCH_P_H
 
 #include <QString>
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 class Context;
 class Definition;
@@ -47,4 +47,4 @@ private:
 };
 }
 
-#endif // SYNTAXHIGHLIGHTING_CONTEXTSWITCH_P_H
+#endif // KSYNTAXHIGHLIGHTING_CONTEXTSWITCH_P_H

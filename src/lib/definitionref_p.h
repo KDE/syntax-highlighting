@@ -15,12 +15,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_DEFINITIONREF_P_H
-#define SYNTAXHIGHLIGHTING_DEFINITIONREF_P_H
+#ifndef KSYNTAXHIGHLIGHTING_DEFINITIONREF_P_H
+#define KSYNTAXHIGHLIGHTING_DEFINITIONREF_P_H
 
 #include <memory>
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 class Definition;
 class DefinitionData;

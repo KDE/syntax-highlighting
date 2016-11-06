@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_STATE_P_H
-#define SYNTAXHIGHLIGHTING_STATE_P_H
+#ifndef KSYNTAXHIGHLIGHTING_STATE_P_H
+#define KSYNTAXHIGHLIGHTING_STATE_P_H
 
 #include <QSharedData>
 #include <QStack>
@@ -25,7 +25,7 @@ QT_BEGIN_NAMESPACE
 class QStringList;
 QT_END_NAMESPACE
 
-namespace SyntaxHighlighting
+namespace KSyntaxHighlighting
 {
 
 class Context;

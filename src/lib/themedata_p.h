@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_THEMEDATA_P_H
-#define SYNTAXHIGHLIGHTING_THEMEDATA_P_H
+#ifndef KSYNTAXHIGHLIGHTING_THEMEDATA_P_H
+#define KSYNTAXHIGHLIGHTING_THEMEDATA_P_H
 
 #include "theme.h"
 #include "textstyledata_p.h"
@@ -25,7 +25,7 @@
 #include <QHash>
 #include <QSharedData>
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 /**
  * Data container for a Theme.
@@ -146,6 +146,6 @@ private:
 
 }
 
-Q_DECLARE_TYPEINFO(SyntaxHighlighting::TextStyleData, Q_MOVABLE_TYPE);
+Q_DECLARE_TYPEINFO(KSyntaxHighlighting::TextStyleData, Q_MOVABLE_TYPE);
 
-#endif // SYNTAXHIGHLIGHTING_THEMEDATA_P_H
+#endif // KSYNTAXHIGHLIGHTING_THEMEDATA_P_H

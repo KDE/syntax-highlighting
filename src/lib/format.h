@@ -15,10 +15,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_FORMAT_H
-#define SYNTAXHIGHLIGHTING_FORMAT_H
+#ifndef KSYNTAXHIGHLIGHTING_FORMAT_H
+#define KSYNTAXHIGHLIGHTING_FORMAT_H
 
-#include "kf5syntaxhighlighting_export.h"
+#include "ksyntaxhighlighting_export.h"
 
 #include <QExplicitlySharedDataPointer>
 #include <QTypeInfo>
@@ -27,7 +27,7 @@ class QColor;
 class QString;
 class QXmlStreamReader;
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 class DefinitionRef;
 class FormatPrivate;
@@ -39,7 +39,7 @@ class Theme;
  *
  *  @see Theme
  */
-class KF5SYNTAXHIGHLIGHTING_EXPORT Format
+class KSYNTAXHIGHLIGHTING_EXPORT Format
 {
 public:
     /** Creates an empty/invalid format. */
@@ -127,6 +127,6 @@ private:
 };
 }
 
-Q_DECLARE_TYPEINFO(SyntaxHighlighting::Format, Q_MOVABLE_TYPE);
+Q_DECLARE_TYPEINFO(KSyntaxHighlighting::Format, Q_MOVABLE_TYPE);
 
-#endif // SYNTAXHIGHLIGHTING_FORMAT_H
+#endif // KSYNTAXHIGHLIGHTING_FORMAT_H

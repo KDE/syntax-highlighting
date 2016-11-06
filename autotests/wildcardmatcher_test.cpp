@@ -61,7 +61,7 @@ private Q_SLOTS:
     {
         QFETCH(QString, str);
         QFETCH(QString, pattern);
-        QVERIFY(SyntaxHighlighting::WildcardMatcher::exactMatch(str, pattern));
+        QVERIFY(KSyntaxHighlighting::WildcardMatcher::exactMatch(str, pattern));
     }
 
     void testNegativeMatch_data()
@@ -78,7 +78,7 @@ private Q_SLOTS:
     {
         QFETCH(QString, str);
         QFETCH(QString, pattern);
-        QVERIFY(!SyntaxHighlighting::WildcardMatcher::exactMatch(str, pattern));
+        QVERIFY(!KSyntaxHighlighting::WildcardMatcher::exactMatch(str, pattern));
     }
 };
 

@@ -15,15 +15,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_ABSTRACTHIGHLIGHTERM_P_H
-#define SYNTAXHIGHLIGHTING_ABSTRACTHIGHLIGHTERM_P_H
+#ifndef KSYNTAXHIGHLIGHTING_ABSTRACTHIGHLIGHTERM_P_H
+#define KSYNTAXHIGHLIGHTING_ABSTRACTHIGHLIGHTERM_P_H
 
 #include "definition.h"
 #include "theme.h"
 
 class QStringList;
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 class ContextSwitch;
 class StateData;

@@ -28,7 +28,7 @@
 #include <QStandardPaths>
 #include <QtTest/qtest.h>
 
-using namespace SyntaxHighlighting;
+using namespace KSyntaxHighlighting;
 
 class HTMLHighlighterTest : public QObject
 {

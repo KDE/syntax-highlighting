@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_DEFINITION_P_H
-#define SYNTAXHIGHLIGHTING_DEFINITION_P_H
+#ifndef KSYNTAXHIGHLIGHTING_DEFINITION_P_H
+#define KSYNTAXHIGHLIGHTING_DEFINITION_P_H
 
 #include "definitionref_p.h"
 
@@ -29,7 +29,7 @@ class QXmlStreamReader;
 class QJsonObject;
 QT_END_NAMESPACE
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 class Definition;
 class Repository;

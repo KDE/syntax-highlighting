@@ -15,10 +15,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_ABSTRACTHIGHLIGHTERM_H
-#define SYNTAXHIGHLIGHTING_ABSTRACTHIGHLIGHTERM_H
+#ifndef KSYNTAXHIGHLIGHTING_ABSTRACTHIGHLIGHTERM_H
+#define KSYNTAXHIGHLIGHTING_ABSTRACTHIGHLIGHTERM_H
 
-#include "kf5syntaxhighlighting_export.h"
+#include "ksyntaxhighlighting_export.h"
 
 #include <QObject>
 
@@ -26,7 +26,7 @@
 
 class QString;
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 class AbstractHighlighterPrivate;
 class Definition;
@@ -76,7 +76,7 @@ class Theme;
  *
  * @see SyntaxHighlighter
  */
-class KF5SYNTAXHIGHLIGHTING_EXPORT AbstractHighlighter
+class KSYNTAXHIGHLIGHTING_EXPORT AbstractHighlighter
 {
 public:
     virtual ~AbstractHighlighter();
@@ -175,6 +175,6 @@ private:
 };
 }
 
-Q_DECLARE_INTERFACE(SyntaxHighlighting::AbstractHighlighter, "org.kde.SyntaxHighlighting.AbstractHighlighter")
+Q_DECLARE_INTERFACE(KSyntaxHighlighting::AbstractHighlighter, "org.kde.SyntaxHighlighting.AbstractHighlighter")
 
-#endif // SYNTAXHIGHLIGHTING_ABSTRACTHIGHLIGHTERM_H
+#endif // KSYNTAXHIGHLIGHTING_ABSTRACTHIGHLIGHTERM_H

@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_KEYWORDLIST_P_H
-#define SYNTAXHIGHLIGHTING_KEYWORDLIST_P_H
+#ifndef KSYNTAXHIGHLIGHTING_KEYWORDLIST_P_H
+#define KSYNTAXHIGHLIGHTING_KEYWORDLIST_P_H
 
 #include <QSet>
 #include <QString>
@@ -24,7 +24,7 @@
 
 class QXmlStreamReader;
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 class KeywordList
 {
@@ -52,4 +52,4 @@ private:
 };
 }
 
-#endif // SYNTAXHIGHLIGHTING_KEYWORDLIST_P_H
+#endif // KSYNTAXHIGHLIGHTING_KEYWORDLIST_P_H

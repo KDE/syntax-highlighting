@@ -15,15 +15,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_REPOSITORY_P_H
-#define SYNTAXHIGHLIGHTING_REPOSITORY_P_H
+#ifndef KSYNTAXHIGHLIGHTING_REPOSITORY_P_H
+#define KSYNTAXHIGHLIGHTING_REPOSITORY_P_H
 
 #include <QHash>
 #include <QVector>
 
 class QString;
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 class Definition;
 class Repository;

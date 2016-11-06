@@ -25,8 +25,8 @@
 #include "format_p.h"
 #include "repository_p.h"
 #include "rule_p.h"
-#include "syntaxhighlighting_logging.h"
-#include "syntaxhighlighting_version.h"
+#include "ksyntaxhighlighting_logging.h"
+#include "ksyntaxhighlighting_version.h"
 #include "xml_p.h"
 
 #include <QCoreApplication>
@@ -40,7 +40,7 @@
 
 #include <algorithm>
 
-using namespace SyntaxHighlighting;
+using namespace KSyntaxHighlighting;
 
 DefinitionData::DefinitionData() :
     repo(Q_NULLPTR),

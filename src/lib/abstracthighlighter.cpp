@@ -25,12 +25,12 @@
 #include "rule_p.h"
 #include "state.h"
 #include "state_p.h"
-#include "syntaxhighlighting_logging.h"
+#include "ksyntaxhighlighting_logging.h"
 #include "theme.h"
 
 #include <QDebug>
 
-using namespace SyntaxHighlighting;
+using namespace KSyntaxHighlighting;
 
 AbstractHighlighterPrivate::AbstractHighlighterPrivate()
 {

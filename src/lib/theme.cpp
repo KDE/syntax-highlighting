@@ -20,7 +20,7 @@
 
 #include <QCoreApplication>
 
-using namespace SyntaxHighlighting;
+using namespace KSyntaxHighlighting;
 
 Theme::Theme()
 {

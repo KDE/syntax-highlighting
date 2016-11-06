@@ -21,7 +21,7 @@
 #include "definition_p.h"
 #include "theme.h"
 #include "themedata_p.h"
-#include "syntaxhighlighting_logging.h"
+#include "ksyntaxhighlighting_logging.h"
 #include "wildcardmatcher_p.h"
 
 #include <QDebug>
@@ -34,7 +34,7 @@
 
 #include <limits>
 
-using namespace SyntaxHighlighting;
+using namespace KSyntaxHighlighting;
 
 static void initResource()
 {

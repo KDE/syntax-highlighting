@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_FORMAT_P_H
-#define SYNTAXHIGHLIGHTING_FORMAT_P_H
+#ifndef KSYNTAXHIGHLIGHTING_FORMAT_P_H
+#define KSYNTAXHIGHLIGHTING_FORMAT_P_H
 
 #include "definitionref_p.h"
 #include "textstyledata_p.h"
@@ -25,7 +25,7 @@
 #include <QSharedData>
 #include <QString>
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 class FormatPrivate : public QSharedData
 {

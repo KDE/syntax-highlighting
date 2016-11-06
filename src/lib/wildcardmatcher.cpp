@@ -19,7 +19,7 @@
 
 #include "wildcardmatcher_p.h"
 
-using namespace SyntaxHighlighting;
+using namespace KSyntaxHighlighting;
 
 #include <QString>
 #include <QChar>

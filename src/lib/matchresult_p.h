@@ -15,12 +15,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_MATCHRESULT_P_H
-#define SYNTAXHIGHLIGHTING_MATCHRESULT_P_H
+#ifndef KSYNTAXHIGHLIGHTING_MATCHRESULT_P_H
+#define KSYNTAXHIGHLIGHTING_MATCHRESULT_P_H
 
 #include <QStringList>
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 class MatchResult
 {
@@ -39,4 +39,4 @@ private:
 };
 }
 
-#endif // SYNTAXHIGHLIGHTING_MATCHRESULT_P_H
+#endif // KSYNTAXHIGHLIGHTING_MATCHRESULT_P_H

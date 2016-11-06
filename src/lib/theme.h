@@ -15,17 +15,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_THEME_H
-#define SYNTAXHIGHLIGHTING_THEME_H
+#ifndef KSYNTAXHIGHLIGHTING_THEME_H
+#define KSYNTAXHIGHLIGHTING_THEME_H
 
-#include "kf5syntaxhighlighting_export.h"
+#include "ksyntaxhighlighting_export.h"
 
 #include <QColor>
 #include <QExplicitlySharedDataPointer>
 #include <qobjectdefs.h>
 #include <QTypeInfo>
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 class ThemeData;
 class RepositoryPrivate;
@@ -71,7 +71,7 @@ class RepositoryPrivate;
  *
  * @see Format
  */
-class KF5SYNTAXHIGHLIGHTING_EXPORT Theme
+class KSYNTAXHIGHLIGHTING_EXPORT Theme
 {
     Q_GADGET
 public:
@@ -354,6 +354,6 @@ private:
 
 }
 
-Q_DECLARE_TYPEINFO(SyntaxHighlighting::Theme, Q_MOVABLE_TYPE);
+Q_DECLARE_TYPEINFO(KSyntaxHighlighting::Theme, Q_MOVABLE_TYPE);
 
-#endif // SYNTAXHIGHLIGHTING_THEME_H
+#endif // KSYNTAXHIGHLIGHTING_THEME_H

@@ -22,7 +22,7 @@
 
 #include <QStringList>
 
-using namespace SyntaxHighlighting;
+using namespace KSyntaxHighlighting;
 
 StateData::StateData() :
     m_defData(Q_NULLPTR)

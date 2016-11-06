@@ -17,14 +17,14 @@
 
 #include "rule_p.h"
 #include "definition_p.h"
-#include "syntaxhighlighting_logging.h"
+#include "ksyntaxhighlighting_logging.h"
 #include "xml_p.h"
 
 #include <QDebug>
 #include <QString>
 #include <QXmlStreamReader>
 
-using namespace SyntaxHighlighting;
+using namespace KSyntaxHighlighting;
 
 static bool isOctalChar(QChar c)
 {

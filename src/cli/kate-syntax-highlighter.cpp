@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "syntaxhighlighting_version.h"
+#include "ksyntaxhighlighting_version.h"
 
 #include <definition.h>
 #include <definitiondownloader.h>
@@ -29,7 +29,7 @@
 
 #include <iostream>
 
-using namespace SyntaxHighlighting;
+using namespace KSyntaxHighlighting;
 
 int main(int argc, char **argv)
 {

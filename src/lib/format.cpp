@@ -29,7 +29,7 @@
 #include <QMetaEnum>
 #include <QXmlStreamReader>
 
-using namespace SyntaxHighlighting;
+using namespace KSyntaxHighlighting;
 
 static Theme::TextStyle stringToDefaultFormat(const QStringRef &str)
 {

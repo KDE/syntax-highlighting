@@ -27,7 +27,7 @@
 #include <QStandardPaths>
 #include <QtTest/qtest.h>
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 class FormatCollector : public AbstractHighlighter
 {
@@ -171,7 +171,7 @@ private Q_SLOTS:
 };
 }
 
-QTEST_GUILESS_MAIN(SyntaxHighlighting::ThemeTest)
+QTEST_GUILESS_MAIN(KSyntaxHighlighting::ThemeTest)
 
 #include "theme_test.moc"
 

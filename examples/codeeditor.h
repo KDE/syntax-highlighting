@@ -22,7 +22,7 @@
 
 #include <QPlainTextEdit>
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 class SyntaxHighlighter;
 }
 
@@ -43,7 +43,7 @@ protected:
 
 private:
     friend class CodeEditorSidebar;
-    void setTheme(const SyntaxHighlighting::Theme &theme);
+    void setTheme(const KSyntaxHighlighting::Theme &theme);
     int sidebarWidth() const;
     void sidebarPaintEvent(QPaintEvent *event);
     void updateSidebarGeometry();
@@ -55,8 +55,8 @@ private:
     bool isFolded(const QTextBlock &block) const;
     void toggleFold(const QTextBlock &block);
 
-    SyntaxHighlighting::Repository m_repository;
-    SyntaxHighlighting::SyntaxHighlighter *m_highlighter;
+    KSyntaxHighlighting::Repository m_repository;
+    KSyntaxHighlighting::SyntaxHighlighter *m_highlighter;
     CodeEditorSidebar *m_sideBar;
 };
 

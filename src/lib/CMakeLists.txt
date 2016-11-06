@@ -21,21 +21,21 @@ set(syntax_highlighting_srcs
     ${syntax_highlighting_QM_LOADER}
 )
 ecm_qt_declare_logging_category(syntax_highlighting_srcs
-    HEADER syntaxhighlighting_logging.h
-    IDENTIFIER SyntaxHighlighting::Log
-    CATEGORY_NAME org.kde.syntax-highlighting
+    HEADER ksyntaxhighlighting_logging.h
+    IDENTIFIER KSyntaxHighlighting::Log
+    CATEGORY_NAME org.kde.ksyntaxhighlighting
 )
 
 qt5_add_resources(themes_QRC ${CMAKE_SOURCE_DIR}/data/themes/theme-data.qrc)
 
 add_library(KF5SyntaxHighlighting SHARED ${syntax_highlighting_srcs} ${themes_QRC})
-generate_export_header(KF5SyntaxHighlighting)
+generate_export_header(KF5SyntaxHighlighting BASE_NAME KSyntaxHighlighting)
 set_target_properties(KF5SyntaxHighlighting PROPERTIES
     VERSION ${SyntaxHighlighting_VERSION_STRING}
     SOVERSION ${SyntaxHighlighting_SOVERSION}
     EXPORT_NAME SyntaxHighlighting
 )
-target_include_directories(KF5SyntaxHighlighting INTERFACE "$<INSTALL_INTERFACE:${KDE_INSTALL_INCLUDEDIR_KF5}/SyntaxHighlighting;${KDE_INSTALL_INCLUDEDIR_KF5}>")
+target_include_directories(KF5SyntaxHighlighting INTERFACE "$<INSTALL_INTERFACE:${KDE_INSTALL_INCLUDEDIR_KF5}/KSyntaxHighlighting;${KDE_INSTALL_INCLUDEDIR_KF5}>")
 target_include_directories(KF5SyntaxHighlighting PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR};${CMAKE_CURRENT_BINARY_DIR};>")
 target_link_libraries(KF5SyntaxHighlighting LINK_PUBLIC Qt5::Gui LINK_PRIVATE Qt5::Network SyntaxHighlightingData)
 
@@ -55,14 +55,14 @@ ecm_generate_headers(SyntaxHighlighting_HEADERS
 install(TARGETS KF5SyntaxHighlighting EXPORT KF5SyntaxHighlightingTargets ${INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES
     ${SyntaxHighlighting_HEADERS}
-    ${CMAKE_CURRENT_BINARY_DIR}/kf5syntaxhighlighting_export.h
-    DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF5}/SyntaxHighlighting)
+    ${CMAKE_CURRENT_BINARY_DIR}/ksyntaxhighlighting_export.h
+    DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF5}/KSyntaxHighlighting)
 
 ecm_generate_pri_file(
-    BASE_NAME SyntaxHighlighting LIB_NAME
+    BASE_NAME KSyntaxHighlighting LIB_NAME
     KF5SyntaxHighlighting
     DEPS "gui"
     FILENAME_VAR PRI_FILENAME
-    INCLUDE_INSTALL_DIR ${KDE_INSTALL_INCLUDEDIR_KF5}/SyntaxHighlighting
+    INCLUDE_INSTALL_DIR ${KDE_INSTALL_INCLUDEDIR_KF5}/KSyntaxHighlighting
 )
 install(FILES ${PRI_FILENAME} DESTINATION ${ECM_MKSPECS_INSTALL_DIR})

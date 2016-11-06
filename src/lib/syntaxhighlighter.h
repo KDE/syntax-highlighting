@@ -15,16 +15,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_QSYNTAXHIGHLIGHTER_H
-#define SYNTAXHIGHLIGHTING_QSYNTAXHIGHLIGHTER_H
+#ifndef KSYNTAXHIGHLIGHTING_QSYNTAXHIGHLIGHTER_H
+#define KSYNTAXHIGHLIGHTING_QSYNTAXHIGHLIGHTER_H
 
-#include "kf5syntaxhighlighting_export.h"
+#include "ksyntaxhighlighting_export.h"
 
 #include "abstracthighlighter.h"
 
 #include <QSyntaxHighlighter>
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 class SyntaxHighlighterPrivate;
 
@@ -32,7 +32,7 @@ class SyntaxHighlighterPrivate;
  *  This supports partial re-highlighting during editing and
  *  tracks syntax-based code folding regions.
  */
-class KF5SYNTAXHIGHLIGHTING_EXPORT SyntaxHighlighter : public QSyntaxHighlighter, public AbstractHighlighter
+class KSYNTAXHIGHLIGHTING_EXPORT SyntaxHighlighter : public QSyntaxHighlighter, public AbstractHighlighter
 {
     Q_OBJECT
 public:
@@ -74,4 +74,4 @@ private:
 };
 }
 
-#endif // SYNTAXHIGHLIGHTING_QSYNTAXHIGHLIGHTER_H
+#endif // KSYNTAXHIGHLIGHTING_QSYNTAXHIGHLIGHTER_H

@@ -15,10 +15,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_DEFINITION_H
-#define SYNTAXHIGHLIGHTING_DEFINITION_H
+#ifndef KSYNTAXHIGHLIGHTING_DEFINITION_H
+#define KSYNTAXHIGHLIGHTING_DEFINITION_H
 
-#include "kf5syntaxhighlighting_export.h"
+#include "ksyntaxhighlighting_export.h"
 
 #include <QTypeInfo>
 
@@ -28,7 +28,7 @@ class QString;
 class QStringList;
 template <typename T> class QVector;
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 class Context;
 class Format;
@@ -64,7 +64,7 @@ class DefinitionData;
  *
  * @see Repository
  */
-class KF5SYNTAXHIGHLIGHTING_EXPORT Definition
+class KSYNTAXHIGHLIGHTING_EXPORT Definition
 {
 public:
     /**
@@ -180,6 +180,6 @@ private:
 
 }
 
-Q_DECLARE_TYPEINFO(SyntaxHighlighting::Definition, Q_MOVABLE_TYPE);
+Q_DECLARE_TYPEINFO(KSyntaxHighlighting::Definition, Q_MOVABLE_TYPE);
 
 #endif

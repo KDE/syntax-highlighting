@@ -31,7 +31,7 @@
 #include <QTextStream>
 #include <QtTest/qtest.h>
 
-using namespace SyntaxHighlighting;
+using namespace KSyntaxHighlighting;
 
 class FoldingHighlighter : public AbstractHighlighter
 {

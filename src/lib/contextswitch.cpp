@@ -19,11 +19,11 @@
 #include "definition.h"
 #include "definition_p.h"
 #include "repository.h"
-#include "syntaxhighlighting_logging.h"
+#include "ksyntaxhighlighting_logging.h"
 
 #include <QDebug>
 
-using namespace SyntaxHighlighting;
+using namespace KSyntaxHighlighting;
 
 ContextSwitch::ContextSwitch() :
     m_context(Q_NULLPTR),

@@ -20,16 +20,16 @@
 #include "format.h"
 #include "state.h"
 #include "theme.h"
-#include "syntaxhighlighting_logging.h"
+#include "ksyntaxhighlighting_logging.h"
 
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
 #include <QTextStream>
 
-using namespace SyntaxHighlighting;
+using namespace KSyntaxHighlighting;
 
-class SyntaxHighlighting::HtmlHighlighterPrivate
+class KSyntaxHighlighting::HtmlHighlighterPrivate
 {
 public:
     std::unique_ptr<QTextStream> out;

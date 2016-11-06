@@ -17,12 +17,12 @@
  *  Boston, MA 02110-1301, USA.
  */
 
-#ifndef SYNTAXHIGHLIGHTING_WILDCARDMATCHER_P_H
-#define SYNTAXHIGHLIGHTING_WILDCARDMATCHER_P_H
+#ifndef KSYNTAXHIGHLIGHTING_WILDCARDMATCHER_P_H
+#define KSYNTAXHIGHLIGHTING_WILDCARDMATCHER_P_H
 
 class QString;
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 namespace WildcardMatcher
 {
@@ -40,4 +40,4 @@ namespace WildcardMatcher
 
 }
 
-#endif // SYNTAXHIGHLIGHTING_WILDCARDMATCHER_P_H
+#endif // KSYNTAXHIGHLIGHTING_WILDCARDMATCHER_P_H

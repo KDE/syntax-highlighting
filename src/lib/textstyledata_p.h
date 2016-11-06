@@ -15,12 +15,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_TEXTSTYLEDATA_P_H
-#define SYNTAXHIGHLIGHTING_TEXTSTYLEDATA_P_H
+#ifndef KSYNTAXHIGHLIGHTING_TEXTSTYLEDATA_P_H
+#define KSYNTAXHIGHLIGHTING_TEXTSTYLEDATA_P_H
 
 #include <QColor>
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 class TextStyleData
 {

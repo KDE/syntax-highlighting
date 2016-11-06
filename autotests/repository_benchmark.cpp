@@ -20,7 +20,7 @@
 #include <QObject>
 #include <QtTest/qtest.h>
 
-using namespace SyntaxHighlighting;
+using namespace KSyntaxHighlighting;
 
 class RepositoryBenchmark : public QObject
 {

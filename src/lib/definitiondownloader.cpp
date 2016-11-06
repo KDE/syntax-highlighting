@@ -18,8 +18,8 @@
 #include "definitiondownloader.h"
 #include "definition.h"
 #include "repository.h"
-#include "syntaxhighlighting_logging.h"
-#include "syntaxhighlighting_version.h"
+#include "ksyntaxhighlighting_logging.h"
+#include "ksyntaxhighlighting_version.h"
 
 #include <QDebug>
 #include <QDir>
@@ -31,9 +31,9 @@
 #include <QTimer>
 #include <QXmlStreamReader>
 
-using namespace SyntaxHighlighting;
+using namespace KSyntaxHighlighting;
 
-class SyntaxHighlighting::DefinitionDownloaderPrivate
+class KSyntaxHighlighting::DefinitionDownloaderPrivate
 {
 public:
     DefinitionDownloader *q;

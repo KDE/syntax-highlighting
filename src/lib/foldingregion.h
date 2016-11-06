@@ -15,17 +15,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_FOLDINGREGION_H
-#define SYNTAXHIGHLIGHTING_FOLDINGREGION_H
+#ifndef KSYNTAXHIGHLIGHTING_FOLDINGREGION_H
+#define KSYNTAXHIGHLIGHTING_FOLDINGREGION_H
 
-#include "kf5syntaxhighlighting_export.h"
+#include "ksyntaxhighlighting_export.h"
 
 #include <QTypeInfo>
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 /** Represents a begin or end of a folding region. */
-class KF5SYNTAXHIGHLIGHTING_EXPORT FoldingRegion
+class KSYNTAXHIGHLIGHTING_EXPORT FoldingRegion
 {
 public:
     /**
@@ -94,6 +94,6 @@ private:
 
 }
 
-Q_DECLARE_TYPEINFO(SyntaxHighlighting::FoldingRegion, Q_PRIMITIVE_TYPE);
+Q_DECLARE_TYPEINFO(KSyntaxHighlighting::FoldingRegion, Q_PRIMITIVE_TYPE);
 
 #endif

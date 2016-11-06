@@ -15,10 +15,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_REPOSITORY_H
-#define SYNTAXHIGHLIGHTING_REPOSITORY_H
+#ifndef KSYNTAXHIGHLIGHTING_REPOSITORY_H
+#define KSYNTAXHIGHLIGHTING_REPOSITORY_H
 
-#include "kf5syntaxhighlighting_export.h"
+#include "ksyntaxhighlighting_export.h"
 
 #include <qglobal.h>
 #include <memory>
@@ -27,7 +27,7 @@ class QString;
 template <typename T> class QVector;
 
 /**
- * @namespace SyntaxHighlighting
+ * @namespace KSyntaxHighlighting
  *
  * Syntax highlighting engine for Kate syntax definitions.
  * In order to access the syntax highlighting Definition files, use the
@@ -35,7 +35,7 @@ template <typename T> class QVector;
  *
  * @see Repository
  */
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 class Definition;
 class RepositoryPrivate;
@@ -71,7 +71,7 @@ class Theme;
  *
  * @see Definition, Theme, AbstractHighlighter
  */
-class KF5SYNTAXHIGHLIGHTING_EXPORT Repository
+class KSYNTAXHIGHLIGHTING_EXPORT Repository
 {
 public:
     /**
@@ -160,4 +160,4 @@ private:
 
 }
 
-#endif // SYNTAXHIGHLIGHTING_REPOSITORY_H
+#endif // KSYNTAXHIGHLIGHTING_REPOSITORY_H

@@ -76,14 +76,14 @@ void CodeEditorSidebar::mouseReleaseEvent(QMouseEvent *event)
 
 CodeEditor::CodeEditor(QWidget *parent) :
     QPlainTextEdit(parent),
-    m_highlighter(new SyntaxHighlighting::SyntaxHighlighter(document())),
+    m_highlighter(new KSyntaxHighlighting::SyntaxHighlighter(document())),
     m_sideBar(new CodeEditorSidebar(this))
 {
     setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 
     setTheme((palette().color(QPalette::Base).lightness() < 128)
-        ? m_repository.defaultTheme(SyntaxHighlighting::Repository::DarkTheme)
-        : m_repository.defaultTheme(SyntaxHighlighting::Repository::LightTheme));
+        ? m_repository.defaultTheme(KSyntaxHighlighting::Repository::DarkTheme)
+        : m_repository.defaultTheme(KSyntaxHighlighting::Repository::LightTheme));
 
     connect(this, &QPlainTextEdit::blockCountChanged, this, &CodeEditor::updateSidebarGeometry);
     connect(this, &QPlainTextEdit::updateRequest, this, &CodeEditor::updateSidebarArea);
@@ -185,13 +185,13 @@ void CodeEditor::resizeEvent(QResizeEvent *event)
     updateSidebarGeometry();
 }
 
-void CodeEditor::setTheme(const SyntaxHighlighting::Theme &theme)
+void CodeEditor::setTheme(const KSyntaxHighlighting::Theme &theme)
 {
     auto pal = qApp->palette();
     if (theme.isValid()) {
-        pal.setColor(QPalette::Base, theme.editorColor(SyntaxHighlighting::Theme::BackgroundColor));
-        pal.setColor(QPalette::Text, theme.textColor(SyntaxHighlighting::Theme::Normal));
-        pal.setColor(QPalette::Highlight, theme.editorColor(SyntaxHighlighting::Theme::TextSelection));
+        pal.setColor(QPalette::Base, theme.editorColor(KSyntaxHighlighting::Theme::BackgroundColor));
+        pal.setColor(QPalette::Text, theme.textColor(KSyntaxHighlighting::Theme::Normal));
+        pal.setColor(QPalette::Highlight, theme.editorColor(KSyntaxHighlighting::Theme::TextSelection));
     }
     setPalette(pal);
 
@@ -214,7 +214,7 @@ int CodeEditor::sidebarWidth() const
 void CodeEditor::sidebarPaintEvent(QPaintEvent *event)
 {
     QPainter painter(m_sideBar);
-    painter.fillRect(event->rect(), m_highlighter->theme().editorColor(SyntaxHighlighting::Theme::IconBorder));
+    painter.fillRect(event->rect(), m_highlighter->theme().editorColor(KSyntaxHighlighting::Theme::IconBorder));
 
     auto block = firstVisibleBlock();
     auto blockNumber = block.blockNumber();
@@ -228,8 +228,8 @@ void CodeEditor::sidebarPaintEvent(QPaintEvent *event)
         if (block.isVisible() && bottom >= event->rect().top()) {
             const auto number = QString::number(blockNumber + 1);
             painter.setPen(m_highlighter->theme().editorColor(
-                (blockNumber == currentBlockNumber) ? SyntaxHighlighting::Theme::CurrentLineNumber
-                                                    : SyntaxHighlighting::Theme::LineNumbers));
+                (blockNumber == currentBlockNumber) ? KSyntaxHighlighting::Theme::CurrentLineNumber
+                                                    : KSyntaxHighlighting::Theme::LineNumbers));
             painter.drawText(0, top, m_sideBar->width() - 2 - foldingMarkerSize, fontMetrics().height(), Qt::AlignRight, number);
         }
 
@@ -248,7 +248,7 @@ void CodeEditor::sidebarPaintEvent(QPaintEvent *event)
             painter.save();
             painter.setRenderHint(QPainter::Antialiasing);
             painter.setPen(Qt::NoPen);
-            painter.setBrush(QColor(m_highlighter->theme().editorColor(SyntaxHighlighting::Theme::CodeFolding)));
+            painter.setBrush(QColor(m_highlighter->theme().editorColor(KSyntaxHighlighting::Theme::CodeFolding)));
             painter.translate(m_sideBar->width() - foldingMarkerSize, top);
             painter.drawPolygon(polygon);
             painter.restore();
@@ -279,7 +279,7 @@ void CodeEditor::updateSidebarArea(const QRect& rect, int dy)
 void CodeEditor::highlightCurrentLine()
 {
     QTextEdit::ExtraSelection selection;
-    selection.format.setBackground(QColor(m_highlighter->theme().editorColor(SyntaxHighlighting::Theme::CurrentLine)));
+    selection.format.setBackground(QColor(m_highlighter->theme().editorColor(KSyntaxHighlighting::Theme::CurrentLine)));
     selection.format.setProperty(QTextFormat::FullWidthSelection, true);
     selection.cursor = textCursor();
     selection.cursor.clearSelection();

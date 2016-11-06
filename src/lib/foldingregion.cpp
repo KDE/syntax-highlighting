@@ -17,7 +17,7 @@
 
 #include "foldingregion.h"
 
-using namespace SyntaxHighlighting;
+using namespace KSyntaxHighlighting;
 
 static_assert(sizeof(FoldingRegion) == 2, "FoldingRegion is size-sensitive to frequent use in KTextEditor!");
 

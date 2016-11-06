@@ -15,10 +15,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_HTMLHIGHLIGHTER_H
-#define SYNTAXHIGHLIGHTING_HTMLHIGHLIGHTER_H
+#ifndef KSYNTAXHIGHLIGHTING_HTMLHIGHLIGHTER_H
+#define KSYNTAXHIGHLIGHTING_HTMLHIGHLIGHTER_H
 
-#include "kf5syntaxhighlighting_export.h"
+#include "ksyntaxhighlighting_export.h"
 #include "abstracthighlighter.h"
 
 #include <QString>
@@ -28,11 +28,11 @@
 class QFile;
 class QTextStream;
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 class HtmlHighlighterPrivate;
 
-class KF5SYNTAXHIGHLIGHTING_EXPORT HtmlHighlighter : public AbstractHighlighter
+class KSYNTAXHIGHLIGHTING_EXPORT HtmlHighlighter : public AbstractHighlighter
 {
 public:
     HtmlHighlighter();
@@ -51,4 +51,4 @@ private:
 };
 }
 
-#endif // SYNTAXHIGHLIGHTING_HTMLHIGHLIGHTER_H
+#endif // KSYNTAXHIGHLIGHTING_HTMLHIGHLIGHTER_H

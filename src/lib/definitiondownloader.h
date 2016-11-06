@@ -15,15 +15,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_DEFINITIONDOWNLOADER_H
-#define SYNTAXHIGHLIGHTING_DEFINITIONDOWNLOADER_H
+#ifndef KSYNTAXHIGHLIGHTING_DEFINITIONDOWNLOADER_H
+#define KSYNTAXHIGHLIGHTING_DEFINITIONDOWNLOADER_H
 
-#include "kf5syntaxhighlighting_export.h"
+#include "ksyntaxhighlighting_export.h"
 
 #include <QObject>
 #include <memory>
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 class DefinitionDownloaderPrivate;
 class Repository;
@@ -53,7 +53,7 @@ class Repository;
  *
  * @see Repository, Definition
  */
-class KF5SYNTAXHIGHLIGHTING_EXPORT DefinitionDownloader : public QObject
+class KSYNTAXHIGHLIGHTING_EXPORT DefinitionDownloader : public QObject
 {
     Q_OBJECT
 public:
@@ -103,4 +103,4 @@ private:
 };
 }
 
-#endif // SYNTAXHIGHLIGHTING_DEFINITIONDOWNLOADER_H
+#endif // KSYNTAXHIGHLIGHTING_DEFINITIONDOWNLOADER_H

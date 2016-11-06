@@ -27,7 +27,7 @@
 #include <QStandardPaths>
 #include <QtTest/qtest.h>
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 class NullHighlighter : public AbstractHighlighter
 {
@@ -180,6 +180,6 @@ private Q_SLOTS:
 };
 }
 
-QTEST_GUILESS_MAIN(SyntaxHighlighting::RepositoryTest)
+QTEST_GUILESS_MAIN(KSyntaxHighlighting::RepositoryTest)
 
 #include "syntaxrepository_test.moc"

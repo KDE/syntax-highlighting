@@ -15,15 +15,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SYNTAXHIGHLIGHTING_STATE_H
-#define SYNTAXHIGHLIGHTING_STATE_H
+#ifndef KSYNTAXHIGHLIGHTING_STATE_H
+#define KSYNTAXHIGHLIGHTING_STATE_H
 
-#include "kf5syntaxhighlighting_export.h"
+#include "ksyntaxhighlighting_export.h"
 
 #include <QExplicitlySharedDataPointer>
 #include <QTypeInfo>
 
-namespace SyntaxHighlighting {
+namespace KSyntaxHighlighting {
 
 class StateData;
 
@@ -32,7 +32,7 @@ class StateData;
  *  and allows concrete highlighter implementations to store state per
  *  line for fast re-highlighting of specific lines (e.g. during editing).
  */
-class KF5SYNTAXHIGHLIGHTING_EXPORT State
+class KSYNTAXHIGHLIGHTING_EXPORT State
 {
 public:
     /** Creates an initial state, ie. what should be used for the first line
@@ -71,6 +71,6 @@ private:
 
 }
 
-Q_DECLARE_TYPEINFO(SyntaxHighlighting::State, Q_MOVABLE_TYPE);
+Q_DECLARE_TYPEINFO(KSyntaxHighlighting::State, Q_MOVABLE_TYPE);
 
-#endif // SYNTAXHIGHLIGHTING_STATE_H
+#endif // KSYNTAXHIGHLIGHTING_STATE_H

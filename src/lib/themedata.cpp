@@ -17,7 +17,7 @@
 */
 
 #include "themedata_p.h"
-#include "syntaxhighlighting_logging.h"
+#include "ksyntaxhighlighting_logging.h"
 
 #include <QFile>
 #include <QJsonDocument>
@@ -27,7 +27,7 @@
 
 #include <QDebug>
 
-using namespace SyntaxHighlighting;
+using namespace KSyntaxHighlighting;
 
 ThemeData* ThemeData::get(const Theme &theme)
 {

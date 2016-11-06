@@ -87,7 +87,6 @@ AbstractHighlighter::~AbstractHighlighter()
 
 Definition AbstractHighlighter::definition() const
 {
-    Q_D(const AbstractHighlighter);
     return d_ptr->m_definition;
 }
 

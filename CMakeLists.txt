@@ -19,6 +19,7 @@ include(ECMQtDeclareLoggingCategory)
 include(KDEInstallDirs)
 include(KDEFrameworkCompilerSettings)
 include(KDECMakeSettings)
+include(ECMMarkNonGuiExecutable)
 
 set(KF5_VERSION "5.29.0")
 

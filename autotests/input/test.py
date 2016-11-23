@@ -26,3 +26,13 @@ def func(x):
                 continued line ")
         print('single line')
     return float(len(a2))
+
+
+def test_f_literals():
+    f'xy'
+    f'x{bar}y'
+    f'x{bar["baz"]}y'
+    f'x{bar["baz"]}y\n'
+
+    f'x{bar["baz"]!r}y\n'
+    f'x{bar["baz"]:.2}y\n'

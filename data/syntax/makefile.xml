@@ -13,7 +13,7 @@
           mimetype="text/x-makefile"
           author="Per Wigren (wigren@home.se)" license="">
   <highlighting>
-    <list name = "keywords">
+    <list name = "keywords" >
       <item> include </item>
       <item> define </item>
       <item> else </item>
@@ -23,8 +23,30 @@
       <item> ifeq </item>
       <item> ifndef </item>
       <item> ifneq </item>
-      <item> override </item>
     </list>
+    <!-- bmake statements: https://www.freebsd.org/cgi/man.cgi?make(1)#INCLUDE_STATEMENTS,_CONDITIONALS_AND_FOR_LOOPS -->
+    <list name = "conditionals">
+      <item> .if </item>
+      <item> .ifdef </item>
+      <item> .ifndef </item>
+      <item> .ifmake </item>
+      <item> .ifnmake </item>
+      <item> .elif </item>
+      <item> .elifdef </item>
+      <item> .elifndef </item>
+      <item> .elifmake </item>
+      <item> .elifnmake </item>
+      <item> .else </item>
+      <item> .endif </item>
+    </list>
+    <list name="bmake_expressions">
+      <item>defined</item>
+      <item>empty</item>
+      <item>exists</item>
+      <item>target</item>
+      <item>commands</item>
+    </list>
+
     <list name = "functions">
       <item> call </item>
       <item> subst </item>
@@ -62,11 +84,11 @@
       <item> warning </item>
       <item> info </item>
     </list>
-
     <contexts>
       <context name="normal" attribute="Normal" lineEndContext="#stay">
         <DetectSpaces/>
         <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <keyword attribute="ControlFlow"  context="conditional" String="conditionals"/>
         <keyword attribute="Keyword"  context="#stay" String="keywords"/>
         <RegExpr attribute="Variable" context="assign" String="[^\s:?]*\s*(?=:=|=|\+=|\?=)"/>
         <RegExpr attribute="Section"  context="prereq" String="^\.[^.][^:]*:"/>
@@ -78,6 +100,20 @@
         <Detect2Chars attribute="Special" context="#stay" char="\" char1="#"/>
         <Detect2Chars attribute="Special" context="#stay" char="\" char1="\"/>
         <AnyChar attribute="Operator" context="silent" String="@-" firstNonSpace="1"/>
+      </context>
+      <context name="conditional" attribute="Normal" lineEndContext="#pop">
+        <DetectSpaces/>
+        <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <keyword attribute="Builtin"  context="#stay" String="bmake_expressions"/>
+        <DetectIdentifier/>
+        <DetectChar attribute="String" context="string&quot;" char="&quot;"/>
+        <DetectChar attribute="String" context="string'" char="'"/>
+        <DetectChar attribute="Operator" context="dollar" char="$"/>
+        <Detect2Chars attribute="RealOperator" context="#stay" char="&amp;" char1="&amp;"/>
+        <Detect2Chars attribute="RealOperator" context="#stay" char="|" char1="|"/>
+        <Detect2Chars attribute="RealOperator" context="#stay" char="!" char1="="/>
+        <Detect2Chars attribute="RealOperator" context="#stay" char="=" char1="="/>
+        <DetectChar attribute="RealOperator" context="#stay" char="!"/>
       </context>
 
       <context name="prereq" attribute="Prereq" lineEndContext="rule">
@@ -167,7 +203,10 @@
         <DetectChar attribute="Operator" char="}" context="#pop#pop#pop"/>
         <DetectChar attribute="Operator" context="dollar" char="$"/>
         <DetectSpaces attribute="Error" context="#stay"/>
-        <AnyChar attribute="Error" context="#stay" String="=#:"/>
+        <!-- Handle bmake Variable modifiers -->
+        <!-- TODO: only highlight valid ones -->
+        <DetectChar attribute="RealOperator" context="#stay" char=":"/>
+        <AnyChar attribute="Error" context="#stay" String="=#"/>
       </context>
 
       <context name="callFunc(" attribute="FuncParam" lineEndContext="#stay">
@@ -205,6 +244,9 @@
       <itemData name="Silent"    defStyleNum="dsFunction" spellChecking="0"/>
       <itemData name="Special"   defStyleNum="dsFloat" spellChecking="0"/>
       <itemData name="Error"     defStyleNum="dsError" spellChecking="0"/>
+      <itemData name="Builtin"   defStyleNum="dsBuiltIn" spellChecking="0"/>
+      <itemData name="ControlFlow" defStyleNum="dsControlFlow" spellChecking="0"/>
+      <itemData name="RealOperator" defStyleNum="dsKeyword" spellChecking="0"/>
     </itemDatas>
   </highlighting>
   <general>
@@ -212,7 +254,7 @@
       <comment name = "singleLine" start = "#"/>
     </comments>
     <!-- '-' is not a deliminator in function filter-out -->
-    <keywords casesensitive="1" weakDeliminator = "-"/>
+    <keywords casesensitive="1" weakDeliminator = ".-"/>
   </general>
 </language>
 <!-- kate: space-indent on; indent-width 2; replace-tabs on; -->

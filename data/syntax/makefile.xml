@@ -203,10 +203,104 @@
         <DetectChar attribute="Operator" char="}" context="#pop#pop#pop"/>
         <DetectChar attribute="Operator" context="dollar" char="$"/>
         <DetectSpaces attribute="Error" context="#stay"/>
-        <!-- Handle bmake Variable modifiers -->
-        <!-- TODO: only highlight valid ones -->
-        <DetectChar attribute="RealOperator" context="#stay" char=":"/>
+        <!-- Handle bmake Variable modifiers: ${variable[:modifier[:...]]} -->
+        <Detect2Chars context="#stay" char="\" char1=":"/>
+        <!-- modifiers without arguments-->
+        <keyword attribute="Keyword"  context="#pop!expect}" String="bmake_var_modifiers_noarg"/>
+        <!-- with arguments -->
+        <keyword attribute="Keyword"  context="#pop!bmake_var_modifier_arg" String="bmake_var_modifiers_with_arg"/>
+        <!-- other modifiers -->
+        <DetectChar attribute="RealOperator" context="bmake_var_modifier" char=":"/>
         <AnyChar attribute="Error" context="#stay" String="=#"/>
+      </context>
+
+      <context name="bmake_var_modifier_arg" attribute="VarModifier" lineEndContext="#pop">
+        <DetectChar attribute="Operator" context="dollar" char="$"/>
+        <Detect2Chars context="#stay" char="\" char1="}"/>
+        <DetectChar attribute="Operator" char="}" context="#pop#pop#pop#pop"/>
+        <Detect2Chars context="#stay" char="\" char1=":"/>
+        <DetectChar attribute="RealOperator" context="#pop!bmake_var_modifier" char=":"/>
+      </context>
+
+      <!-- TODO: once all modifiers are properly handled change fallthroughContext to "expect}" -->
+      <context name="bmake_var_modifier" attribute="VarModifier" lineEndContext="#pop" fallthroughContext="#pop!bmake_var_modifier_arg" fallthrough="true">
+        <DetectChar attribute="Operator" context="dollar" char="$"/>
+
+                    <!--
+          TODO :?true_string:false_string
+          TODO :old_string=new_string This is the AT&T System V UNIX style variable substitution.
+          TODO :@temp@string@ This is the loop expansion mechanism from the OSF Development Environment (ODE) make.
+          TODO :!cmd! The output of running cmd is the value.
+          TODO :[range]
+        -->
+        <!--  Modifiers without arguments:-->
+        <!--
+          :E Replaces each word in the variable with its suffix.
+          :H Replaces each word in the variable with everything but the last component.
+          :O   Order every word in variable alphabetically.
+          :Q   Quotes every shell meta-character in the variable
+          :R   Replaces each word in the variable with everything but its suffix.
+          :T   Replaces each word in the variable with its last component.
+          :u   Remove adjacent duplicate words (like uniq(1)).
+          :L The name of the variable is the value.
+          :P The path of the node which has the same name as the variable is the value.
+        -->
+        <AnyChar    attribute="Builtin" context="#pop!expect}" String="EHOQRTuLP"/>
+        <!-- :sh  If the variable is non-empty it is run as a command and the output becomes the new value. -->
+        <Detect2Chars attribute="Builtin" context="#pop!expect}" char="s" char1="h"/>
+        <!-- :Ox  Randomize words in variable. -->
+        <Detect2Chars attribute="Builtin" context="#pop!expect}" char="O" char1="x"/>
+        <!-- :tA  Attempt to convert variable to an absolute path using realpath(3),-->
+        <Detect2Chars attribute="Builtin" context="#pop!expect}" char="t" char1="A"/>
+        <!-- :tl  Converts variable to lower-case letters.-->
+        <Detect2Chars attribute="Builtin" context="#pop!expect}" char="t" char1="L"/>
+        <!--  :gmtime The value is a format string for strftime(3), using the current gmtime(3). -->
+        <StringDetect attribute="Builtin" String="gmtime" context="#pop!expect}" />
+        <!-- :hash Compute a 32bit hash of the value and encode it as hex digits. -->
+        <StringDetect attribute="Builtin" String="hash" context="#pop!expect}" />
+        <!-- :localtime The value is a format string for strftime(3), using the current localtime(3). -->
+        <StringDetect attribute="Builtin" String="localtime" context="#pop!expect}" />
+        <!--Now the modifiers with arguments:-->
+        <!--
+          :Mpattern Select only those words that match pattern.
+          :Npattern This is identical to `:M', but selects all words which do not match pattern.
+          :Dnewval If the variable is defined newval is the value.
+          :Unewval If the variable is undefined newval is the value.
+        -->
+        <AnyChar    attribute="Builtin" context="#pop!bmake_var_modifier_arg" String="MNDU"/>
+        <!-- TODO: add new context to highligh old_string and new_string differently
+          :S/old_string/new_string/[1gW]
+          :C/pattern/replacement/[1gW]
+        -->
+        <AnyChar attribute="Builtin" context="#pop!bmake_var_modifier_arg" String="SC"/>
+        <!-- ::=str The variable is assigned the value str after substitution. -->
+        <Detect2Chars attribute="Builtin" context="#pop!bmake_var_modifier_arg" char=":" char1="="/>
+        <!-- ::?=str As for ::= but only if the variable does not already have a value. -->
+        <StringDetect attribute="Builtin" String=":?=" context="#pop!bmake_var_modifier_arg" />
+        <!-- ::+=str Append str to the variable. -->
+        <StringDetect attribute="Builtin" String=":+=" context="#pop!bmake_var_modifier_arg" />
+        <!-- ::!=cmd Assign the output of cmd to the variable. -->
+        <StringDetect attribute="Builtin" String=":!=" context="#pop!bmake_var_modifier_arg" />
+        <!-- :tu  Converts variable to upper-case letters. -->
+        <Detect2Chars attribute="Builtin" context="#pop!bmake_var_modifier_arg" char="t" char1="u"/>
+        <!-- :tW  Causes the value to be treated as a single word.  See also `:[*]'. -->
+        <Detect2Chars attribute="Builtin" context="#pop!bmake_var_modifier_arg" char="t" char1="W"/>
+        <!-- :tw  Causes the value to be treated as a sequence of words delimited by white space.  See also `:[@]'.-->
+        <Detect2Chars attribute="Builtin" context="#pop!bmake_var_modifier_arg" char="t" char1="w"/>
+        <!-- :tsc Words in the variable are normally separated by a space on
+          expansion.  This modifier sets the separator to the character c.  If
+          c is omitted, then no separator is used.  The common escapes
+          (including octal numeric codes), work as expected. -->
+        <Detect2Chars attribute="Builtin" context="#pop!bmake_var_modifier_arg" char="t" char1="s"/>
+        <RegExpr String=""/>
+
+
+        <IncludeRules context="bmake_var_modifier_arg"/>
+      </context>
+
+      <context name="expect}" attribute="Error" lineEndContext="#pop#pop#pop#pop">
+        <Detect2Chars context="#stay" char="\" char1="}"/>
+        <DetectChar attribute="Operator" char="}" context="#pop#pop#pop#pop"/>
       </context>
 
       <context name="callFunc(" attribute="FuncParam" lineEndContext="#stay">
@@ -247,6 +341,7 @@
       <itemData name="Builtin"   defStyleNum="dsBuiltIn" spellChecking="0"/>
       <itemData name="ControlFlow" defStyleNum="dsControlFlow" spellChecking="0"/>
       <itemData name="RealOperator" defStyleNum="dsKeyword" spellChecking="0"/>
+      <itemData name="VarModifier" defStyleNum="dsSpecialString" spellChecking="0"/>
     </itemDatas>
   </highlighting>
   <general>

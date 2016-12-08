@@ -27,20 +27,21 @@
       <item> ifneq </item>
     </list>
     <!-- bmake statements: https://www.freebsd.org/cgi/man.cgi?make(1)#INCLUDE_STATEMENTS,_CONDITIONALS_AND_FOR_LOOPS -->
-    <list name="bmake_conditionals">
+    <list name="bmake_if">
       <item> .if </item>
       <item> .ifdef </item>
       <item> .ifndef </item>
       <item> .ifmake </item>
       <item> .ifnmake </item>
+    </list>
+    <list name="bmake_else">
       <item> .elif </item>
       <item> .elifdef </item>
       <item> .elifndef </item>
       <item> .elifmake </item>
       <item> .elifnmake </item>
-      <item> .else </item>
-      <item> .endif </item>
     </list>
+
     <list name="bmake_expressions">
       <item>defined</item>
       <item>empty</item>
@@ -90,7 +91,11 @@
       <context name="normal" attribute="Normal" lineEndContext="#stay">
         <DetectSpaces/>
         <DetectChar attribute="Comment" context="Comment" char="#"/>
-        <keyword attribute="ControlFlow"  context="conditional" String="bmake_conditionals"/>
+        <keyword attribute="ControlFlow" String="bmake_if" context="bmake_conditional" beginRegion="ifthenelse" firstNonSpace="true"/>
+        <!--TODO: trailing non-space after .else should be highlighted as an error -->
+        <keyword attribute="ControlFlow" String="bmake_else" context="bmake_conditional" endRegion="ifthenelse" beginRegion="ifthenelse" firstNonSpace="true"/>
+        <StringDetect attribute="ControlFlow" String=".endif" context="bmake_conditional" firstNonSpace="true" endRegion="ifthenelse" />
+
         <keyword attribute="Keyword"  context="#stay" String="keywords"/>
         <RegExpr attribute="Variable" context="assign" String="[^\s:?]*\s*(?=:=|=|\+=|\?=)"/>
         <RegExpr attribute="Section"  context="prereq" String="^\.[^.][^:]*:"/>
@@ -103,7 +108,7 @@
         <Detect2Chars attribute="Special" context="#stay" char="\" char1="\"/>
         <AnyChar attribute="Operator" context="silent" String="@-" firstNonSpace="1"/>
       </context>
-      <context name="conditional" attribute="Normal" lineEndContext="#pop">
+      <context name="bmake_conditional" attribute="Normal" lineEndContext="#pop">
         <DetectSpaces/>
         <DetectChar attribute="Comment" context="Comment" char="#"/>
         <keyword attribute="Builtin"  context="bmake_expression" String="bmake_expressions"/>

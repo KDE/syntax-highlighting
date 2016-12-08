@@ -51,6 +51,13 @@
       <item>commands</item>
     </list>
 
+    <list name="bmake_include_stmt">
+      <item>.include</item>
+      <item>.-include</item>
+      <item>.sinclude</item>
+      <!-- For compat bmake also handles include but this is already highlighted. <item>include</item> -->
+    </list>
+
     <!-- https://www.freebsd.org/cgi/man.cgi?make(1)#SPECIAL_TARGETS -->
     <list name="bmake_special_targets">
       <item> .BEGIN </item>
@@ -145,6 +152,7 @@
         <RegExpr attribute="Variable" context="assign" String="[^\s:?]*\s*(?=:=|=|\+=|\?=)"/>
         <keyword attribute="SpecialTarget" context="bmake_special_target" String="bmake_special_targets" firstNonSpace="true"/>
         <RegExpr attribute="SpecialTarget" context="prereq" String="\.PATH\.[^:]*:" firstNonSpace="true"/>
+        <keyword attribute="Keyword" context="bmake_include" String="bmake_include_stmt" firstNonSpace="true"/>
 
         <RegExpr attribute="Section"  context="prereq" String="^\.[^.][^:]*:"/>
         <RegExpr attribute="Target"   context="prereq" String="^[^:]*:"/>
@@ -156,6 +164,13 @@
         <Detect2Chars attribute="Special" context="#stay" char="\" char1="\"/>
         <AnyChar attribute="Operator" context="silent" String="@-" firstNonSpace="1"/>
       </context>
+
+      <context name="bmake_include" attribute="Normal" lineEndContext="#pop">
+        <DetectSpaces />
+        <RangeDetect char="&lt;"  char1="&gt;" context="#stay" attribute="Include" />
+        <RangeDetect char="&quot;"  char1="&quot;" context="#stay" attribute="Include" />
+      </context>
+
 
       <context name="bmake_conditional" attribute="Normal" lineEndContext="#pop">
         <DetectSpaces/>
@@ -413,12 +428,13 @@
       <itemData name="Special"   defStyleNum="dsFloat" spellChecking="0"/>
       <itemData name="Error"     defStyleNum="dsError" spellChecking="0"/>
       <itemData name="Builtin"   defStyleNum="dsBuiltIn" spellChecking="0"/>
+      <itemData name="Number"    defStyleNum="dsDecVal" spellChecking="0"/>
+      <itemData name="Include"   defStyleNum="dsImport" spellChecking="0"/>
+      <itemData name="ControlFlow" defStyleNum="dsControlFlow" spellChecking="0"/>
+      <itemData name="VarModifier" defStyleNum="dsSpecialString" spellChecking="0"/>
+      <itemData name="RealOperator" defStyleNum="dsKeyword" spellChecking="0"/>
       <itemData name="SpecialTarget" defStyleNum="dsOthers" spellChecking="0" bold="1"/>
       <itemData name="SpecialPrereq" defStyleNum="dsDataType" spellChecking="0" bold="1"/>
-      <itemData name="ControlFlow" defStyleNum="dsControlFlow" spellChecking="0"/>
-      <itemData name="RealOperator" defStyleNum="dsKeyword" spellChecking="0"/>
-      <itemData name="VarModifier" defStyleNum="dsSpecialString" spellChecking="0"/>
-      <itemData name="Number"      defStyleNum="dsDecVal" spellChecking="0"/>
     </itemDatas>
   </highlighting>
   <general>

@@ -50,6 +50,30 @@
       <item>commands</item>
     </list>
 
+    <!-- https://www.freebsd.org/cgi/man.cgi?make(1)#SPECIAL_TARGETS -->
+    <list name="bmake_special_targets">
+      <item> .BEGIN </item>
+      <item> .DEFAULT </item>
+      <item> .END </item>
+      <item> .ERROR </item>
+      <item> .IGNORE </item>
+      <item> .INTERRUPT </item>
+      <item> .MAIN </item>
+      <item> .MAKEFLAGS </item>
+      <item> .NOPATH </item>
+      <item> .NOTPARALLEL </item>
+      <item> .NO_PARALLEL </item>
+      <item> .OBJDIR </item>
+      <item> .ORDER </item>
+      <item> .PATH </item>
+      <item> .PHONY </item>
+      <item> .PRECIOUS </item>
+      <item> .SHELL </item>
+      <item> .SILENT </item>
+      <item> .STALE </item>
+      <item> .SUFFIXES </item>
+    </list>
+
     <list name = "functions">
       <item> call </item>
       <item> subst </item>
@@ -98,6 +122,9 @@
 
         <keyword attribute="Keyword"  context="#stay" String="keywords"/>
         <RegExpr attribute="Variable" context="assign" String="[^\s:?]*\s*(?=:=|=|\+=|\?=)"/>
+        <keyword attribute="SpecialTarget" context="bmake_special_target" String="bmake_special_targets" firstNonSpace="true"/>
+        <RegExpr attribute="SpecialTarget" context="prereq" String="\.PATH\.[^:]*:" firstNonSpace="true"/>
+
         <RegExpr attribute="Section"  context="prereq" String="^\.[^.][^:]*:"/>
         <RegExpr attribute="Target"   context="prereq" String="^[^:]*:"/>
         <DetectIdentifier/>
@@ -108,6 +135,7 @@
         <Detect2Chars attribute="Special" context="#stay" char="\" char1="\"/>
         <AnyChar attribute="Operator" context="silent" String="@-" firstNonSpace="1"/>
       </context>
+
       <context name="bmake_conditional" attribute="Normal" lineEndContext="#pop">
         <DetectSpaces/>
         <DetectChar attribute="Comment" context="Comment" char="#"/>
@@ -132,6 +160,12 @@
         <DetectSpaces/>
         <DetectIdentifier attribute="Variable"/>
         <DetectChar attribute="Normal" context="#pop" char=")"/>
+      </context>
+
+      <context name="bmake_special_target" attribute="Error" lineEndContext="rule">
+        <!-- anything but spaces before the : should be an error -->
+        <DetectSpaces attribute="Normal" />
+        <DetectChar attribute="SpecialTarget" context="#pop!prereq" char=":"/>
       </context>
 
       <context name="prereq" attribute="Prereq" lineEndContext="rule">
@@ -357,6 +391,7 @@
       <itemData name="Special"   defStyleNum="dsFloat" spellChecking="0"/>
       <itemData name="Error"     defStyleNum="dsError" spellChecking="0"/>
       <itemData name="Builtin"   defStyleNum="dsBuiltIn" spellChecking="0"/>
+      <itemData name="SpecialTarget" defStyleNum="dsOthers" spellChecking="0" bold="1"/>
       <itemData name="ControlFlow" defStyleNum="dsControlFlow" spellChecking="0"/>
       <itemData name="RealOperator" defStyleNum="dsKeyword" spellChecking="0"/>
       <itemData name="VarModifier" defStyleNum="dsSpecialString" spellChecking="0"/>

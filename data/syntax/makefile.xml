@@ -62,6 +62,9 @@
       <item> .warning </item>
       <item> .error </item>
     </list>
+    <!-- Use single element list here so that .for/.endfor also shows up in code completion -->
+    <list name="bmake_for_stmt"><item>.for</item></list>
+    <list name="bmake_endfor_stmt"><item>.endfor</item></list>
 
     <!-- https://www.freebsd.org/cgi/man.cgi?make(1)#SPECIAL_TARGETS -->
     <list name="bmake_special_targets">
@@ -159,6 +162,8 @@
         <RegExpr attribute="SpecialTarget" context="prereq" String="\.PATH\.[^:]*:" firstNonSpace="true"/>
         <keyword attribute="Keyword" context="bmake_include" String="bmake_include_stmt" firstNonSpace="true"/>
         <keyword attribute="Keyword" context="bmake_message" String="bmake_message_stmt" firstNonSpace="true"/>
+        <keyword attribute="Keyword" context="bmake_for_loop" String="bmake_for_stmt" firstNonSpace="true" beginRegion="for"/>
+        <keyword attribute="Keyword" context="#stay" String="bmake_endfor_stmt" firstNonSpace="true" endRegion="for"/>
 
         <RegExpr attribute="Section"  context="prereq" String="^\.[^.][^:]*:"/>
         <RegExpr attribute="Target"   context="prereq" String="^[^:]*:"/>
@@ -194,6 +199,15 @@
         <Int attribute="Number" context="#stay"/>
         <DetectIdentifier attribute="Variable" context="#stay"/>
         <LineContinue attribute="Operator" context="#stay"/>
+      </context>
+
+      <context name="bmake_for_loop" attribute="Variable" lineEndContext="#pop">
+        <DetectSpaces/>
+        <WordDetect attribute="RealOperator" context="#stay" String="in" />
+        <DetectChar attribute="Operator" context="dollar" char="$"/>
+        <DetectChar attribute="String" context="string&quot;" char="&quot;"/>
+        <DetectChar attribute="String" context="string'" char="'"/>
+        <DetectChar attribute="Comment" context="Comment" char="#"/>
       </context>
 
       <context name="bmake_expression" attribute="Variable" lineEndContext="#pop">

@@ -110,6 +110,14 @@
       <item> .WAIT </item>
     </list>
 
+    <list name="bmake_other_stmts">
+      <item> .unexport-env </item>
+      <item> .unexport </item>
+      <item> .undef </item>
+      <item> .export-env </item>
+      <item> .export </item>
+    </list>
+
     <list name = "functions">
       <item> call </item>
       <item> subst </item>
@@ -157,6 +165,7 @@
         <StringDetect attribute="ControlFlow" String=".endif" context="bmake_conditional" firstNonSpace="true" endRegion="ifthenelse" />
 
         <keyword attribute="Keyword"  context="#stay" String="keywords"/>
+        <keyword attribute="Keyword"  context="bmake_other_stmts" String="bmake_other_stmts" firstNonSpace="true"/>
         <RegExpr attribute="Variable" context="assign" String="[^\s:?]*\s*(?=:=|=|\+=|\?=)"/>
         <keyword attribute="SpecialTarget" context="bmake_special_target" String="bmake_special_targets" firstNonSpace="true"/>
         <RegExpr attribute="SpecialTarget" context="prereq" String="\.PATH\.[^:]*:" firstNonSpace="true"/>
@@ -207,6 +216,12 @@
         <DetectChar attribute="Operator" context="dollar" char="$"/>
         <DetectChar attribute="String" context="string&quot;" char="&quot;"/>
         <DetectChar attribute="String" context="string'" char="'"/>
+        <DetectChar attribute="Comment" context="Comment" char="#"/>
+      </context>
+
+      <context name="bmake_other_stmts" attribute="Variable" lineEndContext="#pop">
+        <DetectSpaces/>
+        <DetectChar attribute="Operator" context="dollar" char="$"/>
         <DetectChar attribute="Comment" context="Comment" char="#"/>
       </context>
 

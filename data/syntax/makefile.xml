@@ -57,6 +57,11 @@
       <item>.sinclude</item>
       <!-- For compat bmake also handles include but this is already highlighted. <item>include</item> -->
     </list>
+    <list name="bmake_message_stmt">
+      <item> .info </item>
+      <item> .warning </item>
+      <item> .error </item>
+    </list>
 
     <!-- https://www.freebsd.org/cgi/man.cgi?make(1)#SPECIAL_TARGETS -->
     <list name="bmake_special_targets">
@@ -153,6 +158,7 @@
         <keyword attribute="SpecialTarget" context="bmake_special_target" String="bmake_special_targets" firstNonSpace="true"/>
         <RegExpr attribute="SpecialTarget" context="prereq" String="\.PATH\.[^:]*:" firstNonSpace="true"/>
         <keyword attribute="Keyword" context="bmake_include" String="bmake_include_stmt" firstNonSpace="true"/>
+        <keyword attribute="Keyword" context="bmake_message" String="bmake_message_stmt" firstNonSpace="true"/>
 
         <RegExpr attribute="Section"  context="prereq" String="^\.[^.][^:]*:"/>
         <RegExpr attribute="Target"   context="prereq" String="^[^:]*:"/>
@@ -202,6 +208,10 @@
         <!-- anything but spaces before the : should be an error -->
         <DetectSpaces attribute="Normal" />
         <DetectChar attribute="SpecialTarget" context="#pop!prereq" char=":"/>
+      </context>
+
+      <context name="bmake_message" attribute="String" lineEndContext="#pop">
+        <DetectChar attribute="Operator" context="dollar" char="$"/>
       </context>
 
       <context name="prereq" attribute="Prereq" lineEndContext="rule">

@@ -25,7 +25,7 @@
       <item> ifneq </item>
     </list>
     <!-- bmake statements: https://www.freebsd.org/cgi/man.cgi?make(1)#INCLUDE_STATEMENTS,_CONDITIONALS_AND_FOR_LOOPS -->
-    <list name = "conditionals">
+    <list name="bmake_conditionals">
       <item> .if </item>
       <item> .ifdef </item>
       <item> .ifndef </item>
@@ -88,7 +88,7 @@
       <context name="normal" attribute="Normal" lineEndContext="#stay">
         <DetectSpaces/>
         <DetectChar attribute="Comment" context="Comment" char="#"/>
-        <keyword attribute="ControlFlow"  context="conditional" String="conditionals"/>
+        <keyword attribute="ControlFlow"  context="conditional" String="bmake_conditionals"/>
         <keyword attribute="Keyword"  context="#stay" String="keywords"/>
         <RegExpr attribute="Variable" context="assign" String="[^\s:?]*\s*(?=:=|=|\+=|\?=)"/>
         <RegExpr attribute="Section"  context="prereq" String="^\.[^.][^:]*:"/>
@@ -104,8 +104,7 @@
       <context name="conditional" attribute="Normal" lineEndContext="#pop">
         <DetectSpaces/>
         <DetectChar attribute="Comment" context="Comment" char="#"/>
-        <keyword attribute="Builtin"  context="#stay" String="bmake_expressions"/>
-        <DetectIdentifier/>
+        <keyword attribute="Builtin"  context="bmake_expression" String="bmake_expressions"/>
         <DetectChar attribute="String" context="string&quot;" char="&quot;"/>
         <DetectChar attribute="String" context="string'" char="'"/>
         <DetectChar attribute="Operator" context="dollar" char="$"/>
@@ -114,6 +113,14 @@
         <Detect2Chars attribute="RealOperator" context="#stay" char="!" char1="="/>
         <Detect2Chars attribute="RealOperator" context="#stay" char="=" char1="="/>
         <DetectChar attribute="RealOperator" context="#stay" char="!"/>
+      </context>
+
+      <context name="bmake_expression" attribute="Variable" lineEndContext="#pop">
+        <DetectChar attribute="Normal" context="#stay" char="("/>
+        <DetectChar attribute="Operator" context="dollar" char="$"/>
+        <DetectSpaces/>
+        <DetectIdentifier attribute="String"/>
+        <DetectChar attribute="Normal" context="#pop" char=")"/>
       </context>
 
       <context name="prereq" attribute="Prereq" lineEndContext="rule">

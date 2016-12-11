@@ -17,24 +17,29 @@
   <highlighting>
     <list name = "keywords" >
       <item> include </item>
+      <item> -include </item>
       <item> define </item>
-      <item> else </item>
       <item> endef </item>
-      <item> endif </item>
-      <item> ifdef </item>
-      <item> ifeq </item>
-      <item> ifndef </item>
-      <item> ifneq </item>
     </list>
+    <!-- https://www.gnu.org/software/make/manual/html_node/Conditional-Syntax.html -->
+    <list name="gmake_if_keywords">
+      <item>if</item>
+      <item>ifeq</item>
+      <item>ifneq</item>
+      <item>ifdef</item>
+      <item>ifndef</item>
+    </list>
+    <list name="gmake_else_keywords"><item>else</item></list>
+    <list name="gmake_endif_keywords"><item>endif</item></list>
     <!-- bmake statements: https://www.freebsd.org/cgi/man.cgi?make(1)#INCLUDE_STATEMENTS,_CONDITIONALS_AND_FOR_LOOPS -->
-    <list name="bmake_if">
+    <list name="bmake_if_keywords">
       <item> .if </item>
       <item> .ifdef </item>
       <item> .ifndef </item>
       <item> .ifmake </item>
       <item> .ifnmake </item>
     </list>
-    <list name="bmake_else">
+    <list name="bmake_else_keywords">
       <item> .elif </item>
       <item> .elifdef </item>
       <item> .elifndef </item>
@@ -42,6 +47,7 @@
       <item> .elifnmake </item>
       <item> .else </item> <!-- TODO: anything following .else should be highlighted as an error -->
     </list>
+    <list name="bmake_endif_keywords"><item>.endif</item></list>
 
     <list name="bmake_expressions">
       <item>defined</item>
@@ -159,10 +165,15 @@
       <context name="normal" attribute="Normal" lineEndContext="#stay">
         <DetectSpaces/>
         <DetectChar attribute="Comment" context="Comment" char="#"/>
-        <keyword attribute="ControlFlow" String="bmake_if" context="bmake_conditional" beginRegion="ifthenelse" firstNonSpace="true"/>
+        <keyword attribute="ControlFlow" String="bmake_if_keywords" context="bmake_conditional" beginRegion="bmake_if" firstNonSpace="true"/>
         <!--TODO: trailing non-space after .else should be highlighted as an error -->
-        <keyword attribute="ControlFlow" String="bmake_else" context="bmake_conditional" endRegion="ifthenelse" beginRegion="ifthenelse" firstNonSpace="true"/>
-        <StringDetect attribute="ControlFlow" String=".endif" context="bmake_conditional" firstNonSpace="true" endRegion="ifthenelse" />
+        <keyword attribute="ControlFlow" String="bmake_else_keywords" context="bmake_conditional" endRegion="bmake_if" beginRegion="bmake_if" firstNonSpace="true"/>
+        <keyword attribute="ControlFlow" String="bmake_endif_keywords" context="#stay" endRegion="bmake_if"/>
+
+        <keyword attribute="ControlFlow" String="gmake_if_keywords" context="#stay" beginRegion="gmake_if" firstNonSpace="true"/>
+        <!--TODO: trailing non-space after .else should be highlighted as an error -->
+        <keyword attribute="ControlFlow" String="gmake_else_keywords" context="gmake_else" endRegion="gmake_if" beginRegion="gmake_if" firstNonSpace="true"/>
+        <keyword attribute="ControlFlow" String="gmake_endif_keywords" context="#stay" endRegion="gmake_if"/>
 
         <keyword attribute="Keyword"  context="#stay" String="keywords"/>
         <keyword attribute="Keyword"  context="bmake_other_stmts" String="bmake_other_stmts" firstNonSpace="true"/>
@@ -185,6 +196,19 @@
         <AnyChar attribute="Operator" context="silent" String="@-" firstNonSpace="1"/>
       </context>
 
+      <context name="strings_and_vars">
+        <DetectChar attribute="Operator" context="dollar" char="$"/>
+        <DetectChar attribute="String" context="string&quot;" char="&quot;"/>
+        <DetectChar attribute="String" context="string'" char="'"/>
+        <DetectChar attribute="Comment" context="Comment" char="#"/>
+      </context>
+
+      <context name="gmake_else" attribute="Error" lineEndContext="#pop">
+        <DetectSpaces attribute="Normal"/>
+        <keyword attribute="ControlFlow" String="gmake_if_keywords" context="#stay"/>
+        <IncludeRules context="strings_and_vars"/>
+      </context>
+
       <context name="bmake_include" attribute="Normal" lineEndContext="#pop">
         <DetectSpaces />
         <RangeDetect char="&lt;"  char1="&gt;" context="#stay" attribute="Include" />
@@ -194,11 +218,8 @@
 
       <context name="bmake_conditional" attribute="Normal" lineEndContext="#pop">
         <DetectSpaces/>
-        <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <IncludeRules context="strings_and_vars"/>
         <keyword attribute="Builtin"  context="bmake_expression" String="bmake_expressions"/>
-        <DetectChar attribute="String" context="string&quot;" char="&quot;"/>
-        <DetectChar attribute="String" context="string'" char="'"/>
-        <DetectChar attribute="Operator" context="dollar" char="$"/>
         <Detect2Chars attribute="RealOperator" context="#stay" char="&amp;" char1="&amp;"/>
         <Detect2Chars attribute="RealOperator" context="#stay" char="|" char1="|"/>
         <Detect2Chars attribute="RealOperator" context="#stay" char="!" char1="="/>
@@ -212,25 +233,21 @@
 
       <context name="bmake_for_loop" attribute="Variable" lineEndContext="#pop">
         <DetectSpaces/>
+        <IncludeRules context="strings_and_vars"/>
         <WordDetect attribute="RealOperator" context="#stay" String="in" />
-        <DetectChar attribute="Operator" context="dollar" char="$"/>
-        <DetectChar attribute="String" context="string&quot;" char="&quot;"/>
-        <DetectChar attribute="String" context="string'" char="'"/>
-        <DetectChar attribute="Comment" context="Comment" char="#"/>
       </context>
 
       <context name="bmake_other_stmts" attribute="Variable" lineEndContext="#pop">
         <DetectSpaces/>
-        <DetectChar attribute="Operator" context="dollar" char="$"/>
-        <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <IncludeRules context="strings_and_vars"/>
       </context>
 
       <context name="bmake_expression" attribute="Variable" lineEndContext="#pop">
-        <DetectChar attribute="Normal" context="#stay" char="("/>
-        <DetectChar attribute="Operator" context="dollar" char="$"/>
         <DetectSpaces/>
-        <DetectIdentifier attribute="Variable"/>
+        <IncludeRules context="strings_and_vars"/>
+        <DetectChar attribute="Normal" context="#stay" char="("/>
         <DetectChar attribute="Normal" context="#pop" char=")"/>
+        <DetectIdentifier attribute="Variable"/>
       </context>
 
       <context name="bmake_special_target" attribute="Error" lineEndContext="rule">

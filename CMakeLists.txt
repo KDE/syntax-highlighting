@@ -21,7 +21,7 @@ include(KDEFrameworkCompilerSettings)
 include(KDECMakeSettings)
 include(ECMMarkNonGuiExecutable)
 
-set(KF5_VERSION "5.29.0")
+set(KF5_VERSION "5.30.0")
 
 ecm_setup_version(${KF5_VERSION}
     VARIABLE_PREFIX SyntaxHighlighting

@@ -1,6 +1,7 @@
 # comment
 
 include Makefile.in
+-include Makefile.doesntexist
 
 .PHONY: all
 
@@ -11,6 +12,8 @@ foo = bar $(var) \
 
 ifeq ($(CC),gcc)
     bla=$(call func,param1,param2)
+else ifeq "x" "y"
+    $(error this seems wrong)
 else
     libs=$(normal_libs)
 endif

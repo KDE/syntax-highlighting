@@ -2,7 +2,7 @@ project(KSyntaxHighlighting)
 
 cmake_minimum_required(VERSION 2.8.12)
 
-find_package(ECM 5.26.0 REQUIRED NO_MODULE)
+find_package(ECM 5.29.0 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 if(POLICY CMP0063)
     cmake_policy(SET CMP0063 NEW)
@@ -21,7 +21,7 @@ include(KDEFrameworkCompilerSettings)
 include(KDECMakeSettings)
 include(ECMMarkNonGuiExecutable)
 
-set(KF5_VERSION "5.29.0")
+set(KF5_VERSION "5.30.0")
 
 ecm_setup_version(${KF5_VERSION}
     VARIABLE_PREFIX SyntaxHighlighting

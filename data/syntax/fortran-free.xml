@@ -12,13 +12,11 @@
       <item> associate </item>
       <item> break </item>
       <item> call </item>
-      <item> case </item>
       <item> common </item>
       <!--item> contains </item-->
       <item> continue </item>
       <item> cycle </item>
       <item> deallocate </item>
-      <item> default </item>
       <!--item> do </item-->
       <item> forall </item>
       <item> where </item>
@@ -50,8 +48,6 @@
       <item> recursive </item>
       <item> result </item>
       <item> return </item>
-      <item> select </item>
-      <item> selectcase </item>
       <item> stop </item>
       <!--item> then </item-->
       <item> to </item>
@@ -385,8 +381,6 @@
     <contexts>
       <context attribute="Normal Text" lineEndContext="#stay" name="default" >
         <IncludeRules context="find_strings" />
-        <IncludeRules context="find_decls" />
-        <IncludeRules context="find_intrinsics" />
         <IncludeRules context="find_io_stmnts" />
         <IncludeRules context="find_op_and_log" />
         <IncludeRules context="find_numbers" />
@@ -394,8 +388,10 @@
         <IncludeRules context="find_comments" />
         <IncludeRules context="find_symbols" />
         <IncludeRules context="find_begin_stmnts" />
-        <IncludeRules context="find_end_stmnts" />
         <IncludeRules context="find_mid_stmnts" />
+        <IncludeRules context="find_end_stmnts" />
+        <IncludeRules context="find_decls" />
+        <IncludeRules context="find_intrinsics" />
       </context>
 <!--************************END OF THE MAIN CONTEXT*************************-->
 
@@ -473,7 +469,7 @@
         <RegExpr attribute="Keyword" context="#stay" String="\bmodule\s+procedure\b" insensitive="true"/>
         <RegExpr attribute="Keyword" context="#stay" String="\b(subroutine|function|block\s*data)\b" insensitive="true" beginRegion="Routine"/>
         <RegExpr attribute="Keyword" context="#stay" String="\b(program|module|block\s*data)\b" insensitive="true" beginRegion="Routine"/>
-        <RegExpr attribute="Keyword" context="#stay" String="\b(then|do)\b" insensitive="true" beginRegion="Block"/>
+        <RegExpr attribute="Keyword" context="#stay" String="\b(then|do|select\s+case|select\s+type)\b" insensitive="true" beginRegion="Block"/>
       </context>
 <!-- The following context matches the end of program units -->
       <context attribute="Normal Text" lineEndContext="#stay" name="find_end_stmnts">
@@ -482,11 +478,14 @@
         <RegExpr attribute="Keyword" context="#stay" String="\bend\s*(do|if)\b" insensitive="true" endRegion="Block"/>
         <RegExpr attribute="Keyword" context="#stay" String="\bend\s*(select|where|forall|interface|associate)\b" insensitive="true"/>
         <RegExpr attribute="Keyword" context="#stay" String="\belse\s*if\b" insensitive="true" endRegion="Block"/>
+        <RegExpr attribute="Data Type" context="#stay" String="\bend\s*type\b" insensitive="true"/>
+        <RegExpr attribute="Data Type" context="#stay" String="\bend\s*enum\b" insensitive="true"/>
         <RegExpr attribute="Keyword" context="#stay" String="\bend\b" insensitive="true" endRegion="Routine"/>
       </context>
 <!-- The following context matches the mid of program units -->
       <context attribute="Normal Text" lineEndContext="#stay" name="find_mid_stmnts">
         <RegExpr attribute="Keyword" context="#stay" String="\belse\b" insensitive="true" endRegion="Block" beginRegion="Block"/>
+        <RegExpr attribute="Keyword" context="#stay" String="\b(case\s+default|case|type\s+is|class\s+is|class\s+default)\b" insensitive="true" endRegion="Block" beginRegion="Block"/>
         <RegExpr attribute="Keyword" context="#stay" String="\bcontains\b" insensitive="true" endRegion="Routine" beginRegion="Routine"/>
       </context>
 
@@ -495,13 +494,11 @@
         <RegExpr attribute="Data Type" context="#stay" String="\binteger[\*]\d{1,2}" insensitive="true"/>
         <RegExpr attribute="Data Type" context="#stay" String="\breal[\*]\d{1,2}" insensitive="true"/>
         <RegExpr attribute="Data Type" context="#stay" String="\bcomplex[\*]\d{1,2}" insensitive="true"/>
-        <RegExpr attribute="Data Type" context="#stay" String="\bend\s*type\b" insensitive="true"/>
-        <RegExpr attribute="Data Type" context="#stay" String="\bend\s*enum\b" insensitive="true"/>
         <keyword attribute="Data Type" context="#stay" String="types"/>
         <RegExpr attribute="Data Type" context="#stay" String="^\s*data\b" insensitive="true"/>
         <RegExpr attribute="Data Type" context="#stay" String="\bcharacter[*][0-9]+\b" insensitive="true"/>
         <RegExpr attribute="Data Type" context="find_paren" String="\b(type|class|integer|real|complex|character|logical|intent|dimension|extends|procedure|pass)\b\s*[(]" insensitive="true"/>
-        <RegExpr attribute="Data Type" context="#stay" String="\b(type|class|integer|real|complex|character|logical|double\s*precision|intent|dimension|extends|procedure|pass)\b" insensitive="true"/>
+        <RegExpr attribute="Data Type" context="#stay" String="\b(type|integer|real|complex|character|logical|double\s*precision|intent|dimension|procedure|pass)\b" insensitive="true"/>
         <Detect2Chars attribute="Data Type" context="#stay" char=":" char1=":"/>
       </context>
 <!-- This context matches parenthesis in data type declarations, such as in 'real(...)'-->

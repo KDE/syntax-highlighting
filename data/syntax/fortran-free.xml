@@ -130,6 +130,7 @@
       <item> allocatable </item>
       <item> asynchronous </item>
       <item> bind </item>
+      <item> contiguous </item>
       <item> deferred </item>
       <item> enum </item>
       <item> enumerator </item>
@@ -468,14 +469,14 @@
       <context attribute="Normal Text" lineEndContext="#stay" name="find_begin_stmnts">
         <RegExpr attribute="Keyword" context="#stay" String="\bmodule\s+procedure\b" insensitive="true"/>
         <RegExpr attribute="Keyword" context="#stay" String="\b(subroutine|function|block\s*data)\b" insensitive="true" beginRegion="Routine"/>
-        <RegExpr attribute="Keyword" context="#stay" String="\b(program|module|block\s*data)\b" insensitive="true" beginRegion="Routine"/>
-        <RegExpr attribute="Keyword" context="#stay" String="\b(then|do|select\s+case|select\s+type)\b" insensitive="true" beginRegion="Block"/>
+        <RegExpr attribute="Keyword" context="#stay" String="\b(program|module|submodule|block\s*data)\b" insensitive="true" beginRegion="Routine"/>
+        <RegExpr attribute="Keyword" context="#stay" String="\b(do\s*(,|\s)\s*concurrent|do|then|select\s+case|select\s+type|block|critical)\b" insensitive="true" beginRegion="Block"/>
       </context>
 <!-- The following context matches the end of program units -->
       <context attribute="Normal Text" lineEndContext="#stay" name="find_end_stmnts">
-        <RegExpr attribute="Keyword" context="#stay" String="\bend\s*(subroutine|function|block\s*data)\b" insensitive="true" endRegion="Routine"/>
-        <RegExpr attribute="Keyword" context="#stay" String="\bend\s*(program|module)\b" insensitive="true" endRegion="Routine"/>
-        <RegExpr attribute="Keyword" context="#stay" String="\bend\s*(do|if)\b" insensitive="true" endRegion="Block"/>
+        <RegExpr attribute="Keyword" context="#stay" String="\bend\s*(subroutine|function|procedure|block\s*data)\b" insensitive="true" endRegion="Routine"/>
+        <RegExpr attribute="Keyword" context="#stay" String="\bend\s*(program|module|submodule)\b" insensitive="true" endRegion="Routine"/>
+        <RegExpr attribute="Keyword" context="#stay" String="\bend\s*(do|if|block|critical)\b" insensitive="true" endRegion="Block"/>
         <RegExpr attribute="Keyword" context="#stay" String="\bend\s*(select|where|forall|interface|associate)\b" insensitive="true"/>
         <RegExpr attribute="Keyword" context="#stay" String="\belse\s*if\b" insensitive="true" endRegion="Block"/>
         <RegExpr attribute="Data Type" context="#stay" String="\bend\s*type\b" insensitive="true"/>
@@ -498,13 +499,16 @@
         <RegExpr attribute="Data Type" context="#stay" String="^\s*data\b" insensitive="true"/>
         <RegExpr attribute="Data Type" context="#stay" String="\bcharacter[*][0-9]+\b" insensitive="true"/>
         <RegExpr attribute="Data Type" context="find_paren" String="\b(type|class|integer|real|complex|character|logical|intent|dimension|extends|procedure|pass)\b\s*[(]" insensitive="true"/>
-        <RegExpr attribute="Data Type" context="#stay" String="\b(type|integer|real|complex|character|logical|double\s*precision|intent|dimension|procedure|pass)\b" insensitive="true"/>
+        <RegExpr attribute="Data Type" context="find_paren" String="\b(codimension)\b\s*[\[]" insensitive="true"/>
+        <RegExpr attribute="Data Type" context="#stay" String="\b(type|integer|real|complex|character|logical|double\s*precision|intent|dimension|codimension|procedure|pass)\b" insensitive="true"/>
         <Detect2Chars attribute="Data Type" context="#stay" char=":" char1=":"/>
       </context>
 <!-- This context matches parenthesis in data type declarations, such as in 'real(...)'-->
       <context attribute="Data Type" lineEndContext="#pop" name="find_paren">
         <DetectChar attribute="Data Type" context="find_paren" char="("/>
+        <DetectChar attribute="Data Type" context="find_paren" char="["/>
         <DetectChar attribute="Data Type" context="#pop" char=")"/>
+        <DetectChar attribute="Data Type" context="#pop" char="]"/>
       </context>
 
 <!-- The following context matches intrinsic procedures -->

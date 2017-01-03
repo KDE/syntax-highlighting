@@ -1,6 +1,7 @@
-project(KSyntaxHighlighting)
-
 cmake_minimum_required(VERSION 3.0)
+
+set(KF5_VERSION "5.30.0")
+project(KSyntaxHighlighting VERSION ${KF5_VERSION})
 
 find_package(ECM 5.29.0 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
@@ -21,9 +22,8 @@ include(KDEFrameworkCompilerSettings)
 include(KDECMakeSettings)
 include(ECMMarkNonGuiExecutable)
 
-set(KF5_VERSION "5.30.0")
 
-ecm_setup_version(${KF5_VERSION}
+ecm_setup_version(PROJECT
     VARIABLE_PREFIX SyntaxHighlighting
     VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/ksyntaxhighlighting_version.h"
     PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KF5SyntaxHighlightingConfigVersion.cmake"

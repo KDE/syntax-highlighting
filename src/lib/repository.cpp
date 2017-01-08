@@ -160,7 +160,7 @@ void RepositoryPrivate::loadSyntaxFolder(Repository *repo, const QString &path)
     if (loadSyntaxFolderFromIndex(repo, path))
         return;
 
-    QDirIterator it(path);
+    QDirIterator it(path, QStringList() << QLatin1String("*.xml"), QDir::Files);
     while (it.hasNext()) {
         Definition def;
         auto defData = DefinitionData::get(def);
@@ -207,7 +207,7 @@ void RepositoryPrivate::addDefinition(const Definition &def)
 
 void RepositoryPrivate::loadThemeFolder(const QString &path)
 {
-    QDirIterator it(path);
+    QDirIterator it(path, QStringList() << QLatin1String("*.theme"), QDir::Files);
     while (it.hasNext()) {
         auto themeData = std::unique_ptr<ThemeData>(new ThemeData);
         if (themeData->load(it.next()))

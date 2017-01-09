@@ -144,7 +144,7 @@ private Q_SLOTS:
                 << syntax;
         }
 
-        QDir().mkpath(QStringLiteral(TESTBUILDDIR "/output/"));
+        QVERIFY(QDir().mkpath(QStringLiteral(TESTBUILDDIR "/output/")));
     }
 
     void testHighlight()

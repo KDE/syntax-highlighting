@@ -26,7 +26,7 @@
 using namespace KSyntaxHighlighting;
 
 ContextSwitch::ContextSwitch() :
-    m_context(Q_NULLPTR),
+    m_context(nullptr),
     m_popCount(0)
 {
 }

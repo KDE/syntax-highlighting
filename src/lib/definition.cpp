@@ -43,7 +43,7 @@
 using namespace KSyntaxHighlighting;
 
 DefinitionData::DefinitionData() :
-    repo(Q_NULLPTR),
+    repo(nullptr),
     delimiters(QStringLiteral("\t !%&()*+,-./:;<=>?[\\]^{|}~")), // must be sorted!
     indentationBasedFolding(false),
     caseSensitive(Qt::CaseSensitive),
@@ -198,7 +198,7 @@ Context* DefinitionData::contextByName(const QString& name) const
         if (context->name() == name)
             return context;
     }
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 KeywordList DefinitionData::keywordList(const QString& name) const

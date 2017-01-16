@@ -84,7 +84,7 @@ class TestHighlighterTest : public QObject
 {
     Q_OBJECT
 public:
-    explicit TestHighlighterTest(QObject *parent = Q_NULLPTR) : QObject(parent), m_repo(Q_NULLPTR) {}
+    explicit TestHighlighterTest(QObject *parent = nullptr) : QObject(parent), m_repo(nullptr) {}
 private:
         Repository *m_repo;
         QSet<QString> m_coveredDefinitions;
@@ -117,7 +117,7 @@ private Q_SLOTS:
         qDebug() << "Syntax definitions with test coverage:" << ((float)m_coveredDefinitions.size() * 100.0f / (float)count) << "%";
 
         delete m_repo;
-        m_repo = Q_NULLPTR;
+        m_repo = nullptr;
     }
 
     void testHighlight_data()

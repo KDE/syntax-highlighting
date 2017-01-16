@@ -64,7 +64,7 @@ public:
      *
      * Optionally, @p parent is a pointer to the owner of this instance.
      */
-    explicit DefinitionDownloader(Repository *repo, QObject *parent = Q_NULLPTR);
+    explicit DefinitionDownloader(Repository *repo, QObject *parent = nullptr);
 
     /**
      * Destructor.

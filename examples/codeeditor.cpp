@@ -133,7 +133,7 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *event)
     noHlAction->setCheckable(true);
     hlActionGroup->addAction(noHlAction);
     noHlAction->setChecked(!m_highlighter->definition().isValid());
-    QMenu *hlSubMenu = Q_NULLPTR;
+    QMenu *hlSubMenu = nullptr;
     QString currentGroup;
     foreach (const auto &def, m_repository.definitions()) {
         if (def.isHidden())

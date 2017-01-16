@@ -52,7 +52,7 @@ class HighlighterBenchmark : public QObject
 {
     Q_OBJECT
 public:
-    explicit HighlighterBenchmark(QObject *parent = Q_NULLPTR) : QObject(parent), m_repo(Q_NULLPTR) {}
+    explicit HighlighterBenchmark(QObject *parent = nullptr) : QObject(parent), m_repo(nullptr) {}
 
 private:
     Repository *m_repo;
@@ -66,7 +66,7 @@ private Q_SLOTS:
     void cleanupTestCase()
     {
         delete m_repo;
-        m_repo = Q_NULLPTR;
+        m_repo = nullptr;
     }
 
     void benchmarkHighlight_data()

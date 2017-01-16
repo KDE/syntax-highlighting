@@ -36,7 +36,7 @@ class KSYNTAXHIGHLIGHTING_EXPORT SyntaxHighlighter : public QSyntaxHighlighter, 
 {
     Q_OBJECT
 public:
-    explicit SyntaxHighlighter(QObject *parent = Q_NULLPTR);
+    explicit SyntaxHighlighter(QObject *parent = nullptr);
     explicit SyntaxHighlighter(QTextDocument *document);
     ~SyntaxHighlighter();
 

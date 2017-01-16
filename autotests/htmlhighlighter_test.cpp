@@ -34,7 +34,7 @@ class HTMLHighlighterTest : public QObject
 {
     Q_OBJECT
 public:
-    explicit HTMLHighlighterTest(QObject *parent = Q_NULLPTR) : QObject(parent), m_repo(Q_NULLPTR) {}
+    explicit HTMLHighlighterTest(QObject *parent = nullptr) : QObject(parent), m_repo(nullptr) {}
 
 private:
     Repository *m_repo;
@@ -49,7 +49,7 @@ private Q_SLOTS:
     void cleanupTestCase()
     {
         delete m_repo;
-        m_repo = Q_NULLPTR;
+        m_repo = nullptr;
     }
 
     void testHighlight_data()

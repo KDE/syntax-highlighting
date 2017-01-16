@@ -25,7 +25,7 @@
 using namespace KSyntaxHighlighting;
 
 StateData::StateData() :
-    m_defData(Q_NULLPTR)
+    m_defData(nullptr)
 {
 }
 

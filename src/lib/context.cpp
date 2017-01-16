@@ -195,7 +195,7 @@ void Context::resolveIncludes()
             ++it;
             continue;
         }
-        Context* context = Q_NULLPTR;
+        Context* context = nullptr;
         auto myDefData = DefinitionData::get(m_def.definition());
         if (inc->definitionName().isEmpty()) { // local include
             context = myDefData->contextByName(inc->contextName());

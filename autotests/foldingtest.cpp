@@ -116,7 +116,7 @@ class FoldingTest : public QObject
 {
     Q_OBJECT
 public:
-    explicit FoldingTest(QObject *parent = Q_NULLPTR) : QObject(parent) {}
+    explicit FoldingTest(QObject *parent = nullptr) : QObject(parent) {}
 private:
 
 private Q_SLOTS:

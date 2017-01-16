@@ -32,7 +32,7 @@ class CodeEditor : public QPlainTextEdit
 {
     Q_OBJECT
 public:
-    explicit CodeEditor(QWidget *parent = Q_NULLPTR);
+    explicit CodeEditor(QWidget *parent = nullptr);
     ~CodeEditor();
 
     void openFile(const QString &fileName);

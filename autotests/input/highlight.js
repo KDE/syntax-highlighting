@@ -1,5 +1,5 @@
 /* test.js - test for javascript.xml syntax file */
-// Note: this script will not, and is not supposed to, comile in any js engine.
+// Note: this script will not, and is not supposed to, compile in any js engine.
 
 /* 
    NOTE: The words "todo", "fixme" and "note" should be rendered in a different style

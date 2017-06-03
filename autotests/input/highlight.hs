@@ -122,3 +122,13 @@ RealFrac, Real, Show
 -- data constructors
 
 EQ, False, GT, Just, LT, Left, Nothing, Right, True
+
+-- pragma with compiler flags
+
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+
+-- multiline pragma with language extensions
+
+{-# LANGUAGE OverlappingInstances,
+             BangPatterns
+#-}

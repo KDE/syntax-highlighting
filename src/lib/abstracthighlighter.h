@@ -75,6 +75,7 @@ class Theme;
  * notified whenever the Definition or the Theme changes.
  *
  * @see SyntaxHighlighter
+ * @since 5.28
  */
 class KSYNTAXHIGHLIGHTING_EXPORT AbstractHighlighter
 {

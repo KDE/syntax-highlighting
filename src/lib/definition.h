@@ -63,6 +63,7 @@ class DefinitionData;
  * with higher priority() wins.
  *
  * @see Repository
+ * @since 5.28
  */
 class KSYNTAXHIGHLIGHTING_EXPORT Definition
 {

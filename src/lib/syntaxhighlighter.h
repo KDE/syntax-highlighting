@@ -31,6 +31,8 @@ class SyntaxHighlighterPrivate;
 /** A QSyntaxHighlighter implementation for use with QTextDocument.
  *  This supports partial re-highlighting during editing and
  *  tracks syntax-based code folding regions.
+ *
+ *  @since 5.28
  */
 class KSYNTAXHIGHLIGHTING_EXPORT SyntaxHighlighter : public QSyntaxHighlighter, public AbstractHighlighter
 {

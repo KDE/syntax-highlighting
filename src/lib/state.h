@@ -31,6 +31,8 @@ class StateData;
  *  This needs to be fed into AbstractHighlighter for every line of text
  *  and allows concrete highlighter implementations to store state per
  *  line for fast re-highlighting of specific lines (e.g. during editing).
+ *
+ *  @since 5.28
  */
 class KSYNTAXHIGHLIGHTING_EXPORT State
 {

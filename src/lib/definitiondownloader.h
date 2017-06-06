@@ -52,6 +52,7 @@ class Repository;
  * @endcode
  *
  * @see Repository, Definition
+ * @since 5.28
  */
 class KSYNTAXHIGHLIGHTING_EXPORT DefinitionDownloader : public QObject
 {

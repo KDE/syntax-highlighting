@@ -51,6 +51,12 @@ QStringList readListing(const QString &fileName)
             listing.append(xml.text().toString());
         }
     }
+
+    if (xml.hasError()) {
+        qWarning() << "XML error while reading" << fileName << " - "
+            << qPrintable(xml.errorString()) << "@ offset" << xml.characterOffset();
+    }
+
     return listing;
 }
 
@@ -79,6 +85,7 @@ int main(int argc, char *argv[])
 
     QStringList hlFilenames = readListing(hlFilenamesListing);
     if (hlFilenames.isEmpty()) {
+        qWarning("Failed to read %s", qPrintable(hlFilenamesListing));
         return 3;
     }
 
@@ -93,7 +100,7 @@ int main(int argc, char *argv[])
     foreach (const QString &hlFilename, hlFilenames) {
         QFile hlFile(hlFilename);
         if (!hlFile.open(QIODevice::ReadOnly)) {
-            qWarning ("Failed to open %s.", qPrintable(hlFilename));
+            qWarning ("Failed to open %s", qPrintable(hlFilename));
             anyError = 3;
             continue;
         }

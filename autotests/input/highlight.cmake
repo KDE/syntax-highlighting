@@ -45,5 +45,7 @@ ENDMACRO(ECOS_ADD_EXECUTABLE)
 #calling a self-defined function, variables are also Qt::blue here
 ECOS_ADD_EXECUTABLE(${PROJECT_NAME} ${the_sources} ${qt4_moc_SRCS})
 
+if((A AND B) OR C)
+endif()
 
 

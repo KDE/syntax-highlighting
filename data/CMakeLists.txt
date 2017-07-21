@@ -22,17 +22,13 @@ set(defs
 
 # generate the resource file
 set(qrc_file ${CMAKE_CURRENT_BINARY_DIR}/syntax-data.qrc)
-file(REMOVE ${qrc_file})
-file(APPEND ${qrc_file} "<!DOCTYPE RCC>\n")
-file(APPEND ${qrc_file} "<RCC version=\"1.0\">\n")
-file(APPEND ${qrc_file} "<qresource prefix=\"/org.kde.syntax-highlighting/syntax\">\n")
+set(qrc_body "")
 foreach(def ${defs})
     get_filename_component(def_name ${def} NAME)
-    file(APPEND ${qrc_file} "<file alias=\"${def_name}\">${def}</file>\n")
+    string(APPEND qrc_body "<file alias=\"${def_name}\">${def}</file>\n")
 endforeach()
-file(APPEND ${qrc_file} "<file alias=\"index.katesyntax\">${CMAKE_CURRENT_BINARY_DIR}/index.katesyntax</file>\n")
-file(APPEND ${qrc_file} "</qresource>\n")
-file(APPEND ${qrc_file} "</RCC>\n")
+set(SYNTAX_DATA_QRC_FILES_STRING ${qrc_body})
+configure_file(syntax-data.qrc.in ${qrc_file} @ONLY)
 
 # generate the index file
 add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/index.katesyntax"

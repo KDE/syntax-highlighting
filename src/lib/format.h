@@ -38,6 +38,7 @@ class Theme;
  *  in the syntax definition file, and a theme.
  *
  *  @see Theme
+ *  @since 5.28
  */
 class KSYNTAXHIGHLIGHTING_EXPORT Format
 {

@@ -58,6 +58,27 @@ install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/ksyntaxhighlighting_export.h
     DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF5}/KSyntaxHighlighting)
 
+if(BUILD_QCH)
+    ecm_add_qch(
+        KF5SyntaxHighlighting_QCH
+        NAME KSyntaxHighlighting
+        BASE_NAME KF5SyntaxHighlighting
+        VERSION ${KF5_VERSION}
+        ORG_DOMAIN org.kde
+        SOURCES # using only public headers, to cover only public API
+            ${SyntaxHighlighting_HEADERS}
+        MD_MAINPAGE "${CMAKE_SOURCE_DIR}/README.md"
+        LINK_QCHS
+            Qt5Core_QCH
+            Qt5Gui_QCH
+        BLANK_MACROS
+            KSYNTAXHIGHLIGHTING_EXPORT
+            KSYNTAXHIGHLIGHTING_DEPRECATED
+        TAGFILE_INSTALL_DESTINATION ${KDE_INSTALL_QTQCHDIR}
+        QCH_INSTALL_DESTINATION ${KDE_INSTALL_QTQCHDIR}
+        COMPONENT Devel
+    )
+endif()
 ecm_generate_pri_file(
     BASE_NAME KSyntaxHighlighting LIB_NAME
     KF5SyntaxHighlighting

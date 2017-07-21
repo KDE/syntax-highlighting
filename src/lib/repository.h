@@ -70,6 +70,7 @@ class Theme;
  * either a light or a black color theme.
  *
  * @see Definition, Theme, AbstractHighlighter
+ * @since 5.28
  */
 class KSYNTAXHIGHLIGHTING_EXPORT Repository
 {

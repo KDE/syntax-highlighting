@@ -70,6 +70,7 @@ class RepositoryPrivate;
  * and therefore unusable.
  *
  * @see Format
+ * @since 5.28
  */
 class KSYNTAXHIGHLIGHTING_EXPORT Theme
 {

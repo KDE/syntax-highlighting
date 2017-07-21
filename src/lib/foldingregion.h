@@ -24,7 +24,8 @@
 
 namespace KSyntaxHighlighting {
 
-/** Represents a begin or end of a folding region. */
+/** Represents a begin or end of a folding region.
+ *  @since 5.28 */
 class KSYNTAXHIGHLIGHTING_EXPORT FoldingRegion
 {
 public:

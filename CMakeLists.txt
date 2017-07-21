@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.0)
 
-set(KF5_VERSION "5.33.0")
+set(KF5_VERSION "5.37.0")
 project(KSyntaxHighlighting VERSION ${KF5_VERSION})
 
-find_package(ECM 5.33.0 REQUIRED NO_MODULE)
+find_package(ECM 5.36.0 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 if(POLICY CMP0063)
     cmake_policy(SET CMP0063 NEW)
@@ -21,6 +21,7 @@ include(KDEInstallDirs)
 include(KDEFrameworkCompilerSettings)
 include(KDECMakeSettings)
 include(ECMMarkNonGuiExecutable)
+include(ECMAddQch)
 
 
 ecm_setup_version(PROJECT
@@ -42,6 +43,13 @@ set_package_properties(Qt5XmlPatterns PROPERTIES PURPOSE "Compile-time validatio
 find_package(Perl REQUIRED)
 set_package_properties(Perl PROPERTIES PURPOSE "Auto-generate PHP syntax definition files.")
 
+
+#
+# API documentation
+#
+option(BUILD_QCH "Build API documentation in QCH format (for e.g. Qt Assistant, Qt Creator & KDevelop)" OFF)
+add_feature_info(QCH ${BUILD_QCH} "API documentation in QCH format (for e.g. Qt Assistant, Qt Creator & KDevelop)")
+
 #
 # Translations
 #
@@ -62,6 +70,16 @@ add_subdirectory(autotests)
 # CMake package config file generation
 #
 set(CMAKECONFIG_INSTALL_DIR "${CMAKECONFIG_INSTALL_PREFIX}/KF5SyntaxHighlighting")
+
+if (BUILD_QCH)
+    ecm_install_qch_export(
+        TARGETS KF5SyntaxHighlighting_QCH
+        FILE KF5SyntaxHighlightingQchTargets.cmake
+        DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
+        COMPONENT Devel
+    )
+    set(PACKAGE_INCLUDE_QCHTARGETS "include(\"\${CMAKE_CURRENT_LIST_DIR}/KF5SyntaxHighlightingQchTargets.cmake\")")
+endif()
 
 configure_package_config_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/KF5SyntaxHighlightingConfig.cmake.in"

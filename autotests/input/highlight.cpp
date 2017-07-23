@@ -205,7 +205,7 @@ operator""a(const char*); // BUG
 
 "string"_s; // BUG colorized or
 "string"s; // BUG or not colorized
-"string"_s-b; // BUG
+"string"_s-b; // -b is not part of the string
 
 // Macro
 

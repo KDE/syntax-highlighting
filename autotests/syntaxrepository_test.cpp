@@ -113,7 +113,7 @@ private Q_SLOTS:
         QVERIFY(def.version() >= 1.11f);
         QVERIFY(def.isHidden());
         QCOMPARE(def.section(), QLatin1String("Other"));
-        QCOMPARE(def.license(), QLatin1String("LGPLv2+"));
+        QCOMPARE(def.license(), QLatin1String("MIT"));
         QVERIFY(def.author().contains(QLatin1String("Dominik")));
         QFileInfo fi(def.filePath());
         QVERIFY(fi.isAbsolute());

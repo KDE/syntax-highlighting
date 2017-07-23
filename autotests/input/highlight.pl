@@ -38,6 +38,17 @@ __EOF
 }
 
 sub blah {
+    my $str = << '    EOS';
+        this is my string
+        and it's continuation
+    EOS
+
+    $str = "hello world";
+
+    $str = << "    EOS";
+        this is my string
+        and it's continuation
+    EOS
 }
 
 &blah;

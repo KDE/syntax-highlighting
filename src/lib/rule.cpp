@@ -77,21 +77,14 @@ static int matchEscapedChar(const QString &text, int offset)
     return offset;
 }
 
-static QString quoteCapture(const QString &capture)
-{
-    auto quoted = capture;
-    return quoted.replace(QRegularExpression(QStringLiteral("(\\W)")), QStringLiteral("\\\\1"));
-}
-
 static QString replaceCaptures(const QString &pattern, const QStringList &captures, bool quote)
 {
     auto result = pattern;
-    for (int i = 1; i < captures.size(); ++i) {
-        result.replace(QLatin1Char('%') + QString::number(i), quote ? quoteCapture(captures.at(i)) : captures.at(i));
+    for (int i = captures.size() - 1; i >= 1; --i) {
+        result.replace(QLatin1Char('%') + QString::number(i), quote ? QRegularExpression::escape(captures.at(i)) : captures.at(i));
     }
     return result;
 }
-
 
 Rule::Rule() :
     m_column(-1),

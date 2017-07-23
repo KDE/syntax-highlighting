@@ -6,7 +6,7 @@
     '''
 
 def func(x):
-    """ API docs """
+    """ EXTENDED API docs """
     if x == 42:
         func()
         c1 = {}

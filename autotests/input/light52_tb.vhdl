@@ -178,3 +178,9 @@ uut: entity work.light52_mcu
     end process log_execution;
 
 end architecture testbench;
+
+
+-- these should be the same, see bug #368897
+A(A'high)  -- comment
+A(A'high ) -- comment
+

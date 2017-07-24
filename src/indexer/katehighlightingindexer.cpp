@@ -146,21 +146,35 @@ int main(int argc, char *argv[])
         // remember hl
         hls[QFileInfo(hlFile).fileName()] = hl;
 
-        // scan for broken regex
+        // scan for broken regex or keywords with spaces
         while (!xml.atEnd()) {
             xml.readNext();
-            if (!xml.isStartElement() || (xml.name() != QLatin1String("RegExpr") && xml.name() != QLatin1String("emptyLine"))) {
+            if (!xml.isStartElement()) {
                 continue;
             }
 
-            // get right attribute
-            const QString string (xml.attributes().value((xml.name() == QLatin1String("RegExpr")) ? QLatin1String("String") : QLatin1String("regexpr")).toString());
+            // scan for bad regex
+            if (xml.name() == QLatin1String("RegExpr") || xml.name() == QLatin1String("emptyLine")) {
+                // get right attribute
+                const QString string (xml.attributes().value((xml.name() == QLatin1String("RegExpr")) ? QLatin1String("String") : QLatin1String("regexpr")).toString());
 
-            // validate regexp
-            const QRegularExpression regexp (string);
-            if (!regexp.isValid()) {
-                qDebug() << hlFilename << "line" << xml.lineNumber() << "broken regex:" << string << "problem:" << regexp.errorString() << "at offset" << regexp.patternErrorOffset();
-                anyError = 7;
+                // validate regexp
+                const QRegularExpression regexp (string);
+                if (!regexp.isValid()) {
+                    qDebug() << hlFilename << "line" << xml.lineNumber() << "broken regex:" << string << "problem:" << regexp.errorString() << "at offset" << regexp.patternErrorOffset();
+                    anyError = 7;
+                }
+                continue;
+            }
+
+            // scan for bogus <item>     lala    </item> spaces
+            if (xml.name() == QLatin1String("item")) {
+                const QString keyword = xml.readElementText();
+                if (keyword != keyword.trimmed()) {
+                    qDebug() << hlFilename << "line" << xml.lineNumber() << "keyword with leading/trailing spaces:" << keyword;
+                    //anyError = 8;
+                }
+                continue;
             }
         }
     }

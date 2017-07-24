@@ -20,4 +20,7 @@ $var = <<<DOOH
 This is the $string inside the variable (which seems to be rendered as a string)
 It works well, I think.
 DOOH
+
+# bug 382527
+throw new ParserException("Test {$this->some_var[$index]}\nin {$this->file} is missing.\nThis is bad.");
 ?>

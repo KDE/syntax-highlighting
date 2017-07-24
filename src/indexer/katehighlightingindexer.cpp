@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
                 const QString keyword = xml.readElementText();
                 if (keyword != keyword.trimmed()) {
                     qDebug() << hlFilename << "line" << xml.lineNumber() << "keyword with leading/trailing spaces:" << keyword;
-                    //anyError = 8;
+                    anyError = 8;
                 }
                 continue;
             }
@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
     // create outfile, after all has worked!
     QFile outFile(app.arguments().at(1));
     if (!outFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-        return 7;
+        return 9;
 
     // write out json
     outFile.write(QJsonDocument::fromVariant(QVariant(hls)).toBinaryData());

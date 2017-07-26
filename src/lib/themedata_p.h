@@ -51,6 +51,10 @@ public:
      */
     QString name() const;
 
+    /**
+     * Returns the revision of this Theme.
+     * The revision in a .theme file should be increased with every change.
+     */
     int revision() const;
 
     /**
@@ -122,19 +126,29 @@ public:
      */
     QRgb editorColor(Theme::EditorColorRole role) const;
 
-
+    /**
+     * Returns the TextStyle override of a specific "itemData" with attributeName
+     * in the syntax definition called definitionName.
+     *
+     * If no override exists, a valid TextStyleData with the respective default
+     * TextStyle will be used, so the returned value is always valid.
+     */
     TextStyleData textStyleOverride(const QString &definitionName, const QString &attributeName) const;
 
 private:
     int m_revision;
     QString m_name;
+
+    //! Path to the file where the theme came from.
+    //! This is either a resource location (":/themes/Default.theme"), or a file
+    //! on disk (in a read-only or a writeable location).
     QString m_filePath;
 
     //! TextStyles
     TextStyleData m_textStyles[Theme::Others + 1];
 
     //! style overrides for individual itemData entries
-    // definition name -> attribute name -> style
+    //! definition name -> attribute name -> style
     QHash<QString, QHash<QString, TextStyleData> > m_textStyleOverrides;
 
     //! Editor area colors

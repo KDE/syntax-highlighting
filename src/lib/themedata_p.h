@@ -128,8 +128,6 @@ public:
 private:
     int m_revision;
     QString m_name;
-    QString m_author;
-    QString m_license;
     QString m_filePath;
 
     //! TextStyles

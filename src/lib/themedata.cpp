@@ -115,8 +115,6 @@ bool ThemeData::load(const QString &filePath)
     const QJsonObject metadata = obj.value(QLatin1String("metadata")).toObject();
     m_name = metadata.value(QLatin1String("name")).toString();
     m_revision = metadata.value(QLatin1String("revision")).toInt();
-    m_author = metadata.value(QLatin1String("author")).toString();
-    m_license = metadata.value(QLatin1String("license")).toString();
 
     // read text styles
     static const auto idx = Theme::staticMetaObject.indexOfEnumerator("TextStyle");

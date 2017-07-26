@@ -20,6 +20,7 @@
 #include "ksyntaxhighlighting_logging.h"
 
 #include <QFile>
+#include <QFileInfo>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
@@ -36,7 +37,6 @@ ThemeData* ThemeData::get(const Theme &theme)
 
 ThemeData::ThemeData()
     : m_revision(0)
-    , m_readOnly(true)
 {
     memset(m_editorColors, 0, sizeof(m_editorColors));
 }
@@ -117,7 +117,6 @@ bool ThemeData::load(const QString &filePath)
     m_revision = metadata.value(QLatin1String("revision")).toInt();
     m_author = metadata.value(QLatin1String("author")).toString();
     m_license = metadata.value(QLatin1String("license")).toString();
-    m_readOnly = metadata.value(QLatin1String("read-only")).toBool();
 
     // read text styles
     static const auto idx = Theme::staticMetaObject.indexOfEnumerator("TextStyle");
@@ -185,7 +184,7 @@ int ThemeData::revision() const
 
 bool ThemeData::isReadOnly() const
 {
-    return m_readOnly;
+    return !QFileInfo(m_filePath).isWritable();
 }
 
 QString ThemeData::filePath() const

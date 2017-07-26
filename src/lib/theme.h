@@ -271,7 +271,11 @@ public:
 
     /**
      * Returns @c true if this Theme is read-only.
-     * Typically, themes that are shipped by default are read-only.
+     *
+     * A Theme is read-only, if the filePath() points to a non-writable file.
+     * This is typically the case for Themes that are compiled into the executable
+     * as resource file, as well as for theme files that are installed in read-only
+     * system locations (e.g. /usr/share/).
      */
     bool isReadOnly() const;
 

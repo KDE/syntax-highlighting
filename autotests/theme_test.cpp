@@ -123,6 +123,9 @@ private Q_SLOTS:
         Theme t = m_repo.theme(QLatin1String("Default"));
         QVERIFY(t.isValid());
 
+        // Themes compiled in as resource are never writable
+        QVERIFY(t.isReadOnly());
+
         // make sure all editor colors are properly read
         QCOMPARE(t.editorColor(Theme::BackgroundColor)  , QColor("#ffffff").rgb());
         QCOMPARE(t.editorColor(Theme::TextSelection)    , QColor("#94caef").rgb());

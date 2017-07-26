@@ -131,7 +131,6 @@ private:
     QString m_author;
     QString m_license;
     QString m_filePath;
-    bool m_readOnly;
 
     //! TextStyles
     TextStyleData m_textStyles[Theme::Others + 1];

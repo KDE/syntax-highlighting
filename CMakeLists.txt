@@ -34,7 +34,11 @@ ecm_setup_version(PROJECT
 # Dependencies
 #
 set(REQUIRED_QT_VERSION "5.6.0")
-find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED COMPONENTS Core Gui Network Test)
+find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED COMPONENTS Core Network Test)
+option(KSYNTAXHIGHLIGHTING_USE_GUI "Build components depending on Qt5Gui" ON)
+if(KSYNTAXHIGHLIGHTING_USE_GUI)
+    find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED COMPONENTS Gui)
+endif()
 find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE QUIET OPTIONAL_COMPONENTS Widgets XmlPatterns)
 set_package_properties(Qt5 PROPERTIES URL "http://qt-project.org/")
 set_package_properties(Qt5Widgets PROPERTIES PURPOSE "Example application.")
@@ -63,8 +67,10 @@ endif()
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_subdirectory(data)
 add_subdirectory(src)
-add_subdirectory(examples)
-add_subdirectory(autotests)
+if(TARGET Qt5::Gui)
+    add_subdirectory(examples)
+    add_subdirectory(autotests)
+endif()
 
 #
 # CMake package config file generation
@@ -93,10 +99,12 @@ install(FILES
         DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
         COMPONENT Devel)
 
-install(EXPORT KF5SyntaxHighlightingTargets
+if(TARGET KF5SyntaxHighlighting)
+    install(EXPORT KF5SyntaxHighlightingTargets
         DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
         FILE KF5SyntaxHighlightingTargets.cmake
         NAMESPACE KF5::)
+endif()
 
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ksyntaxhighlighting_version.h"
         DESTINATION "${KDE_INSTALL_INCLUDEDIR_KF5}"

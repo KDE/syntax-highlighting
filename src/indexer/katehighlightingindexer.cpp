@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
                 // validate regexp
                 const QRegularExpression regexp (string);
                 if (!regexp.isValid()) {
-                    qDebug() << hlFilename << "line" << xml.lineNumber() << "broken regex:" << string << "problem:" << regexp.errorString() << "at offset" << regexp.patternErrorOffset();
+                    qWarning() << hlFilename << "line" << xml.lineNumber() << "broken regex:" << string << "problem:" << regexp.errorString() << "at offset" << regexp.patternErrorOffset();
                     anyError = 7;
                 }
                 continue;
@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
             if (xml.name() == QLatin1String("item")) {
                 const QString keyword = xml.readElementText();
                 if (keyword != keyword.trimmed()) {
-                    qDebug() << hlFilename << "line" << xml.lineNumber() << "keyword with leading/trailing spaces:" << keyword;
+                    qWarning() << hlFilename << "line" << xml.lineNumber() << "keyword with leading/trailing spaces:" << keyword;
                     anyError = 8;
                 }
                 continue;

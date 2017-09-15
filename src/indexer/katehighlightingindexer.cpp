@@ -164,6 +164,14 @@ int main(int argc, char *argv[])
                     qWarning() << hlFilename << "line" << xml.lineNumber() << "broken regex:" << string << "problem:" << regexp.errorString() << "at offset" << regexp.patternErrorOffset();
                     anyError = 7;
                 }
+
+                // catch possible case typos: [A-z] or [a-Z]
+                const int azOffset = std::max(string.indexOf(QStringLiteral("A-z")), string.indexOf(QStringLiteral("a-Z")));
+                if (azOffset >= 0) {
+                    qWarning() << hlFilename << "line" << xml.lineNumber() << "broken regex:" << string << "problem: [a-Z] or [A-z] at offset" << azOffset;
+                    anyError = 7;
+                }
+
                 continue;
             }
 

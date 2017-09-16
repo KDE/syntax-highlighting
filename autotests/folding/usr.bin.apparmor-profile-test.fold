@@ -1,0 +1,210 @@
+# Example AppArmor Profile.
+# License: Public Domain
+# Last change: August 29, 2017
+
+# NOTE: This profile is not fully functional, since
+# it is designed to test the syntax highlighting.
+
+include <tunables/global>
+
+# Declare an AppArmor variables to help with overrides
+@{FOO_LIB}=/usr/lib{,64,/*-linux-gnu}/foo
+@{USER_DIR}=@{HOME}/Public @{HOME}/Desktop
+
+# Profile for /usr/bin/foo
+/usr/bin/foo <beginfold id='2'>(</beginfold id='2'>attach_disconnected, enforce<endfold id='2'>)</endfold id='2'> <beginfold id='1'>{</beginfold id='1'>
+	include <abstractions/base>
+	include <abstractions/dbus>
+	include <abstractions/dbus-session>
+	include <abstractions/dbus-accessibility>
+	include <abstractions/fonts>
+	include <abstractions/X>
+	include <abstractions/kde>
+	include <abstractions/consoles>
+
+	#include <abstractions/ubuntu-helpers>
+	#include<abstractions/confidential-deny>
+	#include"/etc/apparmor.d/abstractions/open-browser"
+	include "/etc/apparmor.d/abstractions/open-email"
+
+	/{,**/} r<endfold id='3'>,</endfold id='3'># Read only directories
+
+	<beginfold id='3'>owner</beginfold id='3'> /{home,media,mnt,srv,net}/** r<endfold id='3'>,</endfold id='3'>
+	<beginfold id='3'>owner</beginfold id='3'> @{USER_DIR}/{,**} rw<endfold id='3'>,</endfold id='3'>
+
+	audit deny <beginfold id='3'>owner</beginfold id='3'> /**/* mx<endfold id='3'>,</endfold id='3'>
+	audit deny <beginfold id='3'>owner</beginfold id='3'> /**/**.py* r<endfold id='3'>,</endfold id='3'>
+
+	# Files supported
+	/**.[tT][xX][tT] r<endfold id='3'>,</endfold id='3'> # txt
+	/**.[wW][bB][mM][pP] r<endfold id='3'>,</endfold id='3'> # wbmp
+	/**.[wW][eE][bB][pP] r<endfold id='3'>,</endfold id='3'> # webp
+
+	# Local configuration
+	<beginfold id='3'>owner</beginfold id='3'> file @{HOME}/.local/share/foo/{,**} rwk<endfold id='3'>,</endfold id='3'>
+	<beginfold id='3'>owner</beginfold id='3'> @{HOME}/.local/share/RecentDocuments/* rwk<endfold id='3'>,</endfold id='3'>
+	<beginfold id='3'>owner</beginfold id='3'> @{HOME}/.config/foo/{,**} rwk<endfold id='3'>,</endfold id='3'>	
+	<beginfold id='3'>owner</beginfold id='3'> @{HOME}/.config/foorc{,.lock} rwk<endfold id='3'>,</endfold id='3'>
+	<beginfold id='3'>owner</beginfold id='3'> @{HOME}/.config/.[a-zA-Z0-9]* rwk<endfold id='3'>,</endfold id='3'>
+	<beginfold id='3'>owner</beginfold id='3'> @{HOME}/.cache/foo/{,**} rwk<endfold id='3'>,</endfold id='3'>
+
+	"/usr/share/**" r<endfold id='3'>,</endfold id='3'>
+	"/var/lib/flatpak/exports/share/**" r<endfold id='3'>,</endfold id='3'>
+	"/var/lib/flatpak/app/**/export/share/applications/*.desktop" r<endfold id='3'>,</endfold id='3'>
+	"/var/lib/snapd/desktop/applications/**" r<endfold id='3'>,</endfold id='3'>
+
+	allow <beginfold id='3'>file</beginfold id='3'> /etc/nsswitch.conf r<endfold id='3'>,</endfold id='3'>
+	allow /etc/fstab r<endfold id='3'>,</endfold id='3'>
+	/etc/udev/udev.conf r<endfold id='3'>,</endfold id='3'>
+	/etc/passwd r<endfold id='3'>,</endfold id='3'>
+	/etc/xdg/{,**} r<endfold id='3'>,</endfold id='3'>
+	/etc/xdg/Trolltech.conf k<endfold id='3'>,</endfold id='3'>
+	deny /etc/xdg/{autostart,systemd}/{,**} rw<endfold id='3'>,</endfold id='3'>
+	deny /boot/** rwlkmx<endfold id='3'>,</endfold id='3'>
+	@{PROC}/[0-9]*/{cmdline,mountinfo,mounts,stat,status,vmstat} r<endfold id='3'>,</endfold id='3'>
+	/sys/devices/**/uevent r<endfold id='3'>,</endfold id='3'>
+
+	# Libraries and binaries
+	/usr/bin/foo ixr<endfold id='3'>,</endfold id='3'>
+	/usr/bin/dolphin PUx<endfold id='3'>,</endfold id='3'>
+	/usr/bin/khelpcenter Cxr -> sanitized_helper<endfold id='3'>,</endfold id='3'>
+	/usr/bin/helloworld Cxr -> hello_world<endfold id='3'>,</endfold id='3'>
+	/usr/bin/* Pixr<endfold id='3'>,</endfold id='3'>
+	/usr/lib{,64}/** Pixr<endfold id='3'>,</endfold id='3'>
+	/usr/lib{,64,/*-linux-gnu}/qt5/plugins/{,**/}*.so m<endfold id='3'>,</endfold id='3'>
+	@{FOO_LIB}/{,**} mr<endfold id='3'>,</endfold id='3'>
+
+	# Temporal files and sockets
+	<beginfold id='3'>owner</beginfold id='3'> /tmp/{*lock,kde-*/**} rwk<endfold id='3'>,</endfold id='3'>
+	<beginfold id='3'>owner</beginfold id='3'> /var/tmp/kdecache-*/* rwk<endfold id='3'>,</endfold id='3'>
+	<beginfold id='3'>owner</beginfold id='3'> /run/user/[0-9]*/{*-socket,bus,kdeinit5*,foo*} rwk<endfold id='3'>,</endfold id='3'>
+	<beginfold id='3'>owner</beginfold id='3'> /run/user/[0-9]*/ksocket-*/{,**} rwk<endfold id='3'>,</endfold id='3'>
+	/run/dbus/system_bus_socket w<endfold id='3'>,</endfold id='3'>
+
+	/dev/{ati,dri}/** rw<endfold id='3'>,</endfold id='3'>
+	audit deny /dev/{audio,video}* rwlkmx<endfold id='3'>,</endfold id='3'>
+
+	# Dbus rules
+	<beginfold id='3'>dbus</beginfold id='3'> <beginfold id='2'>(</beginfold id='2'>send<endfold id='2'>)</endfold id='2'>
+		bus=system
+		path=/org/freedesktop/NetworkManager
+		interface=org.freedesktop.DBus.Introspectable
+		peer=<beginfold id='2'>(</beginfold id='2'>name=org.freedesktop.NetworkManager label=unconfined<endfold id='2'>)</endfold id='2'><endfold id='3'>,</endfold id='3'>
+	<beginfold id='3'>dbus</beginfold id='3'> <beginfold id='2'>(</beginfold id='2'>send receive<endfold id='2'>)</endfold id='2'>
+		bus=system
+		path=/org/freedesktop/NetworkManager
+		interface=org.freedesktop.NetworkManager
+		member={Introspect,state}
+		peer=<beginfold id='2'>(</beginfold id='2'>name=(org.freedesktop.NetworkManager|org.freedesktop.DBus)<endfold id='2'>)</endfold id='2'><endfold id='3'>,</endfold id='3'>
+	<beginfold id='3'>dbus</beginfold id='3'> <beginfold id='2'>(</beginfold id='2'>send<endfold id='2'>)</endfold id='2'>
+		bus=session
+		path=/org/gnome/GConf/Database/*
+		member={AddMatch,AddNotify,AllEntries,LookupExtended,RemoveNotify}<endfold id='3'>,</endfold id='3'>
+
+	# Signal rules
+	<beginfold id='3'>signal</beginfold id='3'> <beginfold id='2'>(</beginfold id='2'>send<endfold id='2'>)</endfold id='2'> set=<beginfold id='2'>(</beginfold id='2'>term<endfold id='2'>)</endfold id='2'> peer=unconfined<endfold id='3'>,</endfold id='3'>
+	<beginfold id='3'>signal</beginfold id='3'> <beginfold id='2'>(</beginfold id='2'>send, receive<endfold id='2'>)</endfold id='2'> set=<beginfold id='2'>(</beginfold id='2'>int exists<endfold id='2'>)</endfold id='2'> peer=/usr/lib/hello/world//foo-helper<endfold id='3'>,</endfold id='3'>
+
+	# Child profile
+	profile hello_world <beginfold id='1'>{</beginfold id='1'>
+		# File rules (three different ways)
+		<beginfold id='3'>file</beginfold id='3'> /usr/lib{,32,64}/helloworld/**.so mr<endfold id='3'>,</endfold id='3'>
+		/usr/lib{,32,64}/helloworld/** r<endfold id='3'>,</endfold id='3'>
+		rk /usr/lib{,32,64}/helloworld/hello,file<endfold id='3'>,</endfold id='3'>
+
+		# Link rules (two ways)
+		l /foo1 -> /bar<endfold id='3'>,</endfold id='3'>
+		<beginfold id='3'>link</beginfold id='3'> /foo2 -> bar<endfold id='3'>,</endfold id='3'>
+		<beginfold id='3'>link</beginfold id='3'> /foo3 to bar<endfold id='3'>,</endfold id='3'>
+		<beginfold id='3'>link</beginfold id='3'> subset /link* -> /**<endfold id='3'>,</endfold id='3'>
+
+		# Network rules
+		<beginfold id='3'>network</beginfold id='3'> inet6 tcp<endfold id='3'>,</endfold id='3'>#Allow access to tcp only for inet6 addresses
+		<beginfold id='3'>network</beginfold id='3'> netlink dgram<endfold id='3'>,</endfold id='3'>
+		<beginfold id='3'>network</beginfold id='3'> bluetooth<endfold id='3'>,</endfold id='3'>
+
+		# Capability rules
+		<beginfold id='3'>capability</beginfold id='3'> dac_override<endfold id='3'>,</endfold id='3'>
+		<beginfold id='3'>capability</beginfold id='3'> sys_admin<endfold id='3'>,</endfold id='3'>
+		<beginfold id='3'>capability</beginfold id='3'> sys_chroot<endfold id='3'>,</endfold id='3'>
+
+		# Mount rules
+		<beginfold id='3'>mount</beginfold id='3'> options=<beginfold id='2'>(</beginfold id='2'>rw bind remount nodev noexec<endfold id='2'>)</endfold id='2'> fstype=ecryptfs /home/*/.helloworld/ -> /home/*/helloworld/<endfold id='3'>,</endfold id='3'>
+		<beginfold id='3'>mount</beginfold id='3'> options in <beginfold id='2'>(</beginfold id='2'>rw, bind<endfold id='2'>)</endfold id='2'> / -> /run/hellowordd/*.mnt<endfold id='3'>,</endfold id='3'>
+		<beginfold id='3'>umount</beginfold id='3'> /home/*/helloworld/<endfold id='3'>,</endfold id='3'>
+
+		# Pivot Root rules
+		<beginfold id='3'>pivot_root</beginfold id='3'> oldroot=/mnt/root/old/ /mnt/root/<endfold id='3'>,</endfold id='3'>
+		<beginfold id='3'>pivot_root</beginfold id='3'> /mnt/root/<endfold id='3'>,</endfold id='3'>
+
+		# Ptrace rules
+		<beginfold id='3'>ptrace</beginfold id='3'> <beginfold id='2'>(</beginfold id='2'>trace<endfold id='2'>)</endfold id='2'> peer=unconfined<endfold id='3'>,</endfold id='3'>
+		<beginfold id='3'>ptrace</beginfold id='3'> <beginfold id='2'>(</beginfold id='2'>read, trace, tracedby<endfold id='2'>)</endfold id='2'> peer=/usr/lib/hello/helloword<endfold id='3'>,</endfold id='3'>
+
+		# Unix rules
+		<beginfold id='3'>unix</beginfold id='3'> <beginfold id='2'>(</beginfold id='2'>connect receive send<endfold id='2'>)</endfold id='2'> type=<beginfold id='2'>(</beginfold id='2'>stream<endfold id='2'>)</endfold id='2'> peer=<beginfold id='2'>(</beginfold id='2'>label=unconfined addr=@/tmp/ibus/dbus-*<endfold id='2'>)</endfold id='2'><endfold id='3'>,</endfold id='3'>
+		<beginfold id='3'>unix</beginfold id='3'> <beginfold id='2'>(</beginfold id='2'>send,receive<endfold id='2'>)</endfold id='2'> type=<beginfold id='2'>(</beginfold id='2'>stream<endfold id='2'>)</endfold id='2'> protocol=0 peer=<beginfold id='2'>(</beginfold id='2'>addr=none<endfold id='2'>)</endfold id='2'><endfold id='3'>,</endfold id='3'>
+		<beginfold id='3'>unix</beginfold id='3'> peer=<beginfold id='2'>(</beginfold id='2'>label=@{profile_name},addr=@helloworld<endfold id='2'>)</endfold id='2'><endfold id='3'>,</endfold id='3'>
+
+		# Rlimit rule
+		set <beginfold id='3'>rlimit</beginfold id='3'> data <= 100M<endfold id='3'>,</endfold id='3'>
+		set <beginfold id='3'>rlimit</beginfold id='3'> nproc <= 10<endfold id='3'>,</endfold id='3'>
+		set <beginfold id='3'>rlimit</beginfold id='3'> nice <= 5<endfold id='3'>,</endfold id='3'>
+
+		# Change Profile rules
+		<beginfold id='3'>change_profile</beginfold id='3'> unsafe /** -> [^u/]**<endfold id='3'>,</endfold id='3'>
+		<beginfold id='3'>change_profile</beginfold id='3'> unsafe /** -> {u,un,unc,unco,uncon,unconf,unconfi,unconfin,unconfine}<endfold id='3'>,</endfold id='3'>
+		<beginfold id='3'>change_profile</beginfold id='3'> /bin/bash -> new_profile<endfold id='3'>,</endfold id='3'>
+
+		# Alias
+		<beginfold id='3'>alias</beginfold id='3'> /usr/ -> /mnt/usr/<endfold id='3'>,</endfold id='3'>
+	<endfold id='1'>}</endfold id='1'>
+
+	# Hat
+	^foo-helper <beginfold id='1'>{</beginfold id='1'>
+		<beginfold id='3'>network</beginfold id='3'> unix stream<endfold id='3'>,</endfold id='3'>
+		<beginfold id='3'>unix</beginfold id='3'> stream<endfold id='3'>,</endfold id='3'>
+
+		/usr/hi\"esc\x23esc\032esc\c3esc r<endfold id='3'>,</endfold id='3'> # Escape expressions
+
+		# Text after a variable is highlighted as path
+		<beginfold id='3'>file</beginfold id='3'> /my/path r<endfold id='3'>,</endfold id='3'>
+		@{FOO_LIB}file r<endfold id='3'>,</endfold id='3'>
+		@{FOO_LIB}#my/path r<endfold id='3'>,</endfold id='3'> #Comment
+	<endfold id='1'>}</endfold id='1'>
+<endfold id='1'>}</endfold id='1'>
+
+# Profile for /usr/bin/error
+profile syntax_error /usr/bin/error flags=<beginfold id='2'>(</beginfold id='2'>complain audit<endfold id='2'>)</endfold id='2'> <beginfold id='1'>{</beginfold id='1'>
+	# Syntax error highlighting:
+
+	# Error: Include
+	include<filepath>
+	include <filepath >
+	#includefilepath
+	# include
+	<beginfold id='3'>file</beginfold id='3'> #include /hello r<endfold id='3'>,</endfold id='3'>
+
+	# Error: Variable open or with characters not allowed
+	@<beginfold id='1'>{</beginfold id='1'>var
+	@<beginfold id='1'>{</beginfold id='1'>sdf&s<endfold id='1'>}</endfold id='1'>
+
+	# Error: Open brackets
+	/{hello{ab,cd}world  kr<endfold id='3'>,</endfold id='3'>
+	/{abc{abc kr<endfold id='3'>,</endfold id='3'>
+	/[abc  kr<endfold id='3'>,</endfold id='3'>
+	/(abc kr<endfold id='3'>,</endfold id='3'>
+
+	# Error: Empty brackets
+	/hello[]hello{}hello()he  kr<endfold id='3'>,</endfold id='3'>
+
+	# Error: Open rule
+	/home/*/file rw
+	<endfold id='3'>capability</endfold id='3'> dac_override<beginfold id='3'>capability</beginfold id='3'> dac_override
+	<endfold id='3'>deny</endfold id='3'> file /etc/fstab w
+	<endfold id='3'>audit</endfold id='3'> network ieee802154<endfold id='3'>,</endfold id='3'>
+
+	<endfold id='3'>dbus</endfold id='3'> (receive<beginfold id='3'>dbus</beginfold id='3'> <beginfold id='2'>(</beginfold id='2'>receive
+	<endfold id='3'>unix</endfold id='3'> stream,<beginfold id='3'>unix</beginfold id='3'> stream<endfold id='3'>,</endfold id='3'>
+	<endfold id='3'>unix</endfold id='3'> stream,<beginfold id='3'>unix</beginfold id='3'> stream<endfold id='3'>,</endfold id='3'>
+}

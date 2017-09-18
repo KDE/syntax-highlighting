@@ -69,3 +69,5 @@
 (defn something-cool [] (first @state))
 
 (defn- something-different [] (first (into @state [12])))
+
+(defn- instance-getfield [this k] (@(.state this) k))

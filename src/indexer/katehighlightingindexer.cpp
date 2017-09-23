@@ -60,6 +60,66 @@ QStringList readListing(const QString &fileName)
     return listing;
 }
 
+QString filterContext(QString context)
+{
+    // filter out #stay and #pop
+    static QRegularExpression stayPop(QStringLiteral("^(#stay|#pop)+"));
+    context.remove(stayPop);
+
+    // filter out cross-language context references
+    if (context.contains(QStringLiteral("##")))
+        return QString();
+
+    // TODO: handle #pop!context"
+    if (context.startsWith(QLatin1Char('!')))
+        return QString();
+
+    return context;
+}
+
+/**
+ * Helper class to search for non-existing contexts
+ */
+class ContextChecker
+{
+public:
+    ContextChecker(const QString &filename)
+        : m_filename(filename)
+    {}
+
+    void processElement(QXmlStreamReader &xml)
+    {
+        if (xml.name() == QLatin1String("context")) {
+            const QString name = xml.attributes().value(QLatin1String("name")).toString();
+            m_existingContextNames.insert(name);
+
+            const QString lineEndContext = filterContext(xml.attributes().value(QLatin1String("lineEndContext")).toString());
+            if (!lineEndContext.isEmpty())
+                m_usedContextNames.insert(lineEndContext);
+        } else {
+            const QString context = filterContext(xml.attributes().value(QLatin1String("context")).toString());
+            if (!context.isEmpty())
+                m_usedContextNames.insert(context);
+        }
+    }
+
+    bool check() const
+    {
+        const auto invalidContextNames = m_usedContextNames - m_existingContextNames;
+        if (!invalidContextNames.isEmpty()) {
+            qWarning() << m_filename << "Reference of non-existing contexts:" << invalidContextNames;
+            return false;
+        }
+
+        return true;
+    }
+
+private:
+    QString m_filename;
+    QSet<QString> m_usedContextNames;
+    QSet<QString> m_existingContextNames;
+};
+
 }
 
 int main(int argc, char *argv[])
@@ -146,12 +206,17 @@ int main(int argc, char *argv[])
         // remember hl
         hls[QFileInfo(hlFile).fileName()] = hl;
 
+        ContextChecker contextChecker(hlFilename);
+
         // scan for broken regex or keywords with spaces
         while (!xml.atEnd()) {
             xml.readNext();
             if (!xml.isStartElement()) {
                 continue;
             }
+
+            // search for used/existing contexts if applicable
+            contextChecker.processElement(xml);
 
             // scan for bad regex
             if (xml.name() == QLatin1String("RegExpr") || xml.name() == QLatin1String("emptyLine")) {
@@ -185,6 +250,9 @@ int main(int argc, char *argv[])
                 continue;
             }
         }
+
+        if (!contextChecker.check())
+            anyError = 7;
     }
 
     // bail out if any problem was seen

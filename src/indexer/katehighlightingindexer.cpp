@@ -70,9 +70,9 @@ QString filterContext(QString context)
     if (context.contains(QStringLiteral("##")))
         return QString();
 
-    // TODO: handle #pop!context"
+    // handle #pop!context"
     if (context.startsWith(QLatin1Char('!')))
-        return QString();
+        context.remove(0, 1);
 
     return context;
 }
@@ -96,6 +96,10 @@ public:
             const QString lineEndContext = filterContext(xml.attributes().value(QLatin1String("lineEndContext")).toString());
             if (!lineEndContext.isEmpty())
                 m_usedContextNames.insert(lineEndContext);
+
+            const QString fallthroughContext = filterContext(xml.attributes().value(QLatin1String("fallthroughContext")).toString());
+            if (!fallthroughContext.isEmpty())
+                m_usedContextNames.insert(fallthroughContext);
         } else {
             const QString context = filterContext(xml.attributes().value(QLatin1String("context")).toString());
             if (!context.isEmpty())

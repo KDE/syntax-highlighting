@@ -60,6 +60,43 @@ QStringList readListing(const QString &fileName)
     return listing;
 }
 
+bool checkRegularExpression(const QString &hlFilename, QXmlStreamReader &xml)
+{
+    if (xml.name() == QLatin1String("RegExpr") || xml.name() == QLatin1String("emptyLine")) {
+        // get right attribute
+        const QString string (xml.attributes().value((xml.name() == QLatin1String("RegExpr")) ? QLatin1String("String") : QLatin1String("regexpr")).toString());
+
+        // validate regexp
+        const QRegularExpression regexp (string);
+        if (!regexp.isValid()) {
+            qWarning() << hlFilename << "line" << xml.lineNumber() << "broken regex:" << string << "problem:" << regexp.errorString() << "at offset" << regexp.patternErrorOffset();
+            return false;
+        }
+
+        // catch possible case typos: [A-z] or [a-Z]
+        const int azOffset = std::max(string.indexOf(QStringLiteral("A-z")), string.indexOf(QStringLiteral("a-Z")));
+        if (azOffset >= 0) {
+            qWarning() << hlFilename << "line" << xml.lineNumber() << "broken regex:" << string << "problem: [a-Z] or [A-z] at offset" << azOffset;
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool checkItemsTrimmed(const QString &hlFilename, QXmlStreamReader &xml)
+{
+    if (xml.name() == QLatin1String("item")) {
+        const QString keyword = xml.readElementText();
+        if (keyword != keyword.trimmed()) {
+            qWarning() << hlFilename << "line" << xml.lineNumber() << "keyword with leading/trailing spaces:" << keyword;
+            return false;
+        }
+    }
+
+    return true;
+}
+
 QString filterContext(QString context)
 {
     // filter out #stay and #pop
@@ -223,34 +260,14 @@ int main(int argc, char *argv[])
             contextChecker.processElement(xml);
 
             // scan for bad regex
-            if (xml.name() == QLatin1String("RegExpr") || xml.name() == QLatin1String("emptyLine")) {
-                // get right attribute
-                const QString string (xml.attributes().value((xml.name() == QLatin1String("RegExpr")) ? QLatin1String("String") : QLatin1String("regexpr")).toString());
-
-                // validate regexp
-                const QRegularExpression regexp (string);
-                if (!regexp.isValid()) {
-                    qWarning() << hlFilename << "line" << xml.lineNumber() << "broken regex:" << string << "problem:" << regexp.errorString() << "at offset" << regexp.patternErrorOffset();
-                    anyError = 7;
-                }
-
-                // catch possible case typos: [A-z] or [a-Z]
-                const int azOffset = std::max(string.indexOf(QStringLiteral("A-z")), string.indexOf(QStringLiteral("a-Z")));
-                if (azOffset >= 0) {
-                    qWarning() << hlFilename << "line" << xml.lineNumber() << "broken regex:" << string << "problem: [a-Z] or [A-z] at offset" << azOffset;
-                    anyError = 7;
-                }
-
+            if (!checkRegularExpression(hlFilename, xml)) {
+                anyError = 7;
                 continue;
             }
 
             // scan for bogus <item>     lala    </item> spaces
-            if (xml.name() == QLatin1String("item")) {
-                const QString keyword = xml.readElementText();
-                if (keyword != keyword.trimmed()) {
-                    qWarning() << hlFilename << "line" << xml.lineNumber() << "keyword with leading/trailing spaces:" << keyword;
-                    anyError = 8;
-                }
+            if (!checkItemsTrimmed(hlFilename, xml)) {
+                anyError = 8;
                 continue;
             }
         }

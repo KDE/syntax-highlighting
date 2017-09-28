@@ -9,28 +9,48 @@
 ]>
 
 <!--
-  AppArmor Profiles Syntax Highlighting Definition
-  for the KDE Editors Kate and KWrite.
+  AppArmor Profiles Syntax Highlighting Definition for KDE Kate.
+  ==========================================================================================
+   Copyright (c) 2017 Nibaldo González S. (nibgonz@gmail.com)
+
+   Permission is hereby granted, free of charge, to any person obtaining a copy of this
+   software and associated documentation files (the "Software"), to deal in the Software
+   without restriction, including without limitation the rights to use, copy, modify, merge,
+   publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+   persons to whom the Software is furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be included
+   in all copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+   INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+   PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+   COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+   AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  ==========================================================================================
 
   Last update:
 	Syntax highlighting based in AppArmor 2.11
 	For more details about the syntax of AppArmor profiles, visit:
-	http://manpages.ubuntu.com/manpages/zesty/man5/apparmor.d.5.html
-	http://wiki.apparmor.net/index.php/Documentation
+		http://manpages.ubuntu.com/manpages/zesty/man5/apparmor.d.5.html
+		http://wiki.apparmor.net/index.php/Documentation
 
   Change log:
-  	* Version 1 [22-Feb-2017, by Nibaldo González (nibgonz@gmail.com)]:
-		- Initial version.
-		- Support for profile syntax of Apparmor 2.11.
+	* Version 3 [24-Sep-2017, by Nibaldo González]:
+		- Update highlighting in DBus rules.
 	* Version 2 [29-Aug-2017, by Nibaldo González]:
 		- Improvements in highlighting and bug fixes.
 		- Each rule has its own context.
 		- The profile name is highlighted in the profile header and profile transition rules.
 		- Improvements in the detection of file paths and file globbing syntax.
-  -->
+	* Version 1 [22-Feb-2017, by Nibaldo González]:
+		- Initial version.
+		- Support for profile syntax of Apparmor 2.11.
+-->
 
 <language name="AppArmor Security Profile"
-		version="2"
+		version="3"
 		kateversion="5.0"
 		section="Markup"
 		extensions="usr.bin.*;usr.sbin.*;bin.*;sbin.*;usr.lib.*;usr.lib64.*;usr.libexec*;usr.local.bin.*;usr.local.sbin.*;usr.local.lib*;opt.*;etc.cron.*"
@@ -404,13 +424,14 @@
 			<item>receive</item>
 		</list>
 
-		<!-- Dbus Rule -->
+		<!-- DBus Rule -->
 		<list name="rule_dbus_options">
 			<item>peer</item>
 			<item>bus</item>
 			<item>path</item>
 			<item>interface</item>
 			<item>member</item>
+			<item>name</item>
 		</list>
 		<list name="rule_dbus_peer">
 			<item>name</item>
@@ -683,6 +704,7 @@
 			<context name="_common_rules" attribute="Normal Text" lineEndContext="#stay">
 				<IncludeRules context="_common"/>
 				<IncludeRules context="_pcre_escape_str"/>
+				<!-- Highlight as path the text after the operator '=' (except for simple words) -->
 				<RegExpr context="_path_content" attribute="Operator 1" String="\=\s*(?=[^\s\(]*[\*\?\\@\[\{/\.])" insensitive="true"/>
 				<IncludeRules context="_operators"/>
 				<IncludeRules context="_path"/>
@@ -785,7 +807,7 @@
 				<keyword context="#stay" attribute="Permissions" String="common_accesses"/>
 			</context>
 			
-			<!-- Dbus Rule -->
+			<!-- DBus Rule -->
 			<context name="_rule_dbus" attribute="Normal Text" lineEndContext="#stay">
 				<IncludeRules context="_common_rules"/>
 				<IncludeRules context="_end_rule"/>
@@ -794,7 +816,6 @@
 				<DetectChar context="_parentheses_block_dbus" attribute="Normal Text" char="(" beginRegion="Parentheses Block"/>
 
 				<keyword context="#stay" attribute="Option" String="rule_dbus_options"/>
-				<keyword context="#stay" attribute="Other Option" String="rule_dbus_peer"/>
 				<keyword context="#stay" attribute="Permissions" String="rule_dbus_access"/>
 				<keyword context="#stay" attribute="Other Data" String="rule_dbus_bus"/>
 			</context>

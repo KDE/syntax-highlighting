@@ -138,6 +138,9 @@ void RepositoryPrivate::load(Repository *repo)
 
     loadSyntaxFolder(repo, QStringLiteral(":/org.kde.syntax-highlighting/syntax"));
 
+    foreach (const auto &path, m_customSearchPaths)
+        loadSyntaxFolder(repo, path + QStringLiteral("/syntax"));
+
     m_sortedDefs.reserve(m_defs.size());
     for (auto it = m_defs.constBegin(); it != m_defs.constEnd(); ++it)
         m_sortedDefs.push_back(it.value());
@@ -153,6 +156,9 @@ void RepositoryPrivate::load(Repository *repo)
     foreach (const auto &dir, dirs)
         loadThemeFolder(dir);
     loadThemeFolder(QStringLiteral(":/org.kde.syntax-highlighting/themes"));
+
+    foreach (const auto &path, m_customSearchPaths)
+        loadThemeFolder(path + QStringLiteral("/themes"));
 }
 
 void RepositoryPrivate::loadSyntaxFolder(Repository *repo, const QString &path)
@@ -265,4 +271,15 @@ void Repository::reload()
     d->m_formatId = 0;
 
     d->load(this);
+}
+
+void Repository::addCustomSearchPath(const QString &path)
+{
+    d->m_customSearchPaths.append(path);
+    reload();
+}
+
+QVector<QString> Repository::customSearchPaths() const
+{
+    return d->m_customSearchPaths;
 }

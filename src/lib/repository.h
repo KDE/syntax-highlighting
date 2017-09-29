@@ -153,6 +153,20 @@ public:
      */
     void reload();
 
+    /**
+     * Add a custom search path to the repository.
+     * This path will be searched in addition to the usual locations for
+     * syntax and theme definition files.
+     */
+    void addCustomSearchPath(const QString &path);
+
+    /**
+     * Returns the list of custom search paths added to the repository.
+     * By default, this list is empty.
+     * @see addCustomSearchPath()
+     */
+    QVector<QString> customSearchPaths() const;
+
 private:
     Q_DISABLE_COPY(Repository)
     friend class RepositoryPrivate;

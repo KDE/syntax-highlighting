@@ -15,6 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "test-config.h"
+
 #include <abstracthighlighter.h>
 #include <definition.h>
 #include <format.h>
@@ -176,6 +178,22 @@ private Q_SLOTS:
             hl.setTheme(repo.defaultTheme());
         }
         hl.highlightLine(QLatin1String("/**! @todo this should not crash .*/"), State());
+    }
+
+    void testCustomPath()
+    {
+        QString testInputPath = QStringLiteral(TESTSRCDIR "/input");
+
+        Repository repo;
+        QVERIFY(repo.customSearchPaths().empty());
+        repo.addCustomSearchPath(testInputPath);
+        QCOMPARE(repo.customSearchPaths().size(), 1);
+        QCOMPARE(repo.customSearchPaths()[0], testInputPath);
+
+        auto customDefinition = repo.definitionForName(QLatin1String("Test Syntax"));
+        QVERIFY(customDefinition.isValid());
+        auto customTheme = repo.theme(QLatin1String("Test Theme"));
+        QVERIFY(customTheme.isValid());
     }
 };
 }

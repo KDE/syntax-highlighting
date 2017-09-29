@@ -47,6 +47,8 @@ public:
     quint16 foldingRegionId(const QString &defName, const QString &foldName);
     quint16 nextFormatId();
 
+    QVector<QString> m_customSearchPaths;
+
     QHash<QString, Definition> m_defs;
     QVector<Definition> m_sortedDefs;
 

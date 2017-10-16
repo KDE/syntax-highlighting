@@ -1,5 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="C#" version="2" kateversion="5.0" section="Sources" extensions="*.cs" mimetype="text/x-csharp-src;text/x-csharp-hde">
+<!--
+    original author unknown
+    
+    v2.1 Gene Thomas <gene@genethomas.com>
+         added @"string" support
+         
+    @todo: @"{varname}" and $@"{varname} interpolated strings
+           https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/interpolated-strings
+ -->
+<language name="C#" version="2.1" kateversion="5.0" section="Sources" extensions="*.cs" mimetype="text/x-csharp-src;text/x-csharp-hde">
   <highlighting>
     <list name="keywords">
       <item>abstract</item>
@@ -111,6 +121,7 @@
         </Int>
         <HlCChar attribute="Char" context="#stay"/>
         <DetectChar attribute="String" context="String" char="&quot;"/>
+        <Detect2Chars attribute="Verbatim String" context="Verbatim String" char="@" char1="&quot;"/>
         <IncludeRules context="##Doxygen" />
         <Detect2Chars attribute="Comment" context="Commentar 1" char="/" char1="/"/>
         <Detect2Chars attribute="Comment" context="Commentar 2" char="/" char1="*"/>
@@ -132,6 +143,10 @@
         <HlCStringChar attribute="String Char" context="#stay"/>
         <DetectChar attribute="String" context="#pop" char="&quot;"/>
       </context>
+      <context attribute="Verbatim String" lineEndContext="#stay" name="Verbatim String">
+        <Detect2Chars attribute="Verbatim Special" context="#stay" char="&quot;" char1="&quot;"/>
+        <DetectChar attribute="Verbatim String" context="#pop" char="&quot;"/>
+      </context>
       <context attribute="Normal Text" lineEndContext="#pop" name="Member" fallthrough="true" fallthroughContext="#pop">
         <RegExpr attribute="Function" context="#pop" String="\b[_\w][_\w\d]*(?=[\s]*)" />
       </context>
@@ -141,19 +156,21 @@
       </context>
     </contexts>
     <itemDatas>
-      <itemData name="Normal Text"  defStyleNum="dsNormal"/>
-      <itemData name="Keyword"      defStyleNum="dsKeyword"/>
-      <itemData name="Function"     defStyleNum="dsFunction"/>
-      <itemData name="Data Type"    defStyleNum="dsDataType"/>
-      <itemData name="Decimal"      defStyleNum="dsDecVal"/>
-      <itemData name="Octal"        defStyleNum="dsBaseN"/>
-      <itemData name="Hex"          defStyleNum="dsBaseN"/>
-      <itemData name="Float"        defStyleNum="dsFloat"/>
-      <itemData name="Char"         defStyleNum="dsChar"/>
-      <itemData name="String"       defStyleNum="dsString"/>
-      <itemData name="String Char"  defStyleNum="dsSpecialChar"/>
-      <itemData name="Comment"      defStyleNum="dsComment"/>
-      <itemData name="Symbol"       defStyleNum="dsNormal"/>
+      <itemData name="Normal Text"      defStyleNum="dsNormal"/>
+      <itemData name="Keyword"          defStyleNum="dsKeyword"/>
+      <itemData name="Function"         defStyleNum="dsFunction"/>
+      <itemData name="Data Type"        defStyleNum="dsDataType"/>
+      <itemData name="Decimal"          defStyleNum="dsDecVal"/>
+      <itemData name="Octal"            defStyleNum="dsBaseN"/>
+      <itemData name="Hex"              defStyleNum="dsBaseN"/>
+      <itemData name="Float"            defStyleNum="dsFloat"/>
+      <itemData name="Char"             defStyleNum="dsChar"/>
+      <itemData name="String"           defStyleNum="dsString"/>
+      <itemData name="String Char"      defStyleNum="dsSpecialString"/>
+      <itemData name="Verbatim String"  defStyleNum="dsVerbatimString"/>
+      <itemData name="Verbatim Special" defStyleNum="dsSpecialChar"/>
+      <itemData name="Comment"          defStyleNum="dsComment"/>
+      <itemData name="Symbol"           defStyleNum="dsNormal"/>
     </itemDatas>
   </highlighting>
   <general>

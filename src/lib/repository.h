@@ -69,6 +69,46 @@ class Theme;
  * Additionally, defaultTheme() provides a way to obtain a default theme for
  * either a light or a black color theme.
  *
+ * @section repo_search_paths Search Paths
+ *
+ * All highlighting Definition and Theme files are compiled into the shared
+ * KSyntaxHighlighting library by using the Qt resource system. Loading
+ * additional files from disk is supported as well.
+ *
+ * Loading syntax Definition files works as follows:
+ * -# First, all syntax highlighting files are loaded that are located in
+ *    QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("org.kde.syntax-highlighting/syntax"), QStandardPaths::LocateDirectory);
+ *    Under Unix, this uses $XDG_DATA_HOME and $XDG_DATA_DIRS, which could
+ *    map to $HOME/.local5/share/org.kde.syntax-highlighting/syntax and
+ *    /usr/share/org.kde.syntax-highlighting/syntax.
+ * -# Next, for backwards compatibility with Kate, all syntax highlighting
+ *    files are loaded that are located in
+ *    QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("katepart5/syntax"), QStandardPaths::LocateDirectory);
+ *    Again, under Unix, this uses $XDG_DATA_HOME and $XDG_DATA_DIRS, which
+ *    could map to $HOME/.local5/share/katepart5/syntax and
+ *    /usr/share/katepart5/syntax.
+ * -# Then, all files compiled into the library through resources are loaded.
+ *    The internal resource path is ":/org.kde.syntax-highlighting/syntax".
+ *    This path should never be touched by other applications.
+ * -# Finally, the search path can be extended by calling addCustomSearchPath().
+ *    A custom search path can either be a path on disk or again a path to
+ *    a Qt resoruce.
+ *
+ * Similarly, loading Theme files works as follows:
+ * -# First, all Theme files are loaded that are located in
+ *    QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("org.kde.syntax-highlighting/themes"), QStandardPaths::LocateDirectory);
+ *    Under Unix, this uses $XDG_DATA_HOME and $XDG_DATA_DIRS, which could
+ *    map to $HOME/.local5/share/org.kde.syntax-highlighting/themes and
+ *    /usr/share/org.kde.syntax-highlighting/themes.
+ * -# Then, all files compiled into the library through resources are loaded.
+ *    The internal resource path is ":/org.kde.syntax-highlighting/themes".
+ *    This path should never be touched by other applications.
+ * -# Finally, all Theme%s located in the paths added addCustomSearchPath()
+ *    are loaded.
+ *
+ * @note Whenever a Definition or a Theme exists twice, the variant with
+ *       higher version is used.
+ *
  * @see Definition, Theme, AbstractHighlighter
  * @since 5.28
  */
@@ -155,15 +195,25 @@ public:
 
     /**
      * Add a custom search path to the repository.
-     * This path will be searched in addition to the usual locations for
-     * syntax and theme definition files.
+     * This path will be searched in addition to the usual locations for syntax
+     * and theme definition files. Both locations on disk as well as Qt
+     * resource paths are supported.
+     *
+     * @note Internally, the two sub-folders @p path/syntax as well as
+     *       @p path/themes are searched for additional Definition%s and
+     *       Theme%s. Do not append @e syntax or @e themes to @p path
+     *       yourself.
+     *
+     * @since 5.39
      */
     void addCustomSearchPath(const QString &path);
 
     /**
      * Returns the list of custom search paths added to the repository.
      * By default, this list is empty.
+     *
      * @see addCustomSearchPath()
+     * @since 5.39
      */
     QVector<QString> customSearchPaths() const;
 

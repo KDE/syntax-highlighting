@@ -197,8 +197,13 @@ public:
     {
         if (xml.name() == QLatin1String("itemData")) {
             const QString name = xml.attributes().value(QLatin1String("name")).toString();
-            if (!name.isEmpty())
-                m_existingAttributeNames.insert(name);
+            if (!name.isEmpty()) {
+                if (m_existingAttributeNames.contains(name)) {
+                    qWarning() << m_filename << "itemData duplicate:" << name;
+                } else {
+                    m_existingAttributeNames.insert(name);
+                }
+            }
         } else {
             const QString name = xml.attributes().value(QLatin1String("attribute")).toString();
             if (!name.isEmpty())

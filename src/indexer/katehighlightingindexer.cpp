@@ -281,6 +281,11 @@ public:
             return false;
         }
 
+        auto unusedNames = m_existingAttributeNames - m_usedAttributeNames;
+        if (!unusedNames.isEmpty()) {
+            qWarning() << m_filename << "Unused itemData:" << unusedNames;
+        }
+
         return true;
     }
 

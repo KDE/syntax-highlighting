@@ -97,6 +97,28 @@ bool checkItemsTrimmed(const QString &hlFilename, QXmlStreamReader &xml)
     return true;
 }
 
+bool checkSingleChars(const QString &hlFilename, QXmlStreamReader &xml)
+{
+    const bool testChar = xml.name() == QLatin1String("DetectChar");
+    const bool testChar1 = xml.name() == QLatin1String("Detect2Chars");
+
+    if (testChar) {
+        const QString c = xml.attributes().value(QLatin1String("char")).toString();
+        if (c.size() != 1) {
+            qWarning() << hlFilename << "line" << xml.lineNumber() << "'char' must contain exactly one char:" << c;
+        }
+    }
+
+    if (testChar1) {
+        const QString c = xml.attributes().value(QLatin1String("char1")).toString();
+        if (c.size() != 1) {
+            qWarning() << hlFilename << "line" << xml.lineNumber() << "'char1' must contain exactly one char:" << c;
+        }
+    }
+
+    return true;
+}
+
 QString filterContext(QString context)
 {
     // filter out #stay and #pop
@@ -314,6 +336,13 @@ int main(int argc, char *argv[])
                 anyError = 8;
                 continue;
             }
+
+            // check single chars in DetectChar and Detect2Chars
+            if (!checkSingleChars(hlFilename, xml)) {
+//                 anyError = 8;
+                continue;
+            }
+
         }
 
         if (!contextChecker.check())

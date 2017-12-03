@@ -197,6 +197,10 @@ public:
     {
         if (xml.name() == QLatin1String("context")) {
             const QString name = xml.attributes().value(QLatin1String("name")).toString();
+            if (m_firstContext.isEmpty()) {
+                m_firstContext = name;
+            }
+
             if (m_existingContextNames.contains(name)) {
                 qWarning() << m_filename << "context duplicate:" << name;
             } else {
@@ -225,11 +229,18 @@ public:
             return false;
         }
 
+        auto unusedNames = m_existingContextNames - m_usedContextNames;
+        unusedNames.remove(m_firstContext);
+        if (!unusedNames.isEmpty()) {
+            qWarning() << m_filename << "Unused contexts:" << unusedNames;
+        }
+
         return true;
     }
 
 private:
     QString m_filename;
+    QString m_firstContext;
     QSet<QString> m_usedContextNames;
     QSet<QString> m_existingContextNames;
 };

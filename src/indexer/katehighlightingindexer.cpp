@@ -161,6 +161,46 @@ private:
     QSet<QString> m_existingContextNames;
 };
 
+/**
+ * Helper class to search for non-existing itemDatas.
+ */
+class AttributeChecker
+{
+public:
+    AttributeChecker(const QString &filename)
+        : m_filename(filename)
+    {}
+
+    void processElement(QXmlStreamReader &xml)
+    {
+        if (xml.name() == QLatin1String("itemData")) {
+            const QString name = xml.attributes().value(QLatin1String("name")).toString();
+            if (!name.isEmpty())
+                m_existingAttributeNames.insert(name);
+        } else {
+            const QString name = xml.attributes().value(QLatin1String("attribute")).toString();
+            if (!name.isEmpty())
+                m_usedAttributeNames.insert(name);
+        }
+    }
+
+    bool check() const
+    {
+        const auto invalidNames = m_usedAttributeNames - m_existingAttributeNames;
+        if (!invalidNames.isEmpty()) {
+            qWarning() << m_filename << "Reference of non-existing itemData attributes:" << invalidNames;
+            return false;
+        }
+
+        return true;
+    }
+
+private:
+    QString m_filename;
+    QSet<QString> m_usedAttributeNames;
+    QSet<QString> m_existingAttributeNames;
+};
+
 }
 
 int main(int argc, char *argv[])
@@ -248,6 +288,7 @@ int main(int argc, char *argv[])
         hls[QFileInfo(hlFile).fileName()] = hl;
 
         ContextChecker contextChecker(hlFilename);
+        AttributeChecker attributeChecker(hlFilename);
 
         // scan for broken regex or keywords with spaces
         while (!xml.atEnd()) {
@@ -258,6 +299,9 @@ int main(int argc, char *argv[])
 
             // search for used/existing contexts if applicable
             contextChecker.processElement(xml);
+
+            // search for used/existing attributes if applicable
+            attributeChecker.processElement(xml);
 
             // scan for bad regex
             if (!checkRegularExpression(hlFilename, xml)) {
@@ -274,6 +318,10 @@ int main(int argc, char *argv[])
 
         if (!contextChecker.check())
             anyError = 7;
+
+        if (!attributeChecker.check()) {
+            //anyError = 7;
+        }
     }
 
     // bail out if any problem was seen

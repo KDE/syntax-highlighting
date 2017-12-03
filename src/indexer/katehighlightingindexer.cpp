@@ -137,6 +137,53 @@ QString filterContext(QString context)
 }
 
 /**
+ * Helper class to search for non-existing or unreferenced keyword lists.
+ */
+class KeywordChecker
+{
+public:
+    KeywordChecker(const QString &filename)
+        : m_filename(filename)
+    {}
+
+    void processElement(QXmlStreamReader &xml)
+    {
+        if (xml.name() == QLatin1String("list")) {
+            const QString name = xml.attributes().value(QLatin1String("name")).toString();
+            if (m_existingNames.contains(name)) {
+                qWarning() << m_filename << "list duplicate:" << name;
+            }
+            m_existingNames.insert(name);
+        } else if (xml.name() == QLatin1String("keyword")) {
+            const QString context = xml.attributes().value(QLatin1String("String")).toString();
+            if (!context.isEmpty())
+                m_usedNames.insert(context);
+        }
+    }
+
+    bool check() const
+    {
+        const auto invalidNames = m_usedNames - m_existingNames;
+        if (!invalidNames.isEmpty()) {
+            qWarning() << m_filename << "Reference of non-existing keyword list:" << invalidNames;
+            return false;
+        }
+
+        const auto unusedNames = m_existingNames - m_usedNames;
+        if (!unusedNames.isEmpty()) {
+            qWarning() << m_filename << "Unused keyword lists:" << unusedNames;
+        }
+
+        return true;
+    }
+
+private:
+    QString m_filename;
+    QSet<QString> m_usedNames;
+    QSet<QString> m_existingNames;
+};
+
+/**
  * Helper class to search for non-existing contexts
  */
 class ContextChecker
@@ -320,6 +367,7 @@ int main(int argc, char *argv[])
 
         ContextChecker contextChecker(hlFilename);
         AttributeChecker attributeChecker(hlFilename);
+        KeywordChecker keywordChecker(hlFilename);
 
         // scan for broken regex or keywords with spaces
         while (!xml.atEnd()) {
@@ -333,6 +381,9 @@ int main(int argc, char *argv[])
 
             // search for used/existing attributes if applicable
             attributeChecker.processElement(xml);
+
+            // search for used/existing keyword lists if applicable
+            keywordChecker.processElement(xml);
 
             // scan for bad regex
             if (!checkRegularExpression(hlFilename, xml)) {
@@ -358,6 +409,10 @@ int main(int argc, char *argv[])
             anyError = 7;
 
         if (!attributeChecker.check()) {
+            //anyError = 7;
+        }
+
+        if (!keywordChecker.check()) {
             //anyError = 7;
         }
     }

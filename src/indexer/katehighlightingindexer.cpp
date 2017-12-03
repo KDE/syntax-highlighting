@@ -150,7 +150,11 @@ public:
     {
         if (xml.name() == QLatin1String("context")) {
             const QString name = xml.attributes().value(QLatin1String("name")).toString();
-            m_existingContextNames.insert(name);
+            if (m_existingContextNames.contains(name)) {
+                qWarning() << m_filename << "context duplicate:" << name;
+            } else {
+                m_existingContextNames.insert(name);
+            }
 
             const QString lineEndContext = filterContext(xml.attributes().value(QLatin1String("lineEndContext")).toString());
             if (!lineEndContext.isEmpty())

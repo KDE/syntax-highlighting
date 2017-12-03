@@ -99,8 +99,8 @@ bool checkItemsTrimmed(const QString &hlFilename, QXmlStreamReader &xml)
 
 bool checkSingleChars(const QString &hlFilename, QXmlStreamReader &xml)
 {
-    const bool testChar = xml.name() == QLatin1String("DetectChar");
     const bool testChar1 = xml.name() == QLatin1String("Detect2Chars");
+    const bool testChar = testChar1 || xml.name() == QLatin1String("DetectChar");
 
     if (testChar) {
         const QString c = xml.attributes().value(QLatin1String("char")).toString();

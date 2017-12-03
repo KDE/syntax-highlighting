@@ -8,7 +8,7 @@
         <!ENTITY noword   "(?![\w$+-])">		<!-- no word, $, + or - following -->
         <!ENTITY pathpart "([\w_@.&#37;*?+-]|\\ )">     <!-- valid character in a file name -->
 ]>
-<language name="Tcsh" version="1" kateversion="2.4" section="Scripts" extensions="*.csh;*.tcsh;csh.cshrc;csh.login;.tcshrc;.cshrc;.login" mimetype="application/x-csh" casesensitive="1" author="Matthew Woehlke (mw_triad@users.sourceforge.net)" license="LGPL">
+<language name="Tcsh" version="2" kateversion="5.0" section="Scripts" extensions="*.csh;*.tcsh;csh.cshrc;csh.login;.tcshrc;.cshrc;.login" mimetype="application/x-csh" casesensitive="1" author="Matthew Woehlke (mw_triad@users.sourceforge.net)" license="LGPL">
 
 <!-- (c) 2006 Matthew Woehlke (mw_triad@users.sourceforge.net)
     Based on the bash highlighter by Wilbert Berendsen (wilbert@kde.nl)
@@ -522,11 +522,11 @@
         <RegExpr attribute="Option" context="#stay" String="--[a-z][A-Za-z0-9_-]*" />
         <!-- handle variable assignments -->
 <!--R--><RegExpr attribute="Keyword" context="#stay" String="\b@\s" />
-<!--R--><RegExpr attribute="Keyword" context="#stay" String="\bset\s" />
-        <RegExpr attribute="Keyword" context="CmdSetEnv" String="\bsetenv\s" />
+<!--R--><WordDetect attribute="Keyword" context="#stay" String="set" />
+        <WordDetect attribute="Keyword" context="CmdSetEnv" String="setenv" />
         <!-- handle functions with function keyword before keywords -->
 <!--!--><StringDetect attribute="Function" context="#stay" String=":()" />
-<!--!--><RegExpr attribute="Keyword" context="FunctionDef" String="\bfunction\b" />
+<!--!--><WordDetect attribute="Keyword" context="FunctionDef" String="function" />
         <!-- handle keywords -->
         <keyword attribute="Keyword" context="#stay" String="keywords" />
         <keyword attribute="Builtin" context="#stay" String="builtins" />
@@ -683,7 +683,7 @@
       <context attribute="Normal Text" lineEndContext="#pop" name="CmdSetEnv" fallthrough="true" fallthroughContext="#pop">
         <!-- handle command line options -->
         <RegExpr attribute="Variable" context="#pop" String="\b&varname;" />
-        <DetectChar attribute="Variable" context="Assign" char="\s" />
+        <RegExpr attribute="Variable" context="Assign" String="\s" />
         <IncludeRules context="FindMost" />
       </context>
 

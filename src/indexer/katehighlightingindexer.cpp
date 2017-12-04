@@ -71,6 +71,9 @@ bool checkRegularExpression(const QString &hlFilename, QXmlStreamReader &xml)
         if (!regexp.isValid()) {
             qWarning() << hlFilename << "line" << xml.lineNumber() << "broken regex:" << string << "problem:" << regexp.errorString() << "at offset" << regexp.patternErrorOffset();
             return false;
+        } else if (string.isEmpty()) {
+            qWarning() << hlFilename << "line" << xml.lineNumber() << "empty regex not allowed.";
+            return false;
         }
 
         // catch possible case typos: [A-z] or [a-Z]
@@ -202,7 +205,7 @@ public:
             }
 
             if (m_existingContextNames.contains(name)) {
-                qWarning() << m_filename << "context duplicate:" << name;
+                qWarning() << m_filename << "Duplicate context:" << name;
             } else {
                 m_existingContextNames.insert(name);
             }
@@ -219,9 +222,16 @@ public:
             if (!fallthroughContext.isEmpty())
                 m_usedContextNames.insert(fallthroughContext);
         } else {
-            const QString context = filterContext(xml.attributes().value(QLatin1String("context")).toString());
-            if (!context.isEmpty())
-                m_usedContextNames.insert(context);
+            if (xml.attributes().hasAttribute(QLatin1String("context"))) {
+                QString context = xml.attributes().value(QLatin1String("context")).toString();
+                if (context.isEmpty()) {
+                    qWarning() << m_filename << "Missing context name in line" << xml.lineNumber();
+                } else {
+                    context = filterContext(xml.attributes().value(QLatin1String("context")).toString());
+                    if (!context.isEmpty())
+                        m_usedContextNames.insert(context);
+                }
+            }
         }
     }
 

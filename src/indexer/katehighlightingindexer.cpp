@@ -211,6 +211,10 @@ public:
             if (!lineEndContext.isEmpty())
                 m_usedContextNames.insert(lineEndContext);
 
+            const QString lineEmptyContext = filterContext(xml.attributes().value(QLatin1String("lineEmptyContext")).toString());
+            if (!lineEmptyContext.isEmpty())
+                m_usedContextNames.insert(lineEmptyContext);
+
             const QString fallthroughContext = filterContext(xml.attributes().value(QLatin1String("fallthroughContext")).toString());
             if (!fallthroughContext.isEmpty())
                 m_usedContextNames.insert(fallthroughContext);

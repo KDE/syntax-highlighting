@@ -60,6 +60,10 @@ QStringList readListing(const QString &fileName)
     return listing;
 }
 
+//! Check that a regular expression in a RegExpr rule:
+//! - is not empty
+//! - isValid()
+//! - character ranges such as [A-Z] are valid and not accidentally e.g. [A-z].
 bool checkRegularExpression(const QString &hlFilename, QXmlStreamReader &xml)
 {
     if (xml.name() == QLatin1String("RegExpr") || xml.name() == QLatin1String("emptyLine")) {
@@ -87,6 +91,8 @@ bool checkRegularExpression(const QString &hlFilename, QXmlStreamReader &xml)
     return true;
 }
 
+//! Check that keyword list items do not have trailing or leading spaces,
+//! e.g.: <item> keyword </item>
 bool checkItemsTrimmed(const QString &hlFilename, QXmlStreamReader &xml)
 {
     if (xml.name() == QLatin1String("item")) {
@@ -100,6 +106,8 @@ bool checkItemsTrimmed(const QString &hlFilename, QXmlStreamReader &xml)
     return true;
 }
 
+//! Checks that DetectChar and Detect2Chars really only have one char
+//! in the attributes 'char' and 'char1'.
 bool checkSingleChars(const QString &hlFilename, QXmlStreamReader &xml)
 {
     const bool testChar1 = xml.name() == QLatin1String("Detect2Chars");
@@ -122,6 +130,30 @@ bool checkSingleChars(const QString &hlFilename, QXmlStreamReader &xml)
     return true;
 }
 
+//! Search for rules with lookAhead="true" and context="#stay".
+//! This would cause an infinite loop.
+bool checkLookAhead(const QString &hlFilename, QXmlStreamReader &xml)
+{
+    if (xml.attributes().hasAttribute(QStringLiteral("lookAhead"))) {
+        auto lookAhead = xml.attributes().value(QStringLiteral("lookAhead"));
+        if (lookAhead == QStringLiteral("true")) {
+            auto context = xml.attributes().value(QStringLiteral("context"));
+            if (context == QStringLiteral("#stay")) {
+                qWarning() << hlFilename << "line" << xml.lineNumber() << "Infinite loop: lookAhead with context #stay";
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+//! Extract the referenced context name.
+//! Some input / output examples are:
+//! - "#stay"         -> ""
+//! - "#pop"          -> ""
+//! - "Comment"       -> "Comment"
+//! - "#pop!Comment"  -> "Comment"
+//! - "##ISO C++"     -> "" (i.e. context cross-language references are currently ignored
 QString filterContext(QString context)
 {
     // filter out #stay and #pop
@@ -433,6 +465,11 @@ int main(int argc, char *argv[])
                 continue;
             }
 
+            // scan for lookAhead="true" with context="#stay"
+            if (!checkLookAhead(hlFilename, xml)) {
+                anyError = 7;
+                continue;
+            }
         }
 
         if (!contextChecker.check())

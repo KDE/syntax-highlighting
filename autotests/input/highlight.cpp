@@ -287,3 +287,8 @@ goto label;
  */
 
 #endif
+
+// Some GNU macros, cross-referenced from gcc.xml to isocpp.xml
+__GCC_ATOMIC_CHAR16_T_LOCK_FREE
+__GNUC__
+__linux__

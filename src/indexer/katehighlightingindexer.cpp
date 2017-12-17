@@ -174,10 +174,11 @@ public:
 
     bool check() const
     {
+        bool success = true;
         const auto invalidNames = m_usedNames - m_existingNames;
         if (!invalidNames.isEmpty()) {
             qWarning() << m_filename << "Reference of non-existing keyword list:" << invalidNames;
-            return false;
+            success = false;
         }
 
         const auto unusedNames = m_existingNames - m_usedNames;
@@ -185,7 +186,7 @@ public:
             qWarning() << m_filename << "Unused keyword lists:" << unusedNames;
         }
 
-        return true;
+        return success;
     }
 
 private:
@@ -488,7 +489,7 @@ int main(int argc, char *argv[])
 
             // check single chars in DetectChar and Detect2Chars
             if (!checkSingleChars(hlFilename, xml)) {
-//                 anyError = 8;
+                anyError = 8;
                 continue;
             }
 
@@ -500,11 +501,11 @@ int main(int argc, char *argv[])
         }
 
         if (!attributeChecker.check()) {
-            //anyError = 7;
+            anyError = 7;
         }
 
         if (!keywordChecker.check()) {
-            //anyError = 7;
+            anyError = 7;
         }
     }
 

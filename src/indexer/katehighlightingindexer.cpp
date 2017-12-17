@@ -346,10 +346,11 @@ public:
 
     bool check() const
     {
+        bool success = true;
         const auto invalidNames = m_usedAttributeNames - m_existingAttributeNames;
         if (!invalidNames.isEmpty()) {
             qWarning() << m_filename << "Reference of non-existing itemData attributes:" << invalidNames;
-            return false;
+            success = false;
         }
 
         auto unusedNames = m_existingAttributeNames - m_usedAttributeNames;
@@ -357,7 +358,7 @@ public:
             qWarning() << m_filename << "Unused itemData:" << unusedNames;
         }
 
-        return true;
+        return success;
     }
 
 private:

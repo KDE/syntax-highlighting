@@ -147,30 +147,6 @@ bool checkLookAhead(const QString &hlFilename, QXmlStreamReader &xml)
     return true;
 }
 
-//! Extract the referenced context name.
-//! Some input / output examples are:
-//! - "#stay"         -> ""
-//! - "#pop"          -> ""
-//! - "Comment"       -> "Comment"
-//! - "#pop!Comment"  -> "Comment"
-//! - "##ISO C++"     -> "" (i.e. context cross-language references are currently ignored
-QString filterContext(QString context)
-{
-    // filter out #stay and #pop
-    static QRegularExpression stayPop(QStringLiteral("^(#stay|#pop)+"));
-    context.remove(stayPop);
-
-    // filter out cross-language context references
-    if (context.contains(QStringLiteral("##")))
-        return QString();
-
-    // handle #pop!context"
-    if (context.startsWith(QLatin1Char('!')))
-        context.remove(0, 1);
-
-    return context;
-}
-
 /**
  * Helper class to search for non-existing or unreferenced keyword lists.
  */
@@ -224,44 +200,33 @@ private:
 class ContextChecker
 {
 public:
-    ContextChecker(const QString &filename)
-        : m_filename(filename)
-    {}
-
-    void processElement(QXmlStreamReader &xml)
+    void processElement(const QString &hlFilename, const QString &hlName, QXmlStreamReader &xml)
     {
         if (xml.name() == QLatin1String("context")) {
+            auto & language = m_contextMap[hlName];
+            language.hlFilename = hlFilename;
             const QString name = xml.attributes().value(QLatin1String("name")).toString();
-            if (m_firstContext.isEmpty()) {
-                m_firstContext = name;
+            if (language.isFirstContext) {
+                language.isFirstContext = false;
+                language.usedContextNames.insert(name);
             }
 
-            if (m_existingContextNames.contains(name)) {
-                qWarning() << m_filename << "Duplicate context:" << name;
+            if (language.existingContextNames.contains(name)) {
+                qWarning() << hlFilename << "Duplicate context:" << name;
             } else {
-                m_existingContextNames.insert(name);
+                language.existingContextNames.insert(name);
             }
 
-            const QString lineEndContext = filterContext(xml.attributes().value(QLatin1String("lineEndContext")).toString());
-            if (!lineEndContext.isEmpty())
-                m_usedContextNames.insert(lineEndContext);
-
-            const QString lineEmptyContext = filterContext(xml.attributes().value(QLatin1String("lineEmptyContext")).toString());
-            if (!lineEmptyContext.isEmpty())
-                m_usedContextNames.insert(lineEmptyContext);
-
-            const QString fallthroughContext = filterContext(xml.attributes().value(QLatin1String("fallthroughContext")).toString());
-            if (!fallthroughContext.isEmpty())
-                m_usedContextNames.insert(fallthroughContext);
+            processContext(hlName, xml.attributes().value(QLatin1String("lineEndContext")).toString());
+            processContext(hlName, xml.attributes().value(QLatin1String("lineEmptyContext")).toString());
+            processContext(hlName, xml.attributes().value(QLatin1String("fallthroughContext")).toString());
         } else {
             if (xml.attributes().hasAttribute(QLatin1String("context"))) {
-                QString context = xml.attributes().value(QLatin1String("context")).toString();
+                const QString context = xml.attributes().value(QLatin1String("context")).toString();
                 if (context.isEmpty()) {
-                    qWarning() << m_filename << "Missing context name in line" << xml.lineNumber();
+                    qWarning() << hlFilename << "Missing context name in line" << xml.lineNumber();
                 } else {
-                    context = filterContext(xml.attributes().value(QLatin1String("context")).toString());
-                    if (!context.isEmpty())
-                        m_usedContextNames.insert(context);
+                    processContext(hlName, context);
                 }
             }
         }
@@ -269,26 +234,86 @@ public:
 
     bool check() const
     {
-        const auto invalidContextNames = m_usedContextNames - m_existingContextNames;
-        if (!invalidContextNames.isEmpty()) {
-            qWarning() << m_filename << "Reference of non-existing contexts:" << invalidContextNames;
-            return false;
+        bool success = true;
+        for (auto &language : m_contextMap) {
+            const auto invalidContextNames = language.usedContextNames - language.existingContextNames;
+            if (!invalidContextNames.isEmpty()) {
+                qWarning() << language.hlFilename << "Reference of non-existing contexts:" << invalidContextNames;
+                success = false;
+            }
+
+            const auto unusedNames = language.existingContextNames - language.usedContextNames;
+            if (!unusedNames.isEmpty()) {
+                qWarning() << language.hlFilename << "Unused contexts:" << unusedNames;
+            }
         }
 
-        auto unusedNames = m_existingContextNames - m_usedContextNames;
-        unusedNames.remove(m_firstContext);
-        if (!unusedNames.isEmpty()) {
-            qWarning() << m_filename << "Unused contexts:" << unusedNames;
-        }
-
-        return true;
+        return success;
     }
 
 private:
-    QString m_filename;
-    QString m_firstContext;
-    QSet<QString> m_usedContextNames;
-    QSet<QString> m_existingContextNames;
+    //! Extract the referenced context name and language.
+    //! Some input / output examples are:
+    //! - "#stay"         -> ""
+    //! - "#pop"          -> ""
+    //! - "Comment"       -> "Comment"
+    //! - "#pop!Comment"  -> "Comment"
+    //! - "##ISO C++"     -> ""
+    //! - "Comment##ISO C++"-> "Comment" in ISO C++
+    void processContext(const QString &language, QString context)
+    {
+        if (context.isEmpty())
+            return;
+
+        // filter out #stay and #pop
+        static QRegularExpression stayPop(QStringLiteral("^(#stay|#pop)+"));
+        context.remove(stayPop);
+
+        // handle cross-language context references
+        if (context.contains(QStringLiteral("##"))) {
+            const QStringList list = context.split(QStringLiteral("##"), QString::SkipEmptyParts);
+            if (list.size() == 1) {
+                // nothing to do, other language is included: e.g. ##Doxygen
+            } else if (list.size() == 2) {
+                // specific context of other language, e.g. Comment##ISO C++
+                m_contextMap[list[1]].usedContextNames.insert(list[0]);
+            }
+            return;
+        }
+
+        // handle #pop!context" (#pop was already removed above)
+        if (context.startsWith(QLatin1Char('!')))
+            context.remove(0, 1);
+
+        if (!context.isEmpty())
+            m_contextMap[language].usedContextNames.insert(context);
+    }
+
+private:
+    class Language
+    {
+    public:
+        // filename on disk or in Qt resource
+        QString hlFilename;
+
+        // Is true, if the first context in xml file is encountered, and
+        // false in all other cases. This is required, since the first context
+        // is typically not referenced explicitly. So we will simply add the
+        // first context to the usedContextNames list.
+        bool isFirstContext = true;
+
+        // holds all contexts that were referenced
+        QSet<QString> usedContextNames;
+
+        // holds all existing context names
+        QSet<QString> existingContextNames;
+    };
+
+    /**
+     * "Language name" to "Language" map.
+     * Example key: "Doxygen"
+     */
+    QHash<QString, Language> m_contextMap;
 };
 
 /**
@@ -376,6 +401,7 @@ int main(int argc, char *argv[])
             << QStringLiteral("author") << QStringLiteral("license") << QStringLiteral("indenter");
 
     // index all given highlightings
+    ContextChecker contextChecker;
     QVariantMap hls;
     int anyError = 0;
     foreach (const QString &hlFilename, hlFilenames) {
@@ -427,9 +453,9 @@ int main(int argc, char *argv[])
         // remember hl
         hls[QFileInfo(hlFile).fileName()] = hl;
 
-        ContextChecker contextChecker(hlFilename);
         AttributeChecker attributeChecker(hlFilename);
         KeywordChecker keywordChecker(hlFilename);
+        const QString hlName = hl[QStringLiteral("name")].toString();
 
         // scan for broken regex or keywords with spaces
         while (!xml.atEnd()) {
@@ -439,7 +465,7 @@ int main(int argc, char *argv[])
             }
 
             // search for used/existing contexts if applicable
-            contextChecker.processElement(xml);
+            contextChecker.processElement(hlFilename, hlName, xml);
 
             // search for used/existing attributes if applicable
             attributeChecker.processElement(xml);
@@ -472,9 +498,6 @@ int main(int argc, char *argv[])
             }
         }
 
-        if (!contextChecker.check())
-            anyError = 7;
-
         if (!attributeChecker.check()) {
             //anyError = 7;
         }
@@ -483,6 +506,10 @@ int main(int argc, char *argv[])
             //anyError = 7;
         }
     }
+
+    if (!contextChecker.check())
+        anyError = 7;
+
 
     // bail out if any problem was seen
     if (anyError)

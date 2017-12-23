@@ -218,6 +218,10 @@ public:
                 language.existingContextNames.insert(name);
             }
 
+            if (xml.attributes().value(QLatin1String("fallthroughContext")).toString() == QLatin1String("#stay")) {
+                qWarning() << hlFilename << "possible infinite loop due to fallthroughContext=\"#stay\" in context " << name;
+            }
+
             processContext(hlName, xml.attributes().value(QLatin1String("lineEndContext")).toString());
             processContext(hlName, xml.attributes().value(QLatin1String("lineEmptyContext")).toString());
             processContext(hlName, xml.attributes().value(QLatin1String("fallthroughContext")).toString());

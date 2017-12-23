@@ -338,10 +338,13 @@ public:
                     m_existingAttributeNames.insert(name);
                 }
             }
-        } else {
+        } else if (xml.attributes().hasAttribute(QLatin1String("attribute"))) {
             const QString name = xml.attributes().value(QLatin1String("attribute")).toString();
-            if (!name.isEmpty())
+            if (name.isEmpty()) {
+                qWarning() << m_filename << "specified attribute is empty:" << xml.name();
+            } else {
                 m_usedAttributeNames.insert(name);
+            }
         }
     }
 

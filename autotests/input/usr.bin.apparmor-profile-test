@@ -1,87 +1,62 @@
-# Example AppArmor Profile.
+# Sample AppArmor Profile.
 # License: Public Domain
-# Last change: August 29, 2017
-
-# NOTE: This profile is not fully functional, since
-# it is designed to test the syntax highlighting.
+# Last change: January 25, 2018
 
 include <tunables/global>
 
-# Declare an AppArmor variables to help with overrides
-@{FOO_LIB}=/usr/lib{,64,/*-linux-gnu}/foo
-@{USER_DIR}=@{HOME}/Public @{HOME}/Desktop
+# Variable assignment
+@{FOO_LIB}=/usr/lib{,32,64}/foo
+@{USER_DIR} = @{HOME}/Public @{HOME}/Desktop
+@{USER_DIR} += @{HOME}/Hello
 
 # Profile for /usr/bin/foo
 /usr/bin/foo (attach_disconnected, enforce) {
 	include <abstractions/base>
 	include <abstractions/dbus>
-	include <abstractions/dbus-session>
-	include <abstractions/dbus-accessibility>
-	include <abstractions/fonts>
-	include <abstractions/X>
-	include <abstractions/kde>
-	include <abstractions/consoles>
 
 	#include <abstractions/ubuntu-helpers>
-	#include<abstractions/confidential-deny>
-	#include"/etc/apparmor.d/abstractions/open-browser"
-	include "/etc/apparmor.d/abstractions/open-email"
+	#include<abstractions/wayland>
+	#include"/etc/apparmor.d/abstractions/ubuntu-konsole"
+	include "/etc/apparmor.d/abstractions/openssl"
 
 	/{,**/} r,# Read only directories
 
 	owner /{home,media,mnt,srv,net}/** r,
-	owner @{USER_DIR}/{,**} rw,
-
+	owner @{USER_DIR}/** rw,
 	audit deny owner /**/* mx,
-	audit deny owner /**/**.py* r,
-
-	# Files supported
-	/**.[tT][xX][tT] r, # txt
-	/**.[wW][bB][mM][pP] r, # wbmp
-	/**.[wW][eE][bB][pP] r, # webp
-
-	# Local configuration
-	owner file @{HOME}/.local/share/foo/{,**} rwk,
-	owner @{HOME}/.local/share/RecentDocuments/* rwk,
-	owner @{HOME}/.config/foo/{,**} rwk,	
-	owner @{HOME}/.config/foorc{,.lock} rwk,
-	owner @{HOME}/.config/.[a-zA-Z0-9]* rwk,
-	owner @{HOME}/.cache/foo/{,**} rwk,
+	/**.[tT][xX][tT] r,  # txt
+	
+	owner file @{HOME}/.local/share/foo/{,**} rwkl,
+	owner @{HOME}/.config/foo/{,**}           rwk,
+	owner @{HOME}/.config/*                   rw,
+	owner @{HOME}/.config/*.[a-zA-Z0-9]*      rwk,
+	owner @{HOME}/.cache/foo/{,**}            rwk,
 
 	"/usr/share/**" r,
 	"/var/lib/flatpak/exports/share/**" r,
 	"/var/lib/flatpak/app/**/export/share/applications/*.desktop" r,
-	"/var/lib/snapd/desktop/applications/**" r,
 
-	allow file /etc/nsswitch.conf r,
-	allow /etc/fstab r,
-	/etc/udev/udev.conf r,
-	/etc/passwd r,
-	/etc/xdg/{,**} r,
-	/etc/xdg/Trolltech.conf k,
-	deny /etc/xdg/{autostart,systemd}/{,**} rw,
-	deny /boot/** rwlkmx,
-	@{PROC}/[0-9]*/{cmdline,mountinfo,mounts,stat,status,vmstat} r,
+	allow file /etc/nsswitch.conf           r,
+	allow /etc/fstab                        r,
+	/etc/udev/udev.conf                     r,
+	/etc/xdg/**                             r,
+	/etc/xdg/Trolltech.conf                 k,
+	deny /etc/xdg/{autostart,systemd}/**    r,
+	deny /boot/**                           rwlkmx,
+	
+	owner @{PROC}/@{pid}/{cmdline,mountinfo,mounts,stat,status,vmstat} r,
 	/sys/devices/**/uevent r,
 
-	# Libraries and binaries
-	/usr/bin/foo ixr,
-	/usr/bin/dolphin PUx,
-	/usr/bin/khelpcenter Cxr -> sanitized_helper,
-	/usr/bin/helloworld Cxr -> hello_world,
-	/usr/bin/* Pixr,
-	/usr/lib{,64}/** Pixr,
-	/usr/lib{,64,/*-linux-gnu}/qt5/plugins/{,**/}*.so m,
+	/usr/bin/foo         ixr,
+	/usr/bin/dolphin     PUx,
+	/usr/bin/*           Pixr,
+	/usr/bin/khelpcenter Cx  -> sanitized_helper,
+	/usr/bin/helloworld  Cxr ->
+			hello_world,
+	
+	/usr/lib{,32,64}/{,@{multiarch}/}qt5/plugins/{,**/}*.so m,
 	@{FOO_LIB}/{,**} mr,
-
-	# Temporal files and sockets
-	owner /tmp/{*lock,kde-*/**} rwk,
-	owner /var/tmp/kdecache-*/* rwk,
-	owner /run/user/[0-9]*/{*-socket,bus,kdeinit5*,foo*} rwk,
-	owner /run/user/[0-9]*/ksocket-*/{,**} rwk,
-	/run/dbus/system_bus_socket w,
-
-	/dev/{ati,dri}/** rw,
+	
 	audit deny /dev/{audio,video}* rwlkmx,
 
 	# Dbus rules
@@ -100,10 +75,13 @@ include <tunables/global>
 		bus=session
 		path=/org/gnome/GConf/Database/*
 		member={AddMatch,AddNotify,AllEntries,LookupExtended,RemoveNotify},
+	dbus (bind)
+		bus=system
+		name=org.bluez,
 
 	# Signal rules
 	signal (send) set=(term) peer=unconfined,
-	signal (send, receive) set=(int exists) peer=/usr/lib/hello/world//foo-helper,
+	signal (send, receive) set=(int exists rtmin+8) peer=/usr/lib/hello/world//foo-helper,
 
 	# Child profile
 	profile hello_world {
@@ -119,9 +97,10 @@ include <tunables/global>
 		link subset /link* -> /**,
 
 		# Network rules
-		network inet6 tcp,#Allow access to tcp only for inet6 addresses
+		network inet6 tcp, #Allow access to tcp only for inet6 addresses
 		network netlink dgram,
 		network bluetooth,
+		network unspec dgram,
 
 		# Capability rules
 		capability dac_override,
@@ -129,8 +108,9 @@ include <tunables/global>
 		capability sys_chroot,
 
 		# Mount rules
-		mount options=(rw bind remount nodev noexec) fstype=ecryptfs /home/*/.helloworld/ -> /home/*/helloworld/,
+		mount options=(rw bind remount nodev noexec) vfstype=ecryptfs /home/*/.helloworld/ -> /home/*/helloworld/,
 		mount options in (rw, bind) / -> /run/hellowordd/*.mnt,
+		mount option=read-only fstype=btrfs /dev/sd[a-z][1-9]* -> /media/*/*,
 		umount /home/*/helloworld/,
 
 		# Pivot Root rules
@@ -147,14 +127,16 @@ include <tunables/global>
 		unix peer=(label=@{profile_name},addr=@helloworld),
 
 		# Rlimit rule
-		set rlimit data <= 100M,
+		set rlimit data  <= 100M,
 		set rlimit nproc <= 10,
-		set rlimit nice <= 5,
+		set rlimit memlock <= 2GB,
+		set rlimit rss <= infinity,
 
 		# Change Profile rules
 		change_profile unsafe /** -> [^u/]**,
 		change_profile unsafe /** -> {u,un,unc,unco,uncon,unconf,unconfi,unconfin,unconfine},
-		change_profile /bin/bash -> new_profile,
+		change_profile /bin/bash  -> 
+			new_profile,
 
 		# Alias
 		alias /usr/ -> /mnt/usr/,
@@ -165,46 +147,11 @@ include <tunables/global>
 		network unix stream,
 		unix stream,
 
-		/usr/hi\"esc\x23esc\032esc\c3esc r, # Escape expressions
+		/usr/hi\"esc\x23esc\032esc\*es\{esc\ rw r, # Escape expressions
 
 		# Text after a variable is highlighted as path
 		file /my/path r,
 		@{FOO_LIB}file r,
 		@{FOO_LIB}#my/path r, #Comment
 	}
-}
-
-# Profile for /usr/bin/error
-profile syntax_error /usr/bin/error flags=(complain audit) {
-	# Syntax error highlighting:
-
-	# Error: Include
-	include<filepath>
-	include <filepath >
-	#includefilepath
-	# include
-	file #include /hello r,
-
-	# Error: Variable open or with characters not allowed
-	@{var
-	@{sdf&s}
-
-	# Error: Open brackets
-	/{hello{ab,cd}world  kr,
-	/{abc{abc kr,
-	/[abc  kr,
-	/(abc kr,
-
-	# Error: Empty brackets
-	/hello[]hello{}hello()he  kr,
-
-	# Error: Open rule
-	/home/*/file rw
-	capability dac_override
-	deny file /etc/fstab w
-	audit network ieee802154,
-
-	dbus (receive
-	unix stream,
-	unix stream,
 }

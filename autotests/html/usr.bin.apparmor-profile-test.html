@@ -4,90 +4,65 @@
 <title>usr.bin.apparmor-profile-test</title>
 <meta name="generator" content="KF5::SyntaxHighlighting (AppArmor Security Profile)"/>
 </head><body style="color:#1f1c1b"><pre>
-<span style="color:#898887;"># Example AppArmor Profile.</span>
+<span style="color:#898887;"># Sample AppArmor Profile.</span>
 <span style="color:#898887;"># License: Public Domain</span>
-<span style="color:#898887;"># Last change: August 29, 2017</span>
-
-<span style="color:#898887;"># </span><span style="color:#81ca2d;background-color:#f7e6e6;font-weight:bold;">NOTE</span><span style="color:#898887;">: This profile is not fully functional, since</span>
-<span style="color:#898887;"># it is designed to test the syntax highlighting.</span>
+<span style="color:#898887;"># Last change: January 25, 2018</span>
 
 <span style="color:#006e28;">include </span><span style="color:#ff5500;">&lt;tunables/global&gt;</span>
 
-<span style="color:#898887;"># Declare an AppArmor variables to help with overrides</span>
-<span style="color:#b08000;">@{FOO_LIB}</span>=/usr/lib<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">64</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">/</span><span style="color:#3daee9;">*</span><span style="color:#ff5500;">-linux-gnu}</span>/foo
-<span style="color:#b08000;">@{USER_DIR}</span>=<span style="color:#b08000;">@{HOME}</span>/Public <span style="color:#b08000;">@{HOME}</span>/Desktop
+<span style="color:#898887;"># Variable assignment</span>
+<span style="color:#b08000;">@{FOO_LIB}</span>=/usr/lib<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">32</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">64}</span>/foo
+<span style="color:#b08000;">@{USER_DIR}</span> = <span style="color:#b08000;">@{HOME}</span>/Public <span style="color:#b08000;">@{HOME}</span>/Desktop
+<span style="color:#b08000;">@{USER_DIR}</span> += <span style="color:#b08000;">@{HOME}</span>/Hello
 
 <span style="color:#898887;"># Profile for /usr/bin/foo</span>
 /usr/bin/foo (<span style="color:#bf0303;">attach_disconnected</span>, <span style="color:#bf0303;">enforce</span>) {
 <span style="color:#006e28;">	include </span><span style="color:#ff5500;">&lt;abstractions/base&gt;</span>
 <span style="color:#006e28;">	include </span><span style="color:#ff5500;">&lt;abstractions/dbus&gt;</span>
-<span style="color:#006e28;">	include </span><span style="color:#ff5500;">&lt;abstractions/dbus-session&gt;</span>
-<span style="color:#006e28;">	include </span><span style="color:#ff5500;">&lt;abstractions/dbus-accessibility&gt;</span>
-<span style="color:#006e28;">	include </span><span style="color:#ff5500;">&lt;abstractions/fonts&gt;</span>
-<span style="color:#006e28;">	include </span><span style="color:#ff5500;">&lt;abstractions/X&gt;</span>
-<span style="color:#006e28;">	include </span><span style="color:#ff5500;">&lt;abstractions/kde&gt;</span>
-<span style="color:#006e28;">	include </span><span style="color:#ff5500;">&lt;abstractions/consoles&gt;</span>
 
 	<span style="color:#006e28;">#include </span><span style="color:#ff5500;">&lt;abstractions/ubuntu-helpers&gt;</span>
-	<span style="color:#006e28;">#include</span><span style="color:#ff5500;">&lt;abstractions/confidential-deny&gt;</span>
-	<span style="color:#006e28;">#include</span><span style="color:#ff5500;">&quot;/etc/apparmor.d/abstractions/open-browser&quot;</span>
-<span style="color:#006e28;">	include </span><span style="color:#ff5500;">&quot;/etc/apparmor.d/abstractions/open-email&quot;</span>
+	<span style="color:#006e28;">#include</span><span style="color:#ff5500;">&lt;abstractions/wayland&gt;</span>
+	<span style="color:#006e28;">#include</span><span style="color:#ff5500;">&quot;/etc/apparmor.d/abstractions/ubuntu-konsole&quot;</span>
+<span style="color:#006e28;">	include </span><span style="color:#ff5500;">&quot;/etc/apparmor.d/abstractions/openssl&quot;</span>
 
 	/<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#3daee9;">**</span><span style="color:#ff5500;">/}</span><span style="font-weight:bold;"> r</span>,<span style="color:#898887;"># Read only directories</span>
 
 	<span style="color:#0057ae;font-weight:bold;">owner</span> /<span style="color:#ff5500;">{home</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">media</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">mnt</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">srv</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">net}</span>/<span style="color:#3daee9;">**</span><span style="font-weight:bold;"> r</span>,
-	<span style="color:#0057ae;font-weight:bold;">owner</span> <span style="color:#b08000;">@{USER_DIR}</span>/<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#3daee9;">**</span><span style="color:#ff5500;">}</span><span style="font-weight:bold;"> rw</span>,
-
+	<span style="color:#0057ae;font-weight:bold;">owner</span> <span style="color:#b08000;">@{USER_DIR}</span>/<span style="color:#3daee9;">**</span><span style="font-weight:bold;"> rw</span>,
 	<span style="font-weight:bold;">audit</span> <span style="color:#bf0303;font-weight:bold;">deny</span> <span style="color:#0057ae;font-weight:bold;">owner</span> /<span style="color:#3daee9;">**</span>/<span style="color:#3daee9;">*</span><span style="font-weight:bold;"> mx</span>,
-	<span style="font-weight:bold;">audit</span> <span style="color:#bf0303;font-weight:bold;">deny</span> <span style="color:#0057ae;font-weight:bold;">owner</span> /<span style="color:#3daee9;">**</span>/<span style="color:#3daee9;">**</span>.py<span style="color:#3daee9;">*</span><span style="font-weight:bold;"> r</span>,
-
-	<span style="color:#898887;"># Files supported</span>
-	/<span style="color:#3daee9;">**</span>.<span style="color:#ff5500;">[tT][xX][tT]</span><span style="font-weight:bold;"> r</span>, <span style="color:#898887;"># txt</span>
-	/<span style="color:#3daee9;">**</span>.<span style="color:#ff5500;">[wW][bB][mM][pP]</span><span style="font-weight:bold;"> r</span>, <span style="color:#898887;"># wbmp</span>
-	/<span style="color:#3daee9;">**</span>.<span style="color:#ff5500;">[wW][eE][bB][pP]</span><span style="font-weight:bold;"> r</span>, <span style="color:#898887;"># webp</span>
-
-	<span style="color:#898887;"># Local configuration</span>
-	<span style="color:#0057ae;font-weight:bold;">owner</span> <span style="color:#0057ae;font-weight:bold;">file</span> <span style="color:#b08000;">@{HOME}</span>/.local/share/foo/<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#3daee9;">**</span><span style="color:#ff5500;">}</span><span style="font-weight:bold;"> rwk</span>,
-	<span style="color:#0057ae;font-weight:bold;">owner</span> <span style="color:#b08000;">@{HOME}</span>/.local/share/RecentDocuments/<span style="color:#3daee9;">*</span><span style="font-weight:bold;"> rwk</span>,
-	<span style="color:#0057ae;font-weight:bold;">owner</span> <span style="color:#b08000;">@{HOME}</span>/.config/foo/<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#3daee9;">**</span><span style="color:#ff5500;">}</span><span style="font-weight:bold;"> rwk</span>,	
-	<span style="color:#0057ae;font-weight:bold;">owner</span> <span style="color:#b08000;">@{HOME}</span>/.config/foorc<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">.lock}</span><span style="font-weight:bold;"> rwk</span>,
-	<span style="color:#0057ae;font-weight:bold;">owner</span> <span style="color:#b08000;">@{HOME}</span>/.config/.<span style="color:#ff5500;">[a</span><span style="color:#ca60ca;">-</span><span style="color:#ff5500;">zA</span><span style="color:#ca60ca;">-</span><span style="color:#ff5500;">Z0</span><span style="color:#ca60ca;">-</span><span style="color:#ff5500;">9]</span><span style="color:#3daee9;">*</span><span style="font-weight:bold;"> rwk</span>,
-	<span style="color:#0057ae;font-weight:bold;">owner</span> <span style="color:#b08000;">@{HOME}</span>/.cache/foo/<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#3daee9;">**</span><span style="color:#ff5500;">}</span><span style="font-weight:bold;"> rwk</span>,
+	/<span style="color:#3daee9;">**</span>.<span style="color:#ff5500;">[tT][xX][tT]</span><span style="font-weight:bold;"> r</span>,  <span style="color:#898887;"># txt</span>
+	
+	<span style="color:#0057ae;font-weight:bold;">owner</span> <span style="color:#0057ae;font-weight:bold;">file</span> <span style="color:#b08000;">@{HOME}</span>/.local/share/foo/<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#3daee9;">**</span><span style="color:#ff5500;">}</span><span style="font-weight:bold;"> rwkl</span>,
+	<span style="color:#0057ae;font-weight:bold;">owner</span> <span style="color:#b08000;">@{HOME}</span>/.config/foo/<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#3daee9;">**</span><span style="color:#ff5500;">}</span>          <span style="font-weight:bold;"> rwk</span>,
+	<span style="color:#0057ae;font-weight:bold;">owner</span> <span style="color:#b08000;">@{HOME}</span>/.config/<span style="color:#3daee9;">*</span>                  <span style="font-weight:bold;"> rw</span>,
+	<span style="color:#0057ae;font-weight:bold;">owner</span> <span style="color:#b08000;">@{HOME}</span>/.config/<span style="color:#3daee9;">*</span>.<span style="color:#ff5500;">[a</span><span style="color:#ca60ca;">-</span><span style="color:#ff5500;">zA</span><span style="color:#ca60ca;">-</span><span style="color:#ff5500;">Z0</span><span style="color:#ca60ca;">-</span><span style="color:#ff5500;">9]</span><span style="color:#3daee9;">*</span>     <span style="font-weight:bold;"> rwk</span>,
+	<span style="color:#0057ae;font-weight:bold;">owner</span> <span style="color:#b08000;">@{HOME}</span>/.cache/foo/<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#3daee9;">**</span><span style="color:#ff5500;">}</span>           <span style="font-weight:bold;"> rwk</span>,
 
 	<span style="color:#bf0303;">&quot;/usr/share/</span><span style="color:#3daee9;">**</span><span style="color:#bf0303;">&quot;</span><span style="font-weight:bold;"> r</span>,
 	<span style="color:#bf0303;">&quot;/var/lib/flatpak/exports/share/</span><span style="color:#3daee9;">**</span><span style="color:#bf0303;">&quot;</span><span style="font-weight:bold;"> r</span>,
 	<span style="color:#bf0303;">&quot;/var/lib/flatpak/app/</span><span style="color:#3daee9;">**</span><span style="color:#bf0303;">/export/share/applications/</span><span style="color:#3daee9;">*</span><span style="color:#bf0303;">.desktop&quot;</span><span style="font-weight:bold;"> r</span>,
-	<span style="color:#bf0303;">&quot;/var/lib/snapd/desktop/applications/</span><span style="color:#3daee9;">**</span><span style="color:#bf0303;">&quot;</span><span style="font-weight:bold;"> r</span>,
 
-	<span style="color:#bf0303;font-weight:bold;">allow</span> <span style="color:#0057ae;font-weight:bold;">file</span> /etc/nsswitch.conf<span style="font-weight:bold;"> r</span>,
-	<span style="color:#bf0303;font-weight:bold;">allow</span> /etc/fstab<span style="font-weight:bold;"> r</span>,
-	/etc/udev/udev.conf<span style="font-weight:bold;"> r</span>,
-	/etc/passwd<span style="font-weight:bold;"> r</span>,
-	/etc/xdg/<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#3daee9;">**</span><span style="color:#ff5500;">}</span><span style="font-weight:bold;"> r</span>,
-	/etc/xdg/Trolltech.conf<span style="font-weight:bold;"> k</span>,
-	<span style="color:#bf0303;font-weight:bold;">deny</span> /etc/xdg/<span style="color:#ff5500;">{autostart</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">systemd}</span>/<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#3daee9;">**</span><span style="color:#ff5500;">}</span><span style="font-weight:bold;"> rw</span>,
-	<span style="color:#bf0303;font-weight:bold;">deny</span> /boot/<span style="color:#3daee9;">**</span><span style="font-weight:bold;"> rwlkmx</span>,
-	<span style="color:#b08000;">@{PROC}</span>/<span style="color:#ff5500;">[0</span><span style="color:#ca60ca;">-</span><span style="color:#ff5500;">9]</span><span style="color:#3daee9;">*</span>/<span style="color:#ff5500;">{cmdline</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">mountinfo</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">mounts</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">stat</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">status</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">vmstat}</span><span style="font-weight:bold;"> r</span>,
+	<span style="color:#bf0303;font-weight:bold;">allow</span> <span style="color:#0057ae;font-weight:bold;">file</span> /etc/nsswitch.conf          <span style="font-weight:bold;"> r</span>,
+	<span style="color:#bf0303;font-weight:bold;">allow</span> /etc/fstab                       <span style="font-weight:bold;"> r</span>,
+	/etc/udev/udev.conf                    <span style="font-weight:bold;"> r</span>,
+	/etc/xdg/<span style="color:#3daee9;">**</span>                            <span style="font-weight:bold;"> r</span>,
+	/etc/xdg/Trolltech.conf                <span style="font-weight:bold;"> k</span>,
+	<span style="color:#bf0303;font-weight:bold;">deny</span> /etc/xdg/<span style="color:#ff5500;">{autostart</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">systemd}</span>/<span style="color:#3daee9;">**</span>   <span style="font-weight:bold;"> r</span>,
+	<span style="color:#bf0303;font-weight:bold;">deny</span> /boot/<span style="color:#3daee9;">**</span>                          <span style="font-weight:bold;"> rwlkmx</span>,
+	
+	<span style="color:#0057ae;font-weight:bold;">owner</span> <span style="color:#b08000;">@{PROC}</span>/<span style="color:#b08000;">@{pid}</span>/<span style="color:#ff5500;">{cmdline</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">mountinfo</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">mounts</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">stat</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">status</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">vmstat}</span><span style="font-weight:bold;"> r</span>,
 	/sys/devices/<span style="color:#3daee9;">**</span>/uevent<span style="font-weight:bold;"> r</span>,
 
-	<span style="color:#898887;"># Libraries and binaries</span>
-	/usr/bin/foo<span style="font-weight:bold;"> ixr</span>,
-	/usr/bin/dolphin<span style="font-weight:bold;"> PUx</span>,
-	/usr/bin/khelpcenter<span style="font-weight:bold;"> Cxr</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span><span style="color:#644a9b;font-style:italic;"> sanitized_helper</span>,
-	/usr/bin/helloworld<span style="font-weight:bold;"> Cxr</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span><span style="color:#644a9b;font-style:italic;"> hello_world</span>,
-	/usr/bin/<span style="color:#3daee9;">*</span><span style="font-weight:bold;"> Pixr</span>,
-	/usr/lib<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">64}</span>/<span style="color:#3daee9;">**</span><span style="font-weight:bold;"> Pixr</span>,
-	/usr/lib<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">64</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">/</span><span style="color:#3daee9;">*</span><span style="color:#ff5500;">-linux-gnu}</span>/qt5/plugins/<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#3daee9;">**</span><span style="color:#ff5500;">/}</span><span style="color:#3daee9;">*</span>.so<span style="font-weight:bold;"> m</span>,
+	/usr/bin/foo        <span style="font-weight:bold;"> ixr</span>,
+	/usr/bin/dolphin    <span style="font-weight:bold;"> PUx</span>,
+	/usr/bin/<span style="color:#3daee9;">*</span>          <span style="font-weight:bold;"> Pixr</span>,
+	/usr/bin/khelpcenter<span style="font-weight:bold;"> Cx</span>  <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#644a9b;font-style:italic;">sanitized_helper</span>,
+	/usr/bin/helloworld <span style="font-weight:bold;"> Cxr</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span>
+			<span style="color:#644a9b;font-style:italic;">hello_world</span>,
+	
+	/usr/lib<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">32</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">64}</span>/<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#b08000;">@{multiarch}</span><span style="color:#ff5500;">/}</span>qt5/plugins/<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#3daee9;">**</span><span style="color:#ff5500;">/}</span><span style="color:#3daee9;">*</span>.so<span style="font-weight:bold;"> m</span>,
 	<span style="color:#b08000;">@{FOO_LIB}</span>/<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#3daee9;">**</span><span style="color:#ff5500;">}</span><span style="font-weight:bold;"> mr</span>,
-
-	<span style="color:#898887;"># Temporal files and sockets</span>
-	<span style="color:#0057ae;font-weight:bold;">owner</span> /tmp/<span style="color:#ff5500;">{</span><span style="color:#3daee9;">*</span><span style="color:#ff5500;">lock</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">kde-</span><span style="color:#3daee9;">*</span><span style="color:#ff5500;">/</span><span style="color:#3daee9;">**</span><span style="color:#ff5500;">}</span><span style="font-weight:bold;"> rwk</span>,
-	<span style="color:#0057ae;font-weight:bold;">owner</span> /var/tmp/kdecache-<span style="color:#3daee9;">*</span>/<span style="color:#3daee9;">*</span><span style="font-weight:bold;"> rwk</span>,
-	<span style="color:#0057ae;font-weight:bold;">owner</span> /run/user/<span style="color:#ff5500;">[0</span><span style="color:#ca60ca;">-</span><span style="color:#ff5500;">9]</span><span style="color:#3daee9;">*</span>/<span style="color:#ff5500;">{</span><span style="color:#3daee9;">*</span><span style="color:#ff5500;">-socket</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">bus</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">kdeinit5</span><span style="color:#3daee9;">*</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">foo</span><span style="color:#3daee9;">*</span><span style="color:#ff5500;">}</span><span style="font-weight:bold;"> rwk</span>,
-	<span style="color:#0057ae;font-weight:bold;">owner</span> /run/user/<span style="color:#ff5500;">[0</span><span style="color:#ca60ca;">-</span><span style="color:#ff5500;">9]</span><span style="color:#3daee9;">*</span>/ksocket-<span style="color:#3daee9;">*</span>/<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#3daee9;">**</span><span style="color:#ff5500;">}</span><span style="font-weight:bold;"> rwk</span>,
-	/run/dbus/system_bus_socket<span style="font-weight:bold;"> w</span>,
-
-	/dev/<span style="color:#ff5500;">{ati</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">dri}</span>/<span style="color:#3daee9;">**</span><span style="font-weight:bold;"> rw</span>,
+	
 	<span style="font-weight:bold;">audit</span> <span style="color:#bf0303;font-weight:bold;">deny</span> /dev/<span style="color:#ff5500;">{audio</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">video}</span><span style="color:#3daee9;">*</span><span style="font-weight:bold;"> rwlkmx</span>,
 
 	<span style="color:#898887;"># Dbus rules</span>
@@ -106,28 +81,32 @@
 		<span style="color:#006e28;">bus</span>=<span style="font-style:italic;">session</span>
 		<span style="color:#006e28;">path</span>=/org/gnome/GConf/Database/<span style="color:#3daee9;">*</span>
 		<span style="color:#006e28;">member</span>=<span style="color:#ff5500;">{AddMatch</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">AddNotify</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">AllEntries</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">LookupExtended</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">RemoveNotify}</span>,
+	<span style="color:#0057ae;font-weight:bold;">dbus</span> (<span style="font-weight:bold;">bind</span>)
+		<span style="color:#006e28;">bus</span>=<span style="font-style:italic;">system</span>
+		<span style="color:#006e28;">name</span>=org.bluez,
 
 	<span style="color:#898887;"># Signal rules</span>
 	<span style="color:#0057ae;font-weight:bold;">signal</span> (<span style="font-weight:bold;">send</span>) <span style="color:#006e28;">set</span>=(<span style="color:#bf0303;">term</span>) <span style="color:#006e28;">peer</span>=<span style="font-style:italic;">unconfined</span>,
-	<span style="color:#0057ae;font-weight:bold;">signal</span> (<span style="font-weight:bold;">send</span>, <span style="font-weight:bold;">receive</span>) <span style="color:#006e28;">set</span>=(<span style="color:#bf0303;">int</span> <span style="color:#bf0303;">exists</span>) <span style="color:#006e28;">peer</span>=/usr/lib/hello/world<span style="color:#ca60ca;font-weight:bold;">//</span><span style="color:#ca60ca;">foo-helper</span>,
+	<span style="color:#0057ae;font-weight:bold;">signal</span> (<span style="font-weight:bold;">send</span>, <span style="font-weight:bold;">receive</span>) <span style="color:#006e28;">set</span>=(<span style="color:#bf0303;">int</span> <span style="color:#bf0303;">exists</span> <span style="color:#bf0303;">rtmin+8</span>) <span style="color:#006e28;">peer</span>=/usr/lib/hello/world<span style="color:#ca60ca;font-weight:bold;">//</span><span style="color:#ca60ca;">foo-helper</span>,
 
 	<span style="color:#898887;"># Child profile</span>
-	<span style="color:#644a9b;font-weight:bold;">profile</span><span style="color:#644a9b;"> hello_world</span> {
+	<span style="color:#644a9b;font-weight:bold;">profile</span> <span style="color:#644a9b;">hello_world</span> {
 		<span style="color:#898887;"># File rules (three different ways)</span>
 		<span style="color:#0057ae;font-weight:bold;">file</span> /usr/lib<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">32</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">64}</span>/helloworld/<span style="color:#3daee9;">**</span>.so<span style="font-weight:bold;"> mr</span>,
 		/usr/lib<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">32</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">64}</span>/helloworld/<span style="color:#3daee9;">**</span><span style="font-weight:bold;"> r</span>,
-<span style="font-weight:bold;">		rk</span> /usr/lib<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">32</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">64}</span>/helloworld/hello,file,
+	<span style="font-weight:bold;">	rk</span> /usr/lib<span style="color:#ff5500;">{</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">32</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">64}</span>/helloworld/hello,file,
 
 		<span style="color:#898887;"># Link rules (two ways)</span>
-<span style="font-weight:bold;">		l</span> /foo1 <span style="color:#bf0303;font-weight:bold;">-&gt;</span> /bar,
+	<span style="font-weight:bold;">	l</span> /foo1 <span style="color:#bf0303;font-weight:bold;">-&gt;</span> /bar,
 		<span style="color:#0057ae;font-weight:bold;">link</span> /foo2 <span style="color:#bf0303;font-weight:bold;">-&gt;</span> bar,
 		<span style="color:#0057ae;font-weight:bold;">link</span> /foo3<span style="color:#bf0303;font-weight:bold;"> to</span> bar,
 		<span style="color:#0057ae;font-weight:bold;">link</span> <span style="color:#0057ae;">subset</span> /link<span style="color:#3daee9;">*</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> /<span style="color:#3daee9;">**</span>,
 
 		<span style="color:#898887;"># Network rules</span>
-		<span style="color:#0057ae;font-weight:bold;">network</span> <span style="color:#0057ae;">inet6</span> <span style="color:#0057ae;">tcp</span>,<span style="color:#898887;">#Allow access to tcp only for inet6 addresses</span>
+		<span style="color:#0057ae;font-weight:bold;">network</span> <span style="color:#0057ae;">inet6</span> <span style="color:#0057ae;">tcp</span>, <span style="color:#898887;">#Allow access to tcp only for inet6 addresses</span>
 		<span style="color:#0057ae;font-weight:bold;">network</span> <span style="color:#0057ae;">netlink</span> <span style="color:#0057ae;">dgram</span>,
 		<span style="color:#0057ae;font-weight:bold;">network</span> <span style="color:#0057ae;">bluetooth</span>,
+		<span style="color:#0057ae;font-weight:bold;">network</span> <span style="font-style:italic;">unspec</span> <span style="color:#0057ae;">dgram</span>,
 
 		<span style="color:#898887;"># Capability rules</span>
 		<span style="color:#0057ae;font-weight:bold;">capability</span> <span style="color:#0057ae;">dac_override</span>,
@@ -135,8 +114,9 @@
 		<span style="color:#0057ae;font-weight:bold;">capability</span> <span style="color:#0057ae;">sys_chroot</span>,
 
 		<span style="color:#898887;"># Mount rules</span>
-		<span style="color:#0057ae;font-weight:bold;">mount</span> <span style="color:#006e28;">options</span>=(<span style="font-weight:bold;">rw</span> <span style="font-weight:bold;">bind</span> <span style="font-weight:bold;">remount</span> <span style="font-weight:bold;">nodev</span> <span style="font-weight:bold;">noexec</span>) <span style="color:#006e28;">fstype</span>=<span style="color:#bf0303;">ecryptfs</span> /home/<span style="color:#3daee9;">*</span>/.helloworld/ <span style="color:#bf0303;font-weight:bold;">-&gt;</span> /home/<span style="color:#3daee9;">*</span>/helloworld/,
+		<span style="color:#0057ae;font-weight:bold;">mount</span> <span style="color:#006e28;">options</span>=(<span style="font-weight:bold;">rw</span> <span style="font-weight:bold;">bind</span> <span style="font-weight:bold;">remount</span> <span style="font-weight:bold;">nodev</span> <span style="font-weight:bold;">noexec</span>) <span style="color:#006e28;">vfstype</span>=<span style="color:#bf0303;">ecryptfs</span> /home/<span style="color:#3daee9;">*</span>/.helloworld/ <span style="color:#bf0303;font-weight:bold;">-&gt;</span> /home/<span style="color:#3daee9;">*</span>/helloworld/,
 		<span style="color:#0057ae;font-weight:bold;">mount</span> <span style="color:#006e28;">options</span><span style="color:#bf0303;font-weight:bold;"> in</span> (<span style="font-weight:bold;">rw</span>, <span style="font-weight:bold;">bind</span>) / <span style="color:#bf0303;font-weight:bold;">-&gt;</span> /run/hellowordd/<span style="color:#3daee9;">*</span>.mnt,
+		<span style="color:#0057ae;font-weight:bold;">mount</span> <span style="color:#006e28;">option</span>=<span style="font-weight:bold;">read-only</span> <span style="color:#006e28;">fstype</span>=<span style="color:#bf0303;">btrfs</span> /dev/sd<span style="color:#ff5500;">[a</span><span style="color:#ca60ca;">-</span><span style="color:#ff5500;">z][1</span><span style="color:#ca60ca;">-</span><span style="color:#ff5500;">9]</span><span style="color:#3daee9;">*</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> /media/<span style="color:#3daee9;">*</span>/<span style="color:#3daee9;">*</span>,
 		<span style="color:#0057ae;font-weight:bold;">umount</span> /home/<span style="color:#3daee9;">*</span>/helloworld/,
 
 		<span style="color:#898887;"># Pivot Root rules</span>
@@ -153,14 +133,16 @@
 		<span style="color:#0057ae;font-weight:bold;">unix</span> <span style="color:#006e28;">peer</span>=(<span style="color:#0057ae;">label</span>=<span style="color:#b08000;">@{profile_name}</span>,<span style="color:#0057ae;">addr</span>=@helloworld),
 
 		<span style="color:#898887;"># Rlimit rule</span>
-		<span style="color:#0057ae;font-weight:bold;">set</span> <span style="color:#0057ae;font-weight:bold;">rlimit</span> <span style="color:#0057ae;">data</span> <span style="color:#bf0303;font-weight:bold;">&lt;=</span> <span style="color:#b08000;">100</span><span style="color:#bf0303;">M</span>,
+		<span style="color:#0057ae;font-weight:bold;">set</span> <span style="color:#0057ae;font-weight:bold;">rlimit</span> <span style="color:#0057ae;">data</span>  <span style="color:#bf0303;font-weight:bold;">&lt;=</span> <span style="color:#b08000;">100</span><span style="color:#bf0303;">M</span>,
 		<span style="color:#0057ae;font-weight:bold;">set</span> <span style="color:#0057ae;font-weight:bold;">rlimit</span> <span style="color:#0057ae;">nproc</span> <span style="color:#bf0303;font-weight:bold;">&lt;=</span> <span style="color:#b08000;">10</span>,
-		<span style="color:#0057ae;font-weight:bold;">set</span> <span style="color:#0057ae;font-weight:bold;">rlimit</span> <span style="color:#0057ae;">nice</span> <span style="color:#bf0303;font-weight:bold;">&lt;=</span> <span style="color:#b08000;">5</span>,
+		<span style="color:#0057ae;font-weight:bold;">set</span> <span style="color:#0057ae;font-weight:bold;">rlimit</span> <span style="color:#0057ae;">memlock</span> <span style="color:#bf0303;font-weight:bold;">&lt;=</span> <span style="color:#b08000;">2</span><span style="color:#bf0303;">GB</span>,
+		<span style="color:#0057ae;font-weight:bold;">set</span> <span style="color:#0057ae;font-weight:bold;">rlimit</span> <span style="color:#0057ae;">rss</span> <span style="color:#bf0303;font-weight:bold;">&lt;=</span> <span style="font-style:italic;">infinity</span>,
 
 		<span style="color:#898887;"># Change Profile rules</span>
-		<span style="color:#0057ae;font-weight:bold;">change_profile</span> <span style="color:#0057ae;">unsafe</span> /<span style="color:#3daee9;">**</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span><span style="color:#644a9b;font-style:italic;"> [^u/]</span><span style="color:#ff5500;font-style:italic;">**</span>,
-		<span style="color:#0057ae;font-weight:bold;">change_profile</span> <span style="color:#0057ae;">unsafe</span> /<span style="color:#3daee9;">**</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span><span style="color:#644a9b;font-style:italic;"> {u,un,unc,unco,uncon,unconf,unconfi,unconfin,unconfine}</span>,
-		<span style="color:#0057ae;font-weight:bold;">change_profile</span> /bin/bash <span style="color:#bf0303;font-weight:bold;">-&gt;</span><span style="color:#644a9b;font-style:italic;"> new_profile</span>,
+		<span style="color:#0057ae;font-weight:bold;">change_profile</span> <span style="color:#0057ae;">unsafe</span> /<span style="color:#3daee9;">**</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#644a9b;font-style:italic;">[^u/]</span><span style="color:#ff5500;font-style:italic;">**</span>,
+		<span style="color:#0057ae;font-weight:bold;">change_profile</span> <span style="color:#0057ae;">unsafe</span> /<span style="color:#3daee9;">**</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#644a9b;font-style:italic;">{u,un,unc,unco,uncon,unconf,unconfi,unconfin,unconfine}</span>,
+		<span style="color:#0057ae;font-weight:bold;">change_profile</span> /bin/bash  <span style="color:#bf0303;font-weight:bold;">-&gt;</span> 
+			<span style="color:#644a9b;font-style:italic;">new_profile</span>,
 
 		<span style="color:#898887;"># Alias</span>
 		<span style="color:#0057ae;font-weight:bold;">alias</span> /usr/ <span style="color:#bf0303;font-weight:bold;">-&gt;</span> /mnt/usr/,
@@ -171,47 +153,12 @@
 		<span style="color:#0057ae;font-weight:bold;">network</span> <span style="color:#0057ae;">unix</span> <span style="color:#0057ae;">stream</span>,
 		<span style="color:#0057ae;font-weight:bold;">unix</span> <span style="color:#0057ae;">stream</span>,
 
-		/usr/hi<span style="color:#3daee9;">\&quot;</span>esc<span style="color:#3daee9;">\x23</span>esc<span style="color:#3daee9;">\032</span>esc<span style="color:#3daee9;">\c3</span>esc<span style="font-weight:bold;"> r</span>, <span style="color:#898887;"># Escape expressions</span>
+		/usr/hi<span style="color:#3daee9;">\&quot;</span>esc<span style="color:#3daee9;">\x23</span>esc<span style="color:#3daee9;">\032</span>esc<span style="color:#3daee9;">\*</span>es<span style="color:#3daee9;">\{</span>esc<span style="color:#3daee9;">\ </span>rw<span style="font-weight:bold;"> r</span>, <span style="color:#898887;"># Escape expressions</span>
 
 		<span style="color:#898887;"># Text after a variable is highlighted as path</span>
 		<span style="color:#0057ae;font-weight:bold;">file</span> /my/path<span style="font-weight:bold;"> r</span>,
 		<span style="color:#b08000;">@{FOO_LIB}</span>file<span style="font-weight:bold;"> r</span>,
 		<span style="color:#b08000;">@{FOO_LIB}</span>#my/path<span style="font-weight:bold;"> r</span>, <span style="color:#898887;">#Comment</span>
 	}
-}
-
-<span style="color:#898887;"># Profile for /usr/bin/error</span>
-<span style="color:#644a9b;font-weight:bold;">profile</span><span style="color:#644a9b;"> syntax_error</span> /usr/bin/error <span style="color:#006e28;">flags</span>=(<span style="color:#bf0303;">complain</span> <span style="color:#bf0303;">audit</span>) {
-	<span style="color:#898887;"># Syntax error highlighting:</span>
-
-	<span style="color:#898887;"># Error: Include</span>
-	include&lt;filepath&gt;
-<span style="color:#006e28;">	include &lt;</span><span style="color:#bf0303;text-decoration:underline;">filepath</span><span style="color:#006e28;"> </span><span style="color:#bf0303;text-decoration:underline;">&gt;</span>
-	<span style="color:#006e28;">#include</span><span style="color:#bf0303;text-decoration:underline;">filepath</span>
-	<span style="color:#898887;"># include</span>
-	<span style="color:#0057ae;font-weight:bold;">file</span> <span style="color:#bf0303;text-decoration:underline;">#include</span> /hello<span style="font-weight:bold;"> r</span>,
-
-	<span style="color:#898887;"># Error: Variable open or with characters not allowed</span>
-	<span style="color:#bf0303;text-decoration:underline;">@</span>{var
-	<span style="color:#bf0303;text-decoration:underline;">@</span>{sdf&amp;s}
-
-	<span style="color:#898887;"># Error: Open brackets</span>
-	/<span style="color:#ff5500;">{hello{ab</span><span style="color:#ca60ca;">,</span><span style="color:#ff5500;">cd}worl</span><span style="color:#ff5500;text-decoration:underline;">d</span> <span style="font-weight:bold;"> kr</span>,
-	/<span style="color:#ff5500;">{abc{ab</span><span style="color:#ff5500;text-decoration:underline;">c</span><span style="font-weight:bold;"> kr</span>,
-	/<span style="color:#ff5500;">[ab</span><span style="color:#ff5500;text-decoration:underline;">c</span> <span style="font-weight:bold;"> kr</span>,
-	/<span style="color:#ff5500;">(ab</span><span style="color:#ff5500;text-decoration:underline;">c</span><span style="font-weight:bold;"> kr</span>,
-
-	<span style="color:#898887;"># Error: Empty brackets</span>
-	/hello<span style="color:#bf0303;text-decoration:underline;">[]</span>hello<span style="color:#bf0303;text-decoration:underline;">{}</span>hello<span style="color:#bf0303;text-decoration:underline;">()</span>he <span style="font-weight:bold;"> kr</span>,
-
-	<span style="color:#898887;"># Error: Open rule</span>
-	/home/<span style="color:#3daee9;">*</span>/file<span style="font-weight:bold;"> rw</span>
-	<span style="color:#0057ae;font-weight:bold;text-decoration:underline;">capability</span> <span style="color:#0057ae;">dac_override</span>
-	<span style="color:#bf0303;font-weight:bold;text-decoration:underline;">deny</span> file /etc/fstab w
-	<span style="font-weight:bold;text-decoration:underline;">audit</span> network ieee802154,
-
-	<span style="color:#0057ae;font-weight:bold;text-decoration:underline;">dbus</span> (<span style="font-weight:bold;">receive</span>
-	<span style="color:#0057ae;font-weight:bold;text-decoration:underline;">unix</span> <span style="color:#0057ae;">stream</span>,
-	<span style="color:#0057ae;font-weight:bold;text-decoration:underline;">unix</span> <span style="color:#0057ae;">stream</span>,
 }
 </pre></body></html>

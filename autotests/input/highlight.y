@@ -26,9 +26,27 @@ extern KateParser *parser;
 %token <int_val>      TOK_NOT_EQUAL  "!="
 %token <int_val>      TOK_LESSER_E   "<="
 %token <int_val>      TOK_GREATER_E  ">="
-%token <int_val>      TOK_EQUAL_2    "=="
+%token <int_val>      TOK_EQUAL_2    "==" //comment
+%token
+   PERCENT_DEBUG           "%debug"
+   PERCENT_DEFAULT_PREC    "%default-prec"
+   PERCENT_DEFINE          "%define"
+;
 
 %type <int_val>       type type_proc
+
+%code top {
+  #define _GNU_SOURCE
+  #include <stdio.h>
+  int val;
+}
+
+%destructor { free ($$); printf ("%d", @$.first_line); } <*>
+%lex-param   {scanner_mode *mode};
+%parse-param {int *nastiness} {int *randomness}
+%initial-action {
+  @$.initialize (file_name);
+};
 
 %%
 
@@ -42,7 +60,28 @@ number:               integer_number
                          $$->cl = var::LITTERAL;
                          $$->real = $<int_val>1;
                       };
+words:
+                      %empty
+                      | words word
+                      ;
 
+%type <type> word;
+%printer { fprintf (yyo, "%s", word_string ($$)); } <type>;
+word:
+                      %?{ boom(1); }
+                      | "hello"  { $$ = hello; }
+                      | "bye"  { $$ = bye; }
+                      ;
+
+foo:                  { $$ = 0 }
+                      | number { $$ = $1 | $2; }
+                      | hello { $$ = $1 | $3; } // without a comma
+
+hello:
+                      gram1 { $$ = "hi" };
+                      | gram2
+                      ;;
+                      
 %%
 
 #include <stdio.h>

@@ -672,6 +672,7 @@ MatchResult StringDetect::doMatch(const QString& text, int offset, const QString
 bool WordDetect::doLoad(QXmlStreamReader& reader)
 {
     m_word = reader.attributes().value(QStringLiteral("String")).toString();
+    m_caseSensitivity = Xml::attrToBool(reader.attributes().value(QStringLiteral("insensitive"))) ? Qt::CaseInsensitive : Qt::CaseSensitive;
     return !m_word.isEmpty();
 }
 
@@ -684,7 +685,7 @@ MatchResult WordDetect::doMatch(const QString& text, int offset, const QStringLi
     if (offset > 0 && !isDelimiter(text.at(offset - 1)))
         return offset;
 
-    if (text.midRef(offset, m_word.size()) != m_word)
+    if (text.midRef(offset, m_word.size()).compare(m_word, m_caseSensitivity) != 0)
         return offset;
 
     if (text.size() == offset + m_word.size() || isDelimiter(text.at(offset + m_word.size())))

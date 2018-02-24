@@ -246,6 +246,7 @@ protected:
 
 private:
     QString m_word;
+    Qt::CaseSensitivity m_caseSensitivity;
 };
 
 }

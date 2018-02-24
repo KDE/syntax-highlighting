@@ -37,3 +37,31 @@ normal text
 Title: some text
 
 normal text
+
+# Fenced code blocks (bug 356974)
+
+## PHP
+
+```php
+namespace Application\Controller;
+
+use Zend\Mvc\Controller\AbstractActionController;
+
+class IndexController extends AbstractActionController
+{
+}
+```
+
+## Python
+
+```python
+def addXToY(x, y):
+    total = x + y
+    print total
+```
+
+## No language specified
+
+```
+No language is specified, but it should be still rendered as code block.
+```

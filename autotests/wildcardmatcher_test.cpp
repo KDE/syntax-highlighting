@@ -20,7 +20,7 @@
 #include <wildcardmatcher_p.h>
 
 #include <QObject>
-#include <QtTest/qtest.h>
+#include <qtest.h>
 
 class WildcardMatcherTest : public QObject
 {

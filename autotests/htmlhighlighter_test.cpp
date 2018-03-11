@@ -26,7 +26,7 @@
 #include <QObject>
 #include <QProcess>
 #include <QStandardPaths>
-#include <QtTest/qtest.h>
+#include <qtest.h>
 
 using namespace KSyntaxHighlighting;
 

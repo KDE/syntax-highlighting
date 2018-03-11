@@ -25,7 +25,7 @@
 #include <QFileInfo>
 #include <QObject>
 #include <QStandardPaths>
-#include <QtTest/qtest.h>
+#include <qtest.h>
 
 namespace KSyntaxHighlighting {
 

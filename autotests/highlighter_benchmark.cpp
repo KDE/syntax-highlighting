@@ -23,7 +23,7 @@
 #include <state.h>
 
 #include <QObject>
-#include <QtTest/qtest.h>
+#include <qtest.h>
 
 using namespace KSyntaxHighlighting;
 

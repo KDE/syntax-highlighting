@@ -30,7 +30,7 @@
 #include <QProcess>
 #include <QStandardPaths>
 #include <QTextStream>
-#include <QtTest/qtest.h>
+#include <qtest.h>
 
 using namespace KSyntaxHighlighting;
 

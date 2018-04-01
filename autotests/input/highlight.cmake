@@ -1,51 +1,111 @@
-#this CMakeLists.txt doesn't do anything useful, but it shoudl demonstrate the cmake syntax highlighting
-#Alexander Neundorf <neundorf@kde.org>
+# This CMakeLists.txt doesn't do anything useful,
+# but it shoudl demonstrate the cmake syntax highlighting
+#
+# Alex Turbov <i.zaufi@gmail.com>
+#
 
-#ok this is a comment
-#and another line
-#a built-in command, it's bold black
-ADD_DEFINITIONS(-Wall -Wctor-dtor-privacy -Woverloaded-virtual -Wno-long-long -pipe -fno-builtin -fno-exceptions)
+#[[.rst:
+Demo
+----
 
-#and another function
-INCLUDE_DIRECTORIES(
-#comments are also highlighted inside function parameters
-#variables are Qt::blue
-${CMAKE_CURRENT_SOURCE_DIR}/../../lib/qt4/include/Qt  
+This is an **RST** documentation.
+
+::
+
+    # Sample code block
+    blah-blah
+
+But we are about to test CMake here ;-)
+
+#]]
+
+cmake_policy(VERSION 3.11)
+
+project(
+    Demo VERSION 1.0
+    DESCRIPTION "For unit testing purposes"
+    # NOTE that particular languages is a separate style
+    # to highlight "special" (well known values)
+    LANGUAGES C CXX
+  )
+
+set(SOME_TRUE_OPTION TRUE)      # `true` value
+# `false` value and "internal" variable
+set(_ANOTHER_FALSE_OPTION OFF CACHE INTERNAL "Internal option")
+
+#BEGIN Message block
+message(FATAL_ERROR "Ordinal message do ${VARIABLE_EXPANSION}")
+message(AUTHOR_WARNING "... standard variables have a dedicated style")
+message(SEND_ERROR "e.g. ${PROJECT_DESCRIPTION} or ${CMAKE_COMMAND}")
+message(
+    STATUS [=[
+        Raw messages do not do ${VARIABLES_EXPANSION} or \n
+        escape symbols highlighting...
+    ]=]
 )
+#END Message block
 
-# BEGIN defining a macro
-MACRO(ECOS_ADD_EXECUTABLE _exe_NAME )
+# ATTENTION Every command highlight only its own named keywords...
+# Also, note aliased (most of the time imported) targets higlighted as well
+add_library(Foo::foo IMPORTED GLOBAL)
+set(KW_HL IMPORTED GLOBAL)      # `IMPORTED` and `GLOBAL` are not highlighted here!
 
-#special parameters are italic, see the STATIC in the next line
-ADD_LIBRARY(${_exe_NAME} STATIC ${ARGN})
-#but not in the following line ?
-  ADD_LIBRARY(${_exe_NAME} STATIC ${ARGN})
-# it seems the kate highlighting file could need some love, Alex
+# Properties are separate ("special value") style
+set_target_properties(Foo::foo PROPERTIES LOCATION "${FOO_LIBRARY}")
 
+# Generator expressions
+target_compile_definitions(
+    # NOTE Ok w/ CMake >= 3.11
+    Foo::foo
+    $<$<PLATFORM_ID:Windows>:WINDOWS_FOO>
+    $<$<PLATFORM_ID:Linux>:
+        LINUX_FOO
+        $<$<BOOL:${_has_foo}>:SOME_FOO_PATH=${PROJECT_BINARY_DIR}/foo>
+    >
+  )
 
-#another command with a bunch of variables and special parameters   
-   ADD_CUSTOM_COMMAND(
-      TARGET ${_exe_NAME} 
-      PRE_LINK 
-      COMMAND ${CMAKE_C_COMPILER} 
-      ARGS -o ${_exe_NAME} 
-$\(${_exe_NAME}_SRC_OBJS\) -nostdlib  -nostartfiles -Lecos/install/lib -Ttarget.ld
-   )
+#[=======================================================================[.rst:
+.. cmake:command:: my_fun
 
-#add the created files to the make_clean_files
-   SET(ECOS_ADD_MAKE_CLEAN_FILES ${ECOS_ADD_MAKE_CLEAN_FILES};${_exe_NAME};)
-#and another command...   
-   SET_DIRECTORY_PROPERTIES( 
-      PROPERTIES
-      ADDITIONAL_MAKE_CLEAN_FILES "${ECOS_ADD_MAKE_CLEAN_FILES}"
-   )
-ENDMACRO(ECOS_ADD_EXECUTABLE)
-# END of macro
+*RST* documentation ``can`` refer to :cmake:command:`any_commands` or
+:cmake:variable:`variables`... (but this require updated RST higlighter ;-)
 
-#calling a self-defined function, variables are also Qt::blue here
-ECOS_ADD_EXECUTABLE(${PROJECT_NAME} ${the_sources} ${qt4_moc_SRCS})
+.. seealso::
 
-if((A AND B) OR C)
+    * `RST improvement MR <https://phabricator.kde.org/D7245>`_
+
+.. code-block:: cmake
+   :caption: **Synopsys**
+
+    my_fun([ANYTHING...])
+
+#]=======================================================================]
+function(my_fun)
+    # TODO Add implementation
+endfunction()
+
+my_fun(
+    # Custom functions do not highlight "standard" named args ...
+    PUBLIC LOCATION PARENT_SCOPE
+    # only some well-known values ...
+    smth-NOTFOUND ON
+    # and standard variables
+    PROJECT_VERSION
+    # or substitutions
+    $ENV{HOME} OR ${_internal_var_is_grey}
+  )
+
+# I dont'recall exactly, but there was some bug with `if`...
+if((A AND "${B}") OR C OR (var MATCHES "regex"))
+    # Anyway... it is Ok nowadays ;-)
+
+elseif(POLICY CMP066)
+    add_executable(${PROJECT_NAME} ${PROJECT_NAME}.cc)
+    target_link_libraries(
+        ${PROJECT_NAME}
+        PRIVATE
+            Qt5::Core
+            $<$<BOOL:${HAS_FOO}>:Foo::foo>
+      )
+
 endif()
-
-

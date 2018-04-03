@@ -1,50 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
 
-<language name="GDB Backtrace" section="Other"
-          version="2" kateversion="3.4"
-          extensions="*.kcrash;*.crash;*.bt"
+<language name="GDB" section="Other"
+          version="1" kateversion="3.4"
+          extensions="*.gdb"
           mimetype=""
           author="Milian Wolff (mail@milianw.de)" license="LGPL">
 
 <highlighting>
-
+  <list name="commands">
+    <item>break</item>
+    <item>run</item>
+    <item>continue</item>
+    <item>backtrace</item>
+    <item>detach</item>
+    <item>quit</item>
+    <item>up</item>
+    <item>down</item>
+    <item>frame</item>
+    <item>where</item>
+    <item>info</item>
+    <item>ptype</item>
+    <item>print</item>
+    <item>call</item>
+    <item>catch</item>
+    <item>condition</item>
+    <item>command</item>
+    <item>set</item>
+    <item>awatch</item>
+    <item>thread</item>
+    <item>list</item>
+    <item>dprintf</item>
+    <item>target</item>
+    <item>end</item>
+    <item>source</item>
+  </list>
   <contexts>
-    <context name="apache" attribute="Normal" lineEndContext="#stay">
-      <DetectChar char="#" context="stackframe" firstNonSpace="true" />
-      <IncludeRules context="oneliners" />
+    <context name="default" attribute="Normal" lineEndContext="#stay">
+      <!-- highlight GDB command listings -->
+      <StringDetect String="(gdb)" context="gdb" firstNonSpace="true" />
+      <!-- continuation of commands -->
+      <DetectChar char=">" context="gdb" firstNonSpace="true" />
+      <!-- output of backtrace-generating commands -->
+      <IncludeRules context="##GDB Backtrace" />
     </context>
-    <context name="oneliners" attribute="Normal" lineEndContext="#pop">
-      <StringDetect attribute="Crash" context="#stay" String="[KCrash Handler]" />
-      <StringDetect String="Thread" firstNonSpace="true" context="thread" />
-      <StringDetect String="[Current thread" firstNonSpace="true" context="thread" />
+    <context name="gdb" attribute="CommandLine" lineEndContext="#pop">
+      <keyword attribute="Command" String="commands" context="args" />
+      <WordDetect String="python" context="python" attribute="Command" />
+      <DetectChar char="#" context="comment" />
     </context>
-    <context name="stackframe" attribute="Normal" lineEndContext="#stay">
-      <RegExpr attribute="Normal" context="identifier"  String="((?:[^ ]|&lt;.+&gt;)+::)?([^ :]+)\s*\(" lookAhead="true" />
-      <StringDetect attribute="Normal" String="at" context="file" />
-      <StringDetect attribute="Normal" String="from" context="file" />
-      <IncludeRules context="oneliners" />
+    <context name="args" attribute="CommandLine" lineEndContext="#pop">
+      <DetectChar char="#" context="comment" />
     </context>
-    <context name="identifier" attribute="Normal" lineEndContext="#stay" dynamic="true">
-      <StringDetect attribute="QualifiedIdentifier" String="%1" dynamic="true" />
-      <StringDetect attribute="Function" String="%2" dynamic="true" />
-      <RegExpr attribute="Crash" String="\b0x0\b" />
-      <DetectChar char=")" context="#pop" />
+    <context name="comment" attribute="Comment" lineEndContext="#pop">
     </context>
-    <context name="file" attribute="File" lineEndContext="#pop#pop">
-      <DetectChar char=":" context="#pop#pop" attribute="Normal" />
-    </context>
-    <context name="thread" attribute="Thread" lineEndContext="#pop">
+    <context name="python" attribute="Normal" lineEndContext="#stay">
+      <WordDetect String="end" context="#pop" attribute="Command" />
+      <IncludeRules context="##Python" />
     </context>
   </contexts>
-
   <itemDatas>
     <itemData name="Normal" defStyleNum="dsNormal" spellChecking="false" />
-    <itemData name="Crash" defStyleNum="dsError" spellChecking="false" underline="false" bold="true" />
-    <itemData name="QualifiedIdentifier" defStyleNum="dsOthers" spellChecking="false" />
-    <itemData name="Function" defStyleNum="dsFunction" spellChecking="false" bold="true" />
-    <itemData name="File" defStyleNum="dsDataType" spellChecking="false" />
-    <itemData name="Thread" defStyleNum="dsBaseN" spellChecking="false" />
+    <itemData name="CommandLine" defStyleNum="dsFunction" spellChecking="false" />
+    <itemData name="Command" defStyleNum="dsKeyword" spellChecking="false" />
+    <itemData name="Comment" defStyleNum="dsComment" spellChecking="false" />
   </itemDatas>
 </highlighting>
 

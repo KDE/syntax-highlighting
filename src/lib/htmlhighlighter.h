@@ -36,7 +36,7 @@ class KSYNTAXHIGHLIGHTING_EXPORT HtmlHighlighter : public AbstractHighlighter
 {
 public:
     HtmlHighlighter();
-    ~HtmlHighlighter();
+    ~HtmlHighlighter() Q_DECL_OVERRIDE;
 
     void highlightFile(const QString &fileName);
 

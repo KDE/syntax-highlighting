@@ -28,8 +28,6 @@
 #include "ksyntaxhighlighting_logging.h"
 #include "theme.h"
 
-#include <QDebug>
-
 using namespace KSyntaxHighlighting;
 
 AbstractHighlighterPrivate::AbstractHighlighterPrivate()

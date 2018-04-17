@@ -277,7 +277,7 @@ void DefinitionData::clear()
     mimetypes.clear();
     extensions.clear();
     delimiters = QStringLiteral("\t !%&()*+,-./:;<=>?[\\]^{|}~"); // must be sorted!
-    caseSensitive = Qt::CaseSensitive,
+    caseSensitive = Qt::CaseSensitive;
     version = 0.0f;
     priority = 0;
     hidden = false;

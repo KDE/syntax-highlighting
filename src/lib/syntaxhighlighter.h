@@ -40,7 +40,7 @@ class KSYNTAXHIGHLIGHTING_EXPORT SyntaxHighlighter : public QSyntaxHighlighter, 
 public:
     explicit SyntaxHighlighter(QObject *parent = nullptr);
     explicit SyntaxHighlighter(QTextDocument *document);
-    ~SyntaxHighlighter();
+    ~SyntaxHighlighter() Q_DECL_OVERRIDE;
 
     void setDefinition(const Definition &def) Q_DECL_OVERRIDE;
 

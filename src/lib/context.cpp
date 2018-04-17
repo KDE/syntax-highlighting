@@ -23,7 +23,6 @@
 #include "ksyntaxhighlighting_logging.h"
 #include "xml_p.h"
 
-#include <QDebug>
 #include <QString>
 #include <QXmlStreamReader>
 

@@ -21,7 +21,6 @@
 #include "repository.h"
 #include "ksyntaxhighlighting_logging.h"
 
-#include <QDebug>
 
 using namespace KSyntaxHighlighting;
 

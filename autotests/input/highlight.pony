@@ -149,8 +149,13 @@ actor Main
     env.out.print(f(20).string())
 
 /* nested /* commentary */ */
-// simgle comment
+// single comment
 
+class A
+class _A
+x'
+x''
+x'.string()
 '\uaaaa'
 '\Ubbbbbb'
 '\xcc'
@@ -175,8 +180,13 @@ end
 
 a.endnormal
 
+print();print()
+
 /* syntactically false: */
 
+class _aA
+class _a
+class a
 0b2332
 0b
 0x
@@ -197,5 +207,7 @@ a.endnormal
 "\ua"
 "\uaaa"
 "\uyyyy"
+a'a
 
 class badType
+print();

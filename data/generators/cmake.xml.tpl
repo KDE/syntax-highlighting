@@ -208,8 +208,8 @@
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="User Function Args">
-        <Detect2Chars attribute="Normal Text" context="#stay" char="\\" char1="(" />
-        <Detect2Chars attribute="Normal Text" context="#stay" char="\\" char1=")" />
+        <Detect2Chars attribute="Normal Text" context="#stay" char="\" char1="(" />
+        <Detect2Chars attribute="Normal Text" context="#stay" char="\" char1=")" />
         <RegExpr attribute="Escapes" context="#stay" String="\\[&quot;$n\\]" />
         <DetectChar attribute="Strings" context="String" char="&quot;" />
         <RegExpr attribute="Strings" context="Bracketed String" String="\[(=*)\[" />

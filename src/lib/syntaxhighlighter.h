@@ -40,9 +40,9 @@ class KSYNTAXHIGHLIGHTING_EXPORT SyntaxHighlighter : public QSyntaxHighlighter, 
 public:
     explicit SyntaxHighlighter(QObject *parent = nullptr);
     explicit SyntaxHighlighter(QTextDocument *document);
-    ~SyntaxHighlighter() Q_DECL_OVERRIDE;
+    ~SyntaxHighlighter() override;
 
-    void setDefinition(const Definition &def) Q_DECL_OVERRIDE;
+    void setDefinition(const Definition &def) override;
 
     /** Returns whether there is a folding region beginning at @p startBlock.
      *  This only considers syntax-based folding regions,
@@ -67,9 +67,9 @@ public:
     QTextBlock findFoldingRegionEnd(const QTextBlock &startBlock) const;
 
 protected:
-    void highlightBlock(const QString & text) Q_DECL_OVERRIDE;
-    void applyFormat(int offset, int length, const Format &format) Q_DECL_OVERRIDE;
-    void applyFolding(int offset, int length, FoldingRegion region) Q_DECL_OVERRIDE;
+    void highlightBlock(const QString & text) override;
+    void applyFormat(int offset, int length, const Format &format) override;
+    void applyFolding(int offset, int length, FoldingRegion region) override;
 
 private:
     Q_DECLARE_PRIVATE_D(AbstractHighlighter::d_ptr, SyntaxHighlighter)

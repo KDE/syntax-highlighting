@@ -38,8 +38,8 @@ public:
     void openFile(const QString &fileName);
 
 protected:
-    void contextMenuEvent(QContextMenuEvent *event) Q_DECL_OVERRIDE;
-    void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
+    void contextMenuEvent(QContextMenuEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
     friend class CodeEditorSidebar;

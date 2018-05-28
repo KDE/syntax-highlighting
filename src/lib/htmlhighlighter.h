@@ -36,7 +36,7 @@ class KSYNTAXHIGHLIGHTING_EXPORT HtmlHighlighter : public AbstractHighlighter
 {
 public:
     HtmlHighlighter();
-    ~HtmlHighlighter() Q_DECL_OVERRIDE;
+    ~HtmlHighlighter() override;
 
     void highlightFile(const QString &fileName);
 
@@ -44,7 +44,7 @@ public:
     void setOutputFile(FILE *fileHandle);
 
 protected:
-    void applyFormat(int offset, int length, const Format &format) Q_DECL_OVERRIDE;
+    void applyFormat(int offset, int length, const Format &format) override;
 
 private:
     std::unique_ptr<HtmlHighlighterPrivate> d;

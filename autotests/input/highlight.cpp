@@ -147,6 +147,8 @@ static char binNumWithSep = 0b0'1010'10;
 
 static double d1 = 42.;
 static double d2 = .42;
+static double d2a = -0.49;
+static double d2b = -0.09;
 static double d3 = 42.3e1;
 static double d4 = .2e-12;
 static double d5 = 32.e+12;

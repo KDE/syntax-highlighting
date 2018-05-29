@@ -6,7 +6,7 @@
 <!--
 sed -E '
   s/<Detect2Chars(.*)char="\*" char1="\/"(.*)/<StringDetect\1String="]%1]" dynamic="true"\2/
-  s/<context name="ML_/<context dynamic="true" name="ML_/
+  s/ (name="ML_|name="BlockComment")/ dynamic="true" \1/
 ' doxygen.xml > doxygenlua.xml
 
 + edit
@@ -15,7 +15,7 @@ sed -E '
 - grep '\\\*' doxygenlua.xml
 -->
 <language name="DoxygenLua"
-          version="5"
+          version="6"
           kateversion="5.0"
           section="Markup"
           extensions=""
@@ -263,7 +263,7 @@ sed -E '
         <Detect2Chars attribute="Comment" context="#stay" char="&lt;" char1="&lt;" />
         <RegExpr attribute="HTML Tag" context="SL_htmltag" String="&lt;\/?[-\w0-9._:@]+" />
       </context>
-      <context attribute="Comment" lineEndContext="#stay" name="BlockComment">
+      <context attribute="Comment" lineEndContext="#stay" dynamic="true" name="BlockComment">
         <DetectSpaces />
         <StringDetect attribute="Comment" context="#pop" String="]%1]" dynamic="true" endRegion="BlockComment" />
         <IncludeRules context="##Alerts" />
@@ -293,11 +293,11 @@ sed -E '
                  refer to another SL_*/ML_* context, to help maintainability.)
       -->
       <!-- tag contexts -->
-      <context attribute="Comment" lineEndContext="#pop" name="ML_TagWord">
+      <context attribute="Comment" lineEndContext="#pop" dynamic="true" name="ML_TagWord">
         <StringDetect attribute="Comment" context="#pop" String="]%1]" dynamic="true" lookAhead="true" />
         <IncludeRules context="SL_TagWord" />
       </context>
-      <context attribute="Comment" lineEndContext="#pop" name="ML_TagParam">
+      <context attribute="Comment" lineEndContext="#pop" dynamic="true" name="ML_TagParam">
         <StringDetect attribute="Comment" context="#pop" String="]%1]" dynamic="true" lookAhead="true" />
         <DetectSpaces />
         <StringDetect attribute="Tags" context="ML_Tag2ndWord" String="[in]" />
@@ -306,18 +306,18 @@ sed -E '
         <RegExpr attribute="Word" context="#pop" String="\S(?=&wordsep;)" />
         <RegExpr attribute="Word" context="#stay" String="\S" />
       </context>
-      <context attribute="Comment" lineEndContext="#pop" name="ML_TagWordWord">
+      <context attribute="Comment" lineEndContext="#pop" dynamic="true" name="ML_TagWordWord">
         <StringDetect attribute="Comment" context="#pop" String="]%1]" dynamic="true" lookAhead="true" />
         <DetectSpaces />
         <RegExpr attribute="Word" context="ML_Tag2ndWord" String="\S(?=&wordsep;)" />
         <RegExpr attribute="Word" context="#stay" String="\S" />
       </context>
       <!-- TODO for kate 2.x, convert references to "#pop!ML_TagWord" -->
-      <context attribute="Comment" lineEndContext="#pop#pop" name="ML_Tag2ndWord">
+      <context attribute="Comment" lineEndContext="#pop#pop" dynamic="true" name="ML_Tag2ndWord">
         <StringDetect attribute="Comment" context="#pop#pop" String="]%1]" dynamic="true" lookAhead="true" />
         <IncludeRules context="SL_Tag2ndWord" />
       </context>
-      <context attribute="Comment" lineEndContext="#pop" name="ML_TagString">
+      <context attribute="Comment" lineEndContext="#pop" dynamic="true" name="ML_TagString">
         <DetectSpaces />
         <StringDetect attribute="Comment" context="#pop" String="]%1]" dynamic="true" lookAhead="true" />
         <StringDetect attribute="HTML Comment" context="ML_htmlcomment" String="&lt;!--" />
@@ -325,7 +325,7 @@ sed -E '
         <RegExpr attribute="HTML Tag" context="ML_htmltag" String="&lt;\/?[-\w0-9._:@]+" />
         <RegExpr attribute="Description" context="#stay" String="." />
       </context>
-      <context attribute="Comment" lineEndContext="#pop" name="ML_TagWordString">
+      <context attribute="Comment" lineEndContext="#pop" dynamic="true" name="ML_TagWordString">
         <StringDetect attribute="Comment" context="#pop" String="]%1]" dynamic="true" lookAhead="true" />
         <IncludeRules context="SL_TagWordString" />
       </context>

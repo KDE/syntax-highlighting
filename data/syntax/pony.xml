@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd"
 [
-<!ENTITY space " ">
-<!ENTITY punctuators ":!&#37;&space;&amp;()+-/.*&lt;=&gt;?[]{|}~^,;">
+<!ENTITY punctuators ":!&amp;()&#37;+-/.*&lt;=&gt;?[]{|}~^,;">
 <!ENTITY EXP "(?:[eE][+-]?[0-9](?:_?[0-9]+)*)">
 <!ENTITY HEX "[0-9A-Fa-f]">
 <!ENTITY SPECHAR "(?:\\[abefnrtv\\0]|\\x&HEX;&HEX;|\\u&HEX;&HEX;&HEX;&HEX;|\\U&HEX;&HEX;&HEX;&HEX;&HEX;&HEX;)">
@@ -11,7 +10,7 @@
 ]>
 <language author="Jonathan Poelen (jonathan.poelen@gmail.com)"
   name="Pony" section="Sources"
-  version="4" kateversion="5.0"
+  version="5" kateversion="5.0"
   indenter="ruby"
   extensions="*.pony"
   mimetype="text/x-pony"
@@ -29,11 +28,6 @@
       <item>struct</item>
       <item>class</item>
       <item>actor</item>
-    </list>
-    <list name="field">
-      <item>var</item>
-      <item>let</item>
-      <item>embed</item>
     </list>
     <list name="method">
       <item>fun</item>
@@ -73,10 +67,11 @@
     <list name="controlflow_end">
       <item>end</item>
     </list>
-    <list name="binop">
+    <list name="operators">
       <item>and</item>
       <item>or</item>
       <item>xor</item>
+      <item>not</item>
     </list>
     <list name="new_overloaders">
       <item>create</item>
@@ -100,9 +95,6 @@
       <item>op_and</item>
       <item>op_or</item>
       <item>op_xor</item>
-    </list>
-    <list name="unop">
-      <item>not</item>
     </list>
     <list name="capability">
       <item>iso</item>
@@ -135,6 +127,10 @@
       <!-- literal -->
       <item>true</item>
       <item>false</item>
+      <!-- field -->
+      <item>var</item>
+      <item>let</item>
+      <item>embed</item>
     </list>
     <list name="types">
       <item>None</item>
@@ -189,24 +185,24 @@
         <keyword attribute="Keyword" context="DefClass" String="class_def"/>
         <keyword attribute="Keyword" context="DefFun" String="method"/>
         <keyword attribute="Keyword" context="DefNew" String="method_new"/>
-        <keyword attribute="Keyword" context="#stay" String="field"/>
         <keyword attribute="Keyword" context="#stay" String="keyword"/>
 
         <keyword attribute="Capability" context="#stay" String="capability"/>
 
-        <keyword attribute="Symbol" context="#stay" String="binop"/>
-        <keyword attribute="Symbol" context="#stay" String="unop"/>
+        <keyword attribute="Symbol" context="#stay" String="operators"/>
 
         <RegExpr attribute="Normal Text" context="#stay" String="&IDVAR;" />
 
-        <RegExpr attribute="Char" context="#stay" String="'[^\\]'" /> <!-- only ascii char -->
-        <RegExpr attribute="Special Char" context="#stay" String="'&SPECHAR;'" />
+        <RegExpr attribute="Char" context="#stay" String="'[^\\']'" /> <!-- only ascii char -->
+        <RegExpr attribute="Special Char" context="#stay" String="'(?:&SPECHAR;|\\')'" />
         <DetectChar attribute="Error" context="#stay" char="'" />
         <DetectChar attribute="String" context="String" char="&quot;" />
 
         <RegExpr attribute="Data Type" context="#stay" String="&IDTYPE;" />
 
-        <DetectChar attribute="Constraint" context="Constraint" char="#" lookAhead="true" />
+        <keyword attribute="Constraint" context="#stay" String="gencapability"/>
+
+        <RegExpr attribute="Error" context="#stay" String="#\w+"/>
 
         <DetectIdentifier />
       </context>
@@ -217,53 +213,56 @@
       </context>
 
       <context attribute="String" lineEndContext="#stay" name="SimpleString">
-        <RegExpr attribute="Special Char" context="#stay" String="&SPECHAR;" />
+        <RegExpr attribute="Special Char" context="#stay" String="&SPECHAR;|\\&quot;" />
         <RegExpr attribute="Error" context="#stay" String="\\." />
         <DetectChar attribute="String" context="#pop#pop" char="&quot;"/>
+        <DetectIdentifier />
       </context>
 
       <context attribute="String" lineEndContext="#stay" name="LongString">
+        <DetectSpaces />
         <RegExpr attribute="Special Char" context="#stay" String="&SPECHAR;" />
         <RegExpr attribute="Error" context="#stay" String="\\." />
-        <RegExpr attribute="String" context="#pop#pop" String="&quot;{3,}"/>
+        <StringDetect attribute="String" context="#pop#pop" String="&quot;&quot;&quot;"/>
+        <DetectIdentifier />
       </context>
 
 
       <context attribute="Comment" lineEndContext="#pop" name="Commentar 1">
-        <LineContinue attribute="Comment" context="#stay"/>
         <IncludeRules context="##Alerts" />
+        <DetectIdentifier />
       </context>
 
       <context attribute="Comment" lineEndContext="#stay" name="Commentar 2">
+        <DetectSpaces />
         <Detect2Chars attribute="Comment" context="#pop" char="*" char1="/" endRegion="Comment"/>
         <Detect2Chars attribute="Comment" context="Commentar 2" char="/" char1="*" endRegion="Comment"/>
         <IncludeRules context="##Alerts" />
+        <DetectIdentifier />
       </context>
 
 
-      <context attribute="Normal Text" lineEndContext="#stay" name="DefNew" fallthrough="true" fallthroughContext="#pop">
+      <context attribute="Normal Text" lineEndContext="#stay" name="def_base">
         <DetectSpaces/>
         <Detect2Chars attribute="Attributes" context="Attributes" char="\" char1="\"/>
         <keyword attribute="Capability" context="#stay" String="capability"/>
-        <DetectChar attribute="External Function" context="External Function And Pop" char="@"/>
+        <DetectChar attribute="External Function" context="#pop!External Function" char="@"/>
+      </context>
+
+      <context attribute="Normal Text" lineEndContext="#stay" name="DefNew" fallthrough="true" fallthroughContext="#pop">
+        <IncludeRules context="def_base" />
         <keyword attribute="Overloaders" context="#pop" String="new_overloaders"/>
         <DetectIdentifier attribute="Function"/>
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="DefFun" fallthrough="true" fallthroughContext="#pop">
-        <DetectSpaces/>
-        <Detect2Chars attribute="Attributes" context="Attributes" char="\" char1="\"/>
-        <keyword attribute="Capability" context="#stay" String="capability"/>
-        <DetectChar attribute="External Function" context="External Function And Pop" char="@"/>
+        <IncludeRules context="def_base" />
         <keyword attribute="Overloaders" context="#pop" String="overloaders"/>
         <DetectIdentifier attribute="Function"/>
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="DefClass" fallthrough="true" fallthroughContext="#pop">
-        <DetectSpaces/>
-        <Detect2Chars attribute="Attributes" context="Attributes" char="\" char1="\"/>
-        <keyword attribute="Capability" context="#stay" String="capability"/>
-        <DetectChar attribute="External Function" context="External Function And Pop" char="@"/>
+        <IncludeRules context="def_base" />
         <RegExpr attribute="Data Type" context="#pop" String="&IDTYPE;"/>
         <DetectIdentifier attribute="Error" context="#pop"/>
       </context>
@@ -273,21 +272,12 @@
         <DetectIdentifier attribute="External Function"/>
       </context>
 
-      <context attribute="External Function" lineEndContext="#pop#pop" name="External Function And Pop" fallthrough="true" fallthroughContext="#pop#pop">
-        <DetectIdentifier attribute="External Function"/>
-      </context>
-
 
       <context attribute="Attributes" lineEndContext="#pop" name="Attributes">
         <DetectSpaces/>
         <Detect2Chars attribute="Attributes" context="#pop" char="\" char1="\"/>
         <DetectChar attribute="Attributes" context="#stay" char=","/>
         <DetectIdentifier/>
-      </context>
-
-
-      <context attribute="Error" lineEndContext="#pop" name="Constraint" fallthrough="true" fallthroughContext="#pop">
-        <keyword attribute="Constraint" context="#stay" String="gencapability"/>
       </context>
     </contexts>
     <itemDatas>

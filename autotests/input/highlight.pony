@@ -102,6 +102,8 @@ fun tag assert_true(actual: Bool, msg: String = "") ?
 fun tag expect_true(actual: Bool, msg: String = ""): Bool
 fun tag expect_eq[A: (Equatable[A] #read & Stringable)]
   (expect: A, actual: A, msg: String = ""): Bool
+fun tag expect_eq[A: (Equatable[A] #unknown & Stringable)]
+  (expect: A, actual: A, msg: String = ""): Bool
 
 fun add(other: A): A
 fun sub(other: A): A
@@ -159,9 +161,13 @@ x'.string()
 '\uaaaa'
 '\Ubbbbbb'
 '\xcc'
+'\''
+'\n'
 "\uaaaaa"
 "\Ubbbbbbb"
 "\xccc"
+"\""
+"\n"
 34.4
 34.4e43
 43e4

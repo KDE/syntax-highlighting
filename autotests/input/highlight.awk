@@ -26,3 +26,27 @@ $1 =~ /[^abc/]def/ || b == 3 / 5 {
 END {
 	print p;
 }
+
+function myfunc()
+{
+    print 42
+}
+
+/abc/,/a[b]c/{
+	# parameter with a regex
+	if (match($0, /a/)) {}
+
+	"x\ax\nx\ex\zx\023x\2x\xffx\xFf\xax\12x"
+
+	a =~ /[[:alpha:]]/
+	a =~ /[xx[:alpha:]xx]/
+	a =~ /[a-z[:alpha:]xx-]/
+	a =~ /[]a]/
+	a =~ /[-a]/
+	a =~ /[^]a]/
+	a =~ /[^-a]/
+	a =~ /[a]a\/\n/
+	# incomplete regex
+	a =~ /[xx[:alph
+	a = 23.2
+}

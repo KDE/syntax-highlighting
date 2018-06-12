@@ -31,7 +31,7 @@
 
 <language
     name="CMake"
-    version="7"
+    version="8"
     kateversion="2.4"
     section="Other"
     extensions="CMakeLists.txt;*.cmake;*.cmake.in"
@@ -92,9 +92,10 @@
         <WordDetect String="{{command.name}}" insensitive="true" attribute="Command" context="{{command.name}}_ctx" />
         {% endfor -%}
         <RegExpr attribute="Region Marker" context="RST Documentation" String="^#\[(=*)\[\.rst:" column="0" />
-        <RegExpr attribute="Comment" context="Bracketed Comment" String="^#\[(=*)\[" column="0" />
+        <RegExpr attribute="Comment" context="Bracketed Comment" String="#\[(=*)\[" />
         <DetectChar attribute="Comment" context="Comment" char="#" />
         <DetectIdentifier attribute="User Function/Macro" context="User Function" />
+        <DetectChar attribute="@Variable Substitution" context="@VarSubst" char="@" />
         <!-- Include keywords matching for language autocompleter work -->
         <keyword attribute="Command" context="#stay" String="commands" />
       </context>
@@ -198,6 +199,7 @@
       <context attribute="Normal Text" lineEndContext="#stay" name="Detect Variable Substitutions">
         <RegExpr attribute="Environment Variable Substitution" context="#stay" String="\$ENV\{\s*[\w-]+\s*\}" />
         <Detect2Chars attribute="Variable Substitution" context="VarSubst" char="$" char1="{" />
+        <DetectChar attribute="@Variable Substitution" context="@VarSubst" char="@" />
       </context>
 
       <context attribute="Variable Substitution" lineEndContext="#pop" name="VarSubst">
@@ -207,12 +209,19 @@
         <IncludeRules context="Detect Variable Substitutions" />
       </context>
 
+      <context attribute="@Variable Substitution" lineEndContext="#pop" name="@VarSubst">
+        <IncludeRules context="Detect Builtin Variables" />
+        <DetectIdentifier />
+        <DetectChar attribute="@Variable Substitution" context="#pop" char="@" />
+      </context>
+
       <context attribute="Normal Text" lineEndContext="#stay" name="User Function Args">
         <Detect2Chars attribute="Normal Text" context="#stay" char="\" char1="(" />
         <Detect2Chars attribute="Normal Text" context="#stay" char="\" char1=")" />
         <RegExpr attribute="Escapes" context="#stay" String="\\[&quot;$n\\]" />
         <DetectChar attribute="Strings" context="String" char="&quot;" />
         <RegExpr attribute="Strings" context="Bracketed String" String="\[(=*)\[" />
+        <RegExpr attribute="Comment" context="Bracketed Comment" String="#\[(=*)\[" />
         <DetectChar attribute="Comment" context="Comment" char="#" />
         <IncludeRules context="Detect Builtin Variables" />
         <IncludeRules context="Detect Variable Substitutions" />
@@ -243,7 +252,7 @@
       </context>
 
       <context attribute="Comment" lineEndContext="#stay" name="Bracketed Comment" dynamic="true">
-        <RegExpr attribute="Comment" context="#pop" String="^#?\]%1\]" dynamic="true" column="0" />
+        <RegExpr attribute="Comment" context="#pop" String=".*\]%1\]" dynamic="true" />
         <IncludeRules context="##Alerts" />
         <IncludeRules context="##Modelines" />
       </context>
@@ -288,6 +297,7 @@
       <itemData name="Escapes" defStyleNum="dsChar" spellChecking="false" />
       <itemData name="Builtin Variable" defStyleNum="dsDecVal" color="#c09050" selColor="#c09050" spellChecking="false" />
       <itemData name="Variable Substitution" defStyleNum="dsDecVal" spellChecking="false" />
+      <itemData name="@Variable Substitution" defStyleNum="dsBaseN" spellChecking="false" />
       <itemData name="Internal Name" defStyleNum="dsDecVal" color="#303030" selColor="#303030" spellChecking="false" />
       <itemData name="Environment Variable Substitution" defStyleNum="dsFloat" spellChecking="false" />
       <itemData name="Generator Expression Keyword" defStyleNum="dsKeyword" color="#b84040" selColor="#b84040" spellChecking="false" />

@@ -31,7 +31,7 @@
 
 <language
     name="CMake"
-    version="8"
+    version="9"
     kateversion="2.4"
     section="Other"
     extensions="CMakeLists.txt;*.cmake;*.cmake.in"
@@ -95,7 +95,7 @@
         <RegExpr attribute="Comment" context="Bracketed Comment" String="#\[(=*)\[" />
         <DetectChar attribute="Comment" context="Comment" char="#" />
         <DetectIdentifier attribute="User Function/Macro" context="User Function" />
-        <DetectChar attribute="@Variable Substitution" context="@VarSubst" char="@" />
+        <RegExpr attribute="@Variable Substitution" context="@VarSubst" String="@&id_re;@" lookAhead="true" />
         <!-- Include keywords matching for language autocompleter work -->
         <keyword attribute="Command" context="#stay" String="commands" />
       </context>
@@ -199,7 +199,7 @@
       <context attribute="Normal Text" lineEndContext="#stay" name="Detect Variable Substitutions">
         <RegExpr attribute="Environment Variable Substitution" context="#stay" String="\$ENV\{\s*[\w-]+\s*\}" />
         <Detect2Chars attribute="Variable Substitution" context="VarSubst" char="$" char1="{" />
-        <DetectChar attribute="@Variable Substitution" context="@VarSubst" char="@" />
+        <RegExpr attribute="@Variable Substitution" context="@VarSubst" String="@&id_re;@" lookAhead="true" />
       </context>
 
       <context attribute="Variable Substitution" lineEndContext="#pop" name="VarSubst">
@@ -210,9 +210,13 @@
       </context>
 
       <context attribute="@Variable Substitution" lineEndContext="#pop" name="@VarSubst">
+        <DetectChar attribute="@Variable Substitution" context="VarSubst@" char="@" />
+      </context>
+
+      <context attribute="@Variable Substitution" lineEndContext="#pop#pop" name="VarSubst@">
         <IncludeRules context="Detect Builtin Variables" />
         <DetectIdentifier />
-        <DetectChar attribute="@Variable Substitution" context="#pop" char="@" />
+        <DetectChar attribute="@Variable Substitution" context="#pop#pop" char="@" />
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="User Function Args">

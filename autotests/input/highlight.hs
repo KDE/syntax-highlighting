@@ -80,7 +80,7 @@ quot, rem, div, mod, elem, notElem, seq
 
 -- functions
 
-FilePath, IOError, abs, acos, acosh, all, and, any, appendFile,
+abs, acos, acosh, all, and, any, appendFile,
 approxRational, asTypeOf, asin, asinh, atan, atan2, atanh, basicIORun,
 break, catch, ceiling, chr, compare, concat, concatMap, const, cos, cosh,
 curry, cycle, decodeFloat, denominator, digitToInt, div, divMod, drop,
@@ -112,8 +112,8 @@ writeFile, zip, zip3, zipWith, zipWith3
 
 -- type constructors
 
-Bool, Char, Double, Either, Float, IO, Integer, Int, Maybe, Ordering, Rational, Ratio, ReadS,
-ShowS, String
+Bool, Char, Double, Either, FilePath, Float, IO, IOError, Integer, Int, Maybe,
+Ordering, Rational, Ratio, ReadS, ShowS, String
 
 -- classes
 

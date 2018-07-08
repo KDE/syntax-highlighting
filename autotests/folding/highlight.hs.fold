@@ -66,7 +66,8 @@ class (Num a, Ord a) => Real a where
 
 -- keywords
 
-case, class, data, deriving, do, else, if, in, infixl, infixr, instance, let, module, of, primitive,
+case, class, data, deriving, do, else, family, forall, if, in, infixl, infixr,
+instance, let, module, of, pattern, primitive,
 then, type, where
 
 -- infix operators

@@ -124,6 +124,10 @@ RealFrac, Real, Show
 
 EQ, False, GT, Just, LT, Left, Nothing, Right, True
 
+-- promoted data constructors
+
+'True
+
 -- pragma with compiler flags
 
 {-# OPTIONS_GHC -fno-warn-orphans #-}

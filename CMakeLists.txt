@@ -69,7 +69,9 @@ add_subdirectory(data)
 add_subdirectory(src)
 if(TARGET Qt5::Gui)
     add_subdirectory(examples)
-    add_subdirectory(autotests)
+    if (BUILD_TESTING)
+        add_subdirectory(autotests)
+    endif()
 endif()
 
 #

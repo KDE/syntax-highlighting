@@ -40,3 +40,8 @@ def test_f_literals():
 
     f'x{bar["baz"]!r}y\n'
     f'x{bar["baz"]:.2}y\n'
+
+a = "Escapes in String \U12345678 \xAB \""
+"Escapes in Doc/Comment String \u1234 \xAb \"\\"
+''' Doc/Comment String \N{123} \''''
+""" Doc/Comment String \17 \x1f \n \" \\"""

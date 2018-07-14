@@ -2,11 +2,11 @@
 <!DOCTYPE language SYSTEM "language.dtd">
 
 <language name="CoffeeScript"
-          version="4"
+          version="5"
           kateversion="3.4"
           section="Scripts"
           extensions="Cakefile;*.coffee;*.coco;*.cson"
-          mimetype="text/x-coffeescript;application/x-coffeescript"
+          mimetype="text/x-coffeescript;application/x-coffeescript;application/vnd.coffeescript"
           indenter="python"
           casesensitive="1"
           author="Max Shawabkeh (max99x@gmail.com)"
@@ -173,6 +173,8 @@
         <!-- Regular expressions. -->
         <StringDetect attribute="Regex" context="Multiline Regex" String="///" beginRegion="Multiline Regex"/>
         <RegExpr attribute="Regex" context="#stay" String="/([^/\\\r\n]|\\.)*/[mig]{0,3}"/>
+        <!-- Member objects. -->
+        <DetectChar attribute="Symbol" context="Member Object" char="."/>
         <!-- Operators and other non-alphanumeric symbols. -->
         <AnyChar attribute="Symbol" context="#stay" String="():!%&amp;+,-/.*&lt;=&gt;?[]|~^&#59;{}"/>
       </context>
@@ -186,6 +188,10 @@
       <context name="Class" attribute="Normal" lineEndContext="#stay">
         <DetectSpaces/>
         <RegExpr attribute="Class" context="#pop" String="[@$:.\w\[\]]+"/>
+      </context>
+      <!-- Member objects. -->
+      <context name="Member Object" attribute="Normal" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+        <RegExpr attribute="Identifier" context="#pop" String="\s*[_$a-z][$\w]*" insensitive="true"/>
       </context>
       <!-- Comments. -->
       <context name="Comment" attribute="Comment" lineEndContext="#pop">

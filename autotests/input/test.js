@@ -1,3 +1,6 @@
+#! shebang
+#! no-shebang
+
 /* comment */
 
 function fun()
@@ -6,3 +9,7 @@ function fun()
 }
 
 class MyClass; // reserved keywords
+
+// Member objects: text after "."
+object.property instanceof Number;
+iden1.iden2  . iden3.class class;

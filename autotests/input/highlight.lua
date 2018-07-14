@@ -66,6 +66,13 @@ a;a
 '\u{100201}' -- max 6 digits
 '\2a\ks' -- error
 
+'multi\
+line'
+'multi\z
+line'
+'multi\z    line\
+2'
+
 a = 'alo\n123"'
 a = "alo\n123\""
 a = '\97lo\10\04923"'

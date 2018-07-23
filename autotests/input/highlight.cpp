@@ -319,6 +319,10 @@ static double invalidD2 = 0x0.123p-a;
 static float floatQualifier = 0xf.p-1f;
 
 60min; // c++17
+60.min;
+60.3min;
+0x1ffp10min;
+2d; // c++20
 23._f
 23._fd
 2.3_f

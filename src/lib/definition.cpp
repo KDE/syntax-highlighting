@@ -34,6 +34,7 @@
 #include <QFile>
 #include <QHash>
 #include <QJsonObject>
+#include <QQueue>
 #include <QStringList>
 #include <QVector>
 #include <QXmlStreamReader>
@@ -184,6 +185,33 @@ QStringList Definition::foldingIgnoreList() const
 {
     d->load();
     return d->foldingIgnoreList;
+}
+
+QVector<Definition> Definition::includedDefinitions() const
+{
+    d->load();
+
+    QVector<Definition> definitions;
+
+    QQueue<Definition> queue;
+    queue.enqueue(*this);
+    while (!queue.isEmpty()) {
+        const auto definition = queue.dequeue();
+        definitions.push_back(definition);
+
+        // Iterate all context rules to find associated Definitions. This will
+        // automatically catch other Definitions referenced with IncludeRuldes.
+        foreach (const auto & context, definition.d->contexts) {
+            foreach (const auto &rule, context->rules()) {
+                if ((!definitions.contains(rule->definition())) &&
+                    (!queue.contains(rule->definition())))
+                {
+                    queue.enqueue(rule->definition());
+                }
+            }
+        }
+    }
+    return definitions;
 }
 
 Context* DefinitionData::initialContext() const

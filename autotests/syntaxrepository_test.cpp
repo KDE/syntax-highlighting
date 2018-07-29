@@ -148,6 +148,27 @@ private Q_SLOTS:
         QCOMPARE(def.foldingIgnoreList(), QStringList() << QLatin1String("(?:\\s+|\\s*#.*)"));
     }
 
+    void testIncludedDefinitions()
+    {
+        auto def = m_repo.definitionForName(QLatin1String("C++"));
+        QVERIFY(def.isValid());
+        auto defs = def.includedDefinitions();
+
+        const QStringList expectedDefinitionNames = {
+            QStringLiteral("C++"),
+            QStringLiteral("ISO C++"),
+            QStringLiteral("GCCExtensions"),
+            QStringLiteral("Doxygen"),
+            QStringLiteral("Alerts"),
+            QStringLiteral("Modelines")
+        };
+        QStringList definitionNames;
+        for (auto d : defs) {
+            definitionNames.push_back(d.name());
+        }
+        QCOMPARE(definitionNames, expectedDefinitionNames);
+    }
+
     void testReload()
     {
         auto def = m_repo.definitionForName(QLatin1String("QML"));

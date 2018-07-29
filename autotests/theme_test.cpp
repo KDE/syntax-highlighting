@@ -92,6 +92,7 @@ private Q_SLOTS:
         // normal text
         auto f = collector.formatMap.value(QLatin1String("Normal Text"));
         QVERIFY(f.isValid());
+        QVERIFY(f.textStyle() == Theme::Normal);
         QVERIFY(f.isDefaultTextStyle(t));
         QVERIFY(!f.hasTextColor(t));
         QVERIFY(!f.hasBackgroundColor(t));
@@ -100,6 +101,7 @@ private Q_SLOTS:
         // visually identical to normal text
         f = collector.formatMap.value(QLatin1String("Symbol"));
         QVERIFY(f.isValid());
+        QCOMPARE(f.textStyle(), Theme::Operator);
         QVERIFY(f.isDefaultTextStyle(t));
         QVERIFY(!f.hasTextColor(t));
         QVERIFY(f.id() > 0);
@@ -107,12 +109,14 @@ private Q_SLOTS:
         // visually different to normal text
         f = collector.formatMap.value(QLatin1String("Keywords"));
         QVERIFY(f.isValid());
+        QCOMPARE(f.textStyle(), Theme::Keyword);
         QVERIFY(!f.isDefaultTextStyle(t));
         QVERIFY(f.isBold(t));
         QVERIFY(f.id() > 0);
 
         f = collector.formatMap.value(QLatin1String("Float"));
         QVERIFY(f.isValid());
+        QCOMPARE(f.textStyle(), Theme::Float);
         QVERIFY(!f.isDefaultTextStyle(t));
         QVERIFY(f.hasTextColor(t));
         QVERIFY(f.id() > 0);

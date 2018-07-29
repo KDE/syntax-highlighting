@@ -20,7 +20,6 @@
 #include "definition.h"
 #include "definitionref_p.h"
 #include "textstyledata_p.h"
-#include "theme.h"
 #include "themedata_p.h"
 #include "xml_p.h"
 
@@ -99,6 +98,11 @@ QString Format::name() const
 quint16 Format::id() const
 {
     return d->id;
+}
+
+Theme::TextStyle Format::textStyle() const
+{
+    return d->defaultStyle;
 }
 
 bool Format::isDefaultTextStyle(const Theme &theme) const

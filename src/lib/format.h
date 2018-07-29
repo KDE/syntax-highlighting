@@ -19,9 +19,11 @@
 #define KSYNTAXHIGHLIGHTING_FORMAT_H
 
 #include "ksyntaxhighlighting_export.h"
+#include "theme.h"
 
 #include <QExplicitlySharedDataPointer>
 #include <QTypeInfo>
+
 
 class QColor;
 class QString;
@@ -31,7 +33,6 @@ namespace KSyntaxHighlighting {
 
 class DefinitionRef;
 class FormatPrivate;
-class Theme;
 
 /** Describes the format to be used for a specific text fragment.
  *  The actual format used for displaying is merged from the format information
@@ -65,6 +66,15 @@ public:
      *  Definition anyway).
      */
     quint16 id() const;
+
+    /** Returns the underlying TextStyle of this Format.
+     *  Every Theme::TextStyle is visually defined by a Theme. A Format uses one
+     *  of the Theme::TextStyle%s and on top allows modifications such as setting
+     *  a different foreground color etc.
+     *  @see Theme::TextStyle
+     *  @since 5.49
+     */
+    Theme::TextStyle textStyle() const;
 
     /** Returns @c true if the combination of this format and the theme @p theme
      *  do not change the default text format in any way.

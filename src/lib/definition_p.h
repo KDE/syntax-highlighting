@@ -69,12 +69,12 @@ public:
 
     DefinitionRef q;
 
-    Repository *repo;
+    Repository *repo = nullptr;
     QHash<QString, KeywordList> keywordLists;
     QVector<Context*> contexts;
     QHash<QString, Format> formats;
     QString delimiters;
-    bool indentationBasedFolding;
+    bool indentationBasedFolding = false;
     QStringList foldingIgnoreList;
 
     QString fileName;
@@ -86,10 +86,10 @@ public:
     QString license;
     QVector<QString> mimetypes;
     QVector<QString> extensions;
-    Qt::CaseSensitivity caseSensitive;
-    int version;
-    int priority;
-    bool hidden;
+    Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive;
+    int version = 0;
+    int priority = 0;
+    bool hidden = false;
 };
 }
 

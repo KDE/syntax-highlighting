@@ -29,8 +29,8 @@ namespace KSyntaxHighlighting {
 class KeywordList
 {
 public:
-    KeywordList();
-    ~KeywordList();
+    KeywordList() = default;
+    ~KeywordList() = default;
 
     bool isEmpty() const;
 
@@ -50,7 +50,7 @@ private:
     QString m_name;
     QSet<QString> m_keywords;
     mutable QSet<QString> m_lowerCaseKeywords;
-    Qt::CaseSensitivity m_caseSensitive;
+    Qt::CaseSensitivity m_caseSensitive = Qt::CaseSensitive;
 };
 }
 

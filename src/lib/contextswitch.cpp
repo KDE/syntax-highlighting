@@ -24,16 +24,6 @@
 
 using namespace KSyntaxHighlighting;
 
-ContextSwitch::ContextSwitch() :
-    m_context(nullptr),
-    m_popCount(0)
-{
-}
-
-ContextSwitch::~ContextSwitch()
-{
-}
-
 bool ContextSwitch::isStay() const
 {
     return m_popCount == 0 && !m_context && m_contextName.isEmpty() && m_defName.isEmpty();

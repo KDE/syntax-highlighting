@@ -19,10 +19,9 @@
 
 using namespace KSyntaxHighlighting;
 
-MatchResult::MatchResult(int offset, const QStringList &captures) :
-    m_captures(captures),
-    m_offset(offset),
-    m_skipOffset(0)
+MatchResult::MatchResult(int offset, const QStringList &captures)
+    : m_captures(captures)
+    , m_offset(offset)
 {
 }
 

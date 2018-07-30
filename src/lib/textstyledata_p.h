@@ -27,11 +27,7 @@ class TextStyleData
 public:
     // Constructor initializing all data.
     TextStyleData()
-        : textColor(0x0)
-        , backgroundColor(0x0)
-        , selectedTextColor(0x0)
-        , selectedBackgroundColor(0x0)
-        , bold(false)
+        : bold(false)
         , italic(false)
         , underline(false)
         , strikeThrough(false)
@@ -41,10 +37,10 @@ public:
         , hasStrikeThrough(false)
     {}
 
-    QRgb textColor;
-    QRgb backgroundColor;
-    QRgb selectedTextColor;
-    QRgb selectedBackgroundColor;
+    QRgb textColor = 0x0;
+    QRgb backgroundColor = 0x0;
+    QRgb selectedTextColor = 0x0;
+    QRgb selectedBackgroundColor = 0x0;
     bool bold :1;
     bool italic :1;
     bool underline :1;

@@ -41,12 +41,6 @@ static void initResource()
     Q_INIT_RESOURCE(syntax_data);
 }
 
-RepositoryPrivate::RepositoryPrivate() :
-    m_foldingRegionId(0),
-    m_formatId(0)
-{
-}
-
 RepositoryPrivate* RepositoryPrivate::get(Repository *repo)
 {
     return repo->d.get();

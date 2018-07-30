@@ -30,7 +30,7 @@ namespace KSyntaxHighlighting {
 class FormatPrivate : public QSharedData
 {
 public:
-    FormatPrivate();
+    FormatPrivate() = default;
     static FormatPrivate* get(const Format &format);
 
     TextStyleData styleOverride(const Theme &theme) const;
@@ -39,9 +39,9 @@ public:
     DefinitionRef definition;
     QString name;
     TextStyleData style;
-    Theme::TextStyle defaultStyle;
-    quint16 id;
-    bool spellCheck;
+    Theme::TextStyle defaultStyle = Theme::Normal;
+    quint16 id = 0;
+    bool spellCheck = true;
 };
 
 }

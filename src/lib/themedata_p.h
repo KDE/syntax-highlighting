@@ -136,7 +136,7 @@ public:
     TextStyleData textStyleOverride(const QString &definitionName, const QString &attributeName) const;
 
 private:
-    int m_revision;
+    int m_revision = 0;
     QString m_name;
 
     //! Path to the file where the theme came from.

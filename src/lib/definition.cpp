@@ -43,14 +43,8 @@
 
 using namespace KSyntaxHighlighting;
 
-DefinitionData::DefinitionData() :
-    repo(nullptr),
-    delimiters(QStringLiteral("\t !%&()*+,-./:;<=>?[\\]^{|}~")), // must be sorted!
-    indentationBasedFolding(false),
-    caseSensitive(Qt::CaseSensitive),
-    version(0.0f),
-    priority(0),
-    hidden(false)
+DefinitionData::DefinitionData()
+    : delimiters(QStringLiteral("\t !%&()*+,-./:;<=>?[\\]^{|}~")) // must be sorted!
 {
 }
 

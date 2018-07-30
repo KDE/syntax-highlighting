@@ -28,8 +28,8 @@ class Definition;
 class ContextSwitch
 {
 public:
-    ContextSwitch();
-    ~ContextSwitch();
+    ContextSwitch() = default;
+    ~ContextSwitch() = default;
 
     bool isStay() const;
 
@@ -42,8 +42,8 @@ public:
 private:
     QString m_defName;
     QString m_contextName;
-    Context *m_context;
-    int m_popCount;
+    Context *m_context = nullptr;
+    int m_popCount = 0;
 };
 }
 

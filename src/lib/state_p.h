@@ -34,7 +34,7 @@ class DefinitionData;
 class StateData : public QSharedData
 {
 public:
-    StateData();
+    StateData() = default;
     static StateData* get(State &state);
 
     bool isEmpty() const;
@@ -45,7 +45,7 @@ public:
     Context* topContext() const;
     QStringList topCaptures() const;
 
-    DefinitionData *m_defData;
+    DefinitionData *m_defData = nullptr;
 private:
     friend class State;
     QStack<Context*> m_contextStack;

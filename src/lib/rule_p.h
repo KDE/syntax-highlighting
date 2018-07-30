@@ -38,8 +38,8 @@ namespace KSyntaxHighlighting {
 class Rule
 {
 public:
-    Rule();
-    virtual ~Rule();
+    Rule() = default;
+    virtual ~Rule() = default;
 
     typedef std::shared_ptr<Rule> Ptr;
 
@@ -76,12 +76,12 @@ private:
     QString m_attribute;
     ContextSwitch m_context;
     QVector<Rule::Ptr> m_subRules;
-    int m_column;
+    int m_column = -1;
     FoldingRegion m_beginRegion;
     FoldingRegion m_endRegion;
-    bool m_firstNonSpace;
-    bool m_lookAhead;
-    bool m_dynamic;
+    bool m_firstNonSpace = false;
+    bool m_lookAhead = false;
+    bool m_dynamic = false;
 };
 
 

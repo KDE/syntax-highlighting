@@ -33,8 +33,8 @@ namespace KSyntaxHighlighting {
 class Context
 {
 public:
-    Context();
-    ~Context();
+    Context() = default;
+    ~Context() = default;
 
     Definition definition() const;
     void setDefinition(const DefinitionRef &def);
@@ -85,9 +85,9 @@ private:
 
     QVector<Rule::Ptr> m_rules;
 
-    ResolveState m_resolveState;
-    bool m_fallthrough;
-    bool m_noIndentationBasedFolding;
+    ResolveState m_resolveState = Unknown;
+    bool m_fallthrough = false;
+    bool m_noIndentationBasedFolding = false;
 };
 }
 

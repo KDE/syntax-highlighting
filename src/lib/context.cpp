@@ -28,17 +28,6 @@
 
 using namespace KSyntaxHighlighting;
 
-Context::Context()
-    : m_resolveState(Unknown)
-    , m_fallthrough(false)
-    , m_noIndentationBasedFolding(false)
-{
-}
-
-Context::~Context()
-{
-}
-
 Definition Context::definition() const
 {
     return m_def.definition();

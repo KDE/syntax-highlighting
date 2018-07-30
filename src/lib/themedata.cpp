@@ -36,7 +36,6 @@ ThemeData* ThemeData::get(const Theme &theme)
 }
 
 ThemeData::ThemeData()
-    : m_revision(0)
 {
     memset(m_editorColors, 0, sizeof(m_editorColors));
 }

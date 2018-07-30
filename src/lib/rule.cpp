@@ -85,18 +85,6 @@ static QString replaceCaptures(const QString &pattern, const QStringList &captur
     return result;
 }
 
-Rule::Rule() :
-    m_column(-1),
-    m_firstNonSpace(false),
-    m_lookAhead(false),
-    m_dynamic(false)
-{
-}
-
-Rule::~Rule()
-{
-}
-
 Definition Rule::definition() const
 {
     return m_def.definition();

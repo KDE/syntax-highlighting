@@ -46,13 +46,6 @@ static Theme::TextStyle stringToDefaultFormat(const QStringRef &str)
     return static_cast<Theme::TextStyle>(value);
 }
 
-FormatPrivate::FormatPrivate()
-    : defaultStyle(Theme::Normal)
-    , id(0)
-    , spellCheck(true)
-{
-}
-
 FormatPrivate* FormatPrivate::get(const Format &format)
 {
     return format.d.data();

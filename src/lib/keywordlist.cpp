@@ -22,15 +22,6 @@
 
 using namespace KSyntaxHighlighting;
 
-KeywordList::KeywordList() :
-    m_caseSensitive(Qt::CaseSensitive)
-{
-}
-
-KeywordList::~KeywordList()
-{
-}
-
 bool KeywordList::isEmpty() const
 {
     return m_keywords.isEmpty();

@@ -24,11 +24,6 @@
 
 using namespace KSyntaxHighlighting;
 
-StateData::StateData() :
-    m_defData(nullptr)
-{
-}
-
 StateData* StateData::get(State &state)
 {
     state.d.detach();

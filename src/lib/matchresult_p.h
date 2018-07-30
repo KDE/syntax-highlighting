@@ -35,7 +35,7 @@ public:
 private:
     QStringList m_captures;
     int m_offset;
-    int m_skipOffset;
+    int m_skipOffset = 0;
 };
 }
 

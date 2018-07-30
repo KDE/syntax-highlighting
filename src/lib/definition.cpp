@@ -187,6 +187,12 @@ QStringList Definition::foldingIgnoreList() const
     return d->foldingIgnoreList;
 }
 
+QVector<Format> Definition::formats() const
+{
+    d->load();
+    return QVector<Format>::fromList(d->formats.values());
+}
+
 QVector<Definition> Definition::includedDefinitions() const
 {
     d->load();

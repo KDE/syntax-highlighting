@@ -148,6 +148,25 @@ private Q_SLOTS:
         QCOMPARE(def.foldingIgnoreList(), QStringList() << QLatin1String("(?:\\s+|\\s*#.*)"));
     }
 
+    void testFormatData()
+    {
+        auto def = m_repo.definitionForName(QLatin1String("ChangeLog"));
+        QVERIFY(def.isValid());
+        auto formats = def.formats();
+        QVERIFY(!formats.isEmpty());
+
+        QStringList formatNames;
+        foreach (const auto & format, formats) {
+            formatNames.append(format.name());
+        }
+        QVERIFY(formatNames.contains(QStringLiteral("Normal Text")));
+        QVERIFY(formatNames.contains(QStringLiteral("Name")));
+        QVERIFY(formatNames.contains(QStringLiteral("E-Mail")));
+        QVERIFY(formatNames.contains(QStringLiteral("Date")));
+        QVERIFY(formatNames.contains(QStringLiteral("Entry")));
+        QVERIFY(!formatNames.contains(QStringLiteral("Does not Exist")));
+    }
+
     void testIncludedDefinitions()
     {
         auto def = m_repo.definitionForName(QLatin1String("C++"));

@@ -173,6 +173,12 @@ public:
     QStringList foldingIgnoreList() const;
 
     /**
+     * Returns a list of all Format items used by this definition.
+     * @since 5.49
+     */
+    QVector<Format> formats() const;
+
+    /**
      * Returns a list of Definitions that are referenced with the IncludeRules rule.
      * The returned list includes this Definition as well as any recursively used
      * Definition.

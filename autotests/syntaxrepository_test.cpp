@@ -144,8 +144,15 @@ private Q_SLOTS:
 
         def = m_repo.definitionForName(QLatin1String("Python"));
         QVERIFY(def.isValid());
+
+        // indentation
         QVERIFY(def.indentationBasedFoldingEnabled());
         QCOMPARE(def.foldingIgnoreList(), QStringList() << QLatin1String("(?:\\s+|\\s*#.*)"));
+
+        // keyword lists
+        QVERIFY(!def.keywordLists().isEmpty());
+        QVERIFY(def.keywordList(QLatin1String("operators")).contains(QLatin1String("and")));
+        QVERIFY(!def.keywordList(QLatin1String("does not exits")).contains(QLatin1String("and")));
     }
 
     void testFormatData()

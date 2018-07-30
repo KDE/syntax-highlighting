@@ -187,6 +187,18 @@ QStringList Definition::foldingIgnoreList() const
     return d->foldingIgnoreList;
 }
 
+QStringList Definition::keywordLists() const
+{
+    d->load();
+    return d->keywordLists.keys();
+}
+
+QStringList Definition::keywordList(const QString& name) const
+{
+    d->load();
+    return d->keywordList(name).keywords();
+}
+
 QVector<Format> Definition::formats() const
 {
     d->load();

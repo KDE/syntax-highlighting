@@ -41,6 +41,11 @@ QString KeywordList::name() const
     return m_name;
 }
 
+QStringList KeywordList::keywords() const
+{
+    return m_keywords.values();
+}
+
 bool KeywordList::contains(const QStringRef &str) const
 {
     return contains(str, m_caseSensitive);

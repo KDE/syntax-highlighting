@@ -173,6 +173,20 @@ public:
     QStringList foldingIgnoreList() const;
 
     /**
+     * Returns the section names of keywords.
+     * @since 5.49
+     * @see keywordList()
+     */
+    QStringList keywordLists() const;
+
+    /**
+     * Returns the list of keywords for the keyword list @p name.
+     * @since 5.49
+     * @see keywordLists()
+     */
+    QStringList keywordList(const QString& name) const;
+
+    /**
      * Returns a list of all Format items used by this definition.
      * @since 5.49
      */

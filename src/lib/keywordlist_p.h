@@ -36,6 +36,8 @@ public:
 
     QString name() const;
 
+    QStringList keywords() const;
+
     /** Checks if @p str is a keyword in this list. */
     bool contains(const QStringRef &str) const;
     /** Checks if @p str is a keyword in this list, overriding the global case-sensitivity setting. */

@@ -516,6 +516,8 @@ void DefinitionData::loadGeneral(QXmlStreamReader& reader)
                 --elementRefCounter;
                 if (elementRefCounter == 0)
                     return;
+                reader.readNext();
+                break;
             default:
                 reader.readNext();
                 break;
@@ -545,6 +547,8 @@ void DefinitionData::loadFoldingIgnoreList(QXmlStreamReader& reader)
                 --elementRefCounter;
                 if (elementRefCounter == 0)
                     return;
+                reader.readNext();
+                break;
             default:
                 reader.readNext();
                 break;

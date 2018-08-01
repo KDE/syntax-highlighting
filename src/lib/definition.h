@@ -194,8 +194,8 @@ public:
 
     /**
      * Returns a list of Definitions that are referenced with the IncludeRules rule.
-     * The returned list includes this Definition as well as any recursively used
-     * Definition.
+     * The returned list does not include this Definition. In case no other
+     * Definitions are referenced via IncludeRules, the returned list is empty.
      *
      * @since 5.49
      */

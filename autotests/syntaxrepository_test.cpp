@@ -181,7 +181,6 @@ private Q_SLOTS:
         auto defs = def.includedDefinitions();
 
         const QStringList expectedDefinitionNames = {
-            QStringLiteral("C++"),
             QStringLiteral("ISO C++"),
             QStringLiteral("GCCExtensions"),
             QStringLiteral("Doxygen"),
@@ -190,6 +189,7 @@ private Q_SLOTS:
         };
         QStringList definitionNames;
         for (auto d : defs) {
+            QVERIFY(d.isValid());
             definitionNames.push_back(d.name());
         }
         QCOMPARE(definitionNames, expectedDefinitionNames);

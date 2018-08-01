@@ -223,6 +223,10 @@ QVector<Definition> Definition::includedDefinitions() const
             }
         }
     }
+
+    // remove the 1st entry, since it is this Definition
+    definitions.pop_front();
+
     return definitions;
 }
 

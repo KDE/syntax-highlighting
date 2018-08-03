@@ -56,3 +56,16 @@ switch day
 # Member objects:
 Object.prop.  Object .Object Object
 timelineEvent.class
+
+# Embedded JavaScript Code
+markdown = `function () {
+  return \`In Markdown, write code like \\\`this\\\`\`;
+}`
+
+```
+	// Comment
+	var array = new Array(500);
+	var name = "Willy";
+	alert(`Hello ${name}!`);
+```
+` String.raw\`String ${x} \` `

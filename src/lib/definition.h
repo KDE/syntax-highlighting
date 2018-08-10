@@ -188,6 +188,7 @@ public:
 
     /**
      * Returns a list of all Format items used by this definition.
+     * The order of the Format items equals the order of the itemDatas in the xml file.
      * @since 5.49
      */
     QVector<Format> formats() const;

@@ -196,7 +196,14 @@ QStringList Definition::keywordList(const QString& name) const
 QVector<Format> Definition::formats() const
 {
     d->load();
-    return QVector<Format>::fromList(d->formats.values());
+
+    // sort formats so that the order matches the order of the itemDatas in the xml files.
+    auto formatList = QVector<Format>::fromList(d->formats.values());
+    std::sort(formatList.begin(), formatList.end(), [](const KSyntaxHighlighting::Format & lhs, const KSyntaxHighlighting::Format & rhs){
+        return lhs.id() < rhs.id();
+    });
+
+    return formatList;
 }
 
 QVector<Definition> Definition::includedDefinitions() const

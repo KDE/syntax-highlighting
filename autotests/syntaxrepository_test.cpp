@@ -162,16 +162,26 @@ private Q_SLOTS:
         auto formats = def.formats();
         QVERIFY(!formats.isEmpty());
 
+        // verify that the formats are sorted, such that the order matches the order of the itemDatas in the xml files.
+        auto sortComparator = [](const KSyntaxHighlighting::Format & lhs, const KSyntaxHighlighting::Format & rhs) {
+            return lhs.id() < rhs.id();
+        };
+        QVERIFY(std::is_sorted(formats.begin(), formats.end(), sortComparator));
+
+        // check all names are listed
         QStringList formatNames;
         foreach (const auto & format, formats) {
             formatNames.append(format.name());
         }
-        QVERIFY(formatNames.contains(QStringLiteral("Normal Text")));
-        QVERIFY(formatNames.contains(QStringLiteral("Name")));
-        QVERIFY(formatNames.contains(QStringLiteral("E-Mail")));
-        QVERIFY(formatNames.contains(QStringLiteral("Date")));
-        QVERIFY(formatNames.contains(QStringLiteral("Entry")));
-        QVERIFY(!formatNames.contains(QStringLiteral("Does not Exist")));
+
+        const QStringList expectedItemDatas = {
+            QStringLiteral("Normal Text"),
+            QStringLiteral("Name"),
+            QStringLiteral("E-Mail"),
+            QStringLiteral("Date"),
+            QStringLiteral("Entry")
+        };
+        QCOMPARE(formatNames, expectedItemDatas);
     }
 
     void testIncludedDefinitions()

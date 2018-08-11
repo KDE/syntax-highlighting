@@ -58,7 +58,7 @@ public:
     bool checkKateVersion(const QStringRef &verStr);
 
     KeywordList keywordList(const QString &name) const;
-    bool isDelimiter(QChar c) const;
+    bool isWordDelimiter(QChar c) const;
 
     Context* initialContext() const;
     Context* contextByName(const QString &name) const;

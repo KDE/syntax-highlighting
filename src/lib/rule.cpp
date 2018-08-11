@@ -265,10 +265,10 @@ Rule::Ptr Rule::create(const QStringRef& name)
     return Ptr(rule);
 }
 
-bool Rule::isDelimiter(QChar c) const
+bool Rule::isWordDelimiter(QChar c) const
 {
     auto defData = DefinitionData::get(m_def.definition());
-    return defData->isDelimiter(c);
+    return defData->isWordDelimiter(c);
 }
 
 
@@ -363,7 +363,7 @@ MatchResult DetectSpaces::doMatch(const QString& text, int offset, const QString
 
 MatchResult Float::doMatch(const QString& text, int offset, const QStringList&)
 {
-    if (offset > 0 && !isDelimiter(text.at(offset - 1)))
+    if (offset > 0 && !isWordDelimiter(text.at(offset - 1)))
         return offset;
 
     auto newOffset = offset;
@@ -426,7 +426,7 @@ MatchResult HlCChar::doMatch(const QString& text, int offset, const QStringList&
 
 MatchResult HlCHex::doMatch(const QString& text, int offset, const QStringList&)
 {
-    if (offset > 0 && !isDelimiter(text.at(offset - 1)))
+    if (offset > 0 && !isWordDelimiter(text.at(offset - 1)))
         return offset;
 
     if (text.size() < offset + 3)
@@ -450,7 +450,7 @@ MatchResult HlCHex::doMatch(const QString& text, int offset, const QStringList&)
 
 MatchResult HlCOct::doMatch(const QString& text, int offset, const QStringList&)
 {
-    if (offset > 0 && !isDelimiter(text.at(offset - 1)))
+    if (offset > 0 && !isWordDelimiter(text.at(offset - 1)))
         return offset;
 
     if (text.size() < offset + 2)
@@ -515,7 +515,7 @@ MatchResult IncludeRules::doMatch(const QString& text, int offset, const QString
 
 MatchResult Int::doMatch(const QString& text, int offset, const QStringList &captures)
 {
-    if (offset > 0 && !isDelimiter(text.at(offset - 1)))
+    if (offset > 0 && !isWordDelimiter(text.at(offset - 1)))
         return offset;
 
     Q_UNUSED(captures); // ### the doc says this can be dynamic, but how??
@@ -540,7 +540,7 @@ bool KeywordListRule::doLoad(QXmlStreamReader& reader)
 
 MatchResult KeywordListRule::doMatch(const QString& text, int offset, const QStringList&)
 {
-    if (offset > 0 && !isDelimiter(text.at(offset - 1)))
+    if (offset > 0 && !isWordDelimiter(text.at(offset - 1)))
         return offset;
 
     if (m_keywordList.isEmpty()) {
@@ -551,7 +551,7 @@ MatchResult KeywordListRule::doMatch(const QString& text, int offset, const QStr
     }
 
     auto newOffset = offset;
-    while (text.size() > newOffset && !isDelimiter(text.at(newOffset)))
+    while (text.size() > newOffset && !isWordDelimiter(text.at(newOffset)))
         ++newOffset;
     if (newOffset == offset)
         return offset;
@@ -669,13 +669,13 @@ MatchResult WordDetect::doMatch(const QString& text, int offset, const QStringLi
     if (text.size() - offset < m_word.size())
         return offset;
 
-    if (offset > 0 && !isDelimiter(text.at(offset - 1)))
+    if (offset > 0 && !isWordDelimiter(text.at(offset - 1)))
         return offset;
 
     if (text.midRef(offset, m_word.size()).compare(m_word, m_caseSensitivity) != 0)
         return offset;
 
-    if (text.size() == offset + m_word.size() || isDelimiter(text.at(offset + m_word.size())))
+    if (text.size() == offset + m_word.size() || isWordDelimiter(text.at(offset + m_word.size())))
         return offset + m_word.size();
 
     return offset;

@@ -172,7 +172,7 @@ public:
      *
      * @since 5.50
      */
-    bool isDelimiter(QChar c) const;
+    bool isWordDelimiter(QChar c) const;
 
     /**
      * Returns whether indentation-based folding is enabled.

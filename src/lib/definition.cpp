@@ -169,10 +169,10 @@ QString Definition::license() const
     return d->license;
 }
 
-bool Definition::isDelimiter(QChar c) const
+bool Definition::isWordDelimiter(QChar c) const
 {
     d->load();
-    return d->isDelimiter(c);
+    return d->isWordDelimiter(c);
 }
 
 bool Definition::indentationBasedFoldingEnabled() const
@@ -263,7 +263,7 @@ KeywordList DefinitionData::keywordList(const QString& name) const
     return keywordLists.value(name);
 }
 
-bool DefinitionData::isDelimiter(QChar c) const
+bool DefinitionData::isWordDelimiter(QChar c) const
 {
     return std::binary_search(delimiters.constBegin(), delimiters.constEnd(), c);
 }

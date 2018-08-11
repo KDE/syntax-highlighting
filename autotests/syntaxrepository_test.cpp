@@ -278,7 +278,7 @@ private Q_SLOTS:
         QVERIFY(def.includedDefinitions().isEmpty());
 
         for (QChar c : QStringLiteral("\t !%&()*+,-./:;<=>?[\\]^{|}~"))
-            QVERIFY(def.isDelimiter(c));
+            QVERIFY(def.isWordDelimiter(c));
     }
 };
 }

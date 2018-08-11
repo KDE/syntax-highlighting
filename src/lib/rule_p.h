@@ -67,7 +67,7 @@ protected:
     virtual bool doLoad(QXmlStreamReader &reader);
     virtual MatchResult doMatch(const QString &text, int offset, const QStringList &captures) = 0;
 
-    bool isDelimiter(QChar c) const;
+    bool isWordDelimiter(QChar c) const;
 
 private:
     Q_DISABLE_COPY(Rule)

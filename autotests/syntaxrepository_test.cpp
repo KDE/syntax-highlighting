@@ -252,6 +252,34 @@ private Q_SLOTS:
         auto customTheme = repo.theme(QLatin1String("Test Theme"));
         QVERIFY(customTheme.isValid());
     }
+
+    void testEmptyDefinition()
+    {
+        Definition def;
+        QVERIFY(!def.isValid());
+        QVERIFY(def.filePath().isEmpty());
+        QVERIFY(def.name().isEmpty());
+        QVERIFY(def.translatedName().isEmpty());
+        QVERIFY(def.section().isEmpty());
+        QVERIFY(def.translatedSection().isEmpty());
+        QVERIFY(def.mimeTypes().isEmpty());
+        QVERIFY(def.extensions().isEmpty());
+        QCOMPARE(def.version(), 0);
+        QCOMPARE(def.priority(), 0);
+        QVERIFY(!def.isHidden());
+        QVERIFY(def.style().isEmpty());
+        QVERIFY(def.indenter().isEmpty());
+        QVERIFY(def.author().isEmpty());
+        QVERIFY(def.license().isEmpty());
+        QVERIFY(!def.indentationBasedFoldingEnabled());
+        QVERIFY(def.foldingIgnoreList().isEmpty());
+        QVERIFY(def.keywordLists().isEmpty());
+        QVERIFY(def.formats().isEmpty());
+        QVERIFY(def.includedDefinitions().isEmpty());
+
+        for (QChar c : QStringLiteral("\t !%&()*+,-./:;<=>?[\\]^{|}~"))
+            QVERIFY(def.isDelimiter(c));
+    }
 };
 }
 

@@ -284,10 +284,12 @@ bool DefinitionData::isLoaded() const
 
 bool DefinitionData::load()
 {
+    if (fileName.isEmpty())
+        return false;
+
     if (isLoaded())
         return true;
 
-    Q_ASSERT(!fileName.isEmpty());
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly))
         return false;

@@ -105,6 +105,9 @@ void HtmlHighlighter::highlightFile(const QString& fileName)
 
 void HtmlHighlighter::applyFormat(int offset, int length, const Format& format)
 {
+    if (length == 0)
+        return;
+
     if (!format.isDefaultTextStyle(theme())) {
         *d->out << "<span style=\"";
         if (format.hasTextColor(theme()))

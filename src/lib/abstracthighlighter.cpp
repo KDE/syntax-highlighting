@@ -134,7 +134,8 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
     if (text.isEmpty()) {
         while (!stateData->topContext()->lineEmptyContext().isStay())
             d->switchContext(stateData, stateData->topContext()->lineEmptyContext(), QStringList());
-        applyFormat(0, 0, Format());
+        auto context = stateData->topContext();
+        applyFormat(0, 0, context->formatByName(context->attribute()));
         return newState;
     }
 

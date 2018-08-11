@@ -24,6 +24,7 @@
 
 #include <memory>
 
+class QChar;
 class QString;
 class QStringList;
 template <typename T> class QVector;
@@ -148,6 +149,30 @@ public:
     QString author() const;
     /** License of this syntax definition. */
     QString license() const;
+
+    /**
+     * Returns whether the character @p c is a word delimiter.
+     * A delimiter defines whether a characters is a word boundary. Internally,
+     * delimiters are used for matching keyword lists. As example, typcally the
+     * dot '.' is a word delimiter. However, if you have a keyword in a keyword
+     * list that contains a dot, you have to add the dot to the
+     * @e weakDeliminator attribute of the @e general section in your
+     * highlighting definition. Similarly, sometimes additional delimiters are
+     * required, which can be specified in @e additionalDeliminator.
+     *
+     * Checking whether a characters is a delimiter is useful for instance if
+     * text is selected with double click. Typically, the whole word should be
+     * selected in this case. Similarly to the example above, the dot '.'
+     * usually acts as word delimiter. However, using this function you can
+     * implement text selection in such a way that keyword lists are correctly
+     * selected.
+     *
+     * @note By default, the list of delimiters contains the following
+     *       characters: \\t !%&()*+,-./:;<=>?[\\]^{|}~
+     *
+     * @since 5.50
+     */
+    bool isDelimiter(QChar c) const;
 
     /**
      * Returns whether indentation-based folding is enabled.

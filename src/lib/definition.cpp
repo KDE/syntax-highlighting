@@ -169,6 +169,12 @@ QString Definition::license() const
     return d->license;
 }
 
+bool Definition::isDelimiter(QChar c) const
+{
+    d->load();
+    return d->isDelimiter(c);
+}
+
 bool Definition::indentationBasedFoldingEnabled() const
 {
     d->load();

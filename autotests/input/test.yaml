@@ -1,0 +1,78 @@
+# YAML test
+
+# Comment
+
+key: value
+another key: Another value
+boolean: true
+null_value: null
+single quotes: 'have ''one'' escape pattern'
+double quotes: "have many: \", \0, \t, \u263A, \x0d\x0a == \r\n, and more."
+
+decimal: +12345
+negative: -1_4
+zero: 0
+octal: 0o14
+another octal: 014_2
+hexadecimal: 0x_Ca2
+float: 1.23015e+3
+exponential: 12.3015e+02
+fixed: 12__30.1_5
+sexagesimal: 19_0:20:30.15
+sexagesimal-inline: [123:45:12, 123:45:32.234_32, +12__3:23]
+infinity: !!float .inf
+not a number: !!float .NaN
+datetime: 2001-12-15T02:59:43.1Z
+date: 2002-12-14
+
+json_map: {"key": "value"}
+json_seq: [3, 2, -.inf, "value"]
+another key: {key: [+0x12a, , !!hello: bye, 1, off, {a: [{b: ''}]}]}
+
+? !!python/tuple [5, 7]
+: Fifty Seven
+
+? set2:
+  item1: null
+  item2: null
+
+foo: &foo
+  <<: *base
+  age: 10
+
+!!seq [
+  !!str "Block scalar\n",
+  !!map {
+    ? &B1 !!str "foo"
+    : !!str "bar",
+    ? !!str "baz"
+    : *B1,
+  },
+  !!map {
+     !!str "sun" : !!str "yellow",
+  },
+]
+
+!!map {
+  !!str "Booleans": !!seq [
+    !!bool "true", !!bool "false"
+  ],
+  !!str "Invalid": !!seq [
+    # Rejected by the schema
+    True, Null, 0o7, 0x3A, +12.3,
+  ],
+}
+
+--- !clarkevans.com,2002/graph/^shape
+- !^circle
+  center: &ORIGIN {x: 73, y: 129}
+  radius: 7
+
+? |
+  This is a key
+  that has multiple lines
+: and this is its value
+
+? - Dog
+  - Cat
+: [ 2018-08-11, 2016-01-01 ]

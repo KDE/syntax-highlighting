@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd"
+[
+	<!ENTITY simpleName "([a-z][a-z\d]*:)?[a-z][a-z\d]*">
+	<!ENTITY name       "([a-zA-Z_\$]([\w\$\-\.]*[\w\$])?:)?[a-zA-Z_\$]([\w\$\-\.]*[\w\$])?">
+	<!ENTITY simpleTag  "&lt;\s*&simpleName;">
+	<!ENTITY tag        "&lt;\s*&name;">
+	<!ENTITY entref     "&amp;([a-zA-Z\d]+|#\d+|#x[a-fA-F\d]+);">
+]>
+
+<!--
+    ====================================================================
+
+      This file is part of the KDE's KSyntaxHighlighting framework.
+    
+      Copyright 2018 Nibaldo González S. (nibgonz@gmail.com)
+    
+      This Source Code Form is subject to the terms of the MIT License. 
+      If a copy of the license was not distributed with this file, 
+      You can obtain one at: https://opensource.org/licenses/MIT
+    
+    ====================================================================
+
+    This file is an extension of the JavaScript highlighter 
+    (javascript.xml). 
+    Based on the XML syntax highlighting (v7), by Wilbert Berendsen 
+    (wilbert@kde.nl), and the TypeScript React grammar files of VS Code, 
+    available at: https://github.com/Microsoft/TypeScript-TmLanguage
+
+    Change log:
+	* v1 [2018-06-20]: Initial version
+-->
+
+<!-- NOTE: TSX extension of TypeScript React is included -->
+<language name="JavaScript React" version="1" kateversion="5.0" section="Scripts" indenter="cstyle" 
+          priority="6" extensions="*.jsx;*.tsx" mimetype="text/jsx;text/x-jsx;application/jsx;application/x-jsx;" 
+          author="Nibaldo González (nibgonz@gmail.com)" license="MIT">
+
+<highlighting>
+
+	<contexts>
+
+		<context name="Shebang" attribute="Normal Text" lineEndContext="#pop!Normal" fallthrough="true" fallthroughContext="#pop!Normal">
+			<Detect2Chars context="ShebangLine" attribute="Comment" char="#" char1="!" column="0" />
+		</context>
+		<context name="ShebangLine" attribute="Comment" lineEndContext="#pop#pop!Normal" />
+
+		<context name="Normal" attribute="Normal Text" lineEndContext="#stay">
+			<IncludeRules context="React" />
+			<IncludeRules context="Normal##JavaScript" />
+		</context>
+
+		<!-- JavaScript -->
+		
+		<!-- NOTE: Keep synchronized with 'javascript.xml'! 
+		     Overwrite rules of 'javascript.xml'. These rules send to contexts 
+		     that contain: <IncludeRules context="Normal"/> in the JavaScript XML file. -->
+		<context name="OverwriteJavascript" attribute="Normal Text" lineEndContext="#stay">
+			<DetectChar context="Template" attribute="Template" char="`" />
+			<DetectChar context="Object" attribute="Symbol" char="{" beginRegion="Brace" />
+			<DetectChar context="Conditional Expression" attribute="Symbol" char="?" />
+		</context>
+		<context name="Object" attribute="Normal Text" lineEndContext="#stay">
+			<IncludeRules context="React" />
+			<IncludeRules context="Object##JavaScript" />
+		</context>
+		<context name="Conditional Expression" attribute="Normal Text" lineEndContext="#stay">
+			<IncludeRules context="React" />
+			<IncludeRules context="Conditional Expression##JavaScript" />
+		</context>
+		<context name="Template" attribute="Template" lineEndContext="#stay">
+			<Detect2Chars context="Substitution" attribute="Substitution" char="$" char1="{" />
+			<IncludeRules context="Template##JavaScript" />
+		</context>
+		<context name="Substitution" attribute="Normal Text" lineEndContext="#stay">
+			<IncludeRules context="React" />
+			<IncludeRules context="Substitution##JavaScript" />
+		</context>
+
+		<!-- ReactJS -->
+
+		<context name="React" attribute="Normal Text" lineEndContext="#stay">
+			<!-- Characters before a valid tag. Keep synchronized with 'javascript.xml'! -->
+			<RegExpr context="ValidTag" attribute="Normal Text" String="&tag;" firstNonSpace="true" lookAhead="true" />
+			<RegExpr context="ValidTag" attribute="ControlFlow" String="\b(return)\s*(?=&tag;|/\*)" />
+			<RegExpr context="ValidTag" attribute="Module" String="\b(default)\s*(?=&tag;|/\*)" />
+			<RegExpr context="ValidTag" attribute="Symbol" String="([,\=&gt;:\*]|&amp;&amp;|\|\|)\s*(?=&tag;|/\*)" />
+			<RegExpr context="ValidTag" attribute="Normal Text" String="[\(\[]\s*(?=&tag;|/\*)" />
+
+			<RegExpr context="Object-BeforeTag" attribute="Symbol" String="\{\s*(?=&tag;|/\*)" beginRegion="Brace" />
+			<RegExpr context="ConditionalExpression-BeforeTag" attribute="Symbol" String="\?\s*(?=&tag;|/\*)" />
+			<Detect2Chars context="ValidTag" attribute="Comment" char="/" char1="*" firstNonSpace="true" lookAhead="true" />
+
+			<IncludeRules context="OverwriteJavascript" />
+			<IncludeRules context="AllComments" />
+		</context>
+
+		<!-- NOTE: The highlighting of Tags after a multiline comment does not work with: lineEndContext="#pop" -->
+		<context name="ValidTag" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop">
+			<RegExpr context="#stay" attribute="Normal Text" String="\s+(?=&lt;|/\*)" />
+			<IncludeRules context="FindTags" />
+			<Detect2Chars context="MultiInlineComment" attribute="Comment" char="/" char1="*" beginRegion="Comment" />
+		</context>
+		<context name="Object-BeforeTag" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop!Object">
+			<IncludeRules context="ValidTag" />
+		</context>
+		<context name="ConditionalExpression-BeforeTag" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop!Conditional Expression">
+			<IncludeRules context="ValidTag" />
+		</context>
+		<context name="EvaluatedCode-BeforeTag" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop!EvaluatedCode">
+			<IncludeRules context="ValidTag" />
+		</context>
+
+		<context name="FindTags" attribute="Normal Text" lineEndContext="#stay">
+			<RegExpr context="ElementTag" attribute="Element Tag" String="&simpleTag;(?=[^\w\$\-\.:]|$|[\-\.]+([^\w\$\-\.]|$)|:([^a-zA-Z_\$]|$))" beginRegion="Element" />
+			<RegExpr context="ComponentTag" attribute="Component Tag" String="&tag;" beginRegion="ComponentElement" />
+		</context>
+		<context name="FindEntityRefs" attribute="Normal Text" lineEndContext="#stay">
+			<RegExpr context="#stay" attribute="EntityRef" String="&entref;" />
+		</context>
+
+		<context name="ElementTag" attribute="Normal Text" lineEndContext="#stay">
+			<Detect2Chars context="#pop" attribute="Element Tag" char="/" char1="&gt;" endRegion="Element" />
+			<DetectChar context="#pop!ElementTagContent" attribute="Element Tag" char="&gt;" />
+			<IncludeRules context="DefaultTag" />
+		</context>
+		<context name="ComponentTag" attribute="Normal Text" lineEndContext="#stay">
+			<Detect2Chars context="#pop" attribute="Component Tag" char="/" char1="&gt;" endRegion="ComponentElement" />
+			<DetectChar context="#pop!ComponentTagContent" attribute="Component Tag" char="&gt;" />
+			<IncludeRules context="DefaultTag" />
+		</context>
+		<context name="DefaultTag" attribute="Normal Text" lineEndContext="#stay">
+			<RegExpr context="Attribute" attribute="Attribute" String="\b&name;" />
+			<IncludeRules context="AllComments" />
+			<RegExpr context="#stay" attribute="Error" String="\S+&name;" />
+			<RegExpr context="#stay" attribute="Error" String="\S" />
+		</context>
+
+		<context name="ElementTagContent" attribute="Tag Content Text" lineEndContext="#stay">
+			<RegExpr context="ElementTagEnd" attribute="Element Tag" String="&lt;/\s*&simpleName;" />
+			<RegExpr context="ElementTagEnd" attribute="Element Tag" String="&lt;/\s*(?=[A-Z_\$])" /> <!-- Component tag (error) -->
+			<IncludeRules context="DefaultTagContent" />
+		</context>
+		<context name="ComponentTagContent" attribute="Tag Content Text" lineEndContext="#stay">
+			<RegExpr context="ComponentTagEnd" attribute="Component Tag" String="&lt;/\s*&name;" />
+			<IncludeRules context="DefaultTagContent" />
+		</context>
+		<context name="DefaultTagContent" attribute="Tag Content Text" lineEndContext="#stay">
+			<IncludeRules context="FindTags" />
+			<IncludeRules context="FindEntityRefs" />
+			<RegExpr context="EvaluatedCode-BeforeTag" attribute="Code Brackets" String="\{\s*(?=&tag;|/\*)" beginRegion="Code" />
+			<DetectChar context="EvaluatedCode" attribute="Code Brackets" char="{" beginRegion="Code" />
+			<DetectChar context="#stay" attribute="Error" char="&lt;" />
+		</context>
+
+		<context name="ElementTagEnd" attribute="Normal Text" lineEndContext="#stay">
+			<DetectChar context="#pop#pop" attribute="Element Tag" char="&gt;" endRegion="Element" />
+			<RegExpr context="#stay" attribute="Error" String="\S" />
+		</context>
+		<context name="ComponentTagEnd" attribute="Normal Text" lineEndContext="#stay">
+			<DetectChar context="#pop#pop" attribute="Component Tag" char="&gt;" endRegion="ComponentElement" />
+			<RegExpr context="#stay" attribute="Error" String="\S" />
+		</context>
+
+		<context name="Attribute" attribute="Normal Text" lineEndContext="#stay">
+			<DetectChar context="#pop!Value" attribute="Symbol" char="=" />
+			<Detect2Chars context="#pop" attribute="Normal Text" char="/" char1="&gt;" lookAhead="true" />
+			<DetectChar context="#pop" attribute="Normal Text" char="&gt;" lookAhead="true" />
+			<IncludeRules context="AllComments" />
+			<RegExpr context="#stay" attribute="Attribute" String="\b&name;" />
+			<RegExpr context="#stay" attribute="Error" String="\S+&name;" />
+			<RegExpr context="#stay" attribute="Error" String="\S" />
+		</context>
+
+		<context name="Value" attribute="Normal Text" lineEndContext="#stay">
+			<DetectChar context="#pop!ValueDQ" attribute="Value" char="&quot;" />
+			<DetectChar context="#pop!ValueSQ" attribute="Value" char="&apos;" />
+			<RegExpr context="#pop!EvaluatedCode-BeforeTag" attribute="Code Brackets" String="\{\s*(?=&tag;|/\*)" beginRegion="Code" />
+			<DetectChar context="#pop!EvaluatedCode" attribute="Code Brackets" char="{" beginRegion="Code" />
+			<IncludeRules context="AllComments" />
+			<RegExpr context="#stay" attribute="Error" String="\S" />
+		</context>
+		<context name="ValueDQ" attribute="Value" lineEndContext="#stay">
+			<DetectChar context="#pop" attribute="Value" char="&quot;" />
+			<IncludeRules context="FindEntityRefs" />
+		</context>
+		<context name="ValueSQ" attribute="Value" lineEndContext="#stay">
+			<DetectChar context="#pop" attribute="Value" char="&apos;" />
+			<IncludeRules context="FindEntityRefs" />
+		</context>
+		<context name="EvaluatedCode" attribute="Normal Text" lineEndContext="#stay">
+			<DetectChar context="#pop" attribute="Code Brackets" char="}" endRegion="Code" />
+			<IncludeRules context="Normal" />
+		</context>
+
+		<context name="AllComments" attribute="Normal Text" lineEndContext="#stay">
+			<Detect2Chars context="SingleLineComment" attribute="Comment" char="/" char1="/" />
+			<Detect2Chars context="MultiInlineComment" attribute="Comment" char="/" char1="*" beginRegion="Comment" />
+		</context>
+		<context name="SingleLineComment" attribute="Comment" lineEndContext="#pop">
+			<IncludeRules context="##Alerts" />
+			<IncludeRules context="##Modelines" />
+			<RegExpr context="SingleLineCommentURL" attribute="Comment URL" String="\bhttps?://(?=[^\s&lt;&gt;&quot;&apos;`])" />
+			<IncludeRules context="DefaultComment" />
+		</context>
+		<context name="MultiInlineComment" attribute="Comment" lineEndContext="#stay">
+			<Detect2Chars context="#pop" attribute="Comment" char="*" char1="/" endRegion="Comment" />
+			<IncludeRules context="##Alerts" />
+			<IncludeRules context="##Modelines" />
+			<RegExpr context="MultiInlineCommentURL" attribute="Comment URL" String="\bhttps?://(?=[^\s&lt;&gt;&quot;&apos;`])" />
+			<IncludeRules context="DefaultComment" />
+		</context>
+		<context name="DefaultComment" attribute="Comment" lineEndContext="#stay">
+			<RegExpr context="#stay" attribute="Comment URL" String="(([^&lt;&gt;\(\)\[\]\\\.,;:\s@&quot;]+(\.[^&lt;&gt;\(\)\[\]\\\.,;:\s@&quot;]+)*)|(&quot;[^&quot;]+&quot;))@((\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}])|(([a-zA-Z\-\d]+\.)+[a-zA-Z]{2,}))\b" /> <!-- Detect e-mail (Source: http://emailregex.com) -->
+		</context>
+		<context name="SingleLineCommentURL" attribute="Comment URL" lineEndContext="#pop#pop">
+			<DetectSpaces context="#pop" attribute="Comment" lookAhead="true" />
+			<AnyChar context="#pop" attribute="Comment" String="&lt;&gt;&quot;&apos;`" lookAhead="true" />
+			<RegExpr context="#pop" attribute="Comment" String="[\}\)\]\.,;\|]+([\s&lt;&gt;&quot;&apos;`]|$)" lookAhead="true" />
+		</context>
+		<context name="MultiInlineCommentURL" attribute="Comment URL" lineEndContext="#pop">
+			<Detect2Chars context="#pop" attribute="Comment" char="*" char1="/" lookAhead="true" />
+			<RegExpr context="#pop" attribute="Comment" String="[\}\)\]\.,;\|]+\*/" lookAhead="true" />
+			<IncludeRules context="SingleLineCommentURL" />
+		</context>
+
+	</contexts>
+
+	<itemDatas>
+		<itemData name="Normal Text"      defStyleNum="dsNormal" spellChecking="false" />
+		<itemData name="Comment"          defStyleNum="dsComment" />
+
+		<itemData name="Tag Content Text" defStyleNum="dsNormal" />
+		<itemData name="Element Tag"      defStyleNum="dsKeyword" spellChecking="false" />
+		<itemData name="Component Tag"    defStyleNum="dsFunction" bold="1" spellChecking="false" />
+		<itemData name="Attribute"        defStyleNum="dsOthers" spellChecking="false" />
+		<itemData name="Value"            defStyleNum="dsString" spellChecking="false" />
+		<itemData name="EntityRef"        defStyleNum="dsDecVal" spellChecking="false" />
+		<itemData name="Code Brackets"    defStyleNum="dsVariable" spellChecking="false" />
+		<itemData name="Error"            defStyleNum="dsError" spellChecking="false" />
+		<itemData name="Comment URL"      defStyleNum="dsComment" underline="1" spellChecking="false" />
+
+		<!-- itemDatas in JavaScript XML file -->
+		<itemData name="Symbol"           defStyleNum="dsOperator" />
+		<itemData name="ControlFlow"      defStyleNum="dsControlFlow" spellChecking="false" />
+		<itemData name="Module"           defStyleNum="dsImport" spellChecking="false" />
+		<itemData name="Template"         defStyleNum="dsVerbatimString" />
+		<itemData name="Substitution"     defStyleNum="dsSpecialChar" spellChecking="false" />
+	</itemDatas>
+
+</highlighting>
+
+<general>
+	<keywords casesensitive="1" />
+	<comments>
+		<comment name="singleLine" start="//" />
+		<comment name="multiLine" start="/*" end="*/" />
+	</comments>
+</general>
+
+</language>

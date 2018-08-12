@@ -19,6 +19,7 @@
 #define KSYNTAXHIGHLIGHTING_DEFINITION_P_H
 
 #include "definitionref_p.h"
+#include "definition.h"
 
 #include <QHash>
 #include <QString>
@@ -31,7 +32,6 @@ QT_END_NAMESPACE
 
 namespace KSyntaxHighlighting {
 
-class Definition;
 class Repository;
 
 class DefinitionData
@@ -54,6 +54,7 @@ public:
     void loadContexts(QXmlStreamReader &reader);
     void loadItemData(QXmlStreamReader &reader);
     void loadGeneral(QXmlStreamReader &reader);
+    void loadComments(QXmlStreamReader &reader);
     void loadFoldingIgnoreList(QXmlStreamReader &reader);
     bool checkKateVersion(const QStringRef &verStr);
 
@@ -77,6 +78,10 @@ public:
     QString wordWrapDelimiters;
     bool indentationBasedFolding = false;
     QStringList foldingIgnoreList;
+    QString singleLineCommentMarker;
+    CommentPosition singleLineCommentPosition = CommentPosition::StartOfLine;
+    QString multiLineCommentStartMarker;
+    QString multiLineCommentEndMarker;
 
     QString fileName;
     QString name;

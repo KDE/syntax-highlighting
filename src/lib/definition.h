@@ -21,6 +21,7 @@
 #include "ksyntaxhighlighting_export.h"
 
 #include <QTypeInfo>
+#include <QPair>
 
 #include <memory>
 
@@ -36,6 +37,20 @@ class Format;
 class KeywordList;
 
 class DefinitionData;
+
+/**
+ * Defines the insert position when commenting code.
+ * @since 5.50
+ * @see Definition::singleLineCommentPosition()
+ */
+enum class CommentPosition
+{
+    //! The comment marker is inserted at the beginning of a line at column 0
+    StartOfLine = 0,
+    //! The comment marker is inserted after leading whitespaces right befire
+    //! the first non-whitespace character.
+    AfterWhitespace
+};
 
 /**
  * Represents a syntax definition.
@@ -257,6 +272,29 @@ public:
      * @since 5.49
      */
     QVector<Definition> includedDefinitions() const;
+
+    /**
+     * Returns the marker that starts a single line comment.
+     * For instance, in C++ the single line comment marker is "//".
+     * @since 5.50
+     * @see singleLineCommentPosition();
+     */
+    QString singleLineCommentMarker() const;
+
+    /**
+     * Returns the insert position of the comment marker for sinle line
+     * comments.
+     * @since 5.50
+     * @see singleLineCommentMarker();
+     */
+    CommentPosition singleLineCommentPosition() const;
+
+    /**
+     * Returns the markers that start and end multiline comments.
+     * For instance, in XML this is defined as "<!--" and "-->".
+     * @since 5.50
+     */
+    QPair<QString, QString> multiLineCommentMarker() const;
 
 private:
     friend class DefinitionData;

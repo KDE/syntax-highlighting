@@ -250,6 +250,24 @@ QVector<Definition> Definition::includedDefinitions() const
     return definitions;
 }
 
+QString Definition::singleLineCommentMarker() const
+{
+    d->load();
+    return d->singleLineCommentMarker;
+}
+
+CommentPosition Definition::singleLineCommentPosition() const
+{
+    d->load();
+    return d->singleLineCommentPosition;
+}
+
+QPair<QString, QString> Definition::multiLineCommentMarker() const
+{
+    d->load();
+    return { d->multiLineCommentStartMarker, d->multiLineCommentEndMarker };
+}
+
 Context* DefinitionData::initialContext() const
 {
     Q_ASSERT(!contexts.isEmpty());
@@ -542,8 +560,49 @@ void DefinitionData::loadGeneral(QXmlStreamReader& reader)
                         indentationBasedFolding = Xml::attrToBool(reader.attributes().value(QStringLiteral("indentationsensitive")));
                 } else if (reader.name() == QLatin1String("emptyLines")) {
                     loadFoldingIgnoreList(reader);
+                } else if (reader.name() == QLatin1String("comments")) {
+                    loadComments(reader);
                 } else {
                     reader.skipCurrentElement();
+                }
+                reader.readNext();
+                break;
+            case QXmlStreamReader::EndElement:
+                --elementRefCounter;
+                if (elementRefCounter == 0)
+                    return;
+                reader.readNext();
+                break;
+            default:
+                reader.readNext();
+                break;
+        }
+    }
+}
+
+void DefinitionData::loadComments(QXmlStreamReader &reader)
+{
+    Q_ASSERT(reader.name() == QLatin1String("comments"));
+    Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
+    reader.readNext();
+
+    // reference counter to count XML child elements, to not return too early
+    int elementRefCounter = 1;
+
+    while (!reader.atEnd()) {
+        switch (reader.tokenType()) {
+            case QXmlStreamReader::StartElement:
+                ++elementRefCounter;
+                if (reader.name() == QLatin1String("comment")) {
+                    const bool isSingleLine = reader.attributes().value(QStringLiteral("name")) == QStringLiteral("singleLine");
+                    if (isSingleLine) {
+                        singleLineCommentMarker = reader.attributes().value(QStringLiteral("start")).toString();
+                        const bool afterWhiteSpace = reader.attributes().value(QStringLiteral("position")).toString() == QStringLiteral("afterwhitespace");
+                        singleLineCommentPosition = afterWhiteSpace ? CommentPosition::AfterWhitespace : CommentPosition::StartOfLine;
+                    } else {
+                        multiLineCommentStartMarker = reader.attributes().value(QStringLiteral("start")).toString();
+                        multiLineCommentEndMarker = reader.attributes().value(QStringLiteral("end")).toString();
+                    }
                 }
                 reader.readNext();
                 break;

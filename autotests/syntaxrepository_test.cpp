@@ -142,6 +142,12 @@ private Q_SLOTS:
         QVERIFY(def.isValid());
         QVERIFY(!def.indentationBasedFoldingEnabled());
 
+        // comment markers
+        QCOMPARE(def.singleLineCommentMarker(), QLatin1String("//"));
+        QCOMPARE(def.singleLineCommentPosition(), KSyntaxHighlighting::CommentPosition::StartOfLine);
+        const auto cppMultiLineCommentMarker = QPair<QString, QString>(QLatin1String("/*"), QLatin1String("*/"));
+        QCOMPARE(def.multiLineCommentMarker(), cppMultiLineCommentMarker);
+
         def = m_repo.definitionForName(QLatin1String("Python"));
         QVERIFY(def.isValid());
 
@@ -276,6 +282,11 @@ private Q_SLOTS:
         QVERIFY(def.keywordLists().isEmpty());
         QVERIFY(def.formats().isEmpty());
         QVERIFY(def.includedDefinitions().isEmpty());
+        QVERIFY(def.singleLineCommentMarker().isEmpty());
+        QCOMPARE(def.singleLineCommentPosition(), KSyntaxHighlighting::CommentPosition::StartOfLine);
+        const auto emptyPair = QPair<QString, QString>();
+        QCOMPARE(def.multiLineCommentMarker(), emptyPair);
+
 
         for (QChar c : QStringLiteral("\t !%&()*+,-./:;<=>?[\\]^{|}~")) {
             QVERIFY(def.isWordDelimiter(c));

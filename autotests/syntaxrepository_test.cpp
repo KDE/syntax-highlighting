@@ -253,7 +253,7 @@ private Q_SLOTS:
         QVERIFY(customTheme.isValid());
     }
 
-    void testEmptyDefinition()
+    void testInvalidDefinition()
     {
         Definition def;
         QVERIFY(!def.isValid());
@@ -277,8 +277,25 @@ private Q_SLOTS:
         QVERIFY(def.formats().isEmpty());
         QVERIFY(def.includedDefinitions().isEmpty());
 
-        for (QChar c : QStringLiteral("\t !%&()*+,-./:;<=>?[\\]^{|}~"))
+        for (QChar c : QStringLiteral("\t !%&()*+,-./:;<=>?[\\]^{|}~")) {
             QVERIFY(def.isWordDelimiter(c));
+            QVERIFY(def.isWordWrapDelimiter(c));
+        }
+    }
+
+    void testDelimiters()
+    {
+        auto def = m_repo.definitionForName(QLatin1String("LaTeX"));
+        QVERIFY(def.isValid());
+
+        // check that backslash '\' is removed
+        for (QChar c : QStringLiteral("\t !%&()*+,-./:;<=>?[]^{|}~"))
+            QVERIFY(def.isWordDelimiter(c));
+        QVERIFY(!def.isWordDelimiter(QLatin1Char('\\')));
+
+        // check where breaking a line is valid
+        for (QChar c : QStringLiteral(",{}[]"))
+            QVERIFY(def.isWordWrapDelimiter(c));
     }
 };
 }

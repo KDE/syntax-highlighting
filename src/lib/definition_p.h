@@ -73,7 +73,8 @@ public:
     QHash<QString, KeywordList> keywordLists;
     QVector<Context*> contexts;
     QHash<QString, Format> formats;
-    QString delimiters;
+    QString wordDelimiters;
+    QString wordWrapDelimiters;
     bool indentationBasedFolding = false;
     QStringList foldingIgnoreList;
 

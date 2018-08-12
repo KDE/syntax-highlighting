@@ -171,8 +171,39 @@ public:
      *       characters: \\t !%&()*+,-./:;<=>?[\\]^{|}~
      *
      * @since 5.50
+     * @see isWordWrapDelimiter()
      */
     bool isWordDelimiter(QChar c) const;
+
+    /**
+     * Returns whether it is safe to break a line at before the character @c.
+     * This is useful when wrapping a line e.g. by applying static word wrap.
+     *
+     * As example, consider the LaTeX code
+     * @code
+     * \command1\command2
+     * @endcode
+     * Applying static word wrap could lead to the following code:
+     * @code
+     * \command1\
+     * command2
+     * @endcode
+     * command2 without a leading backslash is invalid in LaTeX. If '\\' is set
+     * as word wrap delimiter, isWordWrapDelimiter('\\') then returns true,
+     * meaning that it is safe to break the line before @c. The resulting code
+     * then would be
+     * @code
+     * \command1
+     * \command2
+     * @endcode
+     *
+     * @note By default, the word wrap delimiters are equal to the word
+     *       delimiters in isWordDelimiter().
+     *
+     * @since 5.50
+     * @see isWordDelimiter()
+     */
+    bool isWordWrapDelimiter(QChar c) const;
 
     /**
      * Returns whether indentation-based folding is enabled.

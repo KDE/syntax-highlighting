@@ -44,7 +44,8 @@
 using namespace KSyntaxHighlighting;
 
 DefinitionData::DefinitionData()
-    : delimiters(QStringLiteral("\t !%&()*+,-./:;<=>?[\\]^{|}~")) // must be sorted!
+    : wordDelimiters(QStringLiteral("\t !%&()*+,-./:;<=>?[\\]^{|}~")) // must be sorted!
+    , wordWrapDelimiters(wordDelimiters)
 {
 }
 
@@ -175,6 +176,12 @@ bool Definition::isWordDelimiter(QChar c) const
     return d->isWordDelimiter(c);
 }
 
+bool Definition::isWordWrapDelimiter(QChar c) const
+{
+    d->load();
+    return std::binary_search(d->wordWrapDelimiters.constBegin(), d->wordWrapDelimiters.constEnd(), c);
+}
+
 bool Definition::indentationBasedFoldingEnabled() const
 {
     d->load();
@@ -265,7 +272,7 @@ KeywordList DefinitionData::keywordList(const QString& name) const
 
 bool DefinitionData::isWordDelimiter(QChar c) const
 {
-    return std::binary_search(delimiters.constBegin(), delimiters.constEnd(), c);
+    return std::binary_search(wordDelimiters.constBegin(), wordDelimiters.constEnd(), c);
 }
 
 Format DefinitionData::formatByName(const QString& name) const
@@ -315,7 +322,7 @@ bool DefinitionData::load()
         context->resolveIncludes();
     }
 
-    Q_ASSERT(std::is_sorted(delimiters.constBegin(), delimiters.constEnd()));
+    Q_ASSERT(std::is_sorted(wordDelimiters.constBegin(), wordDelimiters.constEnd()));
     return true;
 }
 
@@ -335,7 +342,8 @@ void DefinitionData::clear()
     license.clear();
     mimetypes.clear();
     extensions.clear();
-    delimiters = QStringLiteral("\t !%&()*+,-./:;<=>?[\\]^{|}~"); // must be sorted!
+    wordDelimiters = QStringLiteral("\t !%&()*+,-./:;<=>?[\\]^{|}~"); // must be sorted!
+    wordWrapDelimiters = wordDelimiters;
     caseSensitive = Qt::CaseSensitive;
     version = 0.0f;
     priority = 0;
@@ -515,12 +523,20 @@ void DefinitionData::loadGeneral(QXmlStreamReader& reader)
                 if (reader.name() == QLatin1String("keywords")) {
                     if (reader.attributes().hasAttribute(QStringLiteral("casesensitive")))
                         caseSensitive = Xml::attrToBool(reader.attributes().value(QStringLiteral("casesensitive"))) ? Qt::CaseSensitive : Qt::CaseInsensitive;
-                    delimiters += reader.attributes().value(QStringLiteral("additionalDeliminator"));
-                    std::sort(delimiters.begin(), delimiters.end());
-                    auto it = std::unique(delimiters.begin(), delimiters.end());
-                    delimiters.truncate(std::distance(delimiters.begin(), it));
+
+                    // adapt sorted wordDelimiters
+                    wordDelimiters += reader.attributes().value(QStringLiteral("additionalDeliminator"));
+                    std::sort(wordDelimiters.begin(), wordDelimiters.end());
+                    auto it = std::unique(wordDelimiters.begin(), wordDelimiters.end());
+                    wordDelimiters.truncate(std::distance(wordDelimiters.begin(), it));
                     foreach (const auto c, reader.attributes().value(QLatin1String("weakDeliminator")))
-                        delimiters.remove(c);
+                        wordDelimiters.remove(c);
+
+                    // adaptWordWrapDelimiters, and sort
+                    wordWrapDelimiters = reader.attributes().value(QStringLiteral("wordWrapDeliminator")).toString();
+                    std::sort(wordWrapDelimiters.begin(), wordWrapDelimiters.end());
+                    if (wordWrapDelimiters.isEmpty())
+                        wordWrapDelimiters = wordDelimiters;
                 } else if (reader.name() == QLatin1String("folding")) {
                     if (reader.attributes().hasAttribute(QStringLiteral("indentationsensitive")))
                         indentationBasedFolding = Xml::attrToBool(reader.attributes().value(QStringLiteral("indentationsensitive")));

@@ -122,6 +122,9 @@ Theme Repository::defaultTheme(Repository::DefaultTheme t)
 
 void RepositoryPrivate::load(Repository *repo)
 {
+    // always add invalid default "None" highlighting
+    addDefinition(Definition());
+
     auto dirs = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("org.kde.syntax-highlighting/syntax"), QStandardPaths::LocateDirectory);
     foreach (const auto &dir, dirs)
         loadSyntaxFolder(repo, dir);

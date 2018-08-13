@@ -84,7 +84,7 @@ public:
     QString multiLineCommentEndMarker;
 
     QString fileName;
-    QString name;
+    QString name = QStringLiteral(QT_TRANSLATE_NOOP("Syntax highlighting", "None"));
     QString section;
     QString style;
     QString indenter;

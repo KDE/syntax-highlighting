@@ -105,7 +105,7 @@ private Q_SLOTS:
 
         int count = 0;
         foreach (const auto &def, m_repo->definitions()) {
-            if (def.isHidden())
+            if (def.isHidden() || !def.isValid())
                 continue;
             ++count;
             if (m_coveredDefinitions.contains(def.name()))

@@ -94,15 +94,15 @@ private Q_SLOTS:
         foreach (const auto &def, m_repo.definitions()) {
             QVERIFY(!def.name().isEmpty());
             QVERIFY(!def.translatedName().isEmpty());
-            QVERIFY(!def.section().isEmpty());
-            QVERIFY(!def.translatedSection().isEmpty());
+            QVERIFY(!def.isValid() || !def.section().isEmpty());
+            QVERIFY(!def.isValid() || !def.translatedSection().isEmpty());
             // indirectly trigger loading, as we can't reach that from public API
             // if the loading fails the highlighter will produce empty states
             NullHighlighter hl;
             State initialState;
             hl.setDefinition(def);
             const auto state = hl.highlightLine(QLatin1String("This should not crash } ] ) !"), initialState);
-            QVERIFY(state != initialState);
+            QVERIFY(!def.isValid() || state != initialState);
         }
     }
 
@@ -264,8 +264,7 @@ private Q_SLOTS:
         Definition def;
         QVERIFY(!def.isValid());
         QVERIFY(def.filePath().isEmpty());
-        QVERIFY(def.name().isEmpty());
-        QVERIFY(def.translatedName().isEmpty());
+        QCOMPARE(def.name(), QLatin1String("None"));
         QVERIFY(def.section().isEmpty());
         QVERIFY(def.translatedSection().isEmpty());
         QVERIFY(def.mimeTypes().isEmpty());

@@ -1,46 +1,46 @@
 # Sample AppArmor Profile.
 # License: Public Domain
-# Last change: January 25, 2018
+
+# NOTE: This profile is not fully functional, since
+# it is designed to test the syntax highlighting.
 
 include <tunables/global>
 
 # Variable assignment
 @{FOO_LIB}=/usr/lib{,32,64}/foo
-@{USER_DIR} = @{HOME}/Public @{HOME}/Desktop
-@{USER_DIR} += @{HOME}/Hello
+@{USER_DIR}
+  = @{HOME}/Public @{HOME}/Desktop #No-Comment
+@{USER_DIR} += @{HOME}/Hello \
+deny owner #No-comment
+${BOOL} = true
 
 # Profile for /usr/bin/foo
-/usr/bin/foo (attach_disconnected, enforce) <beginfold id='1'>{</beginfold id='1'>
-	include <abstractions/base>
-	include <abstractions/dbus>
-
+/usr/bin/foo (attach_disconnected enforce) <beginfold id='1'>{</beginfold id='1'>
+	include <include_tests/includes_okay_helper.include> #include <includes/base>
 	#include <abstractions/ubuntu-helpers>
 	#include<abstractions/wayland>
 	#include"/etc/apparmor.d/abstractions/ubuntu-konsole"
 	include "/etc/apparmor.d/abstractions/openssl"
+	include if exists <path with spaces>
 
-	/{,**/} r<endfold id='2'>,</endfold id='2'># Read only directories
-
+	/{,**/} r<endfold id='2'>,</endfold id='2'>
 	owner /{home,media,mnt,srv,net}/** r<endfold id='2'>,</endfold id='2'>
 	owner @{USER_DIR}/** rw<endfold id='2'>,</endfold id='2'>
 	audit deny owner /**/* mx<endfold id='2'>,</endfold id='2'>
 	/**.[tT][xX][tT] r<endfold id='2'>,</endfold id='2'>  # txt
 	
 	owner <beginfold id='2'>file</beginfold id='2'> @{HOME}/.local/share/foo/{,**} rwkl<endfold id='2'>,</endfold id='2'>
-	owner @{HOME}/.config/foo/{,**}           rwk<endfold id='2'>,</endfold id='2'>
 	owner @{HOME}/.config/*                   rw<endfold id='2'>,</endfold id='2'>
 	owner @{HOME}/.config/*.[a-zA-Z0-9]*      rwk<endfold id='2'>,</endfold id='2'>
-	owner @{HOME}/.cache/foo/{,**}            rwk<endfold id='2'>,</endfold id='2'>
 
 	"/usr/share/**" r<endfold id='2'>,</endfold id='2'>
 	"/var/lib/flatpak/exports/share/**" r<endfold id='2'>,</endfold id='2'>
-	"/var/lib/flatpak/app/**/export/share/applications/*.desktop" r<endfold id='2'>,</endfold id='2'>
+	"/var/lib/{spaces in
+		string,hello}/a[^ a]a/**" r<endfold id='2'>,</endfold id='2'>
 
 	allow <beginfold id='2'>file</beginfold id='2'> /etc/nsswitch.conf           r<endfold id='2'>,</endfold id='2'>
 	allow /etc/fstab                        r<endfold id='2'>,</endfold id='2'>
-	/etc/udev/udev.conf                     r<endfold id='2'>,</endfold id='2'>
-	/etc/xdg/**                             r<endfold id='2'>,</endfold id='2'>
-	/etc/xdg/Trolltech.conf                 k<endfold id='2'>,</endfold id='2'>
+	deny /etc/udev/udev.conf                a<endfold id='2'>,</endfold id='2'>
 	deny /etc/xdg/{autostart,systemd}/**    r<endfold id='2'>,</endfold id='2'>
 	deny /boot/**                           rwlkmx<endfold id='2'>,</endfold id='2'>
 	
@@ -48,19 +48,16 @@ include <tunables/global>
 	/sys/devices/**/uevent r<endfold id='2'>,</endfold id='2'>
 
 	/usr/bin/foo         ixr<endfold id='2'>,</endfold id='2'>
-	/usr/bin/dolphin     PUx<endfold id='2'>,</endfold id='2'>
+	/usr/bin/dolphin     pUx<endfold id='2'>,</endfold id='2'>
 	/usr/bin/*           Pixr<endfold id='2'>,</endfold id='2'>
 	/usr/bin/khelpcenter Cx  -> sanitized_helper<endfold id='2'>,</endfold id='2'>
-	/usr/bin/helloworld  Cxr ->
+	/usr/bin/helloworld  cxr ->
 			hello_world<endfold id='2'>,</endfold id='2'>
 	
-	/usr/lib{,32,64}/{,@{multiarch}/}qt5/plugins/{,**/}*.so m<endfold id='2'>,</endfold id='2'>
-	@{FOO_LIB}/{,**} mr<endfold id='2'>,</endfold id='2'>
+	@{FOO_LIB}/{@{multiarch},64}/** mr<endfold id='2'>,</endfold id='2'>
 	
-	audit deny /dev/{audio,video}* rwlkmx<endfold id='2'>,</endfold id='2'>
-
 	# Dbus rules
-	<beginfold id='2'>dbus</beginfold id='2'> (send)
+	<beginfold id='2'>dbus</beginfold id='2'> (send)  #No-Comment
 		bus=system
 		path=/org/freedesktop/NetworkManager
 		interface=org.freedesktop.DBus.Introspectable
@@ -80,7 +77,7 @@ include <tunables/global>
 		name=org.bluez<endfold id='2'>,</endfold id='2'>
 
 	# Signal rules
-	<beginfold id='2'>signal</beginfold id='2'> (send) set=(term) peer=unconfined<endfold id='2'>,</endfold id='2'>
+	<beginfold id='2'>signal</beginfold id='2'> (send) set=(term) peer="/usr/lib/hello/world// foo helper"<endfold id='2'>,</endfold id='2'>
 	<beginfold id='2'>signal</beginfold id='2'> (send, receive) set=(int exists rtmin+8) peer=/usr/lib/hello/world//foo-helper<endfold id='2'>,</endfold id='2'>
 
 	# Child profile
@@ -97,7 +94,7 @@ include <tunables/global>
 		<beginfold id='2'>link</beginfold id='2'> subset /link* -> /**<endfold id='2'>,</endfold id='2'>
 
 		# Network rules
-		<beginfold id='2'>network</beginfold id='2'> inet6 tcp<endfold id='2'>,</endfold id='2'> #Allow access to tcp only for inet6 addresses
+		<beginfold id='2'>network</beginfold id='2'> inet6 tcp<endfold id='2'>,</endfold id='2'>
 		<beginfold id='2'>network</beginfold id='2'> netlink dgram<endfold id='2'>,</endfold id='2'>
 		<beginfold id='2'>network</beginfold id='2'> bluetooth<endfold id='2'>,</endfold id='2'>
 		<beginfold id='2'>network</beginfold id='2'> unspec dgram<endfold id='2'>,</endfold id='2'>
@@ -122,7 +119,7 @@ include <tunables/global>
 		<beginfold id='2'>ptrace</beginfold id='2'> (read, trace, tracedby) peer=/usr/lib/hello/helloword<endfold id='2'>,</endfold id='2'>
 
 		# Unix rules
-		<beginfold id='2'>unix</beginfold id='2'> (connect receive send) type=(stream) peer=(label=unconfined addr=@/tmp/ibus/dbus-*)<endfold id='2'>,</endfold id='2'>
+		<beginfold id='2'>unix</beginfold id='2'> (connect receive send) type=(stream) peer=(addr=@/tmp/ibus/dbus-*,label=unconfined)<endfold id='2'>,</endfold id='2'>
 		<beginfold id='2'>unix</beginfold id='2'> (send,receive) type=(stream) protocol=0 peer=(addr=none)<endfold id='2'>,</endfold id='2'>
 		<beginfold id='2'>unix</beginfold id='2'> peer=(label=@{profile_name},addr=@helloworld)<endfold id='2'>,</endfold id='2'>
 
@@ -136,22 +133,24 @@ include <tunables/global>
 		<beginfold id='2'>change_profile</beginfold id='2'> unsafe /** -> [^u/]**<endfold id='2'>,</endfold id='2'>
 		<beginfold id='2'>change_profile</beginfold id='2'> unsafe /** -> {u,un,unc,unco,uncon,unconf,unconfi,unconfin,unconfine}<endfold id='2'>,</endfold id='2'>
 		<beginfold id='2'>change_profile</beginfold id='2'> /bin/bash  -> 
-			new_profile<endfold id='2'>,</endfold id='2'>
+			new_profile//hat<endfold id='2'>,</endfold id='2'>
 
 		# Alias
 		<beginfold id='2'>alias</beginfold id='2'> /usr/ -> /mnt/usr/<endfold id='2'>,</endfold id='2'>
 	<endfold id='1'>}</endfold id='1'>
 
 	# Hat
-	^foo-helper <beginfold id='1'>{</beginfold id='1'>
+	^foo-\/helper <beginfold id='1'>{</beginfold id='1'>
 		<beginfold id='2'>network</beginfold id='2'> unix stream<endfold id='2'>,</endfold id='2'>
 		<beginfold id='2'>unix</beginfold id='2'> stream<endfold id='2'>,</endfold id='2'>
 
-		/usr/hi\"esc\x23esc\032esc\*es\{esc\ rw r<endfold id='2'>,</endfold id='2'> # Escape expressions
+		/usr/hi\"esc\x23esc\032es\477esc\*es\{esc\ rw r<endfold id='2'>,</endfold id='2'> # Escape expressions
 
 		# Text after a variable is highlighted as path
 		<beginfold id='2'>file</beginfold id='2'> /my/path r<endfold id='2'>,</endfold id='2'>
 		@{FOO_LIB}file r<endfold id='2'>,</endfold id='2'>
 		@{FOO_LIB}#my/path r<endfold id='2'>,</endfold id='2'> #Comment
+		@{FOO_LIB}ñ* r<endfold id='2'>,</endfold id='2'>
+		<beginfold id='2'>unix</beginfold id='2'> (/path\t{aa}*,*a @{var}*path,* @{var},*)<endfold id='2'>,</endfold id='2'>
 	<endfold id='1'>}</endfold id='1'>
 <endfold id='1'>}</endfold id='1'>

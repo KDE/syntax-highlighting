@@ -1,46 +1,46 @@
 # Sample AppArmor Profile.
 # License: Public Domain
-# Last change: January 25, 2018
+
+# NOTE: This profile is not fully functional, since
+# it is designed to test the syntax highlighting.
 
 include <tunables/global>
 
 # Variable assignment
 @{FOO_LIB}=/usr/lib{,32,64}/foo
-@{USER_DIR} = @{HOME}/Public @{HOME}/Desktop
-@{USER_DIR} += @{HOME}/Hello
+@{USER_DIR}
+  = @{HOME}/Public @{HOME}/Desktop #No-Comment
+@{USER_DIR} += @{HOME}/Hello \
+deny owner #No-comment
+${BOOL} = true
 
 # Profile for /usr/bin/foo
-/usr/bin/foo (attach_disconnected, enforce) {
-	include <abstractions/base>
-	include <abstractions/dbus>
-
+/usr/bin/foo (attach_disconnected enforce) {
+	include <include_tests/includes_okay_helper.include> #include <includes/base>
 	#include <abstractions/ubuntu-helpers>
 	#include<abstractions/wayland>
 	#include"/etc/apparmor.d/abstractions/ubuntu-konsole"
 	include "/etc/apparmor.d/abstractions/openssl"
+	include if exists <path with spaces>
 
-	/{,**/} r,# Read only directories
-
+	/{,**/} r,
 	owner /{home,media,mnt,srv,net}/** r,
 	owner @{USER_DIR}/** rw,
 	audit deny owner /**/* mx,
 	/**.[tT][xX][tT] r,  # txt
 	
 	owner file @{HOME}/.local/share/foo/{,**} rwkl,
-	owner @{HOME}/.config/foo/{,**}           rwk,
 	owner @{HOME}/.config/*                   rw,
 	owner @{HOME}/.config/*.[a-zA-Z0-9]*      rwk,
-	owner @{HOME}/.cache/foo/{,**}            rwk,
 
 	"/usr/share/**" r,
 	"/var/lib/flatpak/exports/share/**" r,
-	"/var/lib/flatpak/app/**/export/share/applications/*.desktop" r,
+	"/var/lib/{spaces in
+		string,hello}/a[^ a]a/**" r,
 
 	allow file /etc/nsswitch.conf           r,
 	allow /etc/fstab                        r,
-	/etc/udev/udev.conf                     r,
-	/etc/xdg/**                             r,
-	/etc/xdg/Trolltech.conf                 k,
+	deny /etc/udev/udev.conf                a,
 	deny /etc/xdg/{autostart,systemd}/**    r,
 	deny /boot/**                           rwlkmx,
 	
@@ -48,19 +48,16 @@ include <tunables/global>
 	/sys/devices/**/uevent r,
 
 	/usr/bin/foo         ixr,
-	/usr/bin/dolphin     PUx,
+	/usr/bin/dolphin     pUx,
 	/usr/bin/*           Pixr,
 	/usr/bin/khelpcenter Cx  -> sanitized_helper,
-	/usr/bin/helloworld  Cxr ->
+	/usr/bin/helloworld  cxr ->
 			hello_world,
 	
-	/usr/lib{,32,64}/{,@{multiarch}/}qt5/plugins/{,**/}*.so m,
-	@{FOO_LIB}/{,**} mr,
+	@{FOO_LIB}/{@{multiarch},64}/** mr,
 	
-	audit deny /dev/{audio,video}* rwlkmx,
-
 	# Dbus rules
-	dbus (send)
+	dbus (send)  #No-Comment
 		bus=system
 		path=/org/freedesktop/NetworkManager
 		interface=org.freedesktop.DBus.Introspectable
@@ -80,7 +77,7 @@ include <tunables/global>
 		name=org.bluez,
 
 	# Signal rules
-	signal (send) set=(term) peer=unconfined,
+	signal (send) set=(term) peer="/usr/lib/hello/world// foo helper",
 	signal (send, receive) set=(int exists rtmin+8) peer=/usr/lib/hello/world//foo-helper,
 
 	# Child profile
@@ -97,7 +94,7 @@ include <tunables/global>
 		link subset /link* -> /**,
 
 		# Network rules
-		network inet6 tcp, #Allow access to tcp only for inet6 addresses
+		network inet6 tcp,
 		network netlink dgram,
 		network bluetooth,
 		network unspec dgram,
@@ -122,7 +119,7 @@ include <tunables/global>
 		ptrace (read, trace, tracedby) peer=/usr/lib/hello/helloword,
 
 		# Unix rules
-		unix (connect receive send) type=(stream) peer=(label=unconfined addr=@/tmp/ibus/dbus-*),
+		unix (connect receive send) type=(stream) peer=(addr=@/tmp/ibus/dbus-*,label=unconfined),
 		unix (send,receive) type=(stream) protocol=0 peer=(addr=none),
 		unix peer=(label=@{profile_name},addr=@helloworld),
 
@@ -136,22 +133,24 @@ include <tunables/global>
 		change_profile unsafe /** -> [^u/]**,
 		change_profile unsafe /** -> {u,un,unc,unco,uncon,unconf,unconfi,unconfin,unconfine},
 		change_profile /bin/bash  -> 
-			new_profile,
+			new_profile//hat,
 
 		# Alias
 		alias /usr/ -> /mnt/usr/,
 	}
 
 	# Hat
-	^foo-helper {
+	^foo-\/helper {
 		network unix stream,
 		unix stream,
 
-		/usr/hi\"esc\x23esc\032esc\*es\{esc\ rw r, # Escape expressions
+		/usr/hi\"esc\x23esc\032es\477esc\*es\{esc\ rw r, # Escape expressions
 
 		# Text after a variable is highlighted as path
 		file /my/path r,
 		@{FOO_LIB}file r,
 		@{FOO_LIB}#my/path r, #Comment
+		@{FOO_LIB}ñ* r,
+		unix (/path\t{aa}*,*a @{var}*path,* @{var},*),
 	}
 }

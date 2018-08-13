@@ -276,6 +276,7 @@ private Q_SLOTS:
         QVERIFY(def.indenter().isEmpty());
         QVERIFY(def.author().isEmpty());
         QVERIFY(def.license().isEmpty());
+        QVERIFY(!def.foldingEnabled());
         QVERIFY(!def.indentationBasedFoldingEnabled());
         QVERIFY(def.foldingIgnoreList().isEmpty());
         QVERIFY(def.keywordLists().isEmpty());
@@ -306,6 +307,39 @@ private Q_SLOTS:
         // check where breaking a line is valid
         for (QChar c : QStringLiteral(",{}[]"))
             QVERIFY(def.isWordWrapDelimiter(c));
+    }
+
+    void testFoldingEnabled()
+    {
+        // test invalid folding
+        Definition def;
+        QVERIFY(!def.isValid());
+        QVERIFY(!def.foldingEnabled());
+        QVERIFY(!def.indentationBasedFoldingEnabled());
+
+        // test no folding
+        def = m_repo.definitionForName(QLatin1String("ChangeLog"));
+        QVERIFY(def.isValid());
+        QVERIFY(!def.foldingEnabled());
+        QVERIFY(!def.indentationBasedFoldingEnabled());
+
+        // C++ (itself has no regions, since it includes ISOC++
+        def = m_repo.definitionForName(QLatin1String("C++"));
+        QVERIFY(def.isValid());
+        QVERIFY(def.foldingEnabled());
+        QVERIFY(!def.indentationBasedFoldingEnabled());
+
+        // ISO C++ itself has folding regions
+        def = m_repo.definitionForName(QLatin1String("ISO C++"));
+        QVERIFY(def.isValid());
+        QVERIFY(def.foldingEnabled());
+        QVERIFY(!def.indentationBasedFoldingEnabled());
+
+        // Python has indentation based folding
+        def = m_repo.definitionForName(QLatin1String("Python"));
+        QVERIFY(def.isValid());
+        QVERIFY(def.foldingEnabled());
+        QVERIFY(def.indentationBasedFoldingEnabled());
     }
 };
 }

@@ -221,6 +221,15 @@ public:
     bool isWordWrapDelimiter(QChar c) const;
 
     /**
+     * Returns whether the highlighting supports code folding.
+     * Code folding is supported either if the highlighting defines code folding
+     * regions or if indentationBasedFoldingEnabled() returns @e true.
+     * @since 5.50
+     * @see indentationBasedFoldingEnabled()
+     */
+    bool foldingEnabled() const;
+
+    /**
      * Returns whether indentation-based folding is enabled.
      * An example for indentation-based folding is Python.
      * When indentation-based folding is enabled, make sure to also check

@@ -182,6 +182,24 @@ bool Definition::isWordWrapDelimiter(QChar c) const
     return std::binary_search(d->wordWrapDelimiters.constBegin(), d->wordWrapDelimiters.constEnd(), c);
 }
 
+bool Definition::foldingEnabled() const
+{
+    d->load();
+    if (d->hasFoldingRegions || indentationBasedFoldingEnabled()) {
+        return true;
+    }
+
+    // check included definitions
+    for (const auto &def : includedDefinitions()) {
+        if (def.foldingEnabled()) {
+            d->hasFoldingRegions = true;
+            break;
+        }
+    }
+
+    return d->hasFoldingRegions;
+}
+
 bool Definition::indentationBasedFoldingEnabled() const
 {
     d->load();
@@ -670,6 +688,7 @@ bool DefinitionData::checkKateVersion(const QStringRef& verStr)
 
 quint16 DefinitionData::foldingRegionId(const QString &foldName)
 {
+    hasFoldingRegions = true;
     return RepositoryPrivate::get(repo)->foldingRegionId(name, foldName);
 }
 

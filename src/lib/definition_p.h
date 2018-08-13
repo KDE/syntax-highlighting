@@ -76,6 +76,7 @@ public:
     QHash<QString, Format> formats;
     QString wordDelimiters;
     QString wordWrapDelimiters;
+    bool hasFoldingRegions = false;
     bool indentationBasedFolding = false;
     QStringList foldingIgnoreList;
     QString singleLineCommentMarker;

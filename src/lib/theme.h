@@ -76,6 +76,12 @@ class KSYNTAXHIGHLIGHTING_EXPORT Theme
 {
     Q_GADGET
 public:
+
+    // TODO KF6:
+    // - make TextStyle an enum class
+    // - move out of Theme into KSyntaxHighlighting
+    // - do the same for EditorColorRole
+
     /**
      * Default styles that can be referenced from syntax definition XML files.
      * Make sure to choose readable colors with good contrast especially in

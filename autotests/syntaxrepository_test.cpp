@@ -323,7 +323,7 @@ private Q_SLOTS:
         QVERIFY(!def.foldingEnabled());
         QVERIFY(!def.indentationBasedFoldingEnabled());
 
-        // C++ (itself has no regions, since it includes ISOC++
+        // C++ itself has no regions, but it includes ISO C++
         def = m_repo.definitionForName(QLatin1String("C++"));
         QVERIFY(def.isValid());
         QVERIFY(def.foldingEnabled());

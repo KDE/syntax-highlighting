@@ -286,6 +286,12 @@ QPair<QString, QString> Definition::multiLineCommentMarker() const
     return { d->multiLineCommentStartMarker, d->multiLineCommentEndMarker };
 }
 
+QVector<QPair<QChar, QString>> Definition::characterEncodings() const
+{
+    d->load();
+    return d->characterEncodings;
+}
+
 Context* DefinitionData::initialContext() const
 {
     Q_ASSERT(!contexts.isEmpty());
@@ -580,6 +586,8 @@ void DefinitionData::loadGeneral(QXmlStreamReader& reader)
                     loadFoldingIgnoreList(reader);
                 } else if (reader.name() == QLatin1String("comments")) {
                     loadComments(reader);
+                } else if (reader.name() == QLatin1String("spellchecking")) {
+                    loadSpellchecking(reader);
                 } else {
                     reader.skipCurrentElement();
                 }
@@ -652,6 +660,41 @@ void DefinitionData::loadFoldingIgnoreList(QXmlStreamReader& reader)
                 ++elementRefCounter;
                 if (reader.name() == QLatin1String("emptyLine")) {
                     foldingIgnoreList << reader.attributes().value(QStringLiteral("regexpr")).toString();
+                }
+                reader.readNext();
+                break;
+            case QXmlStreamReader::EndElement:
+                --elementRefCounter;
+                if (elementRefCounter == 0)
+                    return;
+                reader.readNext();
+                break;
+            default:
+                reader.readNext();
+                break;
+        }
+    }
+}
+
+void DefinitionData::loadSpellchecking(QXmlStreamReader &reader)
+{
+    Q_ASSERT(reader.name() == QLatin1String("spellchecking"));
+    Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
+    reader.readNext();
+
+    // reference counter to count XML child elements, to not return too early
+    int elementRefCounter = 1;
+
+    while (!reader.atEnd()) {
+        switch (reader.tokenType()) {
+            case QXmlStreamReader::StartElement:
+                ++elementRefCounter;
+                if (reader.name() == QLatin1String("encoding")) {
+                    const auto charRef = reader.attributes().value(QStringLiteral("char"));
+                    if (!charRef.isEmpty()) {
+                        const auto str = reader.attributes().value(QStringLiteral("string")).toString();
+                        characterEncodings.push_back({ charRef[0], str });
+                    }
                 }
                 reader.readNext();
                 break;

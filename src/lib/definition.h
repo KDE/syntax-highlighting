@@ -305,6 +305,14 @@ public:
      */
     QPair<QString, QString> multiLineCommentMarker() const;
 
+    /**
+     * Returns a list of character/string mapping that can be used for spell
+     * checking. This is useful for instance when spell checking LaTeX, where
+     * the string \"{A} represents the character Ä.
+     * @since 5.50
+     */
+    QVector<QPair<QChar, QString>> characterEncodings() const;
+
 private:
     friend class DefinitionData;
     friend class DefinitionRef;

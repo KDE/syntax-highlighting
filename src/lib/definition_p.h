@@ -56,6 +56,7 @@ public:
     void loadGeneral(QXmlStreamReader &reader);
     void loadComments(QXmlStreamReader &reader);
     void loadFoldingIgnoreList(QXmlStreamReader &reader);
+    void loadSpellchecking(QXmlStreamReader &reader);
     bool checkKateVersion(const QStringRef &verStr);
 
     KeywordList keywordList(const QString &name) const;
@@ -83,6 +84,7 @@ public:
     CommentPosition singleLineCommentPosition = CommentPosition::StartOfLine;
     QString multiLineCommentStartMarker;
     QString multiLineCommentEndMarker;
+    QVector<QPair<QChar, QString>> characterEncodings;
 
     QString fileName;
     QString name = QStringLiteral(QT_TRANSLATE_NOOP("Syntax highlighting", "None"));

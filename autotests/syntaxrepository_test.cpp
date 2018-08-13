@@ -286,6 +286,7 @@ private Q_SLOTS:
         QCOMPARE(def.singleLineCommentPosition(), KSyntaxHighlighting::CommentPosition::StartOfLine);
         const auto emptyPair = QPair<QString, QString>();
         QCOMPARE(def.multiLineCommentMarker(), emptyPair);
+        QVERIFY(def.characterEncodings().isEmpty());
 
 
         for (QChar c : QStringLiteral("\t !%&()*+,-./:;<=>?[\\]^{|}~")) {
@@ -340,6 +341,16 @@ private Q_SLOTS:
         QVERIFY(def.isValid());
         QVERIFY(def.foldingEnabled());
         QVERIFY(def.indentationBasedFoldingEnabled());
+    }
+
+    void testCharacterEncodings()
+    {
+        auto def = m_repo.definitionForName(QLatin1String("LaTeX"));
+        QVERIFY(def.isValid());
+        const auto encodings = def.characterEncodings();
+        QVERIFY(!encodings.isEmpty());
+        QVERIFY(encodings.contains({ QChar(196), QLatin1String("\\\"{A}") }));
+        QVERIFY(encodings.contains({ QChar(227), QLatin1String("\\~{a}") }));
     }
 };
 }

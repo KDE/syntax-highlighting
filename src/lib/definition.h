@@ -63,7 +63,7 @@ enum class CommentPosition
  * highlighting of keywords, information about code folding regions, and
  * indentation preferences.
  *
- * @section def_info General Information
+ * @section def_info General Header Data
  *
  * Each Definition contains a non-translated unique name() and a section().
  * In addition, for putting this information e.g. into menus, the functions
@@ -77,6 +77,19 @@ enum class CommentPosition
  * wildcards that need to be matched against the filename of the file that
  * requires highlighting. If multiple Definition%s match the file, then the one
  * with higher priority() wins.
+ *
+ * @section def_metadata Advanced Definition Data
+ *
+ * Advanced text editors such as Kate require additional information from a
+ * Definition. For instance, foldingEnabled() defines whether a Definition has
+ * code folding regions that can be shown in a code folding pane. Or
+ * singleLineCommentMarker() and multiLineCommentMarker() provide comment
+ * markers that can be used for commenting/uncommenting code. Similarly,
+ * formats() returns a list of Format items defined by this Definition (which
+ * equal the itemDatas of a highlighing definition file). includedDefinitions()
+ * returns a list of all included Definition%s referenced by this Definition via
+ * the rule IncludeRules, which is useful for displaying all Format items for
+ * color configuration in the user interface.
  *
  * @see Repository
  * @since 5.28
@@ -119,10 +132,20 @@ public:
      */
     bool operator!=(const Definition &other) const;
 
-    /** Checks whether this object refers to a valid syntax definition. */
+    /**
+     * @name General Header Data
+     *
+     * @{
+     */
+
+    /**
+     * Checks whether this object refers to a valid syntax definition.
+     */
     bool isValid() const;
-    /** Returns the full path to the definition XML file containing
-     *  the syntax definition. Note that this can be a path to QRC content.
+
+    /**
+     * Returns the full path to the definition XML file containing
+     * the syntax definition. Note that this can be a path to QRC content.
      */
     QString filePath() const;
 
@@ -130,40 +153,76 @@ public:
      *  Used for internal references, prefer translatedName() for display.
      */
     QString name() const;
-    /** Translated name for display. */
+
+    /**
+     * Translated name for display.
+     */
     QString translatedName() const;
-    /** The group this syntax definition belongs to.
-     *  For display, consider translatedSection().
+
+    /**
+     * The group this syntax definition belongs to.
+     * For display, consider translatedSection().
      */
     QString section() const;
-    /** Translated group name for display. */
+
+    /**
+     * Translated group name for display.
+     */
     QString translatedSection() const;
-    /** Mime types associated with this syntax definition. */
+
+    /**
+     * Mime types associated with this syntax definition.
+     */
     QVector<QString> mimeTypes() const;
+
     /**
      * File extensions associated with this syntax definition.
      * The returned list contains wildcards.
      */
     QVector<QString> extensions() const;
-    /** Returns the definition version. */
+
+    /**
+     * Returns the definition version.
+     */
     int version() const;
+
     /**
      * Returns the definition priority.
      * A Definition with higher priority wins over Definitions with lower priorities.
      */
     int priority() const;
-    /** Returns @c true if this is an internal definition that should not be
+
+    /**
+     * Returns @c true if this is an internal definition that should not be
      * displayed to the user.
      */
     bool isHidden() const;
-    /** Generalized language style, used for indentation. */
+
+    /**
+     * Generalized language style, used for indentation.
+     */
     QString style() const;
-    /** Indentation style to be used for this syntax. */
+
+    /**
+     * Indentation style to be used for this syntax.
+     */
     QString indenter() const;
-    /** Name and email of the author of this syntax definition. */
+
+    /**
+     * Name and email of the author of this syntax definition.
+     */
     QString author() const;
-    /** License of this syntax definition. */
+
+    /**
+     * License of this syntax definition.
+     */
     QString license() const;
+
+    /**
+     * @}
+     *
+     * @name Advanced Definition Data
+     */
 
     /**
      * Returns whether the character @p c is a word delimiter.
@@ -312,6 +371,10 @@ public:
      * @since 5.50
      */
     QVector<QPair<QChar, QString>> characterEncodings() const;
+
+    /**
+     * @}
+     */
 
 private:
     friend class DefinitionData;

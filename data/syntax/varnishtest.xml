@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="Varnish Test Case language" version="3" kateversion="3.4" section="Configuration" extensions="*.vtc;" mimetype="" author="Xavier Guerrin (xavier@tuxfamily.org)" license="WTFPL" priority="3">
+<language name="Varnish Test Case language" version="4" kateversion="3.4" section="Configuration" extensions="*.vtc;" mimetype="" author="Xavier Guerrin (xavier@tuxfamily.org)" license="WTFPL" priority="3">
   <highlighting>
     <contexts>
       <!-- default context: define main keywords -->
@@ -119,7 +119,7 @@
         <IncludeRules context="comments" />
         <RegExpr    attribute="Float"                context="http_expectation_operator" String="[0-9\.]+(\s+|$)" />
         <RegExpr    attribute="Decimal"              context="http_expectation_operator" String="[0-9]+(\s+|$)" />
-        <RegExpr    attribute="Keyword"              context="http_expectation_operator" String="&lt;undef>" />
+        <StringDetect attribute="Keyword"              context="http_expectation_operator" String="&lt;undef&gt;" />
         <!-- Written from cmd_var_resolve() in bin/varnishtest/vtc_http.c. -->
         <RegExpr    attribute="HTTP Property"        context="http_expectation_operator" String="req.(request|url|proto)" />
         <RegExpr    attribute="HTTP Property"        context="http_expectation_operator" String="resp.(proto|status|msg|chunklen|bodylen|body)" />
@@ -142,7 +142,7 @@
         <IncludeRules context="comments" />
         <RegExpr    attribute="Float"                context="common_expectation_end" String="[0-9\.]+(\s+|$)" />
         <RegExpr    attribute="Decimal"              context="common_expectation_end" String="[0-9]+(\s+|$)" />
-        <RegExpr    attribute="Keyword"              context="common_expectation_end" String="&lt;undef>" />
+        <StringDetect attribute="Keyword"              context="common_expectation_end" String="&lt;undef&gt;" />
         <!-- Written from cmd_var_resolve() in bin/varnishtest/vtc_http.c. -->
         <RegExpr    attribute="HTTP Property"        context="common_expectation_end" String="req.(request|url|proto)" />
         <RegExpr    attribute="HTTP Property"        context="common_expectation_end" String="resp.(proto|status|msg|chunklen|bodylen|body)" />
@@ -243,18 +243,18 @@
       <context name="client_options" attribute="Normal Text" lineEndContext="#stay">
         <!-- Extracted from bin/varnishtest/vtc_client.c  -->
         <RegExpr attribute="Keyword" context="#stay" String="\-(?:run|start|wait)" />
-        <RegExpr attribute="Keyword" context="int-arg" String="\-repeat" />
-        <RegExpr attribute="Keyword" context="string-arg" String="\-connect" />
-        <RegExpr attribute="Keyword" context="http_expectation" String="-expect" />
+        <StringDetect attribute="Keyword" context="int-arg" String="-repeat" />
+        <StringDetect attribute="Keyword" context="string-arg" String="-connect" />
+        <StringDetect attribute="Keyword" context="http_expectation" String="-expect" />
         <IncludeRules context="common_options" />
       </context>
 
       <context name="server_options" attribute="Normal Text" lineEndContext="#stay" >
         <!-- Extracted from bin/varnishtest/vtc_server.c  -->
         <RegExpr attribute="Keyword" context="#stay" String="\-(?:start|wait)" />
-        <RegExpr attribute="Keyword" context="int-arg" String="\-repeat" />
-        <RegExpr attribute="Keyword" context="string-arg" String="\-listen " />
-        <RegExpr attribute="Keyword" context="http_expectation" String="-expect" />
+        <StringDetect attribute="Keyword" context="int-arg" String="-repeat" />
+        <StringDetect attribute="Keyword" context="string-arg" String="-listen " />
+        <StringDetect attribute="Keyword" context="http_expectation" String="-expect" />
         <IncludeRules context="common_options" />
       </context>
 
@@ -262,8 +262,8 @@
         <!-- Extracted from bin/varnishtest/vtc_varnish.c  -->
         <RegExpr attribute="Keyword" context="#stay" String="\-(?:start|stop|wait|wait-running|wait-stopped)" />
         <RegExpr attribute="Keyword" context="string-arg" String="\-(?:arg|cli|cliok|storage) " />
-        <RegExpr attribute="Keyword" context="clierr_options" String="\-clierr " />
-        <RegExpr attribute="Keyword" context="varnish_expectation" String="-expect" />
+        <StringDetect attribute="Keyword" context="clierr_options" String="-clierr " />
+        <StringDetect attribute="Keyword" context="varnish_expectation" String="-expect" />
         <IncludeRules context="common_options" />
       </context>
 
@@ -287,16 +287,16 @@
       <context name="txreq_options" attribute="String" lineEndContext="#pop">
         <IncludeRules context="tx_options" />
         <RegExpr attribute="TxReq Keyword" context="string-arg" String="\-(?:proto|req|url|hdr|body)" />
-        <RegExpr attribute="TxReq Keyword" context="int-arg" String="\-bodylen" />
+        <StringDetect attribute="TxReq Keyword" context="int-arg" String="-bodylen" />
       </context>
 
       <!-- Define syntax for the server-specific txresp keyword -->
       <context name="txresp_options" attribute="Normal Text" lineEndContext="#pop">
         <IncludeRules context="tx_options" />
-        <RegExpr attribute="TxResp Keyword" String="-nolen" />
+        <StringDetect attribute="TxResp Keyword" String="-nolen" />
         <RegExpr attribute="TxResp Keyword" context="int-arg" String="\-(?:bodylen|gzip(?:len|residual|level))" />
         <RegExpr attribute="TxResp Keyword" context="string-arg" String="\-(?:body|gzipbody|hdr|msg|proto)" />
-        <RegExpr attribute="TxResp Keyword" context="status-arg" String="\-status" />
+        <StringDetect attribute="TxResp Keyword" context="status-arg" String="-status" />
       </context>
 
       <!-- Define syntax for the client-specific rxresp keyword -->
@@ -426,7 +426,7 @@
         <DetectIdentifier attribute="Sema Identifier" context="sema_identified" />
       </context>
       <context name="sema_identified" attribute="Normal Text" lineEndContext="#pop#pop">
-        <RegExpr attribute="Keyword" String="sync" />
+        <StringDetect attribute="Keyword" String="sync" />
         <Int attribute="Decimal" context="#stay" />
         <IncludeRules context="comments" />
       </context>

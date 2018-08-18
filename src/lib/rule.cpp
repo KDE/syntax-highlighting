@@ -494,12 +494,12 @@ bool IncludeRules::includeAttribute() const
 bool IncludeRules::doLoad(QXmlStreamReader& reader)
 {
     const auto s = reader.attributes().value(QLatin1String("context"));
-    auto splitted = s.split(QLatin1String("##"), QString::KeepEmptyParts);
-    if (splitted.isEmpty())
+    const auto split = s.split(QLatin1String("##"), QString::KeepEmptyParts);
+    if (split.isEmpty())
         return false;
-    m_contextName = splitted.at(0).toString();
-    if (splitted.size() > 1)
-        m_defName = splitted.at(1).toString();
+    m_contextName = split.at(0).toString();
+    if (split.size() > 1)
+        m_defName = split.at(1).toString();
     m_includeAttribute = Xml::attrToBool(reader.attributes().value(QLatin1String("includeAttrib")));
 
     return !m_contextName.isEmpty() || !m_defName.isEmpty();

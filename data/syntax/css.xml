@@ -12,6 +12,15 @@ Kate CSS syntax highlighting definition
 
 Changelog:
 
+- Version 8, by Jonathan Poelen
+- fix some Operator and Selector Tag highlighting
+
+- Version 7, by Jonathan Poelen
+- fix tag followed by a pseudo-class in a nested rule (@media, ...)
+- fix constraint in a rule
+- fix Kate auto-completion for properties and rules
+- New highlighting categories: Keyword, Operator, Separator Symbol, SpecialChar, Variable, Value Keyword, Color, Number, Unit, Selector Tag
+
 - Version 4, by Guo Yunhe guoyunhebrave@gmail.com
 - Remake for complex CSS syntax, avoid errors
 
@@ -29,7 +38,7 @@ Changelog:
 
 -->
 
-<language name="CSS" version="7" kateversion="5.0" section="Markup" extensions="*.css" indenter="cstyle" mimetype="text/css" author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL" priority="10">
+<language name="CSS" version="8" kateversion="5.0" section="Markup" extensions="*.css" indenter="cstyle" mimetype="text/css" author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL" priority="10">
 
     <highlighting>
         <list name="properties">
@@ -1330,25 +1339,37 @@ Changelog:
             <item>to</item>
         </list>
 
-        <list name="keywords">
+        <list name="media operators">
             <item>and</item>
-            <item>or</item>
+            <item>only</item>
+            <item>not</item>
         </list>
 
         <contexts>
-            <context name="Base" attribute="Selector Tag" lineEndContext="#stay">
-                <DetectSpaces attribute="Normal Text" />
+            <context name="Base" attribute="Normal Text" lineEndContext="#stay">
+                <DetectSpaces />
                 <IncludeRules context="FindComments" />
                 <DetectChar attribute="Normal Text" context="RuleSet" char="{" beginRegion="ruleset" />
                 <DetectChar attribute="At Rule" context="SelectAtRule" char="@" lookAhead="true" />
                 <!-- find selectors // .class #id :hover :nth-child(2n+1) [type="search"] -->
                 <DetectChar attribute="Selector Pseudo" context="SelectorPseudo" char=":" />
                 <DetectChar attribute="Selector Attribute" context="SelectorAttr" char="[" />
-                <RegExpr attribute="Selector Id" context="#stay" String="#[-]?(&nmstart;)(&nmchar;)*" />
-                <RegExpr attribute="Selector Class" context="#stay" String="\.([a-zA-Z0-9\-_]|[\x80-\xFF]|\\[0-9A-Fa-f]{1,6})*" />
                 <DetectChar attribute="Separator Symbol" context="#stay" char="," />
                 <AnyChar attribute="Operator" context="#stay" String="*>+~|" />
-                <DetectIdentifier />
+                <RegExpr attribute="Selector Id" context="#stay" String="#[-]?(&nmstart;)(&nmchar;)*" />
+                <RegExpr attribute="Selector Class" context="#stay" String="\.([a-zA-Z0-9\-_]|[\x80-\xFF]|\\[0-9A-Fa-f]{1,6})*" />
+                <RegExpr attribute="Selector Tag" context="#stay" String="[-]?(&nmstart;)(&nmchar;)*" />
+            </context>
+
+            <context name="FindSelector" attribute="Normal Text" lineEndContext="#stay">
+                <IncludeRules context="FindComments" />
+                <!-- find selectors // .class #id :hover :nth-child(2n+1) [type="search"] -->
+                <DetectChar attribute="Selector Attribute" context="SelectorAttr" char="[" />
+                <DetectChar attribute="Separator Symbol" context="#stay" char="," />
+                <AnyChar attribute="Operator" context="#stay" String="*>+~|" />
+                <RegExpr attribute="Selector Id" context="#stay" String="#[-]?(&nmstart;)(&nmchar;)*" />
+                <RegExpr attribute="Selector Class" context="#stay" String="\.([a-zA-Z0-9\-_]|[\x80-\xFF]|\\[0-9A-Fa-f]{1,6})*" />
+                <RegExpr attribute="Selector Tag" context="#stay" String="[-]?(&nmstart;)(&nmchar;)*" />
             </context>
 
             <!-- find functions // rgba(255,255,255,0.75) -->
@@ -1358,13 +1379,17 @@ Changelog:
 
             <!-- find values //  10px 12pt 2.5em 1rem 75% #ffcc99 red solid -->
             <context name="FindValues" attribute="Normal Text" lineEndContext="#stay">
-                <RegExpr attribute="Annotation" context="#stay" String="!important\b" />
+                <DetectChar attribute="Annotation" context="Annotation" char="!" />
                 <keyword attribute="Value Keyword" context="#stay" String="value keywords" />
                 <keyword attribute="Value" context="#stay" String="values" />
                 <keyword attribute="Color" context="#stay" String="colors" />
                 <RegExpr attribute="Color" context="#stay" String="#([0-9A-Fa-f]{3}){1,2}\b" />
                 <RegExpr attribute="Number" context="FindUnits" String="[-+]?[0-9.]+(?![-+])" />
-                <RegExpr attribute="Normal Text" context="#stay" String="[\w][\w\-]*|-[\w-]+" />
+                <RegExpr attribute="Normal Text" context="#stay" String="[-]?(&nmstart;)(&nmchar;)*" />
+            </context>
+
+            <context name="Annotation" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+                <WordDetect attribute="Annotation" context="#pop" String="important" />
             </context>
 
             <context name="FindUnits" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
@@ -1380,11 +1405,16 @@ Changelog:
             <!-- find comments // /* comment */ -->
             <context name="FindComments" attribute="Normal Text" lineEndContext="#stay">
                 <Detect2Chars attribute="Comment" context="IsComments" char="/" char1="*" lookAhead="true"/>
+                <Detect2Chars attribute="Error" context="Error" char="/" char1="/" />
+            </context>
+
+            <context name="Error" attribute="Error" lineEndContext="#pop">
+                <RegExpr attribute="Error" context="#pop" String=".*" />
             </context>
 
             <context name="IsComments" attribute="Normal Text" lineEndContext="#stay">
-                <RegExpr attribute="Region Marker" context="#pop" String="/\*BEGIN.*\*/" beginRegion="UserDefined" />
-                <RegExpr attribute="Region Marker" context="#pop" String="/\*END.*\*/" endRegion="UserDefined" />
+                <RegExpr attribute="Region Marker" context="#pop" String="/\*\s*BEGIN\b.*\*/" beginRegion="UserDefined" />
+                <RegExpr attribute="Region Marker" context="#pop" String="/\*\s*END\b.*\*/" endRegion="UserDefined" />
                 <Detect2Chars attribute="Comment" context="Comment" char="/" char1="*" beginRegion="comment" />
             </context>
 
@@ -1469,8 +1499,8 @@ Changelog:
                 <IncludeRules context="AtRuleValue" />
             </context>
 
-            <context name="NestedBase" attribute="Selector Tag" lineEndContext="#stay">
-                <DetectSpaces attribute="Normal Text" />
+            <context name="NestedBase" attribute="Normal Text" lineEndContext="#stay">
+                <DetectSpaces />
                 <DetectChar attribute="Normal Text" context="#pop#pop" char="}" endRegion="ruleset" />
                 <IncludeRules context="Base" />
             </context>
@@ -1481,10 +1511,11 @@ Changelog:
                 <IncludeRules context="AtRuleValue" />
             </context>
 
-            <context name="UnknownAtRule" attribute="Normal Text" lineEndContext="#pop">
+            <context name="UnknownAtRule" attribute="Normal Text" lineEndContext="#stay">
                 <DetectSpaces />
                 <DetectChar attribute="Separator Symbol" context="#pop" char=";" />
                 <DetectChar attribute="Normal Text" context="#pop!RuleSet" char="{" beginRegion="ruleset" />
+                <DetectChar attribute="Normal Text" context="#pop" char="}" endRegion="ruleset" />
                 <IncludeRules context="AtRuleValue" />
             </context>
 
@@ -1492,7 +1523,7 @@ Changelog:
                 <IncludeRules context="FindComments" />
                 <IncludeRules context="FindStrings" />
                 <IncludeRules context="FindFunctions" />
-                <keyword attribute="Keyword" context="#stay" String="keywords" />
+                <keyword attribute="Keyword" context="#stay" String="media operators" />
                 <RegExpr attribute="Property" context="#stay" String="[A-Za-z_-]+(?=\s*:)" />
                 <keyword attribute="Value" context="#stay" String="medias" />
                 <IncludeRules context="FindValues" />
@@ -1531,10 +1562,11 @@ Changelog:
                 <DetectChar attribute="Selector Pseudo" context="SelectorPseudoValueCloseSelector" char="(" />
             </context>
 
-            <context name="SelectorPseudoValueCloseSelector" attribute="Selector Tag" lineEndContext="#stay">
+            <context name="SelectorPseudoValueCloseSelector" attribute="Normal Text" lineEndContext="#stay">
+                <DetectSpaces />
                 <DetectChar attribute="Selector Pseudo" context="#pop#pop#pop" char=")" />
                 <DetectChar attribute="Error" context="#pop#pop#pop!RuleSet" char="{" beginRegion="ruleset" />
-                <IncludeRules context="Base" />
+                <IncludeRules context="FindSelector" />
             </context>
 
             <context name="SelectorPseudoValue" attribute="Selector Pseudo" lineEndContext="#pop#pop" fallthrough="true" fallthroughContext="#pop#pop">
@@ -1550,16 +1582,17 @@ Changelog:
                 <DetectSpaces />
                 <Detect2Chars attribute="Comment" context="#pop#pop" char="*" char1="/" endRegion="comment" />
                 <IncludeRules context="##Alerts" />
+                <DetectIdentifier />
             </context>
 
             <context name="RuleSet" attribute="Normal Text" lineEndContext="#stay">
                 <DetectSpaces />
-                <DetectChar attribute="Normal Text" context="RuleSet" char="{" beginRegion="ruleset" />
                 <DetectChar attribute="Normal Text" context="#pop" char="}" endRegion="ruleset" />
                 <RegExpr attribute="Property" context="Rule" String="[A-Za-z_-]+(?=\s*:)" lookAhead="true" />
+                <IncludeRules context="Base" />
+                <RegExpr attribute="Normal Text" context="#stay" String="[A-Za-z_-]+" />
                 <!-- auto-completion only, includes by previous rule -->
                 <keyword attribute="Normal Text" context="#stay" String="properties" />
-                <IncludeRules context="Base" />
             </context>
 
             <context name="Rule" attribute="Normal Text" lineEndContext="#stay">
@@ -1584,7 +1617,6 @@ Changelog:
                 <DetectChar attribute="Separator Symbol" context="#pop#pop" char=";" />
                 <DetectChar attribute="Separator Symbol" context="#stay" char="," />
                 <DetectChar attribute="Normal Text" context="#pop#pop#pop" char="}" endRegion="ruleset" />
-                <DetectIdentifier />
                 <!-- auto-completion only -->
                 <keyword attribute="Normal Text" context="#stay" String="functions" />
             </context>
@@ -1623,6 +1655,8 @@ Changelog:
                 <IncludeRules context="FindFunctions" />
                 <IncludeRules context="FindValues" />
                 <RegExpr attribute="Operator" context="#stay" String="[-](?=$|[ \t(,;])|[+](?=$|[^0-9)])|[/*]" />
+                <!-- auto-completion only -->
+                <keyword attribute="Normal Text" context="#stay" String="functions" />
             </context>
 
             <context name="FunctionUrl" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="UrlValue">

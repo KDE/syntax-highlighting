@@ -192,16 +192,21 @@ private Q_SLOTS:
 
     void testIncludedDefinitions()
     {
-        auto def = m_repo.definitionForName(QLatin1String("C++"));
+        auto def = m_repo.definitionForName(QLatin1String("PHP (HTML)"));
         QVERIFY(def.isValid());
         auto defs = def.includedDefinitions();
 
         const QStringList expectedDefinitionNames = {
-            QStringLiteral("ISO C++"),
-            QStringLiteral("GCCExtensions"),
-            QStringLiteral("Doxygen"),
+            QStringLiteral("PHP/PHP"),
             QStringLiteral("Alerts"),
-            QStringLiteral("Modelines")
+            QStringLiteral("CSS/PHP"),
+            QStringLiteral("JavaScript/PHP"),
+            QStringLiteral("Doxygen"),
+            QStringLiteral("Modelines"),
+            QStringLiteral("HTML"),
+            QStringLiteral("CSS"),
+            QStringLiteral("SQL (MySQL)"),
+            QStringLiteral("JavaScript")
         };
         QStringList definitionNames;
         for (auto d : defs) {

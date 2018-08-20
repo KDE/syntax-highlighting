@@ -34,7 +34,6 @@
 #include <QFile>
 #include <QHash>
 #include <QJsonObject>
-#include <QQueue>
 #include <QStringList>
 #include <QVector>
 #include <QXmlStreamReader>
@@ -241,22 +240,27 @@ QVector<Definition> Definition::includedDefinitions() const
 {
     d->load();
 
-    QVector<Definition> definitions;
-
-    QQueue<Definition> queue;
-    queue.enqueue(*this);
+    // init worklist and result used as guard with this definition
+    QVector<Definition> queue{*this};
+    QVector<Definition> definitions{*this};
     while (!queue.isEmpty()) {
-        const auto definition = queue.dequeue();
-        definitions.push_back(definition);
-
         // Iterate all context rules to find associated Definitions. This will
-        // automatically catch other Definitions referenced with IncludeRuldes.
-        foreach (const auto & context, definition.d->contexts) {
-            foreach (const auto &rule, context->rules()) {
-                if ((!definitions.contains(rule->definition())) &&
-                    (!queue.contains(rule->definition())))
-                {
-                    queue.enqueue(rule->definition());
+        // automatically catch other Definitions referenced with IncludeRuldes or ContextSwitch.
+        const auto definition = queue.takeLast();
+        for (const auto & context : definition.d->contexts) {
+            for (const auto &rule : context->rules()) {
+                // handle include rules like inclusion
+                if (!definitions.contains(rule->definition())) {
+                    queue.push_back(rule->definition());
+                    definitions.push_back(rule->definition());
+                }
+
+                // handle context switch context inclusion
+                if (auto switchContext = rule->context().context()) {
+                    if (!definitions.contains(switchContext->definition())) {
+                        queue.push_back(switchContext->definition());
+                        definitions.push_back(switchContext->definition());
+                    }
                 }
             }
         }

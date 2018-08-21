@@ -45,6 +45,7 @@ using namespace KSyntaxHighlighting;
 static void initResource()
 {
     Q_INIT_RESOURCE(syntax_data);
+    Q_INIT_RESOURCE(theme_data);
 }
 
 RepositoryPrivate* RepositoryPrivate::get(Repository *repo)

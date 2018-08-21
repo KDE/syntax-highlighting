@@ -52,8 +52,9 @@ static Theme::TextStyle stringToDefaultFormat(const QStringRef &str)
     return static_cast<Theme::TextStyle>(value);
 }
 
-FormatPrivate* FormatPrivate::get(const Format &format)
+FormatPrivate* FormatPrivate::detachAndGet(Format &format)
 {
+    format.d.detach();
     return format.d.data();
 }
 
@@ -65,7 +66,13 @@ TextStyleData FormatPrivate::styleOverride(const Theme &theme) const
     return TextStyleData();
 }
 
-Format::Format() : d(new FormatPrivate)
+static QExplicitlySharedDataPointer<FormatPrivate> &sharedDefaultPrivate()
+{
+    static QExplicitlySharedDataPointer<FormatPrivate> def(new FormatPrivate);
+    return def;
+}
+
+Format::Format() : d(sharedDefaultPrivate())
 {
 }
 

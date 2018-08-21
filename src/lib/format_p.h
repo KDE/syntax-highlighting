@@ -37,7 +37,7 @@ class FormatPrivate : public QSharedData
 {
 public:
     FormatPrivate() = default;
-    static FormatPrivate* get(const Format &format);
+    static FormatPrivate* detachAndGet(Format &format);
 
     TextStyleData styleOverride(const Theme &theme) const;
     void load(QXmlStreamReader &reader);

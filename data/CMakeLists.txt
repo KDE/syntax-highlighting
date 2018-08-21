@@ -43,6 +43,6 @@ add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/qrc_syntax-data.cpp"
 )
 set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/qrc_syntax-data.cpp" PROPERTIES SKIP_AUTOMOC ON)
 
-# dummy static lib to make cross-folder dependencies work
-add_library(SyntaxHighlightingData STATIC ${CMAKE_CURRENT_BINARY_DIR}/qrc_syntax-data.cpp)
-target_link_libraries(SyntaxHighlightingData LINK_PRIVATE Qt5::Core)
+# object library to make cross-folder dependencies work, set PIC to allow use in static and shared libs
+add_library(SyntaxHighlightingData OBJECT ${CMAKE_CURRENT_BINARY_DIR}/qrc_syntax-data.cpp)
+set_property(TARGET SyntaxHighlightingData PROPERTY POSITION_INDEPENDENT_CODE 1)

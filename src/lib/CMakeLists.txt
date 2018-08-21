@@ -28,7 +28,7 @@ ecm_qt_declare_logging_category(syntax_highlighting_srcs
 
 qt5_add_resources(themes_QRC ${CMAKE_SOURCE_DIR}/data/themes/theme-data.qrc)
 
-add_library(KF5SyntaxHighlighting ${syntax_highlighting_srcs} ${themes_QRC})
+add_library(KF5SyntaxHighlighting ${syntax_highlighting_srcs} ${themes_QRC} $<TARGET_OBJECTS:SyntaxHighlightingData>)
 generate_export_header(KF5SyntaxHighlighting BASE_NAME KSyntaxHighlighting)
 set_target_properties(KF5SyntaxHighlighting PROPERTIES
     VERSION ${SyntaxHighlighting_VERSION_STRING}
@@ -37,7 +37,7 @@ set_target_properties(KF5SyntaxHighlighting PROPERTIES
 )
 target_include_directories(KF5SyntaxHighlighting INTERFACE "$<INSTALL_INTERFACE:${KDE_INSTALL_INCLUDEDIR_KF5}/KSyntaxHighlighting;${KDE_INSTALL_INCLUDEDIR_KF5}>")
 target_include_directories(KF5SyntaxHighlighting PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR};${CMAKE_CURRENT_BINARY_DIR};>")
-target_link_libraries(KF5SyntaxHighlighting LINK_PUBLIC Qt5::Gui LINK_PRIVATE Qt5::Network SyntaxHighlightingData)
+target_link_libraries(KF5SyntaxHighlighting LINK_PUBLIC Qt5::Gui LINK_PRIVATE Qt5::Network)
 
 ecm_generate_headers(SyntaxHighlighting_HEADERS
     HEADER_NAMES

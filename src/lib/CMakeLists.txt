@@ -28,7 +28,7 @@ ecm_qt_declare_logging_category(syntax_highlighting_srcs
 
 qt5_add_resources(themes_QRC ${CMAKE_SOURCE_DIR}/data/themes/theme-data.qrc)
 
-add_library(KF5SyntaxHighlighting SHARED ${syntax_highlighting_srcs} ${themes_QRC})
+add_library(KF5SyntaxHighlighting ${syntax_highlighting_srcs} ${themes_QRC})
 generate_export_header(KF5SyntaxHighlighting BASE_NAME KSyntaxHighlighting)
 set_target_properties(KF5SyntaxHighlighting PROPERTIES
     VERSION ${SyntaxHighlighting_VERSION_STRING}

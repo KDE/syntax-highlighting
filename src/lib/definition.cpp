@@ -256,6 +256,17 @@ QVector<Definition> Definition::includedDefinitions() const
         // automatically catch other Definitions referenced with IncludeRuldes or ContextSwitch.
         const auto definition = queue.takeLast();
         for (const auto & context : definition.d->contexts) {
+            // handle context switch attributes of this context itself
+            for (const auto switchContext : {context->lineEndContext().context(), context->lineEmptyContext().context(), context->fallthroughContext().context()}) {
+                if (switchContext) {
+                    if (!definitions.contains(switchContext->definition())) {
+                        queue.push_back(switchContext->definition());
+                        definitions.push_back(switchContext->definition());
+                    }
+                }
+            }
+
+            // handle the embedded rules
             for (const auto &rule : context->rules()) {
                 // handle include rules like inclusion
                 if (!definitions.contains(rule->definition())) {

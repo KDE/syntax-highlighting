@@ -166,6 +166,7 @@ private Q_SLOTS:
         QFETCH(QString, syntax);
 
         Repository m_repo;
+        initRepositorySearchPaths(m_repo);
 
         auto def = m_repo.definitionForFileName(inFile);
         if (!syntax.isEmpty())

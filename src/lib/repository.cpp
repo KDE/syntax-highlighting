@@ -44,7 +44,9 @@ using namespace KSyntaxHighlighting;
 
 static void initResource()
 {
+#ifdef HAS_SYNTAX_RESOURCE
     Q_INIT_RESOURCE(syntax_data);
+#endif
     Q_INIT_RESOURCE(theme_data);
 }
 

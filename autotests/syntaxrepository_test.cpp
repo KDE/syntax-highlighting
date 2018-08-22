@@ -61,6 +61,7 @@ private Q_SLOTS:
     void initTestCase()
     {
         QStandardPaths::enableTestMode(true);
+        initRepositorySearchPaths(m_repo);
     }
 
     void testDefinitionByExtension_data()

@@ -67,6 +67,7 @@ private Q_SLOTS:
     void initTestCase()
     {
         m_repo = new Repository;
+        initRepositorySearchPaths(*m_repo);
     }
 
     void cleanupTestCase()

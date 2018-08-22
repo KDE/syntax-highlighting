@@ -21,6 +21,8 @@
     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+#include "test-config.h"
+
 #include <repository.h>
 
 #include <QObject>
@@ -36,6 +38,7 @@ private Q_SLOTS:
     {
         QBENCHMARK {
             Repository repo;
+            initRepositorySearchPaths(repo);
         }
     }
 

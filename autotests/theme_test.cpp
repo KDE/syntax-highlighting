@@ -21,6 +21,8 @@
     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+#include "test-config.h"
+
 #include <abstracthighlighter.h>
 #include <definition.h>
 #include <format.h>
@@ -58,6 +60,7 @@ private Q_SLOTS:
     void initTestCase()
     {
         QStandardPaths::enableTestMode(true);
+        initRepositorySearchPaths(m_repo);
     }
 
     void testThemes()

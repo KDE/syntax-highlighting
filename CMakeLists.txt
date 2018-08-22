@@ -47,6 +47,11 @@ set_package_properties(Qt5XmlPatterns PROPERTIES PURPOSE "Compile-time validatio
 find_package(Perl REQUIRED)
 set_package_properties(Perl PROPERTIES PURPOSE "Auto-generate PHP syntax definition files.")
 
+#
+# allow to install the "differently" licensed syntax xml files instead of putting them in a QRC and link them in
+#
+option(QRC_SYNTAX "Bundle the syntax definition files inside the library as resources" ON)
+add_feature_info(SYNTAX_RESOURCE ${QRC_SYNTAX} "Bundle the syntax definition files inside the library as resources")
 
 #
 # API documentation
@@ -59,6 +64,11 @@ add_feature_info(QCH ${BUILD_QCH} "API documentation in QCH format (for e.g. Qt 
 #
 if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/po")
     ecm_install_po_files_as_qm(po)
+endif()
+
+# tell the framework if it shall use the syntax files from the resource
+if (QRC_SYNTAX)
+    add_definitions(-DHAS_SYNTAX_RESOURCE)
 endif()
 
 #

@@ -50,6 +50,7 @@ private Q_SLOTS:
     {
         QStandardPaths::enableTestMode(true);
         m_repo = new Repository;
+        initRepositorySearchPaths(*m_repo);
     }
 
     void cleanupTestCase()

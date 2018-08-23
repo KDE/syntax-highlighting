@@ -54,6 +54,12 @@ option(QRC_SYNTAX "Bundle the syntax definition files inside the library as reso
 add_feature_info(SYNTAX_RESOURCE ${QRC_SYNTAX} "Bundle the syntax definition files inside the library as resources")
 
 #
+# allow to turn of lookup for syntax files and themes via QStandardPaths
+#
+option(NO_STANDARD_PATHS "Skip lookup of syntax and theme definitions in QStandardPaths locations" OFF)
+add_feature_info(FEATURE_NO_STANDARD_PATHS ${NO_STANDARD_PATHS} "Skip lookup of syntax and theme definitions in QStandardPaths locations")
+
+#
 # API documentation
 #
 option(BUILD_QCH "Build API documentation in QCH format (for e.g. Qt Assistant, Qt Creator & KDevelop)" OFF)
@@ -69,6 +75,11 @@ endif()
 # tell the framework if it shall use the syntax files from the resource
 if (QRC_SYNTAX)
     add_definitions(-DHAS_SYNTAX_RESOURCE)
+endif()
+
+# skip standard paths?
+if (NO_STANDARD_PATHS)
+    add_definitions(-DNO_STANDARD_PATHS)
 endif()
 
 #

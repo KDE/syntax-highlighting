@@ -36,7 +36,10 @@
 #include <QFileInfo>
 #include <QJsonDocument>
 #include <QJsonObject>
+
+#ifndef NO_STANDARD_PATHS
 #include <QStandardPaths>
+#endif
 
 #include <limits>
 
@@ -134,16 +137,20 @@ void RepositoryPrivate::load(Repository *repo)
     // always add invalid default "None" highlighting
     addDefinition(Definition());
 
-    auto dirs = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("org.kde.syntax-highlighting/syntax"), QStandardPaths::LocateDirectory);
-    foreach (const auto &dir, dirs)
-        loadSyntaxFolder(repo, dir);
-    // backward compatibility with Kate
-    dirs = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("katepart5/syntax"), QStandardPaths::LocateDirectory);
-    foreach (const auto &dir, dirs)
+    // do lookup in standard paths, if not disabled
+#ifndef NO_STANDARD_PATHS
+    foreach (const auto &dir, QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("org.kde.syntax-highlighting/syntax"), QStandardPaths::LocateDirectory))
         loadSyntaxFolder(repo, dir);
 
+    // backward compatibility with Kate
+    foreach (const auto &dir, QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("katepart5/syntax"), QStandardPaths::LocateDirectory))
+        loadSyntaxFolder(repo, dir);
+#endif
+
+    // default resources are always used
     loadSyntaxFolder(repo, QStringLiteral(":/org.kde.syntax-highlighting/syntax"));
 
+    // user given extra paths
     foreach (const auto &path, m_customSearchPaths)
         loadSyntaxFolder(repo, path + QStringLiteral("/syntax"));
 
@@ -158,11 +165,17 @@ void RepositoryPrivate::load(Repository *repo)
     });
 
     // load themes
-    dirs = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("org.kde.syntax-highlighting/themes"), QStandardPaths::LocateDirectory);
-    foreach (const auto &dir, dirs)
+
+    // do lookup in standard paths, if not disabled
+#ifndef NO_STANDARD_PATHS
+    foreach (const auto &dir, QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("org.kde.syntax-highlighting/themes"), QStandardPaths::LocateDirectory))
         loadThemeFolder(dir);
+#endif
+
+    // default resources are always used
     loadThemeFolder(QStringLiteral(":/org.kde.syntax-highlighting/themes"));
 
+    // user given extra paths
     foreach (const auto &path, m_customSearchPaths)
         loadThemeFolder(path + QStringLiteral("/themes"));
 }

@@ -82,38 +82,47 @@ class Theme;
  * additional files from disk is supported as well.
  *
  * Loading syntax Definition files works as follows:
+ *
  * -# First, all syntax highlighting files are loaded that are located in
  *    QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("org.kde.syntax-highlighting/syntax"), QStandardPaths::LocateDirectory);
  *    Under Unix, this uses $XDG_DATA_HOME and $XDG_DATA_DIRS, which could
  *    map to $HOME/.local5/share/org.kde.syntax-highlighting/syntax and
  *    /usr/share/org.kde.syntax-highlighting/syntax.
+ *
  * -# Next, for backwards compatibility with Kate, all syntax highlighting
  *    files are loaded that are located in
  *    QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("katepart5/syntax"), QStandardPaths::LocateDirectory);
  *    Again, under Unix, this uses $XDG_DATA_HOME and $XDG_DATA_DIRS, which
  *    could map to $HOME/.local5/share/katepart5/syntax and
  *    /usr/share/katepart5/syntax.
+ *
  * -# Then, all files compiled into the library through resources are loaded.
  *    The internal resource path is ":/org.kde.syntax-highlighting/syntax".
  *    This path should never be touched by other applications.
+ *
  * -# Finally, the search path can be extended by calling addCustomSearchPath().
  *    A custom search path can either be a path on disk or again a path to
- *    a Qt resoruce.
+ *    a Qt resource.
  *
  * Similarly, loading Theme files works as follows:
+ *
  * -# First, all Theme files are loaded that are located in
  *    QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("org.kde.syntax-highlighting/themes"), QStandardPaths::LocateDirectory);
  *    Under Unix, this uses $XDG_DATA_HOME and $XDG_DATA_DIRS, which could
  *    map to $HOME/.local5/share/org.kde.syntax-highlighting/themes and
  *    /usr/share/org.kde.syntax-highlighting/themes.
+ *
  * -# Then, all files compiled into the library through resources are loaded.
  *    The internal resource path is ":/org.kde.syntax-highlighting/themes".
  *    This path should never be touched by other applications.
+ *
  * -# Finally, all Theme%s located in the paths added addCustomSearchPath()
  *    are loaded.
  *
  * @note Whenever a Definition or a Theme exists twice, the variant with
  *       higher version is used.
+ *
+ * @note The QStandardPaths lookup can be disabled by compiling the framework with the -DNO_STANDARD_PATHS define.
  *
  * @see Definition, Theme, AbstractHighlighter
  * @since 5.28
@@ -209,6 +218,8 @@ public:
      *       @p path/themes are searched for additional Definition%s and
      *       Theme%s. Do not append @e syntax or @e themes to @p path
      *       yourself.
+     *
+     * @note Calling this triggers a reload() of the repository.
      *
      * @since 5.39
      */

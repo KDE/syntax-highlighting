@@ -223,6 +223,37 @@ private Q_SLOTS:
         QCOMPARE(definitionNames, expectedDefinitionNames);
     }
 
+    void testIncludedFormats()
+    {
+        QStringList definitionNames;
+        foreach (const auto &def, m_repo.definitions()) {
+            definitionNames.push_back(def.name());
+        }
+
+        foreach (const QString & name, definitionNames) {
+            Repository repo;
+            auto def = repo.definitionForName(name);
+            auto includedDefs = def.includedDefinitions();
+            includedDefs.push_front(def);
+
+            // collect all formats, shall be numbered from 1..
+            QSet<int> formatIds;
+            for (auto d : qAsConst(includedDefs)) {
+                const auto formats = d.formats();
+                for (const auto format : formats) {
+                    // no duplicates
+                    QVERIFY(!formatIds.contains(format.id()));
+                    formatIds.insert(format.id());
+                }
+            }
+
+            // ensure all ids are there from 1..size
+            for (int i = 1; i <= formatIds.size(); ++i) {
+                QVERIFY(formatIds.contains(i));
+            }
+        }
+    }
+
     void testReload()
     {
         auto def = m_repo.definitionForName(QLatin1String("QML"));

@@ -232,7 +232,9 @@ private Q_SLOTS:
 
         foreach (const QString & name, definitionNames) {
             Repository repo;
+            initRepositorySearchPaths(repo);
             auto def = repo.definitionForName(name);
+            QCOMPARE(m_repo.definitionForName(name).isValid(), def.isValid());
             auto includedDefs = def.includedDefinitions();
             includedDefs.push_front(def);
 
@@ -246,6 +248,7 @@ private Q_SLOTS:
                     formatIds.insert(format.id());
                 }
             }
+            QVERIFY(!def.isValid() || !formatIds.isEmpty());
 
             // ensure all ids are there from 1..size
             for (int i = 1; i <= formatIds.size(); ++i) {

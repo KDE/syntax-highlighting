@@ -65,6 +65,15 @@ with comment */
 y */ z
 #endif
 
+// check that _XXX defines work, bug 397766
+#ifndef _HEADER_GUARD
+#define _HEADER_GUARD 1
+#endif
+#ifdef _HEADER_GUARD
+#if (_HEADER_GUARD >= 1)
+#endif
+#endif
+
 static int g_global;
 
 template<class T, typename U, template<class> class = std::is_pointer>

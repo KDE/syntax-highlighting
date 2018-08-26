@@ -64,6 +64,48 @@ QStringList readListing(const QString &fileName)
     return listing;
 }
 
+/**
+ * check if the "extensions" attribute have valid wildcards
+ * @param extensions extensions string to check
+ * @return valid?
+ */
+bool checkExtensions(QString extensions)
+{
+    // get list of extensions
+    const QStringList extensionParts = extensions.split(QLatin1Char(';'), QString::SkipEmptyParts);
+
+    // ok if empty
+    if (extensionParts.isEmpty()) {
+        return true;
+    }
+
+    // check that only valid wildcard things are inside the parts
+    for (const auto extension : extensionParts) {
+        for (const auto c : extension) {
+            // eat normal things
+            if (c.isDigit() || c.isLetter()) {
+                continue;
+            }
+
+            // allow some special characters
+            if (c == QLatin1Char('.') || c == QLatin1Char('-') || c == QLatin1Char('_') || c == QLatin1Char('+')) {
+                continue;
+            }
+
+            // only allowed wildcard things: '?' and '*'
+            if (c == QLatin1Char('?') || c == QLatin1Char('*')) {
+                continue;
+            }
+
+            qWarning() << "invalid character" << c << " seen in extensions wildcard";
+            return false;
+        }
+    }
+
+    // all checks passed
+    return true;
+}
+
 //! Check that a regular expression in a RegExpr rule:
 //! - is not empty
 //! - isValid()
@@ -453,6 +495,12 @@ int main(int argc, char *argv[])
         // transfer text attributes
         Q_FOREACH (const QString &attribute, textAttributes) {
             hl[attribute] = xml.attributes().value(attribute).toString();
+        }
+
+        // check if extensions have the right format
+        if (!checkExtensions(hl[QStringLiteral("extensions")].toString())) {
+            qWarning() << hlFilename << "'extensions' wildcards invalid:" << hl[QStringLiteral("extensions")].toString();
+            anyError = 23;
         }
 
         // numerical attributes

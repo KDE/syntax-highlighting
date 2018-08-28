@@ -162,7 +162,13 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
         QString newFormat;
         auto newLookupContext = currentLookupContext;
         foreach (const auto &rule, stateData->topContext()->rules()) {
-            if (skipOffsets.value(rule.get()) > offset)
+            /**
+             * shall we skip application of this rule? two cases:
+             *   - rule can't match at all => currentSkipOffset < 0
+             *   - rule will only match for some higher offset => currentSkipOffset > offset
+             */
+            const auto currentSkipOffset = skipOffsets.value(rule.get());
+            if (currentSkipOffset < 0 || currentSkipOffset > offset)
                 continue;
 
             // filter out rules that only match for leading whitespace
@@ -177,8 +183,13 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
 
             const auto newResult = rule->match(text, offset, stateData->topCaptures());
             newOffset = newResult.offset();
-            if (newResult.skipOffset() > newOffset)
+
+            /**
+             * update skip offset if new one rules out any later match or is larger than current one
+             */
+            if (newResult.skipOffset() < 0 || newResult.skipOffset() > currentSkipOffset)
                 skipOffsets.insert(rule.get(), newResult.skipOffset());
+
             if (newOffset <= offset)
                 continue;
 

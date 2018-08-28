@@ -88,6 +88,9 @@ private:
     bool m_firstNonSpace = false;
     bool m_lookAhead = false;
     bool m_dynamic = false;
+
+    // cache for DefinitionData::wordDelimiters, is accessed VERY often
+    QStringRef m_wordDelimiter;
 };
 
 

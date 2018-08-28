@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 Volker Krause <vkrause@kde.org>
+    Copyright (C) 2018 Christoph Cullmann <cullmann@kde.org>
 
     Permission is hereby granted, free of charge, to any person obtaining
     a copy of this software and associated documentation files (the
@@ -32,6 +33,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QTextStream>
+#include <QVarLengthArray>
 
 using namespace KSyntaxHighlighting;
 
@@ -114,25 +116,32 @@ void HtmlHighlighter::applyFormat(int offset, int length, const Format& format)
     if (length == 0)
         return;
 
-    if (!format.isDefaultTextStyle(theme())) {
+    // collect potential output, cheaper than thinking about "is there any?"
+    QVarLengthArray<QString, 16> formatOutput;
+    if (format.hasTextColor(theme()))
+        formatOutput << QStringLiteral("color:") << format.textColor(theme()).name() << QStringLiteral(";");
+    if (format.hasBackgroundColor(theme()))
+        formatOutput << QStringLiteral("background-color:") << format.backgroundColor(theme()).name() << QStringLiteral(";");
+    if (format.isBold(theme()))
+        formatOutput << QStringLiteral("font-weight:bold;");
+    if (format.isItalic(theme()))
+        formatOutput << QStringLiteral("font-style:italic;");
+    if (format.isUnderline(theme()))
+        formatOutput << QStringLiteral("text-decoration:underline;");
+    if (format.isStrikeThrough(theme()))
+        formatOutput << QStringLiteral("text-decoration:line-through;");
+
+    if (!formatOutput.isEmpty()) {
         *d->out << "<span style=\"";
-        if (format.hasTextColor(theme()))
-            *d->out << "color:" << format.textColor(theme()).name() << ";";
-        if (format.hasBackgroundColor(theme()))
-            *d->out << "background-color:" << format.backgroundColor(theme()).name() << ";";
-        if (format.isBold(theme()))
-            *d->out << "font-weight:bold;";
-        if (format.isItalic(theme()))
-            *d->out << "font-style:italic;";
-        if (format.isUnderline(theme()))
-            *d->out << "text-decoration:underline;";
-        if (format.isStrikeThrough(theme()))
-            *d->out << "text-decoration:line-through;";
+        for (const auto &out : qAsConst(formatOutput)) {
+            *d->out << out;
+        }
         *d->out << "\">";
     }
 
     *d->out << d->currentLine.mid(offset, length).toHtmlEscaped();
 
-    if (!format.isDefaultTextStyle(theme()))
+    if (!formatOutput.isEmpty()) {
         *d->out << "</span>";
+    }
 }

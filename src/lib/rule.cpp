@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 Volker Krause <vkrause@kde.org>
+    Copyright (C) 2018 Christoph Cullmann <cullmann@kde.org>
 
     Permission is hereby granted, free of charge, to any person obtaining
     a copy of this software and associated documentation files (the
@@ -99,6 +100,9 @@ Definition Rule::definition() const
 void Rule::setDefinition(const Definition &def)
 {
     m_def = def;
+
+    // cache for DefinitionData::wordDelimiters, is accessed VERY often
+    m_wordDelimiter = &DefinitionData::get(m_def.definition())->wordDelimiters;
 }
 
 QString Rule::attribute() const
@@ -273,8 +277,8 @@ Rule::Ptr Rule::create(const QStringRef& name)
 
 bool Rule::isWordDelimiter(QChar c) const
 {
-    auto defData = DefinitionData::get(m_def.definition());
-    return defData->isWordDelimiter(c);
+    // perf tells contains is MUCH faster than binary search here, very short array
+    return m_wordDelimiter.contains(c);
 }
 
 
@@ -569,7 +573,9 @@ MatchResult KeywordListRule::doMatch(const QString& text, int offset, const QStr
         if (m_keywordList.contains(text.midRef(offset, newOffset - offset)))
             return newOffset;
     }
-    return offset;
+
+    // we don't match, but we can skip until newOffset as we can't start a keyword in-between
+    return MatchResult(offset, newOffset);
 }
 
 

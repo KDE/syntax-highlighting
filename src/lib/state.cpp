@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 Volker Krause <vkrause@kde.org>
+    Copyright (C) 2018 Christoph Cullmann <cullmann@kde.org>
 
     Permission is hereby granted, free of charge, to any person obtaining
     a copy of this software and associated documentation files (the
@@ -38,46 +39,45 @@ StateData* StateData::get(State &state)
 
 bool StateData::isEmpty() const
 {
-    Q_ASSERT(m_contextStack.size() == m_captureStack.size());
     return m_contextStack.isEmpty();
 }
 
 void StateData::clear()
 {
     m_contextStack.clear();
-    m_captureStack.clear();
 }
 
 int StateData::size() const
 {
-    Q_ASSERT(m_contextStack.size() == m_captureStack.size());
     return m_contextStack.size();
 }
 
 void StateData::push(Context *context, const QStringList &captures)
 {
     Q_ASSERT(context);
-    m_contextStack.push(context);
-    m_captureStack.push(captures);
-    Q_ASSERT(m_contextStack.size() == m_captureStack.size());
+    m_contextStack.push_back(qMakePair(context, captures));
 }
 
 void StateData::pop()
 {
-    m_contextStack.pop();
-    m_captureStack.pop();
+    m_contextStack.pop_back();
+}
+
+Context* StateData::initialContext() const
+{
+    return isEmpty() ? nullptr : m_contextStack.first().first;
 }
 
 Context* StateData::topContext() const
 {
     Q_ASSERT(!isEmpty());
-    return m_contextStack.top();
+    return m_contextStack.last().first;
 }
 
-QStringList StateData::topCaptures() const
+const QStringList &StateData::topCaptures() const
 {
     Q_ASSERT(!isEmpty());
-    return m_captureStack.top();
+    return m_contextStack.last().second;
 }
 
 State::State() :
@@ -102,7 +102,7 @@ State& State::operator=(const State &other)
 
 bool State::operator==(const State &other) const
 {
-    return d->m_contextStack == other.d->m_contextStack && d->m_captureStack == other.d->m_captureStack && d->m_defData == other.d->m_defData;
+    return d->m_contextStack == other.d->m_contextStack;
 }
 
 bool State::operator!=(const State &other) const
@@ -114,5 +114,5 @@ bool State::indentationBasedFoldingEnabled() const
 {
     if (d->m_contextStack.isEmpty())
         return false;
-    return d->m_contextStack.top()->indentationBasedFoldingEnabled();
+    return d->m_contextStack.last().first->indentationBasedFoldingEnabled();
 }

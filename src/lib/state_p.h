@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 Volker Krause <vkrause@kde.org>
+    Copyright (C) 2018 Christoph Cullmann <cullmann@kde.org>
 
     Permission is hereby granted, free of charge, to any person obtaining
     a copy of this software and associated documentation files (the
@@ -25,7 +26,7 @@
 #define KSYNTAXHIGHLIGHTING_STATE_P_H
 
 #include <QSharedData>
-#include <QStack>
+#include <QVector>
 
 QT_BEGIN_NAMESPACE
 class QStringList;
@@ -39,6 +40,8 @@ class DefinitionData;
 
 class StateData : public QSharedData
 {
+    friend class State;
+
 public:
     StateData() = default;
     static StateData* get(State &state);
@@ -48,14 +51,15 @@ public:
     int size() const;
     void push(Context *context, const QStringList &captures);
     void pop();
+    Context* initialContext() const;
     Context* topContext() const;
-    QStringList topCaptures() const;
+    const QStringList &topCaptures() const;
 
-    DefinitionData *m_defData = nullptr;
 private:
-    friend class State;
-    QStack<Context*> m_contextStack;
-    QStack<QStringList> m_captureStack;
+    /**
+     * the context stack combines the active context + valid captures
+     */
+    QVector<QPair<Context *, QStringList>> m_contextStack;
 };
 
 }

@@ -33,8 +33,6 @@
 #include <QDirIterator>
 #include <QFile>
 #include <QObject>
-#include <QProcess>
-#include <QStandardPaths>
 #include <QTextStream>
 #include <qtest.h>
 
@@ -176,16 +174,10 @@ private Q_SLOTS:
         highlighter.setDefinition(def);
         highlighter.highlightFile(inFile, outFile);
 
-        const auto diffExecutable = QStandardPaths::findExecutable(QStringLiteral("diff"));
-        if (!diffExecutable.isEmpty()) {
-            QProcess proc;
-            proc.setProcessChannelMode(QProcess::ForwardedChannels);
-            proc.start(diffExecutable, {QStringLiteral("-u"), refFile, outFile});
-            QVERIFY(proc.waitForFinished());
-            QCOMPARE(proc.exitCode(), 0);
-        } else {
-            qDebug() << "Skipping part of the test since the 'diff' executable is not in PATH";
-        }
+        /**
+         * compare results
+         */
+        compareFiles(refFile, outFile);
     }
 
 };

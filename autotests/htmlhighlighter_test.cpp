@@ -107,16 +107,10 @@ private Q_SLOTS:
         highlighter.setOutputFile(outFile);
         highlighter.highlightFile(inFile);
 
-        const auto diffExecutable = QStandardPaths::findExecutable(QStringLiteral("diff"));
-        if (!diffExecutable.isEmpty()) {
-            QProcess proc;
-            proc.setProcessChannelMode(QProcess::ForwardedChannels);
-            proc.start(diffExecutable, {QStringLiteral("-u"), refFile, outFile});
-            QVERIFY(proc.waitForFinished());
-            QCOMPARE(proc.exitCode(), 0);
-        } else {
-            qDebug() << "Skipping part of the test since the 'diff' executable is not in PATH";
-        }
+        /**
+         * compare results
+         */
+        compareFiles(refFile, outFile);
     }
 
 };

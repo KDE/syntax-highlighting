@@ -51,11 +51,18 @@ public:
     int size() const;
     void push(Context *context, const QStringList &captures);
     void pop();
-    Context* initialContext() const;
     Context* topContext() const;
     const QStringList &topCaptures() const;
 
+    /**
+     * definition pointer to check for invalid states
+     * FIXME: this is a hack, one could get the same pointer
+     * later for other object
+     */
+    DefinitionData *m_defData = nullptr;
+
 private:
+
     /**
      * the context stack combines the active context + valid captures
      */

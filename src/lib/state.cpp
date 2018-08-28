@@ -63,11 +63,6 @@ void StateData::pop()
     m_contextStack.pop_back();
 }
 
-Context* StateData::initialContext() const
-{
-    return isEmpty() ? nullptr : m_contextStack.first().first;
-}
-
 Context* StateData::topContext() const
 {
     Q_ASSERT(!isEmpty());
@@ -102,7 +97,7 @@ State& State::operator=(const State &other)
 
 bool State::operator==(const State &other) const
 {
-    return d->m_contextStack == other.d->m_contextStack;
+    return d->m_contextStack == other.d->m_contextStack && d->m_defData == other.d->m_defData;
 }
 
 bool State::operator!=(const State &other) const

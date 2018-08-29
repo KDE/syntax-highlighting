@@ -29,6 +29,7 @@
 #include <state.h>
 #include <format.h>
 
+#include <QDirIterator>
 #include <QObject>
 #include <qtest.h>
 
@@ -46,6 +47,7 @@ public:
         }
 
         QTextStream in(&f);
+        in.setCodec("UTF-8");
         State state;
         while (!in.atEnd())
             state = highlightLine(in.readLine(), state);
@@ -62,7 +64,7 @@ public:
     explicit HighlighterBenchmark(QObject *parent = nullptr) : QObject(parent), m_repo(nullptr) {}
 
 private:
-    Repository *m_repo;
+    Repository *m_repo = nullptr;
 
 private Q_SLOTS:
     void initTestCase()
@@ -82,8 +84,19 @@ private Q_SLOTS:
         QTest::addColumn<QString>("inFile");
         QTest::addColumn<QString>("syntax");
 
-        QTest::newRow("C") << QStringLiteral(TESTSRCDIR "/input/test.c") << QStringLiteral("C");
-        QTest::newRow("C++") << QStringLiteral(TESTSRCDIR "/input/highlight.cpp") << QStringLiteral("C++");
+        QDirIterator it(QStringLiteral(TESTSRCDIR "/input"), QDir::Files | QDir::NoSymLinks | QDir::Readable);
+        while (it.hasNext()) {
+            const auto inFile = it.next();
+            if (inFile.endsWith(QLatin1String(".syntax")))
+                continue;
+
+            QString syntax;
+            QFile syntaxOverride(inFile + QStringLiteral(".syntax"));
+            if (syntaxOverride.exists() && syntaxOverride.open(QFile::ReadOnly))
+                syntax = QString::fromUtf8(syntaxOverride.readAll()).trimmed();
+
+            QTest::newRow(it.fileName().toUtf8().constData()) << inFile << syntax;
+        }
     }
 
     void benchmarkHighlight()

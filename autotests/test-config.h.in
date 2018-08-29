@@ -25,6 +25,7 @@
 #include <QProcess>
 #include <QStandardPaths>
 #include <QString>
+#include <QTextStream>
 #include <qtest.h>
 
 #include <repository.h>
@@ -57,12 +58,15 @@ void compareFiles(const QString &refFile, const QString &outFile)
 {
     /**
      * quick compare, all fine, if no diffs!
+     * use text streams to avoid unix/windows mismatches
      */
     QFile ref(refFile);
     QFile out(outFile);
     QVERIFY(ref.open(QIODevice::ReadOnly));
     QVERIFY(out.open(QIODevice::ReadOnly));
-    const bool equalResults = ref.readAll() == out.readAll();
+    QTextStream refIn(&ref);
+    QTextStream outIn(&out);
+    const bool equalResults = refIn.readAll() == outIn.readAll();
     if (equalResults) {
         return;
     }

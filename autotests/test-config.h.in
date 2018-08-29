@@ -66,7 +66,9 @@ void compareFiles(const QString &refFile, const QString &outFile)
     QVERIFY(out.open(QIODevice::ReadOnly));
     QTextStream refIn(&ref);
     QTextStream outIn(&out);
-    const bool equalResults = refIn.readAll() == outIn.readAll();
+    const QString refContent = refIn.readAll();
+    const QString outContent = outIn.readAll();
+    const bool equalResults = refContent == outContent;
     if (equalResults) {
         return;
     }
@@ -74,15 +76,24 @@ void compareFiles(const QString &refFile, const QString &outFile)
     /**
      * elaborate diff output, if possible
      */
-    const auto diffExecutable = QStandardPaths::findExecutable(QStringLiteral("diff"));
+    const QString diffExecutable = QStandardPaths::findExecutable(QStringLiteral("diff"));
     if (!diffExecutable.isEmpty()) {
         QProcess proc;
         proc.setProcessChannelMode(QProcess::ForwardedChannels);
         proc.start(diffExecutable, {QStringLiteral("-u"), refFile, outFile});
         QVERIFY(proc.waitForFinished());
         QCOMPARE(proc.exitCode(), 0);
-    } else {
-        qDebug() << "Skipping differences output as the 'diff' executable is not in the PATH";
+    }
+
+    /**
+     * else: trivial output of mismatching characters, e.g. for windows testing without diff
+     */
+    else {
+        qDebug() << "Trivial differences output as the 'diff' executable is not in the PATH";
+        for (int i = 0; i < refContent.size() && i < outContent.size(); ++i) {
+            QCOMPARE(refContent[i], outContent[i]);
+        }
+        QCOMPARE(refContent.size(), outContent.size());
     }
 
     /**

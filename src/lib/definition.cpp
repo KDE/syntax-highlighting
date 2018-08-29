@@ -783,3 +783,12 @@ Definition DefinitionRef::definition() const
         return Definition(d.lock());
     return Definition();
 }
+
+bool DefinitionRef::operator==(const DefinitionRef &other) const
+{
+    if (d.expired() != other.d.expired()) {
+        return false;
+    }
+
+    return d.expired() || d.lock().get() == other.d.lock().get();
+}

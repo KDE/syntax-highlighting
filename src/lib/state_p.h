@@ -28,6 +28,8 @@
 #include <QSharedData>
 #include <QVector>
 
+#include "definitionref_p.h"
+
 QT_BEGIN_NAMESPACE
 class QStringList;
 QT_END_NAMESPACE
@@ -36,11 +38,11 @@ namespace KSyntaxHighlighting
 {
 
 class Context;
-class DefinitionData;
 
 class StateData : public QSharedData
 {
     friend class State;
+    friend class AbstractHighlighter;
 
 public:
     StateData() = default;
@@ -54,14 +56,11 @@ public:
     Context* topContext() const;
     const QStringList &topCaptures() const;
 
-    /**
-     * definition pointer to check for invalid states
-     * FIXME: this is a hack, one could get the same pointer
-     * later for other object
-     */
-    DefinitionData *m_defData = nullptr;
-
 private:
+    /**
+     * weak reference to the used definition to filter out invalid states
+     */
+    DefinitionRef m_defRef;
 
     /**
      * the context stack combines the active context + valid captures

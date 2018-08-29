@@ -50,6 +50,19 @@ public:
 
     Definition definition() const;
 
+    /**
+     * Checks two definition references for equality.
+     */
+    bool operator==(const DefinitionRef &other) const;
+
+    /**
+     * Checks two definition references for inequality.
+     */
+    bool operator!=(const DefinitionRef &other) const
+    {
+        return !(*this == other);
+    }
+
 private:
     friend class DefinitionData;
     std::weak_ptr<DefinitionData> d;

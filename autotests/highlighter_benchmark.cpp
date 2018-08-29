@@ -27,6 +27,7 @@
 #include <definition.h>
 #include <repository.h>
 #include <state.h>
+#include <format.h>
 
 #include <QObject>
 #include <qtest.h>
@@ -81,7 +82,8 @@ private Q_SLOTS:
         QTest::addColumn<QString>("inFile");
         QTest::addColumn<QString>("syntax");
 
-        QTest::newRow("mimedb") << QStringLiteral(":/qt-project.org/qmime/freedesktop.org.xml") << QStringLiteral("XML");
+        QTest::newRow("C") << QStringLiteral(TESTSRCDIR "/input/test.c") << QStringLiteral("C");
+        QTest::newRow("C++") << QStringLiteral(TESTSRCDIR "/input/highlight.cpp") << QStringLiteral("C++");
     }
 
     void benchmarkHighlight()
@@ -96,6 +98,11 @@ private Q_SLOTS:
             def = m_repo->definitionForName(syntax);
         QVERIFY(def.isValid());
         highlighter.setDefinition(def);
+
+        // trigger loading of definition per benchmarking loop
+        QVERIFY(!def.formats().isEmpty());
+
+        // benchmark the highlighting
         QBENCHMARK {
             highlighter.highlightFile(inFile);
         }

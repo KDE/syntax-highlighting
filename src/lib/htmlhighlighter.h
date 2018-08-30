@@ -28,6 +28,7 @@
 #include "abstracthighlighter.h"
 
 #include <QString>
+#include <QIODevice>
 
 #include <memory>
 
@@ -44,7 +45,8 @@ public:
     HtmlHighlighter();
     ~HtmlHighlighter() override;
 
-    void highlightFile(const QString &fileName);
+    void highlightFile(const QString &fileName, const QString &title = QString());
+    void highlightData(QIODevice *device, const QString &title = QString());
 
     void setOutputFile(const QString &fileName);
     void setOutputFile(FILE *fileHandle);

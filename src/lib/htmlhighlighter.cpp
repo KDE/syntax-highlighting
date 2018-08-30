@@ -71,32 +71,46 @@ void HtmlHighlighter::setOutputFile(FILE *fileHandle)
     d->out->setCodec("UTF-8");
 }
 
-void HtmlHighlighter::highlightFile(const QString& fileName)
+void HtmlHighlighter::highlightFile(const QString& fileName, const QString& title)
 {
-    if (!d->out) {
-        qCWarning(Log) << "No output stream defined!";
-        return;
-    }
-
+    QFileInfo fi(fileName);
     QFile f(fileName);
     if (!f.open(QFile::ReadOnly)) {
         qCWarning(Log) << "Failed to open input file" << fileName << ":" << f.errorString();
         return;
     }
 
+    if (title.isEmpty())
+        highlightData(&f, fi.fileName());
+    else
+        highlightData(&f, title);
+}
+
+void HtmlHighlighter::highlightData(QIODevice *dev, const QString& title)
+{
+    if (!d->out) {
+        qCWarning(Log) << "No output stream defined!";
+        return;
+    }
+
+    QString htmlTitle;
+    if (title.isEmpty())
+        htmlTitle = QStringLiteral("Kate Syntax Highlighter");
+    else
+        htmlTitle = title.toHtmlEscaped();
+
     State state;
     *d->out << "<!DOCTYPE html>\n";
     *d->out << "<html><head>\n";
     *d->out << "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>\n";
-    QFileInfo fi(fileName);
-    *d->out << "<title>" << fi.fileName() << "</title>\n";
+    *d->out << "<title>" << htmlTitle << "</title>\n";
     *d->out << "<meta name=\"generator\" content=\"KF5::SyntaxHighlighting (" << definition().name() << ")\"/>\n";
     *d->out << "</head><body";
     if (theme().textColor(Theme::Normal))
         *d->out << " style=\"color:" << QColor(theme().textColor(Theme::Normal)).name() << "\"";
     *d->out << "><pre>\n";
 
-    QTextStream in(&f);
+    QTextStream in(dev);
     in.setCodec("UTF-8");
     while (!in.atEnd()) {
         d->currentLine = in.readLine();

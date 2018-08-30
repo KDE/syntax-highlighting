@@ -165,6 +165,14 @@ public:
     Definition definitionForFileName(const QString &fileName) const;
 
     /**
+     * Returns the best matching Definition to the type named @p mimeType
+     *
+     * If no match is found, Definition::isValid() of the returned instance
+     * returns false.
+     */
+    Definition definitionForMimeType(const QString &mimeType) const;
+
+    /**
      * Returns all available Definition%s.
      * Definition%ss are ordered by translated section and translated names,
      * for consistent displaying.
@@ -235,6 +243,8 @@ public:
     QVector<QString> customSearchPaths() const;
 
 private:
+    Definition bestCandidate(QVector<Definition> &candidates) const;
+
     Q_DISABLE_COPY(Repository)
     friend class RepositoryPrivate;
     std::unique_ptr<RepositoryPrivate> d;

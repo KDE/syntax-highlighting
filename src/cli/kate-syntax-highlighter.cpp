@@ -31,6 +31,7 @@
 
 #include <QCommandLineParser>
 #include <QCoreApplication>
+#include <QFile>
 #include <QVector>
 
 #include <iostream>
@@ -78,6 +79,15 @@ int main(int argc, char **argv)
                                  app.translate("SyntaxHighlightingCLI", "theme"), QStringLiteral("Default"));
     parser.addOption(themeName);
 
+    QCommandLineOption titleOption(QStringList() << QStringLiteral("T") << QStringLiteral("title"),
+                                   app.translate("SyntaxHighlightingCLI", "Set HTML page's title\n(default: the filename or \"Kate Syntax Highlighter\" if reading from stdin)."),
+                                   app.translate("SyntaxHighlightingCLI", "title"));
+    parser.addOption(titleOption);
+
+    QCommandLineOption stdinOption(QStringList() << QStringLiteral("stdin"),
+                                   app.translate("SyntaxHighlightingCLI", "Read file from stdin. The -s option must also be used."));
+    parser.addOption(stdinOption);
+
     parser.process(app);
 
     Repository repo;
@@ -104,16 +114,29 @@ int main(int argc, char **argv)
         return app.exec();
     }
 
-    if (parser.positionalArguments().size() != 1)
-        parser.showHelp(1);
-    const auto inFileName = parser.positionalArguments().at(0);
+    bool fromFileName = false;
+    QString inFileName;
+    if (parser.positionalArguments().size() == 1) {
+        fromFileName = true;
+        inFileName = parser.positionalArguments().at(0);
+    }
 
     Definition def;
     if (parser.isSet(syntaxName)) {
         def = repo.definitionForName(parser.value(syntaxName));
-    } else {
+        if (!def.isValid())
+            /* see if it's a mimetype instead */
+            def = repo.definitionForMimeType(parser.value(syntaxName));
+    } else if (fromFileName) {
         def = repo.definitionForFileName(inFileName);
+    } else {
+        parser.showHelp(1);
     }
+
+    QString title = QString();
+    if (parser.isSet(titleOption))
+        title = parser.value(titleOption);
+
     if (!def.isValid()) {
         std::cerr << "Unknown syntax." << std::endl;
         return 1;
@@ -126,7 +149,16 @@ int main(int argc, char **argv)
     else
         highlighter.setOutputFile(stdout);
     highlighter.setTheme(repo.theme(parser.value(themeName)));
-    highlighter.highlightFile(inFileName);
+
+    if (fromFileName) {
+        highlighter.highlightFile(inFileName, title);
+    } else if (parser.isSet(stdinOption)) {
+        QFile inFile;
+        inFile.open(stdin, QIODevice::ReadOnly);
+        highlighter.highlightData(&inFile, title);
+    } else {
+        parser.showHelp(1);
+    }
 
     return 0;
 }

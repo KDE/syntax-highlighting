@@ -94,6 +94,26 @@ Definition Repository::definitionForFileName(const QString& fileName) const
         }
     }
 
+    return bestCandidate(candidates);
+}
+
+Definition Repository::definitionForMimeType(const QString& mimeType) const
+{
+    QVector<Definition> candidates;
+    for (auto it = d->m_defs.constBegin(); it != d->m_defs.constEnd(); ++it) {
+        auto def = it.value();
+        foreach (const auto &matchType, def.mimeTypes()) {
+            if (mimeType == matchType)
+                candidates.push_back(def);
+                break;
+        }
+    }
+
+    return bestCandidate(candidates);
+}
+
+Definition Repository::bestCandidate(QVector<Definition>& candidates) const
+{
     if (candidates.isEmpty())
         return Definition();
 

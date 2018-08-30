@@ -243,8 +243,6 @@ public:
     QVector<QString> customSearchPaths() const;
 
 private:
-    Definition bestCandidate(QVector<Definition> &candidates) const;
-
     Q_DISABLE_COPY(Repository)
     friend class RepositoryPrivate;
     std::unique_ptr<RepositoryPrivate> d;

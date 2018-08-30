@@ -78,6 +78,18 @@ Definition Repository::definitionForName(const QString& defName) const
     return d->m_defs.value(defName);
 }
 
+static Definition bestCandidate(QVector<Definition>& candidates)
+{
+    if (candidates.isEmpty())
+        return Definition();
+
+    std::partial_sort(candidates.begin(), candidates.begin() + 1, candidates.end(), [](const Definition &lhs, const Definition &rhs) {
+        return lhs.priority() > rhs.priority();
+    });
+
+    return candidates.at(0);
+}
+
 Definition Repository::definitionForFileName(const QString& fileName) const
 {
     QFileInfo fi(fileName);
@@ -110,18 +122,6 @@ Definition Repository::definitionForMimeType(const QString& mimeType) const
     }
 
     return bestCandidate(candidates);
-}
-
-Definition Repository::bestCandidate(QVector<Definition>& candidates) const
-{
-    if (candidates.isEmpty())
-        return Definition();
-
-    std::partial_sort(candidates.begin(), candidates.begin() + 1, candidates.end(), [](const Definition &lhs, const Definition &rhs) {
-        return lhs.priority() > rhs.priority();
-    });
-
-    return candidates.at(0);
 }
 
 QVector<Definition> Repository::definitions() const

@@ -169,6 +169,8 @@ public:
      *
      * If no match is found, Definition::isValid() of the returned instance
      * returns false.
+     *
+     * @since 5.50
      */
     Definition definitionForMimeType(const QString &mimeType) const;
 

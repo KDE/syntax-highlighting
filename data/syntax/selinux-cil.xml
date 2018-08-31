@@ -3,28 +3,28 @@
 [
 	<!ENTITY symbol         "\w\[\]\.@\=/\*\-&#036;&#037;\+&#033;\|&amp;\^&#058;&#126;&#096;#\{\}&#039;&lt;&gt;\?,\\"> <!-- [].@=/*-_$%+!|&^:~`#{}'<>?,\ -->
 	<!ENTITY identifier     "[a-zA-Z][\w\-]*">
-	<!ENTITY statementchar  "[a-z_\-]">	
+	<!ENTITY statementchar  "[a-z_\-]">
+
+	<!ENTITY fullIdentifier "[a-zA-Z][\w\-]*(\.?[\w\-])*">
+	<!ENTITY mlsLevel       "&fullIdentifier;(:&fullIdentifier;(\s*,\s*&fullIdentifier;)*)?">
 ]>
 
 <!--
-  SELinux CIL (Common Interface Language) Policy Syntax Highlighting Definition
-  for the KDE's KSyntaxHighlighting Framework.
+  SELinux CIL (Common Interface Language) Policy Syntax Highlighting Definition for Kate
   ==========================================================================================
-   NOTE: Part of this file (the highlighting of brackets) is based on the Scheme XML file, 
-   created by Dominik Haumann (dhaumann@kde.org) & licensed under MIT; 
-   which is part of the KDE's KSyntaxHighlighting Framework.
-   
+   This file is part of the KDE's KSyntaxHighlighting framework.
+
    Copyright (c) 2018 Nibaldo González S. (nibgonz@gmail.com)
-  
+
    Permission is hereby granted, free of charge, to any person obtaining a copy of this
    software and associated documentation files (the "Software"), to deal in the Software
    without restriction, including without limitation the rights to use, copy, modify, merge,
    publish, distribute, sublicense, and/or sell copies of the Software, and to permit
    persons to whom the Software is furnished to do so, subject to the following conditions:
-  
+
    The above copyright notice and this permission notice shall be included
    in all copies or substantial portions of the Software.
-  
+
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
    PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
@@ -32,21 +32,34 @@
    AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
    WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   ==========================================================================================
-  
+
+  Based on the Scheme syntax highlighting file (scheme.xml),
+  created by Dominik Haumann (dhaumann@kde.org) & licensed under MIT.
+
+  Last update: secilc 2.8
+  More details about CIL:
+    https://github.com/SELinuxProject/selinux/tree/master/secilc/docs
+
   Change log:
-  	* Version 1 [26-Jan-2018, by Nibaldo González]:
+	* Version 2 [28-Aug-2018]:
+		- Implement "selinux.xml": some rules and keywords are moved there. Improve RegExp
+		  highlighting, add Android permissions and BPF permissions, improve IPv6
+		  detection and others improvements.
+		- Fix permissions list in "ioctl" kind and "call" statements.
+		- Add "sctp" protocol keyword and policy capabilities keywords.
+	* Version 1 [26-Jan-2018, by Nibaldo González]:
 		- Initial version.
 -->
 
 <language name="SELinux CIL Policy"
-		version="1"
-		kateversion="5.0"
-		section="Sources"
-		extensions="*.cil"
-		priority="9"
-		mimetype=""
-		author="Nibaldo González (nibgonz@gmail.com)"
-		license="MIT">
+          version="2"
+          kateversion="5.0"
+          section="Sources"
+          extensions="*.cil"
+          priority="9"
+          mimetype=""
+          author="Nibaldo González (nibgonz@gmail.com)"
+          license="MIT">
 
 	<highlighting>
 
@@ -102,8 +115,9 @@
 			<item>tcp</item>
 			<item>udp</item>
 			<item>dccp</item>
+			<item>sctp</item>
 		</list>
-		
+
 		<list name="special_keys">
 			<item>self</item>
 		</list>
@@ -152,7 +166,7 @@
 		</list>
 		<list name="statements">
 			<!-- Container Statements.
-				 Also: block, optional, macro -->
+			     Also: block, optional, macro -->
 			<item>blockabstract</item>
 			<item>blockinherit</item>
 			<item>in</item>
@@ -165,7 +179,7 @@
 			<item>defaultrange</item>
 
 			<!-- User Statements.
-				 Also: user -->
+			     Also: user -->
 			<item>userrole</item>
 			<item>userattribute</item>
 			<item>userattributeset</item>
@@ -177,7 +191,7 @@
 			<item>selinuxuserdefault</item>
 
 			<!-- Role Statements.
-				 Also: role, roleattribute -->
+			     Also: role, roleattribute -->
 			<item>roletype</item>
 			<item>roleattributeset</item>
 			<item>roleallow</item>
@@ -185,7 +199,7 @@
 			<item>rolebounds</item>
 
 			<!-- Type Statements.
-				 Also: type, typeattribute, typealias -->
+			     Also: type, typeattribute, typealias -->
 			<item>typealiasactual</item>
 			<item>typeattributeset</item>
 			<item>typebounds</item>
@@ -199,7 +213,7 @@
 			<item>nametypetransition</item>
 
 			<!-- Class and Permission Statements.
-				 Also: common, class, classmap, classmapping, classpermission -->
+			     Also: common, class, classmap, classmapping, classpermission -->
 			<item>classcommon</item>
 			<item>classorder</item>
 			<item>permission</item>
@@ -208,7 +222,7 @@
 			<item>permissionx</item>
 
 			<!-- Conditional Statements.
-				 Also: tunable, boolean -->
+			     Also: tunable, boolean -->
 			<item>booleanif</item>
 			<item>tunableif</item>
 
@@ -219,7 +233,7 @@
 			<item>mlsvalidatetrans</item>
 
 			<!-- Multi-Level Security Labeling Statements.
-				 Also: sensitivity, sensitivityalias, category, categoryalias, categoryset, level, levelrange -->
+			     Also: sensitivity, sensitivityalias, category, categoryalias, categoryset, level, levelrange -->
 			<item>sensitivityaliasactual</item>
 			<item>sensitivityorder</item>
 			<item>categoryaliasactual</item>
@@ -230,7 +244,7 @@
 
 			<!-- Context Statement: context -->
 			<!-- SID Statements.
-				 Also: sid -->
+			     Also: sid -->
 			<item>sidorder</item>
 			<item>sidcontext</item>
 
@@ -244,7 +258,7 @@
 			<item>fsusetrans</item>
 
 			<!-- Network Labeling Statements.
-				 Also: ipaddr -->
+			     Also: ipaddr -->
 			<item>netifcon</item>
 			<item>nodecon</item>
 			<item>portcon</item>
@@ -272,7 +286,7 @@
 		<list name="type_name">
 			<item>string</item>
 			<item>name</item>
-			<item>ioctl</item>
+			<item>ioctl</item> <!-- permissionx -->
 		</list>
 
 		<list name="other_keywords">
@@ -298,408 +312,77 @@
 			<item>h1</item>
 			<item>h2</item>
 		</list>
-		
-		<!-- Access Vectors Permissions -->
-		<list name="av_permissions">
-			<item>accept</item>
-			<item>acceptfrom</item>
-			<item>access</item>
-			<item>acquire_svc</item>
-			<item>add</item>
-			<item>add_child</item>
-			<item>add_color</item>
-			<item>add_glyph</item>
-			<item>add_name</item>
-			<item>admin</item>
-			<item>append</item>
-			<item>associate</item>
-			<item>attach_queue</item>
-			<item>audit_access</item>
-			<item>audit_control</item>
-			<item>audit_read</item>
-			<item>audit_write</item>
-			<item>bell</item>
-			<item>bind</item>
-			<item>blend</item>
-			<item>block_suspend</item>
-			<item>call</item>
-			<item>check_context</item>
-			<item>chfn</item>
-			<item>chown</item>
-			<item>chsh</item>
-			<item>compute_av</item>
-			<item>compute_create</item>
-			<item>compute_member</item>
-			<item>compute_relabel</item>
-			<item>compute_user</item>
-			<item>connect</item>
-			<item>connectto</item>
-			<item>contains</item>
-			<item>copy</item>
-			<item>create</item>
-			<item>create_files_as</item>
-			<item>crontab</item>
-			<item>dac_override</item>
-			<item>dac_read_search</item>
-			<item>dccp_recv</item>
-			<item>dccp_send</item>
-			<item>debug</item>
-			<item>delete</item>
-			<item>destroy</item>
-			<item>disable</item>
-			<item>drop</item>
-			<item>dyntransition</item>
-			<item>egress</item>
-			<item>enable</item>
-			<item>enforce_dest</item>
-			<item>enqueue</item>
-			<item>entrypoint</item>
-			<item>execheap</item>
-			<item>execmem</item>
-			<item>execmod</item>
-			<item>execstack</item>
-			<item>execute</item>
-			<item>execute_no_trans</item>
-			<item>expand</item>
-			<item>export</item>
-			<item>flow_in</item>
-			<item>flow_out</item>
-			<item>force_cursor</item>
-			<item>fork</item>
-			<item>forward_in</item>
-			<item>forward_out</item>
-			<item>fowner</item>
-			<item>freeze</item>
-			<item>fsetid</item>
-			<item>get_param</item>
-			<item>get_property</item>
-			<item>get_value</item>
-			<item>getattr</item>
-			<item>getcap</item>
-			<item>getfocus</item>
-			<item>getgrp</item>
-			<item>gethost</item>
-			<item>getopt</item>
-			<item>getpgid</item>
-			<item>getpwd</item>
-			<item>getrlimit</item>
-			<item>getsched</item>
-			<item>getserv</item>
-			<item>getsession</item>
-			<item>getstat</item>
-			<item>grab</item>
-			<item>halt</item>
-			<item>hide</item>
-			<item>hide_cursor</item>
-			<item>impersonate</item>
-			<item>implement</item>
-			<item>import</item>
-			<item>ingress</item>
-			<item>insert</item>
-			<item>install</item>
-			<item>install_module</item>
-			<item>ioctl</item>
-			<item>ipc_info</item>
-			<item>ipc_lock</item>
-			<item>ipc_owner</item>
-			<item>kill</item>
-			<item>lease</item>
-			<item>link</item>
-			<item>linux_immutable</item>
-			<item>list_child</item>
-			<item>list_property</item>
-			<item>listen</item>
-			<item>load_module</item>
-			<item>load_policy</item>
-			<item>lock</item>
-			<item>mac_admin</item>
-			<item>mac_override</item>
-			<item>manage</item>
-			<item>manage_subnet</item>
-			<item>map</item>
-			<item>mknod</item>
-			<item>mmap_zero</item>
-			<item>module_load</item>
-			<item>module_request</item>
-			<item>mount</item>
-			<item>mounton</item>
-			<item>name_bind</item>
-			<item>name_connect</item>
-			<item>net_admin</item>
-			<item>net_bind_service</item>
-			<item>net_broadcast</item>
-			<item>net_raw</item>
-			<item>newconn</item>
-			<item>next_value</item>
-			<item>nlmsg_read</item>
-			<item>nlmsg_readpriv</item>
-			<item>nlmsg_relay</item>
-			<item>nlmsg_tty_audit</item>
-			<item>nlmsg_write</item>
-			<item>nnp_transition</item>
-			<item>noatsecure</item>
-			<item>node_bind</item>
-			<item>nosuid_transition</item>
-			<item>open</item>
-			<item>override</item>
-			<item>passwd</item>
-			<item>paste</item>
-			<item>paste_after_confirm</item>
-			<item>polmatch</item>
-			<item>ptrace</item>
-			<item>query</item>
-			<item>quotaget</item>
-			<item>quotamod</item>
-			<item>quotaon</item>
-			<item>rawip_recv</item>
-			<item>rawip_send</item>
-			<item>read</item>
-			<item>read_policy</item>
-			<item>reboot</item>
-			<item>receive</item>
-			<item>record</item>
-			<item>recv</item>
-			<item>recv_msg</item>
-			<item>recvfrom</item>
-			<item>relabelfrom</item>
-			<item>relabelto</item>
-			<item>reload</item>
-			<item>remount</item>
-			<item>remove</item>
-			<item>remove_child</item>
-			<item>remove_color</item>
-			<item>remove_glyph</item>
-			<item>remove_name</item>
-			<item>rename</item>
-			<item>reparent</item>
-			<item>rlimitinh</item>
-			<item>rmdir</item>
-			<item>rootok</item>
-			<item>saver_getattr</item>
-			<item>saver_hide</item>
-			<item>saver_setattr</item>
-			<item>saver_show</item>
-			<item>search</item>
-			<item>select</item>
-			<item>send</item>
-			<item>send_msg</item>
-			<item>sendto</item>
-			<item>set_context_mgr</item>
-			<item>set_param</item>
-			<item>set_property</item>
-			<item>set_value</item>
-			<item>setattr</item>
-			<item>setbool</item>
-			<item>setcap</item>
-			<item>setcheckreqprot</item>
-			<item>setcontext</item>
-			<item>setcurrent</item>
-			<item>setenforce</item>
-			<item>setexec</item>
-			<item>setfcap</item>
-			<item>setfocus</item>
-			<item>setfscreate</item>
-			<item>setgid</item>
-			<item>setkeycreate</item>
-			<item>setopt</item>
-			<item>setpcap</item>
-			<item>setpgid</item>
-			<item>setrlimit</item>
-			<item>setsched</item>
-			<item>setsecparam</item>
-			<item>setsockcreate</item>
-			<item>setuid</item>
-			<item>share</item>
-			<item>shmemgrp</item>
-			<item>shmemhost</item>
-			<item>shmempwd</item>
-			<item>shmemserv</item>
-			<item>show</item>
-			<item>show_cursor</item>
-			<item>shutdown</item>
-			<item>sigchld</item>
-			<item>siginh</item>
-			<item>sigkill</item>
-			<item>signal</item>
-			<item>signull</item>
-			<item>sigstop</item>
-			<item>start</item>
-			<item>status</item>
-			<item>stop</item>
-			<item>swapon</item>
-			<item>sys_admin</item>
-			<item>sys_boot</item>
-			<item>sys_chroot</item>
-			<item>sys_module</item>
-			<item>sys_nice</item>
-			<item>sys_pacct</item>
-			<item>sys_ptrace</item>
-			<item>sys_rawio</item>
-			<item>sys_resource</item>
-			<item>sys_time</item>
-			<item>sys_tty_config</item>
-			<item>syslog</item>
-			<item>syslog_console</item>
-			<item>syslog_mod</item>
-			<item>syslog_read</item>
-			<item>tcp_recv</item>
-			<item>tcp_send</item>
-			<item>transfer</item>
-			<item>transition</item>
-			<item>translate</item>
-			<item>udp_recv</item>
-			<item>udp_send</item>
-			<item>uninstall</item>
-			<item>unix_read</item>
-			<item>unix_write</item>
-			<item>unlink</item>
-			<item>unmount</item>
-			<item>update</item>
-			<item>use</item>
-			<item>use_as_override</item>
-			<item>validate_trans</item>
-			<item>view</item>
-			<item>wake_alarm</item>
-			<item>write</item>
-		</list>
-
-		<list name="filesystem">
-			<!-- VFS Types -->
-			<item>autofs</item>
-			<item>bdev</item>
-			<item>bpf</item>
-			<item>cachefs</item>
-			<item>cgroup</item>
-			<item>cgroup2</item>
-			<item>cifs</item>
-			<item>coherent</item>
-			<item>configfs</item>
-			<item>cpuset</item>
-			<item>cramfs</item>
-			<item>debugfs</item>
-			<item>devfs</item>
-			<item>devpts</item>
-			<item>devtmpfs</item>
-			<item>ecryptfs</item>
-			<item>efs</item>
-			<item>fuse</item>
-			<item>fuseblk</item>
-			<item>fusectl</item>
-			<item>hugetlbfs</item>
-			<item>iso9660</item>
-			<item>kernfs</item>
-			<item>mqueue</item>
-			<item>pipefs</item>
-			<item>proc</item>
-			<item>procfs</item>
-			<item>pstore</item>
-			<item>ramfs</item>
-			<item>romfs</item>
-			<item>rootfs</item>
-			<item>securityfs</item>
-			<item>selinuxfs</item>
-			<item>sockfs</item>
-			<item>specfs</item>
-			<item>squashfs</item>
-			<item>swapfs</item>
-			<item>sysfs</item>
-			<item>sysv</item>
-			<item>tmpfs</item>
-			<item>usbfs</item>
-			<item>vfat</item>
-			<!-- FS Types -->
-			<item>adfs</item>
-			<item>affs</item>
-			<item>apfs</item>
-			<item>btrfs</item>
-			<item>coda</item>
-			<item>exfat</item>
-			<item>ext2</item>
-			<item>ext3</item>
-			<item>ext4</item>
-			<item>f2fs</item>
-			<item>fatx</item>
-			<item>hfs</item>
-			<item>hfsplus</item>
-			<item>hpfs</item>
-			<item>jfs</item>
-			<item>lvm2</item>
-			<item>minix</item>
-			<item>msdos</item>
-			<item>ncpfs</item>
-			<item>nilfs</item>
-			<item>nilfs2</item>
-			<item>nfs</item>
-			<item>nfs4</item>
-			<item>ntfs-3g</item>
-			<item>qnx4</item>
-			<item>qnx6</item>
-			<item>reiser4</item>
-			<item>reiserfs</item>
-			<item>smbfs</item>
-			<item>swap</item>
-			<item>tracefs</item>
-			<item>ubifs</item>
-			<item>udf</item>
-			<item>ufs</item>
-			<item>umsdos</item>
-			<item>urefs</item>
-			<item>xenix</item>	
-			<item>xfs</item>
-			<item>zfs</item>
-		</list>
 
 		<contexts>
-			
+
 			<context name="_normal" attribute="Normal Text" lineEndContext="#stay">
 				<DetectChar context="_rule_bracket_level1" attribute="Brackets1" char="("/>
 				<DetectChar context="#stay" attribute="Error"  char=")"/>
 				<IncludeRules context="_common"/>
+				<IncludeRules context="_identifiers"/>
 			</context>
 			<context name="_common" attribute="Normal Text" lineEndContext="#stay">
 				<DetectChar context="_comment" attribute="Comment" char=";"/>
 				<DetectChar context="_quoted" attribute="Text Quoted" char="&quot;"/>
-				<RegExpr context="_path_content" attribute="Path" String="/(?![\s\(\)&quot;/])" insensitive="true"/>
-				<RegExpr context="#stay" attribute="Path" String="/(?=([\s\(\)]|$))" insensitive="true"/>
-				<!-- IPv4 -->
-				<RegExpr context="#stay" attribute="IP Address" String="\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b"/>
-				<!-- IPv6 -->
-				<RegExpr context="#stay" attribute="IP Address" String="\b([0-9A-Fa-f]{1,4}:([0-9A-Fa-f]{1,4}:([0-9A-Fa-f]{1,4}:([0-9A-Fa-f]{1,4}:([0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{0,4}|:[0-9A-Fa-f]{1,4})?|(:[0-9A-Fa-f]{1,4}){0,2})|(:[0-9A-Fa-f]{1,4}){0,3})|(:[0-9A-Fa-f]{1,4}){0,4})|:(:[0-9A-Fa-f]{1,4}){0,5})((:[0-9A-Fa-f]{1,4}){2}|:(25[0-5]|(2[0-4]|1[0-9]|[1-9])?[0-9])(\.(25[0-5]|(2[0-4]|1[0-9]|[1-9])?[0-9])){3})|(([0-9A-Fa-f]{1,4}:){1,6}|:):[0-9A-Fa-f]{0,4}|([0-9A-Fa-f]{1,4}:){7}:"/>
-				<HlCOct context="#stay" attribute="Octal"/>
-        		<HlCHex context="#stay" attribute="Hex"/>
-				<RegExpr context="#stay" attribute="Number" String="\b\d+(?=([\s\(\)]|$))"/>
-				
-				<RegExpr context="#stay" attribute="Normal Text" String="(\b&identifier;)?(\.&identifier;)+(?=([\s\(\)]|$))"/>
+				<DetectChar context="_path_content" attribute="Path" char="/"/>
+
+				<!-- IP Address -->
+				<IncludeRules context="_ip_addr##SELinux Policy"/>
+				<!-- Special Characters -->
 				<DetectChar context="#stay" attribute="Special Char" char="*"/>
-				<HlCStringChar context="#stay" attribute="Escape Expression"/>
-				<!-- File contexts: user_u:role_r:type_t:s0:c0 -->
-				<RegExpr context="#stay" attribute="File Contexts" String="\b[^\s:\(\)&quot;]+(:[^\s:\(\)&quot;]+){2}(:[^\s:\(\)&quot;]+)*(?=([^&symbol;]|\s|$))"/>
+
+				<!-- File Contexts: user_u:role_r:type_t:s0:c0 -->
+				<RegExpr context="_file_contexts" attribute="File Contexts" String="\b&fullIdentifier;(:&fullIdentifier;){2}(:&mlsLevel;(\s*\-\s*&mlsLevel;)?)?([^&symbol;:]|\s|$)" lookAhead="true"/>
+				<!-- Global Namespace (this avoids highlighting keywords) -->
+				<RegExpr context="#stay" String="(\b&identifier;)?(\.&identifier;)+(?=\s|[^&symbol;]|$)"/>
+
+				<!-- Numbers -->
+				<HlCHex context="#stay" attribute="Hexadecimal"/>
+				<Float context="#stay" attribute="Number"/>
+				<Int context="#stay" attribute="Number"/>
+			</context>
+			<context name="_identifiers" attribute="Normal Text" lineEndContext="#stay">
+				<!-- Avoid highlighting numbers in identifiers.
+				     IMPORTANT: Do not put this rule before the keywords! -->
+				<RegExpr context="#stay" String="&identifier;"/>
 			</context>
 
 			<context name="_comment" attribute="Comment" lineEndContext="#pop">
-				<LineContinue context="#pop" attribute="Comment"/>
 				<DetectSpaces />
+				<LineContinue context="#pop" attribute="Comment"/>
 				<IncludeRules context="##Alerts"/>
 				<IncludeRules context="##Modelines"/>
+				<IncludeRules context="_default_comment##SELinux Policy"/>
 			</context>
-			<context name="_quoted" attribute="Text Quoted" lineEndContext="#stay">
+
+			<context name="_quoted" attribute="Text Quoted" lineEndContext="#pop">
 				<DetectChar context="#pop" attribute="Text Quoted" char="&quot;"/>
-				<DetectChar context="_square_brackets" attribute="Pattern Brackets" char="["/>
-				<DetectChar context="_round_brackets" attribute="Pattern Brackets" char="("/>
-				<IncludeRules context="_quantification_brackets"/>
-				<IncludeRules context="_path_special_chars"/>
+				<IncludeRules context="_regex_quoted##SELinux Policy"/> <!-- This does not support line breaks and line cont. escape -->
+				<RegExpr context="#stay" attribute="Text Quoted Open" String="[^\s&quot;\[\(\\](?=\s*$)"/>
 			</context>
+
 			<context name="_path_content" attribute="Path" lineEndContext="#pop">
 				<DetectSpaces context="#pop" attribute="Normal Text" lookAhead="true"/>
 				<RegExpr context="#pop" attribute="Normal Text" String="[^&symbol;]" lookAhead="true"/>
-				<DetectChar context="_square_brackets_path" attribute="Pattern Brackets" char="["/>
-				<IncludeRules context="_quantification_brackets"/>
-				<IncludeRules context="_path_special_chars"/>
+
+				<IncludeRules context="_default_regex##SELinux Policy"/>
+				<DetectChar context="_square_brackets_cil_path" attribute="RegExp Brackets (Paths)" char="["/>
+			</context>
+			<context name="_square_brackets_cil_path" attribute="RegExp Brackets (Paths)"
+			         lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!_square_brackets_cil_path_content">
+			<RegExpr context="#pop!_square_brackets_cil_path_content" attribute="Special Char of Brackets (Paths)" String="\^(?=[&symbol;])"/>
+			</context>
+			<context name="_square_brackets_cil_path_content" attribute="RegExp Brackets (Paths)" lineEndContext="#pop">
+				<DetectChar context="#pop" attribute="RegExp Brackets (Paths)" char="]"/>
+				<RegExpr context="#pop" String="[^&symbol;]" lookAhead="true"/>
+				<RegExpr context="#stay" attribute="Open RegExp Brackets (Paths)" String="[^\s\[\]\\](?![&symbol;])"/>
+				<DetectChar context="#stay" attribute="Error" char="["/>
+				<IncludeRules context="_special_chars##SELinux Policy"/>
 			</context>
 
 			<!-- RULES -->
 
-			<!-- Highlighting specific keywords for some rules -->
+			<!-- Highlighting specific keywords in some rules -->
 			<context name="_filecon_statement" attribute="Normal Text" lineEndContext="#stay">
 				<IncludeRules context="_default_end"/>
 				<keyword context="#pop" attribute="Types" String="file_types"/>
@@ -720,16 +403,43 @@
 				<keyword context="#pop" attribute="Access Keys" String="handleunknown_keys"/>
 				<IncludeRules context="_default_rule"/>
 			</context>
+			<context name="_policycap_statement" attribute="Normal Text" lineEndContext="#stay">
+				<IncludeRules context="_default_end"/>
+				<IncludeRules context="_policy_capabilities##SELinux Policy"/>
+				<IncludeRules context="_common"/>
+				<IncludeRules context="_identifiers"/>
+			</context>
+			<context name="_av_permissions_statement" attribute="Normal Text" lineEndContext="#stay">
+				<IncludeRules context="_default_end"/>
+				<IncludeRules context="_av_permissions##SELinux Policy"/>
+				<IncludeRules context="_default_rule"/>
+			</context>
 			<context name="_default_end" attribute="Normal Text" lineEndContext="#stay">
 				<AnyChar context="#pop" attribute="Normal Text" String=")(" lookAhead="true"/>
 			</context>
 
+			<context name="_find_ioctl_kind" attribute="Normal Text"
+			         lineEndContext="#pop!_av_permissions_statement" fallthrough="true" fallthroughContext="#pop!_av_permissions_statement">
+				<!-- ioctl is a kind in permissionx/accessx statement:
+				     (permissionx permissionx_id (ioctl class_id (permission ... | expr ...))) -->
+				<RegExpr context="#pop" attribute="Type Name Statements" String="ioctl(?=\s+[&symbol;]+\s*\()"/>
+				<!-- ioctl can be a kind of permissionx or AV permission -->
+				<RegExpr context="#pop!_av_permissions_statement" attribute="Type Name Statements" String="ioctl(?=(\s+[&symbol;]+)?\s*($|;))"/>
+				<RegExpr context="#pop!_av_permissions_statement" attribute="Type Name Statements" String="ioctl(?=\s+[&symbol;]+\s+\d)"/>
+			</context>
+
 			<context name="_default_statement" attribute="Normal Text" lineEndContext="#stay">
 				<WordDetect context="_handleunknown_statement" attribute="Policy Config. Statements" String="handleunknown"/>
+				<WordDetect context="_policycap_statement" attribute="Policy Config. Statements" String="policycap"/>
 				<WordDetect context="_filecon_statement" attribute="Statements" String="filecon"/>
 				<WordDetect context="_fsuse_statement" attribute="Statements" String="fsuse"/>
 				<WordDetect context="_portcon_statement" attribute="Statements" String="portcon"/>
-				
+				<!-- Fix permissions list if the keywords "ioctl" or "call" are not statements,
+				     but a permissions (see "av_permissions" keyword list of "selinux.xml"). -->
+				<RegExpr context="_av_permissions_statement" String="\b(call|ioctl)\s*\)" lookAhead="true"/>
+				<WordDetect context="_find_ioctl_kind" String="ioctl" lookAhead="true"/>
+				<WordDetect context="_av_permissions_statement" attribute="Statements" String="call"/>
+
 				<keyword context="#stay" attribute="Policy Config. Statements" String="policy_config_statements"/>
 				<keyword context="#stay" attribute="Type Statements" String="type_statements"/>
 				<keyword context="#stay" attribute="Statements" String="statements"/>
@@ -737,8 +447,8 @@
 				<keyword context="#stay" attribute="Access Keys" String="access"/>
 
 				<keyword context="#stay" attribute="Booleans" String="booleans"/>
-				<keyword context="#stay" attribute="Type Name" String="classorder_keys"/>
-				<keyword context="#stay" attribute="Type Name" String="type_name"/>
+				<keyword context="#stay" attribute="Type Name Statements" String="classorder_keys"/>
+				<keyword context="#stay" attribute="Type Name Statements" String="type_name"/>
 			</context>
 			<context name="_default_rule" attribute="Normal Text" lineEndContext="#stay">
 				<IncludeRules context="_common"/>
@@ -751,23 +461,27 @@
 				<WordDetect context="#stay" attribute="Other Keywords" String="&lt;src_cil&gt;"/>
 				<WordDetect context="#stay" attribute="Other Keywords" String="&lt;src_hll&gt;"/>
 				<keyword context="#stay" attribute="Other Keywords" String="other_keywords"/>
-				<keyword context="#stay" attribute="Other Keywords" String="filesystem"/>
+				<IncludeRules context="_filesystem##SELinux Policy"/>
+
+				<IncludeRules context="_identifiers"/>
 			</context>
 			<context name="_default_rule_without_statement" attribute="Normal Text" lineEndContext="#stay">
-				<keyword context="#stay" attribute="Permissions" String="av_permissions"/>
+				<IncludeRules context="_av_permissions##SELinux Policy"/>
 			</context>
 			<context name="_default_rule_bracket" attribute="Normal Text" lineEndContext="#stay">
 				<DetectSpaces context="#stay" attribute="Normal Text"/>
-				<DetectChar context="_comment" attribute="Comment" char=";" />
+				<DetectChar context="_comment" attribute="Comment" char=";"/>
 			</context>
 
 			<!-- Levels of rule brackets.
-				 Only the first word of a rule can be highlighted as a statement keyword. -->
+			     Only the first word of a rule can be highlighted as a statement keyword. -->
 			<context name="_rule_bracket_level1" attribute="Normal Text" fallthrough="true" fallthroughContext="#pop!_rule_without_statement_level1" lineEndContext="#stay">
 				<IncludeRules context="_default_rule_bracket"/> <!-- Detect spaces & comments -->
-				<RegExpr context="#pop!_statement_level1" attribute="Normal Text" String="&statementchar;" lookAhead="true"/> <!-- Detect first word -->
+				<!-- Detect first word -->
+				<RegExpr context="#pop!_statement_level1" attribute="Normal Text" String="&statementchar;" lookAhead="true"/>
 			</context>
 			<context name="_statement_level1" attribute="Normal Text" fallthrough="true" fallthroughContext="#pop!_rule_level1" lineEndContext="#pop!_rule_level1">
+				<!-- When writing a statement and then a delimiter (like a space), go to the context "_rule_level1" -->
 				<IncludeRules context="_default_statement"/>
 				<RegExpr context="#pop!_rule_without_statement_level1" attribute="Normal Text" String="&statementchar;+" lookAhead="true"/>
 			</context>
@@ -777,10 +491,10 @@
 				<IncludeRules context="_default_rule"/>
 			</context>
 			<context name="_rule_without_statement_level1" attribute="Normal Text" lineEndContext="#stay">
-				<IncludeRules context="_rule_level1"/>
 				<IncludeRules context="_default_rule_without_statement"/>
+				<IncludeRules context="_rule_level1"/>
 			</context>
-			
+
 			<context name="_rule_bracket_level2" attribute="Normal Text" fallthrough="true" fallthroughContext="#pop!_rule_without_statement_level2" lineEndContext="#stay">
 				<IncludeRules context="_default_rule_bracket"/>
 				<RegExpr context="#pop!_statement_level2" attribute="Normal Text" String="&statementchar;" lookAhead="true"/>
@@ -788,15 +502,15 @@
 			<context name="_statement_level2" attribute="Normal Text" fallthrough="true" fallthroughContext="#pop!_rule_level2" lineEndContext="#pop!_rule_level2">
 				<IncludeRules context="_default_statement"/>
 				<RegExpr context="#pop!_rule_without_statement_level2" attribute="Normal Text" String="&statementchar;+" lookAhead="true"/>
-			</context>			
+			</context>
 			<context name="_rule_level2" attribute="Normal Text" lineEndContext="#stay">
 				<DetectChar attribute="Brackets3" context="_rule_bracket_level3" char="("/>
 				<DetectChar attribute="Brackets2" context="#pop" char=")" />
 				<IncludeRules context="_default_rule"/>
 			</context>
 			<context name="_rule_without_statement_level2" attribute="Normal Text" lineEndContext="#stay">
-				<IncludeRules context="_rule_level2"/>
 				<IncludeRules context="_default_rule_without_statement"/>
+				<IncludeRules context="_rule_level2"/>
 			</context>
 
 			<context name="_rule_bracket_level3" attribute="Normal Text" fallthrough="true" fallthroughContext="#pop!_rule_without_statement_level3" lineEndContext="#stay">
@@ -813,8 +527,8 @@
 				<IncludeRules context="_default_rule"/>
 			</context>
 			<context name="_rule_without_statement_level3" attribute="Normal Text" lineEndContext="#stay">
-				<IncludeRules context="_rule_level3"/>
 				<IncludeRules context="_default_rule_without_statement"/>
+				<IncludeRules context="_rule_level3"/>
 			</context>
 
 			<context name="_rule_bracket_level4" attribute="Normal Text" fallthrough="true" fallthroughContext="#pop!_rule_without_statement_level4" lineEndContext="#stay">
@@ -831,8 +545,8 @@
 				<IncludeRules context="_default_rule"/>
 			</context>
 			<context name="_rule_without_statement_level4" attribute="Normal Text" lineEndContext="#stay">
-				<IncludeRules context="_rule_level4"/>
 				<IncludeRules context="_default_rule_without_statement"/>
+				<IncludeRules context="_rule_level4"/>
 			</context>
 
 			<context name="_rule_bracket_level5" attribute="Normal Text" fallthrough="true" fallthroughContext="#pop!_rule_without_statement_level5" lineEndContext="#stay">
@@ -849,8 +563,8 @@
 				<IncludeRules context="_default_rule"/>
 			</context>
 			<context name="_rule_without_statement_level5" attribute="Normal Text" lineEndContext="#stay">
-				<IncludeRules context="_rule_level5"/>
 				<IncludeRules context="_default_rule_without_statement"/>
+				<IncludeRules context="_rule_level5"/>
 			</context>
 
 			<context name="_rule_bracket_level6" attribute="Normal Text" fallthrough="true" fallthroughContext="#pop!_rule_without_statement_level6" lineEndContext="#stay">
@@ -867,59 +581,54 @@
 				<IncludeRules context="_default_rule"/>
 			</context>
 			<context name="_rule_without_statement_level6" attribute="Normal Text" lineEndContext="#stay">
-				<IncludeRules context="_rule_level6"/>
 				<IncludeRules context="_default_rule_without_statement"/>
+				<IncludeRules context="_rule_level6"/>
 			</context>
 
-			<!-- Regex (FCGlob?) -->
-			<context name="_path_special_chars" attribute="Normal Text" lineEndContext="#stay">
-				<IncludeRules context="_special_chars"/>
-				<IncludeRules context="_escape"/>
-			</context>
-			<context name="_special_chars" attribute="Normal Text" lineEndContext="#stay">
-				<AnyChar context="#stay" attribute="Special Char" String="*?.+"/>
-			</context>
-			<context name="_escape" attribute="Normal Text" lineEndContext="#stay">
-				<HlCStringChar context="#stay" attribute="Escape Expression"/>
-				<RegExpr context="#stay" attribute="Escape Expression" String="\\[\ssSdDwWbBAZiIcC\|\.\-\^\?\*\+\(\)\[\]\{\},]"/>
-			</context>
-			<context name="_quantification_brackets" attribute="Normal Text" lineEndContext="#stay">
-				<!-- {n} {min,} {,max} {min,max} -->
-				<RegExpr context="#stay" attribute="Pattern Brackets" String="\{(\d+(,\d*)?|,\d+)\}"/>
-			</context>
-			<!-- Groups: [ ] and ( ) -->
-			<context name="_square_brackets" attribute="Pattern Brackets" lineEndContext="#pop">
-				<DetectChar context="#pop" attribute="Pattern Brackets" char="]"/>
-				<IncludeRules context="_escape"/>
-
+			<!-- File Contexts -->
+			<!-- user:role:type -->
+			<context name="_file_contexts" attribute="File Contexts" lineEndContext="#pop">
+				<DetectChar context="#pop!_fc_role" attribute="Normal Text" char=":"/>
 				<DetectSpaces context="#pop" attribute="Normal Text" lookAhead="true"/>
-				<DetectChar context="#pop" attribute="Normal Text" char="&quot;" lookAhead="true"/>
-				<DetectChar context="#stay" attribute="Error" char="["/>
-				<RegExpr context="#stay" attribute="Open Pattern Brackets" String="[^\s\]](?=([\s&quot;]|$))"/>
-				
-				<AnyChar context="#stay" attribute="Special Char 2" String="^-"/>
-				<IncludeRules context="_special_chars"/>
 			</context>
-			<context name="_round_brackets" attribute="Pattern Brackets" lineEndContext="#pop">
-				<DetectChar context="#pop" attribute="Pattern Brackets" char=")"/>
-				<IncludeRules context="_escape"/>
-
+			<context name="_fc_role" attribute="File Contexts" lineEndContext="#pop">
+				<DetectChar context="#pop!_fc_type" attribute="Normal Text" char=":"/>
 				<DetectSpaces context="#pop" attribute="Normal Text" lookAhead="true"/>
-				<DetectChar context="#pop" attribute="Normal Text" char="&quot;" lookAhead="true"/>
-				<DetectChar context="_square_brackets" attribute="Pattern Brackets" char="["/>
-				<DetectChar context="_round_brackets" attribute="Pattern Brackets" char="("/>
-				<IncludeRules context="_quantification_brackets"/>
-				<RegExpr context="#stay" attribute="Open Pattern Brackets" String="[^\s\[\]\(\)](?=([\s&quot;]|$))"/>
+			</context>
+			<context name="_fc_type" attribute="File Contexts (Type Enforcement)" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+				<RegExpr context="#pop!_fc_mls" attribute="File Contexts (Type Enforcement)" String="&fullIdentifier;(?=:&mlsLevel;)"/> <!-- Find Level/Range -->
+				<RegExpr context="#pop" attribute="File Contexts (Type Enforcement)" String="&fullIdentifier;"/>
+			</context>
+			<!-- (MLS/MCS) user:role:type:level -->
+			<context name="_fc_mls" attribute="File Contexts" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+				<DetectChar context="#pop!_fc_level_range_sen" attribute="Normal Text" char=":"/>
+			</context>
+			<context name="_fc_level_range_sen" attribute="File Contexts" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+				<RegExpr context="#pop!_fc_level_range_cat" attribute="Normal Text" String=":(?=&identifier;)"/> <!-- Find Category -->
+				<RegExpr context="#pop!_fc_level_sen" attribute="Normal Text" String="\s*\-\s*(?=&mlsLevel;)"/> <!-- Find Range -->
+				<RegExpr context="#stay" attribute="Normal Text" String="\.(?=&identifier;)"/>
+				<IncludeRules context="_default_fc_level"/>
+			</context>
+			<context name="_fc_level_range_cat" attribute="File Contexts" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+				<RegExpr context="#pop!_fc_level_sen" attribute="Normal Text" String="\s*\-\s*(?=&mlsLevel;)"/> <!-- Find Range -->
+				<RegExpr context="#stay" attribute="Normal Text" String="(\.|\s*,\s*)(?=&identifier;)"/>
+				<IncludeRules context="_default_fc_level"/>
+			</context>
+			<!-- (MLS/MCS) user:role:type:level-level -->
+			<context name="_fc_level_sen" attribute="File Contexts" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+				<RegExpr context="#pop!_fc_level_cat" attribute="Normal Text" String=":(?=&identifier;)"/> <!-- Find Category -->
+				<RegExpr context="#stay" attribute="Normal Text" String="\.(?=&identifier;)"/>
+				<IncludeRules context="_default_fc_level"/>
+			</context>
+			<context name="_fc_level_cat" attribute="File Contexts" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+				<RegExpr context="#stay" attribute="Normal Text" String="(\.|\s*,\s*)(?=&identifier;)"/>
+				<IncludeRules context="_default_fc_level"/>
+			</context>
+			<context name="_default_fc_level" attribute="File Contexts" lineEndContext="#pop">
+				<RegExpr context="#stay" attribute="File Contexts" String="\w+"/>
+				<DetectChar context="#stay" attribute="File Contexts" char="-"/>
+			</context>
 
-				<DetectChar context="#stay" attribute="Special Char 2" char="|"/>
-				<IncludeRules context="_special_chars"/>
-			</context>
-			<context name="_square_brackets_path" attribute="Pattern Brackets" lineEndContext="#pop">
-				<RegExpr context="#pop" attribute="Normal Text" String="[^&symbol;]" lookAhead="true"/>
-				<RegExpr context="#stay" attribute="Open Pattern Brackets" String="[^\s\]](?![&symbol;])"/>
-				<IncludeRules context="_square_brackets"/>
-			</context>
-			
 		</contexts>
 
 		<itemDatas>
@@ -933,20 +642,18 @@
 			<itemData name="Policy Config. Statements" defStyleNum="dsPreprocessor" bold="1" spellChecking="false"/>
 			<itemData name="Access Keys"               defStyleNum="dsWarning"      bold="1" spellChecking="false"/>
 			<itemData name="Expression Keys"           defStyleNum="dsVariable"     bold="1" spellChecking="false"/>
-			<itemData name="Type Name"                 defStyleNum="dsDataType"     bold="1" spellChecking="false"/>
+			<itemData name="Type Name Statements"      defStyleNum="dsDataType"     bold="1" spellChecking="false"/>
 			<itemData name="Booleans"                  defStyleNum="dsExtension"    bold="1" spellChecking="false"/>
 
-			<itemData name="Types"          defStyleNum="dsDataType"       spellChecking="false"/>
-			<itemData name="Special Keys"   defStyleNum="dsOthers"         spellChecking="false"/>
-			<itemData name="Permissions"    defStyleNum="dsVerbatimString" spellChecking="false"/>
-			<itemData name="File Contexts"  defStyleNum="dsSpecialString"  spellChecking="false"/>
-			<itemData name="Other Keywords" defStyleNum="dsNormal"         italic="1" spellChecking="false"/>
+			<itemData name="Types"                defStyleNum="dsDataType"      spellChecking="false"/>
+			<itemData name="Special Keys"         defStyleNum="dsOthers"        spellChecking="false"/>
+			<itemData name="File Contexts"        defStyleNum="dsSpecialString" spellChecking="false"/>
+			<itemData name="File Contexts (Type Enforcement)" defStyleNum="dsInformation" spellChecking="false"/>
+			<itemData name="Other Keywords"       defStyleNum="dsNormal"        italic="1" spellChecking="false"/>
 
-			<itemData name="IP Address" defStyleNum="dsFloat"  spellChecking="false"/>
-			<itemData name="Number"     defStyleNum="dsDecVal" spellChecking="false"/>
-			<itemData name="Octal"      defStyleNum="dsBaseN"  spellChecking="false"/>
-			<itemData name="Hex"        defStyleNum="dsBaseN"  spellChecking="false"/>
-	
+			<itemData name="Number"      defStyleNum="dsDecVal" spellChecking="false"/>
+			<itemData name="Hexadecimal" defStyleNum="dsBaseN"  spellChecking="false"/>
+
 			<itemData name="Brackets1" defStyleNum="dsNormal" color="#ff0000" bold="1" />
 			<itemData name="Brackets2" defStyleNum="dsNormal" color="#ff8800" bold="1" />
 			<itemData name="Brackets3" defStyleNum="dsNormal" color="#888800" bold="1" />
@@ -954,21 +661,23 @@
 			<itemData name="Brackets5" defStyleNum="dsNormal" color="#000088" bold="1" />
 			<itemData name="Brackets6" defStyleNum="dsNormal" color="#880088" bold="1" />
 
-			<itemData name="Special Char"          defStyleNum="dsSpecialChar"   spellChecking="false"/>
-			<itemData name="Special Char 2"        defStyleNum="dsAnnotation"    spellChecking="false"/>
-			<itemData name="Pattern Brackets"      defStyleNum="dsSpecialString" spellChecking="false"/>
-			<itemData name="Open Pattern Brackets" defStyleNum="dsSpecialString" underline="1" spellChecking="false"/>
-			<itemData name="Escape Expression"     defStyleNum="dsSpecialChar"   spellChecking="false"/>
+			<itemData name="Special Char"                     defStyleNum="dsSpecialChar"   spellChecking="false"/>
+			<itemData name="Special Char of Brackets (Paths)" defStyleNum="dsAnnotation"    spellChecking="false"/>
+			<itemData name="RegExp Brackets (Paths)"          defStyleNum="dsSpecialString" spellChecking="false"/>
+			<itemData name="Open RegExp Brackets (Paths)"     defStyleNum="dsSpecialString" underline="1" spellChecking="false"/>
+			<itemData name="Text Quoted Open"                 defStyleNum="dsString"        underline="1" spellChecking="false"/>
+
 			<itemData name="Error" defStyleNum="dsError" spellChecking="false"/>
 		</itemDatas>
 
 	</highlighting>
 
 	<general>
-		<keywords casesensitive="true" additionalDeliminator="'&quot;&#096;&#039;" />
+		<keywords casesensitive="true" additionalDeliminator="&quot;&apos;&#096;" weakDeliminator="-"/>
 		<comments>
 			<comment name="singleLine" start=";"/>
 		</comments>
 	</general>
 
 </language>
+<!-- kate: replace-tabs off; tab-width 3; indent-width 3; remove-trailing-spaces mod; dynamic-word-wrap off; -->

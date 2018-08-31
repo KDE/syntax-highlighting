@@ -2,7 +2,7 @@
 
 # Syntax of 'file_contexts' file and other SELinux configuration files:
 
-/usr/lib/.*/program/foo\.so  --  user:role:type:s0:c0
+/usr/lib/.*/program/foo\.so  --  user:role:type:s0:c0-dsds.sd:sdsd
 /.*                system_u:object_r:default_t:s0
 /sys(/.*)?         system_u:object_r:sysfs_t:s0
 /xen(/.*)?         system_u:object_r:xen_image_t:s1
@@ -42,7 +42,7 @@ HOME_DIR/\.mtpz-data     --  gen_context<beginfold id='1'>(</beginfold id='1'>sy
 /var/log/mariadb(/.*)?       gen_context<beginfold id='1'>(</beginfold id='1'>system_u:object_r:mysqld_log_t,s0<endfold id='1'>)</endfold id='1'>
 /dev/dasd[^/]*           -b  gen_context<beginfold id='1'>(</beginfold id='1'>system_u:object_r:fixed_disk_device_t,mls_systemhigh<endfold id='1'>)</endfold id='1'>
 /dev/dasd[^/]*           -c  gen_context<beginfold id='1'>(</beginfold id='1'>system_u:object_r:fixed_disk_device_t,mls_systemhigh<endfold id='1'>)</endfold id='1'>
-HOME_ROOT                -d  gen_context<beginfold id='1'>(</beginfold id='1'>system_u:object_r:home_root_t,s0-mls_systemhigh,c1<endfold id='1'>)</endfold id='1'>
+HOME_ROOT                -d  gen_context<beginfold id='1'>(</beginfold id='1'>system_u:object_r:home_root_t,s0-mls_systemhigh,s1<endfold id='1'>)</endfold id='1'>
 HOME_ROOT                -l  gen_context<beginfold id='1'>(</beginfold id='1'>system_u:object_r:home_root_t,s0<endfold id='1'>)</endfold id='1'>
 
 ifdef<beginfold id='1'>(</beginfold id='1'>`distro_debian',`
@@ -55,6 +55,14 @@ ifdef<beginfold id='1'>(</beginfold id='1'>`distro_suse',`
 ifdef<beginfold id='1'>(</beginfold id='1'>`init_systemd',`
 	/run/tmpfiles\.d/kmod\.conf  --  gen_context<beginfold id='1'>(</beginfold id='1'>system_u:object_r:kmod_tmpfiles_conf_t,s0<endfold id='1'>)</endfold id='1'>
 '<endfold id='1'>)</endfold id='1'>
+
+# Android contexts
+
+android.hardware.light::ILight  u:object_r:hal_light_hwservice:s0
+android.hardware.nfc::INfc      u:object_r:hal_nfc_hwservice:s0
+*                               u:object_r:default_android_hwservice:s0
+ro.boot.bootloader              u:object_r:exported2_default_prop:s0 exact string
+sys.usb.mtp.device_type         u:object_r:exported2_system_prop:s0 exact int
 
 # Tests
 
@@ -80,6 +88,10 @@ user:role:type
 user:role:type:level_sensitivity
 user:role:type:level_sensitivity:level_category
 user:role:type:level_sensitivity:level_category:other:other
+user:role:type:level_sensitivity:level_category-sens:cat:other
+user:role:type:s0.s1.s3:c0.c1,c2,c3 - s5.s6:c4,c5:other
+user : role : type : s0 . s1 . s3 : c0 . c1 , c2 , c3 - s5 . s6 : c4 , c5 : other
+user:role:type:s0,other
 
 <beginfold id='1'>(</beginfold id='1'>user:role:type,<endfold id='1'>)</endfold id='1'>
 <beginfold id='1'>(</beginfold id='1'>user:role:type,level_s,<endfold id='1'>)</endfold id='1'>

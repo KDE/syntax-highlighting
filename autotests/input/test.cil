@@ -48,7 +48,7 @@
 (classcommon file any dir)
 (file any dir)
 ; portcon
-(portcon tcp 3333 (unconfined.user object_r unconfined.object levelrange_1))
+(portcon sctp 3333 (unconfined.user object_r unconfined.object levelrange_1))
 (portcon udp 4444 (unconfined.user object_r unconfined.object ((s0) level_2)))
 (defaultrole tcp udp)
 (tcp udp)
@@ -58,7 +58,7 @@
 (fsuse trans tmpfs file.tmpfs_context)
 (typemember xattr task trans)
 (xattr task trans)
-	
+
 (allow unconfined.process self (file (read write)))
 (allow process httpd.object (file (read write)))
 
@@ -142,3 +142,12 @@
     (genfscon rootfs / rootfs_context)
     (genfscon selinuxfs / selinuxfs_context)
 )
+
+; ioctl & call
+(allowx x bin_t (ioctl policy.file (range 0x1000 0x11FF))) ; ioctl kind
+(ioctl read
+    find connectto) ; kind or permission?
+(ioctl read find connectto) ; ioctl permission
+(ioctl read  )
+(call ioctl read find connectto) ; statement or permission?
+( call  ) ; call permission

@@ -28,6 +28,7 @@
 #include "contextswitch_p.h"
 #include "definition.h"
 #include "definitionref_p.h"
+#include "format.h"
 
 #include <QString>
 #include <QVector>
@@ -46,7 +47,12 @@ public:
     void setDefinition(const DefinitionRef &def);
 
     QString name() const;
-    QString attribute() const;
+
+    const Format &attributeFormat() const
+    {
+        return m_attributeFormat;
+    }
+
     ContextSwitch lineEndContext() const;
     ContextSwitch lineEmptyContext() const;
 
@@ -70,6 +76,7 @@ public:
     void load(QXmlStreamReader &reader);
     void resolveContexts();
     void resolveIncludes();
+    void resolveAttributeFormat();
 
 private:
     Q_DISABLE_COPY(Context)
@@ -85,6 +92,7 @@ private:
     DefinitionRef m_def;
     QString m_name;
     QString m_attribute;
+    Format m_attributeFormat;
     ContextSwitch m_lineEndContext;
     ContextSwitch m_lineEmptyContext;
     ContextSwitch m_fallthroughContext;

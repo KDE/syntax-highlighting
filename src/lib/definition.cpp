@@ -385,6 +385,7 @@ bool DefinitionData::load()
     foreach (auto context, contexts) {
         context->resolveContexts();
         context->resolveIncludes();
+        context->resolveAttributeFormat();
     }
 
     Q_ASSERT(std::is_sorted(wordDelimiters.constBegin(), wordDelimiters.constEnd()));

@@ -49,11 +49,6 @@ QString Context::name() const
     return m_name;
 }
 
-QString Context::attribute() const
-{
-    return m_attribute;
-}
-
 ContextSwitch Context::lineEndContext() const
 {
     return m_lineEndContext;
@@ -214,7 +209,7 @@ void Context::resolveIncludes()
         }
         context->resolveIncludes();
         if (inc->includeAttribute()) {
-            m_attribute = context->attribute();
+            m_attribute = context->m_attribute;
         }
         it = m_rules.erase(it);
         foreach (const auto &rule, context->rules()) {
@@ -224,4 +219,15 @@ void Context::resolveIncludes()
     }
 
     m_resolveState = Resolved;
+}
+
+void Context::resolveAttributeFormat()
+{
+    if (!m_attribute.isEmpty()) {
+        m_attributeFormat = formatByName(m_attribute);
+    }
+
+    foreach (const auto &rule, m_rules) {
+        rule->resolveAttributeFormat(this);
+    }
 }

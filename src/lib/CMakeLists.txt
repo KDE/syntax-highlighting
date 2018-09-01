@@ -9,7 +9,6 @@ set(syntax_highlighting_srcs
     format.cpp
     htmlhighlighter.cpp
     keywordlist.cpp
-    matchresult.cpp
     rule.cpp
     definition.cpp
     repository.cpp

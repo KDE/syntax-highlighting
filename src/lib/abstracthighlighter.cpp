@@ -142,7 +142,7 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
         while (!stateData->topContext()->lineEmptyContext().isStay())
             d->switchContext(stateData, stateData->topContext()->lineEmptyContext(), QStringList());
         auto context = stateData->topContext();
-        applyFormat(0, 0, context->formatByName(context->attribute()));
+        applyFormat(0, 0, context->attributeFormat());
         return newState;
     }
 
@@ -152,16 +152,14 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
         firstNonSpace = text.size();
     }
     int offset = 0, beginOffset = 0;
-    auto currentLookupContext = stateData->topContext();
-    auto currentFormat = currentLookupContext->attribute();
+    auto currentFormat = stateData->topContext()->attributeFormat();
     bool lineContinuation = false;
     QHash<Rule*, int> skipOffsets;
 
     do {
         bool isLookAhead = false;
         int newOffset = 0;
-        QString newFormat;
-        auto newLookupContext = currentLookupContext;
+        Format newFormat;
         foreach (const auto &rule, stateData->topContext()->rules()) {
             /**
              * shall we skip application of this rule? two cases:
@@ -207,9 +205,8 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
                 break;
             }
 
-            newLookupContext = stateData->topContext();
             d->switchContext(stateData, rule->context(), newResult.captures());
-            newFormat = rule->attribute().isEmpty() ? stateData->topContext()->attribute() : rule->attribute();
+            newFormat = rule->attributeFormat().isValid() ? rule->attributeFormat() : stateData->topContext()->attributeFormat();
             if (newOffset == text.size() && std::dynamic_pointer_cast<LineContinue>(rule))
                 lineContinuation = true;
             break;
@@ -224,24 +221,26 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
             }
 
             newOffset = offset + 1;
-            newLookupContext = stateData->topContext();
-            newFormat = newLookupContext->attribute();
+            newFormat = stateData->topContext()->attributeFormat();
         }
 
-        if (newFormat != currentFormat /*|| currentLookupDef != newLookupDef*/) {
+        /**
+         * on format change, apply the last one and switch to new one
+         */
+        if (newFormat.id() != currentFormat.id()) {
             if (offset > 0)
-                applyFormat(beginOffset, offset - beginOffset, currentLookupContext->formatByName(currentFormat));
+                applyFormat(beginOffset, offset - beginOffset, currentFormat);
             beginOffset = offset;
             currentFormat = newFormat;
-            currentLookupContext = newLookupContext;
         }
+
         Q_ASSERT(newOffset > offset);
         offset = newOffset;
 
     } while (offset < text.size());
 
     if (beginOffset < offset)
-        applyFormat(beginOffset, text.size() - beginOffset, currentLookupContext->formatByName(currentFormat));
+        applyFormat(beginOffset, text.size() - beginOffset, currentFormat);
 
     while (!stateData->topContext()->lineEndContext().isStay() && !lineContinuation) {
         if (!d->switchContext(stateData, stateData->topContext()->lineEndContext(), QStringList()))

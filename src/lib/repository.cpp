@@ -115,9 +115,10 @@ Definition Repository::definitionForMimeType(const QString& mimeType) const
     for (auto it = d->m_defs.constBegin(); it != d->m_defs.constEnd(); ++it) {
         auto def = it.value();
         foreach (const auto &matchType, def.mimeTypes()) {
-            if (mimeType == matchType)
+            if (mimeType == matchType) {
                 candidates.push_back(def);
                 break;
+            }
         }
     }
 

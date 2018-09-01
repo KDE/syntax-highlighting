@@ -22,6 +22,7 @@
     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+#include "context_p.h"
 #include "rule_p.h"
 #include "definition_p.h"
 #include "ksyntaxhighlighting_logging.h"
@@ -103,11 +104,6 @@ void Rule::setDefinition(const Definition &def)
 
     // cache for DefinitionData::wordDelimiters, is accessed VERY often
     m_wordDelimiter = &DefinitionData::get(m_def.definition())->wordDelimiters;
-}
-
-QString Rule::attribute() const
-{
-    return m_attribute;
 }
 
 ContextSwitch Rule::context() const
@@ -205,6 +201,17 @@ void Rule::resolveContext()
     m_context.resolve(m_def.definition());
     foreach (const auto &rule, m_subRules)
         rule->resolveContext();
+}
+
+void Rule::resolveAttributeFormat(Context *lookupContext)
+{
+    if (!m_attribute.isEmpty()) {
+        m_attributeFormat = lookupContext->formatByName(m_attribute);
+    }
+
+    foreach (const auto &rule, m_subRules) {
+        rule->resolveAttributeFormat(lookupContext);
+    }
 }
 
 bool Rule::doLoad(QXmlStreamReader& reader)

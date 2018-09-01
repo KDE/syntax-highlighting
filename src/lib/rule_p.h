@@ -28,6 +28,7 @@
 #include "definition.h"
 #include "definitionref_p.h"
 #include "foldingregion.h"
+#include "format.h"
 #include "keywordlist_p.h"
 #include "matchresult_p.h"
 
@@ -52,7 +53,11 @@ public:
     Definition definition() const;
     void setDefinition(const Definition &def);
 
-    QString attribute() const;
+    const Format &attributeFormat() const
+    {
+        return m_attributeFormat;
+    }
+
     ContextSwitch context() const;
     bool isLookAhead() const;
     bool isDynamic() const;
@@ -64,6 +69,7 @@ public:
 
     bool load(QXmlStreamReader &reader);
     void resolveContext();
+    void resolveAttributeFormat(Context *lookupContext);
 
     MatchResult match(const QString &text, int offset, const QStringList &captures);
 
@@ -80,6 +86,7 @@ private:
 
     DefinitionRef m_def;
     QString m_attribute;
+    Format m_attributeFormat;
     ContextSwitch m_context;
     QVector<Rule::Ptr> m_subRules;
     int m_column = -1;

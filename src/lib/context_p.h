@@ -85,9 +85,22 @@ private:
 
     DefinitionRef m_def;
     QString m_name;
+
+    /**
+     * attribute name, to lookup our format
+     */
     QString m_attribute;
-    Context *m_attributeContext = nullptr;
+
+    /**
+     * context to use for lookup, if != this context
+     */
+    const Context *m_attributeContext = nullptr;
+
+    /**
+     * resolved format for our attribute, done in resolveAttributeFormat
+     */
     Format m_attributeFormat;
+
     ContextSwitch m_lineEndContext;
     ContextSwitch m_lineEmptyContext;
     ContextSwitch m_fallthroughContext;

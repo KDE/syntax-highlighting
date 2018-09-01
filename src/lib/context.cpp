@@ -189,10 +189,16 @@ void Context::resolveIncludes()
             continue;
         }
         context->resolveIncludes();
+
+        /**
+         * handle included attribute
+         * transitive closure: we might include attributes included from somewhere else
+         */
         if (inc->includeAttribute()) {
             m_attribute = context->m_attribute;
-            m_attributeContext = context;
+            m_attributeContext = context->m_attributeContext ? context->m_attributeContext : context;
         }
+
         it = m_rules.erase(it);
         foreach (const auto &rule, context->rules()) {
             it = m_rules.insert(it, rule);
@@ -214,7 +220,7 @@ void Context::resolveAttributeFormat()
         m_attributeFormat = DefinitionData::get(def)->formatByName(m_attribute);
         if (!m_attributeFormat.isValid()) {
             if (m_attributeContext) {
-                qCWarning(Log) << "Context: Unknown format" << m_attribute << "in context" << m_name << "of definition" << m_def.definition().name() << "from included definition" << def.name();
+                qCWarning(Log) << "Context: Unknown format" << m_attribute << "in context" << m_name << "of definition" << m_def.definition().name() << "from included context" << m_attributeContext->m_name << "of definition" << def.name();
             } else {
                 qCWarning(Log) << "Context: Unknown format" << m_attribute << "in context" << m_name << "of definition" << m_def.definition().name();
             }

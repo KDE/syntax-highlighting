@@ -5,6 +5,9 @@
     ###
     '''
 
+// alert check, no word delimiter check at start of word, bug 397719
+#TODO
+
 a = 100_000
 b = 856_264.65
 c = 0x420_F52

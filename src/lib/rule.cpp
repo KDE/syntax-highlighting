@@ -550,9 +550,6 @@ bool KeywordListRule::doLoad(QXmlStreamReader& reader)
 
 MatchResult KeywordListRule::doMatch(const QString& text, int offset, const QStringList&)
 {
-    if (offset > 0 && !isWordDelimiter(text.at(offset - 1)))
-        return offset;
-
     if (m_keywordList.isEmpty()) {
         const auto def = definition();
         Q_ASSERT(def.isValid());

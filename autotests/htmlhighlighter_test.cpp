@@ -28,7 +28,7 @@
 #include <theme.h>
 #include <htmlhighlighter.h>
 
-#include <QDirIterator>
+#include <QDir>
 #include <QObject>
 #include <QProcess>
 #include <QStandardPaths>
@@ -66,9 +66,9 @@ private Q_SLOTS:
         QTest::addColumn<QString>("refFile");
         QTest::addColumn<QString>("syntax");
 
-        QDirIterator it(QStringLiteral(TESTSRCDIR "/input"), QDir::Files | QDir::NoSymLinks | QDir::Readable);
-        while (it.hasNext()) {
-            const auto inFile = it.next();
+        const QDir dir(QStringLiteral(TESTSRCDIR "/input"));
+        foreach (const auto &fileName, dir.entryList(QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Name)) {
+            const auto inFile = dir.absoluteFilePath(fileName);
             if (inFile.endsWith(QLatin1String(".syntax")))
                 continue;
 
@@ -78,9 +78,9 @@ private Q_SLOTS:
                 syntax = QString::fromUtf8(syntaxOverride.readAll()).trimmed();
 
 
-            QTest::newRow(it.fileName().toUtf8().constData()) << inFile
-                << (QStringLiteral(TESTBUILDDIR "/html.output/") + it.fileName() + QStringLiteral(".html"))
-                << (QStringLiteral(TESTSRCDIR "/html/") + it.fileName() + QStringLiteral(".html"))
+            QTest::newRow(fileName.toUtf8().constData()) << inFile
+                << (QStringLiteral(TESTBUILDDIR "/html.output/") + fileName + QStringLiteral(".html"))
+                << (QStringLiteral(TESTSRCDIR "/html/") + fileName + QStringLiteral(".html"))
                 << syntax;
         }
 

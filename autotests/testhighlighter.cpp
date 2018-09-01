@@ -30,7 +30,7 @@
 #include <state.h>
 #include <theme.h>
 
-#include <QDirIterator>
+#include <QDir>
 #include <QFile>
 #include <QObject>
 #include <QTextStream>
@@ -132,9 +132,9 @@ private Q_SLOTS:
         QTest::addColumn<QString>("refFile");
         QTest::addColumn<QString>("syntax");
 
-        QDirIterator it(QStringLiteral(TESTSRCDIR "/input"), QDir::Files | QDir::NoSymLinks | QDir::Readable);
-        while (it.hasNext()) {
-            const auto inFile = it.next();
+        const QDir dir(QStringLiteral(TESTSRCDIR "/input"));
+        foreach (const auto &fileName, dir.entryList(QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Name)) {
+            const auto inFile = dir.absoluteFilePath(fileName);
             if (inFile.endsWith(QLatin1String(".syntax")))
                 continue;
 
@@ -143,9 +143,9 @@ private Q_SLOTS:
             if (syntaxOverride.exists() && syntaxOverride.open(QFile::ReadOnly))
                 syntax = QString::fromUtf8(syntaxOverride.readAll()).trimmed();
 
-            QTest::newRow(it.fileName().toUtf8().constData()) << inFile
-                << (QStringLiteral(TESTBUILDDIR "/output/") + it.fileName() + QStringLiteral(".ref"))
-                << (QStringLiteral(TESTSRCDIR "/reference/") + it.fileName() + QStringLiteral(".ref"))
+            QTest::newRow(fileName.toUtf8().constData()) << inFile
+                << (QStringLiteral(TESTBUILDDIR "/output/") + fileName + QStringLiteral(".ref"))
+                << (QStringLiteral(TESTSRCDIR "/reference/") + fileName + QStringLiteral(".ref"))
                 << syntax;
         }
 

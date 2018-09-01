@@ -205,10 +205,19 @@ void Rule::resolveContext()
 
 void Rule::resolveAttributeFormat(Context *lookupContext)
 {
+    /**
+     * try to get our format from the definition we stem from
+     */
     if (!m_attribute.isEmpty()) {
-        m_attributeFormat = lookupContext->formatByName(m_attribute);
+        m_attributeFormat = DefinitionData::get(definition())->formatByName(m_attribute);
+        if (!m_attributeFormat.isValid()) {
+            qCWarning(Log) << "Rule: Unknown format" << m_attribute << "in context" << lookupContext->name() << "of definition" << definition().name();
+        }
     }
 
+    /**
+     * lookup formats for our sub-rules
+     */
     foreach (const auto &rule, m_subRules) {
         rule->resolveAttributeFormat(lookupContext);
     }

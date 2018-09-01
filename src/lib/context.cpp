@@ -82,25 +82,6 @@ QVector<Rule::Ptr> Context::rules() const
     return m_rules;
 }
 
-Format Context::formatByName(const QString &name) const
-{
-    auto defData = DefinitionData::get(m_def.definition());
-    auto format = defData->formatByName(name);
-    if (format.isValid())
-        return format;
-
-    // TODO we can avoid multiple lookups in the same definition here, many rules will share definitions
-    foreach (const auto &rule, m_rules) {
-        auto defData = DefinitionData::get(rule->definition());
-        format = defData->formatByName(name);
-        if (format.isValid())
-            return format;
-    }
-
-    qCWarning(Log) << "Unknown format" << name << "in context" << m_name << "of definition" << m_def.definition().name();
-    return format;
-}
-
 void Context::load(QXmlStreamReader& reader)
 {
     Q_ASSERT(reader.name() == QLatin1String("context"));
@@ -210,6 +191,7 @@ void Context::resolveIncludes()
         context->resolveIncludes();
         if (inc->includeAttribute()) {
             m_attribute = context->m_attribute;
+            m_attributeContext = context;
         }
         it = m_rules.erase(it);
         foreach (const auto &rule, context->rules()) {
@@ -223,10 +205,25 @@ void Context::resolveIncludes()
 
 void Context::resolveAttributeFormat()
 {
+    /**
+     * try to get our format from the definition we stem from
+     * we need to handle included attributes via m_attributeContext
+     */
     if (!m_attribute.isEmpty()) {
-        m_attributeFormat = formatByName(m_attribute);
+        const auto def = m_attributeContext ? m_attributeContext->m_def.definition() : m_def.definition();
+        m_attributeFormat = DefinitionData::get(def)->formatByName(m_attribute);
+        if (!m_attributeFormat.isValid()) {
+            if (m_attributeContext) {
+                qCWarning(Log) << "Context: Unknown format" << m_attribute << "in context" << m_name << "of definition" << m_def.definition().name() << "from included definition" << def.name();
+            } else {
+                qCWarning(Log) << "Context: Unknown format" << m_attribute << "in context" << m_name << "of definition" << m_def.definition().name();
+            }
+        }
     }
 
+    /**
+     * lookup formats for our rules
+     */
     foreach (const auto &rule, m_rules) {
         rule->resolveAttributeFormat(this);
     }

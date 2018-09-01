@@ -67,12 +67,6 @@ public:
 
     QVector<Rule::Ptr> rules() const;
 
-    /** Attempts to find the format named @p name in the
-     *  enclosing definition, or the source definition of any
-     *  included rule.
-     */
-    Format formatByName(const QString &name) const;
-
     void load(QXmlStreamReader &reader);
     void resolveContexts();
     void resolveIncludes();
@@ -92,6 +86,7 @@ private:
     DefinitionRef m_def;
     QString m_name;
     QString m_attribute;
+    Context *m_attributeContext = nullptr;
     Format m_attributeFormat;
     ContextSwitch m_lineEndContext;
     ContextSwitch m_lineEmptyContext;

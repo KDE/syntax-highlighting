@@ -58,12 +58,14 @@ public:
 
     /**
      * highlight the in-memory stored file
+     * @return number of highlighted lines
      */
-    void highlightFile()
+    int highlightFile()
     {
         State state;
         for (const auto &line : qAsConst(m_fileContents))
             state = highlightLine(line, state);
+        return m_fileContents.size();
     }
 
 protected:
@@ -75,22 +77,19 @@ class HighlighterBenchmark : public QObject
 {
     Q_OBJECT
 public:
-    explicit HighlighterBenchmark(QObject *parent = nullptr) : QObject(parent), m_repo(nullptr) {}
+    explicit HighlighterBenchmark(QObject *parent = nullptr) : QObject(parent) {}
 
 private:
-    Repository *m_repo = nullptr;
+    Repository m_repo;
 
 private Q_SLOTS:
     void initTestCase()
     {
-        m_repo = new Repository;
-        initRepositorySearchPaths(*m_repo);
+        initRepositorySearchPaths(m_repo);
     }
 
     void cleanupTestCase()
     {
-        delete m_repo;
-        m_repo = nullptr;
     }
 
     void benchmarkHighlight_data()
@@ -117,24 +116,27 @@ private Q_SLOTS:
     {
         QFETCH(QString, inFile);
         QFETCH(QString, syntax);
-        QVERIFY(m_repo);
 
         NullHighlighter highlighter(inFile);
-        auto def = m_repo->definitionForFileName(inFile);
+        auto def = m_repo.definitionForFileName(inFile);
         if (!syntax.isEmpty())
-            def = m_repo->definitionForName(syntax);
+            def = m_repo.definitionForName(syntax);
         QVERIFY(def.isValid());
         highlighter.setDefinition(def);
 
         // trigger loading of definition per benchmarking loop
         QVERIFY(!def.formats().isEmpty());
 
-        // benchmark the highlighting, fixed iteration count to have reproducible results
-        for(int i = 0; i < 100; ++i) {
-            highlighter.highlightFile();
+        // benchmark the highlighting
+        // try to highlight ~ 20000 lines per file
+        // bail out, if file is empty, else we are stuck
+        for(int i = 0; i <= 20000;) {
+            int lines = highlighter.highlightFile();
+            if (lines <= 0)
+                break;
+            i += lines;
         }
     }
-
 };
 
 QTEST_GUILESS_MAIN(HighlighterBenchmark)

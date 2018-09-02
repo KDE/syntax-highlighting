@@ -44,42 +44,12 @@ void Context::setDefinition(const DefinitionRef &def)
     m_def = def;
 }
 
-QString Context::name() const
-{
-    return m_name;
-}
-
-ContextSwitch Context::lineEndContext() const
-{
-    return m_lineEndContext;
-}
-
-ContextSwitch Context::lineEmptyContext() const
-{
-    return m_lineEmptyContext;
-}
-
-bool Context::fallthrough() const
-{
-    return m_fallthrough;
-}
-
-ContextSwitch Context::fallthroughContext() const
-{
-    return m_fallthroughContext;
-}
-
 bool Context::indentationBasedFoldingEnabled() const
 {
     if (m_noIndentationBasedFolding)
         return false;
 
     return m_def.definition().indentationBasedFoldingEnabled();
-}
-
-QVector<Rule::Ptr> Context::rules() const
-{
-    return m_rules;
 }
 
 void Context::load(QXmlStreamReader& reader)
@@ -128,14 +98,14 @@ void Context::resolveContexts()
     m_lineEndContext.resolve(def);
     m_lineEmptyContext.resolve(def);
     m_fallthroughContext.resolve(def);
-    foreach (const auto &rule, m_rules)
+    for (const auto &rule : m_rules)
         rule->resolveContext();
 }
 
 Context::ResolveState Context::resolveState()
 {
     if (m_resolveState == Unknown) {
-        foreach (const auto &rule, m_rules) {
+        for (const auto &rule : m_rules) {
             auto inc = std::dynamic_pointer_cast<IncludeRules>(rule);
             if (inc) {
                 m_resolveState = Unresolved;
@@ -200,7 +170,7 @@ void Context::resolveIncludes()
         }
 
         it = m_rules.erase(it);
-        foreach (const auto &rule, context->rules()) {
+        for (const auto &rule : context->rules()) {
             it = m_rules.insert(it, rule);
             ++it;
         }
@@ -230,7 +200,7 @@ void Context::resolveAttributeFormat()
     /**
      * lookup formats for our rules
      */
-    foreach (const auto &rule, m_rules) {
+    for (const auto &rule : m_rules) {
         rule->resolveAttributeFormat(this);
     }
 }

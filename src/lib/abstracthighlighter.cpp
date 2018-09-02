@@ -174,7 +174,7 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
         /**
          * try to match all rules in the context in order of declaration in XML
          */
-        foreach (const auto &rule, stateData->topContext()->rules()) {
+        for (const auto &rule : stateData->topContext()->rules()) {
             /**
              * filter out rules that require a specific column
              */

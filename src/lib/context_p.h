@@ -31,7 +31,8 @@
 #include "format.h"
 
 #include <QString>
-#include <QVector>
+
+#include <vector>
 
 class QXmlStreamReader;
 
@@ -46,26 +47,46 @@ public:
     Definition definition() const;
     void setDefinition(const DefinitionRef &def);
 
-    QString name() const;
+    const QString &name() const
+    {
+        return m_name;
+    }
+
+    const ContextSwitch &lineEndContext() const
+    {
+        return m_lineEndContext;
+    }
+
+    const ContextSwitch &lineEmptyContext() const
+    {
+        return m_lineEmptyContext;
+    }
+
+    bool fallthrough() const
+    {
+        return m_fallthrough;
+    }
+
+    const ContextSwitch &fallthroughContext() const
+    {
+        return m_fallthroughContext;
+    }
 
     const Format &attributeFormat() const
     {
         return m_attributeFormat;
     }
 
-    ContextSwitch lineEndContext() const;
-    ContextSwitch lineEmptyContext() const;
-
-    bool fallthrough() const;
-    ContextSwitch fallthroughContext() const;
+    const std::vector<Rule::Ptr> &rules() const
+    {
+        return m_rules;
+    }
 
     /**
      * Returns @c true, when indentationBasedFolding is enabled for the
      * associated Definition and when "noIndentationBasedFolding" is NOT set.
      */
     bool indentationBasedFoldingEnabled() const;
-
-    QVector<Rule::Ptr> rules() const;
 
     void load(QXmlStreamReader &reader);
     void resolveContexts();
@@ -105,7 +126,7 @@ private:
     ContextSwitch m_lineEmptyContext;
     ContextSwitch m_fallthroughContext;
 
-    QVector<Rule::Ptr> m_rules;
+    std::vector<Rule::Ptr> m_rules;
 
     ResolveState m_resolveState = Unknown;
     bool m_fallthrough = false;

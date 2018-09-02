@@ -38,7 +38,11 @@ using namespace KSyntaxHighlighting;
 class NullHighlighter : public AbstractHighlighter
 {
 public:
-    void highlightFile(const QString &inFileName)
+    /**
+     * Read in the given file and cache it for the highlighting benchmarking
+     * @param inFileName file to read
+     */
+    NullHighlighter(const QString &inFileName)
     {
         QFile f(inFileName);
         if (!f.open(QFile::ReadOnly)) {
@@ -48,13 +52,23 @@ public:
 
         QTextStream in(&f);
         in.setCodec("UTF-8");
-        State state;
         while (!in.atEnd())
-            state = highlightLine(in.readLine(), state);
+            m_fileContents.append(in.readLine());
+    }
+
+    /**
+     * highlight the in-memory stored file
+     */
+    void highlightFile()
+    {
+        State state;
+        for (const auto &line : qAsConst(m_fileContents))
+            state = highlightLine(line, state);
     }
 
 protected:
     void applyFormat(int, int, const Format&) Q_DECL_OVERRIDE {}
+    QStringList m_fileContents;
 };
 
 class HighlighterBenchmark : public QObject
@@ -105,7 +119,7 @@ private Q_SLOTS:
         QFETCH(QString, syntax);
         QVERIFY(m_repo);
 
-        NullHighlighter highlighter;
+        NullHighlighter highlighter(inFile);
         auto def = m_repo->definitionForFileName(inFile);
         if (!syntax.isEmpty())
             def = m_repo->definitionForName(syntax);
@@ -115,9 +129,9 @@ private Q_SLOTS:
         // trigger loading of definition per benchmarking loop
         QVERIFY(!def.formats().isEmpty());
 
-        // benchmark the highlighting
-        QBENCHMARK {
-            highlighter.highlightFile(inFile);
+        // benchmark the highlighting, fixed iteration count to have reproducible results
+        for(int i = 0; i < 100; ++i) {
+            highlighter.highlightFile();
         }
     }
 

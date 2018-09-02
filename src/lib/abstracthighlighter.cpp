@@ -147,9 +147,15 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
     }
 
     int offset = 0, beginOffset = 0;
-    auto currentFormat = stateData->topContext()->attributeFormat();
     bool lineContinuation = false;
     QHash<Rule*, int> skipOffsets;
+
+    /**
+     * current active format
+     * stored as pointer to avoid deconstruction/constructions inside the internal loop
+     * the pointers are stable, the formats are either in the contexts or rules
+     */
+    auto currentFormat = &stateData->topContext()->attributeFormat();
 
     /**
      * cached first non-space character, needs to be computed if < 0
@@ -159,7 +165,15 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
     do {
         bool isLookAhead = false;
         int newOffset = 0;
-        Format newFormat;
+
+        /**
+         * next format to use
+         */
+        const Format *newFormat = nullptr;
+
+        /**
+         * try to match all rules in the context in order of declaration in XML
+         */
         foreach (const auto &rule, stateData->topContext()->rules()) {
             /**
              * filter out rules that require a specific column
@@ -224,7 +238,7 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
             }
 
             d->switchContext(stateData, rule->context(), newResult.captures());
-            newFormat = rule->attributeFormat().isValid() ? rule->attributeFormat() : stateData->topContext()->attributeFormat();
+            newFormat = rule->attributeFormat().isValid() ? &rule->attributeFormat() : &stateData->topContext()->attributeFormat();
             if (newOffset == text.size() && std::dynamic_pointer_cast<LineContinue>(rule))
                 lineContinuation = true;
             break;
@@ -239,26 +253,34 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
             }
 
             newOffset = offset + 1;
-            newFormat = stateData->topContext()->attributeFormat();
+            newFormat = &stateData->topContext()->attributeFormat();
         }
+
+        /**
+         * if we arrive here, some new format has to be set!
+         */
+        Q_ASSERT(newFormat);
 
         /**
          * on format change, apply the last one and switch to new one
          */
-        if (newFormat.id() != currentFormat.id()) {
+        if (newFormat != currentFormat && newFormat->id() != currentFormat->id()) {
             if (offset > 0)
-                applyFormat(beginOffset, offset - beginOffset, currentFormat);
+                applyFormat(beginOffset, offset - beginOffset, *currentFormat);
             beginOffset = offset;
             currentFormat = newFormat;
         }
 
+        /**
+         * we must have made progress if we arrive here!
+         */
         Q_ASSERT(newOffset > offset);
         offset = newOffset;
 
     } while (offset < text.size());
 
     if (beginOffset < offset)
-        applyFormat(beginOffset, text.size() - beginOffset, currentFormat);
+        applyFormat(beginOffset, text.size() - beginOffset, *currentFormat);
 
     while (!stateData->topContext()->lineEndContext().isStay() && !lineContinuation) {
         if (!d->switchContext(stateData, stateData->topContext()->lineEndContext(), QStringList()))

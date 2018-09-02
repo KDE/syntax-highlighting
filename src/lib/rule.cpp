@@ -533,12 +533,11 @@ MatchResult IncludeRules::doMatch(const QString& text, int offset, const QString
 }
 
 
-MatchResult Int::doMatch(const QString& text, int offset, const QStringList &captures) const
+MatchResult Int::doMatch(const QString& text, int offset, const QStringList &) const
 {
     if (offset > 0 && !isWordDelimiter(text.at(offset - 1)))
         return offset;
 
-    Q_UNUSED(captures); // ### the doc says this can be dynamic, but how??
     while(offset < text.size() && text.at(offset).isDigit())
         ++offset;
     return offset;

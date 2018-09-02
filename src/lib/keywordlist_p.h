@@ -28,6 +28,8 @@
 #include <QString>
 #include <QVector>
 
+#include <vector>
+
 class QXmlStreamReader;
 
 namespace KSyntaxHighlighting {
@@ -38,25 +40,59 @@ public:
     KeywordList() = default;
     ~KeywordList() = default;
 
-    bool isEmpty() const;
+    bool isEmpty() const
+    {
+        return m_keywords.isEmpty();
+    }
 
-    QString name() const;
+    const QString &name() const
+    {
+        return m_name;
+    }
 
-    QStringList keywords() const;
+    const QStringList &keywords() const
+    {
+        return m_keywords;
+    }
 
     /** Checks if @p str is a keyword in this list. */
-    bool contains(const QStringRef &str) const;
+    bool contains(const QStringRef &str) const
+    {
+        return contains(str, m_caseSensitive);
+    }
+
     /** Checks if @p str is a keyword in this list, overriding the global case-sensitivity setting. */
-    bool contains(const QStringRef &str, Qt::CaseSensitivity caseSensitivityOverride) const;
+    bool contains(const QStringRef &str, Qt::CaseSensitivity caseSensitive) const;
 
     void load(QXmlStreamReader &reader);
     void setCaseSensitivity(Qt::CaseSensitivity caseSensitive);
+    void initLookupForCaseSensitivity(Qt::CaseSensitivity caseSensitive);
 
 private:
+    /**
+     * name of keyword list as in XML
+     */
     QString m_name;
-    QSet<QString> m_keywords;
-    mutable QSet<QString> m_lowerCaseKeywords;
+
+    /**
+     * raw list of keywords, as seen in XML (but trimmed)
+     */
+    QStringList m_keywords;
+
+    /**
+     * default case-sensitivity setting
+     */
     Qt::CaseSensitivity m_caseSensitive = Qt::CaseSensitive;
+
+    /**
+     * case-sensitive sorted string references to m_keywords for lookup
+     */
+    std::vector<QStringRef> m_keywordsSortedCaseSensitive;
+
+    /**
+     * case-insensitive sorted string references to m_keywords for lookup
+     */
+    std::vector<QStringRef> m_keywordsSortedCaseInsensitive;
 };
 }
 

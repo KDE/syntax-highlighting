@@ -204,8 +204,7 @@ protected:
     MatchResult doMatch(const QString & text, int offset, const QStringList&) const override;
 
 private:
-    QString m_listName;
-    mutable KeywordList m_keywordList;
+    KeywordList *m_keywordList;
     bool m_hasCaseSensitivityOverride;
     Qt::CaseSensitivity m_caseSensitivityOverride;
 };

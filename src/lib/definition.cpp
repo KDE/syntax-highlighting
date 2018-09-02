@@ -228,7 +228,8 @@ QStringList Definition::keywordLists() const
 QStringList Definition::keywordList(const QString& name) const
 {
     d->load();
-    return d->keywordList(name).keywords();
+    const auto list = d->keywordList(name);
+    return list ? list->keywords() : QStringList();
 }
 
 QVector<Format> Definition::formats() const
@@ -330,9 +331,10 @@ Context* DefinitionData::contextByName(const QString& name) const
     return nullptr;
 }
 
-KeywordList DefinitionData::keywordList(const QString& name) const
+KeywordList *DefinitionData::keywordList(const QString& name)
 {
-    return keywordLists.value(name);
+    auto it = keywordLists.find(name);
+    return (it == keywordLists.end()) ? nullptr : &it.value();
 }
 
 bool DefinitionData::isWordDelimiter(QChar c) const

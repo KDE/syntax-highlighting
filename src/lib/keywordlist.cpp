@@ -26,39 +26,21 @@
 #include <QDebug>
 #include <QXmlStreamReader>
 
+#include <algorithm>
+
 using namespace KSyntaxHighlighting;
 
-bool KeywordList::isEmpty() const
+bool KeywordList::contains(const QStringRef &str, Qt::CaseSensitivity caseSensitive) const
 {
-    return m_keywords.isEmpty();
-}
+    /**
+     * get right vector to search in
+     */
+    const auto &vectorToSearch = (caseSensitive == Qt::CaseSensitive) ? m_keywordsSortedCaseSensitive : m_keywordsSortedCaseInsensitive;
 
-QString KeywordList::name() const
-{
-    return m_name;
-}
-
-QStringList KeywordList::keywords() const
-{
-    return m_keywords.values();
-}
-
-bool KeywordList::contains(const QStringRef &str) const
-{
-    return contains(str, m_caseSensitive);
-}
-
-bool KeywordList::contains(const QStringRef &str, Qt::CaseSensitivity caseSensitivityOverride) const
-{
-    if (Q_UNLIKELY(caseSensitivityOverride == Qt::CaseInsensitive && m_lowerCaseKeywords.isEmpty())) {
-        foreach (const auto &kw, m_keywords)
-            m_lowerCaseKeywords.insert(kw.toLower());
-    }
-
-    // TODO avoid the copy in toString!
-    if (caseSensitivityOverride == Qt::CaseSensitive)
-        return m_keywords.contains(str.toString());
-    return m_lowerCaseKeywords.contains(str.toString().toLower());
+    /**
+     * search with right predicate
+     */
+    return std::binary_search(vectorToSearch.begin(), vectorToSearch.end(), str, [caseSensitive] (const QStringRef &a, const QStringRef &b) { return a.compare(b, caseSensitive) < 0; });
 }
 
 void KeywordList::load(QXmlStreamReader& reader)
@@ -72,7 +54,7 @@ void KeywordList::load(QXmlStreamReader& reader)
         switch (reader.tokenType()) {
             case QXmlStreamReader::StartElement:
                 if (reader.name() == QLatin1String("item")) {
-                    m_keywords.insert(reader.readElementText().trimmed());
+                    m_keywords.append(reader.readElementText().trimmed());
                     reader.readNextStartElement();
                     break;
                 }
@@ -90,5 +72,33 @@ void KeywordList::load(QXmlStreamReader& reader)
 
 void KeywordList::setCaseSensitivity(Qt::CaseSensitivity caseSensitive)
 {
+    /**
+     * remember default case-sensitivity and init lookup for it
+     */
     m_caseSensitive = caseSensitive;
+    initLookupForCaseSensitivity(m_caseSensitive);
+}
+
+void KeywordList::initLookupForCaseSensitivity(Qt::CaseSensitivity caseSensitive)
+{
+    /**
+     * get right vector to sort, if non-empty, we are done
+     */
+    auto &vectorToSort = (caseSensitive == Qt::CaseSensitive) ? m_keywordsSortedCaseSensitive : m_keywordsSortedCaseInsensitive;
+    if (!vectorToSort.empty()) {
+        return;
+    }
+
+    /**
+     * fill vector with refs to keywords
+     */
+    vectorToSort.reserve(m_keywords.size());
+    for (const auto &keyword : qAsConst(m_keywords)) {
+        vectorToSort.push_back(&keyword);
+    }
+
+    /**
+     * sort with right predicate
+     */
+    std::sort(vectorToSort.begin(), vectorToSort.end(), [caseSensitive] (const QStringRef &a, const QStringRef &b) { return a.compare(b, caseSensitive) < 0; });
 }

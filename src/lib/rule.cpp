@@ -324,7 +324,7 @@ bool DetectChar::doLoad(QXmlStreamReader& reader)
 MatchResult DetectChar::doMatch(const QString& text, int offset, const QStringList &captures) const
 {
     if (m_dynamic) {
-        if (captures.size() <= m_captureIndex || captures.at(m_captureIndex).isEmpty())
+        if (m_captureIndex == 0 || captures.size() <= m_captureIndex || captures.at(m_captureIndex).isEmpty())
             return offset;
         if (text.at(offset) == captures.at(m_captureIndex).at(0))
             return offset + 1;
@@ -546,26 +546,33 @@ MatchResult Int::doMatch(const QString& text, int offset, const QStringList &) c
 
 bool KeywordListRule::doLoad(QXmlStreamReader& reader)
 {
-    m_listName = reader.attributes().value(QLatin1String("String")).toString();
+    /**
+     * get our keyword list, if not found => bail out
+     */
+    auto defData = DefinitionData::get(definition());
+    m_keywordList = defData->keywordList(reader.attributes().value(QLatin1String("String")).toString());
+    if (!m_keywordList) {
+        return false;
+    }
+
+    /**
+     * we might overwrite the case sensitivity
+     * then we need to init the list for lookup of that sensitivity setting
+     */
     if (reader.attributes().hasAttribute(QLatin1String("insensitive"))) {
         m_hasCaseSensitivityOverride = true;
         m_caseSensitivityOverride = Xml::attrToBool(reader.attributes().value(QLatin1String("insensitive"))) ?
             Qt::CaseInsensitive : Qt::CaseSensitive;
+        m_keywordList->initLookupForCaseSensitivity(m_caseSensitivityOverride);
     } else {
         m_hasCaseSensitivityOverride = false;
     }
-    return !m_listName.isEmpty();
+
+    return !m_keywordList->isEmpty();
 }
 
 MatchResult KeywordListRule::doMatch(const QString& text, int offset, const QStringList&) const
 {
-    if (m_keywordList.isEmpty()) {
-        const auto def = definition();
-        Q_ASSERT(def.isValid());
-        auto defData = DefinitionData::get(def);
-        m_keywordList = defData->keywordList(m_listName);
-    }
-
     auto newOffset = offset;
     while (text.size() > newOffset && !isWordDelimiter(text.at(newOffset)))
         ++newOffset;
@@ -573,10 +580,10 @@ MatchResult KeywordListRule::doMatch(const QString& text, int offset, const QStr
         return offset;
 
     if (m_hasCaseSensitivityOverride) {
-        if (m_keywordList.contains(text.midRef(offset, newOffset - offset), m_caseSensitivityOverride))
+        if (m_keywordList->contains(text.midRef(offset, newOffset - offset), m_caseSensitivityOverride))
             return newOffset;
     } else {
-        if (m_keywordList.contains(text.midRef(offset, newOffset - offset)))
+        if (m_keywordList->contains(text.midRef(offset, newOffset - offset)))
             return newOffset;
     }
 
@@ -658,9 +665,29 @@ MatchResult RegExpr::doMatch(const QString& text, int offset, const QStringList 
      */
     const auto &regexp = m_dynamic ? QRegularExpression(replaceCaptures(m_regexp.pattern(), captures, true), m_regexp.patternOptions()) : m_regexp;
 
-    auto result = regexp.match(text, offset, QRegularExpression::NormalMatch, QRegularExpression::DontCheckSubjectStringMatchOption);
-    if (result.capturedStart() == offset)
-        return MatchResult(offset + result.capturedLength(), result.capturedTexts());
+    /**
+     * match the pattern
+     */
+    const auto result = regexp.match(text, offset, QRegularExpression::NormalMatch, QRegularExpression::DontCheckSubjectStringMatchOption);
+    if (result.capturedStart() == offset) {
+        /**
+         * we only need to compute the captured texts if we have real capture groups
+         * highlightings should only address %1..%.., see e.g. replaceCaptures
+         * DetectChar ignores %0, too
+         */
+        if (result.lastCapturedIndex() > 0) {
+            return MatchResult(offset + result.capturedLength(), result.capturedTexts());
+        }
+
+        /**
+         * else: ignore the implicit 0 group we always capture, no need to allocate stuff for that
+         */
+        return MatchResult(offset + result.capturedLength());
+    }
+
+    /**
+     * no match
+     */
     return MatchResult(offset, result.capturedStart());
 }
 

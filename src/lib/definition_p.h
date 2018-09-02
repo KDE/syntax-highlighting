@@ -65,7 +65,7 @@ public:
     void loadSpellchecking(QXmlStreamReader &reader);
     bool checkKateVersion(const QStringRef &verStr);
 
-    KeywordList keywordList(const QString &name) const;
+    KeywordList *keywordList(const QString &name);
     bool isWordDelimiter(QChar c) const;
 
     Context* initialContext() const;

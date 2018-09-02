@@ -106,36 +106,6 @@ void Rule::setDefinition(const Definition &def)
     m_wordDelimiter = &DefinitionData::get(m_def.definition())->wordDelimiters;
 }
 
-ContextSwitch Rule::context() const
-{
-    return m_context;
-}
-
-bool Rule::isLookAhead() const
-{
-    return m_lookAhead;
-}
-
-bool Rule::firstNonSpace() const
-{
-    return m_firstNonSpace;
-}
-
-int Rule::requiredColumn() const
-{
-    return m_column;
-}
-
-FoldingRegion Rule::beginRegion() const
-{
-    return m_beginRegion;
-}
-
-FoldingRegion Rule::endRegion() const
-{
-    return m_endRegion;
-}
-
 bool Rule::load(QXmlStreamReader &reader)
 {
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);

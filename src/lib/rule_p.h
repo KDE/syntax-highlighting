@@ -58,13 +58,35 @@ public:
         return m_attributeFormat;
     }
 
-    ContextSwitch context() const;
-    bool isLookAhead() const;
-    bool firstNonSpace() const;
-    int requiredColumn() const;
+    const ContextSwitch &context() const
+    {
+        return m_context;
+    }
 
-    FoldingRegion beginRegion() const;
-    FoldingRegion endRegion() const;
+    bool isLookAhead() const
+    {
+        return m_lookAhead;
+    }
+
+    bool firstNonSpace() const
+    {
+        return m_firstNonSpace;
+    }
+
+    int requiredColumn() const
+    {
+        return m_column;
+    }
+
+    const FoldingRegion &beginRegion() const
+    {
+        return m_beginRegion;
+    }
+
+    const FoldingRegion &endRegion() const
+    {
+        return m_endRegion;
+    }
 
     bool load(QXmlStreamReader &reader);
     void resolveContext();

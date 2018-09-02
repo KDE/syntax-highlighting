@@ -60,20 +60,6 @@ void AbstractHighlighterPrivate::ensureDefinitionLoaded()
         defData->load();
 }
 
-/**
- * Returns the index of the first non-space character. If the line is empty,
- * or only contains white spaces, -1 is returned.
- */
-static inline int firstNonSpaceChar(const QString & text)
-{
-    for (int i = 0; i < text.length(); ++i) {
-        if (!text[i].isSpace()) {
-            return i;
-        }
-    }
-    return -1;
-}
-
 AbstractHighlighter::AbstractHighlighter() :
     d_ptr(new AbstractHighlighterPrivate)
 {
@@ -112,6 +98,20 @@ void AbstractHighlighter::setTheme(const Theme &theme)
     d->m_theme = theme;
 }
 
+/**
+ * Returns the index of the first non-space character. If the line is empty,
+ * or only contains white spaces, text.size() is returned.
+ */
+static inline int firstNonSpaceChar(const QString & text)
+{
+    for (int i = 0; i < text.length(); ++i) {
+        if (!text[i].isSpace()) {
+            return i;
+        }
+    }
+    return text.size();
+}
+
 State AbstractHighlighter::highlightLine(const QString& text, const State &state)
 {
     Q_D(AbstractHighlighter);
@@ -146,21 +146,48 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
         return newState;
     }
 
-    Q_ASSERT(!stateData->isEmpty());
-    int firstNonSpace = firstNonSpaceChar(text);
-    if (firstNonSpace < 0) {
-        firstNonSpace = text.size();
-    }
     int offset = 0, beginOffset = 0;
     auto currentFormat = stateData->topContext()->attributeFormat();
     bool lineContinuation = false;
     QHash<Rule*, int> skipOffsets;
+
+    /**
+     * cached first non-space character, needs to be computed if < 0
+     */
+    int firstNonSpace = -1;
 
     do {
         bool isLookAhead = false;
         int newOffset = 0;
         Format newFormat;
         foreach (const auto &rule, stateData->topContext()->rules()) {
+            /**
+             * filter out rules that require a specific column
+             */
+            if ((rule->requiredColumn() >= 0) && (rule->requiredColumn() != offset)) {
+                continue;
+            }
+
+            /**
+             * filter out rules that only match for leading whitespace
+             */
+            if (rule->firstNonSpace()) {
+                /**
+                 * compute the first non-space lazy
+                 * avoids computing it for contexts without any such rules
+                 */
+                if (firstNonSpace < 0) {
+                    firstNonSpace = firstNonSpaceChar(text);
+                }
+
+                /**
+                 * can we skip?
+                 */
+                if (offset > firstNonSpace) {
+                    continue;
+                }
+            }
+
             /**
              * shall we skip application of this rule? two cases:
              *   - rule can't match at all => currentSkipOffset < 0
@@ -170,15 +197,6 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
             if (currentSkipOffset < 0 || currentSkipOffset > offset)
                 continue;
 
-            // filter out rules that only match for leading whitespace
-            if (rule->firstNonSpace() && (offset > firstNonSpace)) {
-                continue;
-            }
-
-            // filter out rules that require a specific column
-            if ((rule->requiredColumn() >= 0) && (rule->requiredColumn() != offset)) {
-                continue;
-            }
 
             const auto newResult = rule->doMatch(text, offset, stateData->topCaptures());
             newOffset = newResult.offset();

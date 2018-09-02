@@ -1,6 +1,17 @@
+#
+# test configuration
+#
 configure_file(test-config.h.in ${CMAKE_CURRENT_BINARY_DIR}/test-config.h)
+
+#
+# helper to update the references for the unit tests
+#
 configure_file(update-reference-data.sh.in ${CMAKE_CURRENT_BINARY_DIR}/update-reference-data.sh)
 
+#
+# unit tests
+# always executed during testing, required to pass, else stuff is in a bad shape ;=)
+#
 add_executable(wildcardmatcher_test wildcardmatcher_test.cpp ${CMAKE_SOURCE_DIR}/src/lib/wildcardmatcher.cpp)
 add_test(NAME wildcardmatcher_test COMMAND wildcardmatcher_test)
 target_link_libraries(wildcardmatcher_test KF5SyntaxHighlighting Qt5::Test)
@@ -25,10 +36,14 @@ add_executable(folding_test foldingtest.cpp)
 add_test(NAME folding_test COMMAND folding_test)
 target_link_libraries(folding_test KF5SyntaxHighlighting Qt5::Test)
 
+#
+# benchmarks, don't execute during normal testing
+# they don't test additional stuff but only hang the CI
+#
 add_executable(highlighter_benchmark highlighter_benchmark.cpp)
-add_test(NAME highlighter_benchmark COMMAND highlighter_benchmark)
+add_test(NAME highlighter_benchmark COMMAND highlighter_benchmark CONFIGURATIONS BENCHMARK)
 target_link_libraries(highlighter_benchmark KF5SyntaxHighlighting Qt5::Test)
 
 add_executable(repository_benchmark repository_benchmark.cpp)
-add_test(NAME repository_benchmark COMMAND repository_benchmark)
+add_test(NAME repository_benchmark COMMAND repository_benchmark CONFIGURATIONS BENCHMARK)
 target_link_libraries(repository_benchmark KF5SyntaxHighlighting Qt5::Test)

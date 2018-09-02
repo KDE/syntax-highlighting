@@ -70,13 +70,12 @@ public:
     void resolveContext();
     void resolveAttributeFormat(Context *lookupContext);
 
-    MatchResult match(const QString &text, int offset, const QStringList &captures) const;
+    virtual MatchResult doMatch(const QString &text, int offset, const QStringList &captures) const = 0;
 
     static Rule::Ptr create(const QStringRef &name);
 
 protected:
     virtual bool doLoad(QXmlStreamReader &reader);
-    virtual MatchResult doMatch(const QString &text, int offset, const QStringList &captures) const = 0;
 
     bool isWordDelimiter(QChar c) const;
 
@@ -87,7 +86,6 @@ private:
     QString m_attribute;
     Format m_attributeFormat;
     ContextSwitch m_context;
-    QVector<Rule::Ptr> m_subRules;
     int m_column = -1;
     FoldingRegion m_beginRegion;
     FoldingRegion m_endRegion;

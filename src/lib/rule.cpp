@@ -162,39 +162,14 @@ bool Rule::load(QXmlStreamReader &reader)
     if (m_lookAhead && m_context.isStay())
         result = false;
 
-    reader.readNext();
-    while (!reader.atEnd()) {
-        switch (reader.tokenType()) {
-            case QXmlStreamReader::StartElement:
-            {
-                auto rule = Rule::create(reader.name());
-                if (rule) {
-                    rule->setDefinition(m_def.definition());
-                    if (rule->load(reader)) {
-                        m_subRules.push_back(rule);
-                        reader.readNext();
-                    }
-                } else {
-                    reader.skipCurrentElement();
-                }
-                break;
-            }
-            case QXmlStreamReader::EndElement:
-                return result;
-            default:
-                reader.readNext();
-                break;
-        }
-    }
-
+    // be done with this rule, skip all subelements, e.g. no longer supported sub-rules
+    reader.skipCurrentElement();
     return result;
 }
 
 void Rule::resolveContext()
 {
     m_context.resolve(m_def.definition());
-    foreach (const auto &rule, m_subRules)
-        rule->resolveContext();
 }
 
 void Rule::resolveAttributeFormat(Context *lookupContext)
@@ -208,36 +183,12 @@ void Rule::resolveAttributeFormat(Context *lookupContext)
             qCWarning(Log) << "Rule: Unknown format" << m_attribute << "in context" << lookupContext->name() << "of definition" << definition().name();
         }
     }
-
-    /**
-     * lookup formats for our sub-rules
-     */
-    foreach (const auto &rule, m_subRules) {
-        rule->resolveAttributeFormat(lookupContext);
-    }
 }
 
 bool Rule::doLoad(QXmlStreamReader& reader)
 {
     Q_UNUSED(reader);
     return true;
-}
-
-MatchResult Rule::match(const QString &text, int offset, const QStringList &captures) const
-{
-    Q_ASSERT(!text.isEmpty());
-
-    const auto result = doMatch(text, offset, captures);
-    if (result.offset() == offset || result.offset() == text.size())
-        return result;
-
-    foreach (const auto &subRule, m_subRules) {
-        const auto subResult = subRule->match(text, result.offset(), QStringList());
-        if (subResult.offset() > result.offset())
-            return MatchResult(subResult.offset(), result.captures());
-    }
-
-    return result;
 }
 
 Rule::Ptr Rule::create(const QStringRef& name)

@@ -180,7 +180,7 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
                 continue;
             }
 
-            const auto newResult = rule->match(text, offset, stateData->topCaptures());
+            const auto newResult = rule->doMatch(text, offset, stateData->topCaptures());
             newOffset = newResult.offset();
 
             /**

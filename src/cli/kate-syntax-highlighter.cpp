@@ -133,7 +133,7 @@ int main(int argc, char **argv)
         parser.showHelp(1);
     }
 
-    QString title = QString();
+    QString title;
     if (parser.isSet(titleOption))
         title = parser.value(titleOption);
 

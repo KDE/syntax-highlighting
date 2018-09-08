@@ -22,8 +22,8 @@
     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "context_p.h"
 #include "rule_p.h"
+#include "context_p.h"
 #include "definition_p.h"
 #include "ksyntaxhighlighting_logging.h"
 #include "xml_p.h"

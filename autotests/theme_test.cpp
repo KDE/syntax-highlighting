@@ -30,10 +30,14 @@
 #include <state.h>
 #include <theme.h>
 
+#include <QDirIterator>
 #include <QFileInfo>
+#include <QJsonObject>
+#include <QJsonParseError>
 #include <QObject>
 #include <QStandardPaths>
 #include <qtest.h>
+#include <QDebug>
 
 namespace KSyntaxHighlighting {
 
@@ -96,7 +100,7 @@ private Q_SLOTS:
         collector.highlightLine(QLatin1String("normal + property real foo: 3.14"), State());
 
         QVERIFY(collector.formatMap.size() >= 4);
-        qDebug() << collector.formatMap.keys();
+        //qDebug() << collector.formatMap.keys();
 
         // normal text
         auto f = collector.formatMap.value(QLatin1String("Normal Text"));
@@ -183,6 +187,120 @@ private Q_SLOTS:
         QVERIFY(f.isDefaultTextStyle(Theme()));
         QVERIFY(!f.hasTextColor(Theme()));
         QVERIFY(!f.hasBackgroundColor(Theme()));
+    }
+
+    void testThemeIntegrity_data()
+    {
+        QTest::addColumn<QString>("themeFileName");
+
+        QDirIterator it(QStringLiteral(":/org.kde.syntax-highlighting/themes"), QStringList() << QLatin1String("*.theme"), QDir::Files);
+        while (it.hasNext()) {
+            const QString fileName = it.next();
+            QTest::newRow(fileName.toLatin1().data()) << fileName;
+        }
+    }
+
+    void testThemeIntegrity()
+    {
+        QFETCH(QString, themeFileName);
+
+        QFile loadFile(themeFileName);
+        QVERIFY(loadFile.open(QIODevice::ReadOnly));
+        const QByteArray jsonData = loadFile.readAll();
+        QJsonParseError parseError;
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData, &parseError);
+        if (parseError.error != QJsonParseError::NoError) {
+            qWarning() << "Failed to parse theme file:" << parseError.errorString();
+            QVERIFY(false);
+        }
+
+        QJsonObject obj = jsonDoc.object();
+
+        // verify metadata
+        QVERIFY(obj.contains(QLatin1String("metadata")));
+        const QJsonObject metadata = obj.value(QLatin1String("metadata")).toObject();
+        QVERIFY(metadata.contains(QLatin1String("name")));
+        QVERIFY(!metadata.value(QLatin1String("name")).toString().isEmpty());
+        QVERIFY(metadata.contains(QLatin1String("revision")));
+        QVERIFY(metadata.value(QLatin1String("revision")).toInt() > 0);
+
+        // verify completeness of text styles
+        static const auto idx = Theme::staticMetaObject.indexOfEnumerator("TextStyle");
+        QVERIFY(idx >= 0);
+        const auto metaEnum = Theme::staticMetaObject.enumerator(idx);
+        QVERIFY(obj.contains(QLatin1String("text-styles")));
+        const QJsonObject textStyles = obj.value(QLatin1String("text-styles")).toObject();
+        for (int i = 0; i < metaEnum.keyCount(); ++i) {
+            QCOMPARE(i, metaEnum.value(i));
+            const QString textStyleName = QLatin1String(metaEnum.key(i));
+            QVERIFY(textStyles.contains(textStyleName));
+            const QJsonObject textStyle = textStyles.value(textStyleName).toObject();
+            QVERIFY(textStyle.contains(QLatin1String("text-color")));
+
+            // verify valid entry
+            const QStringList definedColors = textStyle.keys();
+            for (const auto & key : definedColors) {
+                const QString context = textStyleName + QLatin1Char('/') + key + QLatin1Char('=') + textStyle.value(key).toString();
+                if (key == QLatin1String("text-color")
+                    || key == QLatin1String("selected-text-color")
+                    || key == QLatin1String("background-color")
+                    || key == QLatin1String("selected-background-color"))
+                {
+                    QVERIFY2(QColor::isValidColor(textStyle.value(key).toString()), context.toLatin1().data());
+                }
+                else if (key == QLatin1String("bold")
+                    || key == QLatin1String("italic")
+                    || key == QLatin1String("underline")
+                    || key == QLatin1String("strike-through"))
+                {
+                    QVERIFY2(textStyle.value(key).isBool(), context.toLatin1().data());
+                }
+            }
+        }
+
+        // editor area colors
+        const QStringList requiredEditorColors = {
+            QLatin1String("background-color"),
+            QLatin1String("bracket-matching"),
+            QLatin1String("code-folding"),
+            QLatin1String("current-line"),
+            QLatin1String("current-line-number"),
+            QLatin1String("icon-border"),
+            QLatin1String("indentation-line"),
+            QLatin1String("line-numbers"),
+            QLatin1String("mark-bookmark"),
+            QLatin1String("mark-breakpoint-active"),
+            QLatin1String("mark-breakpoint-disabled"),
+            QLatin1String("mark-breakpoint-reached"),
+            QLatin1String("mark-error"),
+            QLatin1String("mark-execution"),
+            QLatin1String("mark-warning"),
+            QLatin1String("modified-lines"),
+            QLatin1String("replace-highlight"),
+            QLatin1String("saved-lines"),
+            QLatin1String("search-highlight"),
+            QLatin1String("selection"),
+            QLatin1String("separator"),
+            QLatin1String("spell-checking"),
+            QLatin1String("tab-marker"),
+            QLatin1String("template-background"),
+            QLatin1String("template-focused-placeholder"),
+            QLatin1String("template-placeholder"),
+            QLatin1String("template-read-only-placeholder"),
+            QLatin1String("word-wrap-marker")
+        };
+
+        // verify all editor colors are defined - not more, not less
+        QVERIFY(obj.contains(QLatin1String("editor-colors")));
+        const QJsonObject editorColors = obj.value(QLatin1String("editor-colors")).toObject();
+        QStringList definedEditorColors = editorColors.keys();
+        std::sort(definedEditorColors.begin(), definedEditorColors.end());
+        QCOMPARE(definedEditorColors, requiredEditorColors);
+
+        // verify all editor colors are valid
+        for (const auto & key : requiredEditorColors) {
+            QVERIFY(QColor::isValidColor(editorColors.value(key).toString()));
+        }
     }
 };
 }

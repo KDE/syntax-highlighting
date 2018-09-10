@@ -53,3 +53,23 @@ sub blah {
 
 &blah;
 prg("test");
+
+# Bracket closures in RegExp patterns (bug #364866)
+qr{ ${var} aa{aa{a}a} aa*b?};
+qr(aa(a(a(a(b|c)a)a)a)aa*b?);
+s{aaa {aaa} a \x{A2} *b?}{aa};
+s(aa(a(a(a(b|c)a)a)a)aa)(aa);
+
+# Strings as scalar references (bug #348765)
+$x = \'Reference of a String';
+$y = \"Reference of a String";
+
+# Variables that start with underscore (bug #355300)
+$_variable
+$_ # Reserved var.
+
+for my $x ($hash->{arr}->@*) {
+    for my $k (keys $k->%*) {
+        ...
+    }
+}

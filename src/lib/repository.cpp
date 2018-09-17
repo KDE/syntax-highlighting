@@ -137,7 +137,7 @@ QVector<Theme> Repository::themes() const
 
 Theme Repository::theme(const QString &themeName) const
 {
-    for (const auto &theme : d->m_themes) {
+    for (const auto &theme : qAsConst(d->m_themes)) {
         if (theme.name() == themeName) {
             return theme;
         }

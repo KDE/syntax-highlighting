@@ -197,7 +197,8 @@ bool Definition::foldingEnabled() const
     }
 
     // check included definitions
-    for (const auto &def : includedDefinitions()) {
+    const auto defs = includedDefinitions();
+    for (const auto &def : defs) {
         if (def.foldingEnabled()) {
             d->hasFoldingRegions = true;
             break;
@@ -256,7 +257,7 @@ QVector<Definition> Definition::includedDefinitions() const
         // Iterate all context rules to find associated Definitions. This will
         // automatically catch other Definitions referenced with IncludeRuldes or ContextSwitch.
         const auto definition = queue.takeLast();
-        for (const auto & context : definition.d->contexts) {
+        for (const auto & context : qAsConst(definition.d->contexts)) {
             // handle context switch attributes of this context itself
             for (const auto switchContext : {context->lineEndContext().context(), context->lineEmptyContext().context(), context->fallthroughContext().context()}) {
                 if (switchContext) {

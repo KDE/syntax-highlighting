@@ -80,7 +80,7 @@ bool checkExtensions(QString extensions)
     }
 
     // check that only valid wildcard things are inside the parts
-    for (const auto extension : extensionParts) {
+    for (const auto& extension : extensionParts) {
         for (const auto c : extension) {
             // eat normal things
             if (c.isDigit() || c.isLetter()) {

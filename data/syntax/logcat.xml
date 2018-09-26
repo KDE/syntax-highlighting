@@ -9,17 +9,19 @@
 <!--
   Syntax Highlighting Definition of Logcat, for the KDE's KSyntaxHighlighting Framework
   ==========================================================================================
+   This file is part of the KDE's KSyntaxHighlighting framework.
+
    Copyright (c) 2018 Nibaldo González S. (nibgonz@gmail.com)
-  
+
    Permission is hereby granted, free of charge, to any person obtaining a copy of this
    software and associated documentation files (the "Software"), to deal in the Software
    without restriction, including without limitation the rights to use, copy, modify, merge,
    publish, distribute, sublicense, and/or sell copies of the Software, and to permit
    persons to whom the Software is furnished to do so, subject to the following conditions:
-  
+
    The above copyright notice and this permission notice shall be included
    in all copies or substantial portions of the Software.
-  
+
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
    PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
@@ -30,14 +32,14 @@
 -->
 
 <language name="Logcat"
-		  version="1"
-		  kateversion="5.0"
-		  section="Other"
-		  extensions="*.logcat"
-		  mimetype="text/x-logcat"
-		  priority="5"
-		  author="Nibaldo González (nibgonz@gmail.com)"
-		  license="MIT">
+          version="2"
+          kateversion="5.0"
+          section="Other"
+          extensions="*.logcat"
+          mimetype="text/x-logcat"
+          priority="5"
+          author="Nibaldo González (nibgonz@gmail.com)"
+          license="MIT">
 
 	<highlighting>
 
@@ -47,7 +49,7 @@
 				<DetectChar   context="CommentLine" attribute="Comment" char="#" firstNonSpace="true" />
 				<StringDetect context="CommentLine" attribute="Comment" String="---------" firstNonSpace="true" />
 				<RegExpr      context="#stay"       attribute="Comment" String="\*\s.+\s\*$" column="0" />
-				
+
 				<RegExpr context="#stay" attribute="DateTime" String="&datetime;" firstNonSpace="true" />
 
 				<!-- Priority & Tag -->
@@ -66,7 +68,7 @@
 				<!-- For "-v long" -->
 				<DetectChar context="LongLog" attribute="Normal Text" char="[" column="0" />
 			</context>
-            
+
 			<context name="CommentLine" attribute="Comment" lineEndContext="#pop">
 				<DetectSpaces />
 				<IncludeRules context="##Alerts" />
@@ -122,7 +124,7 @@
 			<context name="LongLogFatal" attribute="Fatal" lineEndContext="#pop">
 				<RegExpr context="#pop!LongLogFatalMsg" attribute="Normal Text" String="\s*\]$" />
 			</context>
-            
+
 			<context name="LongLogVerboseMsg" attribute="Verbose Message" lineEndContext="#stay" lineEmptyContext="EmptyLine">
 				<IncludeRules context="DefaultLongLogMsg" />
 			</context>
@@ -156,20 +158,20 @@
 			<context name="EmptyLine" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop">
 				<DetectChar context="#pop#pop!CommentLine" attribute="Comment" char="#" firstNonSpace="true" />
 				<RegExpr context="#pop#pop!LongLog" attribute="Normal Text" String="\[(?=\s.+\s\]$)" column="0" />
-				<!-- In a normal Log this is not necessary, but probably some people put items of Logs 
+				<!-- In a normal Log this is not necessary, but probably some people put items of Logs
 				     of different formats in a single file. -->
 				<RegExpr context="#pop#pop" attribute="DateTime" String="&datetime;" firstNonSpace="true" />
 				<!-- NOTE: Use "^\s*" with lookAhead, not firstNonSpace -->
 				<RegExpr context="#pop#pop" attribute="Normal Text" String="\s*[VDIWASEF\?]&priority_tag;" column="0" lookAhead="true" />
 				<DetectSpaces />
 			</context>
-            
+
 		</contexts>
 
 		<itemDatas>
 			<itemData name="Normal Text" defStyleNum="dsNormal"  spellChecking="false" />
-			<itemData name="Comment"     defStyleNum="dsComment" />
-			<itemData name="DateTime"    defStyleNum="dsComment" spellChecking="false" />
+			<itemData name="Comment"     defStyleNum="dsComment" italic="1" />
+			<itemData name="DateTime"    defStyleNum="dsComment" italic="0" underline="0" spellChecking="false" />
 
 			<itemData name="Verbose Tag"     defStyleNum="dsNormal"         bold="1" />
 			<itemData name="Verbose Message" defStyleNum="dsNormal"         bold="0" />
@@ -177,23 +179,24 @@
 			<itemData name="Debug Message"   defStyleNum="dsAttribute"      bold="0" />
 			<itemData name="Info Tag"        defStyleNum="dsPreprocessor"   bold="1" />
 			<itemData name="Info Message"    defStyleNum="dsPreprocessor"   bold="0" />
-			<itemData name="Warning Tag"     defStyleNum="dsBaseN"          bold="1" />
-			<itemData name="Warning Message" defStyleNum="dsBaseN"          bold="0" />
-			<itemData name="Assert Tag"      defStyleNum="dsExtension"      bold="1" />
-			<itemData name="Assert Message"  defStyleNum="dsExtension"      bold="0" />
+			<itemData name="Warning Tag"     defStyleNum="dsInformation"    bold="1" />
+			<itemData name="Warning Message" defStyleNum="dsInformation"    bold="0" />
+			<itemData name="Assert Tag"      defStyleNum="dsChar"           bold="1" />
+			<itemData name="Assert Message"  defStyleNum="dsChar"           bold="0" />
 			<itemData name="Silent Tag"      defStyleNum="dsBuiltIn"        bold="1" />
 			<itemData name="Silent Message"  defStyleNum="dsBuiltIn"        bold="0" />
-			<itemData name="Error Tag"       defStyleNum="dsVerbatimString" bold="1" />
-			<itemData name="Error Message"   defStyleNum="dsVerbatimString" bold="0" />
-			<itemData name="Fatal"           defStyleNum="dsAlert" />
+			<itemData name="Error Tag"       defStyleNum="dsError"          bold="1" underline="0" />
+			<itemData name="Error Message"   defStyleNum="dsError"          bold="0" underline="0" />
+			<itemData name="Fatal"           defStyleNum="dsAlert"          bold="1" />
 		</itemDatas>
 
 	</highlighting>
-    
+
 	<general>
 		<comments>
 			<comment name="singleLine" start="#" />
 		</comments>
 	</general>
-    
+
 </language>
+<!-- kate: replace-tabs off; remove-trailing-spaces mod; dynamic-word-wrap off; -->

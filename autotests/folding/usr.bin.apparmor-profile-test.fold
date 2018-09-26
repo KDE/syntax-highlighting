@@ -11,18 +11,24 @@ include <tunables/global>
 @{USER_DIR}
   = @{HOME}/Public @{HOME}/Desktop #No-Comment
 @{USER_DIR} += @{HOME}/Hello \
-deny owner #No-comment
+deny owner #No-comment aa#aa
 ${BOOL} = true
 
+# Alias
+<beginfold id='2'>alias</beginfold id='2'> /usr/ -> /mnt/usr/<endfold id='2'>,</endfold id='2'>
+
 # Profile for /usr/bin/foo
-/usr/bin/foo (attach_disconnected enforce) <beginfold id='1'>{</beginfold id='1'>
-	include <include_tests/includes_okay_helper.include> #include <includes/base>
+profile foo /usr/bin/foo flags=(attach_disconnected enforce) <beginfold id='1'>{</beginfold id='1'>
 	#include <abstractions/ubuntu-helpers>
 	#include<abstractions/wayland>
 	#include"/etc/apparmor.d/abstractions/ubuntu-konsole"
 	include "/etc/apparmor.d/abstractions/openssl"
-	include if exists <path with spaces>
 
+	include if exists <path with spaces>
+	include <include_tests/includes_okay_helper.include> #include <includes/base>
+	/some/file mr<endfold id='2'>,</endfold id='2'> #include <includes/base> /bin/true Px<endfold id='2'>,</endfold id='2'>
+
+	# File rules
 	/{,**/} r<endfold id='2'>,</endfold id='2'>
 	owner /{home,media,mnt,srv,net}/** r<endfold id='2'>,</endfold id='2'>
 	owner @{USER_DIR}/** rw<endfold id='2'>,</endfold id='2'>
@@ -30,7 +36,6 @@ ${BOOL} = true
 	/**.[tT][xX][tT] r<endfold id='2'>,</endfold id='2'>  # txt
 	
 	owner <beginfold id='2'>file</beginfold id='2'> @{HOME}/.local/share/foo/{,**} rwkl<endfold id='2'>,</endfold id='2'>
-	owner @{HOME}/.config/*                   rw<endfold id='2'>,</endfold id='2'>
 	owner @{HOME}/.config/*.[a-zA-Z0-9]*      rwk<endfold id='2'>,</endfold id='2'>
 
 	"/usr/share/**" r<endfold id='2'>,</endfold id='2'>
@@ -40,12 +45,12 @@ ${BOOL} = true
 
 	allow <beginfold id='2'>file</beginfold id='2'> /etc/nsswitch.conf           r<endfold id='2'>,</endfold id='2'>
 	allow /etc/fstab                        r<endfold id='2'>,</endfold id='2'>
-	deny /etc/udev/udev.conf                a<endfold id='2'>,</endfold id='2'>
 	deny /etc/xdg/{autostart,systemd}/**    r<endfold id='2'>,</endfold id='2'>
 	deny /boot/**                           rwlkmx<endfold id='2'>,</endfold id='2'>
-	
+
 	owner @{PROC}/@{pid}/{cmdline,mountinfo,mounts,stat,status,vmstat} r<endfold id='2'>,</endfold id='2'>
 	/sys/devices/**/uevent r<endfold id='2'>,</endfold id='2'>
+	@{FOO_LIB}/{@{multiarch},64}/** mr<endfold id='2'>,</endfold id='2'>
 
 	/usr/bin/foo         ixr<endfold id='2'>,</endfold id='2'>
 	/usr/bin/dolphin     pUx<endfold id='2'>,</endfold id='2'>
@@ -53,9 +58,7 @@ ${BOOL} = true
 	/usr/bin/khelpcenter Cx  -> sanitized_helper<endfold id='2'>,</endfold id='2'>
 	/usr/bin/helloworld  cxr ->
 			hello_world<endfold id='2'>,</endfold id='2'>
-	
-	@{FOO_LIB}/{@{multiarch},64}/** mr<endfold id='2'>,</endfold id='2'>
-	
+
 	# Dbus rules
 	<beginfold id='2'>dbus</beginfold id='2'> (send)  #No-Comment
 		bus=system
@@ -134,13 +137,10 @@ ${BOOL} = true
 		<beginfold id='2'>change_profile</beginfold id='2'> unsafe /** -> {u,un,unc,unco,uncon,unconf,unconfi,unconfin,unconfine}<endfold id='2'>,</endfold id='2'>
 		<beginfold id='2'>change_profile</beginfold id='2'> /bin/bash  -> 
 			new_profile//hat<endfold id='2'>,</endfold id='2'>
-
-		# Alias
-		<beginfold id='2'>alias</beginfold id='2'> /usr/ -> /mnt/usr/<endfold id='2'>,</endfold id='2'>
 	<endfold id='1'>}</endfold id='1'>
 
 	# Hat
-	^foo-\/helper <beginfold id='1'>{</beginfold id='1'>
+	^foo-helper\/ <beginfold id='1'>{</beginfold id='1'>
 		<beginfold id='2'>network</beginfold id='2'> unix stream<endfold id='2'>,</endfold id='2'>
 		<beginfold id='2'>unix</beginfold id='2'> stream<endfold id='2'>,</endfold id='2'>
 
@@ -153,4 +153,118 @@ ${BOOL} = true
 		@{FOO_LIB}ñ* r<endfold id='2'>,</endfold id='2'>
 		<beginfold id='2'>unix</beginfold id='2'> (/path\t{aa}*,*a @{var}*path,* @{var},*)<endfold id='2'>,</endfold id='2'>
 	<endfold id='1'>}</endfold id='1'>
+<endfold id='1'>}</endfold id='1'>
+
+# Syntax Error
+/usr/bin/error (complain, audit) <beginfold id='1'>{</beginfold id='1'>
+	<beginfold id='2'>file</beginfold id='2'> #include /hello r<endfold id='2'>,</endfold id='2'>
+
+	# Error: Variable open or with characters not allowed
+	@<beginfold id='1'>{</beginfold id='1'>var
+	@<beginfold id='1'>{</beginfold id='1'>sdf&s<endfold id='1'>}</endfold id='1'>
+
+	# Error: Open brackets
+	/{hello{ab,cd}world  kr<endfold id='2'>,</endfold id='2'>
+	/{abc{abc kr<endfold id='2'>,</endfold id='2'>
+	/[abc  kr<endfold id='2'>,</endfold id='2'>
+	/(abc kr<endfold id='2'>,</endfold id='2'>
+
+	# Error: Empty brackets
+	/hello[]hello{}hello()he  kr<endfold id='2'>,</endfold id='2'>
+
+	# Comments not allowed
+	<beginfold id='2'>dbus</beginfold id='2'> (send)  #No comment
+		path=/org/hello
+		#No comment
+		interface=org.hello #No comment
+		peer=(name=org.hello  #No comment
+		      label=unconfined)<endfold id='2'>,</endfold id='2'> #Comment
+	@{VARIABLE} = val1 val2 val3  #No comment
+
+	# Error: Open rule
+	/home/*/file rw
+	<endfold id='2'>capability</endfold id='2'> dac_override<beginfold id='2'>capability</beginfold id='2'> dac_override
+	<endfold id='2'>deny</endfold id='2'> <beginfold id='2'>file</beginfold id='2'> /etc/fstab w
+	<endfold id='2'>audit</endfold id='2'> <beginfold id='2'>network</beginfold id='2'> ieee802154<endfold id='2'>,</endfold id='2'>
+
+	<beginfold id='2'>dbus</beginfold id='2'> (receive
+	<endfold id='2'>unix</endfold id='2'> stream,<beginfold id='2'>unix</beginfold id='2'> stream<endfold id='2'>,</endfold id='2'>
+	<beginfold id='2'>unix</beginfold id='2'> stream<endfold id='2'>,</endfold id='2'>
+<endfold id='1'>}</endfold id='1'>
+
+profile other_tests <beginfold id='1'>{</beginfold id='1'>
+	# set rlimit
+	set <beginfold id='2'>rlimit</beginfold id='2'> nice  <= 3<endfold id='2'>,</endfold id='2'>
+	<beginfold id='2'>rlimit</beginfold id='2'> nice  <= 3<endfold id='2'>,</endfold id='2'> # Without "set"
+	set #comment
+		<beginfold id='2'>rlimit</beginfold id='2'>
+			nice  <= 3<endfold id='2'>,</endfold id='2'>
+
+	# "remount" keyword
+	<beginfold id='2'>mount</beginfold id='2'> remount
+		remount<endfold id='2'>,</endfold id='2'>
+	<beginfold id='2'>remount</beginfold id='2'> remount
+		remount<endfold id='2'>,</endfold id='2'>
+	<beginfold id='2'>dbus</beginfold id='2'> remount
+		<endfold id='2'>remount</endfold id='2'>,<beginfold id='2'>remount</beginfold id='2'><endfold id='2'>,</endfold id='2'>
+	<beginfold id='2'>unix</beginfold id='2'> remount
+		<endfold id='2'>remount</endfold id='2'>,<beginfold id='2'>remount</beginfold id='2'><endfold id='2'>,</endfold id='2'>
+	# "unix" keyword
+	<beginfold id='2'>network</beginfold id='2'> unix
+		unix<endfold id='2'>,</endfold id='2'>
+	<beginfold id='2'>ptrace</beginfold id='2'> unix
+		<endfold id='2'>unix</endfold id='2'>,<beginfold id='2'>unix</beginfold id='2'><endfold id='2'>,</endfold id='2'>
+	<beginfold id='2'>unix</beginfold id='2'> unix
+		<endfold id='2'>unix</endfold id='2'>,<beginfold id='2'>unix</beginfold id='2'><endfold id='2'>,</endfold id='2'>
+
+	# Transition rules
+	/usr/bin/foo cx -> hello*<endfold id='2'>,</endfold id='2'>
+	/usr/bin/foo Cx -> path/<endfold id='2'>,</endfold id='2'>
+	/usr/bin/foo cx -> ab[ad/]hello<endfold id='2'>,</endfold id='2'>
+	/usr/bin/foo Cx -> ab[cd/]a[ad/]hello/path<endfold id='2'>,</endfold id='2'>
+	/usr/bin/foo Cx -> ab[hello/path<endfold id='2'>,</endfold id='2'>
+
+	/usr/bin/foo cx -> "hello*"<endfold id='2'>,</endfold id='2'>
+	/usr/bin/foo Cx -> "path/"<endfold id='2'>,</endfold id='2'>
+	/usr/bin/foo cx -> "ab[ad/]hello"<endfold id='2'>,</endfold id='2'>
+	/usr/bin/foo Cx -> "ab[cd/]a[ad/]hello/path"<endfold id='2'>,</endfold id='2'>
+	/usr/bin/foo Cx -> "ab[hello/path"<endfold id='2'>,</endfold id='2'>
+
+	/usr/bin/foo cx -> holas//hello/sa<endfold id='2'>,</endfold id='2'>
+	/usr/bin/foo cx -> df///dd//hat<endfold id='2'>,</endfold id='2'>
+	/usr/bin/foo cx -> holas,#sd\323fsdf<endfold id='2'>,</endfold id='2'>
+
+	# Access modes
+	/hello/lib/foo rwklms, # s invalid
+	/hello/lib/foo rwmaix,  # w & a incompatible
+	/hello/lib/foo kalmw,
+	/hello/lib/foo wa,
+	# OK
+	/hello/lib/foo rrwrwwrwrw<endfold id='2'>,</endfold id='2'>
+	/hello/lib/foo ixixix<endfold id='2'>,</endfold id='2'>
+	# Incompatible exec permissions
+	ixixux, uxuxUxux, ixixixPixix, ixixpx uxuxuxPuxux, UxUxcUxUx,
+	pixpixcixix, cxcxcxix, pixpixpux pixpixix xxix xxpux ixixx puxpuxx,
+	Cuxcux Pixpix, puxpUx puxPUx xxpix xxcx,
+	# Test valid permissions
+	r w a k l m l x ix ux Ux px Px cx Cx <endfold id='2'>,</endfold id='2'>
+	pix Pix cix Cix pux Pux cux Cux pUx PUx cUx CUx<endfold id='2'>,</endfold id='2'>
+	rwklmx raklmx<endfold id='2'>,</endfold id='2'>
+	r rw rwk rwkl rwklm<endfold id='2'>,</endfold id='2'>
+	rwlmix rwlmUx rwlmPx rwlmcx rwlmPUx<endfold id='2'>,</endfold id='2'>
+	rwixixixkl rwUxUxUxkl rwuxuxuxk rwpxpxpxk rwPxPxkl rwcxcxlm rwCxCxk<endfold id='2'>,</endfold id='2'>
+	rwpixpixk rwPixPixkl wrpuxpuxk rwpUxpUxk rwcixcixcixml rwCixCixk rwCuxCuxk rwCUxCUxl<endfold id='2'>,</endfold id='2'>
+
+	# Profile name
+	profile holas <beginfold id='1'>{</beginfold id='1'> ... <endfold id='1'>}</endfold id='1'>
+	profile <beginfold id='1'>{</beginfold id='1'> ... <endfold id='1'>}</endfold id='1'>
+	profile /path <beginfold id='1'>{</beginfold id='1'> ... <endfold id='1'>}</endfold id='1'>
+	profile holas/abc <beginfold id='1'>{</beginfold id='1'> ... <endfold id='1'>}</endfold id='1'>
+	profile holas\/abc <beginfold id='1'>{</beginfold id='1'> ... <endfold id='1'>}</endfold id='1'>
+	profile
+		#holas <beginfold id='1'>{</beginfold id='1'> ... <endfold id='1'>}</endfold id='1'>
+
+	profile flags=(complain)#asd <beginfold id='1'>{</beginfold id='1'> ... <endfold id='1'>}</endfold id='1'>
+	profile flags flags=(complain) <beginfold id='1'>{</beginfold id='1'> ... <endfold id='1'>}</endfold id='1'>
+	profile flags(complain) <beginfold id='1'>{</beginfold id='1'> ... <endfold id='1'>}</endfold id='1'>
 <endfold id='1'>}</endfold id='1'>

@@ -52,7 +52,15 @@ public:
     void clear();
     int size() const;
     void push(Context *context, const QStringList &captures);
-    void pop();
+
+    /**
+     * Pop the number of elements given from the top of the current stack.
+     * Will not pop the initial element.
+     * @param popCount number of elements to pop
+     * @return false if one has tried to pop the initial context, else true
+     */
+    bool pop(int popCount);
+
     Context* topContext() const;
     const QStringList &topCaptures() const;
 

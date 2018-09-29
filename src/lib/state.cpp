@@ -58,9 +58,18 @@ void StateData::push(Context *context, const QStringList &captures)
     m_contextStack.push_back(qMakePair(context, captures));
 }
 
-void StateData::pop()
+bool StateData::pop(int popCount)
 {
-    m_contextStack.pop_back();
+    // nop if nothing to pop
+    if (popCount <= 0) {
+        return true;
+    }
+
+    // keep the initial context alive in any case
+    Q_ASSERT(!isEmpty());
+    const bool initialContextSurvived = m_contextStack.size() > popCount;
+    m_contextStack.resize(std::max(1, m_contextStack.size() - popCount));
+    return initialContextSurvived;
 }
 
 Context* StateData::topContext() const

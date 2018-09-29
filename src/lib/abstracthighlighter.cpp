@@ -139,8 +139,10 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
 
     // process empty lines
     if (text.isEmpty()) {
-        while (!stateData->topContext()->lineEmptyContext().isStay())
-            d->switchContext(stateData, stateData->topContext()->lineEmptyContext(), QStringList());
+        while (!stateData->topContext()->lineEmptyContext().isStay()) {
+            if (!d->switchContext(stateData, stateData->topContext()->lineEmptyContext(), QStringList()))
+                break;
+        }
         auto context = stateData->topContext();
         applyFormat(0, 0, context->attributeFormat());
         return newState;
@@ -304,20 +306,18 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
 
 bool AbstractHighlighterPrivate::switchContext(StateData *data, const ContextSwitch &contextSwitch, const QStringList &captures)
 {
-    for (int i = 0; i < contextSwitch.popCount(); ++i) {
-        // don't pop the last context if we can't push one
-        if (data->size() == 1 && !contextSwitch.context())
-            return false;
-        if (data->size() == 0)
-            break;
-        data->pop();
+    // kill as many items as requested from the stack, will always keep the initial context alive!
+    const bool initialContextSurvived = data->pop(contextSwitch.popCount());
+
+    // if we have a new context to add, push it
+    // then we always "succeed"
+    if (contextSwitch.context()) {
+        data->push(contextSwitch.context(), captures);
+        return true;
     }
 
-    if (contextSwitch.context())
-        data->push(contextSwitch.context(), captures);
-
-    Q_ASSERT(!data->isEmpty());
-    return true;
+    // else we abort, if we did try to pop the initial context
+    return initialContextSurvived;
 }
 
 void AbstractHighlighter::applyFolding(int offset, int length, FoldingRegion region)

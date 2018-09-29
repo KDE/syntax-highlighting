@@ -161,19 +161,31 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
      * cached first non-space character, needs to be computed if < 0
      */
     int firstNonSpace = -1;
-
+    int lastOffset = offset;
+    int endlessLoopingCounter = 0;
     do {
-        bool isLookAhead = false;
-        int newOffset = 0;
-
         /**
-         * next format to use
+         * avoid that we loop endless for some broken hl definitions
          */
-        const Format *newFormat = nullptr;
+        if (lastOffset == offset) {
+            ++endlessLoopingCounter;
+            if (endlessLoopingCounter > 1024) {
+                qCDebug(Log) << "Endless state transitions, aborting highlighting of line.";
+                break;
+            }
+        } else {
+            // ensure we made progress, clear the endlessLoopingCounter
+            Q_ASSERT(offset > lastOffset);
+            lastOffset = offset;
+            endlessLoopingCounter = 0;
+        }
 
         /**
          * try to match all rules in the context in order of declaration in XML
          */
+        bool isLookAhead = false;
+        int newOffset = 0;
+        const Format *newFormat = nullptr;
         for (const auto &rule : stateData->topContext()->rules()) {
             /**
              * filter out rules that require a specific column

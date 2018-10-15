@@ -59,6 +59,7 @@ directory-properties:
     - INTERPROCEDURAL_OPTIMIZATION
     - LABELS                                                # Since 3.10
     - LINK_DIRECTORIES
+    - LINK_OPTIONS                                          # Since 3.13
     - LISTFILE_STACK
     - MACROS
     - PARENT_DIRECTORY
@@ -143,8 +144,9 @@ target-properties:
     - CXX_EXTENSIONS
     - CXX_STANDARD
     - CXX_STANDARD_REQUIRED
-    # - DEBUG_POSTFIX
+    # - DEBUG_POSTFIX                                       # NOTE: Handled by `<CONFIG>_POSTFIX`
     - DEFINE_SYMBOL
+    - DEPLOYMENT_ADDITIONAL_FILES                           # Since 3.13
     - DEPLOYMENT_REMOTE_DIRECTORY
     - DOTNET_TARGET_FRAMEWORK_VERSION                       # Since 3.12
     - EchoString
@@ -198,7 +200,10 @@ target-properties:
     - INTERFACE_COMPILE_FEATURES
     - INTERFACE_COMPILE_OPTIONS
     - INTERFACE_INCLUDE_DIRECTORIES
+    - INTERFACE_LINK_DEPENDS                                # Since 3.13
+    - INTERFACE_LINK_DIRECTORIES                            # Since 3.13
     - INTERFACE_LINK_LIBRARIES
+    - INTERFACE_LINK_OPTIONS                                # Since 3.13
     - INTERFACE_POSITION_INDEPENDENT_CODE
     - INTERFACE_SOURCES
     - INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
@@ -220,6 +225,7 @@ target-properties:
     - LIBRARY_OUTPUT_NAME
     - LINK_DEPENDS_NO_SHARED
     - LINK_DEPENDS
+    - LINK_DIRECTORIES                                      # Since 3.13
     - LINKER_LANGUAGE
     - LINK_FLAGS_<CONFIG>
     - LINK_FLAGS
@@ -228,6 +234,7 @@ target-properties:
     - LINK_INTERFACE_MULTIPLICITY_<CONFIG>
     - LINK_INTERFACE_MULTIPLICITY
     - LINK_LIBRARIES
+    - LINK_OPTIONS                                          # Since 3.13
     - LINK_SEARCH_END_STATIC
     - LINK_SEARCH_START_STATIC
     - LINK_WHAT_YOU_USE
@@ -269,13 +276,16 @@ target-properties:
     - SOVERSION
     - STATIC_LIBRARY_FLAGS_<CONFIG>
     - STATIC_LIBRARY_FLAGS
+    - STATIC_LIBRARY_OPTIONS                                # Since 3.13
     - SUFFIX
     - TYPE
     - VERSION
     - VISIBILITY_INLINES_HIDDEN
     - VS_CONFIGURATION_TYPE
-    - VS_DEBUGGER_WORKING_DIRECTORY
     - VS_DEBUGGER_COMMAND                                   # Since 3.12
+    - VS_DEBUGGER_COMMAND_ARGUMENTS                         # Since 3.13
+    - VS_DEBUGGER_ENVIRONMENT                               # Since 3.13
+    - VS_DEBUGGER_WORKING_DIRECTORY
     - VS_DESKTOP_EXTENSIONS_VERSION
     - VS_DOTNET_REFERENCE_<refname>
     - VS_DOTNET_REFERENCEPROP_<refname>_TAG_<tagname>       # Since 3.10
@@ -610,6 +620,7 @@ variables:
     - CMAKE_INSTALL_PREFIX
     - CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT
     - CMAKE_LIBRARY_PATH
+    - CMAKE_LINK_DIRECTORIES_BEFORE                         # Since 3.13
     - CMAKE_MFC_FLAG
     - CMAKE_MODULE_PATH
     - CMAKE_NOT_USING_CONFIG_FLAGS
@@ -712,6 +723,8 @@ variables:
     - CMAKE_ANDROID_STL_TYPE
     - CMAKE_ARCHIVE_OUTPUT_DIRECTORY
     - CMAKE_ARCHIVE_OUTPUT_DIRECTORY_<CONFIG>
+    - CMAKE_AUTOGEN_PARALLEL
+    - CMAKE_AUTOGEN_VERBOSE                                 # Since 3.13
     - CMAKE_AUTOMOC
     - CMAKE_AUTOMOC_DEPEND_FILTERS
     - CMAKE_AUTOMOC_MOC_OPTIONS
@@ -793,6 +806,7 @@ variables:
     - CMAKE_TRY_COMPILE_TARGET_TYPE
     - CMAKE_USE_RELATIVE_PATHS
     - CMAKE_VISIBILITY_INLINES_HIDDEN
+    - CMAKE_VS_GLOBALS                                      # Since 3.13
     - CMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD
     - CMAKE_VS_INCLUDE_PACKAGE_TO_DEFAULT_BUILD
     - CMAKE_VS_SDK_EXCLUDE_DIRECTORIES                      # Since 3.12
@@ -866,6 +880,8 @@ variables:
     - CMAKE_<LANG>_LIBRARY_ARCHITECTURE
     - CMAKE_<LANG>_LINKER_PREFERENCE
     - CMAKE_<LANG>_LINKER_PREFERENCE_PROPAGATES
+    - CMAKE_<LANG>_LINKER_WRAPPER_FLAG                      # Since 3.13
+    - CMAKE_<LANG>_LINKER_WRAPPER_FLAG_SEP                  # Since 3.13
     - CMAKE_<LANG>_LINK_EXECUTABLE
     - CMAKE_<LANG>_OUTPUT_EXTENSION
     - CMAKE_<LANG>_PLATFORM_ID
@@ -1116,6 +1132,8 @@ variables:
     - CPACK_DEBIAN_<COMPONENT>_PACKAGE_CONTROL_STRICT_PERMISSION
     - CPACK_DEBIAN_PACKAGE_SOURCE
     - CPACK_DEBIAN_<COMPONENT>_PACKAGE_SOURCE
+    - CPACK_DEBIAN_DEBUGINFO_PACKAGE                        # Since 3.13
+    - CPACK_DEBIAN_<component>_DEBUGINFO_PACKAGE            # Since 3.13
     # - CPackDMG
     - CPACK_DMG_VOLUME_NAME
     - CPACK_DMG_FORMAT
@@ -1128,6 +1146,10 @@ variables:
     - CPACK_COMMAND_HDIUTIL
     - CPACK_COMMAND_SETFILE
     - CPACK_COMMAND_REZ
+    # -CPackExt (Since 3.13)
+    - CPACK_EXT_REQUESTED_VERSIONS
+    - CPACK_EXT_ENABLE_STAGING
+    - CPACK_EXT_PACKAGE_SCRIPT
     # - CPackIFW
     - CPACK_IFW_ROOT
     - QTIFWDIR
@@ -1856,6 +1878,10 @@ scripting-commands:
           , REMOVE_DUPLICATES
           , REVERSE
           , SORT
+            # Since 3.13
+          , COMPARE
+          , CASE
+          , ORDER
             # Since 3.12
           , JOIN
           , SUBLIST
@@ -1874,6 +1900,8 @@ scripting-commands:
             # NOTE Another `REGEX` named arg has already added
           , OUTPUT_VARIABLE
           ]
+        # Since 3.13
+        special-args: [STRING, FILE_BASENAME, SENSITIVE, INSENSITIVE, ASCENDING, DESCENDING]
     -
         name: macro
     -
@@ -1881,7 +1909,12 @@ scripting-commands:
         named-args: [CLEAR, FORCE]
     -
         name: math
-        named-args: [EXPR]
+        named-args: [
+            EXPR
+          , OUTPUT_FORMAT                                   # Since 3.13
+          ]
+        # Since 3.13
+        special-args: [DECIMAL, HEXADECIMAL]
     -
         name: message
         named-args: [STATUS, WARNING, AUTHOR_WARNING, SEND_ERROR, FATAL_ERROR, DEPRECATION]
@@ -2025,6 +2058,8 @@ project-commands:
         name: add_library
         named-args: [STATIC, SHARED, MODULE, OBJECT, EXCLUDE_FROM_ALL, IMPORTED, UNKNOWN, GLOBAL, ALIAS, INTERFACE]
     -
+        name: add_link_options
+    -
         name: add_subdirectory
         named-args: [EXCLUDE_FROM_ALL]
     -
@@ -2134,6 +2169,7 @@ project-commands:
           ]
     -
         name: link_directories
+        named-args: [AFTER, BEFORE]
     -
         name: link_libraries
         named-args: [debug, optimized, general]
@@ -2251,12 +2287,19 @@ project-commands:
           ]
     -
         name: target_compile_options
-        named-args: [BEFORE, INTERFACE, PUBLIC, PRIVATE]
+        named-args: &target_compile_options [BEFORE, INTERFACE, PUBLIC, PRIVATE]
     -
         name: target_include_directories
         named-args: [BEFORE, SYSTEM, INTERFACE, PUBLIC, PRIVATE]
     -
+        # Since 3.13
+        name: target_link_directories
+        named-args: *target_compile_options
+    -
         name: target_link_libraries
+        named-args: *target_compile_definitions
+    -
+        name: target_link_options
         named-args: *target_compile_definitions
     -
         name: target_sources

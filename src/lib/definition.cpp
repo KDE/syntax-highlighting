@@ -31,6 +31,7 @@
 #include "context_p.h"
 #include "format.h"
 #include "format_p.h"
+#include "repository.h"
 #include "repository_p.h"
 #include "rule_p.h"
 #include "ksyntaxhighlighting_logging.h"
@@ -222,13 +223,13 @@ QStringList Definition::foldingIgnoreList() const
 
 QStringList Definition::keywordLists() const
 {
-    d->load();
+    d->load(DefinitionData::OnlyKeywords(true));
     return d->keywordLists.keys();
 }
 
 QStringList Definition::keywordList(const QString& name) const
 {
-    d->load();
+    d->load(DefinitionData::OnlyKeywords(true));
     const auto list = d->keywordList(name);
     return list ? list->keywords() : QStringList();
 }
@@ -357,12 +358,15 @@ bool DefinitionData::isLoaded() const
     return !contexts.isEmpty();
 }
 
-bool DefinitionData::load()
+bool DefinitionData::load(OnlyKeywords onlyKeywords)
 {
     if (fileName.isEmpty())
         return false;
 
     if (isLoaded())
+        return true;
+
+    if (bool(onlyKeywords) && keywordIsLoaded)
         return true;
 
     QFile file(fileName);
@@ -375,15 +379,20 @@ bool DefinitionData::load()
         if (token != QXmlStreamReader::StartElement)
             continue;
 
-        if (reader.name() == QLatin1String("highlighting"))
-            loadHighlighting(reader);
+        if (reader.name() == QLatin1String("highlighting")) {
+            loadHighlighting(reader, onlyKeywords);
+            if (bool(onlyKeywords)) {
+                return true;
+            }
+        }
 
         else if (reader.name() == QLatin1String("general"))
             loadGeneral(reader);
     }
 
-    for (auto it = keywordLists.begin(); it != keywordLists.end(); ++it)
-        (*it).setCaseSensitivity(caseSensitive);
+    for (auto it = keywordLists.begin(); it != keywordLists.end(); ++it) {
+        it->setCaseSensitivity(caseSensitive);
+    }
 
     foreach (auto context, contexts) {
         context->resolveContexts();
@@ -492,19 +501,31 @@ bool DefinitionData::loadLanguage(QXmlStreamReader &reader)
     return true;
 }
 
-void DefinitionData::loadHighlighting(QXmlStreamReader& reader)
+void DefinitionData::loadHighlighting(QXmlStreamReader& reader, OnlyKeywords onlyKeywords)
 {
     Q_ASSERT(reader.name() == QLatin1String("highlighting"));
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
+
+    // skip highlighting
+    reader.readNext();
 
     while (!reader.atEnd()) {
         switch (reader.tokenType()) {
             case QXmlStreamReader::StartElement:
                 if (reader.name() == QLatin1String("list")) {
-                    KeywordList keywords;
-                    keywords.load(reader);
-                    keywordLists.insert(keywords.name(), keywords);
+                    if (!keywordIsLoaded) {
+                        KeywordList keywords;
+                        keywords.load(reader);
+                        keywordLists.insert(keywords.name(), keywords);
+                    }
+                    else {
+                        reader.skipCurrentElement();
+                    }
+                } else if (bool(onlyKeywords)) {
+                    resolveIncludeKeywords();
+                    return;
                 } else if (reader.name() == QLatin1String("contexts")) {
+                    resolveIncludeKeywords();
                     loadContexts(reader);
                     reader.readNext();
                 } else if (reader.name() == QLatin1String("itemDatas")) {
@@ -519,6 +540,19 @@ void DefinitionData::loadHighlighting(QXmlStreamReader& reader)
                 reader.readNext();
                 break;
         }
+    }
+}
+
+void DefinitionData::resolveIncludeKeywords()
+{
+    if (keywordIsLoaded) {
+        return;
+    }
+
+    keywordIsLoaded = true;
+
+    for (auto it = keywordLists.begin(); it != keywordLists.end(); ++it) {
+        it->resolveIncludeKeywords(*this);
     }
 }
 

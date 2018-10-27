@@ -54,9 +54,11 @@ public:
 
     void clear();
 
-    bool load();
+    enum class OnlyKeywords : bool;
+
+    bool load(OnlyKeywords onlyKeywords = OnlyKeywords(false));
     bool loadLanguage(QXmlStreamReader &reader);
-    void loadHighlighting(QXmlStreamReader &reader);
+    void loadHighlighting(QXmlStreamReader &reader, OnlyKeywords onlyKeywords);
     void loadContexts(QXmlStreamReader &reader);
     void loadItemData(QXmlStreamReader &reader);
     void loadGeneral(QXmlStreamReader &reader);
@@ -64,6 +66,8 @@ public:
     void loadFoldingIgnoreList(QXmlStreamReader &reader);
     void loadSpellchecking(QXmlStreamReader &reader);
     bool checkKateVersion(const QStringRef &verStr);
+
+    void resolveIncludeKeywords();
 
     KeywordList *keywordList(const QString &name);
     bool isWordDelimiter(QChar c) const;
@@ -83,6 +87,7 @@ public:
     QHash<QString, Format> formats;
     QString wordDelimiters;
     QString wordWrapDelimiters;
+    bool keywordIsLoaded = false;
     bool hasFoldingRegions = false;
     bool indentationBasedFolding = false;
     QStringList foldingIgnoreList;

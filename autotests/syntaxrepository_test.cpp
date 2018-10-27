@@ -398,6 +398,96 @@ private Q_SLOTS:
         QVERIFY(encodings.contains({ QChar(196), QLatin1String("\\\"{A}") }));
         QVERIFY(encodings.contains({ QChar(227), QLatin1String("\\~{a}") }));
     }
+
+    void testIncludeKeywordLists()
+    {
+        Repository repo;
+        QTemporaryDir dir;
+
+        // forge a syntax file
+        {
+            QVERIFY(QDir(dir.path()).mkpath(QLatin1String("syntax")));
+
+            const char syntax[] = R"xml(<?xml version="1.0" encoding="UTF-8"?>
+            <!DOCTYPE language SYSTEM "language.dtd">
+            <language version="1" kateversion="5.1" name="AAA" section="Other" extensions="*.a" mimetype="" author="" license="MIT">
+              <highlighting>
+                <list name="a">
+                  <include>c</include>
+                  <item>a</item>
+                </list>
+                <list name="b">
+                  <item>b</item>
+                  <include>a</include>
+                </list>
+                <list name="c">
+                  <item>c</item>
+                  <include>b</include>
+                </list>
+
+                <list name="d">
+                  <item>d</item>
+                  <include>e##AAA</include>
+                </list>
+                <list name="e">
+                  <item>e</item>
+                  <include>f</include>
+                </list>
+                <list name="f">
+                  <item>f</item>
+                </list>
+                <contexts>
+                  <context attribute="Normal Text" lineEndContext="#stay" name="Normal Text">
+                    <keyword attribute="x" context="#stay" String="a" />
+                  </context>
+                </contexts>
+                <itemDatas>
+                  <itemData name="Normal Text" defStyleNum="dsNormal"/>
+                  <itemData name="x" defStyleNum="dsAlert" />
+                </itemDatas>
+              </highlighting>
+            </language>
+            )xml";
+
+            QFile file(dir.path() + QLatin1String("/syntax/a.xml"));
+            QVERIFY(file.open(QIODevice::NewOnly | QIODevice::WriteOnly));
+            QTextStream stream(&file);
+            stream << syntax;
+        }
+
+        repo.addCustomSearchPath(dir.path());
+        auto def = repo.definitionForName(QLatin1String("AAA"));
+        QCOMPARE(def.name(), QLatin1String("AAA"));
+
+        auto klist1 = def.keywordList(QLatin1String("a"));
+        auto klist2 = def.keywordList(QLatin1String("b"));
+        auto klist3 = def.keywordList(QLatin1String("c"));
+
+        // internal QHash<QString, KeywordList> is arbitrarily ordered and undeterministic
+        auto& klist = klist1.size() == 3 ? klist1
+                    : klist2.size() == 3 ? klist2
+                    : klist3;
+
+        QCOMPARE(klist.size(), 3);
+        QVERIFY(klist.contains(QLatin1String("a")));
+        QVERIFY(klist.contains(QLatin1String("b")));
+        QVERIFY(klist.contains(QLatin1String("c")));
+
+        klist = def.keywordList(QLatin1String("d"));
+        QCOMPARE(klist.size(), 3);
+        QVERIFY(klist.contains(QLatin1String("d")));
+        QVERIFY(klist.contains(QLatin1String("e")));
+        QVERIFY(klist.contains(QLatin1String("f")));
+
+        klist = def.keywordList(QLatin1String("e"));
+        QCOMPARE(klist.size(), 2);
+        QVERIFY(klist.contains(QLatin1String("e")));
+        QVERIFY(klist.contains(QLatin1String("f")));
+
+        klist = def.keywordList(QLatin1String("f"));
+        QCOMPARE(klist.size(), 1);
+        QVERIFY(klist.contains(QLatin1String("f")));
+    }
 };
 }
 

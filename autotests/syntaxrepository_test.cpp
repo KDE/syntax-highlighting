@@ -450,7 +450,7 @@ private Q_SLOTS:
             )xml";
 
             QFile file(dir.path() + QLatin1String("/syntax/a.xml"));
-            QVERIFY(file.open(QIODevice::NewOnly | QIODevice::WriteOnly));
+            QVERIFY(file.open(QIODevice::WriteOnly));
             QTextStream stream(&file);
             stream << syntax;
         }

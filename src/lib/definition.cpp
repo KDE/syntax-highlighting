@@ -520,6 +520,7 @@ void DefinitionData::loadHighlighting(QXmlStreamReader& reader, OnlyKeywords onl
                     }
                     else {
                         reader.skipCurrentElement();
+                        reader.readNext(); // Skip </list>
                     }
                 } else if (bool(onlyKeywords)) {
                     resolveIncludeKeywords();

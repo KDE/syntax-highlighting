@@ -21,22 +21,20 @@
 
     ====================================================================
 
-    This file is an extension of the JavaScript highlighter
-    (javascript.xml).
-    IMPORTANT: Keep sync with "typescript-react.xml".
+    This file is an extension of the TypeScript highlighter
+    (typescript.xml).
+    IMPORTANT: Keep sync with "javascript-react.xml".
 
     Based on the XML syntax highlighting (v7), by Wilbert Berendsen
     (wilbert@kde.nl), and the TypeScript React grammar files,
     available at: https://github.com/Microsoft/TypeScript-TmLanguage
 
     Change log:
-     * v3 [2018-11-18]: Fix Doxygen comments & shebang. Remove TS extension.
-     * v2 [2018-08-18]: Remove "Conditional Expression" context.
-     * v1 [2018-06-20]: Initial version
+     * v1 [2018-11-18]: Initial version
 -->
 
-<language name="JavaScript React" version="3" kateversion="5.0" section="Scripts" indenter="cstyle"
-          priority="8" extensions="*.jsx" mimetype="text/jsx;text/x-jsx;application/jsx;application/x-jsx;"
+<language name="TypeScript React" version="1" kateversion="5.53" section="Scripts" indenter="cstyle"
+          priority="8" extensions="*.tsx" mimetype="text/tsx;text/x-tsx;application/tsx;application/x-tsx;"
           author="Nibaldo González (nibgonz@gmail.com)" license="MIT">
 
 <highlighting>
@@ -50,32 +48,61 @@
 
 		<context name="Normal" attribute="Normal Text" lineEndContext="#stay">
 			<IncludeRules context="React" />
-			<IncludeRules context="Normal##JavaScript" />
+			<IncludeRules context="Normal##TypeScript" />
 		</context>
 
-		<!-- JavaScript -->
+		<!-- TypeScript -->
 
-		<!-- Overwrite rules of 'javascript.xml'. These rules send to contexts
-		     that contain: <IncludeRules context="Normal"/> in the JavaScript XML file. -->
-		<context name="OverwriteJavaScript" attribute="Normal Text" lineEndContext="#stay">
+		<!-- Overwrite rules of 'typescript.xml'. These rules send to contexts
+		     that contain: <IncludeRules context="Normal"/> in the TypeScript XML file. -->
+		<context name="OverwriteTypeScript" attribute="Normal Text" lineEndContext="#stay">
 			<DetectChar context="Template" attribute="Template" char="`" />
 			<DetectChar context="Object" attribute="Symbol" char="{" beginRegion="Brace" />
-			<DetectChar context="#stay" attribute="Symbol" char="?" />
+			<DetectChar context="Annotation" attribute="Symbol" char=":" />
+			<RegExpr context="Annotation" attribute="Reserved" String="\btype\b(?!\s*[\?!]?:)" />
+			<AnyChar context="#stay" attribute="Symbol" String="[]" />
 		</context>
 		<context name="Object" attribute="Normal Text" lineEndContext="#stay">
 			<DetectChar context="#pop" attribute="Symbol" char="}" endRegion="Brace" />
 			<IncludeRules context="React" />
-			<IncludeRules context="Object##JavaScript" />
+			<IncludeRules context="Object##TypeScript" />
 		</context>
 		<context name="Template" attribute="Template" lineEndContext="#stay">
 			<DetectChar context="#pop" attribute="Template" char="`" />
 			<Detect2Chars context="Substitution" attribute="Substitution" char="$" char1="{" />
-			<IncludeRules context="Template##JavaScript" />
+			<IncludeRules context="Template##TypeScript" />
 		</context>
 		<context name="Substitution" attribute="Normal Text" lineEndContext="#stay">
 			<DetectChar context="#pop" attribute="Substitution" char="}" />
 			<IncludeRules context="React" />
-			<IncludeRules context="Substitution##JavaScript" />
+			<IncludeRules context="Substitution##TypeScript" />
+		</context>
+
+		<context name="Annotation" attribute="Normal Text" lineEndContext="#pop">
+			<AnyChar context="#pop" String=";,{})]" lookAhead="true" />
+			<Detect2Chars context="#pop" char="/" char1="/" lookAhead="true" />
+
+			<DetectChar context="SquareBracket-BeforeTag" attribute="Symbol" char="[" />
+			<DetectChar context="RoundBracket-BeforeTag" char="(" />
+
+			<IncludeRules context="React" />
+			<IncludeRules context="Annotation##TypeScript" />
+		</context>
+		<context name="SquareBracket" attribute="Normal Text" lineEndContext="#stay">
+			<DetectChar context="#pop" attribute="Symbol" char="]" />
+			<DetectChar context="SquareBracket-BeforeTag" attribute="Symbol" char="[" />
+			<DetectChar context="RoundBracket-BeforeTag" char="(" />
+
+			<IncludeRules context="React" />
+			<IncludeRules context="SquareBracket##TypeScript" />
+		</context>
+		<context name="RoundBracket" attribute="Normal Text" lineEndContext="#pop">
+			<DetectChar context="#pop" char=")" />
+			<DetectChar context="SquareBracket-BeforeTag" attribute="Symbol" char="[" />
+			<DetectChar context="RoundBracket-BeforeTag" char="(" />
+
+			<IncludeRules context="React" />
+			<IncludeRules context="RoundBracket##TypeScript" />
 		</context>
 
 		<!-- ReactJS -->
@@ -89,16 +116,17 @@
 			<RegExpr context="ValidTag" attribute="Module" String="\b(default)\s*(?=&tag;|/\*)" />
 
 			<!-- Characters before a valid tag -->
-			<RegExpr context="ValidTag" attribute="Symbol" String="([,\=&gt;:\*\?]|&amp;&amp;|\|\|)\s*(?=&tag;|/\*)" />
-			<RegExpr context="ValidTag" attribute="Normal Text" String="[\(\[]\s*(?=&tag;|/\*)" />
+			<RegExpr context="ValidTag" attribute="Symbol" String="([\[,\=&gt;\*\?]|&amp;&amp;|\|\|)\s*(?=&tag;|/\*)" />
+			<RegExpr context="ValidTag" attribute="Normal Text" String="\(\s*(?=&tag;|/\*)" />
 			<!-- The "Object-BeforeTag" context looks for a valid Tag and then sends the "Object" context -->
 			<RegExpr context="Object-BeforeTag" attribute="Symbol" String="\{\s*(?=&tag;|/\*)" beginRegion="Brace" />
+			<RegExpr context="Annotation-BeforeTag" attribute="Symbol" String=":\s*(?=&tag;|/\*)" />
 
 			<!-- Tag after a comment on a new line -->
 			<Detect2Chars context="ValidTag" attribute="Comment" char="/" char1="*" firstNonSpace="true" lookAhead="true" />
 
-			<!-- Overwrite JavaScript rules to highlight tags within some contexts -->
-			<IncludeRules context="OverwriteJavaScript" />
+			<!-- Overwrite TypeScript rules to highlight tags within some contexts -->
+			<IncludeRules context="OverwriteTypeScript" />
 		</context>
 
 		<!-- Highlight nested tags with comments in between.
@@ -114,6 +142,16 @@
 			<IncludeRules context="ValidTag" />
 		</context>
 		<context name="EvaluatedCode-BeforeTag" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop!EvaluatedCode">
+			<IncludeRules context="ValidTag" />
+		</context>
+
+		<context name="Annotation-BeforeTag" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop!Annotation">
+			<IncludeRules context="ValidTag" />
+		</context>
+		<context name="SquareBracket-BeforeTag" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop!SquareBracket">
+			<IncludeRules context="ValidTag" />
+		</context>
+		<context name="RoundBracket-BeforeTag" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop!RoundBracket">
 			<IncludeRules context="ValidTag" />
 		</context>
 
@@ -201,6 +239,7 @@
 		</context>
 
 		<context name="AllComments" attribute="Normal Text" lineEndContext="#stay">
+			<!-- TypeScript uses this for comments -->
 			<IncludeRules context="FindComments##JavaScript" />
 		</context>
 
@@ -219,9 +258,10 @@
 		<itemData name="Code Brackets"    defStyleNum="dsVariable" spellChecking="false" />
 		<itemData name="Error"            defStyleNum="dsError" spellChecking="false" />
 
-		<!-- itemDatas in JavaScript XML file -->
+		<!-- itemDatas in TypeScript XML file -->
 		<itemData name="Symbol"           defStyleNum="dsOperator" />
 		<itemData name="ControlFlow"      defStyleNum="dsControlFlow" spellChecking="false" />
+		<itemData name="Reserved"         defStyleNum="dsKeyword" italic="true" spellChecking="false" />
 		<itemData name="Module"           defStyleNum="dsImport" spellChecking="false" />
 		<itemData name="Template"         defStyleNum="dsVerbatimString" />
 		<itemData name="Substitution"     defStyleNum="dsSpecialChar" spellChecking="false" />

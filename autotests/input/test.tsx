@@ -1,4 +1,4 @@
-// JavaScript React
+// TypeScript React
 
 /** @author Willy <willy@wmail.com>
   * @url https://reactjs.org/ **/
@@ -50,3 +50,7 @@ anyWord/*comment*/ <noTag/>
 .<noTag>
 &<notag> | <noTag/>
 % /* comment*/ <noTag/>
+
+annotation: <tag/>
+annotation: text [ <tag/> ]
+console.log("hello")

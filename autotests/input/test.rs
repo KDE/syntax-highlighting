@@ -1,5 +1,5 @@
-// Comment
-/* Comment
+// Comment NOTE
+/* Comment FIXME ALERT
 	*/
 
 // Identifiers

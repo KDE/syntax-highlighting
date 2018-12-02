@@ -4,7 +4,7 @@
 	name="BrightScript"
 	section="Scripts"
 	extensions="*.brs"
-	version="1"
+	version="2"
 	kateversion="5.0"
 	author="Daniel Levin (dendy.ua@gmail.com)"
 	license="MIT">
@@ -230,7 +230,7 @@
 
 <!-- Common rules for function and sub. -->
 <context name="@code_end" attribute="g" lineEndContext="#stay">
-	<RegExpr String="end\s+(if|for|while)" insensitive="true" attribute="control" context="#pop"/>
+	<RegExpr String="end\s+(if|for|while)" insensitive="true" attribute="control"/>
 </context>
 
 <context name="arg_as_type" attribute="g" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop">
@@ -256,7 +256,7 @@
 
 <!-- Regular function definition. -->
 <context name="@function" attribute="g" lineEndContext="#stay">
-	<keyword String="function" attribute="keyword" context="function"/>
+	<keyword String="function" attribute="keyword" context="function" beginRegion="function"/>
 </context>
 
 <context name="function" attribute="g" lineEndContext="#stay" fallthrough="true" fallthroughContext="function_name">
@@ -287,21 +287,24 @@
 
 <context name="function_code" attribute="g" lineEndContext="#stay">
 	<DetectSpaces/>
-	<keyword String="end" context="function_end" lookAhead="true"/>
-	<keyword String="endfunction" attribute="keyword" context="#pop#pop"/>
+	<RegExpr String="end\s+function" insensitive="true" context="#pop!function_solid_end" lookAhead="true"/>
+	<keyword String="endfunction" context="#pop!function_solid_end" lookAhead="true"/>
 	<IncludeRules context="@code"/>
 </context>
 
-<context name="function_end" attribute="g" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+<context name="function_solid_end" attribute="g" lineEndContext="#stay">
+	<StringDetect String="end" insensitive="true" attribute="keyword" context="#pop!function_end"/>
+</context>
+
+<context name="function_end" attribute="keyword" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
 	<DetectSpaces/>
-	<RegExpr String="end\s+function" insensitive="true" attribute="keyword" context="#pop#pop#pop"/>
-	<IncludeRules context="@code_end"/>
+	<keyword String="function" attribute="keyword" context="#pop#pop" endRegion="function"/>
 </context>
 
 
 <!-- sub is a function with void return type. -->
 <context name="@sub" attribute="g" lineEndContext="#stay">
-	<keyword String="sub" attribute="keyword" context="sub"/>
+	<keyword String="sub" attribute="keyword" context="sub" beginRegion="sub"/>
 </context>
 
 <context name="sub" attribute="g" lineEndContext="#stay" fallthrough="true" fallthroughContext="sub_name">
@@ -332,15 +335,18 @@
 
 <context name="sub_code" attribute="g" lineEndContext="#stay">
 	<DetectSpaces/>
-	<keyword String="end" context="sub_end" lookAhead="true"/>
-	<keyword String="endsub" attribute="keyword" context="#pop#pop"/>
+	<RegExpr String="end\s+sub" insensitive="true" context="#pop!sub_solid_end" lookAhead="true"/>
+	<keyword String="endsub" context="#pop!sub_solid_end" lookAhead="true"/>
 	<IncludeRules context="@code"/>
 </context>
 
-<context name="sub_end" attribute="g" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop#pop">
+<context name="sub_solid_end" attribute="g" lineEndContext="#stay">
+	<StringDetect String="end" insensitive="true" attribute="keyword" context="#pop!sub_end"/>
+</context>
+
+<context name="sub_end" attribute="keyword" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop#pop">
 	<DetectSpaces/>
-	<RegExpr String="end\s+sub" insensitive="true" attribute="keyword" context="#pop#pop#pop"/>
-	<IncludeRules context="@code_end"/>
+	<keyword String="sub" attribute="keyword" context="#pop#pop" endRegion="sub"/>
 </context>
 
 
@@ -350,6 +356,7 @@
 	<DetectSpaces/>
 	<IncludeRules context="@macro"/>
 	<IncludeRules context="@comment"/>
+	<IncludeRules context="@code_end"/>
 
 	<keyword String="print" attribute="print" context="print"/>
 	<keyword String="goto" attribute="keyword" context="goto"/>

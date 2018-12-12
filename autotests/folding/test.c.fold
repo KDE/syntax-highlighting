@@ -8,14 +8,14 @@
 two \
 three
 
-static uint64_t intWithSuffix = 42ull;
+static uint64_t intWithSuffix = 42ull + ~1233L;
 static int octNum = 07232;
 static int invalidOctNum = 09231;
 static uint64_t hexNum = 0xDEADBEEF42;
 static uint64_t invalidHexNum = 0xGLDFKG;
 static char binNum = 0b0101010;
 
-static double d1 = 42.;
+static double d1 = 42. + 0x1.5p+2;
 static double d2 = .42;
 static double d3 = 42.3e1;
 static double d4 = .2e-12;

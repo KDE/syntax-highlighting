@@ -110,6 +110,16 @@ int main(char[][] args) {
     char c = 'a';
     s = "abc 012 \" \n \x12 \u1234 \U12345678";
     s = `BQString '"`;
+    s = q{foo "bar" 123};
+    s = q"FOO
+foo
+FOO";
+    s = q"[foo [bar] q"[baz]"]";
+    s = q"(foo (bar) q"(baz)")";
+    s = q"<foo <bar> q"<baz>">";
+    s = q"{foo {bar} q"{baz}"}";
+    s = q"/foo/";
+    s = q"!foo!";
     
     /// region markers
     //BEGIN x

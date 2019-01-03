@@ -96,8 +96,6 @@
   2003.08.11 - D.XML 1.10           - updated.
   2003.07.18 - D.XML 1.00           - First released.
 
-  TODO:- Deliminated strings and Token strings (D2.0) are not supported.
-
    ========================================================================
 -->
 
@@ -416,9 +414,13 @@
         <StringDetect attribute="Pragma" context="LinePragma" String="#line"/>
         
         <!-- Rules for the C-style indenter. Currently problems with /// and /++ comments. -->
-        <DetectChar attribute="Symbol" context="#stay" char="{" beginRegion="BraceA" />
-        <DetectChar attribute="Symbol" context="#stay" char="}" endRegion="BraceA" />
+        <DetectChar attribute="Symbol" context="BraceA" char="{" beginRegion="BraceA" />
         <AnyChar attribute="Symbol" context="#stay" String=":!%&amp;()+,-/.*&lt;=&gt;?[]|~^&#59;"/>
+      </context>
+
+      <context name="BraceA" attribute="Normal Text" lineEndContext="#stay">
+        <DetectChar attribute="Symbol" context="#pop" char="}" endRegion="BraceA" />
+        <IncludeRules context="normal"/>
       </context>
 
       <context name="StartingLetter" attribute="Normal Text" lineEndContext="#pop">
@@ -454,6 +456,13 @@
           
           <Detect2Chars attribute="RawString" context="RawString" char="r" char1="&quot;"/>
           <Detect2Chars attribute="HexString" context="HexString" char="x" char1="&quot;"/>
+          <Detect2Chars attribute="Token String Delimiter" context="TokenString" char="q" char1="{"/>
+          <RegExpr attribute="Delimited String Delimiter" context="DelimStrHeredoc" String="q&quot;([A-Za-z_][A-Za-z0-9_]*)$" />
+          <StringDetect attribute="Delimited String Delimiter" context="DelimStrBracket" String="q&quot;[" />
+          <StringDetect attribute="Delimited String Delimiter" context="DelimStrParen" String="q&quot;(" />
+          <StringDetect attribute="Delimited String Delimiter" context="DelimStrLtGt" String="q&quot;&lt;" />
+          <StringDetect attribute="Delimited String Delimiter" context="DelimStrBrace" String="q&quot;{" />
+          <RegExpr attribute="Delimited String Delimiter" context="DelimStrSimple" String="q&quot;([^A-Za-z_[(&lt;{])" />
           
           <!-- user highlighting: last so as not to interfere with anything else -->
           <keyword String="userkeywords"    attribute="UserKeywords"   context="#stay"     />
@@ -658,6 +667,62 @@
         <Detect2Chars attribute="EscapeSequence" context="UnicodeLong"   char="\" char1="U"/>
         <Detect2Chars attribute="EscapeSequence" context="HTMLEntity"   char="\" char1="&amp;"/>
       </context>
+      <!-- token strings: q{...} -->
+      <context name="TokenString" attribute="Normal Text" lineEndContext="#stay">
+        <DetectChar attribute="Token String Delimiter" context="#pop" char="}" />
+        <IncludeRules context="normal" />
+      </context>
+      <!-- delimited strings -->
+      <!-- q"IDENTIFIER...IDENTIFIER" -->
+      <context name="DelimStrHeredoc" attribute="Delimited String Content" lineEndContext="#stay">
+        <RegExpr attribute="Delimited String Delimiter" context="#pop" String="^%1&quot;" dynamic="true" />
+        <RegExpr attribute="Error" context="#pop" String="^%1" dynamic="true" />
+      </context>
+      <!-- q"[...]" -->
+      <context name="DelimStrBracket" attribute="Delimited String Content" lineEndContext="#stay">
+        <DetectChar attribute="Delimited String Content" context="DelimStrBracket2" char="[" />
+        <Detect2Chars attribute="Delimited String Delimiter" context="#pop" char="]" char1="&quot;" />
+        <DetectChar attribute="Error" context="#pop" char="]" />
+      </context>
+      <context name="DelimStrBracket2" attribute="Delimited String Content" lineEndContext="#stay">
+        <DetectChar attribute="Delimited String Content" context="DelimStrBracket2" char="[" />
+        <DetectChar attribute="Delimited String Content" context="#pop" char="]" />
+      </context>
+      <!-- q"(...)" -->
+      <context name="DelimStrParen" attribute="Delimited String Content" lineEndContext="#stay">
+        <DetectChar attribute="Delimited String Content" context="DelimStrParen2" char="(" />
+        <Detect2Chars attribute="Delimited String Delimiter" context="#pop" char=")" char1="&quot;" />
+        <DetectChar attribute="Error" context="#pop" char=")" />
+      </context>
+      <context name="DelimStrParen2" attribute="Delimited String Content" lineEndContext="#stay">
+        <DetectChar attribute="Delimited String Content" context="DelimStrParen2" char="(" />
+        <DetectChar attribute="Delimited String Content" context="#pop" char=")" />
+      </context>
+      <!-- q"<...>" -->
+      <context name="DelimStrLtGt" attribute="Delimited String Content" lineEndContext="#stay">
+        <DetectChar attribute="Delimited String Content" context="DelimStrLtGt2" char="&lt;" />
+        <Detect2Chars attribute="Delimited String Delimiter" context="#pop" char="&gt;" char1="&quot;" />
+        <DetectChar attribute="Error" context="#pop" char="&gt;" />
+      </context>
+      <context name="DelimStrLtGt2" attribute="Delimited String Content" lineEndContext="#stay">
+        <DetectChar attribute="Delimited String Content" context="DelimStrLtGt2" char="&lt;" />
+        <DetectChar attribute="Delimited String Content" context="#pop" char="&gt;" />
+      </context>
+      <!-- q"{...}" -->
+      <context name="DelimStrBrace" attribute="Delimited String Content" lineEndContext="#stay">
+        <DetectChar attribute="Delimited String Content" context="DelimStrBrace2" char="{" />
+        <Detect2Chars attribute="Delimited String Delimiter" context="#pop" char="}" char1="&quot;" />
+        <DetectChar attribute="Error" context="#pop" char="}" />
+      </context>
+      <context name="DelimStrBrace2" attribute="Delimited String Content" lineEndContext="#stay">
+        <DetectChar attribute="Delimited String Content" context="DelimStrBrace2" char="{" />
+        <DetectChar attribute="Delimited String Content" context="#pop" char="}" />
+      </context>
+      <!-- q"*...*" -->
+      <context name="DelimStrSimple" attribute="Delimited String Content" lineEndContext="#stay">
+        <RegExpr attribute="Delimited String Delimiter" context="#pop" String="%1&quot;" dynamic="true" />
+        <RegExpr attribute="Error" context="#pop" String="%1" dynamic="true" />
+      </context>
 
       <!-- Comments -->
       <context name="CommentRules" attribute="Normal Text" lineEndContext="#pop">
@@ -847,6 +912,9 @@
       <itemData name="RawString"      defStyleNum="dsVerbatimString"/>
       <itemData name="BQString"       defStyleNum="dsSpecialString"/>
       <itemData name="HexString"      defStyleNum="dsSpecialString"/>
+      <itemData name="Token String Delimiter" defStyleNum="dsKeyword"/>
+      <itemData name="Delimited String Content" defStyleNum="dsVerbatimString"/>
+      <itemData name="Delimited String Delimiter" defStyleNum="dsKeyword"/>
       
       <!-- Ddoc specific -->
       <itemData name="Macros"      defStyleNum="dsOthers" color="#bf5fbf" selColor="#ffffff" bold="1" italic="0" />

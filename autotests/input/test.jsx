@@ -50,3 +50,28 @@ anyWord/*comment*/ <noTag/>
 .<noTag>
 &<notag> | <noTag/>
 % /* comment*/ <noTag/>
+
+<C<number>/>
+<C<number>> </C>
+<C
+<error />
+
+// Non-ASCII tag name & attribute
+<日本語></日本語>;
+<Component 本本:本-本 aa本:本 aa:aa />
+
+<Namespace.DeepNamespace.Component />;
+<Component { ... x } y
+={2 } z />;
+
+let k1 = <div> <h2> Hello </h2> <h1> world </h1></div>;
+let k2 = <Button> <h2> Hello </h2> </Button>;
+
+// Empty tags
+<></>; // no whitespace
+<    ></   >; // lots of whitespace
+< /*starting wrap*/ ></ /*ending wrap*/>; // comments in the tags
+<>hi</>; // text inside
+<><span>hi</span><div>bye</div></>; // children
+<><span>1</span><><span>2.1</span><span>2.2</span></><span>3</span></>; // nested fragments
+<>#</>; // # would cause scanning error if not in jsxtext

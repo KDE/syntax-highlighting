@@ -51,6 +51,61 @@ anyWord/*comment*/ <noTag/>
 &<notag> | <noTag/>
 % /* comment*/ <noTag/>
 
+// TODO: Fix this (comment before the tag name):
+var x = </**/div></div>;
+
+// Tag after ":"
 annotation: <tag/>
 annotation: text [ <tag/> ]
 console.log("hello")
+
+// Type assertion in tag
+<C<number>/>
+<C<number>> </C>
+<C
+<error />
+
+// Non-ASCII tag name & attribute
+<日本語></日本語>;
+<Component 本本:本-本 aa本:本 aa:aa />
+<aaaa:ñ />
+
+<Namespace.DeepNamespace.Component />;
+<Component { ... x } y
+={2 } z />;
+
+let k1 =
+    <Comp a={10} b="hi" {...o} >
+        hi hi hi!
+    </Comp>;
+
+let k2 =
+    <Comp a={10} b="hi">
+        <div> My Div </div>
+        {(name: string) => <div> My name {name} </div>}
+    </Comp>;
+
+let k3 = <GenericComponent initialValues={{ x: "y" }} nextValues={a => ({ x: a.x })} />; // No Error
+
+// OK
+let k1 = <Comp a={10} b="hi"><></><Button /><AnotherButton /></Comp>;
+let k2 = <Comp a={10} b="hi"><><Button /></><AnotherButton /></Comp>;
+let k3 = <Comp a={10} b="hi"><><Button /><AnotherButton /></></Comp>;
+let k4 = <SingleChildComp a={10} b="hi"><><Button /><AnotherButton /></></SingleChildComp>;
+// OK
+let k1 = <div> <h2> Hello </h2> <h1> world </h1></div>;
+let k2 = <div> <h2> Hello </h2> {(user: any) => <h2>{user.name}</h2>}</div>;
+let k3 = <div> {1} {"That is a number"} </div>;
+let k4 = <Button> <h2> Hello </h2> </Button>;
+
+// Empty tags
+hello<>
+hello<string>
+
+<></>; // no whitespace
+<    ></   >; // lots of whitespace
+< /*starting wrap*/ ></ /*ending wrap*/>; // comments in the tags
+<>hi</>; // text inside
+<><span>hi</span><div>bye</div></>; // children
+<><span>1</span><><span>2.1</span><span>2.2</span></><span>3</span></>; // nested fragments
+<>#</>; // # would cause scanning error if not in jsxtext

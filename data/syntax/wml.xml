@@ -5,6 +5,11 @@
   Alternatively try the "normal" way: #kate@freenode, kwrite-devel@kde.org
   Changelog (0.35 and later):
   ***************************
+* 0.42.1
+  - 2019-01-01 <nibgonz@gmail.com>
+    * Fix infinite loop between the "section" & "error" contexts.
+    * Only highlight tags with valid name format.
+    * Don't highlight array indices as tags.
 * 0.42
   - 2011-11-15 <shadowm2006@gmail.com>:
     * Added preprocessor directives: #error, #warning
@@ -54,8 +59,8 @@
     * Made the new #ifndef directive be recognized (implemented on Wesnoth 1.3.11 and later)
 -->
 
-<language name="Wesnoth Markup Language" section="Markup" extensions="*.cfg;*.pbl;*.CFG;*.PBL" version="3"
-          kateversion="2.3" casesensitive="true" author="Zachary Palmer (zep01@bahj.com), modif. by Ignacio Riquelme Morelle (shadowm2006@gmail.com) and Jonathan Schmidt-Dominé (devel@the-user.org)" license="GPL">
+<language name="Wesnoth Markup Language" section="Markup" extensions="*.cfg;*.pbl;*.CFG;*.PBL" version="4"
+          kateversion="5.0" casesensitive="true" author="Zachary Palmer (zep01@bahj.com), modif. by Ignacio Riquelme Morelle (shadowm2006@gmail.com) and Jonathan Schmidt-Dominé (devel@the-user.org)" license="GPL">
     <highlighting>
         <list name="alerts_wml_utils">
             <item>wmllint</item>
@@ -98,14 +103,17 @@
                 
                 <DetectChar char="{" attribute="Macro/Include" context="macro" beginRegion="macro_block" />
 
-                <!--<DetectChar char="[" attribute="WML Node" context="section" firstNonSpace="true" />-->
-                <RegExpr String="\[(?!/)" attribute="WML Node" context="section" beginRegion="wml_node" />
-                <Detect2Chars char="[" char1="/" attribute="WML Node" context="section" endRegion="wml_node" />
+                <!-- Tags: https://wiki.wesnoth.org/SyntaxWML#Tag_and_Attribute_Structures -->
+                <RegExpr String="\[/\s*\w*\s*\]" attribute="WML Node" context="#stay" endRegion="wml_node" />
+                <RegExpr String="\[\+?\w*\]" attribute="WML Node" context="#stay" beginRegion="wml_node" />
 
                 <RegExpr String="(\w|,| )+=" attribute="WML Attribute" context="value"
                                     lookAhead="true" />
                 
                 <IncludeRules context="variableSubstitutionRule" />
+                
+                <!-- This avoids highlighting array indices as tags -->
+                <RegExpr String="(\w+|\])\[(?!/)" attribute="Normal WML Text" context="#stay" />
             </context>
             
             <context attribute="String" lineEndContext="#stay" name="string">
@@ -152,10 +160,6 @@
                 <IncludeRules context="text" />
             </context>
             
-            <context attribute="WML Node" lineEndContext="error" name="section">
-                <DetectChar char="]" attribute="WML Node" context="#pop" />
-            </context>
-            
             <context attribute="WML Attribute" lineEndContext="#pop" name="value">
                 <DetectChar char="=" attribute="Normal WML Text" context="#pop" />
             </context>
@@ -163,7 +167,7 @@
             <context attribute="Preprocessor" lineEndContext="#pop" name="preprocessor">
             </context>
             
-            <context attribute="Error" lineEndContext="#pop" name="error">
+            <context attribute="Error" lineEndContext="#stay" name="error">
             </context>
             
             <context attribute="Variable Substitution" lineEndContext="#pop"

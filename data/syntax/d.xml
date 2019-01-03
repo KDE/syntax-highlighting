@@ -314,11 +314,16 @@
       <item>Windows</item>
       <item>Pascal</item>
       <item>System</item>
+      <!-- <item>Objective-C</item> --><!-- is handled specially in Linkage rule -->
     </list>
 
     <list name="ptypes">
-      <item>msg</item>
+      <item>inline</item>
       <item>lib</item>
+      <item>linkerDirective</item>
+      <item>mangle</item>
+      <item>msg</item>
+      <item>startaddress</item>
     </list>
     
     <list name="scope_keywords">
@@ -514,23 +519,46 @@
       </context>
       <context name="Linkage2" attribute="Normal Text" lineEndContext="#stay">
         <DetectSpaces/>
-        <StringDetect attribute="Linkage Type" context="#pop#pop" String="C++"/>
+        <StringDetect attribute="Linkage Type" context="Linkage-C++" String="C++"/>
+        <StringDetect attribute="Linkage Type" context="#stay" String="Objective-C"/>
         <keyword    attribute="Linkage Type" context="#stay" String="ltypes"/>
         <IncludeRules context="CommentRules" />
         <!-- Fall-through rules, highlighting errors: -->
         <DetectChar char=")" attribute="Normal Text" context="#pop#pop"/>
         <RegExpr String="[^)\s\n]+" attribute="Error" context="#pop#pop"/>
       </context>
+      <context name="Linkage-C++" attribute="Normal Text" lineEndContext="#stay">
+        <DetectSpaces/>
+        <IncludeRules context="CommentRules" />
+        <DetectChar char="," attribute="Normal Text" context="Linkage-C++2"/>
+        <DetectChar char=")" attribute="Normal Text" context="#pop#pop#pop"/>
+        <RegExpr String="." attribute="Error" context="#stay"/>
+      </context>
+      <context name="Linkage-C++2" attribute="Normal Text" lineEndContext="#stay">
+        <DetectSpaces/>
+        <IncludeRules context="CommentRules" />
+        <DetectIdentifier attribute="Normal Text" context="#stay"/>
+        <DetectChar char="." attribute="Normal Text" context="#stay"/>
+        <DetectChar char=")" attribute="Normal Text" context="#pop#pop#pop"/>
+        <RegExpr String="." attribute="Error" context="#stay"/>
+      </context>
 
       <context name="Version" attribute="Normal Text" lineEndContext="#stay">
         <DetectSpaces/>
-        <DetectChar attribute="Normal Text"  context="Version2"  char="="/>
-        <DetectChar attribute="Normal Text"  context="Version2" char="("/>
+        <DetectChar attribute="Normal Text" context="VersionSpec" char="="/>
+        <DetectChar attribute="Normal Text" context="VersionCond" char="("/>
         <IncludeRules context="CommentRules" />
         <!-- Fall-through rules, highlighting errors: -->
         <RegExpr String="[^\s\n]+" attribute="Error" context="#pop"/>
       </context>
-      <context name="Version2" attribute="Normal Text" lineEndContext="#stay">
+      <context name="VersionSpec" attribute="Normal Text" lineEndContext="#stay">
+        <DetectSpaces/>
+        <DetectIdentifier attribute="Normal Text" context="#stay"/>
+        <RegExpr attribute="Integer" context="#stay" String="\d+[\d_]*(L[uU]?|[uU]L?)?"/>
+        <DetectChar char=";" attribute="Normal Text" context="#pop#pop"/>
+        <RegExpr String="." attribute="Error" context="#pop#pop"/>
+      </context>
+      <context name="VersionCond" attribute="Normal Text" lineEndContext="#stay">
         <DetectSpaces/>
         <keyword    attribute="Version Type" context="#stay" String="vtypes"/>
         <DetectIdentifier attribute="Normal Text" context="#stay"/>
@@ -564,12 +592,28 @@
       </context>
       <context name="Pragma2" attribute="Pragma" lineEndContext="#stay">
         <DetectSpaces/>
-        <keyword    attribute="Version Type" context="#stay" String="ptypes"/>
-        <DetectIdentifier attribute="Normal Text" context="#stay"/>
+        <keyword    attribute="Version Type" context="Pragma3" String="ptypes"/>
+        <DetectIdentifier attribute="Normal Text" context="Pragma3"/>
         <IncludeRules context="CommentRules" />
         <!-- Fall-through rules, highlighting errors: -->
         <DetectChar char=")" attribute="Normal Text" context="#pop#pop"/>
         <RegExpr String="[^)\s\n]+" attribute="Error" context="#pop#pop"/>
+      </context>
+      <context name="Pragma3" attribute="Pragma" lineEndContext="#stay">
+        <DetectSpaces/>
+        <DetectChar char="," attribute="Normal Text" context="Pragma4"/>
+        <DetectChar char=")" attribute="Normal Text" context="#pop#pop#pop"/>
+        <RegExpr String="." attribute="Error" context="#pop#pop#pop"/>
+      </context>
+      <context name="Pragma4" attribute="Pragma" lineEndContext="#stay">
+        <DetectChar char="(" attribute="Normal Text" context="Parenthetical"/>
+        <DetectChar char=")" attribute="Normal Text" context="#pop#pop#pop#pop"/>
+        <IncludeRules context="normal" />
+      </context>
+      <context name="Parenthetical" attribute="Normal Text" lineEndContext="#stay">
+        <DetectChar char="(" attribute="Normal Text" context="Parenthetical"/>
+        <DetectChar char=")" attribute="Normal Text" context="#pop"/>
+        <IncludeRules context="normal" />
       </context>
 
       <!-- Strings -->

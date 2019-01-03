@@ -15,12 +15,18 @@ import X = null;
 +
 + pragma /* */ (msg, "what?");
 + pragma(/++ +/ lib, "insane.a");
++ pragma(inline);
++ pragma(linkerDirective);
++ pragma(mangle);
++ pragma(startaddress);
 + pragma(D_Custom_Extension, "custom data");
++ pragma(foo 0);
 + ---
 +/
 
 /// version condition
 version = X;
+version = 1_2_3;
 version (X) ;
 version(linux) {}
 
@@ -29,7 +35,15 @@ extern
     (C) {}
 extern :
 ;
+extern (C++) {}
+extern (C++, foo.bar.baz) {}
+extern (D) {}
 extern (Windows) {}
+extern (Pascal) {}
+extern (System) {}
+extern (unknown) {}
+extern (C,) {}
+extern (C++, foo, bar) {}
 
 /// alias & typedef
 alias int.min minint;

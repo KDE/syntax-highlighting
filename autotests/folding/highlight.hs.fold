@@ -15,6 +15,8 @@ Things like "a string" or a 'c' character shouldn't be highlighted in here.
 
 -}
 
+import Prelude --
+
 -- a data definition
 
 data Tree a = Br (Tree a) (Tree a) | Leaf a | Nil deriving (Show, Eq)

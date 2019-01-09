@@ -46,6 +46,9 @@ public:
     DefinitionData();
     ~DefinitionData();
 
+    DefinitionData(const DefinitionData &) = delete;
+    DefinitionData &operator=(const DefinitionData &) = delete;
+
     static DefinitionData* get(const Definition &def);
 
     bool isLoaded() const;

@@ -549,3 +549,25 @@ str = "\\\\"
 :@abc
 :@@abc
 :$abc
+
+# squiggly HEREDOC
+    <<~HEREDOC
+      Hello!!
+    HEREDOC
+
+# HEREDOC with backticks
+<<`HEREDOC`
+    echo "hello"
+HEREDOC
+
+# do not highlight HEREDOC markers after the "class" keyword
+# (singleton class definition) (bug: #358273)
+class <<Foo = Object.new
+  attr_accessor :foo
+end
+singleton_class = ( class <<foo; self; end )
+
+# highlight regular expressions after ": " (bug: #361875)
+get 'files/:slug/:filename', to: 'files#download', slug: /^[a-z]+$/, filename: %r|^[/\s]+$|
+@@hello!: /regexp/
+[]=: %r!regexp!

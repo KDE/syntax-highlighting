@@ -139,9 +139,22 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
 
     // process empty lines
     if (text.isEmpty()) {
+        /**
+         * handle line empty context switches
+         * guard against endless loops
+         * see https://phabricator.kde.org/D18509
+         */
+        int endlessLoopingCounter = 0;
         while (!stateData->topContext()->lineEmptyContext().isStay()) {
             if (!d->switchContext(stateData, stateData->topContext()->lineEmptyContext(), QStringList()))
                 break;
+
+            // guard against endless loops
+            ++endlessLoopingCounter;
+            if (endlessLoopingCounter > 1024) {
+                qCDebug(Log) << "Endless switch context transitions for line empty context, aborting highlighting of line.";
+                break;
+            }
         }
         auto context = stateData->topContext();
         applyFormat(0, 0, context->attributeFormat());
@@ -293,12 +306,30 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
 
     } while (offset < text.size());
 
+    /**
+     * apply format for remaining text, if any
+     */
     if (beginOffset < offset)
         applyFormat(beginOffset, text.size() - beginOffset, *currentFormat);
 
-    while (!stateData->topContext()->lineEndContext().isStay() && !lineContinuation) {
-        if (!d->switchContext(stateData, stateData->topContext()->lineEndContext(), QStringList()))
-            break;
+    /**
+     * handle line end context switches
+     * guard against endless loops
+     * see https://phabricator.kde.org/D18509
+     */
+    {
+        int endlessLoopingCounter = 0;
+        while (!stateData->topContext()->lineEndContext().isStay() && !lineContinuation) {
+            if (!d->switchContext(stateData, stateData->topContext()->lineEndContext(), QStringList()))
+                break;
+
+            // guard against endless loops
+            ++endlessLoopingCounter;
+            if (endlessLoopingCounter > 1024) {
+                qCDebug(Log) << "Endless switch context transitions for line end context, aborting highlighting of line.";
+                break;
+            }
+        }
     }
 
     return newState;

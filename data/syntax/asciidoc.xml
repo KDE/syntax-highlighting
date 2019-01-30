@@ -43,7 +43,7 @@
     <!-- postfix/trailing part -->
     <!ENTITY quoted_post "(?=\W|$)">
 ]>
-<language author="Andreas Gratzer" extensions="*.ad;*.adoc;*.asciidoc" kateversion="5.0" mimetype="text/asciidoc" name="AsciiDoc" license="MIT" section="Markup" version="1">
+<language author="Andreas Gratzer" extensions="*.ad;*.adoc;*.asciidoc" kateversion="5.0" mimetype="text/asciidoc" name="AsciiDoc" license="MIT" section="Markup" version="2">
     <highlighting>
         <list name="macro">
             <item>anchor</item>
@@ -165,9 +165,11 @@
                 <RegExpr String="^(&block_dels_pass;)\s*$" attribute="Delimiter" context="#pop!passthrough delimited" beginRegion="block"/>
                 <IncludeRules context="R anchor"/>
                 <IncludeRules context="R block title"/>
+                <IncludeRules context="R include"/>
             </context>
             <context name="passthrough delimited" attribute="Passthrough" lineEndContext="#stay">
                 <RegExpr String="&block_end_del;" dynamic="true" attribute="Delimiter" context="#pop" endRegion="block"/>
+                <IncludeRules context="R include"/>
             </context>
 
             <context name="section" attribute="Normal" lineEndContext="#stay">
@@ -201,13 +203,16 @@
                 <IncludeRules context="R anchor"/>
                 <IncludeRules context="R block title"/>
                 <IncludeRules context="R comment"/>
+                <IncludeRules context="R include"/>
                 <RegExpr String="^." attribute="Verbatim" context="#pop!verbatim paragraph"/>
             </context>
             <context name="verbatim delimited" attribute="Verbatim" lineEndContext="#stay">
                 <RegExpr String="&block_end_del;" dynamic="true" attribute="Delimiter" context="#pop" endRegion="block"/>
                 <IncludeRules context="R include"/>
             </context>
-            <context name="verbatim paragraph" attribute="Verbatim" lineEndContext="#stay" lineEmptyContext="#pop"/>
+            <context name="verbatim paragraph" attribute="Verbatim" lineEndContext="#stay" lineEmptyContext="#pop">
+                <IncludeRules context="R include"/>
+            </context>
 
             <!-- contexts to be used for IncludeRules only -->
 

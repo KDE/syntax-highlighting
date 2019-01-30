@@ -506,7 +506,7 @@ The second reference has number <<r2>> as label.
 
 The third reference has <<r3>> as label.
 
-A reference defintion inside the text instead of the bibliography section yields some strange result: [[[ref-o,outside bibliography]]]].
+A reference definition inside the text instead of the bibliography section yields some strange result: [[[ref-o,outside bibliography]]]].
 Not sure what to do with this.
 
 This is trying to use the escaped reference <<r4>>.
@@ -675,6 +675,8 @@ A fenced block's delimiter length is _exactly_ 3.
 A countiguous *listing* block.
 Last line of the listing.
 
+This line is not part of the contiguous block anymore.
+
 .Delimited with block name
 [listing]
 [[listing-block-id]]
@@ -714,6 +716,8 @@ Inside the contiguous literal block.
 The block contents is rendered verbatim.
 So there is *no* text formatting.
 // this should not be highlighted as comment
+
+This line is not part of the contiguous block anymore.
 
 .Delimited with block name
 [literal]
@@ -939,9 +943,6 @@ Inside the *verse* block.
 
 
 == Nested Blocks
-
-[NOTE]
-Some note text.
 
 <beginfold id='2'>====</beginfold id='2'>
 Start of outer example block.
@@ -1219,7 +1220,7 @@ before![big]#big text#
 <beginfold id='1'>////</beginfold id='1'>
 FIXME Highlighting differs.
 The phrase is rendered as marked.
-Thetrailing hash is therefore not visible.
+The trailing hash is therefore not visible.
 <endfold id='1'>////</endfold id='1'>
 [big]###text###
 
@@ -1300,11 +1301,11 @@ aa__ bb __cc
 
 === Rendered as-is
 
-This line does _not_ contain _some emphasized _ text as there is a surplus space.
+This line does not contain _some emphasized _ text as there is a surplus space.
 
-This line does _not_ contain_some emphasized_ text as there is a space missing.
+This line does not contain_some emphasized_ text as there is a space missing.
 
-This line does _not_ contain _some emphasized_text as there is a space missing.
+This line does not contain _some emphasized_text as there is a space missing.
 
 foo ;_emphasized_ :_emphasized_ }_emphasized_
 
@@ -1723,6 +1724,8 @@ After the horizontal rule.
 
 == Included Contents Rendered
 
+IMPORTANT: The include directive is _always_ processed, even withing passthrough blocks.
+
 NOTE: Using file names with spaces works.
 
 include::{includedir}/demo.adoc[]
@@ -1731,12 +1734,10 @@ include::{includedir}/demo.adoc[]
 include::{includedir}/demo.adoc[lines=2..3]
 
 .Inside contiguous block
-[source,ruby]
-IO.puts 'hello'
-"""
+[literal]
+This line shall be highlighted as verbatim.
 include::{includedir}/demo.adoc[lines=2..3]
-"""
-IO.puts 'bye'
+This line shall be highlighted as verbatim.
 
 .Inside delimited block with name
 [literal]
@@ -1753,6 +1754,19 @@ include::{includedir}/demo.adoc[lines=2..3]
 This line shall be highlighted as verbatim.
 <endfold id='2'>....</endfold id='2'>
 
+.It is also processed within passthrough blocks
+[pass]
+This line shall be highlighted as passthrough.
+include::{includedir}/demo.adoc[lines=2..3]
+This line shall be highlighted as passthrough.
+
+[pass]
+--
+This line shall be highlighted as passthrough.
+include::{includedir}/demo.adoc[lines=2..3]
+This line shall be highlighted as passthrough.
+--
+
 .Inside table
 <beginfold id='2'>|===</beginfold id='2'>
 |row 1 col 1|row 2 col 2
@@ -1764,14 +1778,6 @@ include::{includedir}/demo.adoc[lines=1..1]
 |row 3 col 1
 |row 3 col 2
 <endfold id='2'>|===</endfold id='2'>
-
-
-== Rendered as-is
-
-.Inside verbatim paragraph
- This line shall be highlighted as verbatim.
-include::{includedir}/demo.adoc[lines=2..3]
-This line shall be highlighted as verbatim.
 
 
 = Index
@@ -1817,6 +1823,7 @@ This is \(\((not an indexterm))) as it is fully escaped.
 This is not a \indexterm2:[flow] index term.
 
 This is not a \indexterm:[concealed, index, term] concealed index term.
+
 
 [index]
 == Index Catalog
@@ -2079,7 +2086,6 @@ This is going to be problematic, as we would need to know that we are currently 
 [qanda]
 What is Asciidoctor?::
 An implementation of the AsciiDoc processor in Ruby.
-& answer pairs.
 Must the answer be indented?::
   It's not necessary, but possibly.
 What is the answer to the Ultimate Question?:: 42
@@ -2154,6 +2160,8 @@ menu:View[Zoom > 1:1]
 
 == Pass
 
+// TODO Would be nice to highlight the text within the square bracktes as passthrough.
+
 Some pass:[<u>passthrough</u>] HTML.
 
 Some pass:quotes[<u>passthrough with *quoted* text</u>] HTML.
@@ -2213,7 +2221,7 @@ audio::test.mp3[options="loop"]
 .Test SVG
 [#logo]
 [link=https://github.com/asciidoctor/brand]
-image::test.svg[Asciidoctor Logo, 100]
+image::test.svg[Test, 100]
 
 
 ==== Not highlighted
@@ -2264,7 +2272,6 @@ Within\image:logo-outline-color.svg[Tree, 25]some text.
 == Video
 
 video::test.mp4[width=300]
-
 
 video::test.mp4[width=200, options=loop]
 
@@ -2653,14 +2660,17 @@ This section has leading additional achors.
 
 This section has trailing additional anchors.
 
+
 ==== [[id-1]][[id-2]]Section L3[[id-3]][[id-4]]
 
 This section has both leading and trailing additional anchors.
+
 
 ==== Section L3 {title-attribute} in Title
 
 .Title {title-attribute}
 This section has an attribute in its title.
+
 
 [discrete]
 == Discrete Section
@@ -2688,6 +2698,7 @@ This section will not be shown in the table of contents.
 
 === Section with escaped \*strong* text
 <endfold id='1'>////</endfold id='1'>
+
 
 = Another Section at Level 0
 

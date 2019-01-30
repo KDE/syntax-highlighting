@@ -506,7 +506,7 @@
 <Normal></Normal><br/>
 <Normal>The third reference has </Normal><Link><<r3>></Link><Normal> as label.</Normal><br/>
 <Normal></Normal><br/>
-<Normal>A reference defintion inside the text instead of the bibliography section yields some strange result: </Normal><Anchor>[[[ref-o,outside bibliography]]]</Anchor><Normal>].</Normal><br/>
+<Normal>A reference definition inside the text instead of the bibliography section yields some strange result: </Normal><Anchor>[[[ref-o,outside bibliography]]]</Anchor><Normal>].</Normal><br/>
 <Normal>Not sure what to do with this.</Normal><br/>
 <Normal></Normal><br/>
 <Normal>This is trying to use the escaped reference </Normal><Link><<r4>></Link><Normal>.</Normal><br/>
@@ -675,6 +675,8 @@
 <Verbatim>A countiguous *listing* block.</Verbatim><br/>
 <Verbatim>Last line of the listing.</Verbatim><br/>
 <Normal></Normal><br/>
+<Normal>This line is not part of the contiguous block anymore.</Normal><br/>
+<Normal></Normal><br/>
 <Block Title>.Delimited with block name</Block Title><br/>
 <Preprocessor>[listing]</Preprocessor><br/>
 <Anchor>[[listing-block-id]]</Anchor><br/>
@@ -714,6 +716,8 @@
 <Verbatim>The block contents is rendered verbatim.</Verbatim><br/>
 <Verbatim>So there is *no* text formatting.</Verbatim><br/>
 <Verbatim>// this should not be highlighted as comment</Verbatim><br/>
+<Normal></Normal><br/>
+<Normal>This line is not part of the contiguous block anymore.</Normal><br/>
 <Normal></Normal><br/>
 <Block Title>.Delimited with block name</Block Title><br/>
 <Preprocessor>[literal]</Preprocessor><br/>
@@ -939,9 +943,6 @@
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Section Title>== Nested Blocks</Section Title><br/>
-<Normal></Normal><br/>
-<Preprocessor>[NOTE]</Preprocessor><br/>
-<Normal>Some note text.</Normal><br/>
 <Normal></Normal><br/>
 <Delimiter>====</Delimiter><br/>
 <Normal>Start of outer example block.</Normal><br/>
@@ -1219,7 +1220,7 @@
 <Comment>////</Comment><br/>
 <Alert Level 2>FIXME</Alert Level 2><Comment> Highlighting differs.</Comment><br/>
 <Comment>The phrase is rendered as marked.</Comment><br/>
-<Comment>Thetrailing hash is therefore not visible.</Comment><br/>
+<Comment>The trailing hash is therefore not visible.</Comment><br/>
 <Comment>////</Comment><br/>
 <Preprocessor>[big]###text##</Preprocessor><Normal>#</Normal><br/>
 <Normal></Normal><br/>
@@ -1300,11 +1301,11 @@
 <Normal></Normal><br/>
 <Section Title>=== Rendered as-is</Section Title><br/>
 <Normal></Normal><br/>
-<Normal>This line does </Normal><Emphasized>_not_</Emphasized><Normal> contain _some emphasized _ text as there is a surplus space.</Normal><br/>
+<Normal>This line does not contain _some emphasized _ text as there is a surplus space.</Normal><br/>
 <Normal></Normal><br/>
-<Normal>This line does </Normal><Emphasized>_not_</Emphasized><Normal> contain_some emphasized_ text as there is a space missing.</Normal><br/>
+<Normal>This line does not contain_some emphasized_ text as there is a space missing.</Normal><br/>
 <Normal></Normal><br/>
-<Normal>This line does </Normal><Emphasized>_not_</Emphasized><Normal> contain _some emphasized_text as there is a space missing.</Normal><br/>
+<Normal>This line does not contain _some emphasized_text as there is a space missing.</Normal><br/>
 <Normal></Normal><br/>
 <Normal>foo ;_emphasized_ :_emphasized_ }_emphasized_</Normal><br/>
 <Normal></Normal><br/>
@@ -1723,6 +1724,8 @@
 <Normal></Normal><br/>
 <Section Title>== Included Contents Rendered</Section Title><br/>
 <Normal></Normal><br/>
+<Preprocessor>IMPORTANT:</Preprocessor><Normal> The include directive is </Normal><Emphasized>_always_</Emphasized><Normal> processed, even withing passthrough blocks.</Normal><br/>
+<Normal></Normal><br/>
 <Preprocessor>NOTE:</Preprocessor><Normal> Using file names with spaces works.</Normal><br/>
 <Normal></Normal><br/>
 <Preprocessor>include::{includedir}/demo.adoc[]</Preprocessor><br/>
@@ -1731,12 +1734,10 @@
 <Preprocessor>include::{includedir}/demo.adoc[lines=2..3]</Preprocessor><br/>
 <Normal></Normal><br/>
 <Block Title>.Inside contiguous block</Block Title><br/>
-<Preprocessor>[source,ruby]</Preprocessor><br/>
-<Verbatim>IO.puts 'hello'</Verbatim><br/>
-<Verbatim>"""</Verbatim><br/>
-<Verbatim>include::{includedir}/demo.adoc[lines=2..3]</Verbatim><br/>
-<Verbatim>"""</Verbatim><br/>
-<Verbatim>IO.puts 'bye'</Verbatim><br/>
+<Preprocessor>[literal]</Preprocessor><br/>
+<Verbatim>This line shall be highlighted as verbatim.</Verbatim><br/>
+<Preprocessor>include::{includedir}/demo.adoc[lines=2..3]</Preprocessor><br/>
+<Verbatim>This line shall be highlighted as verbatim.</Verbatim><br/>
 <Normal></Normal><br/>
 <Block Title>.Inside delimited block with name</Block Title><br/>
 <Preprocessor>[literal]</Preprocessor><br/>
@@ -1753,6 +1754,19 @@
 <Verbatim>This line shall be highlighted as verbatim.</Verbatim><br/>
 <Delimiter>....</Delimiter><br/>
 <Normal></Normal><br/>
+<Block Title>.It is also processed within passthrough blocks</Block Title><br/>
+<Preprocessor>[pass]</Preprocessor><br/>
+<Passthrough>This line shall be highlighted as passthrough.</Passthrough><br/>
+<Preprocessor>include::{includedir}/demo.adoc[lines=2..3]</Preprocessor><br/>
+<Passthrough>This line shall be highlighted as passthrough.</Passthrough><br/>
+<Normal></Normal><br/>
+<Preprocessor>[pass]</Preprocessor><br/>
+<Passthrough>--</Passthrough><br/>
+<Passthrough>This line shall be highlighted as passthrough.</Passthrough><br/>
+<Preprocessor>include::{includedir}/demo.adoc[lines=2..3]</Preprocessor><br/>
+<Passthrough>This line shall be highlighted as passthrough.</Passthrough><br/>
+<Passthrough>--</Passthrough><br/>
+<Normal></Normal><br/>
 <Block Title>.Inside table</Block Title><br/>
 <Delimiter>|===</Delimiter><br/>
 <Delimiter>|</Delimiter><Normal>row 1 col 1</Normal><Delimiter>|</Delimiter><Normal>row 2 col 2</Normal><br/>
@@ -1764,14 +1778,6 @@
 <Delimiter>|</Delimiter><Normal>row 3 col 1</Normal><br/>
 <Delimiter>|</Delimiter><Normal>row 3 col 2</Normal><br/>
 <Delimiter>|===</Delimiter><br/>
-<Normal></Normal><br/>
-<Normal></Normal><br/>
-<Section Title>== Rendered as-is</Section Title><br/>
-<Normal></Normal><br/>
-<Block Title>.Inside verbatim paragraph</Block Title><br/>
-<Verbatim> This line shall be highlighted as verbatim.</Verbatim><br/>
-<Verbatim>include::{includedir}/demo.adoc[lines=2..3]</Verbatim><br/>
-<Verbatim>This line shall be highlighted as verbatim.</Verbatim><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Section Title>= Index</Section Title><br/>
@@ -1817,6 +1823,7 @@
 <Normal>This is not a \indexterm2:[flow] index term.</Normal><br/>
 <Normal></Normal><br/>
 <Normal>This is not a \indexterm:[concealed, index, term] concealed index term.</Normal><br/>
+<Normal></Normal><br/>
 <Normal></Normal><br/>
 <Preprocessor>[index]</Preprocessor><br/>
 <Section Title>== Index Catalog</Section Title><br/>
@@ -2079,7 +2086,6 @@
 <Preprocessor>[qanda]</Preprocessor><br/>
 <List Marker>What is Asciidoctor?::</List Marker><br/>
 <Normal>An implementation of the AsciiDoc processor in Ruby.</Normal><br/>
-<Normal>& answer pairs.</Normal><br/>
 <List Marker>Must the answer be indented?::</List Marker><br/>
 <Verbatim>  It's not necessary, but possibly.</Verbatim><br/>
 <Verbatim>What is the answer to the Ultimate Question?:: 42</Verbatim><br/>
@@ -2154,6 +2160,8 @@
 <Normal></Normal><br/>
 <Section Title>== Pass</Section Title><br/>
 <Normal></Normal><br/>
+<Comment>// </Comment><Alert Level 2>TODO</Alert Level 2><Comment> Would be nice to highlight the text within the square bracktes as passthrough.</Comment><br/>
+<Normal></Normal><br/>
 <Normal>Some </Normal><Preprocessor>pass:[<u>passthrough</u>]</Preprocessor><Normal> HTML.</Normal><br/>
 <Normal></Normal><br/>
 <Normal>Some </Normal><Preprocessor>pass:quotes[<u>passthrough with *quoted* text</u>]</Preprocessor><Normal> HTML.</Normal><br/>
@@ -2213,7 +2221,7 @@
 <Block Title>.Test SVG</Block Title><br/>
 <Anchor>[#logo]</Anchor><br/>
 <Preprocessor>[link=https://github.com/asciidoctor/brand]</Preprocessor><br/>
-<Preprocessor>image::test.svg[Asciidoctor Logo, 100]</Preprocessor><br/>
+<Preprocessor>image::test.svg[Test, 100]</Preprocessor><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Section Title>==== Not highlighted</Section Title><br/>
@@ -2264,7 +2272,6 @@
 <Section Title>== Video</Section Title><br/>
 <Normal></Normal><br/>
 <Preprocessor>video::test.mp4[width=300]</Preprocessor><br/>
-<Normal></Normal><br/>
 <Normal></Normal><br/>
 <Preprocessor>video::test.mp4[width=200, options=loop]</Preprocessor><br/>
 <Normal></Normal><br/>
@@ -2653,14 +2660,17 @@
 <Normal></Normal><br/>
 <Normal>This section has trailing additional anchors.</Normal><br/>
 <Normal></Normal><br/>
+<Normal></Normal><br/>
 <Section Title>==== </Section Title><Anchor>[[id-1]][[id-2]]</Anchor><Section Title>Section L3</Section Title><Anchor>[[id-3]][[id-4]]</Anchor><br/>
 <Normal></Normal><br/>
 <Normal>This section has both leading and trailing additional anchors.</Normal><br/>
+<Normal></Normal><br/>
 <Normal></Normal><br/>
 <Section Title>==== Section L3 </Section Title><Attribute>{title-attribute}</Attribute><Section Title> in Title</Section Title><br/>
 <Normal></Normal><br/>
 <Block Title>.Title </Block Title><Attribute>{title-attribute}</Attribute><br/>
 <Normal>This section has an attribute in its title.</Normal><br/>
+<Normal></Normal><br/>
 <Normal></Normal><br/>
 <Preprocessor>[discrete]</Preprocessor><br/>
 <Section Title>== Discrete Section</Section Title><br/>
@@ -2688,6 +2698,7 @@
 <Comment></Comment><br/>
 <Comment>=== Section with escaped \*strong* text</Comment><br/>
 <Comment>////</Comment><br/>
+<Normal></Normal><br/>
 <Normal></Normal><br/>
 <Section Title>= Another Section at Level 0</Section Title><br/>
 <Normal></Normal><br/>

@@ -512,7 +512,7 @@ The second reference has number <span style="color:#0057ae;text-decoration:under
 
 The third reference has <span style="color:#0057ae;text-decoration:underline;">&lt;&lt;r3&gt;&gt;</span> as label.
 
-A reference defintion inside the text instead of the bibliography section yields some strange result: <span style="color:#644a9b;">[[[ref-o,outside bibliography]]]</span>].
+A reference definition inside the text instead of the bibliography section yields some strange result: <span style="color:#644a9b;">[[[ref-o,outside bibliography]]]</span>].
 Not sure what to do with this.
 
 This is trying to use the escaped reference <span style="color:#0057ae;text-decoration:underline;">&lt;&lt;r4&gt;&gt;</span>.
@@ -681,6 +681,8 @@ A fenced block<span style="font-weight:bold;text-decoration:underline;">'</span>
 <span style="color:#607880;">A countiguous *listing* block.</span>
 <span style="color:#607880;">Last line of the listing.</span>
 
+This line is not part of the contiguous block anymore.
+
 <span style="color:#bf0303;font-style:italic;">.Delimited with block name</span>
 <span style="color:#006e28;">[listing]</span>
 <span style="color:#644a9b;">[[listing-block-id]]</span>
@@ -720,6 +722,8 @@ A fenced block<span style="font-weight:bold;text-decoration:underline;">'</span>
 <span style="color:#607880;">The block contents is rendered verbatim.</span>
 <span style="color:#607880;">So there is *no* text formatting.</span>
 <span style="color:#607880;">// this should not be highlighted as comment</span>
+
+This line is not part of the contiguous block anymore.
 
 <span style="color:#bf0303;font-style:italic;">.Delimited with block name</span>
 <span style="color:#006e28;">[literal]</span>
@@ -945,9 +949,6 @@ Inside the <span style="font-weight:bold;">*verse*</span> block.
 
 
 <span style="color:#bf0303;font-weight:bold;">== Nested Blocks</span>
-
-<span style="color:#006e28;">[NOTE]</span>
-Some note text.
 
 <span style="color:#006e28;font-weight:bold;">====</span>
 Start of outer example block.
@@ -1225,7 +1226,7 @@ before!<span style="color:#006e28;">[big]#big text#</span>
 <span style="color:#898887;">////</span>
 <span style="color:#ca9219;background-color:#451e1a;font-weight:bold;">FIXME</span><span style="color:#898887;"> Highlighting differs.</span>
 <span style="color:#898887;">The phrase is rendered as marked.</span>
-<span style="color:#898887;">Thetrailing hash is therefore not visible.</span>
+<span style="color:#898887;">The trailing hash is therefore not visible.</span>
 <span style="color:#898887;">////</span>
 <span style="color:#006e28;">[big]###text##</span>#
 
@@ -1306,11 +1307,11 @@ aa<span style="font-style:italic;">__ bb __</span>cc
 
 <span style="color:#bf0303;font-weight:bold;">=== Rendered as-is</span>
 
-This line does <span style="font-style:italic;">_not_</span> contain _some emphasized _ text as there is a surplus space.
+This line does not contain _some emphasized _ text as there is a surplus space.
 
-This line does <span style="font-style:italic;">_not_</span> contain_some emphasized_ text as there is a space missing.
+This line does not contain_some emphasized_ text as there is a space missing.
 
-This line does <span style="font-style:italic;">_not_</span> contain _some emphasized_text as there is a space missing.
+This line does not contain _some emphasized_text as there is a space missing.
 
 foo ;_emphasized_ :_emphasized_ }_emphasized_
 
@@ -1729,6 +1730,8 @@ After the horizontal rule.
 
 <span style="color:#bf0303;font-weight:bold;">== Included Contents Rendered</span>
 
+<span style="color:#006e28;">IMPORTANT:</span> The include directive is <span style="font-style:italic;">_always_</span> processed, even withing passthrough blocks.
+
 <span style="color:#006e28;">NOTE:</span> Using file names with spaces works.
 
 <span style="color:#006e28;">include::{includedir}/demo.adoc[]</span>
@@ -1737,12 +1740,10 @@ After the horizontal rule.
 <span style="color:#006e28;">include::{includedir}/demo.adoc[lines=2..3]</span>
 
 <span style="color:#bf0303;font-style:italic;">.Inside contiguous block</span>
-<span style="color:#006e28;">[source,ruby]</span>
-<span style="color:#607880;">IO.puts 'hello'</span>
-<span style="color:#607880;">&quot;&quot;&quot;</span>
-<span style="color:#607880;">include::{includedir}/demo.adoc[lines=2..3]</span>
-<span style="color:#607880;">&quot;&quot;&quot;</span>
-<span style="color:#607880;">IO.puts 'bye'</span>
+<span style="color:#006e28;">[literal]</span>
+<span style="color:#607880;">This line shall be highlighted as verbatim.</span>
+<span style="color:#006e28;">include::{includedir}/demo.adoc[lines=2..3]</span>
+<span style="color:#607880;">This line shall be highlighted as verbatim.</span>
 
 <span style="color:#bf0303;font-style:italic;">.Inside delimited block with name</span>
 <span style="color:#006e28;">[literal]</span>
@@ -1759,6 +1760,19 @@ After the horizontal rule.
 <span style="color:#607880;">This line shall be highlighted as verbatim.</span>
 <span style="color:#006e28;font-weight:bold;">....</span>
 
+<span style="color:#bf0303;font-style:italic;">.It is also processed within passthrough blocks</span>
+<span style="color:#006e28;">[pass]</span>
+<span style="color:#ff5500;">This line shall be highlighted as passthrough.</span>
+<span style="color:#006e28;">include::{includedir}/demo.adoc[lines=2..3]</span>
+<span style="color:#ff5500;">This line shall be highlighted as passthrough.</span>
+
+<span style="color:#006e28;">[pass]</span>
+<span style="color:#ff5500;">--</span>
+<span style="color:#ff5500;">This line shall be highlighted as passthrough.</span>
+<span style="color:#006e28;">include::{includedir}/demo.adoc[lines=2..3]</span>
+<span style="color:#ff5500;">This line shall be highlighted as passthrough.</span>
+<span style="color:#ff5500;">--</span>
+
 <span style="color:#bf0303;font-style:italic;">.Inside table</span>
 <span style="color:#006e28;font-weight:bold;">|===</span>
 <span style="color:#006e28;font-weight:bold;">|</span>row 1 col 1<span style="color:#006e28;font-weight:bold;">|</span>row 2 col 2
@@ -1770,14 +1784,6 @@ After the horizontal rule.
 <span style="color:#006e28;font-weight:bold;">|</span>row 3 col 1
 <span style="color:#006e28;font-weight:bold;">|</span>row 3 col 2
 <span style="color:#006e28;font-weight:bold;">|===</span>
-
-
-<span style="color:#bf0303;font-weight:bold;">== Rendered as-is</span>
-
-<span style="color:#bf0303;font-style:italic;">.Inside verbatim paragraph</span>
-<span style="color:#607880;"> This line shall be highlighted as verbatim.</span>
-<span style="color:#607880;">include::{includedir}/demo.adoc[lines=2..3]</span>
-<span style="color:#607880;">This line shall be highlighted as verbatim.</span>
 
 
 <span style="color:#bf0303;font-weight:bold;">= Index</span>
@@ -1823,6 +1829,7 @@ This is \(\((not an indexterm))) as it is fully escaped.
 This is not a \indexterm2:[flow] index term.
 
 This is not a \indexterm:[concealed, index, term] concealed index term.
+
 
 <span style="color:#006e28;">[index]</span>
 <span style="color:#bf0303;font-weight:bold;">== Index Catalog</span>
@@ -2085,7 +2092,6 @@ It will be fixed in the rendered output.
 <span style="color:#006e28;">[qanda]</span>
 <span style="font-weight:bold;">What is Asciidoctor?::</span>
 An implementation of the AsciiDoc processor in Ruby.
-&amp; answer pairs.
 <span style="font-weight:bold;">Must the answer be indented?::</span>
 <span style="color:#607880;">  It's not necessary, but possibly.</span>
 <span style="color:#607880;">What is the answer to the Ultimate Question?:: 42</span>
@@ -2160,6 +2166,8 @@ An image<span style="color:#006e28;">image:logo-outline-color.svg[Logo,25]</span
 
 <span style="color:#bf0303;font-weight:bold;">== Pass</span>
 
+<span style="color:#898887;">// </span><span style="color:#ca9219;background-color:#451e1a;font-weight:bold;">TODO</span><span style="color:#898887;"> Would be nice to highlight the text within the square bracktes as passthrough.</span>
+
 Some <span style="color:#006e28;">pass:[&lt;u&gt;passthrough&lt;/u&gt;]</span> HTML.
 
 Some <span style="color:#006e28;">pass:quotes[&lt;u&gt;passthrough with *quoted* text&lt;/u&gt;]</span> HTML.
@@ -2219,7 +2227,7 @@ This is no passthrough \pass:[&lt;u&gt;passthrough&lt;/u&gt;].
 <span style="color:#bf0303;font-style:italic;">.Test SVG</span>
 <span style="color:#644a9b;">[#logo]</span>
 <span style="color:#006e28;">[link=https://github.com/asciidoctor/brand]</span>
-<span style="color:#006e28;">image::test.svg[Asciidoctor Logo, 100]</span>
+<span style="color:#006e28;">image::test.svg[Test, 100]</span>
 
 
 <span style="color:#bf0303;font-weight:bold;">==== Not highlighted</span>
@@ -2270,7 +2278,6 @@ Within\image:logo-outline-color.svg[Tree, 25]some text.
 <span style="color:#bf0303;font-weight:bold;">== Video</span>
 
 <span style="color:#006e28;">video::test.mp4[width=300]</span>
-
 
 <span style="color:#006e28;">video::test.mp4[width=200, options=loop]</span>
 
@@ -2659,14 +2666,17 @@ This section has leading additional achors.
 
 This section has trailing additional anchors.
 
+
 <span style="color:#bf0303;font-weight:bold;">==== </span><span style="color:#644a9b;">[[id-1]][[id-2]]</span><span style="color:#bf0303;font-weight:bold;">Section L3</span><span style="color:#644a9b;">[[id-3]][[id-4]]</span>
 
 This section has both leading and trailing additional anchors.
+
 
 <span style="color:#bf0303;font-weight:bold;">==== Section L3 </span><span style="color:#0057ae;">{title-attribute}</span><span style="color:#bf0303;font-weight:bold;"> in Title</span>
 
 <span style="color:#bf0303;font-style:italic;">.Title </span><span style="color:#0057ae;">{title-attribute}</span>
 This section has an attribute in its title.
+
 
 <span style="color:#006e28;">[discrete]</span>
 <span style="color:#bf0303;font-weight:bold;">== Discrete Section</span>
@@ -2694,6 +2704,7 @@ This section will not be shown in the table of contents.
 
 <span style="color:#898887;">=== Section with escaped \*strong* text</span>
 <span style="color:#898887;">////</span>
+
 
 <span style="color:#bf0303;font-weight:bold;">= Another Section at Level 0</span>
 

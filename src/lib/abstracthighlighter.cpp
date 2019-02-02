@@ -253,9 +253,9 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
 
             // apply folding
             if (rule->endRegion().isValid())
-                applyFolding(offset, newOffset - offset, rule->endRegion());
+                applyFolding(offset, rule->isLookAhead() ? 0 : newOffset - offset, rule->endRegion());
             if (rule->beginRegion().isValid())
-                applyFolding(offset, newOffset - offset, rule->beginRegion());
+                applyFolding(offset, rule->isLookAhead() ? 0 : newOffset - offset, rule->beginRegion());
 
             if (rule->isLookAhead()) {
                 Q_ASSERT(!rule->context().isStay());

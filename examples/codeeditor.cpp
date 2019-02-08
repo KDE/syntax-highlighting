@@ -137,7 +137,7 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *event)
     auto hlGroupMenu = menu->addMenu(QStringLiteral("Syntax"));
     QMenu *hlSubMenu = hlGroupMenu;
     QString currentGroup;
-    foreach (const auto &def, m_repository.definitions()) {
+    for (const auto &def : m_repository.definitions()) {
         if (def.isHidden())
             continue;
         if (currentGroup != def.section()) {
@@ -163,7 +163,7 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *event)
     auto themeGroup = new QActionGroup(menu);
     themeGroup->setExclusive(true);
     auto themeMenu = menu->addMenu(QStringLiteral("Theme"));
-    foreach (const auto &theme, m_repository.themes()) {
+    for (const auto &theme : m_repository.themes()) {
         auto action = themeMenu->addAction(theme.translatedName());
         action->setCheckable(true);
         action->setData(theme.name());

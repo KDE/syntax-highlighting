@@ -98,7 +98,7 @@ private Q_SLOTS:
 
     void testLoadAll()
     {
-        foreach (const auto &def, m_repo.definitions()) {
+        for (const auto &def : m_repo.definitions()) {
             QVERIFY(!def.name().isEmpty());
             QVERIFY(!def.translatedName().isEmpty());
             QVERIFY(!def.isValid() || !def.section().isEmpty());
@@ -183,7 +183,7 @@ private Q_SLOTS:
 
         // check all names are listed
         QStringList formatNames;
-        foreach (const auto & format, formats) {
+        for (const auto & format : qAsConst(formats)) {
             formatNames.append(format.name());
         }
 
@@ -226,11 +226,11 @@ private Q_SLOTS:
     void testIncludedFormats()
     {
         QStringList definitionNames;
-        foreach (const auto &def, m_repo.definitions()) {
+        for (const auto &def : m_repo.definitions()) {
             definitionNames.push_back(def.name());
         }
 
-        foreach (const QString & name, definitionNames) {
+        for (const QString & name : qAsConst(definitionNames)) {
             Repository repo;
             initRepositorySearchPaths(repo);
             auto def = repo.definitionForName(name);

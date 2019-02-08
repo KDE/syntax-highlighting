@@ -77,7 +77,7 @@ public:
             }
 
             int offset = 0;
-            foreach (const auto &fold, m_folds) {
+            for (const auto &fold : qAsConst(m_folds)) {
                 m_out << currentLine.mid(offset, fold.offset - offset);
                 if (fold.region.type() == FoldingRegion::Begin)
                     m_out << "<beginfold id='" << fold.region.id() << "'>";
@@ -139,7 +139,7 @@ private Q_SLOTS:
         QTest::addColumn<QString>("syntax");
 
         const QDir dir(QStringLiteral(TESTSRCDIR "/input"));
-        foreach (const auto &fileName, dir.entryList(QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Name)) {
+        for (const auto &fileName : dir.entryList(QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Name)) {
             const auto inFile = dir.absoluteFilePath(fileName);
             if (inFile.endsWith(QLatin1String(".syntax")))
                 continue;

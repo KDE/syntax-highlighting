@@ -536,7 +536,7 @@ int main(int argc, char *argv[])
     KeywordIncludeChecker keywordIncludeChecker;
     QVariantMap hls;
     int anyError = 0;
-    foreach (const QString &hlFilename, hlFilenames) {
+    for (const QString &hlFilename : qAsConst(hlFilenames)) {
         QFile hlFile(hlFilename);
         if (!hlFile.open(QIODevice::ReadOnly)) {
             qWarning ("Failed to open %s", qPrintable(hlFilename));

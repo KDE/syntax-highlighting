@@ -109,7 +109,7 @@ private Q_SLOTS:
         QVERIFY(uncoveredList.open(QFile::WriteOnly));
 
         int count = 0;
-        foreach (const auto &def, m_repo->definitions()) {
+        for (const auto &def : m_repo->definitions()) {
             if (def.isHidden() || !def.isValid())
                 continue;
             ++count;
@@ -133,7 +133,7 @@ private Q_SLOTS:
         QTest::addColumn<QString>("syntax");
 
         const QDir dir(QStringLiteral(TESTSRCDIR "/input"));
-        foreach (const auto &fileName, dir.entryList(QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Name)) {
+        for (const auto &fileName : dir.entryList(QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Name)) {
             const auto inFile = dir.absoluteFilePath(fileName);
             if (inFile.endsWith(QLatin1String(".syntax")))
                 continue;

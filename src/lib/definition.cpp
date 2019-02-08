@@ -326,7 +326,7 @@ Context* DefinitionData::initialContext() const
 
 Context* DefinitionData::contextByName(const QString& name) const
 {
-    foreach (auto context, contexts) {
+    for (const auto context : contexts) {
         if (context->name() == name)
             return context;
     }
@@ -394,7 +394,7 @@ bool DefinitionData::load(OnlyKeywords onlyKeywords)
         it->setCaseSensitivity(caseSensitive);
     }
 
-    foreach (auto context, contexts) {
+    for (const auto context : qAsConst(contexts)) {
         context->resolveContexts();
         context->resolveIncludes();
         context->resolveAttributeFormat();
@@ -463,10 +463,10 @@ bool DefinitionData::loadMetaData(const QString &file, const QJsonObject &obj)
     fileName = file;
 
     const auto exts = obj.value(QLatin1String("extensions")).toString();
-    foreach (const auto &ext, exts.split(QLatin1Char(';'), QString::SkipEmptyParts))
+    for (const auto &ext : exts.split(QLatin1Char(';'), QString::SkipEmptyParts))
         extensions.push_back(ext);
     const auto mts = obj.value(QLatin1String("mimetype")).toString();
-    foreach (const auto &mt, mts.split(QLatin1Char(';'), QString::SkipEmptyParts))
+    for (const auto &mt : mts.split(QLatin1Char(';'), QString::SkipEmptyParts))
         mimetypes.push_back(mt);
 
     return true;
@@ -491,10 +491,10 @@ bool DefinitionData::loadLanguage(QXmlStreamReader &reader)
     author = reader.attributes().value(QStringLiteral("author")).toString();
     license = reader.attributes().value(QStringLiteral("license")).toString();
     const auto exts = reader.attributes().value(QStringLiteral("extensions")).toString();
-    foreach (const auto &ext, exts.split(QLatin1Char(';'), QString::SkipEmptyParts))
+    for (const auto &ext : exts.split(QLatin1Char(';'), QString::SkipEmptyParts))
         extensions.push_back(ext);
     const auto mts = reader.attributes().value(QStringLiteral("mimetype")).toString();
-    foreach (const auto &mt, mts.split(QLatin1Char(';'), QString::SkipEmptyParts))
+    for (const auto &mt : mts.split(QLatin1Char(';'), QString::SkipEmptyParts))
         mimetypes.push_back(mt);
     if (reader.attributes().hasAttribute(QStringLiteral("casesensitive")))
         caseSensitive = Xml::attrToBool(reader.attributes().value(QStringLiteral("casesensitive"))) ? Qt::CaseSensitive : Qt::CaseInsensitive;
@@ -633,7 +633,7 @@ void DefinitionData::loadGeneral(QXmlStreamReader& reader)
                     std::sort(wordDelimiters.begin(), wordDelimiters.end());
                     auto it = std::unique(wordDelimiters.begin(), wordDelimiters.end());
                     wordDelimiters.truncate(std::distance(wordDelimiters.begin(), it));
-                    foreach (const auto c, reader.attributes().value(QLatin1String("weakDeliminator")))
+                    for (const auto c : reader.attributes().value(QLatin1String("weakDeliminator")))
                         wordDelimiters.remove(c);
 
                     // adaptWordWrapDelimiters, and sort

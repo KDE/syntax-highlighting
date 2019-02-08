@@ -570,7 +570,7 @@ int main(int argc, char *argv[])
         QVariantMap hl;
 
         // transfer text attributes
-        Q_FOREACH (const QString &attribute, textAttributes) {
+        for (const QString &attribute : qAsConst(textAttributes)) {
             hl[attribute] = xml.attributes().value(attribute).toString();
         }
 

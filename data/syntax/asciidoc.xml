@@ -42,8 +42,16 @@
     <!ENTITY quoted "\S(?:.*?\S)??">
     <!-- postfix/trailing part -->
     <!ENTITY quoted_post "(?=\W|$)">
+
+    <!-- section (title) -->
+    <!ENTITY sectionL0 "^(?:=|#)\s+(?=\S)">
+    <!ENTITY sectionL1 "^(?:={2}|#{2})\s+(?=\S)">
+    <!ENTITY sectionL2 "^(?:={3}|#{3})\s+(?=\S)">
+    <!ENTITY sectionL3 "^(?:={4}|#{4})\s+(?=\S)">
+    <!ENTITY sectionL4 "^(?:={5}|#{5})\s+(?=\S)">
+    <!ENTITY sectionL5 "^(?:={6}|#{6})\s+(?=\S)">
 ]>
-<language author="Andreas Gratzer" extensions="*.ad;*.adoc;*.asciidoc" kateversion="5.0" mimetype="text/asciidoc" name="AsciiDoc" license="MIT" section="Markup" version="2">
+<language author="Andreas Gratzer" extensions="*.ad;*.adoc;*.asciidoc" kateversion="5.0" mimetype="text/asciidoc" name="AsciiDoc" license="MIT" section="Markup" version="3">
     <highlighting>
         <list name="macro">
             <item>anchor</item>
@@ -64,8 +72,8 @@
         <contexts>
             <context name="start" attribute="Normal" lineEndContext="#stay">
                 <!-- main title, first level 0 section title -->
-                <RegExpr String="^(?:=|#)\s+(?=\S)" attribute="Main Title" context="main title"/>
-                <IncludeRules context="section"/>
+                <RegExpr String="&sectionL0;" attribute="Main Title" context="main title" beginRegion="section"/>
+                <IncludeRules context="R section"/>
             </context>
 
             <!-- attribute value definition, may span multiple lines -->
@@ -143,7 +151,7 @@
                 <AnyChar String="+\" attribute="Control"/>
             </context>
 
-            <context name="main title" attribute="Main Title" lineEndContext="#pop!section">
+            <context name="main title" attribute="Main Title" lineEndContext="#pop!section L0">
                 <IncludeRules context="R title"/>
             </context>
 
@@ -172,20 +180,72 @@
                 <IncludeRules context="R include"/>
             </context>
 
-            <context name="section" attribute="Normal" lineEndContext="#stay">
-                <!-- callout as being used below a source code block -->
-                <RegExpr String="^&lt;(?:\.|\d+)&gt;(?=\s+\S)" attribute="Callout"/>
-                <!-- section title -->
-                <RegExpr String="^(?:={1,6}|#{1,6})\s+(?=\S)" attribute="Section Title" context="section title"/>
-                <IncludeRules context="R admonition"/>
-                <IncludeRules context="R block"/>
-                <IncludeRules context="R shared"/>
-                <!-- literal paragraph started by a line with leading spaces
-                     This must be ordered after lists, as list items may be indented -->
-                <RegExpr String="^\s+\S" attribute="Verbatim" context="verbatim paragraph"/>
+            <context name="section L0" attribute="Normal" lineEndContext="#stay">
+                <RegExpr String="&sectionL5;" attribute="Section Title" context="section title L5" beginRegion="section"/>
+                <RegExpr String="&sectionL4;" attribute="Section Title" context="section title L4" beginRegion="section"/>
+                <RegExpr String="&sectionL3;" attribute="Section Title" context="section title L3" beginRegion="section"/>
+                <RegExpr String="&sectionL2;" attribute="Section Title" context="section title L2" beginRegion="section"/>
+                <RegExpr String="&sectionL1;" attribute="Section Title" context="section title L1" beginRegion="section"/>
+                <RegExpr String="&sectionL0;" lookAhead="true" attribute="Section Title" context="section title L0" endRegion="section" beginRegion="section"/>
+                <IncludeRules context="R section"/>
             </context>
 
-            <context name="section title" attribute="Section Title" lineEndContext="#pop">
+            <context name="section L1" attribute="Normal" lineEndContext="#stay">
+                <RegExpr String="&sectionL5;" attribute="Section Title" context="section title L5" beginRegion="section"/>
+                <RegExpr String="&sectionL4;" attribute="Section Title" context="section title L4" beginRegion="section"/>
+                <RegExpr String="&sectionL3;" attribute="Section Title" context="section title L3" beginRegion="section"/>
+                <RegExpr String="&sectionL2;" attribute="Section Title" context="section title L2" beginRegion="section"/>
+                <RegExpr String="^(?:={1,2}|#{1,2})\s+\S" lookAhead="true" attribute="Section Title" context="#pop" endRegion="section"/>
+                <IncludeRules context="R section"/>
+            </context>
+
+            <context name="section L2" attribute="Normal" lineEndContext="#stay">
+                <RegExpr String="&sectionL5;" attribute="Section Title" context="section title L5" beginRegion="section"/>
+                <RegExpr String="&sectionL4;" attribute="Section Title" context="section title L4" beginRegion="section"/>
+                <RegExpr String="&sectionL3;" attribute="Section Title" context="section title L3" beginRegion="section"/>
+                <RegExpr String="^(?:={1,3}|#{1,3})\s+\S" lookAhead="true" attribute="Section Title" context="#pop" endRegion="section"/>
+                <IncludeRules context="R section"/>
+            </context>
+
+            <context name="section L3" attribute="Normal" lineEndContext="#stay">
+                <RegExpr String="&sectionL5;" attribute="Section Title" context="section title L5" beginRegion="section"/>
+                <RegExpr String="&sectionL4;" attribute="Section Title" context="section title L4" beginRegion="section"/>
+                <RegExpr String="^(?:={1,4}|#{1,4})\s+\S" lookAhead="true" attribute="Section Title" context="#pop" endRegion="section"/>
+                <IncludeRules context="R section"/>
+            </context>
+
+            <context name="section L4" attribute="Normal" lineEndContext="#stay">
+                <RegExpr String="&sectionL5;" attribute="Section Title" context="section title L5" beginRegion="section"/>
+                <RegExpr String="^(?:={1,5}|#{1,5})\s+\S" lookAhead="true" attribute="Section Title" context="#pop" endRegion="section"/>
+                <IncludeRules context="R section"/>
+            </context>
+
+            <context name="section L5" attribute="Normal" lineEndContext="#stay">
+                <RegExpr String="^(?:={1,6}|#{1,6})\s+\S" lookAhead="true" attribute="Section Title" context="#pop" endRegion="section"/>
+                <IncludeRules context="R section"/>
+            </context>
+
+            <context name="section title L0" attribute="Section Title" lineEndContext="#pop!section L0">
+                <IncludeRules context="R title"/>
+            </context>
+
+            <context name="section title L1" attribute="Section Title" lineEndContext="#pop!section L1">
+                <IncludeRules context="R title"/>
+            </context>
+
+            <context name="section title L2" attribute="Section Title" lineEndContext="#pop!section L2">
+                <IncludeRules context="R title"/>
+            </context>
+
+            <context name="section title L3" attribute="Section Title" lineEndContext="#pop!section L3">
+                <IncludeRules context="R title"/>
+            </context>
+
+            <context name="section title L4" attribute="Section Title" lineEndContext="#pop!section L4">
+                <IncludeRules context="R title"/>
+            </context>
+
+            <context name="section title L5" attribute="Section Title" lineEndContext="#pop!section L5">
                 <IncludeRules context="R title"/>
             </context>
 
@@ -372,6 +432,17 @@
                 <Detect2Chars char="=" char1="&gt;" attribute="Replacement"/>
                 <!-- unicode character reference -->
                 <RegExpr String="&char_ref;" attribute="Replacement"/>
+            </context>
+
+            <context name="R section" attribute="Normal" lineEndContext="#stay">
+                <!-- callout as being used below a source code block -->
+                <RegExpr String="^&lt;(?:\.|\d+)&gt;(?=\s+\S)" attribute="Callout"/>
+                <IncludeRules context="R admonition"/>
+                <IncludeRules context="R block"/>
+                <IncludeRules context="R shared"/>
+                <!-- literal paragraph started by a line with leading spaces
+                     This must be ordered after lists, as list items may be indented -->
+                <RegExpr String="^\s+\S" attribute="Verbatim" context="verbatim paragraph"/>
             </context>
 
             <context name="R shared" attribute="Normal" lineEndContext="#stay">

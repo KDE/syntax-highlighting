@@ -7,7 +7,7 @@
 
         List values which are current ignored by the keyword identifier are commented.
 -->
-<language name="CubeScript" section="Scripts" version="1" kateversion="5.0" extensions="*.cfg" mimetype="" casesensitive="true" author="Kevin Meyer" license="zlib/libpng" indenter="normal">
+<language name="CubeScript" section="Scripts" version="2" kateversion="5.0" extensions="*.cfg" mimetype="" casesensitive="true" author="Kevin Meyer" license="zlib/libpng" indenter="normal">
   <highlighting>
     <!--
         There are far more commands than these, these are just guaranteed to be in all forks.
@@ -388,17 +388,13 @@
 
       <context name="String" attribute="String" lineEndContext="#pop">
         <DetectChar attribute="String" context="#pop" char="&quot;" />
+        <!-- Escape newlines. -->
+        <LineContinue attribute="Escaped" context="#stay" char="^" />
         <DetectChar attribute="Escaped" context="Escaped" char="^" />
       </context>
 
-      <context name="MLString" attribute="String" lineEndContext="#pop#pop">
-        <DetectChar attribute="String" context="#pop#pop" char="&quot;" />
-        <DetectChar attribute="Escaped" context="Escaped" char="^" />
-      </context>
-
-      <context name="Escaped" attribute="Escaped" lineEndContext="MLString" >
-        <!-- Cubescript treats any character following a "^" in a string is escaped, newlines included.
-        The weird setup with the MLString context attempts to take care of multi-line strings and seems to work too. -->
+      <context name="Escaped" attribute="Escaped" lineEndContext="#stay" >
+        <!-- Cubescript treats any character following a "^" in a string is escaped. -->
         <Detect2Chars char="f" char1="0" attribute="String0" context="#pop"/>
         <Detect2Chars char="f" char1="1" attribute="String1" context="#pop"/>
         <Detect2Chars char="f" char1="2" attribute="String2" context="#pop"/>

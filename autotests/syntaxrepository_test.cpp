@@ -209,16 +209,29 @@ private Q_SLOTS:
             QStringLiteral("CSS/PHP"),
             QStringLiteral("JavaScript/PHP"),
             QStringLiteral("Doxygen"),
+            QStringLiteral("JavaScript React/PHP"),
+            QStringLiteral("TypeScript/PHP"),
+            QStringLiteral("MustacheJS/PHP"),
             QStringLiteral("Modelines"),
             QStringLiteral("HTML"),
             QStringLiteral("CSS"),
             QStringLiteral("SQL (MySQL)"),
-            QStringLiteral("JavaScript")
+            QStringLiteral("JavaScript"),
+            QStringLiteral("JavaScript React"),
+            QStringLiteral("TypeScript"),
+            QStringLiteral("MustacheJS")
         };
         QStringList definitionNames;
         for (auto d : defs) {
             QVERIFY(d.isValid());
             definitionNames.push_back(d.name());
+
+            // already check here a bit to make the test fails better fixable
+            if (definitionNames.size() <= expectedDefinitionNames.size()) {
+                QCOMPARE(d.name(), expectedDefinitionNames[definitionNames.size()-1]);
+            } else {
+                QCOMPARE(d.name(), QStringLiteral("too many included defs found, first one is this one"));
+            }
         }
         QCOMPARE(definitionNames, expectedDefinitionNames);
     }

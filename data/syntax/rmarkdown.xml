@@ -15,7 +15,7 @@
 section="Markup"
 extensions="*.rmd;*.Rmd;*.RMD"
 mimetype="text/x-r-markdown"
-version="4"
+version="5"
 kateversion="3.4"
 casesensitive="true"
 author="Dirk Sarpe (dsarpe@posteo.de)"
@@ -25,45 +25,47 @@ license="GPL">
     <contexts>
 
       <context attribute="Markdown" name="Normal Text" lineEndContext="#stay">
-        <RegExpr String="^```\{r.*\}" attribute="Structure" context="R block"
-                 beginRegion="block"/>
+        <RegExpr String="^```\{r.*\}" column="0" attribute="Structure" context="R block"
+                 beginRegion="R block"/>
         <Detect2Chars char="`" char1="r" attribute="Structure"
                       context="R inline"/>
         <Detect2Chars char="$" char1="$" attribute="MathMode"
-                      context="LaTeX equation block" beginRegion="block"/>
+                      context="LaTeX equation block" beginRegion="LaTeX equation block"/>
         <DetectChar char="$" attribute="MathMode"
                     context="LaTeX inline equation"/>
-        <RegExpr String="^---$" context="YAMLhead" beginRegion="block"/>
+        <RegExpr String="^---$" column="0" attribute="Markdown" context="YAMLhead"
+                 beginRegion="YAMLhead block"/>
         <IncludeRules context="##Markdown" includeAttrib="true"/>
       </context>
 
       <context name="R block" attribute="Markdown" lineEndContext="#stay">
-        <RegExpr String="^```$" attribute="Structure" context="Normal Text"
-                 endRegion="block"/>
+        <RegExpr String="^```$" column="0" attribute="Structure" context="#pop"
+                 endRegion="R block"/>
         <IncludeRules context="##R Script" includeAttrib="true"/>
       </context>
 
       <context name="R inline" attribute="Markdown" lineEndContext="#stay">
-        <DetectChar char="`" attribute="Structure" context="Normal Text"/>
+        <DetectChar char="`" attribute="Structure" context="#pop"/>
         <IncludeRules context="##R Script" includeAttrib="true"/>
       </context>
 
       <context name="LaTeX equation block" attribute="MathMode"
                lineEndContext="#stay">
         <Detect2Chars char="$" char1="$" attribute="MathMode"
-                      context="Normal Text" endRegion="block"/>
+                      context="#pop" endRegion="LaTeX equation block"/>
         <IncludeRules context="MathModeDisplay##LaTeX" includeAttrib="true"/>
       </context>
 
       <context name="LaTeX inline equation" attribute="MathMode"
                lineEndContext="#stay">
-        <DetectChar char="$" attribute="MathMode" context="Normal Text"/>
+        <DetectChar char="$" attribute="MathMode" context="#pop"/>
         <IncludeRules context="MathMode##LaTeX" includeAttrib="true"/>
       </context>
 
       <context name="YAMLhead" attribute="Document Headers"
                lineEndContext="#stay">
-        <RegExpr String="^---$" context="Normal Text"/>
+        <RegExpr String="^---$" column="0" attribute="Markdown" context="#pop"
+                 endRegion="YAMLhead block"/>
         <IncludeRules context="##YAML" includeAttrib="true"/>
       </context>
 

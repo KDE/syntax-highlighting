@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd"
+[
+	<!ENTITY baseName  "([a-zA-Z_\$]|[^[:ascii:]])(([\w\$\-\.]|[^[:ascii:]])*([\w\$]|[^[:ascii:]]))?">
+	<!ENTITY name      "(&baseName;:)?&baseName;">
+	<!ENTITY baseNameWithBound "(\b[a-zA-Z_\$]|[^[:ascii:]])(([\w\$\-\.]|[^[:ascii:]])*([\w\$]|[^[:ascii:]]))?">
+	<!ENTITY nameWithBound     "(&baseNameWithBound;:)?&baseNameWithBound;"> <!-- Use this instead of "\b&name;" -->
+
+	<!ENTITY tag       "&lt;\s*(&name;|&gt;)">
+	<!ENTITY entref    "&amp;([a-zA-Z\d]+|#\d+|#x[a-fA-F\d]+);">
+]>
+
+<!--
+    Syntax Highlighting Defintion of
+    MustacheJS / HandlebarsJS / RactiveJS templates for Kate.
+   ===============================================================
+    This file is part of the KDE's KSyntaxHighlighting framework.
+
+    This highlighter is designed to be used within HTML files,
+    inside the <script> tag. That is, this add the following
+    features to the JavaScript highlighter:
+      * Highlight Mustache variables anywhere in the code.
+      * Adds support for tags (like JSX).
+
+    Based on the JavaScript React (JSX) syntax highlighting
+    file (javascript-react.xml).
+
+    Change log:
+     * v1 [2019-02-10]: Initial version
+-->
+
+<language name="MustacheJS" hidden="true" version="1" kateversion="5.0"
+          indenter="cstyle" section="Scripts" extensions="" mimetype=""
+          author="Nibaldo González (nibgonz@gmail.com)" license="MIT">
+
+<highlighting>
+
+	<contexts>
+
+		<context name="Normal" attribute="Normal Text" lineEndContext="#stay">
+			<IncludeRules context="MustacheJS" />
+			<IncludeRules context="Normal##JavaScript" />
+		</context>
+
+		<!-- HTML: </script> (highlight as "Alert", since it means that the JavaScript/Mustache code is wrong) -->
+		<context name="HtmlScriptEndError" attribute="Normal Text" lineEndContext="#stay">
+			<RegExpr context="#stay" attribute="Alert" String="&lt;/script\s*&gt;" insensitive="true" />
+		</context>
+
+		<!-- MustacheJS Variables -->
+
+		<context name="MustacheVariables" attribute="Normal Text" lineEndContext="#stay">
+			<RegExpr context="MustacheHelperConditional" attribute="Mustache Section" String="\{\{#?(with|link\-to|each(\-in)?|if|unless)\b" beginRegion="MustacheHelper-Conditional" />
+			<RegExpr context="MustacheHelperConditional" attribute="Mustache Section" String="\{\{/(with|link\-to|each(\-in)?|if|unless)\b" endRegion="MustacheHelper-Conditional" />
+			<RegExpr context="ValidTag" attribute="Mustache Section" String="\{\{[#\^]\s*(&name;\s*)?\}\}" beginRegion="MustacheSection" />
+			<RegExpr context="ValidTag" attribute="Mustache Section" String="\{\{/\s*(&name;\s*)?\}\}" endRegion="MustacheSection" />
+			<RegExpr context="ValidTag" attribute="Mustache Variable" String="\{\{\$\s*(&name;\s*)?\}\}" />
+
+			<StringDetect context="MustacheBlockComment" attribute="Mustache Comment" String="{{!--" beginRegion="MustacheBlockComment" /> <!-- Handlebars -->
+			<StringDetect context="MustacheInlineComment" attribute="Mustache Comment" String="{{!" beginRegion="MustacheInlineComment" />
+
+			<StringDetect context="MustacheRawTemplate" attribute="Mustache Variable" String="{{{" />
+			<StringDetect context="MustacheTemplate" attribute="Mustache Variable" String="{{&lt;" />
+			<StringDetect context="MustacheTemplate" attribute="Mustache Variable" String="{{&gt;" />
+			<RegExpr context="MustacheLiteralTemplate" attribute="Mustache Section" String="\{\{\=&lt;%\s+%&gt;\=\}\}" beginRegion="MustacheLiteral" />
+			<Detect2Chars context="MustacheTemplate" attribute="Mustache Variable" char="{" char1="{" />
+
+			<IncludeRules context="HtmlScriptEndError" />
+		</context>
+
+		<context name="MustacheBlockComment" attribute="Mustache Comment" lineEndContext="#stay">
+			<StringDetect context="#pop!ValidTag" attribute="Mustache Comment" String="--}}" endRegion="MustacheBlockComment" />
+			<IncludeRules context="##Alerts" />
+			<IncludeRules context="HtmlScriptEndError" />
+		</context>
+		<context name="MustacheInlineComment" attribute="Mustache Comment" lineEndContext="#stay">
+			<Detect2Chars context="#pop!ValidTag" attribute="Mustache Comment" char="}" char1="}" endRegion="MustacheInlineComment" />
+			<IncludeRules context="##Alerts" />
+			<IncludeRules context="HtmlScriptEndError" />
+		</context>
+		<context name="MustacheTemplate" attribute="Normal Text" lineEndContext="#stay">
+			<Detect2Chars context="#pop!ValidTag" attribute="Mustache Variable" char="}" char1="}" />
+			<IncludeRules context="HtmlScriptEndError" />
+		</context>
+		<context name="MustacheRawTemplate" attribute="Normal Text" lineEndContext="#stay">
+			<StringDetect context="#pop!ValidTag" attribute="Mustache Variable" String="}}}" />
+			<IncludeRules context="HtmlScriptEndError" />
+		</context>
+		<context name="MustacheLiteralTemplate" attribute="Normal Text" lineEndContext="#stay">
+			<RegExpr context="#pop!ValidTag" attribute="Mustache Section" String="&lt;%\=\{\{\s+\}\}\=%&gt;" endRegion="MustacheLiteral" />
+			<IncludeRules context="HtmlScriptEndError" />
+		</context>
+		<context name="MustacheHelperConditional" attribute="Normal Text" lineEndContext="#stay">
+			<Detect2Chars context="#pop!ValidTag" attribute="Mustache Section" char="}" char1="}" />
+			<DetectChar context="MustacheString" attribute="String" char="&quot;" />
+			<DetectChar context="MustacheStringSQ" attribute="String" char="'" />
+			<IncludeRules context="HtmlScriptEndError" />
+		</context>
+
+		<context name="MustacheString" attribute="String" lineEndContext="#pop">
+			<DetectChar context="#pop" attribute="String" char="&quot;" />
+			<IncludeRules context="String##JavaScript" />
+			<IncludeRules context="HtmlScriptEndError" />
+		</context>
+		<context name="MustacheStringSQ" attribute="String" lineEndContext="#pop">
+			<DetectChar context="#pop" attribute="String" char="'" />
+			<IncludeRules context="String SQ##JavaScript" />
+			<IncludeRules context="HtmlScriptEndError" />
+		</context>
+
+		<!-- MustacheJS -->
+
+		<context name="MustacheJS" attribute="Normal Text" lineEndContext="#stay">
+			<IncludeRules context="MustacheVariables" />
+
+			<!-- Detect tags -->
+			<!-- Tag in new line -->
+			<RegExpr context="ValidTag" attribute="Normal Text" String="&tag;" firstNonSpace="true" lookAhead="true" />
+			<!-- Highlight tags only after some keywords -->
+			<RegExpr context="ValidTag" attribute="ControlFlow" String="\b(return|await)\s*(?=&tag;|/\*)" />
+			<RegExpr context="ValidTag" attribute="Module" String="\b(default)\s*(?=&tag;|/\*)" />
+			<RegExpr context="ValidTag" attribute="Reserved" String="\b(yield)\s*(?=&tag;|/\*)" />
+			<!-- Characters before a valid tag -->
+			<RegExpr context="ValidTag" attribute="Special Operators" String="\=&gt;\s*(?=&tag;|/\*)" />
+			<RegExpr context="ValidTag" attribute="Symbol" String="([,\=&gt;:\*\?]|&amp;&amp;|\|\|)\s*(?=&tag;|/\*)" />
+			<RegExpr context="ValidTag" attribute="Normal Text" String="[\(\[]\s*(?=&tag;|/\*)" />
+			<!-- The "Object-BeforeTag" context looks for a valid Tag and then sends the "Object" context -->
+			<RegExpr context="Object-BeforeTag" attribute="Symbol" String="\{\s*(?=&tag;|/\*)" beginRegion="Brace" />
+
+			<RegExpr context="ValidTag" attribute="Symbol" String="&lt;\s*&gt;\s*(?=&tag;|/\*)" />
+
+			<!-- Tag after a comment on a new line -->
+			<Detect2Chars context="ValidTag" attribute="Comment" char="/" char1="*" firstNonSpace="true" lookAhead="true" />
+
+			<!-- Overwrite JavaScript rules to highlight tags within some contexts -->
+			<IncludeRules context="OverwriteJavaScript" />
+		</context>
+
+		<!-- JavaScript -->
+
+		<!-- Overwrite rules of 'javascript.xml' to add Mustache variables -->
+		<context name="OverwriteJavaScript" attribute="Normal Text" lineEndContext="#stay">
+			<DetectChar context="Template" attribute="Template" char="`" />
+			<StringDetect context="RawTemplate" attribute="Template" String="String.raw`" />
+			<DetectChar context="String" attribute="String" char="&quot;" />
+			<DetectChar context="String SQ" attribute="String" char="'" />
+
+			<IncludeRules context="FindComments" />
+			<DetectChar context="Object" attribute="Symbol" char="{" beginRegion="Brace" />
+			<DetectChar context="#stay" attribute="Symbol" char="?" />
+		</context>
+		<context name="Object" attribute="Normal Text" lineEndContext="#stay">
+			<DetectChar context="#pop" attribute="Symbol" char="}" endRegion="Brace" />
+			<IncludeRules context="MustacheJS" />
+			<IncludeRules context="Object##JavaScript" />
+		</context>
+
+		<context name="Template" attribute="Template" lineEndContext="#stay">
+			<DetectChar context="#pop" attribute="Template" char="`" />
+			<Detect2Chars context="Substitution" attribute="Substitution" char="$" char1="{" />
+			<IncludeRules context="MustacheVariables" />
+			<IncludeRules context="Template##JavaScript" />
+		</context>
+		<context name="Substitution" attribute="Normal Text" lineEndContext="#stay">
+			<DetectChar context="#pop" attribute="Substitution" char="}" />
+			<IncludeRules context="MustacheJS" />
+			<IncludeRules context="Substitution##JavaScript" />
+		</context>
+
+		<context name="String" attribute="String" lineEndContext="#pop">
+			<DetectChar context="#pop" attribute="String" char="&quot;" />
+			<IncludeRules context="MustacheVariables" />
+			<IncludeRules context="String##JavaScript" />
+		</context>
+		<context name="String SQ" attribute="String" lineEndContext="#pop">
+			<DetectChar context="#pop" attribute="String" char="'" />
+			<IncludeRules context="MustacheVariables" />
+			<IncludeRules context="String SQ##JavaScript" />
+		</context>
+		<context name="RawTemplate" attribute="Template" lineEndContext="#stay">
+			<DetectChar context="#pop" attribute="Template" char="`" />
+			<IncludeRules context="MustacheVariables" />
+		</context>
+
+		<context name="FindComments" attribute="Normal Text" lineEndContext="#stay">
+			<IncludeRules context="##Doxygen" />
+			<Detect2Chars attribute="Comment" context="Comment" char="/" char1="/" />
+			<Detect2Chars attribute="Comment" context="Multi/inline Comment" char="/" char1="*" beginRegion="Comment" />
+		</context>
+		<context attribute="Comment" lineEndContext="#pop" name="Comment">
+			<IncludeRules context="##Alerts" />
+			<IncludeRules context="##Modelines" />
+			<IncludeRules context="MustacheVariables" />
+		</context>
+		<context attribute="Comment" lineEndContext="#stay" name="Multi/inline Comment">
+			<Detect2Chars attribute="Comment" context="#pop" char="*" char1="/" endRegion="Comment" />
+			<IncludeRules context="##Alerts" />
+			<IncludeRules context="##Modelines" />
+			<IncludeRules context="MustacheVariables" />
+		</context>
+
+		<!-- Tags highlighting -->
+
+		<!-- Detect tags before starting a context -->
+		<context name="Object-BeforeTag" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop!Object">
+			<IncludeRules context="ValidTag" />
+		</context>
+		<context name="EvaluatedCode-BeforeTag" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop!EvaluatedCode">
+			<IncludeRules context="ValidTag" />
+		</context>
+
+		<!-- Highlight nested tags with comments in between -->
+		<context name="ValidTag" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop">
+			<RegExpr context="#stay" attribute="Normal Text" String="\s+(?=&lt;|/\*)" />
+			<IncludeRules context="FindTags" />
+			<!-- Doxygen & Multi-line comments! -->
+			<Detect2Chars context="#pop" attribute="Comment" char="/" char1="/" lookAhead="true" />
+			<IncludeRules context="FindComments" />
+		</context>
+
+		<!-- Start tag -->
+		<context name="FindTags" attribute="Normal Text" lineEndContext="#stay">
+			<RegExpr context="ElementTagContent" attribute="Element Tag" String="&lt;\s*&gt;" beginRegion="Element" />
+			<RegExpr context="ElementTag" attribute="Element Tag" String="&tag;" beginRegion="Element" />
+		</context>
+		<context name="FindEntityRefs" attribute="Normal Text" lineEndContext="#stay">
+			<RegExpr context="#stay" attribute="EntityRef" String="&entref;" />
+		</context>
+
+		<!-- Inside the tag -->
+		<context name="ElementTag" attribute="Normal Text" lineEndContext="#stay">
+			<Detect2Chars context="#pop" attribute="Element Tag" char="/" char1="&gt;" endRegion="Element" />
+			<DetectChar context="#pop!ElementTagContent" attribute="Element Tag" char="&gt;" />
+			<IncludeRules context="MustacheVariables" />
+			<IncludeRules context="FindEvaluatedCode" />
+			<IncludeRules context="FindComments" />
+			<!-- Attribute -->
+			<RegExpr context="#stay" attribute="Attribute" String="&nameWithBound;" />
+			<RegExpr context="#stay" attribute="Error" String="\=(?=\s*/?&gt;)" />
+			<DetectChar context="#stay" attribute="Symbol" char="=" />
+			<!-- Values -->
+			<DetectChar context="ValueDQ" attribute="Value" char="&quot;" />
+			<DetectChar context="ValueSQ" attribute="Value" char="&apos;" />
+
+			<RegExpr context="#stay" attribute="Error" String="\S+&name;" />
+			<RegExpr context="#stay" attribute="Error" String="\S" />
+		</context>
+		<context name="ValueDQ" attribute="Value" lineEndContext="#stay">
+			<DetectChar context="#pop" attribute="Value" char="&quot;" />
+			<IncludeRules context="MustacheVariables" />
+			<IncludeRules context="FindEntityRefs" />
+		</context>
+		<context name="ValueSQ" attribute="Value" lineEndContext="#stay">
+			<DetectChar context="#pop" attribute="Value" char="&apos;" />
+			<IncludeRules context="MustacheVariables" />
+			<IncludeRules context="FindEntityRefs" />
+		</context>
+
+		<!-- Tag content: <tag> content </tag> -->
+		<context name="ElementTagContent" attribute="Tag Content Text" lineEndContext="#stay">
+			<IncludeRules context="MustacheVariables" />
+			<RegExpr context="#pop" attribute="Element Tag" String="&lt;/\s*&gt;" endRegion="Element" />
+			<RegExpr context="ElementTagEnd" attribute="Element Tag" String="&lt;/\s*&name;" />
+			<IncludeRules context="FindTags" />
+			<IncludeRules context="FindEntityRefs" />
+			<IncludeRules context="FindEvaluatedCode" />
+			<DetectChar context="#stay" attribute="Error" char="&lt;" />
+		</context>
+
+		<context name="ElementTagEnd" attribute="Normal Text" lineEndContext="#stay">
+			<DetectChar context="#pop#pop" attribute="Element Tag" char="&gt;" endRegion="Element" />
+			<IncludeRules context="MustacheVariables" />
+			<RegExpr context="#stay" attribute="Error" String="\S" />
+		</context>
+
+		<context name="FindEvaluatedCode" attribute="Normal Text" lineEndContext="#stay">
+			<RegExpr context="EvaluatedCode-BeforeTag" attribute="Code Brackets" String="\{\s*(?=&tag;|/\*)" beginRegion="Code" />
+			<DetectChar context="EvaluatedCode" attribute="Code Brackets" char="{" beginRegion="Code" />
+		</context>
+		<context name="EvaluatedCode" attribute="Normal Text" lineEndContext="#stay">
+			<DetectChar context="#pop" attribute="Code Brackets" char="}" endRegion="Code" />
+			<IncludeRules context="Normal" />
+		</context>
+
+	</contexts>
+
+	<itemDatas>
+		<itemData name="Normal Text"      defStyleNum="dsNormal" spellChecking="false" />
+		<itemData name="Comment"          defStyleNum="dsComment" />
+
+		<itemData name="Mustache Comment" defStyleNum="dsComment" />
+		<itemData name="Mustache Section" defStyleNum="dsFunction" bold="1" spellChecking="false" />
+		<itemData name="Mustache Variable" defStyleNum="dsVariable" bold="1" spellChecking="false" />
+
+		<itemData name="Tag Content Text" defStyleNum="dsNormal" />
+		<itemData name="Element Tag"      defStyleNum="dsKeyword" spellChecking="false" />
+		<itemData name="Attribute"        defStyleNum="dsOthers" spellChecking="false" />
+		<itemData name="Value"            defStyleNum="dsString" spellChecking="false" />
+		<itemData name="EntityRef"        defStyleNum="dsDecVal" spellChecking="false" />
+		<itemData name="Code Brackets"    defStyleNum="dsVariable" spellChecking="false" />
+		<itemData name="Error"            defStyleNum="dsError" spellChecking="false" />
+		<itemData name="Alert"            defStyleNum="dsAlert" bold="1" spellChecking="false" />
+
+		<!-- itemDatas in JavaScript XML file -->
+		<itemData name="Symbol"           defStyleNum="dsOperator" />
+		<itemData name="ControlFlow"      defStyleNum="dsControlFlow" spellChecking="false" />
+		<itemData name="Reserved"         defStyleNum="dsKeyword" italic="true" spellChecking="false" />
+		<itemData name="Module"           defStyleNum="dsImport" spellChecking="false" />
+		<itemData name="Template"         defStyleNum="dsVerbatimString" />
+		<itemData name="String"           defStyleNum="dsString" />
+		<itemData name="Substitution"     defStyleNum="dsSpecialChar" spellChecking="false" />
+		<itemData name="Special Operators" defStyleNum="dsKeyword" spellChecking="false" />
+	</itemDatas>
+
+</highlighting>
+
+<general>
+	<keywords casesensitive="1" />
+	<comments>
+		<comment name="singleLine" start="//" />
+		<comment name="multiLine" start="/*" end="*/" />
+	</comments>
+</general>
+
+</language>
+<!-- kate: replace-tabs off; tab-width 3; indent-width 3; remove-trailing-spaces mod; dynamic-word-wrap off; -->

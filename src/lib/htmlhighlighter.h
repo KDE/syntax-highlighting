@@ -32,8 +32,10 @@
 
 #include <memory>
 
+QT_BEGIN_NAMESPACE
 class QFile;
 class QTextStream;
+QT_END_NAMESPACE
 
 namespace KSyntaxHighlighting {
 

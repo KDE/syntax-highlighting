@@ -65,3 +65,4 @@ endif()
 
 # set PIC to allow use in static and shared libs
 set_property(TARGET SyntaxHighlightingData PROPERTY POSITION_INDEPENDENT_CODE 1)
+target_link_libraries(SyntaxHighlightingData PRIVATE Qt5::Core)

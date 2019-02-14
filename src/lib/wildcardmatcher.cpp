@@ -79,5 +79,5 @@ static bool exactMatch(const QString &candidate, const QString &wildcard, int ca
 bool WildcardMatcher::exactMatch(const QString &candidate, const QString &wildcard,
                                  bool caseSensitive)
 {
-    return exactMatch(candidate, wildcard, candidate.length() - 1, wildcard.length() - 1, caseSensitive);
+    return ::exactMatch(candidate, wildcard, candidate.length() - 1, wildcard.length() - 1, caseSensitive);
 }

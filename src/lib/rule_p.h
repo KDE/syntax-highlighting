@@ -38,7 +38,9 @@
 
 #include <memory>
 
+QT_BEGIN_NAMESPACE
 class QXmlStreamReader;
+QT_END_NAMESPACE
 
 namespace KSyntaxHighlighting {
 

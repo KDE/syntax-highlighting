@@ -30,10 +30,11 @@
 #include <QExplicitlySharedDataPointer>
 #include <QTypeInfo>
 
-
+QT_BEGIN_NAMESPACE
 class QColor;
 class QString;
 class QXmlStreamReader;
+QT_END_NAMESPACE
 
 namespace KSyntaxHighlighting {
 
@@ -144,6 +145,8 @@ private:
 };
 }
 
+QT_BEGIN_NAMESPACE
 Q_DECLARE_TYPEINFO(KSyntaxHighlighting::Format, Q_MOVABLE_TYPE);
+QT_END_NAMESPACE
 
 #endif // KSYNTAXHIGHLIGHTING_FORMAT_H

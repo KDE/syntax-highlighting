@@ -27,7 +27,9 @@
 #include <QHash>
 #include <QVector>
 
+QT_BEGIN_NAMESPACE
 class QString;
+QT_END_NAMESPACE
 
 namespace KSyntaxHighlighting {
 

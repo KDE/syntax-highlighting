@@ -101,6 +101,8 @@ private:
 
 }
 
+QT_BEGIN_NAMESPACE
 Q_DECLARE_TYPEINFO(KSyntaxHighlighting::FoldingRegion, Q_PRIMITIVE_TYPE);
+QT_END_NAMESPACE
 
 #endif

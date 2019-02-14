@@ -24,7 +24,11 @@
 #ifndef KSYNTAXHIGHLIGHTING_WILDCARDMATCHER_P_H
 #define KSYNTAXHIGHLIGHTING_WILDCARDMATCHER_P_H
 
+#include <QtGlobal>
+
+QT_BEGIN_NAMESPACE
 class QString;
+QT_END_NAMESPACE
 
 namespace KSyntaxHighlighting {
 

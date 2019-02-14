@@ -575,7 +575,11 @@ bool RegExpr::doLoad(QXmlStreamReader& reader)
     }
 
     // always using m_regexp.isValid() would be better, but parses the regexp and thus is way too expensive for release builds
-    Q_ASSERT(m_regexp.isValid());
+
+    if (Log().isDebugEnabled()) {
+        if (!m_regexp.isValid())
+            qCDebug(Log) << "Invalid regexp:" << m_regexp.pattern();
+    }
     return !m_regexp.pattern().isEmpty();
 }
 

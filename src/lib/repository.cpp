@@ -78,16 +78,21 @@ Definition Repository::definitionForName(const QString& defName) const
     return d->m_defs.value(defName);
 }
 
-static void sortDefinitions(QVector<Definition> &definitions)
+static Definition bestCandidate(QVector<Definition> &&candidates)
 {
-    std::partial_sort(definitions.begin(), definitions.begin() + 1, definitions.end(), [](const Definition &lhs, const Definition &rhs) {
+    if (candidates.isEmpty())
+        return Definition();
+
+    std::partial_sort(candidates.begin(), candidates.begin() + 1, candidates.end(), [](const Definition &lhs, const Definition &rhs) {
         return lhs.priority() > rhs.priority();
     });
+
+    return candidates.at(0);
 }
 
 Definition Repository::definitionForFileName(const QString& fileName) const
 {
-    return definitionsForFileName(fileName).value(0);
+    return bestCandidate(definitionsForFileName(fileName));
 }
 
 QVector<Definition> Repository::definitionsForFileName(const QString &fileName) const
@@ -96,7 +101,8 @@ QVector<Definition> Repository::definitionsForFileName(const QString &fileName) 
     const auto name = fi.fileName();
 
     QVector<Definition> candidates;
-    for (const Definition &def : qAsConst(d->m_sortedDefs)) {
+    for (auto it = d->m_defs.constBegin(); it != d->m_defs.constEnd(); ++it) {
+        auto def = it.value();
         for (const auto &pattern : def.extensions()) {
             if (WildcardMatcher::exactMatch(name, pattern)) {
                 candidates.push_back(def);
@@ -105,19 +111,19 @@ QVector<Definition> Repository::definitionsForFileName(const QString &fileName) 
         }
     }
 
-    sortDefinitions(candidates);
     return candidates;
 }
 
 Definition Repository::definitionForMimeType(const QString& mimeType) const
 {
-    return definitionsForMimeType(mimeType).value(0);
+    return bestCandidate(definitionsForMimeType(mimeType));
 }
 
 QVector<Definition> Repository::definitionsForMimeType(const QString &mimeType) const
 {
     QVector<Definition> candidates;
-    for (const Definition &def : qAsConst(d->m_sortedDefs)) {
+    for (auto it = d->m_defs.constBegin(); it != d->m_defs.constEnd(); ++it) {
+        auto def = it.value();
         for (const auto &matchType : def.mimeTypes()) {
             if (mimeType == matchType) {
                 candidates.push_back(def);
@@ -125,8 +131,6 @@ QVector<Definition> Repository::definitionsForMimeType(const QString &mimeType) 
             }
         }
     }
-
-    sortDefinitions(candidates);
     return candidates;
 }
 

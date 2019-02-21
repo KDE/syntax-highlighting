@@ -98,6 +98,10 @@ b.foo("string",1,{a:b},1.5,[1,2,3])
 a = b.foo("string",1,{a:b},1.5,[1,2,3])
 
 unnamed_function = function ( a as Integer ) as Float
+
+a = +-b
+a = &h42abcdef
+c = var@attr
 end function
 
 unnamed_sub = sub ( a as Integer ) as Void

@@ -4,7 +4,7 @@
 	name="BrightScript"
 	section="Scripts"
 	extensions="*.brs"
-	version="4"
+	version="5"
 	kateversion="5.0"
 	author="Daniel Levin (dendy.ua@gmail.com)"
 	license="MIT">
@@ -599,6 +599,8 @@
 -->
 <context name="rvalue" attribute="g" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
 	<DetectSpaces/>
+	<DetectChar char="-" attribute="unary"/>
+	<DetectChar char="+" attribute="unary"/>
 	<IncludeRules context="@comment"/>
 	<IncludeRules context="@function"/>
 	<IncludeRules context="@sub"/>
@@ -611,6 +613,7 @@
 	<keyword String="constants" attribute="constant" context="#pop!rvalue_operator"/>
 	<RegExpr String="[-+]?[0-9]*\.[0-9]" context="#pop!float" lookAhead="true"/>
 	<RegExpr String="[-+]?[0-9]" context="#pop!int" lookAhead="true"/>
+	<StringDetect String="&amp;h" insensitive="true" attribute="dec" context="#pop!hex"/>
 	<keyword String="m" attribute="m" context="#pop!rvalue_m_dot"/>
 	<IncludeRules context="@rvalue_builtin_functions"/>
 	<IncludeRules context="@rvalue_library_functions"/>
@@ -628,6 +631,7 @@
 <context name="rvalue_operator" attribute="g" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!rvalue_end">
 	<DetectSpaces/>
 	<DetectChar char="." attribute="operator" context="#pop!rvalue_dot"/>
+	<DetectChar char="@" attribute="operator" context="#pop!rvalue_dot"/>
 	<IncludeRules context="@rvalue_ops"/>
 </context>
 
@@ -718,6 +722,10 @@
 	<!--<RegExpr String="[-+]?[0-9]*\$" attribute="string" context="postfix_delimiter"/>-->
 	<RegExpr String="[-+]?[0-9]*[!#]" attribute="float" context="postfix_delimiter"/>
 	<RegExpr String="[-+]?[0-9]*[%&amp;]?" attribute="dec" context="postfix_delimiter"/>
+</context>
+
+<context name="hex" attribute="invalid" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+	<RegExpr String="[0-9a-fA-F]+" insensitive="true" attribute="dec" context="#pop"/>
 </context>
 
 <context name="postfix_delimiter" attribute="g" lineEndContext="#pop#pop" fallthrough="true" fallthroughContext="#pop#pop">

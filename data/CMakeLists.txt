@@ -1,9 +1,9 @@
 # generate PHP definitions
 macro(generate_php_syntax_definition targetFile srcFile)
-    execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/syntax/generated)
+    execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax)
     execute_process(COMMAND ${PERL_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/generators/generate-php.pl
         INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/syntax/${srcFile}
-        OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/syntax/generated/${targetFile})
+        OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/${targetFile})
 endmacro()
 
 generate_php_syntax_definition(javascript-php.xml javascript.xml)
@@ -17,12 +17,12 @@ generate_php_syntax_definition(mustache-js-php.xml mustache-js.xml)
 file(GLOB src_defs "${CMAKE_CURRENT_SOURCE_DIR}/syntax/*.xml")
 set(defs
     ${src_defs}
-    ${CMAKE_CURRENT_BINARY_DIR}/syntax/generated/html-php.xml
-    ${CMAKE_CURRENT_BINARY_DIR}/syntax/generated/css-php.xml
-    ${CMAKE_CURRENT_BINARY_DIR}/syntax/generated/javascript-php.xml
-    ${CMAKE_CURRENT_BINARY_DIR}/syntax/generated/javascript-react-php.xml
-    ${CMAKE_CURRENT_BINARY_DIR}/syntax/generated/typescript-php.xml
-    ${CMAKE_CURRENT_BINARY_DIR}/syntax/generated/mustache-js-php.xml
+    ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/html-php.xml
+    ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/css-php.xml
+    ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/javascript-php.xml
+    ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/javascript-react-php.xml
+    ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/typescript-php.xml
+    ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/mustache-js-php.xml
 )
 
 # theme data resource

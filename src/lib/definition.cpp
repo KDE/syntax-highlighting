@@ -324,18 +324,18 @@ Context* DefinitionData::initialContext() const
     return contexts.first();
 }
 
-Context* DefinitionData::contextByName(const QString& name) const
+Context* DefinitionData::contextByName(const QString& wantedName) const
 {
     for (const auto context : contexts) {
-        if (context->name() == name)
+        if (context->name() == wantedName)
             return context;
     }
     return nullptr;
 }
 
-KeywordList *DefinitionData::keywordList(const QString& name)
+KeywordList *DefinitionData::keywordList(const QString& wantedName)
 {
-    auto it = keywordLists.find(name);
+    auto it = keywordLists.find(wantedName);
     return (it == keywordLists.end()) ? nullptr : &it.value();
 }
 
@@ -344,9 +344,9 @@ bool DefinitionData::isWordDelimiter(QChar c) const
     return std::binary_search(wordDelimiters.constBegin(), wordDelimiters.constEnd(), c);
 }
 
-Format DefinitionData::formatByName(const QString& name) const
+Format DefinitionData::formatByName(const QString& wantedName) const
 {
-    const auto it = formats.constFind(name);
+    const auto it = formats.constFind(wantedName);
     if (it != formats.constEnd())
         return it.value();
 

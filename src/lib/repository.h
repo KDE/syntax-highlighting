@@ -167,7 +167,7 @@ public:
     Definition definitionForFileName(const QString &fileName) const;
 
     /**
-     * Returns all Definition%s for the file named @p fileName.
+     * Returns all Definition%s for the file named @p fileName sorted by priority.
      * The match is performed based on the \e extensions and @e mimetype of
      * the definition files.
      *
@@ -186,7 +186,7 @@ public:
     Definition definitionForMimeType(const QString &mimeType) const;
 
     /**
-     * Returns all Definition%s to the type named @p mimeType
+     * Returns all Definition%s to the type named @p mimeType sorted by priority
      *
      * @since 5.56
      */

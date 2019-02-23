@@ -40,6 +40,95 @@ normal text
 
 # Fenced code blocks (bug 356974)
 
+## Bash
+
+```bash
+#!/usr/bin/env bash
+
+for f in *; do
+    echo "$f"
+done
+```
+
+## C++
+
+```cpp
+#include <QtCore/QObject>
+
+class Q : public QObject {
+Q_OBJECT
+public:
+    Q();
+}
+
+Q::Q() :QObject(NULL) {
+}
+```
+
+## CMake
+
+```cmake
+cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
+
+project (hello_world)
+
+set(QT_MIN_VERSION "5.6.0")
+```
+
+## CSS
+
+```css
+h1.main::hover {
+    font-size: 100;
+    color: green;
+}
+```
+
+## Email
+
+```email
+From: Konqi Dragon <konqi@kde.org>
+To: All <all@kde.og>
+Subject: highlights
+```
+
+## Haskell
+
+```haskell
+module Main (main) where
+
+main :: IO ()
+main = putStrLn "Hello, World!"
+```
+
+## HTML
+
+```html
+<html>
+  <body>
+    <p class="main">Hello world!</p>
+  </body>
+</html>
+```
+
+## JSON
+
+```json
+[{
+    "hello": "world",
+    "count": 1,
+    "bool": true
+}]
+```
+
+## KConfig
+
+```kconfig
+[General]
+Toggle=true
+Count=1
+```
+
 ## PHP
 
 ```php
@@ -58,6 +147,32 @@ class IndexController extends AbstractActionController
 def addXToY(x, y):
     total = x + y
     print total
+```
+
+## QML
+
+```qml
+Text {
+    id: hello
+    width: 100
+    text: "Hello world!"
+}
+```
+
+## Rust
+
+```rust
+fn main() {
+    println!("Hello world!");
+}
+```
+
+## XML
+
+```xml
+<tag attribute="3">
+  <nested/>
+</tag>
 ```
 
 ## No language specified

@@ -96,6 +96,55 @@ private Q_SLOTS:
         }
     }
 
+    void testDefinitionsForFileName_data()
+    {
+        QTest::addColumn<QString>("fileName");
+        QTest::addColumn<QStringList>("expectedNames");
+
+        QTest::newRow("Matlab") << QStringLiteral("/bla/foo.m")
+                             << (QStringList() << QStringLiteral("Magma") << QStringLiteral("Matlab") << QStringLiteral("Octave") << QStringLiteral("Objective-C"));
+    }
+
+    void testDefinitionsForFileName()
+    {
+        QFETCH(QString, fileName);
+        QFETCH(QStringList, expectedNames);
+
+        const auto defs = m_repo.definitionsForFileName(fileName);
+        QStringList names;
+        for (auto def : defs) {
+            names.push_back(def.name());
+        }
+        QCOMPARE(names, expectedNames);
+    }
+
+    void testDefinitionsForMimeType_data()
+    {
+        QTest::addColumn<QString>("mimeType");
+        QTest::addColumn<QStringList>("expectedNames");
+
+        QTest::newRow("C Header") << QStringLiteral("text/x-chdr")
+                                  << (QStringList() << QStringLiteral("C++")
+                                                    << QStringLiteral("ISO C++")
+                                                    << QStringLiteral("C")
+                                                    << QStringLiteral("GCCExtensions")
+                                                    << QStringLiteral("ANSI C89")
+                                                    << QStringLiteral("SystemC"));
+    }
+
+    void testDefinitionsForMimeType()
+    {
+        QFETCH(QString, mimeType);
+        QFETCH(QStringList, expectedNames);
+
+        const auto defs = m_repo.definitionsForMimeType(mimeType);
+        QStringList names;
+        for (auto def : defs) {
+            names.push_back(def.name());
+        }
+        QCOMPARE(names, expectedNames);
+    }
+
     void testLoadAll()
     {
         for (const auto &def : m_repo.definitions()) {

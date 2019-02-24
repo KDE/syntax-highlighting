@@ -18,7 +18,7 @@
 } 
 
 <span style="font-weight:bold;">function</span> 
-<span style="color:#644a9b;font-weight:bold;">&lt;Tag</span> <span style="color:#006e28;">attr1</span>=<span style="color:#0057ae;">{ </span><span style="font-weight:bold;">&lt;tag/&gt;</span> <span style="font-weight:bold;">function</span> &lt;noTag/&gt; <span style="font-weight:bold;">return</span> <span style="font-weight:bold;font-style:italic;">class</span> <span style="font-weight:bold;">var</span> <span style="color:#b08000;">0x123</span> { } &amp;noRef; <span style="color:#0057ae;">hello</span>() <span style="color:#0057ae;">React</span>.<span style="color:#0057ae;">Component</span>() <span style="color:#0057ae;">}</span> <span style="color:#006e28;">attr2</span>=<span style="color:#bf0303;">&quot;</span><span style="color:#b08000;">&amp;ref;</span><span style="color:#bf0303;">&quot;</span><span style="color:#644a9b;font-weight:bold;">&gt;</span>
+<span style="color:#644a9b;font-weight:bold;">&lt;Tag</span> <span style="color:#006e28;">attr1</span>=<span style="color:#0057ae;">{</span> <span style="font-weight:bold;">&lt;tag/&gt;</span> <span style="font-weight:bold;">function</span> &lt;noTag/&gt; <span style="font-weight:bold;">return</span> <span style="font-weight:bold;font-style:italic;">class</span> <span style="font-weight:bold;">var</span> <span style="color:#b08000;">0x123</span> { } &amp;noRef; <span style="color:#0057ae;">hello</span>() <span style="color:#0057ae;">React</span>.<span style="color:#0057ae;">Component</span>() <span style="color:#0057ae;">}</span> <span style="color:#006e28;">attr2</span>=<span style="color:#bf0303;">&quot;</span><span style="color:#b08000;">&amp;ref;</span><span style="color:#bf0303;">&quot;</span><span style="color:#644a9b;font-weight:bold;">&gt;</span>
 	/* no comment*/ function <span style="font-weight:bold;">&lt;tag/&gt;</span> return class var 0x123 <span style="color:#b08000;">&amp;ref;</span> hello() React.Component()
 	.<span style="font-weight:bold;">&lt;tag/&gt;</span> anyWord <span style="font-weight:bold;">&lt;tag/&gt;</span>
 	<span style="color:#0057ae;">{</span> <span style="font-weight:bold;">function</span> &lt;tag&gt; <span style="font-weight:bold;">return</span> <span style="font-weight:bold;font-style:italic;">class</span> <span style="font-weight:bold;">var</span> <span style="color:#b08000;">0x123</span> <span style="color:#0057ae;">hello</span>() <span style="color:#0057ae;">React</span>.<span style="color:#0057ae;">Component</span>() <span style="color:#0057ae;">}</span> 
@@ -81,4 +81,23 @@ anyWord<span style="color:#898887;">/*comment*/</span> &lt;noTag/&gt;
 <span style="font-weight:bold;">&lt;&gt;&lt;span&gt;</span>hi<span style="font-weight:bold;">&lt;/span&gt;&lt;div&gt;</span>bye<span style="font-weight:bold;">&lt;/div&gt;&lt;/&gt;</span>; <span style="color:#898887;">// children</span>
 <span style="font-weight:bold;">&lt;&gt;&lt;span&gt;</span>1<span style="font-weight:bold;">&lt;/span&gt;&lt;&gt;&lt;span&gt;</span>2.1<span style="font-weight:bold;">&lt;/span&gt;&lt;span&gt;</span>2.2<span style="font-weight:bold;">&lt;/span&gt;&lt;/&gt;&lt;span&gt;</span>3<span style="font-weight:bold;">&lt;/span&gt;&lt;/&gt;</span>; <span style="color:#898887;">// nested fragments</span>
 <span style="font-weight:bold;">&lt;&gt;</span>#<span style="font-weight:bold;">&lt;/&gt;</span>; <span style="color:#898887;">// # would cause scanning error if not in jsxtext</span>
+
+<span style="color:#898887;">// Tags after substitutions in templates</span>
+<span style="color:#bf0303;">`aaa</span><span style="color:#3daee9;">${</span><span style="font-weight:bold;">&lt;tag&gt;&lt;/tag&gt;</span><span style="color:#898887;">//comment</span>
+    <span style="color:#898887;">/*comment*/</span><span style="color:#644a9b;font-weight:bold;">&lt;A/&gt;</span><span style="color:#3daee9;">}</span><span style="color:#bf0303;">`</span>
+
+<span style="color:#898887;">// Don't highlight tags within variable declaration</span>
+<span style="font-weight:bold;font-style:italic;">let</span> myIdentity: &lt;T&gt;(arg: T) <span style="font-weight:bold;">=&gt;</span> T = identity;
+<span style="font-weight:bold;">var</span> myIdentity: &lt;U&gt;(arg: U) <span style="font-weight:bold;">=&gt;</span> U = identity;
+<span style="font-weight:bold;">const</span> myIdentity: {&lt;T&gt;(<span style="color:#0057ae;">arg</span>: T): T} = identity;
+
+<span style="color:#898887;">// Don't highlight tags within interfaces and classes</span>
+<span style="font-weight:bold;font-style:italic;">interface</span> GenericIdentityFn {
+    &lt;T&gt;(<span style="color:#0057ae;">arg</span>: T): T;
+    &lt;noTag /&gt;
+}
+<span style="font-weight:bold;font-style:italic;">class</span> Handler {
+    <span style="color:#0057ae;">info</span>: &lt;T&gt;(<span style="color:#0057ae;">arg</span>: T): T &lt;noTag /&gt;;
+    <span style="font-weight:bold;">&lt;tag&gt;</span> <span style="font-weight:bold;">&lt;/tag&gt;</span>
+}
 </pre></body></html>

@@ -13,6 +13,49 @@ function test($varname) {
 
 <html>
 	<? print "<title>test</title>"; ?>
+
+	<!-- CSS -->
+	<style>
+		.inputText {
+			width: <?php echo $width; ?>px;
+			text-indent: 10px;
+		}
+	</style>
+
+	<!-- JavaScript -->
+	<script>
+		var some_js_var = <?php echo $somevar; ?> ;
+		<?php echo 'alert("Hello there.");'; ?>
+	</script>
+	<!-- JavaScript React -->
+	<script type="text/babel">
+		<Hello> <?php echo("Hello, hello!"); ?> </Hello> <?php /* aaa */ ?> <div></div>
+		function a(i) {
+			<?php echo "var j = 1;"; ?>
+			return <p>{ i + j }</p>;
+		}
+	</script>
+	<!-- TypeScript -->
+	<script type="text/typescript">
+		<?php $timestamp = time(); ?>
+		class DateTime {
+			info: string;
+			constructor() { this.info = <?php echo(date("F d, Y h:i:s", $timestamp)); ?>; }
+			get() { return this.info; }
+		}
+	</script>
+	<!-- MustacheJS -->
+	<script type="x-tmpl-mustache">
+		{{! <?php print "comment"; ?> }}
+		{{#movie}}
+			<div>
+				<h1>{{title}}</h1>
+				<img src="{{poster}}" alt="{{title}}"/>
+				<?php echo $movierating; ?> - {{ratings.critics_rating}}
+			</div>
+		{{/movie}}
+	</script>
+
 </html>
 
 <?php

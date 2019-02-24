@@ -57,6 +57,48 @@ for (var i in pieces) {
     }
 }
 
+const enum ResponseCode {
+    Success = 200,
+    BadRequest = 400
+}
+
+// Substitutions
+export function isInOpenInterval(start: number, end: number) {
+    return tersible(a => a > start && a < end, () => `(${start}...${end})`)
+}
+const bar = `${x} ${y}`; 
+
+// readonly
+function f1(mt: [number, number], rt: readonly [number, number]) {
+}
+
+function f2(ma: string[], ra: readonly string[], mt: [string, string], rt: readonly [string, string]) {
+}
+
+type ReadWrite<T> = { -readonly [P in keyof T] : T[P] };
+
+// const assertion
+let obj = { x: 10, y: [20, 30], z: { a: { b: 42 } } } as const;
+let r2 = { x: 20, y: 10 } as const;
+let r2 = {...p} as const;
+let p1 = { x: 10, y: 20 as const };
+let p2 = { 10 as const, 'foo' as const };
+
+// Definite assignment operator
+class Cl {
+    one?: string;
+    two!: string;
+}
+let x! = 1; 
+
+// Function with multiple arguments
+const children = [].map<Set<Map<number, string>>>(element => {
+    if (!this.identityProvider) {
+        return element;
+    }
+    return element;
+}); 
+
 // Numerics
 var a = 0xA;
 var b = 0b1;
@@ -70,6 +112,12 @@ var i = 1.;
 var j = .1;
 var k =  1;
 var l = 1__.e+3_22 | .2____e2 | 0o1_23 | 11__. ;
+
+// Bigint
+const binBig = 0b101n;
+const octBig = 0o567n;
+const hexBig = 0xC0Bn;
+const decBig = 123n;
 
 // Types
 let a: null = null;
@@ -109,3 +157,25 @@ aa: [ string
 aa: ( string 
       string ) // Don't highlight
 aa: string <string>
+interface a {
+    aa: /* comment
+        */ string,
+    bb: /* comment */
+        number,
+    cc: // comment
+        void,
+    dd:
+        any,
+}
+
+null, <{[key]: () => any}> null
+null, <{[key]: () =>{a: number}}> null
+
+// Correctly highlighting regular expressions
+dt = ((dt[0] * 1e9 + dt[1]) / 1e6).toFixed(3).replace(/\.?0+$/, '') + 'ms';
+(a[0] / 2) / (2)
+
+// Type guards
+function isNumber(x: any): x is number {
+    return typeof x === "number";
+}

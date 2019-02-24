@@ -75,3 +75,22 @@ let k2 = <Button> <h2> Hello </h2> </Button>;
 <><span>hi</span><div>bye</div></>; // children
 <><span>1</span><><span>2.1</span><span>2.2</span></><span>3</span></>; // nested fragments
 <>#</>; // # would cause scanning error if not in jsxtext
+
+// Tags after substitutions in templates
+`aaa${<tag></tag>//comment
+    /*comment*/<A/>}`
+
+// Don't highlight tags within variable declaration
+let myIdentity: <T>(arg: T) => T = identity;
+var myIdentity: <U>(arg: U) => U = identity;
+const myIdentity: {<T>(arg: T): T} = identity;
+
+// Don't highlight tags within interfaces and classes
+interface GenericIdentityFn {
+    <T>(arg: T): T;
+    <noTag />
+}
+class Handler {
+    info: <T>(arg: T): T <noTag />;
+    <tag> </tag>
+}

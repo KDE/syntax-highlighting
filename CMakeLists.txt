@@ -81,6 +81,7 @@ endif()
 if (NO_STANDARD_PATHS)
     add_definitions(-DNO_STANDARD_PATHS)
 endif()
+add_definitions(-DQT_NO_FOREACH)
 
 #
 # Actually build the stuff

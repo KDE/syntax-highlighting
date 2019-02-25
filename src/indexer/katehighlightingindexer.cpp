@@ -372,6 +372,7 @@ public:
             const auto unusedNames = language.existingContextNames - language.usedContextNames;
             if (!unusedNames.isEmpty()) {
                 qWarning() << language.hlFilename << "Unused contexts:" << unusedNames;
+                success = false;
             }
         }
 

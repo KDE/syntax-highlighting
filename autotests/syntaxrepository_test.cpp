@@ -260,7 +260,7 @@ private Q_SLOTS:
             QStringLiteral("Doxygen"),
             QStringLiteral("JavaScript React/PHP"),
             QStringLiteral("TypeScript/PHP"),
-            QStringLiteral("MustacheJS/PHP"),
+            QStringLiteral("Mustache/Handlebars (HTML)/PHP"),
             QStringLiteral("Modelines"),
             QStringLiteral("HTML"),
             QStringLiteral("CSS"),
@@ -268,7 +268,7 @@ private Q_SLOTS:
             QStringLiteral("JavaScript"),
             QStringLiteral("JavaScript React"),
             QStringLiteral("TypeScript"),
-            QStringLiteral("MustacheJS")
+            QStringLiteral("Mustache/Handlebars (HTML)")
         };
         QStringList definitionNames;
         for (auto d : defs) {

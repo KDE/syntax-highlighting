@@ -5,7 +5,7 @@
 	<!ENTITY attributeName "[A-Za-z_:*#\(\[][\)\]\w.:_-]*">
 	<!ENTITY entref        "&amp;(#[0-9]+|#[xX][0-9A-Fa-f]+|&name;);">
 ]>
-<language name="HTML" version="6" kateversion="3.4" section="Markup" extensions="*.htm;*.html;*.shtml;*.shtm" mimetype="text/html"  author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL" priority="10">
+<language name="HTML" version="7" kateversion="3.4" section="Markup" extensions="*.htm;*.html;*.shtml;*.shtm" mimetype="text/html"  author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL" priority="10">
 
 <highlighting>
 <contexts>
@@ -229,12 +229,17 @@
     <!-- MustacheJS / HandlebarsJS / RactiveJS -->
     <StringDetect attribute="Value" context="#pop#pop!MustacheJS" String="&quot;x-tmpl-mustache&quot;"/>
     <StringDetect attribute="Value" context="#pop#pop!MustacheJS" String="&apos;x-tmpl-mustache&apos;"/>
+    <StringDetect attribute="Value" context="#pop#pop!MustacheJS" String="&quot;text/mustache&quot;"/>
+    <StringDetect attribute="Value" context="#pop#pop!MustacheJS" String="&apos;text/mustache&apos;"/>    
     <StringDetect attribute="Value" context="#pop#pop!MustacheJS" String="&quot;text/x-mustache-template&quot;"/>
     <StringDetect attribute="Value" context="#pop#pop!MustacheJS" String="&apos;text/x-mustache-template&apos;"/>
     <StringDetect attribute="Value" context="#pop#pop!MustacheJS" String="&quot;text/x-handlebars-template&quot;"/>
     <StringDetect attribute="Value" context="#pop#pop!MustacheJS" String="&apos;text/x-handlebars-template&apos;"/>
     <StringDetect attribute="Value" context="#pop#pop!MustacheJS" String="&quot;text/ractive&quot;"/>
     <StringDetect attribute="Value" context="#pop#pop!MustacheJS" String="&apos;text/ractive&apos;"/>
+    <!-- HTML templates -->
+    <StringDetect attribute="Value" context="#pop#pop!Script HTML template" String="&quot;text/html&quot;"/>
+    <StringDetect attribute="Value" context="#pop#pop!Script HTML template" String="&apos;text/html&apos;"/>
   </context>
 
   <context name="JSX" attribute="Other Text" lineEndContext="#stay">
@@ -260,8 +265,21 @@
     <IncludeRules context="DefaultJS" />
   </context>
   <context name="MustacheJS content" attribute="Other Text" lineEndContext="#stay">
-    <IncludeRules context="Default JS content"/>
-    <IncludeRules context="Normal##MustacheJS" includeAttrib="true"/>
+    <RegExpr attribute="Element" context="El Close 2" String="&lt;/script\b" insensitive="true" endRegion="script" />
+    <StringDetect attribute="Error" context="#stay" String="&lt;script&gt;" insensitive="true" />
+    <RegExpr attribute="Error" context="#stay" String="&lt;script\b" insensitive="true" />
+    <IncludeRules context="Base##Mustache/Handlebars (HTML)" includeAttrib="true"/>
+  </context>
+
+  <context name="Script HTML template" attribute="Other Text" lineEndContext="#stay">
+    <DetectChar attribute="Element" context="Script HTML template content" char="&gt;" />
+    <IncludeRules context="DefaultJS" />
+  </context>
+  <context name="Script HTML template content" attribute="Other Text" lineEndContext="#stay">
+    <RegExpr attribute="Element" context="El Close 2" String="&lt;/script\b" insensitive="true" endRegion="script" />
+    <StringDetect attribute="Error" context="#stay" String="&lt;script&gt;" insensitive="true" />
+    <RegExpr attribute="Error" context="#stay" String="&lt;script\b" insensitive="true" />
+    <IncludeRules context="FindHTML" />
   </context>
 
 </contexts>

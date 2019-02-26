@@ -11,7 +11,7 @@ generate_php_syntax_definition(css-php.xml css.xml)
 generate_php_syntax_definition(html-php.xml html.xml)
 generate_php_syntax_definition(javascript-react-php.xml javascript-react.xml)
 generate_php_syntax_definition(typescript-php.xml typescript.xml)
-generate_php_syntax_definition(mustache-js-php.xml mustache-js.xml)
+generate_php_syntax_definition(mustache-php.xml mustache.xml)
 
 # find all definitions
 file(GLOB src_defs "${CMAKE_CURRENT_SOURCE_DIR}/syntax/*.xml")
@@ -22,7 +22,7 @@ set(defs
     ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/javascript-php.xml
     ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/javascript-react-php.xml
     ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/typescript-php.xml
-    ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/mustache-js-php.xml
+    ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/mustache-php.xml
 )
 
 # theme data resource

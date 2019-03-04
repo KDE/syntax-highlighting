@@ -64,5 +64,8 @@ else()
 endif()
 
 # set PIC to allow use in static and shared libs
+# this needs some more recent CMake than generally required
 set_property(TARGET SyntaxHighlightingData PROPERTY POSITION_INDEPENDENT_CODE 1)
-target_link_libraries(SyntaxHighlightingData PRIVATE Qt5::Core)
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.13.0")
+    target_link_libraries(SyntaxHighlightingData PRIVATE Qt5::Core)
+endif()

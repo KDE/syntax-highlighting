@@ -118,13 +118,13 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
 
     // verify definition, deal with no highlighting being enabled
     d->ensureDefinitionLoaded();
-    if (!d->m_definition.isValid()) {
+    const auto defData = DefinitionData::get(d->m_definition);
+    if (!d->m_definition.isValid() || !defData->isLoaded()) {
         applyFormat(0, text.size(), Format());
         return State();
     }
 
     // verify/initialize state
-    auto defData = DefinitionData::get(d->m_definition);
     auto newState = state;
     auto stateData = StateData::get(newState);
     const DefinitionRef currentDefRef(d->m_definition);

@@ -41,9 +41,11 @@
  */
 void initRepositorySearchPaths(KSyntaxHighlighting::Repository &repository)
 {
-#ifdef HAS_SYNTAX_RESOURCE
-    Q_UNUSED(repository)
-#else
+    // add extra search path for e.g. broken highlighting test
+    repository.addCustomSearchPath(QStringLiteral(TESTSRCDIR "/input"));
+
+    // handle no-resources case
+#ifndef HAS_SYNTAX_RESOURCE
     repository.addCustomSearchPath(QStringLiteral("@CMAKE_SOURCE_DIR@/data"));
     repository.addCustomSearchPath(QStringLiteral("@CMAKE_BINARY_DIR@/data/generated"));
 #endif

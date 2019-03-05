@@ -158,7 +158,7 @@ private Q_SLOTS:
             State initialState;
             hl.setDefinition(def);
             const auto state = hl.highlightLine(QLatin1String("This should not crash } ] ) !"), initialState);
-            QVERIFY(!def.isValid() || state != initialState);
+            QVERIFY(!def.isValid() || state != initialState || def.name() == QLatin1String("Broken Syntax"));
         }
     }
 
@@ -310,7 +310,7 @@ private Q_SLOTS:
                     formatIds.insert(format.id());
                 }
             }
-            QVERIFY(!def.isValid() || !formatIds.isEmpty());
+            QVERIFY(!def.isValid() || def.name() == QLatin1String("Broken Syntax") || !formatIds.isEmpty());
 
             // ensure all ids are there from 1..size
             for (int i = 1; i <= formatIds.size(); ++i) {

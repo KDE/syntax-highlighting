@@ -128,7 +128,7 @@ private:
 private Q_SLOTS:
     void initTestCase()
     {
-        QStandardPaths::enableTestMode(true);
+        QStandardPaths::setTestModeEnabled(true);
     }
 
     void testFolding_data()

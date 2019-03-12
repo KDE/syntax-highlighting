@@ -60,7 +60,7 @@ private:
 private Q_SLOTS:
     void initTestCase()
     {
-        QStandardPaths::enableTestMode(true);
+        QStandardPaths::setTestModeEnabled(true);
         initRepositorySearchPaths(m_repo);
     }
 

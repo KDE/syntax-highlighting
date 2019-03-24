@@ -251,8 +251,15 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
             if (newOffset <= offset)
                 continue;
 
-            // apply folding
-            if (rule->endRegion().isValid())
+            /**
+             * apply folding.
+             * special cases:
+             *   - rule with endRegion + beginRegion: in endRegion, the length is 0
+             *   - rule with lookAhead: length is 0
+             */
+            if (rule->endRegion().isValid() && rule->beginRegion().isValid())
+                applyFolding(offset, 0, rule->endRegion());
+            else if (rule->endRegion().isValid())
                 applyFolding(offset, rule->isLookAhead() ? 0 : newOffset - offset, rule->endRegion());
             if (rule->beginRegion().isValid())
                 applyFolding(offset, rule->isLookAhead() ? 0 : newOffset - offset, rule->beginRegion());

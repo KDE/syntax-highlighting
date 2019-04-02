@@ -54,3 +54,15 @@ static const char* c5 = "multiline \
  */
 
 #endif
+
+/*
+ * Empty lines after a line continuation character (see bug #405903)
+ */
+#define one \
+two \
+
+int i = 0; // this should not be highlighted as a macro
+char* str = "string \
+
+
+int i = 0; // this should not be highlighted as a string

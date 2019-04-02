@@ -145,8 +145,23 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
          * see https://phabricator.kde.org/D18509
          */
         int endlessLoopingCounter = 0;
-        while (!stateData->topContext()->lineEmptyContext().isStay()) {
-            if (!d->switchContext(stateData, stateData->topContext()->lineEmptyContext(), QStringList()))
+        while (!stateData->topContext()->lineEmptyContext().isStay() || (stateData->topContext()->lineEmptyContext().isStay() && !stateData->topContext()->lineEndContext().isStay())) {
+            /**
+             * line empty context switches
+             */
+            if (!stateData->topContext()->lineEmptyContext().isStay()) {
+                if (!d->switchContext(stateData, stateData->topContext()->lineEmptyContext(), QStringList())) {
+                    /**
+                     * end when trying to #pop the main context
+                     */
+                    break;
+                }
+            /**
+             * line end context switches only when lineEmptyContext is #stay. This avoids
+             * skipping empty lines after a line continuation character (see bug 405903)
+             */
+            } else if (!stateData->topContext()->lineEndContext().isStay() &&
+                       !d->switchContext(stateData, stateData->topContext()->lineEndContext(), QStringList()))
                 break;
 
             // guard against endless loops

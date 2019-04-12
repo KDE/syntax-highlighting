@@ -36,12 +36,16 @@
   ==========================================================================================
 
   Last update:
-    Syntax highlighting based in AppArmor 2.13.0
+    Syntax highlighting based on AppArmor 2.13.2
     For more details about the syntax of AppArmor profiles, visit:
       https://gitlab.com/apparmor/apparmor/wikis/Documentation
       http://manpages.ubuntu.com/manpages/cosmic/en/man5/apparmor.d.5.html
 
   Change log:
+   * Version 8 [02-Apr-2019]: (AppArmor 2.13.2)
+      - Do not highlight variable assignments and alias rules within profiles.
+      - Add keywords of "tunables/share" variables.
+      - Change style of "Other Option" attribute and remove one indentation.
    * Version 7 [15-Sep-2018]:
       - Update itemData's style for the new Solarized color schemes.
       - Fixes in "_end_rule_irnc".
@@ -64,7 +68,7 @@
 -->
 
 <language name="AppArmor Security Profile"
-          version="7"
+          version="8"
           kateversion="5.0"
           section="Markup"
           extensions="usr.bin.*;usr.sbin.*;bin.*;sbin.*;usr.lib.*;usr.lib64.*;usr.lib32.*;usr.libx32.*;usr.libexec.*;usr.local.bin.*;usr.local.sbin.*;usr.local.lib*;opt.*;etc.cron.*;snap.*;snap-update-ns.*;snap-confine.*"
@@ -543,6 +547,7 @@
 		<item>unsafe</item>
 	</list>
 
+	<!-- Include Rule -->
 	<list name="rule_include">
 		<item>if</item>
 		<item>exists</item>
@@ -581,6 +586,9 @@
 		<item>XDG_MUSIC_DIR</item>
 		<item>XDG_PICTURES_DIR</item>
 		<item>XDG_VIDEOS_DIR</item>
+		<item>flatpak_exports_root</item>
+		<item>system_share_dirs</item>
+		<item>user_share_dirs</item>
 	</list>
 	<list name="default_abstractions">
 		<item>abstractions/</item>
@@ -737,7 +745,7 @@
 	        has a different context and for a correct delimitation of the words.
 	      - The content of a rule is found in the contexts "_default_rule"
 	        and "_default_rule_with_comments".
-	      - When adding a new rule, add it also in "_end_rule_irnc". -->
+	      - When adding a new rule, add it also in "_end_rule_irnc"! -->
 	<list name="rule_name_mount">
 		<item>mount</item>
 		<item>remount</item>
@@ -762,42 +770,58 @@
 
 	<contexts>
 
-		<!-- Profile Content -->
-		<context name="_profile" attribute="Normal Text" lineEndContext="#stay">
-
-			<!-- Header -->
-			<keyword context="_profile_name" attribute="Profile Head" String="profile_head"/>
-			<RegExpr context="_profile_name" attribute="Profile Head" String="(^|\s)\^(?=\S)"/>
-			<keyword context="#stay" attribute="Option" String="profile_options"/>
-
+		<context name="_normal" attribute="Normal Text" lineEndContext="#stay">
 			<!-- Preamble -->
-			<StringDetect context="_include" attribute="Preprocessor" String="#include" insensitive="true"/>
-			<RegExpr context="_include" attribute="Preprocessor" String="(^|\s)include(?=\s)"/>
-			<DetectChar context="_comment" attribute="Comment" char="#"/>
 
 			<!-- Variable Assignment.
 			     NOTE:
-			      - Variable assignments are not allowed within profiles, but this behavior is not addressed.
-			        When writing assignments within profiles, the parser shows an error because it does
-			        not allow + or = after a variable, so there are no conflicts with file rules.
+			      - Variable assignments are not allowed within profiles (when writing assignments within
+			        profiles, the parser shows an error because it does not allow + or = after a variable).
 			      - [Jul 24, 2018] Variables of type "@VAR" will only be highlighted in assignments, as long
 			        as they are not fully supported (apparently, they will be used in conditional expressions). -->
 			<Detect2Chars context="_variable_assignment" attribute="Variable" char="@" char1="{" lookAhead="true" firstNonSpace="true"/>
 			<RegExpr context="_variable_assignment_operator" attribute="Variable" String="@&varName;(?=\s*(\+?\=|$|\s#))" firstNonSpace="true"/>
 			<DetectChar context="_variable_assignment_line_general" attribute="Operator 1" char="=" firstNonSpace="true"/>
 			<Detect2Chars context="_variable_assignment_line" attribute="Operator 1" char="+" char1="=" firstNonSpace="true"/>
+			<!-- Alias rule -->
+			<keyword context="_default_rule_with_comments" attribute="Rule" String="rule_name_alias" beginRegion="Rule"/>
 
+			<!-- Profile Content (also highlight rules, for abstractions) -->
+			<IncludeRules context="_default_profile"/>
+		</context>
+
+		<!-- Profile Content, within { ... } -->
+		<context name="_profile" attribute="Normal Text" lineEndContext="#stay">
+			<DetectChar context="#pop" attribute="Operator 1" char="}" endRegion="Profile"/>
+			<Detect2Chars context="_variable_assignment_error" attribute="Variable" char="@" char1="{" lookAhead="true" firstNonSpace="true"/>
+			<IncludeRules context="_default_profile"/>
+			<WordDetect context="#stay" attribute="Error" String="alias"/> <!-- rule_name_alias -->
+		</context>
+
+		<context name="_default_profile" attribute="Normal Text" lineEndContext="#stay">
+			<!-- Profile Header -->
+			<keyword context="_profile_name" attribute="Profile Head" String="profile_head"/>
+			<RegExpr context="_profile_name" attribute="Profile Head" String="(^|\s)\^(?=\S)"/>
+			<keyword context="#stay" attribute="Option" String="profile_options"/>
+
+			<!-- Line Rules -->
+			<StringDetect context="_include" attribute="Preprocessor" String="#include" insensitive="true"/>
+			<RegExpr context="_include" attribute="Preprocessor" String="(^|\s)include(?=\s)"/>
+			<DetectChar context="_comment" attribute="Comment" char="#"/>
+
+			<!-- Variables -->
 			<Detect2Chars context="_variable" attribute="Variable" char="@" char1="{" lookAhead="true"/>
 			<Detect2Chars context="_boolean" attribute="Variable" char="$" char1="{" lookAhead="true"/>
 			<keyword context="#stay" attribute="Other Option" String="boolean" insensitive="true"/>
 			<RegExpr context="#stay" attribute="Variable" String="\$&varName;(?=[\s\(\)\{\}&quot;@\$#\=\+]|$)"/>
 
-			<IncludeRules context="_brackets_error"/>
-			<DetectChar context="#stay" attribute="Operator 1" char="{" beginRegion="Profile"/>
-			<DetectChar context="#stay" attribute="Operator 1" char="}" endRegion="Profile"/>
+			<!-- Brackets -->
+			<IncludeRules context="_brackets_error"/> <!-- {} -->
+			<DetectChar context="_profile" attribute="Operator 1" char="{" beginRegion="Profile"/>
 			<DetectChar context="_parentheses_block_profile" attribute="Normal Text" char="("/>
 			<DetectChar context="_r_square_brackets" attribute="Globbing Brackets" char="["/>
 
+			<!-- Rule Qualifiers -->
 			<keyword context="#stay" attribute="Access Qualifier" String="access_types"/>
 			<keyword context="#stay" attribute="Qualifier" String="qualifiers"/>
 			<keyword context="#stay" attribute="File Qualifier" String="file_qualifiers"/>
@@ -805,7 +829,6 @@
 			<!-- Rules -->
 			<keyword context="_rule_file" attribute="Rule" String="rule_name_file" beginRegion="Rule"/>
 			<keyword context="_rule_mount" attribute="Rule" String="rule_name_mount" beginRegion="Rule"/>
-			<keyword context="_default_rule_with_comments" attribute="Rule" String="rule_name_alias" beginRegion="Rule"/>
 			<keyword context="_rule_capability" attribute="Rule" String="rule_name_capability" beginRegion="Rule"/>
 			<keyword context="_rule_network" attribute="Rule" String="rule_name_network" beginRegion="Rule"/>
 			<keyword context="_rule_pivotroot" attribute="Rule" String="rule_name_pivotroot" beginRegion="Rule"/>
@@ -818,6 +841,7 @@
 			<keyword context="_rule_rlimit" attribute="Rule Error" String="rule_name_rlimit" beginRegion="Rule"/> <!-- set rlimit -->
 			<keyword context="_rule_set" attribute="Rule" String="rule_name_set"/>
 
+			<!-- Paths, text in quotes, file permissions and others -->
 			<IncludeRules context="_operators"/>
 			<IncludeRules context="_find_path"/>
 			<IncludeRules context="_find_text_quoted"/>
@@ -837,9 +861,10 @@
 			<keyword context="#stay" attribute="Other Data" String="boolean" insensitive="true"/>
 		</context>
 
+		<!-- Comment -->
 		<context name="_comment" attribute="Comment" lineEndContext="#pop">
-			<LineContinue context="#pop" attribute="Comment"/>
 			<DetectSpaces />
+			<LineContinue context="#pop" attribute="Comment"/>
 			<IncludeRules context="##Alerts"/>
 			<IncludeRules context="##Modelines"/>
 			<!-- URL -->
@@ -964,6 +989,21 @@
 		<context name="_variable_assignment_line_general" attribute="Path" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!_variable_assignment_line">
 			<keyword context="#pop!_variable_assignment_line" attribute="Other Option" String="boolean" insensitive="true"/>
 			<DetectSpaces context="#stay"/>
+		</context>
+
+		<!-- Within the profiles, highlight as "Error" the operators of variable assignment (= and +=) -->
+		<context name="_variable_assignment_error" attribute="Variable" lineEndContext="#pop">
+			<RegExpr context="#pop!_variable_assignment_error_operator" attribute="Variable" String="&variable;"/>
+			<DetectChar context="#pop" attribute="Error" char="@"/>
+		</context>
+		<context name="_variable_assignment_error_operator" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!_find_path_after_variable">
+			<DetectChar context="#pop!_find_path_after_variable" attribute="Error" char="="/>
+			<Detect2Chars context="#pop!_find_path_after_variable" attribute="Error" char="+" char1="="/>
+			<RegExpr context="#pop!_variable_assignment_error_operator_after_spaces" String="\s+(?=\+?\=)"/>
+		</context>
+		<context name="_variable_assignment_error_operator_after_spaces" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+			<DetectChar context="#pop" attribute="Error" char="="/>
+			<Detect2Chars context="#pop" attribute="Error" char="+" char1="="/>
 		</context>
 
 		<!-- ${BOOLEAN} -->
@@ -1198,7 +1238,7 @@
 		</context>
 
 		<!-- Profile Transition:
-		     Highlight the profile name in File Rule (Execute Mode) and Change Profile Rule. -->
+		     Highlight the profile name in File Rules (Execute Mode) and Change Profile Rules. -->
 		<context name="_profile_transition" attribute="Transition Profile Name" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop">
 			<DetectSpaces context="#stay" attribute="Normal Text"/>
 			<!-- Not highlighting paths and paths quoted -->
@@ -1258,7 +1298,8 @@
 			<IncludeRules context="_default_quoted"/>
 		</context>
 
-		<!-- Parentheses Block: ( ) -->
+		<!-- Parentheses Block: ( )
+		     NOTE: Here special contexts are used for paths, strings and brackets. The "," character acts as a delimiter. -->
 		<context name="_common_parentheses_block" attribute="Normal Text" lineEndContext="#stay">
 			<DetectChar context="#pop" attribute="Normal Text" char=")"/>
 			<!-- Highlight as path the text after the '=' operator, except keywords or simple words ([\w\-\+]+) -->
@@ -1301,7 +1342,6 @@
 			<RegExpr String="set(?=\s+rlimit\b)"    context="#pop" attribute="Rule Error"              firstNonSpace="true" endRegion="Rule"/>
 
 			<keyword String="rule_name_file"          context="#pop!_rule_file"          attribute="Rule Error" firstNonSpace="true" endRegion="Rule" beginRegion="Rule"/>
-			<keyword String="rule_name_alias" context="#pop!_default_rule_with_comments" attribute="Rule Error" firstNonSpace="true" endRegion="Rule" beginRegion="Rule"/>
 			<keyword String="rule_name_capability"    context="#pop!_rule_capability"    attribute="Rule Error" firstNonSpace="true" endRegion="Rule" beginRegion="Rule"/>
 			<keyword String="rule_name_network"       context="#pop!_rule_network"       attribute="Rule Error" firstNonSpace="true" endRegion="Rule" beginRegion="Rule"/>
 			<keyword String="rule_name_pivotroot"     context="#pop!_rule_pivotroot"     attribute="Rule Error" firstNonSpace="true" endRegion="Rule" beginRegion="Rule"/>
@@ -1315,6 +1355,7 @@
 			     ('unix' is also a domain of the network rule; 'remount' is also a flag of the mount rule). -->
 			<keyword String="rule_name_mount" context="#pop!_rule_mount" attribute="Rule Error" firstNonSpace="true" endRegion="Rule" beginRegion="Rule"/>
 			<keyword String="rule_name_unix"  context="#pop!_rule_unix"  attribute="Rule Error" firstNonSpace="true" endRegion="Rule" beginRegion="Rule"/>
+			<!-- Not included: alias rule -->
 		</context>
 		<!-- For blocks of parentheses within rules (the same keywords as "_end_rule_irnc"!) -->
 		<context name="_end_rule_irnc_parentheses_rule" attribute="Normal Text" lineEndContext="#stay">
@@ -1324,7 +1365,6 @@
 			<keyword String="file_qualifiers"         context="#pop" attribute="File Qualifier Error"   lookAhead="true" firstNonSpace="true"/>
 			<RegExpr String="set(?=\s+rlimit\b)"      context="#pop" attribute="Rule Error" lookAhead="true" firstNonSpace="true"/>
 			<keyword String="rule_name_file"          context="#pop" attribute="Rule Error" lookAhead="true" firstNonSpace="true"/>
-			<keyword String="rule_name_alias"         context="#pop" attribute="Rule Error" lookAhead="true" firstNonSpace="true"/>
 			<keyword String="rule_name_capability"    context="#pop" attribute="Rule Error" lookAhead="true" firstNonSpace="true"/>
 			<keyword String="rule_name_network"       context="#pop" attribute="Rule Error" lookAhead="true" firstNonSpace="true"/>
 			<keyword String="rule_name_pivotroot"     context="#pop" attribute="Rule Error" lookAhead="true" firstNonSpace="true"/>
@@ -1337,6 +1377,7 @@
 			<!-- Keep at the end to avoid conflicts! -->
 			<keyword String="rule_name_mount" context="#pop" attribute="Rule Error" lookAhead="true" firstNonSpace="true"/>
 			<keyword String="rule_name_unix"  context="#pop" attribute="Rule Error" lookAhead="true" firstNonSpace="true"/>
+			<!-- Not included: alias rule -->
 		</context>
 
 		<!-- Paths & File Globals -->
@@ -1511,7 +1552,7 @@
 		<itemData name="Permissions"      defStyleNum="dsNormal"    bold="1" spellChecking="false"/>
 
 		<itemData name="Option"                  defStyleNum="dsOthers"        bold="0" spellChecking="false"/>
-		<itemData name="Other Option"            defStyleNum="dsDataType"      bold="0" spellChecking="false"/>
+		<itemData name="Other Option"            defStyleNum="dsAttribute"     bold="0" spellChecking="false"/>
 		<itemData name="Flags"                   defStyleNum="dsVerbatimString"         spellChecking="false"/>
 		<itemData name="SubProfile/Hat"          defStyleNum="dsAnnotation"    bold="0" spellChecking="false"/>
 		<itemData name="SubProfile/Hat Operator" defStyleNum="dsAnnotation"    bold="1" spellChecking="false"/>

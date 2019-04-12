@@ -34,7 +34,7 @@ profile foo /usr/bin/foo flags=(attach_disconnected enforce) {
 	owner @{USER_DIR}/** rw,
 	audit deny owner /**/* mx,
 	/**.[tT][xX][tT] r,  # txt
-	
+
 	owner file @{HOME}/.local/share/foo/{,**} rwkl,
 	owner @{HOME}/.config/*.[a-zA-Z0-9]*      rwk,
 
@@ -135,7 +135,7 @@ profile foo /usr/bin/foo flags=(attach_disconnected enforce) {
 		# Change Profile rules
 		change_profile unsafe /** -> [^u/]**,
 		change_profile unsafe /** -> {u,un,unc,unco,uncon,unconf,unconfi,unconfin,unconfine},
-		change_profile /bin/bash  -> 
+		change_profile /bin/bash  ->
 			new_profile//hat,
 	}
 
@@ -179,7 +179,12 @@ profile foo /usr/bin/foo flags=(attach_disconnected enforce) {
 		interface=org.hello #No comment
 		peer=(name=org.hello  #No comment
 		      label=unconfined), #Comment
-	@{VARIABLE} = val1 val2 val3  #No comment
+
+	# Don't allow assignment of variables within profiles
+	@{VARIABLE} = val1 val2 val3 # Comment
+
+	# Alias rules not allowed within profiles
+	alias /run/ -> /mnt/run/,
 
 	# Error: Open rule
 	/home/*/file rw
@@ -218,25 +223,25 @@ profile other_tests {
 		unix,
 
 	# Transition rules
-	/usr/bin/foo cx -> hello*,
-	/usr/bin/foo Cx -> path/,
-	/usr/bin/foo cx -> ab[ad/]hello,
-	/usr/bin/foo Cx -> ab[cd/]a[ad/]hello/path,
-	/usr/bin/foo Cx -> ab[hello/path,
+	/usr/bin/foo cx -> hello*,                  # profile name
+	/usr/bin/foo Cx -> path/,                   # path
+	/usr/bin/foo cx -> ab[ad/]hello,            # profile name
+	/usr/bin/foo Cx -> ab[cd/]a[ad/]hello/path, # path
+	/usr/bin/foo Cx -> ab[hello/path,           # profile name
 
-	/usr/bin/foo cx -> "hello*",
-	/usr/bin/foo Cx -> "path/",
-	/usr/bin/foo cx -> "ab[ad/]hello",
-	/usr/bin/foo Cx -> "ab[cd/]a[ad/]hello/path",
-	/usr/bin/foo Cx -> "ab[hello/path",
+	/usr/bin/foo cx -> "hello*",                  # profile name
+	/usr/bin/foo Cx -> "path/",                   # path
+	/usr/bin/foo cx -> "ab[ad/]hello",            # profile name
+	/usr/bin/foo Cx -> "ab[cd/]a[ad/]hello/path", # path
+	/usr/bin/foo Cx -> "ab[hello/path",           # profile name
 
-	/usr/bin/foo cx -> holas//hello/sa,
-	/usr/bin/foo cx -> df///dd//hat,
-	/usr/bin/foo cx -> holas,#sd\323fsdf,
+	/usr/bin/foo cx -> holas//hello/sa,    # path
+	/usr/bin/foo cx -> df///dd//hat,       # path + hat
+	/usr/bin/foo cx -> holas,#sd\323fsdf,  # profile name
 
 	# Access modes
 	/hello/lib/foo rwklms, # s invalid
-	/hello/lib/foo rwmaix,  # w & a incompatible
+	/hello/lib/foo rwmaix, # w & a incompatible
 	/hello/lib/foo kalmw,
 	/hello/lib/foo wa,
 	# OK

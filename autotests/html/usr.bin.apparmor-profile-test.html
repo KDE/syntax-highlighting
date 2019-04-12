@@ -40,7 +40,7 @@ deny owner <span style="color:#bf0303;text-decoration:underline;">#</span>No-com
 	<span style="color:#0057ae;font-weight:bold;">owner</span> <span style="color:#b08000;">@{USER_DIR}</span>/<span style="color:#3daee9;">**</span><span style="font-weight:bold;"> rw</span>,
 	<span style="font-weight:bold;">audit</span> <span style="color:#bf0303;font-weight:bold;">deny</span> <span style="color:#0057ae;font-weight:bold;">owner</span> /<span style="color:#3daee9;">**</span>/<span style="color:#3daee9;">*</span><span style="font-weight:bold;"> mx</span>,
 	/<span style="color:#3daee9;">**</span>.<span style="color:#bf0303;">[tT][xX][tT]</span><span style="font-weight:bold;"> r</span>,  <span style="color:#898887;"># txt</span>
-	
+
 	<span style="color:#0057ae;font-weight:bold;">owner</span> <span style="color:#0057ae;font-weight:bold;">file</span> <span style="color:#b08000;">@{HOME}</span>/.local/share/foo/<span style="color:#bf0303;">{</span><span style="color:#644a9b;">,</span><span style="color:#3daee9;">**</span><span style="color:#bf0303;">}</span><span style="font-weight:bold;"> rwkl</span>,
 	<span style="color:#0057ae;font-weight:bold;">owner</span> <span style="color:#b08000;">@{HOME}</span>/.config/<span style="color:#3daee9;">*</span>.<span style="color:#bf0303;">[a-zA-Z0-9]</span><span style="color:#3daee9;">*</span>     <span style="font-weight:bold;"> rwk</span>,
 
@@ -141,7 +141,7 @@ deny owner <span style="color:#bf0303;text-decoration:underline;">#</span>No-com
 		<span style="color:#898887;"># Change Profile rules</span>
 		<span style="color:#0057ae;font-weight:bold;">change_profile</span> <span style="color:#0057ae;">unsafe</span> /<span style="color:#3daee9;">**</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#644a9b;font-style:italic;">[^u/]</span><span style="color:#3daee9;font-style:italic;">**</span>,
 		<span style="color:#0057ae;font-weight:bold;">change_profile</span> <span style="color:#0057ae;">unsafe</span> /<span style="color:#3daee9;">**</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#644a9b;font-style:italic;">{u,un,unc,unco,uncon,unconf,unconfi,unconfin,unconfine}</span>,
-		<span style="color:#0057ae;font-weight:bold;">change_profile</span> /bin/bash  <span style="color:#bf0303;font-weight:bold;">-&gt;</span> 
+		<span style="color:#0057ae;font-weight:bold;">change_profile</span> /bin/bash  <span style="color:#bf0303;font-weight:bold;">-&gt;</span>
 			<span style="color:#644a9b;font-style:italic;">new_profile</span><span style="color:#ca60ca;font-weight:bold;font-style:italic;">//</span><span style="color:#644a9b;font-style:italic;">hat</span>,
 	}
 
@@ -185,7 +185,12 @@ deny owner <span style="color:#bf0303;text-decoration:underline;">#</span>No-com
 		<span style="color:#006e28;">interface</span>=org.hello <span style="color:#bf0303;text-decoration:underline;">#</span>No comment
 		<span style="color:#006e28;">peer</span>=(<span style="color:#0057ae;">name</span>=org.hello  <span style="color:#bf0303;text-decoration:underline;">#</span>No comment
 		      <span style="color:#0057ae;">label</span>=<span style="font-style:italic;">unconfined</span>), <span style="color:#898887;">#Comment</span>
-	<span style="color:#b08000;">@{VARIABLE}</span> = val1 val2 val3  <span style="color:#bf0303;text-decoration:underline;">#</span>No comment
+
+	<span style="color:#898887;"># Don't allow assignment of variables within profiles</span>
+	<span style="color:#b08000;">@{VARIABLE}</span> <span style="color:#bf0303;text-decoration:underline;">=</span> val1 val2 val3 <span style="color:#898887;"># Comment</span>
+
+	<span style="color:#898887;"># Alias rules not allowed within profiles</span>
+	<span style="color:#bf0303;text-decoration:underline;">alias</span> /run/ <span style="color:#bf0303;font-weight:bold;">-&gt;</span> /mnt/run/,
 
 	<span style="color:#898887;"># Error: Open rule</span>
 	/home/<span style="color:#3daee9;">*</span>/file<span style="font-weight:bold;"> rw</span>
@@ -224,25 +229,25 @@ deny owner <span style="color:#bf0303;text-decoration:underline;">#</span>No-com
 		<span style="color:#0057ae;font-weight:bold;text-decoration:underline;">unix</span>,
 
 	<span style="color:#898887;"># Transition rules</span>
-	/usr/bin/foo<span style="font-weight:bold;"> cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#644a9b;font-style:italic;">hello</span><span style="color:#3daee9;font-style:italic;">*</span>,
-	/usr/bin/foo<span style="font-weight:bold;"> Cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> path/,
-	/usr/bin/foo<span style="font-weight:bold;"> cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#644a9b;font-style:italic;">ab[ad/]hello</span>,
-	/usr/bin/foo<span style="font-weight:bold;"> Cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> ab<span style="color:#bf0303;">[cd/]</span>a<span style="color:#bf0303;">[ad/]</span>hello/path,
-	/usr/bin/foo<span style="font-weight:bold;"> Cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#644a9b;font-style:italic;">ab[hello/path</span>,
+	/usr/bin/foo<span style="font-weight:bold;"> cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#644a9b;font-style:italic;">hello</span><span style="color:#3daee9;font-style:italic;">*</span>,                  <span style="color:#898887;"># profile name</span>
+	/usr/bin/foo<span style="font-weight:bold;"> Cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> path/,                   <span style="color:#898887;"># path</span>
+	/usr/bin/foo<span style="font-weight:bold;"> cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#644a9b;font-style:italic;">ab[ad/]hello</span>,            <span style="color:#898887;"># profile name</span>
+	/usr/bin/foo<span style="font-weight:bold;"> Cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> ab<span style="color:#bf0303;">[cd/]</span>a<span style="color:#bf0303;">[ad/]</span>hello/path, <span style="color:#898887;"># path</span>
+	/usr/bin/foo<span style="font-weight:bold;"> Cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#644a9b;font-style:italic;">ab[hello/path</span>,           <span style="color:#898887;"># profile name</span>
 
-	/usr/bin/foo<span style="font-weight:bold;"> cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#644a9b;font-style:italic;">&quot;hello</span><span style="color:#3daee9;font-style:italic;">*</span><span style="color:#644a9b;font-style:italic;">&quot;</span>,
-	/usr/bin/foo<span style="font-weight:bold;"> Cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#bf0303;">&quot;path/&quot;</span>,
-	/usr/bin/foo<span style="font-weight:bold;"> cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#644a9b;font-style:italic;">&quot;ab[ad/]hello&quot;</span>,
-	/usr/bin/foo<span style="font-weight:bold;"> Cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#bf0303;">&quot;ab</span><span style="color:#bf0303;">[cd/]</span><span style="color:#bf0303;">a</span><span style="color:#bf0303;">[ad/]</span><span style="color:#bf0303;">hello/path&quot;</span>,
-	/usr/bin/foo<span style="font-weight:bold;"> Cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#644a9b;font-style:italic;">&quot;ab[hello/path&quot;</span>,
+	/usr/bin/foo<span style="font-weight:bold;"> cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#644a9b;font-style:italic;">&quot;hello</span><span style="color:#3daee9;font-style:italic;">*</span><span style="color:#644a9b;font-style:italic;">&quot;</span>,                  <span style="color:#898887;"># profile name</span>
+	/usr/bin/foo<span style="font-weight:bold;"> Cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#bf0303;">&quot;path/&quot;</span>,                   <span style="color:#898887;"># path</span>
+	/usr/bin/foo<span style="font-weight:bold;"> cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#644a9b;font-style:italic;">&quot;ab[ad/]hello&quot;</span>,            <span style="color:#898887;"># profile name</span>
+	/usr/bin/foo<span style="font-weight:bold;"> Cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#bf0303;">&quot;ab</span><span style="color:#bf0303;">[cd/]</span><span style="color:#bf0303;">a</span><span style="color:#bf0303;">[ad/]</span><span style="color:#bf0303;">hello/path&quot;</span>, <span style="color:#898887;"># path</span>
+	/usr/bin/foo<span style="font-weight:bold;"> Cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#644a9b;font-style:italic;">&quot;ab[hello/path&quot;</span>,           <span style="color:#898887;"># profile name</span>
 
-	/usr/bin/foo<span style="font-weight:bold;"> cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> holas//hello/sa,
-	/usr/bin/foo<span style="font-weight:bold;"> cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> df///dd<span style="color:#ca60ca;font-weight:bold;">//</span><span style="color:#ca60ca;">hat</span>,
-	/usr/bin/foo<span style="font-weight:bold;"> cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#644a9b;font-style:italic;">holas,#sd</span><span style="color:#3daee9;font-style:italic;">\323</span><span style="color:#644a9b;font-style:italic;">fsdf</span>,
+	/usr/bin/foo<span style="font-weight:bold;"> cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> holas//hello/sa,    <span style="color:#898887;"># path</span>
+	/usr/bin/foo<span style="font-weight:bold;"> cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> df///dd<span style="color:#ca60ca;font-weight:bold;">//</span><span style="color:#ca60ca;">hat</span>,       <span style="color:#898887;"># path + hat</span>
+	/usr/bin/foo<span style="font-weight:bold;"> cx</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#644a9b;font-style:italic;">holas,#sd</span><span style="color:#3daee9;font-style:italic;">\323</span><span style="color:#644a9b;font-style:italic;">fsdf</span>,  <span style="color:#898887;"># profile name</span>
 
 	<span style="color:#898887;"># Access modes</span>
 	/hello/lib/foo rwklms, <span style="color:#898887;"># s invalid</span>
-	/hello/lib/foo rwmaix,  <span style="color:#898887;"># w &amp; a incompatible</span>
+	/hello/lib/foo rwmaix, <span style="color:#898887;"># w &amp; a incompatible</span>
 	/hello/lib/foo kalmw,
 	/hello/lib/foo wa,
 	<span style="color:#898887;"># OK</span>

@@ -73,3 +73,7 @@ for my $x ($hash->{arr}->@*) {
         ...
     }
 }
+
+# Highlight correctly operator // (bug #407327)
+$x = ns // "";
+print $x;

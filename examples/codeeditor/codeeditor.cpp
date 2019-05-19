@@ -192,7 +192,6 @@ void CodeEditor::setTheme(const KSyntaxHighlighting::Theme &theme)
     auto pal = qApp->palette();
     if (theme.isValid()) {
         pal.setColor(QPalette::Base, theme.editorColor(KSyntaxHighlighting::Theme::BackgroundColor));
-        pal.setColor(QPalette::Text, theme.textColor(KSyntaxHighlighting::Theme::Normal));
         pal.setColor(QPalette::Highlight, theme.editorColor(KSyntaxHighlighting::Theme::TextSelection));
     }
     setPalette(pal);

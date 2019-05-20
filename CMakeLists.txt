@@ -22,6 +22,7 @@ include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
 include(KDECMakeSettings)
 include(ECMMarkNonGuiExecutable)
 include(ECMAddQch)
+include(ECMOptionalAddSubdirectory)
 
 
 ecm_setup_version(PROJECT
@@ -39,9 +40,10 @@ option(KSYNTAXHIGHLIGHTING_USE_GUI "Build components depending on Qt5Gui" ON)
 if(KSYNTAXHIGHLIGHTING_USE_GUI)
     find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED COMPONENTS Gui)
 endif()
-find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE QUIET OPTIONAL_COMPONENTS Widgets XmlPatterns)
+find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE QUIET OPTIONAL_COMPONENTS PrintSupport Widgets XmlPatterns)
 set_package_properties(Qt5 PROPERTIES URL "http://qt-project.org/")
 set_package_properties(Qt5Widgets PROPERTIES PURPOSE "Example application.")
+set_package_properties(Qt5PrintSupport PROPERTIES PURPOSE "Example application.")
 set_package_properties(Qt5XmlPatterns PROPERTIES PURPOSE "Compile-time validation of syntax definition files.")
 
 find_package(Perl REQUIRED)

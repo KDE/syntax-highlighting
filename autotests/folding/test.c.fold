@@ -25,6 +25,7 @@ static float floatQualifier = 23.123f;
 static const char c1 = 'c';
 static const char c2 = '\n';
 static const char c2a = '\120'; // octal
+static const char c2o = '\0'; // octal, special case
 static const char c2b = '\x1f'; // hex
 static const char c2c = '\'';
 static const char c2d = '\\';

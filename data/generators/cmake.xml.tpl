@@ -31,7 +31,7 @@
 
 <language
     name="CMake"
-    version="12"
+    version="13"
     kateversion="2.4"
     section="Other"
     extensions="CMakeLists.txt;*.cmake;*.cmake.in"

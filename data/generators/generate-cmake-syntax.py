@@ -3,7 +3,7 @@
 #
 # Generate Kate syntax file for CMake
 #
-# Copyright (c) 2017, Alex Turbov <i.zaufi@gmail.com>
+# Copyright (c) 2017-2019 Alex Turbov <i.zaufi@gmail.com>
 #
 # To install prerequisites:
 #
@@ -115,6 +115,13 @@ def cli(input_yaml, template):
       }
     data['variables']['re'] = [*map(lambda x: try_transform_placeholder_string_to_regex(x), data['variables']['re'])]
 
+    # Partition `environment-variables` list into "pure" words and regexes to match
+    data['environment-variables'] = {
+        k: sorted(set(v)) for k, v in zip(_KW_RE_LIST, [*partition_iterable(lambda x: _TEMPLATED_NAME.search(x) is None, data['environment-variables'])])
+      }
+    data['environment-variables']['re'] = [*map(lambda x: try_transform_placeholder_string_to_regex(x), data['environment-variables']['re'])]
+
+
     # Transform properties and make all-properties list
     data['properties'] = {}
     for prop in _PROPERTY_KEYS:
@@ -131,8 +138,11 @@ def cli(input_yaml, template):
     # Make all commands list
     data['commands'] = [*map(lambda cmd: transform_command(cmd), data['scripting-commands'] + data['project-commands'] + data['ctest-commands'])]
 
+    # Fix node names to be accessible from Jinja template
     data['generator_expressions'] = data['generator-expressions']
-
+    data['environment_variables'] = data['environment-variables']
+    del data['generator-expressions']
+    del data['environment-variables']
 
     env = jinja2.Environment(
         keep_trailing_newline=True

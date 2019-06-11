@@ -9,7 +9,7 @@
   Copyright 2004 Alexander Neundorf (neundorf@kde.org)
   Copyright 2005 Dominik Haumann (dhdev@gmx.de)
   Copyright 2007,2008,2013,2014 Matthew Woehlke (mw_triad@users.sourceforge.net)
-  Copyright 2013-2015,2017-2018 Alex Turbov (i.zaufi@gmail.com)
+  Copyright 2013-2015,2017-2019 Alex Turbov (i.zaufi@gmail.com)
 
  **********************************************************************
  * This library is free software; you can redistribute it and/or      *
@@ -31,7 +31,7 @@
 
 <language
     name="CMake"
-    version="13"
+    version="14"
     kateversion="2.4"
     section="Other"
     extensions="CMakeLists.txt;*.cmake;*.cmake.in"
@@ -2017,6 +2017,45 @@
       <item>XCODE</item>
       <item>XCODE_VERSION</item>
     </list>
+
+    <list name="environment-variables">
+      <item>CC</item>
+      <item>CFLAGS</item>
+      <item>CMAKE_APPBUNDLE_PATH</item>
+      <item>CMAKE_BUILD_PARALLEL_LEVEL</item>
+      <item>CMAKE_CONFIG_TYPE</item>
+      <item>CMAKE_FRAMEWORK_PATH</item>
+      <item>CMAKE_GENERATOR</item>
+      <item>CMAKE_GENERATOR_INSTANCE</item>
+      <item>CMAKE_GENERATOR_PLATFORM</item>
+      <item>CMAKE_GENERATOR_TOOLSET</item>
+      <item>CMAKE_MSVCIDE_RUN_PATH</item>
+      <item>CMAKE_NO_VERBOSE</item>
+      <item>CMAKE_OSX_ARCHITECTURES</item>
+      <item>CMAKE_PREFIX_PATH</item>
+      <item>CSFLAGS</item>
+      <item>CTEST_INTERACTIVE_DEBUG_MODE</item>
+      <item>CTEST_OUTPUT_ON_FAILURE</item>
+      <item>CTEST_PARALLEL_LEVEL</item>
+      <item>CTEST_PROGRESS_OUTPUT</item>
+      <item>CTEST_USE_LAUNCHERS_DEFAULT</item>
+      <item>CUDACXX</item>
+      <item>CUDAFLAGS</item>
+      <item>CUDAHOSTCXX</item>
+      <item>CXX</item>
+      <item>CXXFLAGS</item>
+      <item>DASHBOARD_TEST_FROM_CTEST</item>
+      <item>DESTDIR</item>
+      <item>FC</item>
+      <item>FFLAGS</item>
+      <item>LDFLAGS</item>
+      <item>MACOSX_DEPLOYMENT_TARGET</item>
+      <item>PATH</item>
+      <item>RC</item>
+      <item>RCFLAGS</item>
+      <item>SWIFTC</item>
+      <item>VERBOSE</item>
+    </list>
     <list name="global-properties">
       <item>ALLOW_DUPLICATE_CUSTOM_TARGETS</item>
       <item>AUTOGEN_SOURCE_GROUP</item>
@@ -3783,9 +3822,26 @@
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="Detect Variable Substitutions">
-        <RegExpr attribute="Environment Variable Substitution" context="#stay" String="\$ENV\{\s*[\w-]+\s*\}" />
+        <RegExpr attribute="Cache Variable Substitution" context="#stay" String="\$CACHE\{\s*[\w-]+\s*\}" />
+        <RegExpr attribute="Environment Variable Substitution" context="EnvVarSubst" String="\$ENV\{\s*[\w-]+\s*\}" lookAhead="true" />
         <Detect2Chars attribute="Variable Substitution" context="VarSubst" char="$" char1="{" />
         <RegExpr attribute="@Variable Substitution" context="@VarSubst" String="@&id_re;@" lookAhead="true" />
+      </context>
+
+      <context attribute="Environment Variable Substitution" lineEndContext="#pop" name="EnvVarSubst">
+        <DetectIdentifier />
+        <DetectChar attribute="Environment Variable Substitution" context="EnvVarSubstVar" char="{" />
+        <DetectChar attribute="Environment Variable Substitution" context="#pop" char="}" />
+      </context>
+
+      <context attribute="Environment Variable Substitution" lineEndContext="#pop" name="EnvVarSubstVar">
+        <keyword attribute="Standard Environment Variable" context="#stay" String="environment-variables" insensitive="false" />
+        <RegExpr attribute="Standard Environment Variable" context="#stay" String="\b&id_re;_DIR\b" />
+        <RegExpr attribute="Standard Environment Variable" context="#stay" String="\b&id_re;_ROOT\b" />
+        <RegExpr attribute="Standard Environment Variable" context="#stay" String="\bASM&id_re;\b" />
+        <RegExpr attribute="Standard Environment Variable" context="#stay" String="\bASM&id_re;FLAGS\b" />
+        <DetectIdentifier />
+        <DetectChar attribute="Environment Variable Substitution" context="#pop#pop" char="}" />
       </context>
 
       <context attribute="Variable Substitution" lineEndContext="#pop" name="VarSubst">
@@ -3890,6 +3946,7 @@
       <itemData name="@Variable Substitution" defStyleNum="dsBaseN" spellChecking="false" />
       <itemData name="Internal Name" defStyleNum="dsDecVal" color="#303030" selColor="#303030" spellChecking="false" />
       <itemData name="Environment Variable Substitution" defStyleNum="dsFloat" spellChecking="false" />
+      <itemData name="Standard Environment Variable" defStyleNum="dsFloat" spellChecking="false" />
       <itemData name="Generator Expression Keyword" defStyleNum="dsKeyword" color="#b84040" selColor="#b84040" spellChecking="false" />
       <itemData name="Generator Expression" defStyleNum="dsOthers" color="#b86050" selColor="#b86050" spellChecking="false" />
       <itemData name="Comment" defStyleNum="dsComment" spellChecking="true" />

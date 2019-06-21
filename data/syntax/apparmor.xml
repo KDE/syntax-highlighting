@@ -36,12 +36,16 @@
   ==========================================================================================
 
   Last update:
-    Syntax highlighting based on AppArmor 2.13.2
+    Syntax highlighting based on AppArmor 2.13.3
     For more details about the syntax of AppArmor profiles, visit:
       https://gitlab.com/apparmor/apparmor/wikis/Documentation
-      http://manpages.ubuntu.com/manpages/cosmic/en/man5/apparmor.d.5.html
+      https://manpages.ubuntu.com/manpages/disco/en/man5/apparmor.d.5.html
 
   Change log:
+   * Version 9 [20-Jun-2019]: (AppArmor 2.13.3):
+      - Add new network domain keywords.
+      - Fixes: drop unsupported 'to' operator for link rules and only highlight the 'in'
+        operator in mount rules. Only highlight valid numbers in rlimit rules.
    * Version 8 [02-Apr-2019]: (AppArmor 2.13.2)
       - Do not highlight variable assignments and alias rules within profiles.
       - Add keywords of "tunables/share" variables.
@@ -60,7 +64,7 @@
    * Version 3 [24-Sep-2017, by Nibaldo G.]:
       - Fix incorrect highlighting of the DBus rule 'name' keyword.
    * Version 2 [29-Aug-2017, by Nibaldo G.]:
-      - Improvements in highlighting and bug fixes.
+      - Improvements and bug fixes.
       - Each rule has its own context.
       - The profile name is highlighted in the profile header and profile transition rules.
    * Version 1 [22-Feb-2017, by Nibaldo González]:
@@ -68,7 +72,7 @@
 -->
 
 <language name="AppArmor Security Profile"
-          version="8"
+          version="9"
           kateversion="5.0"
           section="Markup"
           extensions="usr.bin.*;usr.sbin.*;bin.*;sbin.*;usr.lib.*;usr.lib64.*;usr.lib32.*;usr.libx32.*;usr.libexec.*;usr.local.bin.*;usr.local.sbin.*;usr.local.lib*;opt.*;etc.cron.*;snap.*;snap-update-ns.*;snap-confine.*"
@@ -109,7 +113,7 @@
 	</list>
 	<list name="file_qualifiers">
 		<item>owner</item>
-		<!-- other -->
+		<item>other</item>
 	</list>
 	<list name="qualifiers">
 		<item>audit</item>
@@ -205,6 +209,8 @@
 		<item>ib</item>
 		<item>kcm</item>
 		<item>smc</item>
+		<item>qipcrtr</item>
+		<item>xdp</item>
 
 		<!-- Type.
 		     Also: packet -->
@@ -1047,13 +1053,15 @@
 			<Detect2Chars context="#stay" attribute="Operator 1" char="+" char1="="/>
 			<Detect2Chars context="#stay" attribute="Operator 2" char="-" char1="&gt;"/>
 		</context>
-		<context name="_operators_keywords" attribute="Normal Text" lineEndContext="#stay">
-			<RegExpr context="#stay" attribute="Operator 2" String="\b(in|to)(?=[\s\(\{\[&quot;/@\$]|$)"/>
+		<context name="_operators_in" attribute="Normal Text" lineEndContext="#stay">
+			<!-- Only in mount rules -->
+			<RegExpr context="#stay" attribute="Operator 2" String="\b(in)(?=[\s\(\{\[&quot;/@\$]|$)"/>
 		</context>
 
 		<!-- RULES -->
 
 		<!-- For all rules -->
+		<!-- Also see: _default_parentheses_block_rule -->
 		<context name="_common_rule" attribute="Normal Text" lineEndContext="#stay">
 			<!-- Highlight as path the text after the '=' operator, except keywords or simple words ([\w\-\+]+) -->
 			<RegExpr context="#stay" attribute="Error" String="\=(?=\s*($|&endPath;))"/>
@@ -1064,7 +1072,6 @@
 			<IncludeRules context="_common"/>
 			<DetectChar context="_r_curly_brackets" attribute="Globbing Brackets" char="{"/>
 			<DetectChar context="_r_square_brackets" attribute="Globbing Brackets" char="["/>
-			<IncludeRules context="_operators_keywords"/>
 			<!-- This must be at the end of each context (to avoid conflicts with some keywords) -->
 			<IncludeRules context="_end_rule"/>
 		</context>
@@ -1114,6 +1121,7 @@
 		<context name="_mount_rule_keywords" attribute="Normal Text" lineEndContext="#stay">
 			<keyword context="#stay" attribute="Permissions" String="rule_mount_flags"/>
 			<keyword context="#stay" attribute="Flags" String="rule_mount_fstypes"/>
+			<IncludeRules context="_operators_in"/>
 		</context>
 
 		<!-- Pivot Root Rule -->
@@ -1205,11 +1213,9 @@
 		<context name="_rule_rlimit" attribute="Normal Text" lineEndContext="#stay">
 			<keyword context="#stay" attribute="Data" String="rule_rlimit"/>
 			<Detect2Chars context="#stay" attribute="Operator 2" char="&lt;" char1="="/>
-			<HlCHex context="_number_unit" attribute="Number"/>
-			<Float context="_number_unit" attribute="Number"/>
-			<Int context="_number_unit" attribute="Number"/>
-			<AnyChar context="#stay" attribute="Number" String="-+"/>
-			<WordDetect context="#stay" attribute="Number" String="infinity"/> <!-- WordDetect uses -+ as delimiter -->
+			<RegExpr context="#stay" attribute="Number" String="\-(20|1?\d)\b"/>
+			<RegExpr context="_number_unit" attribute="Number" String="\b\d+"/> <!-- Rules Int don't use '-' as a delimiter -->
+			<WordDetect context="#stay" attribute="Number" String="infinity"/>
 			<RegExpr context="#stay" attribute="Numerical Unit" String="\b([KMG]B?|[shd]|us|ms|min|sec|(minute|day|hour|week|second)(s?)|(milli|micro)second(s?))\b"/>
 			<IncludeRules context="_default_rule"/>
 		</context>
@@ -1321,9 +1327,9 @@
 			<IncludeRules context="_common_parentheses_block"/>
 			<IncludeRules context="_end_rule_irnc"/>
 		</context>
+		<!-- Parentheses Block within Rules -->
 		<context name="_default_parentheses_block_rule" attribute="Normal Text" lineEndContext="#stay">
 			<IncludeRules context="_common_parentheses_block"/>
-			<IncludeRules context="_operators_keywords"/>
 			<IncludeRules context="_end_rule_irnc_parentheses_rule"/>
 		</context>
 

@@ -14,6 +14,7 @@ For help, type "help".
 Type "apropos word" to search for commands related to "word"...
 Reading symbols from your_application...done.
 (gdb) break main
+# this is a comment
 (gdb) run <arguments for your application>
 ...
 Breakpoint 1 at 0x400b56: file yourmain.cpp, line 3

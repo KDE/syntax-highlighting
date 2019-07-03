@@ -109,3 +109,25 @@ elseif(POLICY CMP066)
       )
 
 endif()
+
+# In each function call below, all 3 named parameter lines should apply the same highlighting.
+add_custom_command(
+    COMMAND true
+    COMMAND (true)
+    COMMAND true
+)
+add_custom_target(TargetName
+    WORKING_DIRECTORY somedir
+    COMMAND (true)
+    BYPRODUCTS somefile
+)
+execute_process(
+    COMMAND true
+    COMMAND (true)
+    COMMAND true
+)
+add_test(
+    NAME sometest
+    COMMAND (true)
+    WORKING_DIRECTORY somedir
+)

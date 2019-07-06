@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="Fortran (Fixed Format)" version="4" kateversion="5.0" section="Sources" extensions="*.f;*.F;*.for;*.FOR;*.fpp;*.FPP;" mimetype="text/x-fortran-src" casesensitive="0" author="Franchin Matteo (fnch@libero.it)" license="LGPL" priority="9">
+<language name="Fortran (Fixed Format)" version="5" kateversion="5.0" section="Sources" extensions="*.f;*.F;*.for;*.FOR;*.fpp;*.FPP;" mimetype="text/x-fortran-src" casesensitive="0" author="Franchin Matteo (fnch@libero.it)" license="LGPL" priority="9">
 <!-- by Franchin Matteo, fnch@libero.it -->
 <!-- NOTE: Keep in sync with the "Fortran (Free Format)" highlighter! (fortran-free.xml) -->
   <highlighting>
@@ -365,14 +365,15 @@
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  -->
     <contexts>
       <context attribute="Normal Text" lineEndContext="#stay" name="default" >
+        <IncludeRules context="find_preprocessor" />
+        <IncludeRules context="find_comments" />
         <IncludeRules context="find_strings" />
         <IncludeRules context="find_decls" />
         <IncludeRules context="find_intrinsics" />
         <IncludeRules context="find_io_stmnts" />
         <IncludeRules context="find_op_and_log" />
         <IncludeRules context="find_numbers" />
-        <IncludeRules context="find_preprocessor" />
-        <IncludeRules context="find_comments" />
+        <IncludeRules context="find_continue" />
         <IncludeRules context="find_symbols" />
         <IncludeRules context="find_begin_stmnts" />
         <IncludeRules context="find_end_stmnts" />
@@ -406,6 +407,8 @@
 <!-- This context highlights comments -->
       <context attribute="Normal Text" lineEndContext="#stay" name="find_comments">
         <AnyChar attribute="Comment" context="comment" String="cC*" column="0"/>
+        <DetectChar attribute="Comment" context="comment" char="!"/>
+        <RegExpr attribute="Comment" context="comment" String="." column="72" />
       </context>
 
       <context attribute="Comment" lineEndContext="#pop" name="comment">
@@ -420,6 +423,11 @@
         <Detect2Chars attribute="Keyword" context="#stay" char="/" char1=")"/>
         <AnyChar attribute="Keyword" context="#stay" String="&amp;+-*/=?[]^{|}~"/>
         <AnyChar attribute="Symbol" context="#stay" String="(),"/>
+      </context>
+
+<!-- This context highlights the continuation character -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="find_continue">
+        <RegExpr attribute="Continuation character" context="#stay" String="^     [^0-9\s]"/>
       </context>
 
 <!-- This context highlights items inside the parentesis of a function -->
@@ -547,6 +555,7 @@
         <RegExpr attribute="Keyword" context="#stay" String="&amp;\s*$"/>
         <DetectChar attribute="Keyword" context="#pop" char="&amp;" firstNonSpace="true"/>
         <AnyChar attribute="Comment" context="comment" String="cC*" column="0"/>
+        <DetectChar attribute="Comment" context="comment" char="!" firstNonSpace="true"/>
       </context>
     </contexts>
 
@@ -567,6 +576,7 @@
       <itemData name="Logical" defStyleNum="dsConstant" bold="1" italic="0"/>
       <itemData name="IO Function" defStyleNum="dsFunction" bold="0" italic="0"/>
       <itemData name="Elemental Procedure" defStyleNum="dsBuiltIn" bold="1" italic="0"/>
+      <itemData name="Continuation character" defStyleNum="dsBuiltIn" bold="1" italic="0"/>
       <itemData name="Inquiry Function" defStyleNum="dsFunction" bold="1" italic="1"/>
       <itemData name="Transformational Function" defStyleNum="dsFunction" bold="1" italic="0"/>
       <itemData name="Non elemental subroutine" defStyleNum="dsFunction" bold="1" italic="0"/>

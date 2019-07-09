@@ -31,7 +31,7 @@
 
 <language
     name="CMake"
-    version="15"
+    version="16"
     kateversion="2.4"
     section="Other"
     extensions="CMakeLists.txt;*.cmake;*.cmake.in"
@@ -322,9 +322,10 @@
       <itemData name="Strings" defStyleNum="dsString" spellChecking="true" />
       <itemData name="Escapes" defStyleNum="dsChar" spellChecking="false" />
       <itemData name="Builtin Variable" defStyleNum="dsDecVal" color="#c09050" selColor="#c09050" spellChecking="false" />
+      <itemData name="Internal Name" defStyleNum="dsDecVal" color="#303030" selColor="#303030" spellChecking="false" />
       <itemData name="Variable Substitution" defStyleNum="dsDecVal" spellChecking="false" />
       <itemData name="@Variable Substitution" defStyleNum="dsBaseN" spellChecking="false" />
-      <itemData name="Internal Name" defStyleNum="dsDecVal" color="#303030" selColor="#303030" spellChecking="false" />
+      <itemData name="Cache Variable Substitution" defStyleNum="dsFloat" spellChecking="false" />
       <itemData name="Environment Variable Substitution" defStyleNum="dsFloat" spellChecking="false" />
       <itemData name="Standard Environment Variable" defStyleNum="dsFloat" spellChecking="false" />
       <itemData name="Generator Expression Keyword" defStyleNum="dsKeyword" color="#b84040" selColor="#b84040" spellChecking="false" />

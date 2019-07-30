@@ -158,3 +158,14 @@ end
 --! \brief gfind is deprecated
 string.gfind('s')
 string.gmatch('f')
+
+function foo()
+  if x then
+    function() end
+    bar=function()
+      if y then
+        if z then end
+      end
+    end
+  end
+end

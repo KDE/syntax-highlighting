@@ -12,7 +12,7 @@ pub use symbol::{Ident, Symbol as Name};
 use serialize::{self, Encoder, Decoder};
 use std::u32;
 
-#[derive(Clone, PartialEq, Eq, RustcEncodable, RustcDecodable, Hash, Copy)]
+#[derive(Clone, PartialEq, Eq, Hash, Copy)]
 
 pub struct Lifetime {
 	pub id: NodeId,
@@ -41,6 +41,21 @@ union tests {
 	b: isize,
 }
 
+// Self vs self
+trait T {
+    type Item;
+    // `Self` will be whatever type that implements `T`.
+    fn new() -> Self;
+    // `Self::Item` will be the type alias in the implementation.
+    fn f(&self) -> Self::Item;
+}
+
+// Raw identifiers
+extern crate foo;
+fn main() {
+    foo::r#try();
+}
+
 #[valid types]
 fn types() {
 	let num = 333_3_;
@@ -53,35 +68,39 @@ fn types() {
 	let num_float: f32 = 333.45f32;
 
 	let binary = 0b1_010;
-	let invalid_binary= 0b1_015;
-
 	let octal = 0o21535;
-	let invalid_octal = 0o64_92;
-
 	let hexadecimal = 0x73A2_F;
-	let invalid_hexadecimal = 0x7_3AY;
 
 	let char1: char = 'a';
 	let char2: char = '\n';
 	let char3: char = '\u{123_AF}';
-	let invalid_char1: char = '\y';
+
+	let byte1: u8 = b'a';
+	let byte2: u8 = b'\x13';
+
+	let string: str = "hello \n \r \u{123_________fd_} \
+						bye";
+	let byte_string: str = b"hello \t \0 \u{123} \b bye";
+	let raw_string1: str = r"hello \t \b";
+	let raw_string2: str = r####"hello \n "### bye"########;
+	let raw_string3: str = br####"hello \n"####;
+
+    // Invalid
+
+	let invalid_binary= 0b1_015;
+	let invalid_octal = 0o64_92;
+	let invalid_hexadecimal = 0x7_3AY;
+
+    let invalid_char1: char = '\y';
 	let invalid_char2: char = '\324';
 	let invalid_char3: char = '%%';
 	let invalid_char4: char = '\n\dfd';
 	let invalid_char5: char = 'aaaaa';
 	let open_char: char = '&&&;
 
-	let byte1: u8 = b'a';
-	let byte2: u8 = b'\x13';
 	let invalid_byte1: u8 = b'ab';
 	let invalid_byte2: u8 = b'\b';
 	let invalid_byte2: u8 = b'\u{123}';
 
-	let string: str = "hello \n \r \u{123_________fd_} \
-						bye";
 	let invalid_string: str = "hello \b \u{_123} \u{1234567} \  bye";
-	let byte_string: str = b"hello \t \0 \u{123} \b bye";
-	let raw_string1: str = r"hello \t \b";
-	let raw_string2: str = r####"hello \n "### bye"########;
-	let raw_string3: str = br####"hello \n"####;
 }

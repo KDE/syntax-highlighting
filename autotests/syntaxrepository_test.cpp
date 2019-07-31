@@ -408,8 +408,8 @@ private Q_SLOTS:
         auto def = m_repo.definitionForName(QLatin1String("LaTeX"));
         QVERIFY(def.isValid());
 
-        // check that backslash '\' is removed
-        for (QChar c : QStringLiteral("\t !%&()*+,-./:;<=>?[]^{|}~"))
+        // check that backslash '\' and '*' are removed
+        for (QChar c : QStringLiteral("\t !%&()+,-./:;<=>?[]^{|}~"))
             QVERIFY(def.isWordDelimiter(c));
         QVERIFY(!def.isWordDelimiter(QLatin1Char('\\')));
 

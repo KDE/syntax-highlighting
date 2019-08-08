@@ -59,6 +59,7 @@ QStringList readListing(const QString &fileName)
     if (xml.hasError()) {
         qWarning() << "XML error while reading" << fileName << " - "
             << qPrintable(xml.errorString()) << "@ offset" << xml.characterOffset();
+        listing.clear();
     }
 
     return listing;
@@ -163,6 +164,7 @@ bool checkSingleChars(const QString &hlFilename, QXmlStreamReader &xml)
         const QString c = xml.attributes().value(QLatin1String("char")).toString();
         if (c.size() != 1) {
             qWarning() << hlFilename << "line" << xml.lineNumber() << "'char' must contain exactly one char:" << c;
+            return false;
         }
     }
 
@@ -170,6 +172,7 @@ bool checkSingleChars(const QString &hlFilename, QXmlStreamReader &xml)
         const QString c = xml.attributes().value(QLatin1String("char1")).toString();
         if (c.size() != 1) {
             qWarning() << hlFilename << "line" << xml.lineNumber() << "'char1' must contain exactly one char:" << c;
+            return false;
         }
     }
 
@@ -285,6 +288,7 @@ public:
             const QString name = xml.attributes().value(QLatin1String("name")).toString();
             if (m_existingNames.contains(name)) {
                 qWarning() << m_filename << "list duplicate:" << name;
+                m_success = false;
             }
             m_existingNames.insert(name);
         } else if (xml.name() == QLatin1String("keyword")) {
@@ -296,7 +300,7 @@ public:
 
     bool check() const
     {
-        bool success = true;
+        bool success = m_success;
         const auto invalidNames = m_usedNames - m_existingNames;
         if (!invalidNames.isEmpty()) {
             qWarning() << m_filename << "Reference of non-existing keyword list:" << invalidNames;
@@ -306,6 +310,7 @@ public:
         const auto unusedNames = m_existingNames - m_usedNames;
         if (!unusedNames.isEmpty()) {
             qWarning() << m_filename << "Unused keyword lists:" << unusedNames;
+            success = false;
         }
 
         return success;
@@ -315,6 +320,7 @@ private:
     QString m_filename;
     QSet<QString> m_usedNames;
     QSet<QString> m_existingNames;
+    bool m_success = true;
 };
 
 /**
@@ -336,12 +342,14 @@ public:
 
             if (language.existingContextNames.contains(name)) {
                 qWarning() << hlFilename << "Duplicate context:" << name;
+                m_success = false;
             } else {
                 language.existingContextNames.insert(name);
             }
 
             if (xml.attributes().value(QLatin1String("fallthroughContext")).toString() == QLatin1String("#stay")) {
                 qWarning() << hlFilename << "possible infinite loop due to fallthroughContext=\"#stay\" in context " << name;
+                m_success = false;
             }
 
             processContext(hlName, xml.attributes().value(QLatin1String("lineEndContext")).toString());
@@ -352,6 +360,7 @@ public:
                 const QString context = xml.attributes().value(QLatin1String("context")).toString();
                 if (context.isEmpty()) {
                     qWarning() << hlFilename << "Missing context name in line" << xml.lineNumber();
+                    m_success = false;
                 } else {
                     processContext(hlName, context);
                 }
@@ -361,7 +370,7 @@ public:
 
     bool check() const
     {
-        bool success = true;
+        bool success = m_success;
         for (auto &language : m_contextMap) {
             const auto invalidContextNames = language.usedContextNames - language.existingContextNames;
             if (!invalidContextNames.isEmpty()) {
@@ -442,6 +451,7 @@ private:
      * Example key: "Doxygen"
      */
     QHash<QString, Language> m_contextMap;
+    bool m_success = true;
 };
 
 /**
@@ -461,6 +471,7 @@ public:
             if (!name.isEmpty()) {
                 if (m_existingAttributeNames.contains(name)) {
                     qWarning() << m_filename << "itemData duplicate:" << name;
+                    m_success = false;
                 } else {
                     m_existingAttributeNames.insert(name);
                 }
@@ -469,6 +480,7 @@ public:
             const QString name = xml.attributes().value(QLatin1String("attribute")).toString();
             if (name.isEmpty()) {
                 qWarning() << m_filename << "specified attribute is empty:" << xml.name();
+                m_success = false;
             } else {
                 m_usedAttributeNames.insert(name);
             }
@@ -477,7 +489,7 @@ public:
 
     bool check() const
     {
-        bool success = true;
+        bool success = m_success;
         const auto invalidNames = m_usedAttributeNames - m_existingAttributeNames;
         if (!invalidNames.isEmpty()) {
             qWarning() << m_filename << "Reference of non-existing itemData attributes:" << invalidNames;
@@ -487,6 +499,7 @@ public:
         auto unusedNames = m_existingAttributeNames - m_usedAttributeNames;
         if (!unusedNames.isEmpty()) {
             qWarning() << m_filename << "Unused itemData:" << unusedNames;
+            success = false;
         }
 
         return success;
@@ -496,6 +509,7 @@ private:
     QString m_filename;
     QSet<QString> m_usedAttributeNames;
     QSet<QString> m_existingAttributeNames;
+    bool m_success = true;
 };
 
 }

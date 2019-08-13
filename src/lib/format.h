@@ -28,7 +28,6 @@
 #include "theme.h"
 
 #include <QExplicitlySharedDataPointer>
-#include <QTypeInfo>
 
 QT_BEGIN_NAMESPACE
 class QColor;

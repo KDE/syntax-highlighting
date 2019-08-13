@@ -26,7 +26,6 @@
 
 #include "ksyntaxhighlighting_export.h"
 
-#include <QTypeInfo>
 #include <QPair>
 
 #include <memory>

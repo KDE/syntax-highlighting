@@ -30,7 +30,6 @@
 #include "xml_p.h"
 
 #include <QColor>
-#include <QDebug>
 #include <QMetaEnum>
 #include <QXmlStreamReader>
 

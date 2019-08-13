@@ -24,7 +24,6 @@
 #include <QCoreApplication>
 #include <QFile>
 #include <QFileInfo>
-#include <QTextStream>
 #include <QVariant>
 #include <QXmlStreamReader>
 #include <QJsonDocument>

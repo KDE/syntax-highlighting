@@ -30,7 +30,6 @@
 
 #include <QDir>
 #include <QObject>
-#include <QProcess>
 #include <QStandardPaths>
 #include <qtest.h>
 

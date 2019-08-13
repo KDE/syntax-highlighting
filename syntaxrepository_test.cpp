@@ -75,6 +75,7 @@ private Q_SLOTS:
         // the following ones are defined in multiple syntax definitions
         QTest::newRow("c") << QStringLiteral("test.c") << QStringLiteral("C");
         QTest::newRow("c++") << QStringLiteral("test.cpp") << QStringLiteral("C++");
+        QTest::newRow("fs") << QStringLiteral("test.fs") << QStringLiteral("FSharp");
         QTest::newRow("markdown") << QStringLiteral("test.md") << QStringLiteral("Markdown");
 
         QTest::newRow("Makefile 1") << QStringLiteral("Makefile") << QStringLiteral("Makefile");

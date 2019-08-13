@@ -34,6 +34,7 @@
 
 #include <QRegularExpression>
 #include <QString>
+#include <QVector>
 
 #include <memory>
 

@@ -26,6 +26,7 @@
 #include "definition_p.h"
 #include "ksyntaxhighlighting_logging.h"
 
+#include <QDebug>
 #include <QXmlStreamReader>
 
 #include <algorithm>

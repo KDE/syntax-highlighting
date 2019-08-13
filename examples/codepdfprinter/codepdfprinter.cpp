@@ -31,6 +31,7 @@
 #include <QFile>
 #include <QFontDatabase>
 #include <QFontMetrics>
+#include <QPainter>
 #include <QDebug>
 
 

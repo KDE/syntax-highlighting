@@ -32,6 +32,7 @@
 #include <QDir>
 #include <QFile>
 #include <QObject>
+#include <QProcess>
 #include <QStandardPaths>
 #include <QTextStream>
 #include <qtest.h>

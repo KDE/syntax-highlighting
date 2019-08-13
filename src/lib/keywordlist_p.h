@@ -24,8 +24,10 @@
 #ifndef KSYNTAXHIGHLIGHTING_KEYWORDLIST_P_H
 #define KSYNTAXHIGHLIGHTING_KEYWORDLIST_P_H
 
+#include <QSet>
 #include <QString>
-#include <QStringList>
+#include <QVector>
+
 #include <vector>
 
 QT_BEGIN_NAMESPACE

@@ -25,6 +25,8 @@
 
 #include <QApplication>
 #include <QCommandLineParser>
+#include <QFile>
+#include <QTextEdit>
 
 int main(int argc, char **argv)
 {

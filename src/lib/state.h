@@ -27,6 +27,7 @@
 #include "ksyntaxhighlighting_export.h"
 
 #include <QExplicitlySharedDataPointer>
+#include <QTypeInfo>
 
 namespace KSyntaxHighlighting {
 

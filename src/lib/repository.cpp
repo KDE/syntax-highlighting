@@ -30,6 +30,7 @@
 #include "ksyntaxhighlighting_logging.h"
 #include "wildcardmatcher_p.h"
 
+#include <QDebug>
 #include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>

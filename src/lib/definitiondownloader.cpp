@@ -27,6 +27,7 @@
 #include "ksyntaxhighlighting_logging.h"
 #include "ksyntaxhighlighting_version.h"
 
+#include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QNetworkAccessManager>

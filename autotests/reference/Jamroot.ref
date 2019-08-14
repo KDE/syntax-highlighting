@@ -12,12 +12,12 @@
 <Rule>exe</Rule><Normal> app </Normal><Operator>:</Operator><Normal> app.cpp ../util/foo//bar </Normal><Operator>;</Operator><br/>
 <Rule>exe</Rule><Normal> important </Normal><Operator>:</Operator><Normal> main.cpp helpers/<link>static </Normal><Operator>;</Operator><br/>
 <Normal></Normal><br/>
-<Rule>exe</Rule><Normal> b </Normal><Operator>:</Operator><Normal> </Normal><Operator>[</Operator><Normal> glob *.cpp </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
+<Rule>exe</Rule><Normal> b </Normal><Operator>:</Operator><Normal> </Normal><Operator>[</Operator><Normal> </Normal><Rule>glob</Rule><Normal> *.cpp </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
 <Normal></Normal><br/>
 <Rule>lib</Rule><Normal> tools </Normal><Operator>:</Operator><br/>
-<Normal>    </Normal><Operator>[</Operator><Normal> glob *.cpp </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
+<Normal>    </Normal><Operator>[</Operator><Normal> </Normal><Rule>glob</Rule><Normal> *.cpp </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
 <Normal></Normal><br/>
-<Rule>lib</Rule><Normal> tools </Normal><Operator>:</Operator><Normal> </Normal><Operator>[</Operator><Normal> glob *.cpp </Normal><Operator>:</Operator><Normal> file_to_exclude.cpp bad*.cpp </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
+<Rule>lib</Rule><Normal> tools </Normal><Operator>:</Operator><Normal> </Normal><Operator>[</Operator><Normal> </Normal><Rule>glob</Rule><Normal> *.cpp </Normal><Operator>:</Operator><Normal> file_to_exclude.cpp bad*.cpp </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
 <Normal></Normal><br/>
 <Rule>lib</Rule><Normal> network </Normal><Operator>:</Operator><Normal> network.cpp</Normal><br/>
 <Normal>    </Normal><Operator>:</Operator><Normal> </Normal><Feature><conditional></Feature><Normal>@my-rule</Normal><br/>
@@ -38,7 +38,7 @@
 <Normal>    </Normal><Feature><variant></Feature><Normal>debug</Normal><FeatureOperator>:</FeatureOperator><Feature><location></Feature><Normal>dist/debug </Normal><Operator>;</Operator><br/>
 <Rule>install</Rule><Normal> dist2 </Normal><Operator>:</Operator><Normal> hello helpers </Normal><Operator>:</Operator><Normal> </Normal><Feature><location></Feature><VariableDelimiter>$(</VariableDelimiter><Variable>DIST</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>;</Operator><br/>
 <Normal></Normal><br/>
-<Rule>exe</Rule><Normal> app </Normal><Operator>:</Operator><Normal> app.cpp </Normal><Operator>:</Operator><Normal> </Normal><Operator>[</Operator><Normal> check-target-builds has_foo </Normal><String>"System has foo"</String><Normal> </Normal><Operator>:</Operator><Normal> </Normal><Feature><library></Feature><Normal>foo </Normal><Operator>:</Operator><Normal> </Normal><Feature><define></Feature><Normal>FOO_MISSING=1 </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
+<Rule>exe</Rule><Normal> app </Normal><Operator>:</Operator><Normal> app.cpp </Normal><Operator>:</Operator><Normal> </Normal><Operator>[</Operator><Normal> </Normal><Rule>check-target-builds</Rule><Normal> has_foo </Normal><String>"System has foo"</String><Normal> </Normal><Operator>:</Operator><Normal> </Normal><Feature><library></Feature><Normal>foo </Normal><Operator>:</Operator><Normal> </Normal><Feature><define></Feature><Normal>FOO_MISSING=1 </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
 <Normal></Normal><br/>
 <Rule>import</Rule><Normal> path </Normal><Operator>:</Operator><Normal> * </Normal><Operator>;</Operator><br/>
 <Normal></Normal><br/>
@@ -95,6 +95,9 @@
 <Operator>}</Operator><br/>
 <Rule>a?</Rule><Normal> 23 </Normal><Operator>;</Operator><br/>
 <Normal></Normal><br/>
+<Keyword>local</Keyword><Normal> </Normal><Keyword>rule</Keyword><Normal> </Normal><Rule>test</Rule><Normal> </Normal><Varname>(</Varname><Normal> </Normal><Varname>a</Varname><Normal> </Normal><Varname>)</Varname><br/>
+<Operator>{</Operator><br/>
+<Operator>}</Operator><br/>
 <Normal></Normal><br/>
 <Keyword>rule</Keyword><Normal> </Normal><Rule>example</Rule><br/>
 <Normal> </Normal><Varname>(</Varname><br/>
@@ -112,26 +115,26 @@
 <Normal></Normal><br/>
 <Keyword>rule</Keyword><Normal> </Normal><Rule>my-rule</Rule><Normal> </Normal><Varname>(</Varname><Normal> </Normal><Varname>properties</Varname><Normal> </Normal><VariableAttribute>*</VariableAttribute><Normal> </Normal><Varname>)</Varname><br/>
 <Operator>{</Operator><br/>
-<Normal>    </Normal><Keyword>local</Keyword><Normal> </Normal><Rule>result</Rule><Normal> </Normal><Operator>;</Operator><br/>
+<Normal>    </Normal><Keyword>local</Keyword><Normal> </Normal><VarAssign>result</VarAssign><Normal> </Normal><Operator>;</Operator><br/>
 <Normal>    </Normal><Keyword>if</Keyword><Normal> </Normal><Feature><toolset></Feature><Normal>gcc </Normal><Feature><optimization></Feature><Normal>speed </Normal><Operator>in</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>properties</Variable><VariableDelimiter>)</VariableDelimiter><br/>
 <Normal>    </Normal><Operator>{</Operator><br/>
 <Normal>        </Normal><VarAssign>result </VarAssign><Operator>+=</Operator><Normal> </Normal><Feature><define></Feature><Normal>USE_INLINE_ASSEMBLER </Normal><Operator>;</Operator><br/>
 <Normal>        </Normal><Keyword>return</Keyword><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>result</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>;</Operator><br/>
 <Normal>    </Normal><Operator>}</Operator><br/>
 <Normal></Normal><br/>
-<Normal>    </Normal><Keyword>local</Keyword><Normal> </Normal><VarAssign>m </VarAssign><Operator>=</Operator><Normal> </Normal><Operator>[</Operator><Normal> CALLER_MODULE </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
-<Normal>    </Normal><Keyword>local</Keyword><Normal> </Normal><Rule>result</Rule><Normal> </Normal><Operator>;</Operator><br/>
+<Normal>    </Normal><Keyword>local</Keyword><Normal> </Normal><VarAssign>m</VarAssign><Normal> </Normal><Operator>=</Operator><Normal> </Normal><Operator>[</Operator><Normal> </Normal><Rule>CALLER_MODULE</Rule><Normal> </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
+<Normal>    </Normal><Keyword>local</Keyword><Normal> </Normal><VarAssign>result</VarAssign><Normal> </Normal><Operator>;</Operator><br/>
 <Normal>    </Normal><Keyword>for</Keyword><Normal> </Normal><Varname>v</Varname><Normal> </Normal><Operator>in</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>values</Variable><VariableDelimiter>)</VariableDelimiter><br/>
 <Normal>    </Normal><Operator>{</Operator><br/>
-<Normal>        </Normal><Keyword>if</Keyword><Normal> </Normal><Operator>[</Operator><Normal> modules.call-in </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>m</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>:</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>f</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>v</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>]</Operator><br/>
+<Normal>        </Normal><Keyword>if</Keyword><Normal> </Normal><Operator>[</Operator><Normal> </Normal><Rule>modules.call-in</Rule><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>m</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>:</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>f</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>v</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>]</Operator><br/>
 <Normal>        </Normal><Operator>{</Operator><br/>
 <Normal>            </Normal><VarAssign>result </VarAssign><Operator>+=</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>v</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>;</Operator><br/>
 <Normal>        </Normal><Operator>}</Operator><br/>
 <Normal>    </Normal><Operator>}</Operator><br/>
 <Normal>    </Normal><Keyword>return</Keyword><Normal> result </Normal><Operator>;</Operator><br/>
 <Normal>    </Normal><Keyword>return</Keyword><Normal> </Normal><Feature><name></Feature><VariableDelimiter>$(</VariableDelimiter><Variable>name</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>;</Operator><br/>
-<Normal>    </Normal><Keyword>return</Keyword><Normal> </Normal><Operator>[</Operator><Normal> virtual-target.register </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>t</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
-<Normal>    </Normal><Keyword>return</Keyword><Normal> </Normal><Operator>[</Operator><Normal> sequence.transform virtual-target.register </Normal><Operator>:</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>targets</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
+<Normal>    </Normal><Keyword>return</Keyword><Normal> </Normal><Operator>[</Operator><Normal> </Normal><Rule>virtual-target.register</Rule><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>t</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
+<Normal>    </Normal><Keyword>return</Keyword><Normal> </Normal><Operator>[</Operator><Normal> </Normal><Rule>sequence.transform</Rule><Normal> virtual-target.register </Normal><Operator>:</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>targets</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
 <Operator>}</Operator><br/>
 <Normal></Normal><br/>
 <Keyword>rule</Keyword><Normal> </Normal><Rule>run</Rule><Normal> </Normal><Varname>(</Varname><Normal> </Normal><Varname>project</Varname><Normal> </Normal><Varname>name</Varname><Normal> </Normal><VariableAttribute>?</VariableAttribute><Normal> </Normal><Operator>:</Operator><Normal> </Normal><Varname>property-set</Varname><Normal> </Normal><Operator>:</Operator><Normal> </Normal><Varname>sources</Varname><Normal> </Normal><VariableAttribute>*</VariableAttribute><Normal> </Normal><Varname>)</Varname><br/>
@@ -141,22 +144,22 @@
 <Normal>        </Normal><VarAssign>python </VarAssign><Operator>=</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>s</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>;</Operator><br/>
 <Normal>    </Normal><Operator>}</Operator><br/>
 <Normal></Normal><br/>
-<Normal>    </Normal><Keyword>local</Keyword><Normal> </Normal><Rule>new-sources</Rule><Normal> </Normal><Operator>;</Operator><br/>
+<Normal>    </Normal><Keyword>local</Keyword><Normal> </Normal><VarAssign>new-sources</VarAssign><Normal> </Normal><Operator>;</Operator><br/>
 <Normal>    </Normal><Keyword>for</Keyword><Normal> </Normal><Keyword>local</Keyword><Normal> </Normal><Varname>s</Varname><Normal> </Normal><Operator>in</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>sources</Variable><VariableDelimiter>)</VariableDelimiter><br/>
 <Normal>    </Normal><Operator>{</Operator><br/>
-<Normal>        </Normal><Keyword>if</Keyword><Normal> </Normal><Operator>[</Operator><Normal> type.is-derived </Normal><Operator>[</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>s</Variable><VariableDelimiter>)</VariableDelimiter><Normal>.type </Normal><Operator>]</Operator><Normal> CPP </Normal><Operator>]</Operator><br/>
+<Normal>        </Normal><Keyword>if</Keyword><Normal> </Normal><Operator>[</Operator><Normal> </Normal><Rule>type.is-derived</Rule><Normal> </Normal><Operator>[</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>s</Variable><VariableDelimiter>)</VariableDelimiter><Normal>.type </Normal><Operator>]</Operator><Normal> CPP </Normal><Operator>]</Operator><br/>
 <Normal>        </Normal><Operator>{</Operator><br/>
-<Normal>            </Normal><Keyword>local</Keyword><Normal> </Normal><VarAssign>name </VarAssign><Operator>=</Operator><Normal> </Normal><Operator>[</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>s</Variable><VariableDelimiter>)</VariableDelimiter><Normal>.name </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><Normal>    </Normal><Comment># get the target's basename</Comment><br/>
+<Normal>            </Normal><Keyword>local</Keyword><Normal> </Normal><VarAssign>name</VarAssign><Normal> </Normal><Operator>=</Operator><Normal> </Normal><Operator>[</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>s</Variable><VariableDelimiter>)</VariableDelimiter><Normal>.name </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><Normal>    </Normal><Comment># get the target's basename</Comment><br/>
 <Normal>            </Normal><Keyword>if</Keyword><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>name</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>=</Operator><Normal> </Normal><Operator>[</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>python</Variable><VariableDelimiter>)</VariableDelimiter><Normal>.name </Normal><Operator>]</Operator><br/>
 <Normal>            </Normal><Operator>{</Operator><br/>
 <Normal>                </Normal><VarAssign>name </VarAssign><Operator>=</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>name</Variable><VariableDelimiter>)</VariableDelimiter><Normal>_ext </Normal><Operator>;</Operator><Normal>        </Normal><Comment># rename the target</Comment><br/>
 <Normal>            </Normal><Operator>}</Operator><br/>
-<Normal>            </Normal><VarAssign>new-sources </VarAssign><Operator>+=</Operator><Normal> </Normal><Operator>[</Operator><Normal> generators.construct </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>project</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>name</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>:</Operator><br/>
+<Normal>            </Normal><VarAssign>new-sources </VarAssign><Operator>+=</Operator><Normal> </Normal><Operator>[</Operator><Normal> </Normal><Rule>generators.construct</Rule><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>project</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>name</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>:</Operator><br/>
 <Normal>              PYTHON_EXTENSION </Normal><Operator>:</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>property-set</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>:</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>s</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>libs</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
 <Normal>        </Normal><Operator>}</Operator><br/>
 <Normal>    </Normal><Operator>}</Operator><br/>
 <Normal></Normal><br/>
-<Normal>    </Normal><VarAssign>result </VarAssign><Operator>=</Operator><Normal> </Normal><Operator>[</Operator><Normal> construct-result </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>python</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>new-sources</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>:</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>project</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>name</Variable><VariableDelimiter>)</VariableDelimiter><br/>
+<Normal>    </Normal><VarAssign>result </VarAssign><Operator>=</Operator><Normal> </Normal><Operator>[</Operator><Normal> </Normal><Rule>construct-result</Rule><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>python</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>new-sources</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>:</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>project</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>name</Variable><VariableDelimiter>)</VariableDelimiter><br/>
 <Normal>                 </Normal><Operator>:</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>property-set</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
 <Operator>}</Operator><br/>
 <Normal></Normal><br/>
@@ -179,14 +182,14 @@
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <VarAssign>mypackage </VarAssign><Operator>=</Operator><br/>
-<Normal>  </Normal><Operator>[</Operator><Normal> pkg-config.import mypackage </Normal><Operator>:</Operator><Normal> usage-requirements </Normal><Feature><conditional></Feature><Normal>@define_ns</Normal><br/>
+<Normal>  </Normal><Operator>[</Operator><Normal> </Normal><Rule>pkg-config.import</Rule><Normal> mypackage </Normal><Operator>:</Operator><Normal> usage-requirements </Normal><Feature><conditional></Feature><Normal>@define_ns</Normal><br/>
 <Normal>  </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
 <Normal></Normal><br/>
-<VarAssign>me </VarAssign><Operator>=</Operator><Normal> </Normal><Operator>[</Operator><Normal> modules.binding </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>__name__</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
+<VarAssign>me </VarAssign><Operator>=</Operator><Normal> </Normal><Operator>[</Operator><Normal> </Normal><Rule>modules.binding</Rule><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>__name__</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
 <Normal></Normal><br/>
-<Keyword>local</Keyword><Normal> </Normal><VarAssign>ZLIB_INCLUDE </VarAssign><Operator>=</Operator><Normal> </Normal><Operator>[</Operator><Normal> modules.peek </Normal><Operator>:</Operator><Normal> ZLIB_INCLUDE </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
+<Keyword>local</Keyword><Normal> </Normal><VarAssign>ZLIB_INCLUDE</VarAssign><Normal> </Normal><Operator>=</Operator><Normal> </Normal><Operator>[</Operator><Normal> </Normal><Rule>modules.peek</Rule><Normal> </Normal><Operator>:</Operator><Normal> ZLIB_INCLUDE </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
 <Normal></Normal><br/>
-<Keyword>local</Keyword><Normal> </Normal><VarAssign>t </VarAssign><Operator>=</Operator><Normal> </Normal><Operator>[</Operator><Normal> new file-target </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>name</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>:</Operator><Normal> CPP </Normal><Operator>:</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>project</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>:</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>a</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
+<Keyword>local</Keyword><Normal> </Normal><VarAssign>t</VarAssign><Normal> </Normal><Operator>=</Operator><Normal> </Normal><Operator>[</Operator><Normal> </Normal><Rule>new</Rule><Normal> file-target </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>name</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>:</Operator><Normal> CPP </Normal><Operator>:</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>project</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>:</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>a</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
 <Normal></Normal><br/>
 <VariableDelimiter>$(</VariableDelimiter><Variable>var</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Rule>field1</Rule><Normal> </Normal><Operator>:</Operator><Normal> field2 </Normal><Operator>:</Operator><Normal> ... </Normal><Operator>:</Operator><Normal> fieldN </Normal><Operator>;</Operator><br/>
 <VariableDelimiter>$(</VariableDelimiter><Variable>var</Variable><VariableDelimiter>)</VariableDelimiter><Rule>o</Rule><Normal> aaaa </Normal><Operator>;</Operator><br/>
@@ -196,9 +199,8 @@
 <Operator>[</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>var</Variable><VariableDelimiter>)</VariableDelimiter><Normal> field1 </Normal><Operator>:</Operator><Normal> field2 </Normal><Operator>:</Operator><Normal> ... </Normal><Operator>:</Operator><Normal> fieldN </Normal><Operator>]</Operator><br/>
 <Operator>[</Operator><Normal> </Normal><Keyword>on</Keyword><Normal> </Normal><Keyword>target</Keyword><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>var</Variable><VariableDelimiter>)</VariableDelimiter><Normal> field1 </Normal><Operator>:</Operator><Normal> field2 </Normal><Operator>:</Operator><Normal> ... </Normal><Operator>:</Operator><Normal> fieldN </Normal><Operator>]</Operator><br/>
 <Normal></Normal><br/>
-<Normal></Normal><br/>
-<Keyword>local</Keyword><Normal> </Normal><VarAssign>key </VarAssign><Operator>=</Operator><Normal> </Normal><String>"HKEY_LOCAL_MACHINE</String><EscapeSeq>\\</EscapeSeq><String>SOFTWARE</String><EscapeSeq>\\</EscapeSeq><String>Microsoft</String><EscapeSeq>\\</EscapeSeq><String>Windows</String><EscapeSeq>\\</EscapeSeq><String>CurrentVersion</String><EscapeSeq>\\</EscapeSeq><String>App Paths"</String><Normal> </Normal><Operator>;</Operator><br/>
-<Keyword>local</Keyword><Normal> </Normal><VarAssign>values </VarAssign><Operator>=</Operator><Normal> </Normal><Operator>[</Operator><Normal> W32_GETREGNAMES </Normal><String>"</String><VariableDelimiter>$(</VariableDelimiter><Variable>key</Variable><VariableDelimiter>)</VariableDelimiter><EscapeSeq>\\</EscapeSeq><VariableDelimiter>$(</VariableDelimiter><Variable>subkey</Variable><VariableDelimiter>)</VariableDelimiter><String>"</String><Normal> </Normal><Operator>:</Operator><Normal> values </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
+<Keyword>local</Keyword><Normal> </Normal><VarAssign>key</VarAssign><Normal> </Normal><Operator>=</Operator><Normal> </Normal><String>"HKEY_LOCAL_MACHINE</String><EscapeSeq>\\</EscapeSeq><String>SOFTWARE</String><EscapeSeq>\\</EscapeSeq><String>Microsoft</String><EscapeSeq>\\</EscapeSeq><String>Windows</String><EscapeSeq>\\</EscapeSeq><String>CurrentVersion</String><EscapeSeq>\\</EscapeSeq><String>App Paths"</String><Normal> </Normal><Operator>;</Operator><br/>
+<Keyword>local</Keyword><Normal> </Normal><VarAssign>values</VarAssign><Normal> </Normal><Operator>=</Operator><Normal> </Normal><Operator>[</Operator><Normal> </Normal><Rule>W32_GETREGNAMES</Rule><Normal> </Normal><String>"</String><VariableDelimiter>$(</VariableDelimiter><Variable>key</Variable><VariableDelimiter>)</VariableDelimiter><EscapeSeq>\\</EscapeSeq><VariableDelimiter>$(</VariableDelimiter><Variable>subkey</Variable><VariableDelimiter>)</VariableDelimiter><String>"</String><Normal> </Normal><Operator>:</Operator><Normal> values </Normal><Operator>]</Operator><Normal> </Normal><Operator>;</Operator><br/>
 <Normal></Normal><br/>
 <VarAssign>variable </VarAssign><Operator>=</Operator><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>b</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><VariableDelimiter>$(</VariableDelimiter><Variable>c</Variable><VariableDelimiter>)</VariableDelimiter><Normal> </Normal><Operator>;</Operator><br/>
 <VarAssign>variable </VarAssign><Operator>+=</Operator><Normal> elements </Normal><Operator>;</Operator><br/>

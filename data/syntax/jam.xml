@@ -24,7 +24,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 -->
-<language name="Jam" version="4" kateversion="5.0" section="Other" extensions="Jam*;*.jam" mimetype="text/x-jam;text/x-Jamfile;text/x-Jamrules;text/x-Jambase" author="Mildred (silkensedai@online.fr)" license="MIT">
+<language name="Jam" version="5" kateversion="5.0" section="Other" extensions="Jam*;*.jam" mimetype="text/x-jam;text/x-Jamfile;text/x-Jamrules;text/x-Jambase" author="Mildred (silkensedai@online.fr)" license="MIT">
   <!--
   Changelog
     0.2
@@ -60,13 +60,16 @@ IN THE SOFTWARE.
       * fix `for local x`
       * new styles: Feature and FeatureOperator for `<xxx>`, `-<xxx>`, `<xxx>abc:<yyy>abc`, `<xxx>abc/<yyy>abc`, `<xxx>abc&&def`
       * don't use black color in Rule
+
+    v5
+      * fix `local x ;`, `x` is a variable not a rule
+      * highlight subrule: `exe x : [ glob *.cpp ]`
   -->
   <highlighting>
     <list name="keywords">
       <item>break</item>
       <item>continue</item>
       <item>else</item>
-      <item>local</item>
     </list>
     <list name="keywordIf">
       <item>if</item>
@@ -226,6 +229,7 @@ IN THE SOFTWARE.
         <keyword attribute="Keyword" context="ClassStatement" String="keywordClass"/>
         <keyword attribute="Keyword" context="ModuleStatement" String="keywordModule"/>
         <keyword attribute="Keyword" context="#stay" String="keywords"/>
+        <keyword attribute="Keyword" context="Local" String="keywordLocal"/>
         <WordDetect attribute="Operator" context="Block" String="{" beginRegion="block"/>
         <RegExpr attribute="VarAssign" context="Assignment" String="[^\t ]+[\t ]+(?=([+?]?=|on|default)([\t ]|$))" />
         <RegExpr attribute="Rule" context="Rule" String="([^\t ][^\t ]+|[^{}\t ])"/>
@@ -364,12 +368,16 @@ IN THE SOFTWARE.
         <RegExpr attribute="Normal" context="#stay" String="&ident;"/>
       </context>
 
-      <context attribute="Normal" lineEndContext="#stay" name="SubRule">
+      <context attribute="Normal" lineEndContext="#stay" name="SubRule" fallthrough="true" fallthroughContext="#pop!SubRuleParam">
+        <DetectSpaces/>
+        <RegExpr attribute="Rule" context="#pop!SubRuleParam" String="&ident;"/>
+      </context>
+
+      <context attribute="Normal" lineEndContext="#stay" name="SubRuleParam">
         <IncludeRules context="Preprocess"/>
         <WordDetect attribute="Operator" context="#stay" String=":"/>
         <WordDetect attribute="Operator" context="#pop#pop" String="]"/>
         <RegExpr attribute="Feature" context="Property" String="&lt;[^\t >]+>"/>
-        <RegExpr attribute="Normal" context="#stay" String="&ident;"/>
         <!-- auto-completion only -->
         <keyword attribute="Feature" context="#stay" String="features"/>
       </context>
@@ -478,6 +486,21 @@ IN THE SOFTWARE.
         <WordDetect attribute="Operator" context="#stay" String=":"/>
         <WordDetect attribute="Operator" context="#pop" String=";"/>
         <IncludeRules context="ValueIdentifier"/>
+      </context>
+
+      <!-- local -->
+
+      <context attribute="Variable" lineEndContext="#stay" name="Local">
+        <DetectSpaces attribute="Normal"/>
+        <keyword attribute="Keyword" context="#pop!RuleDefinition" String="keywordRule"/>
+        <RegExpr attribute="VarAssign" context="#pop!LocalInit" String="&ident;"/>
+        <WordDetect attribute="Operator" context="#pop" String=";"/>
+      </context>
+
+      <context attribute="Normal" lineEndContext="#stay" name="LocalInit" fallthrough="true" fallthroughContext="#pop">
+        <DetectSpaces attribute="Normal"/>
+        <DetectChar attribute="Operator" context="Assignment2" char="="/>
+        <WordDetect attribute="Operator" context="#pop" String=";"/>
       </context>
 
       <!-- Variables, Strings, Comments -->

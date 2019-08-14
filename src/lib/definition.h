@@ -26,9 +26,8 @@
 
 #include "ksyntaxhighlighting_export.h"
 
-#include <QTypeInfo>
 #include <QPair>
-
+#include <QVector>
 #include <memory>
 
 QT_BEGIN_NAMESPACE

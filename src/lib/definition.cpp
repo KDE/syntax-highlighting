@@ -39,7 +39,6 @@
 #include "xml_p.h"
 
 #include <QCoreApplication>
-#include <QDebug>
 #include <QFile>
 #include <QHash>
 #include <QJsonObject>

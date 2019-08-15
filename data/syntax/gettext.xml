@@ -1,82 +1,107 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE language SYSTEM "language.dtd">
-<language name="GNU Gettext" version="5" kateversion="5.0" section="Markup" extensions="*.po;*.pot" mimetype="text/x-gettext-translation" author="Dominik Haumann (dhaumann@kde.org)" license="MIT">
+<!DOCTYPE language SYSTEM "language.dtd"
+[
+  <!-- from xml.xml -->
+  <!ENTITY name    "(?![0-9])[\w_:][\w.:_-]*">
+  <!ENTITY entref  "&amp;(#[0-9]+|#[xX][0-9A-Fa-f]+|&name;);">
+]>
+<language name="GNU Gettext" version="6" kateversion="5.0" section="Markup" extensions="*.po;*.pot" mimetype="text/x-gettext-translation" author="Dominik Haumann (dhaumann@kde.org)" license="MIT">
   <highlighting>
+    <list name="keywords">
+      <item>msgid</item>
+      <item>msgid_plural</item>
+      <item>msgstr</item>
+      <item>msgctxt</item>
+    </list>
+
+    <list name="fuzzy">
+      <item>fuzzy</item>
+    </list>
 
     <contexts>
-      <context name = "Normal" attribute = "Normal Text" lineEndContext="#stay">
-        <RegExpr attribute = "Keyword" String = "^(msgid_plural|msgid|msgstr|msgctxt)" context="#stay"/>
-        <StringDetect attribute = "Automatic Comment" String = "#." context="AutomaticComment" firstNonSpace="true"/>
-        <StringDetect attribute = "Reference" String = "#:" context="References" firstNonSpace="true"/>
-        <StringDetect attribute = "Flag" String = "#," context="Flags" firstNonSpace="true"/>
-        <StringDetect attribute = "StringPrevious" String = "#|" context="Previous" firstNonSpace="true"/>
-        <StringDetect attribute = "Translator Comment" String = "#" context="TranslatorComment" firstNonSpace="true"/>
-        <RegExpr attribute = "Char" String="\\." context="#stay"/>
-        <DetectChar attribute = "String" char="&quot;" context="String"/>
-        <RegExpr attribute = "Index" String="\[\d+\]" context="#stay"/>
+      <context name="Normal" attribute="Normal Text" lineEndContext="#stay">
+        <DetectSpaces/>
+        <keyword String="keywords" attribute="Keyword" context="#stay" firstNonSpace="true"/>
+        <Detect2Chars char="#" char1="." attribute="Automatic Comment" context="AutomaticComment" firstNonSpace="true"/>
+        <Detect2Chars char="#" char1=":" attribute="Reference" context="References" firstNonSpace="true"/>
+        <Detect2Chars char="#" char1="," attribute="Flag" context="Flags" firstNonSpace="true"/>
+        <Detect2Chars char="#" char1="|" attribute="StringPrevious" context="Previous" firstNonSpace="true"/>
+        <Detect2Chars char="#" char1=" " attribute="Translator Comment" context="TranslatorComment" firstNonSpace="true"/>
+        <DetectChar char="#" attribute="Extension Comment" context="ExtensionComment" firstNonSpace="true"/>
+        <DetectChar char="&quot;" attribute="String" context="String"/>
+        <RangeDetect char="[" char1="]" attribute="Index" context="#stay"/>
       </context>
 
-      <context name = "TranslatorComment" attribute = "Translator Comment" lineEndContext="#pop">
-          <StringDetect attribute = "StringDiffNewWrapComment" String="{+" context="StringDiffNewComment"/>
-          <StringDetect attribute = "StringDiffOldWrapComment" String="{-" context="StringDiffOldComment"/>
+      <context name="TranslatorComment" attribute="Translator Comment" lineEndContext="#pop">
+        <IncludeRules context="CommonComment"/>
       </context>
-      <context name = "AutomaticComment" attribute = "Automatic Comment" lineEndContext="#pop">
-        <StringDetect attribute = "StringDiffNewWrapComment" String="{+" context="StringDiffNewComment"/>
-        <StringDetect attribute = "StringDiffOldWrapComment" String="{-" context="StringDiffOldComment"/>
+
+      <context name="ExtensionComment" attribute="Extension Comment" lineEndContext="#pop">
+        <IncludeRules context="CommonComment"/>
       </context>
-      <context name = "References" attribute = "Reference" lineEndContext="#pop">
-        <StringDetect attribute = "StringDiffNewWrapComment" String="{+" context="StringDiffNewComment"/>
-        <StringDetect attribute = "StringDiffOldWrapComment" String="{-" context="StringDiffOldComment"/>
+
+      <context name="AutomaticComment" attribute="Automatic Comment" lineEndContext="#pop">
+        <IncludeRules context="CommonComment"/>
       </context>
-      <context name = "Flags" attribute = "Flag" lineEndContext="#pop">
+
+      <context name="References" attribute="Reference" lineEndContext="#pop">
+        <IncludeRules context="CommonComment"/>
+      </context>
+
+      <context name="Flags" attribute="Flag" lineEndContext="#pop">
         <!-- Make fuzzy-flag stand out from the rest, being the most important. -->
-        <StringDetect attribute = "FlagFuzzy" String="fuzzy" context="#stay"/>
-        <StringDetect attribute = "StringDiffNewWrapComment" String="{+" context="StringDiffNewComment"/>
-        <StringDetect attribute = "StringDiffOldWrapComment" String="{-" context="StringDiffOldComment"/>
+        <keyword String="fuzzy" attribute="FlagFuzzy" context="#stay"/>
+        <IncludeRules context="CommonComment"/>
       </context>
-      <context name = "StringDiffNewComment" attribute = "StringDiffNewComment" lineEndContext="#pop">
-        <StringDetect attribute = "StringDiffNewWrapComment" String="+}" context="#pop"/>
+
+      <context name="CommonComment" attribute="Translator Comment" lineEndContext="#pop">
+        <DetectSpaces/>
+        <DetectIdentifier/>
+        <Detect2Chars char="{" char1="+" attribute="StringDiffNewWrapComment" context="StringDiffNewComment"/>
+        <Detect2Chars char="{" char1="-" attribute="StringDiffOldWrapComment" context="StringDiffOldComment"/>
       </context>
-      <context name = "StringDiffOldComment" attribute = "StringDiffOldComment" lineEndContext="#pop">
-        <StringDetect attribute = "StringDiffOldWrapComment" String="-}" context="#pop"/>
+      <context name="StringDiffNewComment" attribute="StringDiffNewComment" lineEndContext="#pop">
+        <Detect2Chars char="+" char1="}" attribute="StringDiffNewWrapComment" context="#pop"/>
+      </context>
+      <context name="StringDiffOldComment" attribute="StringDiffOldComment" lineEndContext="#pop">
+        <Detect2Chars char="-" char1="}" attribute="StringDiffOldWrapComment" context="#pop"/>
       </context>
 
       <!--
         Tag-context should be carried over if split by string continuation,
         to not lose markup highlighting when that happens.
       -->
-      <context name = "String" attribute = "String" lineEndContext="#stay">
-        <RegExpr attribute = "Char" String="\\." context="#stay"/>
-        <RegExpr attribute = "Entity" String="&amp;([a-zA-Z0-9_.-]+|#[0-9]+);" context="#stay"/>
-        <StringDetect attribute = "StringDiffNewWrap" String="{+" context="StringDiffNew"/>
-        <StringDetect attribute = "StringDiffOldWrap" String="{-" context="StringDiffOld"/>
-        <DetectChar attribute = "StringTag" char="&lt;" context="StringTag"/>
-        <DetectChar attribute = "String" char="&quot;" context="StringWrap"/>
+      <context name="String" attribute="String" lineEndContext="#pop!Error">
+        <DetectSpaces/>
+        <DetectIdentifier/>
+        <Detect2Chars char="{" char1="+" attribute="StringDiffNewWrap" context="StringDiffNew"/>
+        <Detect2Chars char="{" char1="-" attribute="StringDiffOldWrap" context="StringDiffOld"/>
+        <RegExpr String="&lt;/?[a-zA-Z][-_:0-9a-zA-Z]*>" attribute="StringTag" context="#stay"/>
+        <DetectChar char="&quot;" attribute="String" context="#pop"/>
+        <RegExpr String="\\." attribute="Char" context="#stay"/>
+        <RegExpr String="&entref;" attribute="Entity" context="#stay"/>
       </context>
-      <context name = "StringTag" attribute = "StringTag" lineEndContext="#stay">
-        <RegExpr attribute = "Char" String="\\." context="#stay"/>
-        <StringDetect attribute = "StringDiffNewWrap" String="{+" context="StringDiffNew"/>
-        <StringDetect attribute = "StringDiffOldWrap" String="{-" context="StringDiffOld"/>
-        <DetectChar attribute = "StringTag" char="&gt;" context="#pop"/>
-        <DetectChar attribute = "String" char="&quot;" context="StringWrapSub"/>
+
+      <context name="Error" attribute="Error" lineEndContext="#stay">
+        <RegExpr String=".+" attribute="Error" context="#pop"/>
       </context>
-      <context name = "StringWrap" attribute = "String" lineEndContext="#stay">
-        <DetectChar attribute = "String" char="&quot;" context="#pop"/>
-        <RegExpr String="." lookAhead="true" context="#pop#pop"/>
+
+      <context name="StringDiffNew" attribute="StringDiffNew" lineEndContext="#stay">
+        <DetectSpaces/>
+        <DetectIdentifier/>
+        <Detect2Chars char="+" char1="}" attribute="StringDiffNewWrap" context="#pop"/>
+        <DetectChar attribute="String" char="&quot;" context="StringWrapSub"/>
+        <RegExpr attribute="Char" String="\\." context="#stay"/>
       </context>
-      <context name = "StringDiffNew" attribute = "StringDiffNew" lineEndContext="#stay">
-        <RegExpr attribute = "Char" String="\\." context="#stay"/>
-        <StringDetect attribute = "StringDiffNewWrap" String="+}" context="#pop"/>
-        <DetectChar attribute = "String" char="&quot;" context="StringWrapSub"/>
+      <context name="StringDiffOld" attribute="StringDiffOld" lineEndContext="#stay">
+        <DetectSpaces/>
+        <DetectIdentifier/>
+        <Detect2Chars char="-" char1="}" attribute="StringDiffOldWrap" context="#pop"/>
+        <DetectChar attribute="String" char="&quot;" context="StringWrapSub"/>
+        <RegExpr attribute="Char" String="\\." context="#stay"/>
       </context>
-      <context name = "StringDiffOld" attribute = "StringDiffOld" lineEndContext="#stay">
-        <RegExpr attribute = "Char" String="\\." context="#stay"/>
-        <StringDetect attribute = "StringDiffOldWrap" String="-}" context="#pop"/>
-        <DetectChar attribute = "String" char="&quot;" context="StringWrapSub"/>
-      </context>
-      <context name = "StringWrapSub" attribute = "String" lineEndContext="#stay">
-        <DetectChar attribute = "String" char="&quot;" context="#pop"/>
-        <RegExpr String="." lookAhead="true" context="#pop#pop#pop"/>
+      <context name="StringWrapSub" attribute="String" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop#pop#pop">
+        <DetectChar attribute="String" char="&quot;" context="#pop"/>
       </context>
 
       <!--
@@ -85,80 +110,83 @@
         A special addition are embedded diff-segments: {+...+} and {-...-},
         which are not Gettext standard, but some tools can produce them.
       -->
-      <context name = "Previous" attribute = "Normal Text" lineEndContext="#pop">
-        <RegExpr attribute = "KeywordPrevious" String = "(msgctxt|msgid_plural|msgid|msgstr)" context="#stay"/>
-        <RegExpr attribute = "CharPrevious" String="\\." context="#stay"/>
-        <DetectChar attribute = "StringPrevious" char="&quot;" context="StringPrevious"/>
-        <RegExpr attribute = "IndexPrevious" String="\[\d+\]" context="#stay"/>
+      <context name="Previous" attribute="Normal Text" lineEndContext="#pop">
+        <DetectSpaces/>
+        <keyword String="keywords" attribute="KeywordPrevious" context="#stay"/>
+        <DetectChar char="&quot;" attribute="StringPrevious" context="StringPrevious"/>
+        <RangeDetect char="[" char1="]" attribute="IndexPrevious" context="#stay"/>
       </context>
-      <context name = "StringPrevious" attribute = "StringPrevious" lineEndContext="#stay">
-        <RegExpr attribute = "CharPrevious" String="\\." context="#stay"/>
-        <RegExpr attribute = "EntityPrevious" String="&amp;([a-zA-Z0-9_.-]+|#[0-9]+);" context="#stay"/>
-        <StringDetect attribute = "StringDiffNewWrapPrevious" String="{+" context="StringDiffNewPrevious"/>
-        <StringDetect attribute = "StringDiffOldWrapPrevious" String="{-" context="StringDiffOldPrevious"/>
-        <DetectChar attribute = "StringTagPrevious" char="&lt;" context="StringTagPrevious"/>
-        <DetectChar attribute = "StringPrevious" char="&quot;" context="StringWrapPrevious"/>
+
+      <context name="StringPrevious" attribute="StringPrevious" lineEndContext="#pop#pop!Error">
+        <DetectSpaces/>
+        <DetectIdentifier/>
+        <Detect2Chars char="{" char1="+" attribute="StringDiffNewWrapPrevious" context="StringDiffNewPrevious"/>
+        <Detect2Chars char="{" char1="-" attribute="StringDiffOldWrapPrevious" context="StringDiffOldPrevious"/>
+        <RegExpr String="&lt;/?[a-zA-Z][-_:0-9a-zA-Z]*>" attribute="StringTagPrevious" context="#stay"/>
+        <DetectChar char="&quot;" attribute="StringPrevious" context="StringWrapPrevious"/>
+        <RegExpr String="\\." attribute="CharPrevious" context="#stay"/>
+        <RegExpr String="&entref;" attribute="EntityPrevious" context="#stay"/>
       </context>
-      <context name = "StringTagPrevious" attribute = "StringTagPrevious" lineEndContext="#stay">
-        <RegExpr attribute = "Char" String="\\." context="#stay"/>
-        <StringDetect attribute = "StringDiffNewWrapPrevious" String="{+" context="StringDiffNewPrevious"/>
-        <StringDetect attribute = "StringDiffOldWrapPrevious" String="{-" context="StringDiffOldPrevious"/>
-        <DetectChar attribute = "StringTagPrevious" char="&gt;" context="#pop"/>
-        <DetectChar attribute = "StringPrevious" char="&quot;" context="StringWrapSubPrevious"/>
+
+      <context name="StringDiffNewPrevious" attribute="StringDiffNewPrevious" lineEndContext="#stay">
+        <DetectSpaces/>
+        <DetectIdentifier/>
+        <Detect2Chars char="+" char1="}" attribute="StringDiffNewWrapPrevious" context="#pop"/>
+        <DetectChar attribute="StringPrevious" char="&quot;" context="StringWrapSubPrevious"/>
+        <RegExpr attribute="CharPrevious" String="\\." context="#stay"/>
       </context>
-      <context name = "StringDiffNewPrevious" attribute = "StringDiffNewPrevious" lineEndContext="#stay">
-        <RegExpr attribute = "CharPrevious" String="\\." context="#stay"/>
-        <StringDetect attribute = "StringDiffNewWrapPrevious" String="+}" context="#pop"/>
-        <DetectChar attribute = "StringPrevious" char="&quot;" context="StringWrapSubPrevious"/>
+      <context name="StringDiffOldPrevious" attribute="StringDiffOldPrevious" lineEndContext="#stay">
+        <DetectSpaces/>
+        <DetectIdentifier/>
+        <Detect2Chars char="-" char1="}" attribute="StringDiffOldWrapPrevious" context="#pop"/>
+        <DetectChar attribute="StringPrevious" char="&quot;" context="StringWrapSubPrevious"/>
+        <RegExpr attribute="CharPrevious" String="\\." context="#stay"/>
       </context>
-      <context name = "StringDiffOldPrevious" attribute = "StringDiffOldPrevious" lineEndContext="#stay">
-        <RegExpr attribute = "CharPrevious" String="\\." context="#stay"/>
-        <StringDetect attribute = "StringDiffOldWrapPrevious" String="-}" context="#pop"/>
-        <DetectChar attribute = "StringPrevious" char="&quot;" context="StringWrapSubPrevious"/>
+      <context name="StringWrapSubPrevious" attribute="StringPrevious" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop#pop#pop#pop!Error">
+        <DetectSpaces/>
+        <RegExpr String="#\| *&quot;" attribute="StringPrevious" context="#pop" firstNonSpace="true"/>
+        <DetectChar char="&quot;" attribute="StringPrevious" context="#pop"/>
       </context>
-      <context name = "StringWrapPrevious" attribute = "StringPrevious" lineEndContext="#stay">
-        <RegExpr String="[^#]" firstNonSpace="true" lookAhead="true" context="#pop#pop"/>
-        <RegExpr attribute = "StringPrevious" String="(#\|)? *&quot;" context="#pop"/>
-        <RegExpr String="." lookAhead="true" context="#pop#pop"/>
-      </context>
-      <context name = "StringWrapSubPrevious" attribute = "StringPrevious" lineEndContext="#stay">
-        <RegExpr String="[^#]" firstNonSpace="true" lookAhead="true" context="#pop#pop#pop"/>
-        <RegExpr attribute = "StringPrevious" String="(#\|)? *&quot;" context="#pop"/>
-        <RegExpr String="." lookAhead="true" context="#pop#pop#pop"/>
+
+      <context name="StringWrapPrevious" attribute="StringPrevious" lineEndContext="#pop#pop#pop" fallthrough="true" fallthroughContext="#pop#pop#pop!Error">
+        <DetectSpaces/>
+        <DetectChar char="&quot;" attribute="StringPrevious" context="#pop"/>
       </context>
     </contexts>
 
     <itemDatas>
-      <itemData name = "Normal Text" defStyleNum ="dsNormal"/>
-      <itemData name = "Keyword" defStyleNum ="dsKeyword"/>
-      <itemData name = "KeywordPrevious" defStyleNum ="dsKeyword" italic="true" color="#006060"/>
-      <itemData name = "String" defStyleNum ="dsString"/>
-      <itemData name = "StringPrevious" defStyleNum ="dsString" italic="true" color="#008080"/>
-      <itemData name = "Translator Comment" defStyleNum ="dsComment" color="#888888"/>
-      <itemData name = "Automatic Comment" defStyleNum ="dsComment" color="#0000ff"/>
-      <itemData name = "Reference" defStyleNum ="dsComment" color="#0000ff"/>
-      <itemData name = "Flag" defStyleNum ="dsComment" color="#0000ff"/>
-      <itemData name = "FlagFuzzy" defStyleNum ="dsComment" color="#800080" bold="true"/>
-      <itemData name = "Char" defStyleNum ="dsChar" color="#ff00ff"/>
-      <itemData name = "CharPrevious" defStyleNum ="dsChar" italic="true" color="#00c040"/>
-      <itemData name = "Entity" defStyleNum ="dsString" color="#ff0040" bold="true"/>
-      <itemData name = "EntityPrevious" defStyleNum ="dsString" color="#40c080" bold="true" italic="true"/>
-      <itemData name = "StringTag" defStyleNum ="dsString" color="#c00000" bold="true"/>
-      <itemData name = "StringTagPrevious" defStyleNum ="dsString" color="#006060" bold="true" italic="true"/>
-      <itemData name = "Index" defStyleNum ="dsDecVal" color="#0000ff"/>
-      <itemData name = "IndexPrevious" defStyleNum ="dsDecVal" italic="true" color="#000000"/>
-      <itemData name = "StringDiffNewWrap" defStyleNum ="dsString" color="#0080f8"/>
-      <itemData name = "StringDiffOldWrap" defStyleNum ="dsString" color="#f00080"/>
-      <itemData name = "StringDiffNew" defStyleNum ="dsString" underline="true" color="#0080f8"/>
-      <itemData name = "StringDiffOld" defStyleNum ="dsString" underline="true" color="#f00080"/>
-      <itemData name = "StringDiffNewWrapComment" defStyleNum ="dsString" italic="true" color="#0080f8"/>
-      <itemData name = "StringDiffOldWrapComment" defStyleNum ="dsString" italic="true" color="#f00080"/>
-      <itemData name = "StringDiffNewComment" defStyleNum ="dsString" italic="true" color="#0080f8"/>
-      <itemData name = "StringDiffOldComment" defStyleNum ="dsString" italic="true" color="#f00080"/>
-      <itemData name = "StringDiffNewWrapPrevious" defStyleNum ="dsString" italic="true" color="#0080f8"/>
-      <itemData name = "StringDiffOldWrapPrevious" defStyleNum ="dsString" italic="true" color="#f00080"/>
-      <itemData name = "StringDiffNewPrevious" defStyleNum ="dsString" italic="true" color="#0080f8"/>
-      <itemData name = "StringDiffOldPrevious" defStyleNum ="dsString" italic="true" color="#f00080"/>
+      <itemData name="Normal Text" defStyleNum="dsNormal"/>
+      <itemData name="Error" defStyleNum="dsError"/>
+      <itemData name="Keyword" defStyleNum="dsKeyword"/>
+      <itemData name="KeywordPrevious" defStyleNum="dsKeyword" italic="true" color="#006060"/>
+      <itemData name="String" defStyleNum="dsString"/>
+      <itemData name="StringPrevious" defStyleNum="dsString" italic="true" color="#008080"/>
+      <itemData name="Translator Comment" defStyleNum="dsComment" color="#888888"/>
+      <itemData name="Extension Comment" defStyleNum="dsExtension"/>
+      <itemData name="Automatic Comment" defStyleNum="dsComment" color="#0000ff"/>
+      <itemData name="Reference" defStyleNum="dsComment" color="#0000ff"/>
+      <itemData name="Flag" defStyleNum="dsComment" color="#0000ff"/>
+      <itemData name="FlagFuzzy" defStyleNum="dsComment" color="#800080" bold="true"/>
+      <itemData name="Char" defStyleNum="dsChar" color="#ff00ff"/>
+      <itemData name="CharPrevious" defStyleNum="dsChar" italic="true" color="#00c040"/>
+      <itemData name="Entity" defStyleNum="dsString" color="#ff0040" bold="true"/>
+      <itemData name="EntityPrevious" defStyleNum="dsString" color="#40c080" bold="true" italic="true"/>
+      <itemData name="StringTag" defStyleNum="dsString" color="#c00000" bold="true"/>
+      <itemData name="StringTagPrevious" defStyleNum="dsString" color="#006060" bold="true" italic="true"/>
+      <itemData name="Index" defStyleNum="dsDecVal" color="#0000ff"/>
+      <itemData name="IndexPrevious" defStyleNum="dsDecVal" italic="true" color="#000000"/>
+      <itemData name="StringDiffNewWrap" defStyleNum="dsString" color="#0080f8"/>
+      <itemData name="StringDiffOldWrap" defStyleNum="dsString" color="#f00080"/>
+      <itemData name="StringDiffNew" defStyleNum="dsString" underline="true" color="#0080f8"/>
+      <itemData name="StringDiffOld" defStyleNum="dsString" underline="true" color="#f00080"/>
+      <itemData name="StringDiffNewWrapComment" defStyleNum="dsString" italic="true" color="#0080f8"/>
+      <itemData name="StringDiffOldWrapComment" defStyleNum="dsString" italic="true" color="#f00080"/>
+      <itemData name="StringDiffNewComment" defStyleNum="dsString" italic="true" color="#0080f8"/>
+      <itemData name="StringDiffOldComment" defStyleNum="dsString" italic="true" color="#f00080"/>
+      <itemData name="StringDiffNewWrapPrevious" defStyleNum="dsString" italic="true" color="#0080f8"/>
+      <itemData name="StringDiffOldWrapPrevious" defStyleNum="dsString" italic="true" color="#f00080"/>
+      <itemData name="StringDiffNewPrevious" defStyleNum="dsString" italic="true" color="#0080f8"/>
+      <itemData name="StringDiffOldPrevious" defStyleNum="dsString" italic="true" color="#f00080"/>
     </itemDatas>
   </highlighting>
   <general>

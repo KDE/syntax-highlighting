@@ -101,9 +101,6 @@ Definition Rule::definition() const
 void Rule::setDefinition(const Definition &def)
 {
     m_def = def;
-
-    // cache for DefinitionData::wordDelimiters, is accessed VERY often
-    m_wordDelimiter = &DefinitionData::get(m_def.definition())->wordDelimiters;
 }
 
 bool Rule::load(QXmlStreamReader &reader)
@@ -140,6 +137,9 @@ bool Rule::load(QXmlStreamReader &reader)
 void Rule::resolveContext()
 {
     m_context.resolve(m_def.definition());
+
+    // cache for DefinitionData::wordDelimiters, is accessed VERY often
+    m_wordDelimiter = &DefinitionData::get(m_def.definition())->wordDelimiters;
 }
 
 void Rule::resolveAttributeFormat(Context *lookupContext)

@@ -428,8 +428,6 @@ __cplusplus;
 
 // Attributes
 
-int f(int i) [[expects: i > 0]] [[ensures audit x: x < 1]];
-
 [[noreturn]] void foo();
 [[deprecated]] void foo();
 [[deprecated("because")]] void foo();

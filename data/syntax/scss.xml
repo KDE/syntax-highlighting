@@ -34,7 +34,7 @@ Changelog:
 
 -->
 
-<language name="SCSS" version="9" kateversion="5.53" section="Markup" extensions="*.scss" indenter="cstyle" mimetype="text/css" author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL" priority="10">
+<language name="SCSS" version="10" kateversion="5.53" section="Markup" extensions="*.scss" indenter="cstyle" mimetype="text/css" author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL" priority="10">
 
     <highlighting>
         <list name="properties">
@@ -539,7 +539,7 @@ Changelog:
                 <RegExpr attribute="Placeholder Selector" context="IsSelectors" String="%[_a-zA-Z][_a-zA-Z\-]*" />
                 <RegExpr attribute="Selector Tag" context="IsSelectors" String="[-]?(&nmstart;)(&nmchar;)*(?=\s|:?[\s#.&amp;{[*>+~|,]|:[a-z:])" />
                 <RegExpr attribute="Variable" context="VariableDefine" String="\$[a-zA-Z0-9\-_]+(?=\s*:)" />
-                <RegExpr attribute="Variable" context="Interpolation" String="#\{\s*\$[a-zA-Z0-9\-_]+" />
+                <Detect2Chars attribute="Interpolation" context="Interpolation" char="#" char1="{" />
             </context>
 
             <context name="IsSelectors" attribute="Normal Text" lineEndContext="#stay">
@@ -567,16 +567,21 @@ Changelog:
                 <RegExpr attribute="Selector Class" context="#stay" String="\.([a-zA-Z0-9\-_]|[\x80-\xFF]|\\[0-9A-Fa-f]{1,6})*" />
                 <RegExpr attribute="Placeholder Selector" context="#stay" String="%[_a-zA-Z][_a-zA-Z\-]*" />
                 <RegExpr attribute="Selector Tag" context="#stay" String="[-]?(&nmstart;)(&nmchar;)*" />
-                <RegExpr attribute="Variable" context="Interpolation" String="#\{\s*\$[a-zA-Z0-9\-_]+" />
+                <Detect2Chars attribute="Interpolation" context="Interpolation" char="#" char1="{" />
             </context>
 
             <context name="VariableDefine" attribute="Normal Text" lineEndContext="#stay">
                 <DetectChar attribute="Normal Text" context="RuleParameters" char=":" />
             </context>
 
-            <context name="Interpolation" attribute="Variable" lineEndContext="#stay">
+            <context name="Interpolation" attribute="Normal Text" lineEndContext="#stay">
                 <DetectSpaces />
-                <DetectChar attribute="Variable" context="#pop" char="}" />
+                <DetectChar attribute="Interpolation" context="#pop" char="}" />
+                <IncludeRules context="FindStrings" />
+                <IncludeRules context="FindFunctions" />
+                <IncludeRules context="FindValues" />
+                <!-- auto-completion only -->
+                <keyword attribute="Normal Text" context="#stay" String="functions" />
             </context>
 
 
@@ -594,10 +599,10 @@ Changelog:
                 <keyword attribute="Color" context="#stay" String="colors" />
                 <RegExpr attribute="Number" context="FindUnits" String="[0-9.]+" />
                 <RegExpr attribute="Color" context="#stay" String="#([0-9A-Fa-f]{3}){1,2}\b" />
-                <RegExpr attribute="Variable" context="Interpolation" String="#\{\s*\$[a-zA-Z0-9\-_]+" />
                 <RegExpr attribute="Variable" context="#stay" String="\$[a-zA-Z0-9\-_]+" />
                 <RegExpr attribute="Normal Text" context="#stay" String="[-]?(&nmstart;)(&nmchar;)*" />
                 <AnyChar attribute="Operator" context="#stay" String="*/+%-" />
+                <Detect2Chars attribute="Interpolation" context="Interpolation" char="#" char1="{" />
             </context>
 
             <context name="Annotation" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
@@ -889,7 +894,7 @@ Changelog:
                 <DetectChar attribute="Normal Text" context="#pop#pop#pop" char="}" endRegion="ruleset" />
                 <RegExpr attribute="Property" context="IsProperty" String="[A-Za-z_-]+(?=\s*:)" />
                 <RegExpr attribute="Variable" context="VariableDefine" String="\$[a-zA-Z0-9\-_]+(?=\s*:)" />
-                <RegExpr attribute="Variable" context="Interpolation" String="#\{\s*\$[a-zA-Z0-9\-_]+" />
+                <Detect2Chars attribute="Interpolation" context="Interpolation" char="#" char1="{" />
                 <DetectIdentifier />
                 <AnyChar attribute="Error" context="#stay" String="*>+~|.#" />
                 <!-- auto-completion only, includes by previous rule -->
@@ -967,18 +972,9 @@ Changelog:
             </context>
 
             <context name="InsideString" attribute="String" lineEndContext="#stay">
-                <Detect2Chars attribute="SpecialChar" context="InterpolationString" char="#" char1="{" />
+                <Detect2Chars attribute="Interpolation" context="Interpolation" char="#" char1="{" />
                 <RegExpr attribute="SpecialChar" context="#stay" String="\\([0-9A-Fa-f]{1,6}|.?)" />
-                <RegExpr attribute="String" context="#stay" String="\\?[^&quot;'\\]+" />
-            </context>
-
-            <context name="InterpolationString" attribute="String" lineEndContext="#stay">
-                <DetectChar attribute="SpecialChar" context="#pop" char="}" />
-                <IncludeRules context="FindStrings" />
-                <IncludeRules context="FindFunctions" />
-                <IncludeRules context="FindValues" />
-                <!-- auto-completion only -->
-                <keyword attribute="Normal Text" context="#stay" String="functions" />
+                <RegExpr attribute="String" context="#stay" String="\\?[^#&quot;'\\]+" />
             </context>
 
         </contexts>
@@ -991,6 +987,7 @@ Changelog:
             <itemData name="Unknown Property" defStyleNum="dsNormal" spellChecking="false"/>
             <itemData name="String" defStyleNum="dsString"/>
             <itemData name="SpecialChar" defStyleNum="dsSpecialChar" spellChecking="false"/>
+            <itemData name="Interpolation" defStyleNum="dsOperator" spellChecking="false"/>
             <itemData name="Operator" defStyleNum="dsOperator" spellChecking="false"/>
             <itemData name="Separator Symbol" defStyleNum="dsOperator" spellChecking="false"/>
             <itemData name="Value" defStyleNum="dsDecVal" spellChecking="false"/>

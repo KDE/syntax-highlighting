@@ -34,6 +34,9 @@
       alert("This is the second javascript example.");
     }
   //--></script>
+  <style type="text/css">
+    body{ color: yellow; }
+  </style>
   </head>
   <body>
     <%-- The top label table. --%>

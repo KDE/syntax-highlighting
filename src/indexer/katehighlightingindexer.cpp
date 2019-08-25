@@ -323,11 +323,23 @@ private:
 };
 
 /**
- * Helper class to search for non-existing contexts
+ * Helper class to search for non-existing contexts and invalid version
  */
 class ContextChecker
 {
 public:
+    void setKateVersion(QStringRef verStr, const QString &hlFilename, const QString &hlName)
+    {
+        const auto idx = verStr.indexOf(QLatin1Char('.'));
+        if (idx <= 0) {
+            qWarning() << hlFilename << "invalid kateversion" << verStr;
+            m_success = false;
+        } else {
+            auto &language = m_contextMap[hlName];
+            language.version = {verStr.left(idx).toInt(), verStr.mid(idx + 1).toInt()};
+        }
+    }
+
     void processElement(const QString &hlFilename, const QString &hlName, QXmlStreamReader &xml)
     {
         if (xml.name() == QLatin1String("context")) {
@@ -354,6 +366,9 @@ public:
             processContext(hlName, xml.attributes().value(QLatin1String("lineEndContext")).toString());
             processContext(hlName, xml.attributes().value(QLatin1String("lineEmptyContext")).toString());
             processContext(hlName, xml.attributes().value(QLatin1String("fallthroughContext")).toString());
+        } else if (xml.name() == QLatin1String("include")) {
+            // <include> tag inside <list>
+            processVersion(hlFilename, hlName, xml, {5, 53}, QLatin1String("<include>"));
         } else {
             if (xml.attributes().hasAttribute(QLatin1String("context"))) {
                 const QString context = xml.attributes().value(QLatin1String("context")).toString();
@@ -370,6 +385,29 @@ public:
     bool check() const
     {
         bool success = m_success;
+
+        // recursive search for the required miximal version
+        struct GetRequiredVersion
+        {
+            QHash<const Language*, Version> versionMap;
+
+            Version operator()(const QHash<QString, Language> &contextMap, const Language &language)
+            {
+                auto& version = versionMap[&language];
+                if (version < language.version) {
+                    version = language.version;
+                    for (auto &languageName : language.usedLanguageName) {
+                        auto it = contextMap.find(languageName);
+                        if (it != contextMap.end()) {
+                            version = std::max(operator()(contextMap, *it), version);
+                        }
+                    }
+                }
+                return version;
+            };
+        };
+        GetRequiredVersion getRequiredVersion;
+
         for (auto &language : m_contextMap) {
             const auto invalidContextNames = language.usedContextNames - language.existingContextNames;
             if (!invalidContextNames.isEmpty()) {
@@ -380,6 +418,12 @@ public:
             const auto unusedNames = language.existingContextNames - language.usedContextNames;
             if (!unusedNames.isEmpty()) {
                 qWarning() << language.hlFilename << "Unused contexts:" << unusedNames;
+                success = false;
+            }
+
+            auto requiredVersion = getRequiredVersion(m_contextMap, language);
+            if (language.version < requiredVersion) {
+                qWarning().nospace() << language.hlFilename << " depends on a language in version " << requiredVersion.major << "." << requiredVersion.minor << ". Please, increase kateversion.";
                 success = false;
             }
         }
@@ -413,6 +457,7 @@ private:
             } else if (list.size() == 2) {
                 // specific context of other language, e.g. Comment##ISO C++
                 m_contextMap[list[1]].usedContextNames.insert(list[0]);
+                m_contextMap[language].usedLanguageName.insert(list[1]);
             }
             return;
         }
@@ -426,6 +471,34 @@ private:
     }
 
 private:
+    struct Version
+    {
+        int major;
+        int minor;
+
+        Version(int major = 0, int minor = 0)
+            : major(major)
+            , minor(minor)
+        {}
+
+        bool operator<(const Version &version) const
+        {
+            return major < version.major || (major == version.major && minor < version.minor);
+        }
+    };
+
+    void processVersion(const QString &hlFilename, const QString &hlName, QXmlStreamReader &xml, Version const& requiredVersion, QLatin1String item)
+    {
+        auto &language = m_contextMap[hlName];
+
+        if (language.version < requiredVersion) {
+            qWarning().nospace() << hlFilename << " " << item << " in line " << xml.lineNumber() << " is only available since version " << requiredVersion.major << "." << requiredVersion.minor << ". Please, increase kateversion.";
+            // update the version to cancel future warnings
+            language.version = requiredVersion;
+            m_success = false;
+        }
+    }
+
     class Language
     {
     public:
@@ -443,6 +516,12 @@ private:
 
         // holds all existing context names
         QSet<QString> existingContextNames;
+
+        // holds all existing language names
+        QSet<QString> usedLanguageName;
+
+        // kateversion language attribute
+        Version version;
     };
 
     /**
@@ -607,7 +686,10 @@ int main(int argc, char *argv[])
 
         AttributeChecker attributeChecker(hlFilename);
         KeywordChecker keywordChecker(hlFilename);
+
         const QString hlName = hl[QStringLiteral("name")].toString();
+
+        contextChecker.setKateVersion(xml.attributes().value(QStringLiteral("kateversion")), hlFilename, hlName);
 
         // scan for broken regex or keywords with spaces
         while (!xml.atEnd()) {

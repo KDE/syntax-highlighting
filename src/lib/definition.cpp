@@ -233,6 +233,19 @@ QStringList Definition::keywordList(const QString& name) const
     return list ? list->keywords() : QStringList();
 }
 
+bool Definition::setKeywordList(const QString& name, const QStringList& content)
+{
+    d->load(DefinitionData::OnlyKeywords(true));
+    KeywordList* list = d->keywordList(name);
+    if (list)
+    {
+        list->setKeywordList(content);
+        return true;
+    }
+    else
+        return false;
+}
+
 QVector<Format> Definition::formats() const
 {
     d->load();

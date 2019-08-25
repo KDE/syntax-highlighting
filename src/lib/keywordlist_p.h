@@ -26,6 +26,7 @@
 
 #include <QString>
 #include <QStringList>
+
 #include <vector>
 
 QT_BEGIN_NAMESPACE
@@ -56,6 +57,14 @@ public:
     const QStringList &keywords() const
     {
         return m_keywords;
+    }
+
+    void setKeywordList(const QStringList& keywords)
+    {
+        m_keywords = keywords;
+        m_keywordsSortedCaseSensitive.clear();
+        m_keywordsSortedCaseInsensitive.clear();
+        initLookupForCaseSensitivity(m_caseSensitive);
     }
 
     /** Checks if @p str is a keyword in this list. */

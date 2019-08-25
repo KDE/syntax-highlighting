@@ -551,6 +551,28 @@ private Q_SLOTS:
         QCOMPARE(klist.size(), 1);
         QVERIFY(klist.contains(QLatin1String("f")));
     }
+
+    void testKeywordListModification()
+    {
+        auto def = m_repo.definitionForName(QLatin1String("Python"));
+        QVERIFY(def.isValid());
+
+        const QStringList& lists = def.keywordLists();
+        QVERIFY(!lists.isEmpty());
+
+        const QString& listName = lists.first();
+        const QStringList keywords = def.keywordList(listName);
+
+        QStringList modified = keywords;
+        modified.append(QLatin1String("test"));
+
+        QVERIFY(def.setKeywordList(listName, modified) == true);
+        QCOMPARE(keywords + QStringList(QLatin1String("test")), def.keywordList(listName));
+
+        const QString& unexistedName = QLatin1String("unexisted-keyword-name");
+        QVERIFY(lists.contains(unexistedName) == false);
+        QVERIFY(def.setKeywordList(unexistedName, QStringList()) == false);
+    }
 };
 }
 

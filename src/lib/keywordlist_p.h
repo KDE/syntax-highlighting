@@ -27,6 +27,7 @@
 #include <QSet>
 #include <QString>
 #include <QVector>
+#include <QStringList>
 
 #include <vector>
 
@@ -58,6 +59,14 @@ public:
     const QStringList &keywords() const
     {
         return m_keywords;
+    }
+
+    void setKeywordList(const QStringList& keywords)
+    {
+        m_keywords = keywords;
+        m_keywordsSortedCaseSensitive.clear();
+        m_keywordsSortedCaseInsensitive.clear();
+        initLookupForCaseSensitivity(m_caseSensitive);
     }
 
     /** Checks if @p str is a keyword in this list. */

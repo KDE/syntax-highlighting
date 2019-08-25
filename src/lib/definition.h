@@ -334,6 +334,21 @@ public:
     QStringList keywordList(const QString& name) const;
 
     /**
+     * Set content of keyword list with name @p name to @p content
+     * Only existing keywordLists() can be changed. For non-existent keyword lists, false is returned.
+     * @see keywordList(), keywordLists()
+     *
+     * This function can be usefull for dynamic higlighting, when the document rehiglights more, that one time.
+     * For example, you have a program for editing and running Octave scripts files and
+     * you are using KSyntaxHighlighting for syntax higlighting. But also, you can request list of
+     * variables, functions, etc from corresponed Octave process.
+     * And, used this function, you can provide Octave live higlighting - by passing, for
+     * example, variables names from Octave to KSyntaxHighlighting variable keyword list via this function.
+     * @since 5.62
+     */
+    bool setKeywordList(const QString& name, const QStringList& content);
+
+    /**
      * Returns a list of all Format items used by this definition.
      * The order of the Format items equals the order of the itemDatas in the xml file.
      * @since 5.49

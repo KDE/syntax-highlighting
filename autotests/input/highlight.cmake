@@ -68,11 +68,7 @@ target_compile_definitions(
 .. cmake:command:: my_fun
 
 *RST* documentation ``can`` refer to :cmake:command:`any_commands` or
-:cmake:variable:`variables`... (but this require updated RST higlighter ;-)
-
-.. seealso::
-
-    * `RST improvement MR <https://phabricator.kde.org/D7245>`_
+:cmake:variable:`variables`...
 
 .. code-block:: cmake
    :caption: **Synopsys**

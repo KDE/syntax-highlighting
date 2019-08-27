@@ -423,7 +423,7 @@ public:
 
             auto requiredVersion = getRequiredVersion(m_contextMap, language);
             if (language.version < requiredVersion) {
-                qWarning().nospace() << language.hlFilename << " depends on a language in version " << requiredVersion.major << "." << requiredVersion.minor << ". Please, increase kateversion.";
+                qWarning().nospace() << language.hlFilename << " depends on a language in version " << requiredVersion.majorRevision << "." << requiredVersion.minorRevision << ". Please, increase kateversion.";
                 success = false;
             }
         }
@@ -473,17 +473,17 @@ private:
 private:
     struct Version
     {
-        int major;
-        int minor;
+        int majorRevision;
+        int minorRevision;
 
-        Version(int major = 0, int minor = 0)
-            : major(major)
-            , minor(minor)
+        Version(int majorRevision = 0, int minorRevision = 0)
+            : majorRevision(majorRevision)
+            , minorRevision(minorRevision)
         {}
 
         bool operator<(const Version &version) const
         {
-            return major < version.major || (major == version.major && minor < version.minor);
+            return majorRevision < version.majorRevision || (majorRevision == version.majorRevision && minorRevision < version.minorRevision);
         }
     };
 
@@ -492,7 +492,7 @@ private:
         auto &language = m_contextMap[hlName];
 
         if (language.version < requiredVersion) {
-            qWarning().nospace() << hlFilename << " " << item << " in line " << xml.lineNumber() << " is only available since version " << requiredVersion.major << "." << requiredVersion.minor << ". Please, increase kateversion.";
+            qWarning().nospace() << hlFilename << " " << item << " in line " << xml.lineNumber() << " is only available since version " << requiredVersion.majorRevision << "." << requiredVersion.minorRevision << ". Please, increase kateversion.";
             // update the version to cancel future warnings
             language.version = requiredVersion;
             m_success = false;

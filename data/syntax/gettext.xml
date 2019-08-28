@@ -5,13 +5,16 @@
   <!ENTITY name    "(?![0-9])[\w_:][\w.:_-]*">
   <!ENTITY entref  "&amp;(#[0-9]+|#[xX][0-9A-Fa-f]+|&name;);">
 ]>
-<language name="GNU Gettext" version="6" kateversion="5.0" section="Markup" extensions="*.po;*.pot" mimetype="text/x-gettext-translation" author="Dominik Haumann (dhaumann@kde.org)" license="MIT">
+<language name="GNU Gettext" version="7" kateversion="5.0" section="Markup" extensions="*.po;*.pot" mimetype="text/x-gettext-translation" author="Dominik Haumann (dhaumann@kde.org)" license="MIT">
   <highlighting>
     <list name="keywords">
       <item>msgid</item>
       <item>msgid_plural</item>
-      <item>msgstr</item>
       <item>msgctxt</item>
+    </list>
+
+    <list name="translate">
+      <item>msgstr</item>
     </list>
 
     <list name="fuzzy">
@@ -22,6 +25,7 @@
       <context name="Normal" attribute="Normal Text" lineEndContext="#stay">
         <DetectSpaces/>
         <keyword String="keywords" attribute="Keyword" context="#stay" firstNonSpace="true"/>
+        <keyword String="translate" attribute="Keyword" context="Msgstr" firstNonSpace="true"/>
         <Detect2Chars char="#" char1="." attribute="Automatic Comment" context="AutomaticComment" firstNonSpace="true"/>
         <Detect2Chars char="#" char1=":" attribute="Reference" context="References" firstNonSpace="true"/>
         <Detect2Chars char="#" char1="," attribute="Flag" context="Flags" firstNonSpace="true"/>
@@ -29,7 +33,15 @@
         <Detect2Chars char="#" char1=" " attribute="Translator Comment" context="TranslatorComment" firstNonSpace="true"/>
         <DetectChar char="#" attribute="Extension Comment" context="ExtensionComment" firstNonSpace="true"/>
         <DetectChar char="&quot;" attribute="String" context="String"/>
-        <RangeDetect char="[" char1="]" attribute="Index" context="#stay"/>
+      </context>
+
+      <context name="Msgstr" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="MsgstrString">
+        <RangeDetect char="[" char1="]" attribute="Index" context="MsgstrString"/>
+      </context>
+
+      <context name="MsgstrString" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop#pop">
+        <DetectSpaces/>
+        <DetectChar char="&quot;" attribute="Translated String" context="Translated String"/>
       </context>
 
       <context name="TranslatorComment" attribute="Translator Comment" lineEndContext="#pop">
@@ -78,6 +90,17 @@
         <Detect2Chars char="{" char1="-" attribute="StringDiffOldWrap" context="StringDiffOld"/>
         <RegExpr String="&lt;/?[a-zA-Z][-_:0-9a-zA-Z]*>" attribute="StringTag" context="#stay"/>
         <DetectChar char="&quot;" attribute="String" context="#pop"/>
+        <RegExpr String="\\." attribute="Char" context="#stay"/>
+        <RegExpr String="&entref;" attribute="Entity" context="#stay"/>
+      </context>
+
+      <context name="Translated String" attribute="Translated String" lineEndContext="#pop!Error">
+        <DetectSpaces/>
+        <DetectIdentifier/>
+        <Detect2Chars char="{" char1="+" attribute="StringDiffNewWrap" context="StringDiffNew"/>
+        <Detect2Chars char="{" char1="-" attribute="StringDiffOldWrap" context="StringDiffOld"/>
+        <RegExpr String="&lt;/?[a-zA-Z][-_:0-9a-zA-Z]*>" attribute="StringTag" context="#stay"/>
+        <DetectChar char="&quot;" attribute="Translated String" context="#pop"/>
         <RegExpr String="\\." attribute="Char" context="#stay"/>
         <RegExpr String="&entref;" attribute="Entity" context="#stay"/>
       </context>
@@ -155,38 +178,39 @@
     </contexts>
 
     <itemDatas>
-      <itemData name="Normal Text" defStyleNum="dsNormal"/>
-      <itemData name="Error" defStyleNum="dsError"/>
-      <itemData name="Keyword" defStyleNum="dsKeyword"/>
-      <itemData name="KeywordPrevious" defStyleNum="dsKeyword" italic="true" color="#006060"/>
-      <itemData name="String" defStyleNum="dsString"/>
-      <itemData name="StringPrevious" defStyleNum="dsString" italic="true" color="#008080"/>
-      <itemData name="Translator Comment" defStyleNum="dsComment" color="#888888"/>
-      <itemData name="Extension Comment" defStyleNum="dsExtension"/>
-      <itemData name="Automatic Comment" defStyleNum="dsComment" color="#0000ff"/>
-      <itemData name="Reference" defStyleNum="dsComment" color="#0000ff"/>
-      <itemData name="Flag" defStyleNum="dsComment" color="#0000ff"/>
-      <itemData name="FlagFuzzy" defStyleNum="dsComment" color="#800080" bold="true"/>
-      <itemData name="Char" defStyleNum="dsChar" color="#ff00ff"/>
-      <itemData name="CharPrevious" defStyleNum="dsChar" italic="true" color="#00c040"/>
-      <itemData name="Entity" defStyleNum="dsString" color="#ff0040" bold="true"/>
-      <itemData name="EntityPrevious" defStyleNum="dsString" color="#40c080" bold="true" italic="true"/>
-      <itemData name="StringTag" defStyleNum="dsString" color="#c00000" bold="true"/>
-      <itemData name="StringTagPrevious" defStyleNum="dsString" color="#006060" bold="true" italic="true"/>
-      <itemData name="Index" defStyleNum="dsDecVal" color="#0000ff"/>
-      <itemData name="IndexPrevious" defStyleNum="dsDecVal" italic="true" color="#000000"/>
-      <itemData name="StringDiffNewWrap" defStyleNum="dsString" color="#0080f8"/>
-      <itemData name="StringDiffOldWrap" defStyleNum="dsString" color="#f00080"/>
-      <itemData name="StringDiffNew" defStyleNum="dsString" underline="true" color="#0080f8"/>
-      <itemData name="StringDiffOld" defStyleNum="dsString" underline="true" color="#f00080"/>
-      <itemData name="StringDiffNewWrapComment" defStyleNum="dsString" italic="true" color="#0080f8"/>
-      <itemData name="StringDiffOldWrapComment" defStyleNum="dsString" italic="true" color="#f00080"/>
-      <itemData name="StringDiffNewComment" defStyleNum="dsString" italic="true" color="#0080f8"/>
-      <itemData name="StringDiffOldComment" defStyleNum="dsString" italic="true" color="#f00080"/>
-      <itemData name="StringDiffNewWrapPrevious" defStyleNum="dsString" italic="true" color="#0080f8"/>
-      <itemData name="StringDiffOldWrapPrevious" defStyleNum="dsString" italic="true" color="#f00080"/>
-      <itemData name="StringDiffNewPrevious" defStyleNum="dsString" italic="true" color="#0080f8"/>
-      <itemData name="StringDiffOldPrevious" defStyleNum="dsString" italic="true" color="#f00080"/>
+      <itemData name="Normal Text" defStyleNum="dsNormal" spellChecking="false"/>
+      <itemData name="Error" defStyleNum="dsError" spellChecking="false"/>
+      <itemData name="Keyword" defStyleNum="dsKeyword" spellChecking="false"/>
+      <itemData name="KeywordPrevious" defStyleNum="dsKeyword" italic="true" spellChecking="false"/>
+      <itemData name="String" defStyleNum="dsString" spellChecking="false"/>
+      <itemData name="StringPrevious" defStyleNum="dsString" italic="true" spellChecking="false"/>
+      <itemData name="Translated String" defStyleNum="dsString"/>
+      <itemData name="Translator Comment" defStyleNum="dsComment"/>
+      <itemData name="Extension Comment" defStyleNum="dsExtension" spellChecking="false"/>
+      <itemData name="Automatic Comment" defStyleNum="dsComment" spellChecking="false"/>
+      <itemData name="Reference" defStyleNum="dsComment" spellChecking="false"/>
+      <itemData name="Flag" defStyleNum="dsComment" spellChecking="false"/>
+      <itemData name="FlagFuzzy" defStyleNum="dsComment" bold="true" spellChecking="false"/>
+      <itemData name="Char" defStyleNum="dsChar" spellChecking="false"/>
+      <itemData name="CharPrevious" defStyleNum="dsChar" italic="true" spellChecking="false"/>
+      <itemData name="Entity" defStyleNum="dsString" bold="true" spellChecking="false"/>
+      <itemData name="EntityPrevious" defStyleNum="dsString" bold="true" italic="true" spellChecking="false"/>
+      <itemData name="StringTag" defStyleNum="dsString" bold="true" spellChecking="false"/>
+      <itemData name="StringTagPrevious" defStyleNum="dsString" bold="true" italic="true" spellChecking="false"/>
+      <itemData name="Index" defStyleNum="dsDecVal" spellChecking="false"/>
+      <itemData name="IndexPrevious" defStyleNum="dsDecVal" italic="true" spellChecking="false"/>
+      <itemData name="StringDiffNewWrap" defStyleNum="dsString"/>
+      <itemData name="StringDiffOldWrap" defStyleNum="dsString"/>
+      <itemData name="StringDiffNew" defStyleNum="dsString" underline="true"/>
+      <itemData name="StringDiffOld" defStyleNum="dsString" underline="true"/>
+      <itemData name="StringDiffNewWrapComment" defStyleNum="dsString" italic="true"/>
+      <itemData name="StringDiffOldWrapComment" defStyleNum="dsString" italic="true"/>
+      <itemData name="StringDiffNewComment" defStyleNum="dsString" italic="true"/>
+      <itemData name="StringDiffOldComment" defStyleNum="dsString" italic="true"/>
+      <itemData name="StringDiffNewWrapPrevious" defStyleNum="dsString" italic="true"/>
+      <itemData name="StringDiffOldWrapPrevious" defStyleNum="dsString" italic="true"/>
+      <itemData name="StringDiffNewPrevious" defStyleNum="dsString" italic="true"/>
+      <itemData name="StringDiffOldPrevious" defStyleNum="dsString" italic="true"/>
     </itemDatas>
   </highlighting>
   <general>

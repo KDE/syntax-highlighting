@@ -1,6 +1,5 @@
 %%=====================================================
 % MATLAB test code for Kate/Kwrite syntax highlighting
-% kate: hl Matlab
 %%=====================================================
 
 % Numbers _____________________________________________
@@ -22,17 +21,19 @@ a = ~g; g = @sfdgdsf(sdfsd,345); g.' + 1i.' - ('asdf').'
 a = 1+ ...
   2;
 
-% Strings and adjoint _________________________________
-% incomplete strings
+% Character vectors, strings and adjoint ______________
+% incomplete character vectors
 'string
 'str''
 'str''ing
-% complete strings
+% complete character vectors
 'string' % simple string
 '''' % string containing '
 'str''ing' % one string containing '
-'string' 'string'  % two strings
-'asdf'  'asdf''' variable  % two strings and a variable
+'"' % string containing "
+'str"ing' % one string containing "
+'string' 'string'  % two character vectors
+'asdf'  'asdf''' variable  % two character vectors and a variable
 'asdf''asdf''   fsgdfg' + (asdf)' - 'asdf'.' + []''''.';''
 'sadf'.' % string transpose
 % adjoint
@@ -46,6 +47,18 @@ A.'*B + 1     % transpose
 A.'.'*B + 1   % double transpose
 A'.' + 1      % adjoint, then transpose
 A.''          % transpose, then adjoint
+% incomplete strings
+"string
+"str""
+"str""ing
+% complete strings
+"string" % simple string
+"'" % string containing '
+"str'ing" % one string containing '
+"""" % string containing "
+"str""ing" % one string containing "
+"string" "string"  % two strings
+"asdf"  "asdf""" variable  % two strings and a variable
 
 % System command ______________________________________
 !hostname

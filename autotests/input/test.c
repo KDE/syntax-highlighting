@@ -67,3 +67,12 @@ char* str = "string \
 
 
 int i = 0; // this should not be highlighted as a string
+
+/*
+ * Digraphs (see bug #411508)
+ */
+%:include <stdio.h>
+int a()
+<%
+    [](){%>();
+}

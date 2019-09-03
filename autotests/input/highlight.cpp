@@ -505,3 +505,11 @@ goto label;
 __GCC_ATOMIC_CHAR16_T_LOCK_FREE
 __GNUC__
 __linux__
+
+// Digraphs (see bug #411508)
+%:include <stdio.h>
+int main()
+<%
+    [](){%>();
+}
+<:<:fallthrough]]

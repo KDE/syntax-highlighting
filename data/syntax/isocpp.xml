@@ -22,7 +22,7 @@
 <language
     name="ISO C++"
     section="Sources"
-    version="16"
+    version="17"
     kateversion="5.0"
     indenter="cstyle"
     style="C++"
@@ -294,15 +294,15 @@
         <!-- Match scope regions -->
         <DetectChar attribute="Symbol" context="#stay" char="{" beginRegion="Brace1" />
         <DetectChar attribute="Symbol" context="#stay" char="}" endRegion="Brace1" />
+        <Detect2Chars attribute="Symbol" context="#stay" char="&lt;" char1="%" beginRegion="Brace1" /> <!-- Digraph: { -->
+        <Detect2Chars attribute="Symbol" context="#stay" char="%" char1="&gt;" endRegion="Brace1" /> <!-- Digraph: } -->
         <!-- Detect attributes -->
         <Detect2Chars attribute="Symbol" context="Attribute" char="[" char1="[" />
+        <StringDetect attribute="Symbol" context="Attribute" String="&lt;:&lt;:" /> <!-- Digraph: [[ -->
         <!-- Match numbers -->
         <RegExpr attribute="Decimal" context="Number" String="\.?[0-9]" lookAhead="true" />
         <!-- Match comments -->
         <IncludeRules context="match comments and region markers" />
-        <!-- Match punctuators -->
-        <AnyChar attribute="Separator Symbol" context="#stay" String="&separators;" />
-        <AnyChar attribute="Symbol" context="#stay" String="&punctuators;" />
         <!-- Match keywords -->
         <IncludeRules context="match keywords" />
         <!-- Match string literals -->
@@ -320,6 +320,9 @@
         <IncludeRules context="match identifier" />
         <!-- Match preprocessor directives -->
         <RegExpr attribute="Preprocessor" context="AfterHash" String="&ispphash;" lookAhead="true" />
+        <!-- Match punctuators -->
+        <AnyChar attribute="Separator Symbol" context="#stay" String="&separators;" />
+        <AnyChar attribute="Symbol" context="#stay" String="&punctuators;" />
         <!-- Match invalid symbols -->
         <AnyChar attribute="Error" context="#stay" String="$@`" />
       </context>
@@ -519,6 +522,7 @@
         <DetectSpaces/>
         <keyword attribute="Standard Attribute" context="#stay" String="attributes" />
         <Detect2Chars attribute="Symbol" context="#pop" char="]" char1="]" />
+        <StringDetect attribute="Symbol" context="#pop" String=":&gt;:&gt;" /> <!-- Digraph: ]] -->
         <DetectChar attribute="Separator Symbol" context="#stay" char="," />
         <AnyChar attribute="Symbol" context="#stay" String="&punctuators;" />
         <!-- Attributes may contain some text: [[deprecated("Reason text")]] -->
@@ -696,6 +700,7 @@
         <AnyChar attribute="Symbol" context="#stay" String="{}" />
         <!-- Detect attributes -->
         <Detect2Chars attribute="Symbol" context="Attribute In PP" char="[" char1="[" />
+        <StringDetect attribute="Symbol" context="Attribute In PP" String="&lt;:&lt;:" /> <!-- Digraph: [[ -->
         <!-- Match numbers -->
         <RegExpr attribute="Decimal" context="Number" String="\.?[0-9]" lookAhead="true" />
         <!-- Match comments -->

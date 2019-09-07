@@ -328,21 +328,24 @@ public:
     /**
      * Returns the list of keywords for the keyword list @p name.
      * @since 5.49
-     * @see keywordLists()
+     * @see keywordLists(), setKeywordList()
      */
     QStringList keywordList(const QString& name) const;
 
     /**
-     * Set content of keyword list with name @p name to @p content
-     * Only existing keywordLists() can be changed. For non-existent keyword lists, false is returned.
-     * @see keywordList(), keywordLists()
+     * Set the contents of the keyword list @p name to @p content.
+     * Only existing keywordLists() can be changed. For non-existent keyword lists,
+     * false is returned.
      *
-     * This function can be usefull for dynamic higlighting, when the document rehiglights more, that one time.
-     * For example, you have a program for editing and running Octave scripts files and
-     * you are using KSyntaxHighlighting for syntax higlighting. But also, you can request list of
-     * variables, functions, etc from corresponed Octave process.
-     * And, used this function, you can provide Octave live higlighting - by passing, for
-     * example, variables names from Octave to KSyntaxHighlighting variable keyword list via this function.
+     * Whenever you change a keyword list, make sure to trigger a rehighlight of
+     * your documents. In case you are using QSyntaxHighlighter via SyntaxHighlighter,
+     * this can be done by calling SyntaxHighlighter::rehighlight().
+     *
+     * @note In general, changing keyword lists via setKeywordList() is discouraged,
+     *       since if a keyword list name in the syntax highlighting definition
+     *       file changes, the call setKeywordList() may suddenly fail.
+     *
+     * @see keywordList(), keywordLists()
      * @since 5.62
      */
     bool setKeywordList(const QString& name, const QStringList& content);

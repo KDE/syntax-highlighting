@@ -209,7 +209,7 @@ int CodeEditor::sidebarWidth() const
         ++digits;
         count /= 10;
     }
-    return 4 + fontMetrics().width(QLatin1Char('9')) * digits + fontMetrics().lineSpacing();
+    return 4 + fontMetrics().horizontalAdvance(QLatin1Char('9')) * digits + fontMetrics().lineSpacing();
 }
 
 void CodeEditor::sidebarPaintEvent(QPaintEvent *event)

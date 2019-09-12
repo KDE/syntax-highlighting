@@ -43,7 +43,7 @@ CodePdfPrinter::CodePdfPrinter()
     m_document.setDefaultFont(font);
 
     QTextOption textOption(Qt::AlignTop | Qt::AlignLeft );
-    textOption.setTabStop(8 * fontMetrics.width(QLatin1Char(' ')));
+    textOption.setTabStopDistance(8 * fontMetrics.horizontalAdvance(QLatin1Char(' ')));
     textOption.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
     m_document.setDefaultTextOption(textOption);
 

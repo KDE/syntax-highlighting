@@ -612,8 +612,10 @@ MatchResult RegExpr::doMatch(const QString& text, int offset, const QStringList 
 
     /**
      * no match
+     * the pattern of a dynamic regex depends on the previous contexts
+     * so that skipOffset cannot be computed
      */
-    return MatchResult(offset, result.capturedStart());
+    return MatchResult(offset, m_dynamic ? 0 : result.capturedStart());
 }
 
 

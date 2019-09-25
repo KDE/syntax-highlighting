@@ -29,6 +29,16 @@ FILES_${PN}-dbg += " \
     /usr/lib/gammaray/*/*/styles/.debug \
 "
 
+do_install_append() {
+    # multiline string ok here
+    AVAR="this is
+right"
+}
+
+def python_function():
+    # some python code
+    pass
+
 # error: unterinated string
 VAR *= "abc
   this is wrong

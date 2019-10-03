@@ -652,13 +652,17 @@ MatchResult WordDetect::doMatch(const QString& text, int offset, const QStringLi
     if (text.size() - offset < m_word.size())
         return offset;
 
-    if (offset > 0 && !isWordDelimiter(text.at(offset - 1)))
+    /**
+     * detect delimiter characters on the inner and outer boundaries of the string
+     * NOTE: m_word isn't empty
+     */
+    if (offset > 0 && !isWordDelimiter(text.at(offset - 1)) && !isWordDelimiter(text.at(offset)))
         return offset;
 
     if (text.midRef(offset, m_word.size()).compare(m_word, m_caseSensitivity) != 0)
         return offset;
 
-    if (text.size() == offset + m_word.size() || isWordDelimiter(text.at(offset + m_word.size())))
+    if (text.size() == offset + m_word.size() || isWordDelimiter(text.at(offset + m_word.size())) || isWordDelimiter(text.at(offset + m_word.size() - 1)))
         return offset + m_word.size();
 
     return offset;

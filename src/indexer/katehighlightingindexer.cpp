@@ -69,7 +69,7 @@ QStringList readListing(const QString &fileName)
  * @param extensions extensions string to check
  * @return valid?
  */
-bool checkExtensions(QString extensions)
+bool checkExtensions(const QString &extensions)
 {
     // get list of extensions
     const QStringList extensionParts = extensions.split(QLatin1Char(';'), QString::SkipEmptyParts);
@@ -328,7 +328,7 @@ private:
 class ContextChecker
 {
 public:
-    void setKateVersion(QStringRef verStr, const QString &hlFilename, const QString &hlName)
+    void setKateVersion(const QStringRef &verStr, const QString &hlFilename, const QString &hlName)
     {
         const auto idx = verStr.indexOf(QLatin1Char('.'));
         if (idx <= 0) {

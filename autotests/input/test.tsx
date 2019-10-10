@@ -9,13 +9,13 @@ import { PhotoStory, VideoStory } from './stories';
 function Story(props) {
   const SpecificStory = components[props.storyType];
   return <SpecificStory story={ props.story } attr2="&ref;" attr3="Hello\n" />;
-} 
+}
 
-function 
+function
 <Tag attr1={ <tag/> function <noTag/> return class var 0x123 { } &noRef; hello() React.Component() } attr2="&ref;">
 	/* no comment*/ function <tag/> return class var 0x123 &ref; hello() React.Component()
 	.<tag/> anyWord <tag/>
-	{ function <tag> return class var 0x123 hello() React.Component() } 
+	{ function <tag> return class var 0x123 hello() React.Component() }
 </Tag>
 
 <tag1> </tag1>
@@ -27,8 +27,8 @@ function
 // Detect Valid tags
 
 /* comment */ <tag></tag>
-{ /* comment 
-	*/ <Tag /> 
+{ /* comment
+	*/ <Tag />
 	word <noTag/> . <noTag/> } <noTag/>
 return /* comment
 	multiline */ <tag/> /* comment */ <Tag/>
@@ -134,3 +134,13 @@ class Handler {
     info: <T>(arg: T): T <noTag />;
     <tag> </tag>
 }
+
+// Highlight "<T extends" as a type assertion, not as a tag
+// (the "cast" expression works and isn't supported in the TSX file)
+const goodHighlighting = <T extends I>(
+  arg: T
+) => {
+  const a = arg
+  return a
+}
+<tag> text <T extends I/> </tag> // Here "<T extends I/>" is a tag

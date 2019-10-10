@@ -66,7 +66,7 @@ const enum ResponseCode {
 export function isInOpenInterval(start: number, end: number) {
     return tersible(a => a > start && a < end, () => `(${start}...${end})`)
 }
-const bar = `${x} ${y}`; 
+const bar = `${x} ${y}`;
 
 // readonly
 function f1(mt: [number, number], rt: readonly [number, number]) {
@@ -89,7 +89,7 @@ class Cl {
     one?: string;
     two!: string;
 }
-let x! = 1; 
+let x! = 1;
 
 // Function with multiple arguments
 const children = [].map<Set<Map<number, string>>>(element => {
@@ -97,7 +97,7 @@ const children = [].map<Set<Map<number, string>>>(element => {
         return element;
     }
     return element;
-}); 
+});
 
 // Numerics
 var a = 0xA;
@@ -128,7 +128,7 @@ let e: undefined = undefined;
 let f: boolean = true;
 let g: number = 0b111001; // Binary
 let h: number = 0o436; // Octal
-let i: number = 0xadf0d; // Hexa-Decimal 
+let i: number = 0xadf0d; // Hexa-Decimal
 
 const query = query<[number], number>(`
         SELECT *
@@ -142,19 +142,19 @@ function runQuery() {
     return database.execute(query)
 }
 
-aa: <sdf/> string ?<ssd/> string 
+aa: <sdf/> string ?<ssd/> string
  string // Don't highlight
 aa: string assa |
-   string 
+   string
    string ;
    string
 
 aa: { string
     string } // Don't highlight
-    
+
 aa: [ string
       string ]
-aa: ( string 
+aa: ( string
       string ) // Don't highlight
 aa: string <string>
 interface a {
@@ -185,5 +185,23 @@ class C {
     w = () =>
         this.a() ? true : this.b() ? false : true;
     z = () =>
-        this.b() ? hello : k; 
+        this.b() ? hello : k;
+}
+
+function foo<T extends X>(arg: T): T extends B ? number : string {
+  if (arg === "A") return <T extends B ? number : never>111;
+  return <T extends B ? never : string>"returning a string";
+}
+
+// Types and logical `&&` and `||` operators after `as` expression
+Date as any || null;
+
+//Assertions
+const assert: (value: unknown) => asserts value = value => {}
+declare function assertIsString(value: unknown): asserts value is string;
+declare function assertIsArrayOfStrings(value: unknown): asserts value is string[];
+declare function assertDefined<T>(value: T): asserts value is NonNullable<T>;
+namespace Debug {
+    export declare function assert(value: unknown, message?: string): asserts value;
+    export declare function assertDefined<T>(value: T): asserts value is NonNullable<T>;
 }

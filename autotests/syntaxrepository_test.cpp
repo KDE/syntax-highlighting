@@ -35,8 +35,8 @@
 #include <QStandardPaths>
 #include <qtest.h>
 
-namespace KSyntaxHighlighting {
-
+namespace KSyntaxHighlighting
+{
 class NullHighlighter : public AbstractHighlighter
 {
 public:
@@ -55,7 +55,7 @@ class RepositoryTest : public QObject
 {
     Q_OBJECT
 private:
-        Repository m_repo;
+    Repository m_repo;
 
 private Q_SLOTS:
     void initTestCase()
@@ -102,8 +102,7 @@ private Q_SLOTS:
         QTest::addColumn<QString>("fileName");
         QTest::addColumn<QStringList>("expectedNames");
 
-        QTest::newRow("Matlab") << QStringLiteral("/bla/foo.m")
-                             << (QStringList() << QStringLiteral("Magma") << QStringLiteral("Matlab") << QStringLiteral("Octave") << QStringLiteral("Objective-C"));
+        QTest::newRow("Matlab") << QStringLiteral("/bla/foo.m") << (QStringList() << QStringLiteral("Magma") << QStringLiteral("Matlab") << QStringLiteral("Octave") << QStringLiteral("Objective-C"));
     }
 
     void testDefinitionsForFileName()
@@ -125,12 +124,7 @@ private Q_SLOTS:
         QTest::addColumn<QStringList>("expectedNames");
 
         QTest::newRow("C Header") << QStringLiteral("text/x-chdr")
-                                  << (QStringList() << QStringLiteral("C++")
-                                                    << QStringLiteral("ISO C++")
-                                                    << QStringLiteral("C")
-                                                    << QStringLiteral("GCCExtensions")
-                                                    << QStringLiteral("ANSI C89")
-                                                    << QStringLiteral("SystemC"));
+                                  << (QStringList() << QStringLiteral("C++") << QStringLiteral("ISO C++") << QStringLiteral("C") << QStringLiteral("GCCExtensions") << QStringLiteral("ANSI C89") << QStringLiteral("SystemC"));
     }
 
     void testDefinitionsForMimeType()
@@ -226,24 +220,16 @@ private Q_SLOTS:
         QVERIFY(!formats.isEmpty());
 
         // verify that the formats are sorted, such that the order matches the order of the itemDatas in the xml files.
-        auto sortComparator = [](const KSyntaxHighlighting::Format & lhs, const KSyntaxHighlighting::Format & rhs) {
-            return lhs.id() < rhs.id();
-        };
+        auto sortComparator = [](const KSyntaxHighlighting::Format &lhs, const KSyntaxHighlighting::Format &rhs) { return lhs.id() < rhs.id(); };
         QVERIFY(std::is_sorted(formats.begin(), formats.end(), sortComparator));
 
         // check all names are listed
         QStringList formatNames;
-        for (const auto & format : qAsConst(formats)) {
+        for (const auto &format : qAsConst(formats)) {
             formatNames.append(format.name());
         }
 
-        const QStringList expectedItemDatas = {
-            QStringLiteral("Normal Text"),
-            QStringLiteral("Name"),
-            QStringLiteral("E-Mail"),
-            QStringLiteral("Date"),
-            QStringLiteral("Entry")
-        };
+        const QStringList expectedItemDatas = {QStringLiteral("Normal Text"), QStringLiteral("Name"), QStringLiteral("E-Mail"), QStringLiteral("Date"), QStringLiteral("Entry")};
         QCOMPARE(formatNames, expectedItemDatas);
     }
 
@@ -253,24 +239,22 @@ private Q_SLOTS:
         QVERIFY(def.isValid());
         auto defs = def.includedDefinitions();
 
-        const QStringList expectedDefinitionNames = {
-            QStringLiteral("PHP/PHP"),
-            QStringLiteral("Alerts"),
-            QStringLiteral("CSS/PHP"),
-            QStringLiteral("JavaScript/PHP"),
-            QStringLiteral("Doxygen"),
-            QStringLiteral("JavaScript React/PHP"),
-            QStringLiteral("TypeScript/PHP"),
-            QStringLiteral("Mustache/Handlebars (HTML)/PHP"),
-            QStringLiteral("Modelines"),
-            QStringLiteral("HTML"),
-            QStringLiteral("CSS"),
-            QStringLiteral("SQL (MySQL)"),
-            QStringLiteral("JavaScript"),
-            QStringLiteral("JavaScript React"),
-            QStringLiteral("TypeScript"),
-            QStringLiteral("Mustache/Handlebars (HTML)")
-        };
+        const QStringList expectedDefinitionNames = {QStringLiteral("PHP/PHP"),
+                                                     QStringLiteral("Alerts"),
+                                                     QStringLiteral("CSS/PHP"),
+                                                     QStringLiteral("JavaScript/PHP"),
+                                                     QStringLiteral("Doxygen"),
+                                                     QStringLiteral("JavaScript React/PHP"),
+                                                     QStringLiteral("TypeScript/PHP"),
+                                                     QStringLiteral("Mustache/Handlebars (HTML)/PHP"),
+                                                     QStringLiteral("Modelines"),
+                                                     QStringLiteral("HTML"),
+                                                     QStringLiteral("CSS"),
+                                                     QStringLiteral("SQL (MySQL)"),
+                                                     QStringLiteral("JavaScript"),
+                                                     QStringLiteral("JavaScript React"),
+                                                     QStringLiteral("TypeScript"),
+                                                     QStringLiteral("Mustache/Handlebars (HTML)")};
         QStringList definitionNames;
         for (auto d : defs) {
             QVERIFY(d.isValid());
@@ -278,7 +262,7 @@ private Q_SLOTS:
 
             // already check here a bit to make the test fails better fixable
             if (definitionNames.size() <= expectedDefinitionNames.size()) {
-                QCOMPARE(d.name(), expectedDefinitionNames[definitionNames.size()-1]);
+                QCOMPARE(d.name(), expectedDefinitionNames[definitionNames.size() - 1]);
             } else {
                 QCOMPARE(d.name(), QStringLiteral("too many included defs found, first one is this one"));
             }
@@ -293,7 +277,7 @@ private Q_SLOTS:
             definitionNames.push_back(def.name());
         }
 
-        for (const QString & name : qAsConst(definitionNames)) {
+        for (const QString &name : qAsConst(definitionNames)) {
             Repository repo;
             initRepositorySearchPaths(repo);
             auto def = repo.definitionForName(name);
@@ -397,7 +381,6 @@ private Q_SLOTS:
         QCOMPARE(def.multiLineCommentMarker(), emptyPair);
         QVERIFY(def.characterEncodings().isEmpty());
 
-
         for (QChar c : QStringLiteral("\t !%&()*+,-./:;<=>?[\\]^{|}~")) {
             QVERIFY(def.isWordDelimiter(c));
             QVERIFY(def.isWordWrapDelimiter(c));
@@ -458,8 +441,8 @@ private Q_SLOTS:
         QVERIFY(def.isValid());
         const auto encodings = def.characterEncodings();
         QVERIFY(!encodings.isEmpty());
-        QVERIFY(encodings.contains({ QChar(196), QLatin1String("\\\"{A}") }));
-        QVERIFY(encodings.contains({ QChar(227), QLatin1String("\\~{a}") }));
+        QVERIFY(encodings.contains({QChar(196), QLatin1String("\\\"{A}")}));
+        QVERIFY(encodings.contains({QChar(227), QLatin1String("\\~{a}")}));
     }
 
     void testIncludeKeywordLists()
@@ -527,9 +510,7 @@ private Q_SLOTS:
         auto klist3 = def.keywordList(QLatin1String("c"));
 
         // internal QHash<QString, KeywordList> is arbitrarily ordered and undeterministic
-        auto& klist = klist1.size() == 3 ? klist1
-                    : klist2.size() == 3 ? klist2
-                    : klist3;
+        auto &klist = klist1.size() == 3 ? klist1 : klist2.size() == 3 ? klist2 : klist3;
 
         QCOMPARE(klist.size(), 3);
         QVERIFY(klist.contains(QLatin1String("a")));
@@ -557,10 +538,10 @@ private Q_SLOTS:
         auto def = m_repo.definitionForName(QLatin1String("Python"));
         QVERIFY(def.isValid());
 
-        const QStringList& lists = def.keywordLists();
+        const QStringList &lists = def.keywordLists();
         QVERIFY(!lists.isEmpty());
 
-        const QString& listName = lists.first();
+        const QString &listName = lists.first();
         const QStringList keywords = def.keywordList(listName);
 
         QStringList modified = keywords;
@@ -569,7 +550,7 @@ private Q_SLOTS:
         QVERIFY(def.setKeywordList(listName, modified) == true);
         QCOMPARE(keywords + QStringList(QLatin1String("test")), def.keywordList(listName));
 
-        const QString& unexistedName = QLatin1String("unexisted-keyword-name");
+        const QString &unexistedName = QLatin1String("unexisted-keyword-name");
         QVERIFY(lists.contains(unexistedName) == false);
         QVERIFY(def.setKeywordList(unexistedName, QStringList()) == false);
     }

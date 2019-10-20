@@ -35,30 +35,47 @@ private Q_SLOTS:
         QTest::addColumn<QString>("str");
         QTest::addColumn<QString>("pattern");
 
-        QTest::newRow("*.txt") << "abc.txt" << "*.txt";
+        QTest::newRow("*.txt") << "abc.txt"
+                               << "*.txt";
 
-        QTest::newRow("*Makefile* 1") << "Makefile.am" << "*Makefile*";
-        QTest::newRow("*Makefile* 2") << "Makefile.am" << "Makefile*";
+        QTest::newRow("*Makefile* 1") << "Makefile.am"
+                                      << "*Makefile*";
+        QTest::newRow("*Makefile* 2") << "Makefile.am"
+                                      << "Makefile*";
 
-        QTest::newRow("control") << "control" << "control";
+        QTest::newRow("control") << "control"
+                                 << "control";
 
-        QTest::newRow("a??d") << "abcd" << "a??d";
+        QTest::newRow("a??d") << "abcd"
+                              << "a??d";
 
-        QTest::newRow("?") << "a" << "?";
-        QTest::newRow("*?*") << "a" << "*?*";
-        QTest::newRow("*") << "a" << "*";
-        QTest::newRow("**") << "a" << "**";
-        QTest::newRow("***") << "a" << "***";
+        QTest::newRow("?") << "a"
+                           << "?";
+        QTest::newRow("*?*") << "a"
+                             << "*?*";
+        QTest::newRow("*") << "a"
+                           << "*";
+        QTest::newRow("**") << "a"
+                            << "**";
+        QTest::newRow("***") << "a"
+                             << "***";
 
-        QTest::newRow("empty 1") << "" << "*";
-        QTest::newRow("empty 2") << "" << "**";
+        QTest::newRow("empty 1") << ""
+                                 << "*";
+        QTest::newRow("empty 2") << ""
+                                 << "**";
 
-        QTest::newRow("a*") << "ab" << "a*";
-        QTest::newRow("*b") << "ab" << "*b";
-        QTest::newRow("a?") << "ab" << "a?";
-        QTest::newRow("?b") << "ab" << "?b";
+        QTest::newRow("a*") << "ab"
+                            << "a*";
+        QTest::newRow("*b") << "ab"
+                            << "*b";
+        QTest::newRow("a?") << "ab"
+                            << "a?";
+        QTest::newRow("?b") << "ab"
+                            << "?b";
 
-        QTest::newRow("a*b*c") << "aXXbXXbYYaYc" << "a*b*c";
+        QTest::newRow("a*b*c") << "aXXbXXbYYaYc"
+                               << "a*b*c";
     }
 
     void testPositiveMatch()
@@ -73,9 +90,12 @@ private Q_SLOTS:
         QTest::addColumn<QString>("str");
         QTest::addColumn<QString>("pattern");
 
-        QTest::newRow("*.cpp") << "abc.txt" << "*.cpp";
-        QTest::newRow("*Makefile* 3") << "Makefile.am" << "Makefile";
-        QTest::newRow("?") << "" << "?";
+        QTest::newRow("*.cpp") << "abc.txt"
+                               << "*.cpp";
+        QTest::newRow("*Makefile* 3") << "Makefile.am"
+                                      << "Makefile";
+        QTest::newRow("?") << ""
+                           << "?";
     }
 
     void testNegativeMatch()

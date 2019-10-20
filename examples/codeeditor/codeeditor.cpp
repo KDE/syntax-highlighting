@@ -52,9 +52,9 @@ private:
     CodeEditor *m_codeEditor;
 };
 
-CodeEditorSidebar::CodeEditorSidebar(CodeEditor *editor) :
-    QWidget(editor),
-    m_codeEditor(editor)
+CodeEditorSidebar::CodeEditorSidebar(CodeEditor *editor)
+    : QWidget(editor)
+    , m_codeEditor(editor)
 {
 }
 
@@ -79,17 +79,14 @@ void CodeEditorSidebar::mouseReleaseEvent(QMouseEvent *event)
     QWidget::mouseReleaseEvent(event);
 }
 
-
-CodeEditor::CodeEditor(QWidget *parent) :
-    QPlainTextEdit(parent),
-    m_highlighter(new KSyntaxHighlighting::SyntaxHighlighter(document())),
-    m_sideBar(new CodeEditorSidebar(this))
+CodeEditor::CodeEditor(QWidget *parent)
+    : QPlainTextEdit(parent)
+    , m_highlighter(new KSyntaxHighlighting::SyntaxHighlighter(document()))
+    , m_sideBar(new CodeEditorSidebar(this))
 {
     setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 
-    setTheme((palette().color(QPalette::Base).lightness() < 128)
-        ? m_repository.defaultTheme(KSyntaxHighlighting::Repository::DarkTheme)
-        : m_repository.defaultTheme(KSyntaxHighlighting::Repository::LightTheme));
+    setTheme((palette().color(QPalette::Base).lightness() < 128) ? m_repository.defaultTheme(KSyntaxHighlighting::Repository::DarkTheme) : m_repository.defaultTheme(KSyntaxHighlighting::Repository::LightTheme));
 
     connect(this, &QPlainTextEdit::blockCountChanged, this, &CodeEditor::updateSidebarGeometry);
     connect(this, &QPlainTextEdit::updateRequest, this, &CodeEditor::updateSidebarArea);
@@ -103,7 +100,7 @@ CodeEditor::~CodeEditor()
 {
 }
 
-void CodeEditor::openFile(const QString& fileName)
+void CodeEditor::openFile(const QString &fileName)
 {
     QFile f(fileName);
     if (!f.open(QFile::ReadOnly)) {
@@ -228,9 +225,7 @@ void CodeEditor::sidebarPaintEvent(QPaintEvent *event)
     while (block.isValid() && top <= event->rect().bottom()) {
         if (block.isVisible() && bottom >= event->rect().top()) {
             const auto number = QString::number(blockNumber + 1);
-            painter.setPen(m_highlighter->theme().editorColor(
-                (blockNumber == currentBlockNumber) ? KSyntaxHighlighting::Theme::CurrentLineNumber
-                                                    : KSyntaxHighlighting::Theme::LineNumbers));
+            painter.setPen(m_highlighter->theme().editorColor((blockNumber == currentBlockNumber) ? KSyntaxHighlighting::Theme::CurrentLineNumber : KSyntaxHighlighting::Theme::LineNumbers));
             painter.drawText(0, top, m_sideBar->width() - 2 - foldingMarkerSize, fontMetrics().height(), Qt::AlignRight, number);
         }
 
@@ -269,7 +264,7 @@ void CodeEditor::updateSidebarGeometry()
     m_sideBar->setGeometry(QRect(r.left(), r.top(), sidebarWidth(), r.height()));
 }
 
-void CodeEditor::updateSidebarArea(const QRect& rect, int dy)
+void CodeEditor::updateSidebarArea(const QRect &rect, int dy)
 {
     if (dy)
         m_sideBar->scroll(0, dy);

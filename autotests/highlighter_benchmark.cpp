@@ -25,9 +25,9 @@
 
 #include <abstracthighlighter.h>
 #include <definition.h>
+#include <format.h>
 #include <repository.h>
 #include <state.h>
-#include <format.h>
 
 #include <QDir>
 #include <QObject>
@@ -69,7 +69,9 @@ public:
     }
 
 protected:
-    void applyFormat(int, int, const Format&) Q_DECL_OVERRIDE {}
+    void applyFormat(int, int, const Format &) Q_DECL_OVERRIDE
+    {
+    }
     QStringList m_fileContents;
 };
 
@@ -77,7 +79,10 @@ class HighlighterBenchmark : public QObject
 {
     Q_OBJECT
 public:
-    explicit HighlighterBenchmark(QObject *parent = nullptr) : QObject(parent) {}
+    explicit HighlighterBenchmark(QObject *parent = nullptr)
+        : QObject(parent)
+    {
+    }
 
 private:
     Repository m_repo;
@@ -130,7 +135,7 @@ private Q_SLOTS:
         // benchmark the highlighting
         // try to highlight ~ 20000 lines per file
         // bail out, if file is empty, else we are stuck
-        for(int i = 0; i <= 20000;) {
+        for (int i = 0; i <= 20000;) {
             int lines = highlighter.highlightFile();
             if (lines <= 0)
                 break;
@@ -142,4 +147,3 @@ private Q_SLOTS:
 QTEST_GUILESS_MAIN(HighlighterBenchmark)
 
 #include "highlighter_benchmark.moc"
-

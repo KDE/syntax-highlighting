@@ -28,7 +28,8 @@
 
 #include <QTextDocument>
 
-namespace KSyntaxHighlighting {
+namespace KSyntaxHighlighting
+{
 class SyntaxHighlighter;
 }
 

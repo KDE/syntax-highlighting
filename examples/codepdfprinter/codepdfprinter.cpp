@@ -23,17 +23,15 @@
 
 #include "codepdfprinter.h"
 
+#include <definition.h>
 #include <syntaxhighlighter.h>
 #include <theme.h>
-#include <definition.h>
 
-#include <QPrinter>
+#include <QDebug>
 #include <QFile>
 #include <QFontDatabase>
 #include <QFontMetrics>
-#include <QDebug>
-
-
+#include <QPrinter>
 
 CodePdfPrinter::CodePdfPrinter()
     : m_highlighter(new KSyntaxHighlighting::SyntaxHighlighter(&m_document))
@@ -42,7 +40,7 @@ CodePdfPrinter::CodePdfPrinter()
     const QFontMetrics fontMetrics(font);
     m_document.setDefaultFont(font);
 
-    QTextOption textOption(Qt::AlignTop | Qt::AlignLeft );
+    QTextOption textOption(Qt::AlignTop | Qt::AlignLeft);
     textOption.setTabStopDistance(8 * fontMetrics.horizontalAdvance(QLatin1Char(' ')));
     textOption.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
     m_document.setDefaultTextOption(textOption);

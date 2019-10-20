@@ -112,18 +112,24 @@ protected:
 
 private:
     QTextStream m_out;
-    struct Fold { int offset; int length; FoldingRegion region; };
+    struct Fold {
+        int offset;
+        int length;
+        FoldingRegion region;
+    };
     QVector<Fold> m_folds;
 };
-
 
 class FoldingTest : public QObject
 {
     Q_OBJECT
 public:
-    explicit FoldingTest(QObject *parent = nullptr) : QObject(parent) {}
-private:
+    explicit FoldingTest(QObject *parent = nullptr)
+        : QObject(parent)
+    {
+    }
 
+private:
 private Q_SLOTS:
     void initTestCase()
     {
@@ -148,10 +154,8 @@ private Q_SLOTS:
             if (syntaxOverride.exists() && syntaxOverride.open(QFile::ReadOnly))
                 syntax = QString::fromUtf8(syntaxOverride.readAll()).trimmed();
 
-            QTest::newRow(fileName.toUtf8().constData()) << inFile
-                << (QStringLiteral(TESTBUILDDIR "/folding.out/") + fileName + QStringLiteral(".fold"))
-                << (QStringLiteral(TESTSRCDIR "/folding/") + fileName + QStringLiteral(".fold"))
-                << syntax;
+            QTest::newRow(fileName.toUtf8().constData()) << inFile << (QStringLiteral(TESTBUILDDIR "/folding.out/") + fileName + QStringLiteral(".fold")) << (QStringLiteral(TESTSRCDIR "/folding/") + fileName + QStringLiteral(".fold"))
+                                                         << syntax;
         }
 
         QDir().mkpath(QStringLiteral(TESTBUILDDIR "/folding.out/"));
@@ -182,7 +186,6 @@ private Q_SLOTS:
          */
         compareFiles(refFile, outFile);
     }
-
 };
 
 QTEST_GUILESS_MAIN(FoldingTest)

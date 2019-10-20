@@ -41,7 +41,6 @@ private Q_SLOTS:
             initRepositorySearchPaths(repo);
         }
     }
-
 };
 
 QTEST_GUILESS_MAIN(RepositoryBenchmark)

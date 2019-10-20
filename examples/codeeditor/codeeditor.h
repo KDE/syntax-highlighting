@@ -28,7 +28,8 @@
 
 #include <QPlainTextEdit>
 
-namespace KSyntaxHighlighting {
+namespace KSyntaxHighlighting
+{
 class SyntaxHighlighter;
 }
 

@@ -30,6 +30,7 @@
 #include <state.h>
 #include <theme.h>
 
+#include <QDebug>
 #include <QDirIterator>
 #include <QFileInfo>
 #include <QJsonObject>
@@ -37,10 +38,9 @@
 #include <QObject>
 #include <QStandardPaths>
 #include <qtest.h>
-#include <QDebug>
 
-namespace KSyntaxHighlighting {
-
+namespace KSyntaxHighlighting
+{
 class FormatCollector : public AbstractHighlighter
 {
 public:
@@ -58,7 +58,7 @@ class ThemeTest : public QObject
 {
     Q_OBJECT
 private:
-        Repository m_repo;
+    Repository m_repo;
 
 private Q_SLOTS:
     void initTestCase()
@@ -100,7 +100,7 @@ private Q_SLOTS:
         collector.highlightLine(QLatin1String("normal + property real foo: 3.14"), State());
 
         QVERIFY(collector.formatMap.size() >= 4);
-        //qDebug() << collector.formatMap.keys();
+        // qDebug() << collector.formatMap.keys();
 
         // normal text
         auto f = collector.formatMap.value(QLatin1String("Normal Text"));
@@ -144,30 +144,30 @@ private Q_SLOTS:
         QVERIFY(t.isReadOnly());
 
         // make sure all editor colors are properly read
-        QCOMPARE(t.editorColor(Theme::BackgroundColor)  , QColor("#ffffff").rgb());
-        QCOMPARE(t.editorColor(Theme::TextSelection)    , QColor("#94caef").rgb());
-        QCOMPARE(t.editorColor(Theme::CurrentLine)      , QColor("#f8f7f6").rgb());
-        QCOMPARE(t.editorColor(Theme::SearchHighlight)  , QColor("#ffff00").rgb());
-        QCOMPARE(t.editorColor(Theme::ReplaceHighlight) , QColor("#00ff00").rgb());
-        QCOMPARE(t.editorColor(Theme::BracketMatching)  , QColor("#ffff00").rgb());
-        QCOMPARE(t.editorColor(Theme::TabMarker)        , QColor("#d2d2d2").rgb());
-        QCOMPARE(t.editorColor(Theme::SpellChecking)    , QColor("#bf0303").rgb());
-        QCOMPARE(t.editorColor(Theme::IndentationLine)  , QColor("#d2d2d2").rgb());
-        QCOMPARE(t.editorColor(Theme::IconBorder)       , QColor("#f0f0f0").rgb());
-        QCOMPARE(t.editorColor(Theme::CodeFolding)      , QColor("#94caef").rgb());
-        QCOMPARE(t.editorColor(Theme::LineNumbers)      , QColor("#a0a0a0").rgb());
+        QCOMPARE(t.editorColor(Theme::BackgroundColor), QColor("#ffffff").rgb());
+        QCOMPARE(t.editorColor(Theme::TextSelection), QColor("#94caef").rgb());
+        QCOMPARE(t.editorColor(Theme::CurrentLine), QColor("#f8f7f6").rgb());
+        QCOMPARE(t.editorColor(Theme::SearchHighlight), QColor("#ffff00").rgb());
+        QCOMPARE(t.editorColor(Theme::ReplaceHighlight), QColor("#00ff00").rgb());
+        QCOMPARE(t.editorColor(Theme::BracketMatching), QColor("#ffff00").rgb());
+        QCOMPARE(t.editorColor(Theme::TabMarker), QColor("#d2d2d2").rgb());
+        QCOMPARE(t.editorColor(Theme::SpellChecking), QColor("#bf0303").rgb());
+        QCOMPARE(t.editorColor(Theme::IndentationLine), QColor("#d2d2d2").rgb());
+        QCOMPARE(t.editorColor(Theme::IconBorder), QColor("#f0f0f0").rgb());
+        QCOMPARE(t.editorColor(Theme::CodeFolding), QColor("#94caef").rgb());
+        QCOMPARE(t.editorColor(Theme::LineNumbers), QColor("#a0a0a0").rgb());
         QCOMPARE(t.editorColor(Theme::CurrentLineNumber), QColor("#1e1e1e").rgb());
-        QCOMPARE(t.editorColor(Theme::WordWrapMarker)   , QColor("#ededed").rgb());
-        QCOMPARE(t.editorColor(Theme::ModifiedLines)    , QColor("#fdbc4b").rgb());
-        QCOMPARE(t.editorColor(Theme::SavedLines)       , QColor("#2ecc71").rgb());
-        QCOMPARE(t.editorColor(Theme::Separator)        , QColor("#898887").rgb());
-        QCOMPARE(t.editorColor(Theme::MarkBookmark)     , QColor("#0000ff").rgb());
+        QCOMPARE(t.editorColor(Theme::WordWrapMarker), QColor("#ededed").rgb());
+        QCOMPARE(t.editorColor(Theme::ModifiedLines), QColor("#fdbc4b").rgb());
+        QCOMPARE(t.editorColor(Theme::SavedLines), QColor("#2ecc71").rgb());
+        QCOMPARE(t.editorColor(Theme::Separator), QColor("#898887").rgb());
+        QCOMPARE(t.editorColor(Theme::MarkBookmark), QColor("#0000ff").rgb());
         QCOMPARE(t.editorColor(Theme::MarkBreakpointActive), QColor("#ff0000").rgb());
         QCOMPARE(t.editorColor(Theme::MarkBreakpointReached), QColor("#ffff00").rgb());
         QCOMPARE(t.editorColor(Theme::MarkBreakpointDisabled), QColor("#ff00ff").rgb());
-        QCOMPARE(t.editorColor(Theme::MarkExecution)    , QColor("#a0a0a4").rgb());
-        QCOMPARE(t.editorColor(Theme::MarkWarning)      , QColor("#00ff00").rgb());
-        QCOMPARE(t.editorColor(Theme::MarkError)        , QColor("#ff0000").rgb());
+        QCOMPARE(t.editorColor(Theme::MarkExecution), QColor("#a0a0a4").rgb());
+        QCOMPARE(t.editorColor(Theme::MarkWarning), QColor("#00ff00").rgb());
+        QCOMPARE(t.editorColor(Theme::MarkError), QColor("#ff0000").rgb());
         QCOMPARE(t.editorColor(Theme::TemplateBackground), QColor("#d6d2d0").rgb());
         QCOMPARE(t.editorColor(Theme::TemplatePlaceholder), QColor("#baf8ce").rgb());
         QCOMPARE(t.editorColor(Theme::TemplateFocusedPlaceholder), QColor("#76da98").rgb());
@@ -239,56 +239,45 @@ private Q_SLOTS:
 
             // verify valid entry
             const QStringList definedColors = textStyle.keys();
-            for (const auto & key : definedColors) {
+            for (const auto &key : definedColors) {
                 const QString context = textStyleName + QLatin1Char('/') + key + QLatin1Char('=') + textStyle.value(key).toString();
-                if (key == QLatin1String("text-color")
-                    || key == QLatin1String("selected-text-color")
-                    || key == QLatin1String("background-color")
-                    || key == QLatin1String("selected-background-color"))
-                {
+                if (key == QLatin1String("text-color") || key == QLatin1String("selected-text-color") || key == QLatin1String("background-color") || key == QLatin1String("selected-background-color")) {
                     QVERIFY2(QColor::isValidColor(textStyle.value(key).toString()), context.toLatin1().data());
-                }
-                else if (key == QLatin1String("bold")
-                    || key == QLatin1String("italic")
-                    || key == QLatin1String("underline")
-                    || key == QLatin1String("strike-through"))
-                {
+                } else if (key == QLatin1String("bold") || key == QLatin1String("italic") || key == QLatin1String("underline") || key == QLatin1String("strike-through")) {
                     QVERIFY2(textStyle.value(key).isBool(), context.toLatin1().data());
                 }
             }
         }
 
         // editor area colors
-        const QStringList requiredEditorColors = {
-            QLatin1String("background-color"),
-            QLatin1String("bracket-matching"),
-            QLatin1String("code-folding"),
-            QLatin1String("current-line"),
-            QLatin1String("current-line-number"),
-            QLatin1String("icon-border"),
-            QLatin1String("indentation-line"),
-            QLatin1String("line-numbers"),
-            QLatin1String("mark-bookmark"),
-            QLatin1String("mark-breakpoint-active"),
-            QLatin1String("mark-breakpoint-disabled"),
-            QLatin1String("mark-breakpoint-reached"),
-            QLatin1String("mark-error"),
-            QLatin1String("mark-execution"),
-            QLatin1String("mark-warning"),
-            QLatin1String("modified-lines"),
-            QLatin1String("replace-highlight"),
-            QLatin1String("saved-lines"),
-            QLatin1String("search-highlight"),
-            QLatin1String("selection"),
-            QLatin1String("separator"),
-            QLatin1String("spell-checking"),
-            QLatin1String("tab-marker"),
-            QLatin1String("template-background"),
-            QLatin1String("template-focused-placeholder"),
-            QLatin1String("template-placeholder"),
-            QLatin1String("template-read-only-placeholder"),
-            QLatin1String("word-wrap-marker")
-        };
+        const QStringList requiredEditorColors = {QLatin1String("background-color"),
+                                                  QLatin1String("bracket-matching"),
+                                                  QLatin1String("code-folding"),
+                                                  QLatin1String("current-line"),
+                                                  QLatin1String("current-line-number"),
+                                                  QLatin1String("icon-border"),
+                                                  QLatin1String("indentation-line"),
+                                                  QLatin1String("line-numbers"),
+                                                  QLatin1String("mark-bookmark"),
+                                                  QLatin1String("mark-breakpoint-active"),
+                                                  QLatin1String("mark-breakpoint-disabled"),
+                                                  QLatin1String("mark-breakpoint-reached"),
+                                                  QLatin1String("mark-error"),
+                                                  QLatin1String("mark-execution"),
+                                                  QLatin1String("mark-warning"),
+                                                  QLatin1String("modified-lines"),
+                                                  QLatin1String("replace-highlight"),
+                                                  QLatin1String("saved-lines"),
+                                                  QLatin1String("search-highlight"),
+                                                  QLatin1String("selection"),
+                                                  QLatin1String("separator"),
+                                                  QLatin1String("spell-checking"),
+                                                  QLatin1String("tab-marker"),
+                                                  QLatin1String("template-background"),
+                                                  QLatin1String("template-focused-placeholder"),
+                                                  QLatin1String("template-placeholder"),
+                                                  QLatin1String("template-read-only-placeholder"),
+                                                  QLatin1String("word-wrap-marker")};
 
         // verify all editor colors are defined - not more, not less
         QVERIFY(obj.contains(QLatin1String("editor-colors")));
@@ -298,7 +287,7 @@ private Q_SLOTS:
         QCOMPARE(definedEditorColors, requiredEditorColors);
 
         // verify all editor colors are valid
-        for (const auto & key : requiredEditorColors) {
+        for (const auto &key : requiredEditorColors) {
             QVERIFY(QColor::isValidColor(editorColors.value(key).toString()));
         }
     }
@@ -308,4 +297,3 @@ private Q_SLOTS:
 QTEST_GUILESS_MAIN(KSyntaxHighlighting::ThemeTest)
 
 #include "theme_test.moc"
-

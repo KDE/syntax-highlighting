@@ -83,15 +83,19 @@ private:
     QString m_currentLine;
 };
 
-
 class TestHighlighterTest : public QObject
 {
     Q_OBJECT
 public:
-    explicit TestHighlighterTest(QObject *parent = nullptr) : QObject(parent), m_repo(nullptr) {}
+    explicit TestHighlighterTest(QObject *parent = nullptr)
+        : QObject(parent)
+        , m_repo(nullptr)
+    {
+    }
+
 private:
-        Repository *m_repo;
-        QSet<QString> m_coveredDefinitions;
+    Repository *m_repo;
+    QSet<QString> m_coveredDefinitions;
 
 private Q_SLOTS:
     void initTestCase()
@@ -143,10 +147,7 @@ private Q_SLOTS:
             if (syntaxOverride.exists() && syntaxOverride.open(QFile::ReadOnly))
                 syntax = QString::fromUtf8(syntaxOverride.readAll()).trimmed();
 
-            QTest::newRow(fileName.toUtf8().constData()) << inFile
-                << (QStringLiteral(TESTBUILDDIR "/output/") + fileName + QStringLiteral(".ref"))
-                << (QStringLiteral(TESTSRCDIR "/reference/") + fileName + QStringLiteral(".ref"))
-                << syntax;
+            QTest::newRow(fileName.toUtf8().constData()) << inFile << (QStringLiteral(TESTBUILDDIR "/output/") + fileName + QStringLiteral(".ref")) << (QStringLiteral(TESTSRCDIR "/reference/") + fileName + QStringLiteral(".ref")) << syntax;
         }
 
         QVERIFY(QDir().mkpath(QStringLiteral(TESTBUILDDIR "/output/")));
@@ -179,11 +180,8 @@ private Q_SLOTS:
          */
         compareFiles(refFile, outFile);
     }
-
 };
 
 QTEST_GUILESS_MAIN(TestHighlighterTest)
 
 #include "testhighlighter.moc"
-
-

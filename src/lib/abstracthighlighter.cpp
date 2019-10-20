@@ -27,11 +27,11 @@
 #include "definition_p.h"
 #include "foldingregion.h"
 #include "format.h"
+#include "ksyntaxhighlighting_logging.h"
 #include "repository.h"
 #include "rule_p.h"
 #include "state.h"
 #include "state_p.h"
-#include "ksyntaxhighlighting_logging.h"
 #include "theme.h"
 
 using namespace KSyntaxHighlighting;
@@ -60,13 +60,13 @@ void AbstractHighlighterPrivate::ensureDefinitionLoaded()
         defData->load();
 }
 
-AbstractHighlighter::AbstractHighlighter() :
-    d_ptr(new AbstractHighlighterPrivate)
+AbstractHighlighter::AbstractHighlighter()
+    : d_ptr(new AbstractHighlighterPrivate)
 {
 }
 
-AbstractHighlighter::AbstractHighlighter(AbstractHighlighterPrivate *dd) :
-    d_ptr(dd)
+AbstractHighlighter::AbstractHighlighter(AbstractHighlighterPrivate *dd)
+    : d_ptr(dd)
 {
 }
 
@@ -102,7 +102,7 @@ void AbstractHighlighter::setTheme(const Theme &theme)
  * Returns the index of the first non-space character. If the line is empty,
  * or only contains white spaces, text.size() is returned.
  */
-static inline int firstNonSpaceChar(const QString & text)
+static inline int firstNonSpaceChar(const QString &text)
 {
     for (int i = 0; i < text.length(); ++i) {
         if (!text[i].isSpace()) {
@@ -112,7 +112,7 @@ static inline int firstNonSpaceChar(const QString & text)
     return text.size();
 }
 
-State AbstractHighlighter::highlightLine(const QString& text, const State &state)
+State AbstractHighlighter::highlightLine(const QString &text, const State &state)
 {
     Q_D(AbstractHighlighter);
 
@@ -156,12 +156,11 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
                      */
                     break;
                 }
-            /**
-             * line end context switches only when lineEmptyContext is #stay. This avoids
-             * skipping empty lines after a line continuation character (see bug 405903)
-             */
-            } else if (!stateData->topContext()->lineEndContext().isStay() &&
-                       !d->switchContext(stateData, stateData->topContext()->lineEndContext(), QStringList()))
+                /**
+                 * line end context switches only when lineEmptyContext is #stay. This avoids
+                 * skipping empty lines after a line continuation character (see bug 405903)
+                 */
+            } else if (!stateData->topContext()->lineEndContext().isStay() && !d->switchContext(stateData, stateData->topContext()->lineEndContext(), QStringList()))
                 break;
 
             // guard against endless loops
@@ -178,7 +177,7 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
 
     int offset = 0, beginOffset = 0;
     bool lineContinuation = false;
-    QHash<Rule*, int> skipOffsets;
+    QHash<Rule *, int> skipOffsets;
 
     /**
      * current active format
@@ -252,7 +251,6 @@ State AbstractHighlighter::highlightLine(const QString& text, const State &state
             const auto currentSkipOffset = skipOffsets.value(rule.get());
             if (currentSkipOffset < 0 || currentSkipOffset > offset)
                 continue;
-
 
             const auto newResult = rule->doMatch(text, offset, stateData->topCaptures());
             newOffset = newResult.offset();

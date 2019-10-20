@@ -23,10 +23,10 @@
 
 #include "test-config.h"
 
-#include <repository.h>
 #include <definition.h>
-#include <theme.h>
 #include <htmlhighlighter.h>
+#include <repository.h>
+#include <theme.h>
 
 #include <QDir>
 #include <QObject>
@@ -39,7 +39,11 @@ class HTMLHighlighterTest : public QObject
 {
     Q_OBJECT
 public:
-    explicit HTMLHighlighterTest(QObject *parent = nullptr) : QObject(parent), m_repo(nullptr) {}
+    explicit HTMLHighlighterTest(QObject *parent = nullptr)
+        : QObject(parent)
+        , m_repo(nullptr)
+    {
+    }
 
 private:
     Repository *m_repo;
@@ -76,11 +80,8 @@ private Q_SLOTS:
             if (syntaxOverride.exists() && syntaxOverride.open(QFile::ReadOnly))
                 syntax = QString::fromUtf8(syntaxOverride.readAll()).trimmed();
 
-
-            QTest::newRow(fileName.toUtf8().constData()) << inFile
-                << (QStringLiteral(TESTBUILDDIR "/html.output/") + fileName + QStringLiteral(".html"))
-                << (QStringLiteral(TESTSRCDIR "/html/") + fileName + QStringLiteral(".html"))
-                << syntax;
+            QTest::newRow(fileName.toUtf8().constData()) << inFile << (QStringLiteral(TESTBUILDDIR "/html.output/") + fileName + QStringLiteral(".html")) << (QStringLiteral(TESTSRCDIR "/html/") + fileName + QStringLiteral(".html"))
+                                                         << syntax;
         }
 
         QDir().mkpath(QStringLiteral(TESTBUILDDIR "/html.output/"));
@@ -111,10 +112,8 @@ private Q_SLOTS:
          */
         compareFiles(refFile, outFile);
     }
-
 };
 
 QTEST_GUILESS_MAIN(HTMLHighlighterTest)
 
 #include "htmlhighlighter_test.moc"
-

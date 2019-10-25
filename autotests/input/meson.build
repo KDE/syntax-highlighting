@@ -19,3 +19,8 @@ subprojectresult = subproject('mysubprojectdir')
 mysharedlib = shared_library('libraryname', sourcefiles, linkwith: subprojectresult.staticlib)
 
 executable('myprogram', ['test.cpp'], linkwith: mysharedlib)
+
+message(meson.source_root())
+message(unknown.source_root())
+message('str'.join(l))
+

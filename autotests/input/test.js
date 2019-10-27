@@ -21,3 +21,6 @@ var bin = 0b1010;
 
 ლಠ益ಠლ.ñá = 42;
 δ /No-RegExp/
+
+/* Modelines: finish comment in incomplete Modeline:
+ * kate: replace-tabs */ normal text

@@ -7,6 +7,8 @@
    string
 "@
 
+$foo = "Test `u{2013} String`nwith `"escapes`""
+
 #    this file sets some environment variables that are needed
 #    for finding programs and libraries etc.
 #    by Hannah von Reth <vonreth@kde.org>

@@ -184,3 +184,10 @@ end architecture testbench;
 A(A'high)  -- comment
 A(A'high ) -- comment
 
+-- insensitive keywords
+ENTITY ANDGATE IS
+  PORT (
+    I1 : IN std_logic;
+    I2 : IN std_logic;
+    O  : OUT std_logic);
+END ENTITY ANDGATE;

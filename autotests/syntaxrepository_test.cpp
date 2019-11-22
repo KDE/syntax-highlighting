@@ -244,7 +244,7 @@ private Q_SLOTS:
                                                      QStringLiteral("CSS/PHP"),
                                                      QStringLiteral("JavaScript/PHP"),
                                                      QStringLiteral("Doxygen"),
-                                                     QStringLiteral("JavaScript React/PHP"),
+                                                     QStringLiteral("JavaScript React (JSX)/PHP"),
                                                      QStringLiteral("TypeScript/PHP"),
                                                      QStringLiteral("Mustache/Handlebars (HTML)/PHP"),
                                                      QStringLiteral("Modelines"),
@@ -252,7 +252,7 @@ private Q_SLOTS:
                                                      QStringLiteral("CSS"),
                                                      QStringLiteral("SQL (MySQL)"),
                                                      QStringLiteral("JavaScript"),
-                                                     QStringLiteral("JavaScript React"),
+                                                     QStringLiteral("JavaScript React (JSX)"),
                                                      QStringLiteral("TypeScript"),
                                                      QStringLiteral("Mustache/Handlebars (HTML)")};
         QStringList definitionNames;

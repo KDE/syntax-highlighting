@@ -19,5 +19,6 @@ Rectangle {
         width: 0x10
         height: 007
         objectName: 'single quote'
+        objectName2: a ? b : c;
     }
 }

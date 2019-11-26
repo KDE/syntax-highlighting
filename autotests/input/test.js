@@ -19,8 +19,25 @@ aaa";
 var octal = 0o124;
 var bin = 0b1010;
 
-ლಠ益ಠლ.ñá = 42;
-δ /No-RegExp/
+日本語().ლಠ益ಠლ.ñá = 42;
+δ /No-Regex/
 
-/* Modelines: finish comment in incomplete Modeline:
- * kate: replace-tabs */ normal text
+// Only highlight valid regular expressions, of a single line, after strings
+// See: https://github.com/microsoft/TypeScript-TmLanguage/issues/786
+"text" /No-Regex
+"text" /Regex[:)]*/;
+const a = "6" / 2; /*comment*/ const b = 5;
+console.log("4" / "2"); // 2
+// Single quote
+const a = '6' / 2; /*comment*/ const b = 5;
+console.log('4' / '2'); // 2
+// Template
+const a = `6` / 2; /*comment*/ const b = 5;
+console.log(`4` / `2`); // 2
+
+// Built-in
+const os = require('os');
+JSON.stringify("hello");
+console.error("hello");
+Math.LOG10E;
+Number.MAX_SAFE_INTEGER;

@@ -20,9 +20,13 @@ function greeter(person : Person) {
 
 let user = new Student("Jane", "M.", "User");
 
-document.body.innerHTML = greeter(user);
+// Built-in
+document.body.innerHTML = greeter(user); to
 JSON.stringify()
 console.log("Hello world");
+const os = require('os');
+Math.LOG10E;
+Number.MAX_SAFE_INTEGER;
 
 import http = require("http");
 import path = require("path");
@@ -205,3 +209,16 @@ namespace Debug {
     export declare function assert(value: unknown, message?: string): asserts value;
     export declare function assertDefined<T>(value: T): asserts value is NonNullable<T>;
 }
+
+// Only highlight valid regular expressions, of a single line, after strings
+// See: https://github.com/microsoft/TypeScript-TmLanguage/issues/786
+"text" /No-Regex
+"text" /Regex[:)]*/;
+const a = "6" / 2; /*comment*/ const b = 5;
+console.log("4" / "2"); // 2
+// Single quote
+const a = '6' / 2; /*comment*/ const b = 5;
+console.log('4' / '2'); // 2
+// Template
+const a = `6` / 2; /*comment*/ const b = 5;
+console.log(`4` / `2`); // 2

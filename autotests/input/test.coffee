@@ -69,3 +69,7 @@ markdown = `function () {
 	alert(`Hello ${name}!`);
 ```
 ` String.raw\`String ${x} \` `
+
+` // Regular Expression after template
+  const a = \`6\` / 2; /*comment*/
+  \`template\` /regex/ `

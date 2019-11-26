@@ -38,7 +38,7 @@ return /* comment
   <tag/>
 { <hello>Hello</hello> }
 ?<Tag />;
-[ <tag />  ( <tag />
+[ <tag />  ( <tag /> ]
 ,<Tag/>    =<Tag/>
 &&<tag/>   ||<tag/>
 return <tag/> ;
@@ -50,11 +50,6 @@ anyWord/*comment*/ <noTag/>
 .<noTag>
 &<notag> | <noTag/>
 % /* comment*/ <noTag/>
-
-<C<number>/>
-<C<number>> </C>
-<C
-<error />
 
 // Non-ASCII tag name & attribute
 <日本語></日本語>;
@@ -94,3 +89,10 @@ class Handler {
     info: <T>(arg: T): T <noTag />;
     <tag> </tag>
 }
+
+// Check character after tag name, do not highlight invalid tags
+<noTag ?
+<noTag  ,
+<noTag /* comment */ ?
+<noTag#
+<noTag/*comment*/#

@@ -144,3 +144,10 @@ const goodHighlighting = <T extends I>(
   return a
 }
 <tag> text <T extends I/> </tag> // Here "<T extends I/>" is a tag
+
+// Check character after tag name, do not highlight invalid tags
+<noTag  ?
+<noTag  ,
+<noTag /* comment */ ?
+<noTag#
+<noTag/*comment*/#

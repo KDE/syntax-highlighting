@@ -2,16 +2,18 @@
 <!DOCTYPE language SYSTEM "language.dtd"
 [
 	<!ENTITY simpleName "(?:[a-z][a-z\d]*:)?[a-z][a-z\d]*">
-	<!ENTITY baseName   "(?:[a-zA-Z_\$]|[^[:ascii:]])(?:(?:[\w\$\-\.]|[^[:ascii:]])*(?:[\w\$]|[^[:ascii:]]))?">
+	<!ENTITY baseName   "[a-zA-Z_\$[:^ascii:]](?:[\w\$\-\.[:^ascii:]]*[\w\$[:^ascii:]])?">
 	<!ENTITY name       "(?:&baseName;:)?&baseName;">
-	<!ENTITY baseNameWithBound "(?:\b[a-zA-Z_\$]|[^[:ascii:]])(?:(?:[\w\$\-\.]|[^[:ascii:]])*(?:[\w\$]|[^[:ascii:]]))?">
+	<!ENTITY baseNameWithBound "(?:\b[a-zA-Z_\$]|[^[:ascii:]])(?:[\w\$\-\.[:^ascii:]]*[\w\$[:^ascii:]])?">
 	<!ENTITY nameWithBound     "(?:&baseNameWithBound;:)?&baseNameWithBound;"> <!-- Use this instead of "\b&name;" -->
 
 	<!ENTITY simpleTag  "&lt;\s*&simpleName;"> <!-- Element tag -->
 	<!ENTITY tag        "&lt;\s*(?:&name;|&gt;)">
 	<!ENTITY entref     "&amp;(?:[a-zA-Z\d]+|#\d+|#x[a-fA-F\d]+);">
+	<!ENTITY mlComment  "/\*(?:[^\*]|\*+[^/\*])*\*+/">
+	<!ENTITY endTagName "[\s&lt;&gt;]|/[&gt;/\*]|$"> <!-- Delimiter of end of Tag name -->
 
-	<!ENTITY identifier "(?:[a-zA-Z_$]|[^[:ascii:]])(?:[\w$]|[^[:ascii:]])*">
+	<!ENTITY identifier "[a-zA-Z_$[:^ascii:]][\w$[:^ascii:]]*">
 	<!ENTITY objectOp   "[\?!]?">
 	<!ENTITY endLine    "\s*(?:$|//|(?:/\*.*\*/\s*)+(?:$|//))">
 ]>
@@ -30,7 +32,7 @@
     ====================================================================
 
     This file is an extension of the TypeScript highlighter
-    (typescript.xml).
+    (typescript.xml, Version 7 and higher).
     IMPORTANT: Keep sync with "javascript-react.xml".
 
     Based on the XML syntax highlighting (v7), by Wilbert Berendsen
@@ -38,6 +40,7 @@
     available at: https://github.com/Microsoft/TypeScript-TmLanguage
 
     Change log:
+     * v8 [2019-11-21]: Tag detection is more stricter.
      * v7 [2019-11-19]: Rename definition "TypeScript React" to "TypeScript React (TSX)".
      * v6 [2019-10-01]: Highlight "<T extends" as a type assertion, not as a Tag.
      * v5 [2019-08-30]: Adapt to version 5 of "typescript.xml".
@@ -53,7 +56,7 @@
      * v1 [2018-11-18]: Initial version
 -->
 
-<language name="TypeScript React (TSX)" version="7" kateversion="5.53" section="Scripts" indenter="cstyle"
+<language name="TypeScript React (TSX)" version="8" kateversion="5.53" section="Scripts" indenter="cstyle"
           priority="9" extensions="*.tsx" mimetype="text/tsx;text/x-tsx;application/tsx;application/x-tsx;"
           author="Nibaldo González (nibgonz@gmail.com)" license="MIT">
 
@@ -78,22 +81,22 @@
 		     NOTE: After the keyword "type" tags will not be highlighted ("TypeDeclaration" context). -->
 		<context name="OverwriteTypeScript" attribute="Normal Text" lineEndContext="#stay">
 			<DetectChar context="Template" attribute="Template" char="`" />
-			<DetectChar context="Object" attribute="Symbol" char="{" beginRegion="Brace" />
+			<DetectChar context="Object" attribute="Normal Text" char="{" beginRegion="Brace" />
+			<DetectChar context="#stay" attribute="Normal Text" char="[" beginRegion="List" />
+			<DetectChar context="NoRegExp" attribute="Normal Text" char="]" endRegion="List" />
 			<DetectChar context="Types" attribute="Symbol" char=":" />
 			<RegExpr context="TypesAngleBracket" attribute="Symbol" String="&lt;(?=(?:&identifier;|[\[\{\(&lt;]).*&gt;)" />
-			<DetectChar context="#stay" attribute="Symbol" char="[" beginRegion="List" />
-			<DetectChar context="NoRegExp" attribute="Symbol" char="]" endRegion="List" />
 			<RegExpr context="ConditionalExpression" attribute="Symbol" String="\?(?=.*&identifier;\s*\:)" />
 		</context>
 
 		<context name="Object" attribute="Normal Text" lineEndContext="#stay">
-			<DetectChar context="#pop" attribute="Symbol" char="}" endRegion="Brace" />
-			<RegExpr context="TypesNewLine" attribute="Symbol" String=":(?=&endLine;)" />
+			<DetectChar context="#pop" attribute="Normal Text" char="}" endRegion="Brace" />
+			<RegExpr context="TypesNewLine" attribute="Symbol" String=":(?=&endLine;)" minimal="true" />
 			<IncludeRules context="React" />
 			<IncludeRules context="Object##TypeScript" />
 		</context>
 		<context name="Template" attribute="Template" lineEndContext="#stay">
-			<DetectChar context="#pop" attribute="Template" char="`" />
+			<DetectChar context="RegExpAfterString##JavaScript" attribute="Template" char="`" />
 			<!-- Find tags and send to the "Substitution" context -->
 			<Detect2Chars context="Substitution-BeforeTag" attribute="Substitution" char="$" char1="{" />
 			<IncludeRules context="Template##TypeScript" />
@@ -137,12 +140,12 @@
 		<!-- Overwrite TypesFindBrackets##TypeScript (place before "React").
 		     Since there may be tags after "[", "{" or "(". -->
 		<context name="TypesFindBrackets" attribute="Normal Text" lineEndContext="#stay">
-			<DetectChar context="TypesSquareBracket-BeforeTag" attribute="Symbol" char="[" beginRegion="List" />
-			<DetectChar context="TypesCurlyBracket-BeforeTag" attribute="Symbol" char="{" beginRegion="Brace" />
-			<DetectChar context="TypesRoundBracket-BeforeTag" char="(" />
+			<DetectChar context="TypesSquareBracket-BeforeTag" attribute="Normal Text" char="[" beginRegion="List" />
+			<DetectChar context="TypesCurlyBracket-BeforeTag" attribute="Normal Text" char="{" beginRegion="Brace" />
+			<DetectChar context="TypesRoundBracket-BeforeTag" attribute="Normal Text" char="(" />
 		</context>
 		<context name="TypesSquareBracket" attribute="Normal Text" lineEndContext="#stay">
-			<DetectChar context="#pop!NoRegExp" attribute="Symbol" char="]" endRegion="List" />
+			<DetectChar context="#pop!NoRegExp" attribute="Normal Text" char="]" endRegion="List" />
 			<!-- React -->
 			<IncludeRules context="TypesFindBrackets" />
 			<IncludeRules context="React" />
@@ -151,7 +154,7 @@
 			<IncludeRules context="Normal##TypeScript" />
 		</context>
 		<context name="TypesCurlyBracket" attribute="Normal Text" lineEndContext="#pop!Object">
-			<DetectChar context="#pop" attribute="Symbol" char="}" endRegion="Brace" />
+			<DetectChar context="#pop" attribute="Normal Text" char="}" endRegion="Brace" />
 			<!-- FixPopLineEndContext##TypeScript -->
 			<RegExpr context="#pop!Object" String="\S" firstNonSpace="true" lookAhead="true" />
 			<!-- React -->
@@ -162,7 +165,7 @@
 			<IncludeRules context="Object##TypeScript" />
 		</context>
 		<context name="TypesRoundBracket" attribute="Normal Text" lineEndContext="#pop">
-			<DetectChar context="#pop!NoRegExp" char=")" />
+			<DetectChar context="#pop!NoRegExp" attribute="Normal Text" char=")" />
 			<IncludeRules context="FixPopLineEndContext##TypeScript" />
 			<!-- React -->
 			<IncludeRules context="TypesFindBrackets" />
@@ -213,22 +216,22 @@
 		</context>
 		<!-- Do not highlight tags in interface declarations -->
 		<context name="InterfaceDeclaration" attribute="Normal Text" lineEndContext="#stay">
-			<DetectChar context="#pop!InterfaceContentDeclaration" attribute="Symbol" char="{" beginRegion="Brace" />
+			<DetectChar context="#pop!InterfaceContentDeclaration" attribute="Normal Text" char="{" beginRegion="Brace" />
 			<DetectChar context="#pop" char="}" lookAhead="true" />
 			<IncludeRules context="Normal##TypeScript" />
 		</context>
 		<context name="InterfaceContentDeclaration" attribute="Normal Text" lineEndContext="#stay">
-			<DetectChar context="#pop" attribute="Symbol" char="}" endRegion="Brace" />
+			<DetectChar context="#pop" attribute="Normal Text" char="}" endRegion="Brace" />
 			<IncludeRules context="Object##TypeScript" />
 		</context>
 		<!-- Do not highlight tags in class declarations -->
 		<context name="ClassDeclaration" attribute="Normal Text" lineEndContext="#stay">
-			<DetectChar context="#pop!ClassDeclarationContent" attribute="Symbol" char="{" beginRegion="Brace" />
+			<DetectChar context="#pop!ClassDeclarationContent" attribute="Normal Text" char="{" beginRegion="Brace" />
 			<DetectChar context="#pop" char="}" lookAhead="true" />
 			<IncludeRules context="Normal##TypeScript" />
 		</context>
 		<context name="ClassDeclarationContent" attribute="Normal Text" lineEndContext="#stay">
-			<DetectChar context="#pop" attribute="Symbol" char="}" endRegion="Brace" />
+			<DetectChar context="#pop" attribute="Normal Text" char="}" endRegion="Brace" />
 			<RegExpr context="VarDeclTypesNewLine" attribute="Symbol" String=":(?=&endLine;)" minimal="true" />
 			<DetectChar context="VarDeclTypes" attribute="Symbol" char=":" />
 			<IncludeRules context="Object" />
@@ -247,10 +250,11 @@
 
 			<!-- Characters before a valid tag -->
 			<RegExpr context="ValidTag" attribute="Special Operators" String="\=&gt;\s*(?=&tag;|/\*)" />
-			<RegExpr context="ValidTag" attribute="Symbol" String="(?:[\[,\=&gt;\*\?]|&amp;&amp;|\|\|)\s*(?=&tag;|/\*)" />
+			<RegExpr context="ValidTag" attribute="Symbol" String="(?:[,\=&gt;\*\?]|&amp;&amp;|\|\|)\s*(?=&tag;|/\*)" />
+			<RegExpr context="ValidTag" attribute="Normal Text" String="\[\s*(?=&tag;|/\*)" beginRegion="List" />
 			<RegExpr context="ValidTag" attribute="Normal Text" String="\(\s*(?=&tag;|/\*)" />
 			<!-- The "Object-BeforeTag" context looks for a valid Tag and then sends the "Object" context -->
-			<RegExpr context="Object-BeforeTag" attribute="Symbol" String="\{\s*(?=&tag;|/\*)" beginRegion="Brace" />
+			<RegExpr context="Object-BeforeTag" attribute="Normal Text" String="\{\s*(?=&tag;|/\*)" beginRegion="Brace" />
 			<RegExpr context="Types-BeforeTag" attribute="Symbol" String=":\s*(?=&tag;|/\*)" />
 
 			<RegExpr context="ValidTag" attribute="Symbol" String="&lt;\s*&gt;\s*(?=&tag;|/\*)" />
@@ -300,36 +304,63 @@
 		     NOTE: The highlighting of Tags after a multiline comment does not work with: lineEndContext="#pop" -->
 		<context name="ValidTag" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop">
 			<RegExpr context="#stay" attribute="Normal Text" String="\s+(?=&lt;|/\*)" />
-
-			<!-- Because TSX cannot have "cast" expression, we can say "<T extends" starts the type parameter of arrow
-			     See: https://github.com/microsoft/TypeScript-TmLanguage/commit/11b1a4f8dc3a3eaa4df71e8cc1ad6f01a688961d#diff-d5222b162266b45fd998419db416fddd -->
-			<RegExpr context="#pop!TypesAngleBracket" attribute="Symbol" String="&lt;(?=\s*&identifier;\s+extends\s*[^\=&gt;])" />
-
 			<IncludeRules context="FindTags" />
 			<IncludeRules context="AllComments" />
 		</context>
 
-		<!-- Start tag -->
+		<!-- Start tag.
+		     There are two contexts to find Tags:
+		     * FindTags: For Tags within TypeScript code; invalid name tags aren't highlighted.
+		     * FindTagsInTagContent: For Tag within another tag; highlight any Tag.
+		                             Tags with invalid names are highlighted as "Error".
+		-->
 		<context name="FindTags" attribute="Normal Text" lineEndContext="#stay">
+			<!-- Because TSX cannot have "cast" expression, we can say "<T extends" starts the type parameter of arrow
+			     See: https://github.com/microsoft/TypeScript-TmLanguage/commit/11b1a4f8dc3a3eaa4df71e8cc1ad6f01a688961d#diff-d5222b162266b45fd998419db416fddd -->
+			<RegExpr context="#pop!TypesAngleBracket" attribute="Symbol" String="&lt;(?=\s*&identifier;\s+extends\s*[^\=&gt;])" />
+
+			<!-- Invalid Tag, do not highlight tags in these cases:
+				  * "?" or "," after tag name:
+				      <Tag ? ...
+				      <Tag< ? ...
+				      <Tag /* comment */ ? ...
+				  * Invalid delimiter after comment (without spaces):
+				      <Tag/* comment */#
+			-->
+			<RegExpr context="#pop!TypesAngleBracket" attribute="Symbol" String="&lt;(?=\s*&name;(?:(&lt;(?:\s*&mlComment;)*)?(?:\s*&mlComment;)*\s*[\?,]|(?:&mlComment;)+(?!&endTagName;|&baseName;|\{)))" />
+			<!-- Empty tag (element) -->
+			<RegExpr context="ElementTagContent" attribute="Element Tag" String="&lt;\s*&gt;" beginRegion="Element" />
+			<!-- Detect Tags -->
+			<RegExpr context="ElementTagFindType" attribute="Element Tag" String="&simpleTag;(?=&endTagName;)" beginRegion="Element" />
+			<RegExpr context="ComponentTagFindType" attribute="Component Tag" String="&tag;(?=&endTagName;)" beginRegion="ComponentElement" />
+			<!-- If a valid Tag was not detected -->
+			<DetectChar context="#pop!TypesAngleBracket" attribute="Symbol" char="&lt;" />
+		</context>
+
+		<context name="FindTagsInTagContent" attribute="Normal Text" lineEndContext="#stay">
 			<!-- Empty tag (element) -->
 			<RegExpr context="ElementTagContent" attribute="Element Tag" String="&lt;\s*&gt;" beginRegion="Element" />
 			<!-- Detect non-ASCII character in the tag name (component). This prevents highlighting as Element,
 			     tag names that don't start with a non-ASCII character. -->
 			<RegExpr context="ComponentTagNonASCII" attribute="Component Tag" String="&lt;\s*(?=(?:[a-z][a-z\d]*:)?(?:[a-z][a-z\d]*)?[^[:ascii:]])" beginRegion="ComponentElement" /> <!-- &simpleName; -->
 			<!-- Element & component tags -->
-			<RegExpr context="ElementTag" attribute="Element Tag" String="&simpleTag;(?=[^\w\$\-\.:]|$|[\-\.]+(?:[^\w\$\-\.]|$)|:(?:[^a-zA-Z_\$]|$))" beginRegion="Element" />
+			<RegExpr context="ElementTagFindType" attribute="Element Tag" String="&simpleTag;(?=[^\w\$\-\.:]|$|[\-\.]+(?:[^\w\$\-\.]|$)|:(?:[^a-zA-Z_\$]|$))" beginRegion="Element" />
 			<RegExpr context="ComponentTagFindType" attribute="Component Tag" String="&tag;" beginRegion="ComponentElement" />
 		</context>
-		<context name="FindEntityRefs" attribute="Normal Text" lineEndContext="#stay">
-			<RegExpr context="#stay" attribute="EntityRef" String="&entref;" />
-		</context>
-
 		<!-- Highlight tag name with non-ASCII characters -->
 		<context name="ComponentTagNonASCII" attribute="Normal Text" lineEndContext="#pop!ComponentTag" fallthrough="true" fallthroughContext="#pop!ComponentTag">
 			<RegExpr context="#pop!ComponentTagFindType" attribute="Component Tag" String="&name;" />
 		</context>
+
+		<context name="FindEntityRefs" attribute="Normal Text" lineEndContext="#stay">
+			<RegExpr context="#stay" attribute="EntityRef" String="&entref;" />
+		</context>
+
 		<!-- Type after the tag name. Ex: <C<number> /> -->
 		<context name="ComponentTagFindType" attribute="Normal Text" lineEndContext="#pop!ComponentTag" fallthrough="true" fallthroughContext="#pop!ComponentTag">
+			<DetectChar context="#pop!TypeInsideTag" attribute="Symbol" char="&lt;" />
+		</context>
+		<context name="ElementTagFindType" attribute="Normal Text" lineEndContext="#pop!ElementTag" fallthrough="true" fallthroughContext="#pop!ElementTag">
 			<DetectChar context="#pop!TypeInsideTag" attribute="Symbol" char="&lt;" />
 		</context>
 
@@ -354,11 +385,11 @@
 			<IncludeRules context="DefaultTypeInsideTag" />
 		</context>
 		<context name="TypeInsideTag-SquareBracket" attribute="Component Tag" lineEndContext="#stay">
-			<DetectChar context="#pop" attribute="Symbol" char="]" />
+			<DetectChar context="#pop!NoRegExp" attribute="Symbol" char="]" />
 			<IncludeRules context="DefaultTypeInsideTag" />
 		</context>
 		<context name="TypeInsideTag-RoundBracket" attribute="Component Tag" lineEndContext="#stay">
-			<DetectChar context="#pop" attribute="Symbol" char=")" />
+			<DetectChar context="#pop!NoRegExp" attribute="Symbol" char=")" />
 			<IncludeRules context="DefaultTypeInsideTag" />
 		</context>
 
@@ -394,7 +425,7 @@
 			<IncludeRules context="DefaultTagContent" />
 		</context>
 		<context name="DefaultTagContent" attribute="Tag Content Text" lineEndContext="#stay">
-			<IncludeRules context="FindTags" />
+			<IncludeRules context="FindTagsInTagContent" />
 			<IncludeRules context="FindEntityRefs" />
 			<IncludeRules context="FindEvaluatedCode" />
 			<DetectChar context="#stay" attribute="Error" char="&lt;" />

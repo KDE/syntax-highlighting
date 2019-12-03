@@ -4,6 +4,9 @@
         <!ENTITY inlinestart "(^|[-\s&apos;&quot;\(\[{&lt;/:‘“’«¡¿‐‑‒–— ])">
         <!ENTITY inlineend "(?=[-\s’”»‐‑‒–— &apos;&quot;\)\]}&gt;/:\.,;!\?\\]|$)">
         <!ENTITY SimpleReferenceNameChars "\w_\.:\+\-">
+
+        <!-- Keep in sync with Markdown -->
+        <!ENTITY startlink "(?:https?|ftp)\://">
 ]>
 <!--
   This file is part of KDE's kate project.
@@ -30,6 +33,10 @@
         <RegExpr attribute="SubstitutionDefinition" context="#stay" String="^\s*\.\. \|[&SimpleReferenceNameChars; ]+\|\s+[&SimpleReferenceNameChars;]+::\s" minimal="true" column="0"/>
         <RegExpr attribute="Field" String=":(?=([^:]*\\:)*[^:]*:(\s|$))" context="Field" firstNonSpace="true"/>
         <RegExpr attribute="Comment" context="Comment" String="^(\s*)\.\.(\s|$)(?!([\w\-_\.]+)(:[\w\-_\.]+)*::(\s|$))" column="0"/>
+
+        <!-- Keep in sync with Markdown’s implicitlink entity -->
+        <RegExpr attribute="StandaloneHyperlink" context="#stay" String="\b&startlink;[^&quot;&gt;\s`\)]*[^\s!&quot;&apos;`\(\)\*,\.:;&lt;&gt;\?~\]\}\\](?=[[:punct:]]*(?:[\s\)]|$))" />
+
       </context>
 
       <context name="InlineMarkup" attribute="Normal" lineEndContext="#stay">
@@ -97,6 +104,7 @@
       <itemData name="DefaultRole" defStyleNum="dsDecVal" />
       <itemData name="Code" defStyleNum="dsDataType" />
       <itemData name="Comment" defStyleNum="dsComment" />
+      <itemData name="StandaloneHyperlink" defStyleNum="dsOthers" />
     </itemDatas>
 
   </highlighting>

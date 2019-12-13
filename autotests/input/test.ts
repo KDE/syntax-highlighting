@@ -133,6 +133,7 @@ let f: boolean = true;
 let g: number = 0b111001; // Binary
 let h: number = 0o436; // Octal
 let i: number = 0xadf0d; // Hexa-Decimal
+let j: bigint = 123n;
 
 const query = query<[number], number>(`
         SELECT *

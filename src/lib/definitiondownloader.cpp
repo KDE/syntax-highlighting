@@ -57,8 +57,13 @@ public:
 
 void DefinitionDownloaderPrivate::definitionListDownloadFinished(QNetworkReply *reply)
 {
-    if (reply->error() != QNetworkReply::NoError) {
-        qCWarning(Log) << reply->error();
+#if (QT_VERSION < QT_VERSION_CHECK(5, 15, 0))
+    const auto networkError = reply->error();
+#else
+    const auto networkError = reply->networkError();
+#endif
+    if (networkError != QNetworkReply::NoError) {
+        qCWarning(Log) << networkError;
         emit q->done(); // TODO return error
         return;
     }
@@ -118,8 +123,14 @@ void DefinitionDownloaderPrivate::downloadDefinition(const QUrl &downloadUrl)
 void DefinitionDownloaderPrivate::downloadDefinitionFinished(QNetworkReply *reply)
 {
     --pendingDownloads;
-    if (reply->error() != QNetworkReply::NoError) {
-        qCWarning(Log) << "Failed to download definition file" << reply->url() << reply->error();
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 15, 0))
+    const auto networkError = reply->error();
+#else
+    const auto networkError = reply->networkError();
+#endif
+    if (networkError != QNetworkReply::NoError) {
+        qCWarning(Log) << "Failed to download definition file" << reply->url() << networkError;
         checkDone();
         return;
     }

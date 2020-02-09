@@ -10,7 +10,7 @@
 <!-- v4 by Alex Richardson <arichardson.kde@gmail.com>
      added bmake support -->
 <language name="Makefile" section="Other"
-          version="7" kateversion="3.4"
+          version="8" kateversion="3.4"
           extensions="GNUmakefile;Makefile;makefile;GNUmakefile.*;Makefile.*;makefile.*;*.mk"
           mimetype="text/x-makefile" priority="11"
           author="Per Wigren (wigren@home.se)" license="">
@@ -341,7 +341,8 @@
         <DetectChar attribute="Operator" char=")" context="#pop#pop#pop"/>
         <DetectChar attribute="Operator" context="dollar" char="$"/>
         <DetectSpaces attribute="Error" context="#stay"/>
-        <AnyChar attribute="Error" context="#stay" String="=#:"/>
+        <DetectChar attribute="RealOperator" context="SubstitutionRefs" char=":"/>
+        <AnyChar attribute="Error" context="#stay" String="=#"/>
       </context>
 
       <context name="callVar{" attribute="Variable" lineEndContext="#stay">
@@ -454,6 +455,16 @@
         <DetectChar attribute="Operator" context="dollar" char="$"/>
         <DetectChar attribute="Keyword" context="#stay" char=","/>
         <DetectChar attribute="String" context="string'" char="'"/>
+      </context>
+
+      <!-- $(var:pattern=replacement) -->
+      <context name="SubstitutionRefs" attribute="VarModifier" lineEndContext="#stay">
+        <DetectChar attribute="RealOperator" context="#pop!SubstitutionRefsReplacement" char="="/>
+        <IncludeRules context="SubstitutionRefsReplacement"/>
+      </context>
+      <context name="SubstitutionRefsReplacement" attribute="VarModifier" lineEndContext="#stay">
+        <DetectChar attribute="Operator" char=")" context="#pop#pop#pop#pop"/>
+        <DetectChar attribute="Operator" context="dollar" char="$"/>
       </context>
 
       <context attribute="Comment" lineEndContext="#pop" name="Comment">

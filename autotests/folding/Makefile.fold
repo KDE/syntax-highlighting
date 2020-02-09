@@ -26,3 +26,11 @@ target2: bla.cpp $@
 	$(CC) bla.o $< \
 	    -o bla.exe
 	@echo "hello"
+
+# String Substitution
+VAR := $(ANOTHER_VAR:%=%+1)
+
+rempl := x
+foo := a b c
+bar := foo
+hello := $($(bar):a=$(rempl))

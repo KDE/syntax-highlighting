@@ -5,8 +5,8 @@
 	<!ENTITY identifier     "[a-zA-Z][\w\-]*">
 	<!ENTITY statementchar  "[a-z_\-]">
 
-	<!ENTITY fullIdentifier "[a-zA-Z][\w\-]*(\.?[\w\-])*">
-	<!ENTITY mlsLevel       "&fullIdentifier;(:&fullIdentifier;(\s*,\s*&fullIdentifier;)*)?">
+	<!ENTITY fullIdentifier "[a-zA-Z][\w\-]*(?:\.?[\w\-])*">
+	<!ENTITY mlsLevel       "&fullIdentifier;(?:\:&fullIdentifier;(?:\s*,\s*&fullIdentifier;)*)?">
 ]>
 
 <!--
@@ -54,7 +54,7 @@
 -->
 
 <language name="SELinux CIL Policy"
-          version="4"
+          version="5"
           kateversion="5.0"
           section="Sources"
           extensions="*.cil"
@@ -334,9 +334,9 @@
 			<DetectChar context="#stay" attribute="Special Char" char="*"/>
 
 			<!-- File Contexts: user_u:role_r:type_t:s0:c0 -->
-			<RegExpr context="_file_contexts" attribute="File Contexts" String="\b&fullIdentifier;(:&fullIdentifier;){2}(:&mlsLevel;(\s*\-\s*&mlsLevel;)?)?([^&symbol;:]|\s|$)" lookAhead="true"/>
+			<RegExpr context="_file_contexts" attribute="File Contexts" String="\b&fullIdentifier;(?:\:&fullIdentifier;){2}(?:\:&mlsLevel;(?:\s*\-\s*&mlsLevel;)?)?(?:[^&symbol;:]|\s|$)" lookAhead="true"/>
 			<!-- Global Namespace (this avoids highlighting keywords) -->
-			<RegExpr context="#stay" String="(\b&identifier;)?(\.&identifier;)+(?=\s|[^&symbol;]|$)"/>
+			<RegExpr context="#stay" String="(?:\b&identifier;)?(?:\.&identifier;)+(?=\s|[^&symbol;]|$)"/>
 
 			<!-- Numbers -->
 			<HlCHex context="#stay" attribute="Hexadecimal"/>
@@ -372,7 +372,7 @@
 		</context>
 		<context name="_square_brackets_cil_path" attribute="RegExp Brackets (Paths)"
 		         lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!_square_brackets_cil_path_content">
-		<RegExpr context="#pop!_square_brackets_cil_path_content" attribute="Special Char of Brackets (Paths)" String="\^(?=[&symbol;])"/>
+			<RegExpr context="#pop!_square_brackets_cil_path_content" attribute="Special Char of Brackets (Paths)" String="\^(?=[&symbol;])"/>
 		</context>
 		<context name="_square_brackets_cil_path_content" attribute="RegExp Brackets (Paths)" lineEndContext="#pop">
 			<DetectChar context="#pop" attribute="RegExp Brackets (Paths)" char="]"/>
@@ -426,7 +426,7 @@
 			     (permissionx permissionx_id (ioctl class_id (permission ... | expr ...))) -->
 			<RegExpr context="#pop" attribute="Type Name Statements" String="ioctl(?=\s+[&symbol;]+\s*\()"/>
 			<!-- ioctl can be a kind of permissionx or AV permission -->
-			<RegExpr context="#pop!_av_permissions_statement" attribute="Type Name Statements" String="ioctl(?=(\s+[&symbol;]+)?\s*($|;))"/>
+			<RegExpr context="#pop!_av_permissions_statement" attribute="Type Name Statements" String="ioctl(?=(?:\s+[&symbol;]+)?\s*(?:$|;))"/>
 			<RegExpr context="#pop!_av_permissions_statement" attribute="Type Name Statements" String="ioctl(?=\s+[&symbol;]+\s+\d)"/>
 		</context>
 
@@ -438,7 +438,7 @@
 			<WordDetect context="_portcon_statement" attribute="Statements" String="portcon"/>
 			<!-- Fix permissions list if the keywords "ioctl" or "call" are not statements,
 			     but a permissions (see "av_permissions" keyword list of "selinux.xml"). -->
-			<RegExpr context="_av_permissions_statement" String="\b(call|ioctl)\s*\)" lookAhead="true"/>
+			<RegExpr context="_av_permissions_statement" String="\b(?:call|ioctl)\s*\)" lookAhead="true"/>
 			<WordDetect context="_find_ioctl_kind" String="ioctl" lookAhead="true"/>
 			<WordDetect context="_av_permissions_statement" attribute="Statements" String="call"/>
 
@@ -598,7 +598,7 @@
 			<DetectSpaces context="#pop" attribute="Normal Text" lookAhead="true"/>
 		</context>
 		<context name="_fc_type" attribute="File Contexts (Type Enforcement)" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
-			<RegExpr context="#pop!_fc_mls" attribute="File Contexts (Type Enforcement)" String="&fullIdentifier;(?=:&mlsLevel;)"/> <!-- Find Level/Range -->
+			<RegExpr context="#pop!_fc_mls" attribute="File Contexts (Type Enforcement)" String="&fullIdentifier;(?=\:&mlsLevel;)"/> <!-- Find Level/Range -->
 			<RegExpr context="#pop" attribute="File Contexts (Type Enforcement)" String="&fullIdentifier;"/>
 		</context>
 		<!-- (MLS/MCS) user:role:type:level -->
@@ -613,7 +613,7 @@
 		</context>
 		<context name="_fc_level_range_cat" attribute="File Contexts" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
 			<RegExpr context="#pop!_fc_level_sen" attribute="Normal Text" String="\s*\-\s*(?=&mlsLevel;)"/> <!-- Find Range -->
-			<RegExpr context="#stay" attribute="Normal Text" String="(\.|\s*,\s*)(?=&identifier;)"/>
+			<RegExpr context="#stay" attribute="Normal Text" String="(?:\.|\s*,\s*)(?=&identifier;)"/>
 			<IncludeRules context="_default_fc_level"/>
 		</context>
 		<!-- (MLS/MCS) user:role:type:level-level -->
@@ -623,7 +623,7 @@
 			<IncludeRules context="_default_fc_level"/>
 		</context>
 		<context name="_fc_level_cat" attribute="File Contexts" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
-			<RegExpr context="#stay" attribute="Normal Text" String="(\.|\s*,\s*)(?=&identifier;)"/>
+			<RegExpr context="#stay" attribute="Normal Text" String="(?:\.|\s*,\s*)(?=&identifier;)"/>
 			<IncludeRules context="_default_fc_level"/>
 		</context>
 		<context name="_default_fc_level" attribute="File Contexts" lineEndContext="#pop">

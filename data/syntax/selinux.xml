@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd"
 [
-	<!ENTITY identifier        "[a-zA-Z][\w\-]*(\.?[\w\-])*">
-	<!ENTITY versionIdentifier "\d+(\.[\d_\.]*)?">
+	<!ENTITY identifier        "[a-zA-Z][\w\-]*(?:\.?[\w\-])*">
+	<!ENTITY versionIdentifier "\d+(?:\.[\d_\.]*)?">
 	<!-- Documentation -->
-	<!ENTITY tagName           "([a-zA-Z_]([\w\-\.]*\w)?:)?[a-zA-Z_]([\w\-\.]*\w)?">
+	<!ENTITY tagName           "(?:[a-zA-Z_](?:[\w\-\.]*\w)?\:)?[a-zA-Z_](?:[\w\-\.]*\w)?">
 	<!-- PCRE 2 RegExp -->
 	<!ENTITY specialChars      "*?.+">
-	<!ENTITY capGroup          "\?(&lt;[\=!]|P?&lt;\w+&gt;|&apos;\w+&apos;|[\=!:&gt;\|R&amp;\-#])"> <!-- Capturing & Groups -->
+	<!ENTITY capGroup          "\?(?:&lt;[\=!]|P?&lt;\w+&gt;|&apos;\w+&apos;|[\=!:&gt;\|R&amp;\-#])"> <!-- Capturing & Groups -->
 	<!-- M4 Macros -->
-	<!ENTITY m4Args            "\$([1-9]\d*|0|[\#\*\@]|\{([1-9]\d*|0)\})">
+	<!ENTITY m4Args            "\$(?:[1-9]\d*|0|[\#\*\@]|\{(?:[1-9]\d*|0)\})">
 	<!ENTITY m4Quotes          "`'‘’“”"> <!-- Default Quotes (`') & Other Common Quotes -->
 	<!-- For File Contexts -->
-	<!ENTITY identifierWithArg "([a-zA-Z]|&m4Args;)(\.?([\w\-]|&m4Args;))*">
-	<!ENTITY mlsLevel          "&identifierWithArg;(:&identifierWithArg;(\s*,\s*&identifierWithArg;)*)?">
+	<!ENTITY identifierWithArg "(?:[a-zA-Z]|&m4Args;)(?:\.?(?:[\w\-]|&m4Args;))*">
+	<!ENTITY mlsLevel          "&identifierWithArg;(?:\:&identifierWithArg;(?:\s*,\s*&identifierWithArg;)*)?">
 ]>
 
 <!--
@@ -21,7 +21,7 @@
   ==========================================================================================
    This file is part of the KDE's KSyntaxHighlighting framework.
 
-   Copyright (c) 2018 Nibaldo González S. (nibgonz@gmail.com)
+   Copyright (c) 2018-2019 Nibaldo González S. (nibgonz@gmail.com)
 
    Permission is hereby granted, free of charge, to any person obtaining a copy of this
    software and associated documentation files (the "Software"), to deal in the Software
@@ -55,6 +55,7 @@
     file contexts are highlighted by "selinux-fc.xml".
 
   Change log:
+	* Version 3 [25-Oct-2019]: Use non-capturing groups in RegExpr.
 	* Version 2 [09-Sep-2018]:
 		- Update itemData's style for the new Solarized color schemes.
 	* Version 1 [28-Aug-2018, by Nibaldo González]:
@@ -62,7 +63,7 @@
 -->
 
 <language name="SELinux Policy"
-          version="2"
+          version="3"
           kateversion="5.0"
           section="Sources"
           extensions="*.te;*.if;*.spt;policy.conf;access_vectors;mls;mcs;mls_macros;te_macros;policy_capabilities;seapp_contexts;port_contexts"
@@ -454,7 +455,7 @@
 		<item>load_module</item>
 		<item>load_policy</item>
 		<item>lock</item>
-		<item>mac_admin</item> <!-- Unused by SELinux -->
+		<item>mac_admin</item>
 		<item>mac_override</item> <!-- Unused by SELinux -->
 		<item>manage</item>
 		<item>manage_subnet</item>
@@ -952,7 +953,7 @@
 			<IncludeRules context="_line_continue_escape"/>
 
 			<!-- File Contexts -->
-			<RegExpr context="_file_contexts" attribute="File Contexts" String="\b&identifierWithArg;(:&identifierWithArg;){2}(:&mlsLevel;(\s*\-\s*&mlsLevel;)?)?\b" lookAhead="true"/>
+			<RegExpr context="_file_contexts" attribute="File Contexts" String="\b&identifierWithArg;(?:\:&identifierWithArg;){2}(?:\:&mlsLevel;(?:\s*\-\s*&mlsLevel;)?)?\b" lookAhead="true"/>
 
 			<!-- This avoids highlighting numbers in identifiers -->
 			<RegExpr context="#stay" String="&identifier;"/>
@@ -962,7 +963,7 @@
 			<Float context="#stay" attribute="Number"/>
 			<Int context="#stay" attribute="Number"/>
 
-			<RegExpr context="#stay" attribute="Reserved Keywords" String="(\s|^)\-[bcdpls\-](?=\s|$)"/>
+			<RegExpr context="#stay" attribute="Reserved Keywords" String="(?:\s|^)\-[bcdpls\-](?=\s|$)"/>
 			<DetectChar context="#stay" attribute="Symbol" char="."/>
 		</context>
 
@@ -1008,8 +1009,8 @@
 			<DetectChar context="#pop" attribute="Symbol" char=";" lookAhead="true"/>
 			<RegExpr context="_class_range_transition_statement" String="&identifierWithArg;\s*:\s*&identifierWithArg;\s+[a-zA-Z\$]" lookAhead="true"/>
 
-			<RegExpr context="#pop!_mls_level_range" String="&identifierWithArg;(\s*:\s*&identifierWithArg;(\s*,\s*&identifierWithArg;)*)?\s+\-\s+&identifierWithArg;(\s*:\s*&identifierWithArg;(\s*,\s*&identifierWithArg;)*)?" lookAhead="true"/>
-			<RegExpr context="#pop!_mls_level_range" String="&identifierWithArg;(\s*:\s*&identifierWithArg;(\s*,\s*&identifierWithArg;)*)?(\s*\-\s*&identifierWithArg;(\s*:\s*&identifierWithArg;(\s*,\s*&identifierWithArg;)*)?)?(?=\s*;)" lookAhead="true"/>
+			<RegExpr context="#pop!_mls_level_range" String="&identifierWithArg;(?:\s*\:\s*&identifierWithArg;(?:\s*,\s*&identifierWithArg;)*)?\s+\-\s+&identifierWithArg;(?:\s*\:\s*&identifierWithArg;(?:\s*,\s*&identifierWithArg;)*)?" lookAhead="true"/>
+			<RegExpr context="#pop!_mls_level_range" String="&identifierWithArg;(?:\s*\:\s*&identifierWithArg;(?:\s*,\s*&identifierWithArg;)*)?(?:\s*\-\s*&identifierWithArg;(?:\s*\:\s*&identifierWithArg;(?:\s*,\s*&identifierWithArg;)*)?)?(?=\s*;)" lookAhead="true"/>
 			<IncludeRules context="_normal"/>
 		</context>
 		<context name="_class_range_transition_statement" attribute="Normal Text" lineEndContext="#pop">
@@ -1049,7 +1050,7 @@
 		</context>
 		<context name="_mls_level_range_cat" attribute="MLS/MCS Level/Range" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
 			<RegExpr context="#pop!_mls_level" attribute="Symbol" String="\s*\-\s*(?=&mlsLevel;)"/> <!-- Find Range -->
-			<RegExpr context="#stay" attribute="Symbol" String="(\.|\s*,\s*)(?=&identifierWithArg;)"/>
+			<RegExpr context="#stay" attribute="Symbol" String="(?:\.|\s*,\s*)(?=&identifierWithArg;)"/>
 			<IncludeRules context="_default_mls_level"/>
 		</context>
 		<!-- MLS/MCS Level: Sensitivity:Category -->
@@ -1059,7 +1060,7 @@
 			<IncludeRules context="_default_mls_level"/>
 		</context>
 		<context name="_mls_level_cat" attribute="MLS/MCS Level/Range" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
-			<RegExpr context="#stay" attribute="Symbol" String="(\.|\s*,\s*)(?=&identifierWithArg;)"/>
+			<RegExpr context="#stay" attribute="Symbol" String="(?:\.|\s*,\s*)(?=&identifierWithArg;)"/>
 			<IncludeRules context="_default_mls_level"/>
 		</context>
 		<context name="_default_mls_level" attribute="MLS/MCS Level/Range" lineEndContext="#pop">
@@ -1101,7 +1102,7 @@
 			<keyword context="#pop" attribute="Booleans" String="booleans"/>
 			<keyword context="#pop" attribute="Special Keys" String="self"/>
 			<DetectChar context="#pop" char="&quot;" lookAhead="true"/>
-			<RegExpr context="#pop" attribute="Normal Text" String="&identifier;(?=[,;]?(\s|$))"/>
+			<RegExpr context="#pop" attribute="Normal Text" String="&identifier;(?=[,;]?(?:\s|$))"/>
 			<!-- Find RegExp -->
 			<AnyChar context="#pop!_path" String="[(" lookAhead="true"/>
 			<RegExpr context="#pop!_path" String="[^\=\s&quot;\{\}\[\]\(\);#]+[\{\[\(\*\+\?]" lookAhead="true"/>
@@ -1114,7 +1115,7 @@
 		</context>
 		<context name="_function_gen_context_find_fc" attribute="File Contexts"
 		         lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!_function_gen_context_content">
-			<RegExpr context="_file_contexts" String="&identifierWithArg;(:&identifierWithArg;){2}\b" lookAhead="true"/>
+			<RegExpr context="_file_contexts" String="&identifierWithArg;(?:\:&identifierWithArg;){2}\b" lookAhead="true"/>
 			<DetectSpaces context="#stay"/>
 		</context>
 		<context name="_function_gen_context_content" attribute="File Contexts" lineEndContext="#pop">
@@ -1153,7 +1154,7 @@
 		</context>
 		<context name="_fc_level_range_cat" attribute="File Contexts" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!_after_fc">
 			<RegExpr context="#pop!_fc_level" attribute="Symbol" String="\s*\-\s*(?=&mlsLevel;)"/> <!-- Find Range -->
-			<RegExpr context="#stay" attribute="Symbol" String="(\.|\s*,\s*)(?=&identifierWithArg;)"/>
+			<RegExpr context="#stay" attribute="Symbol" String="(?:\.|\s*,\s*)(?=&identifierWithArg;)"/>
 			<IncludeRules context="_default_fc_level"/>
 		</context>
 		<!-- (MLS/MCS) user:role:type:level-level -->
@@ -1163,7 +1164,7 @@
 			<IncludeRules context="_default_fc_level"/>
 		</context>
 		<context name="_fc_level_cat" attribute="File Contexts" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!_after_fc">
-			<RegExpr context="#stay" attribute="Symbol" String="(\.|\s*,\s*)(?=&identifierWithArg;)"/>
+			<RegExpr context="#stay" attribute="Symbol" String="(?:\.|\s*,\s*)(?=&identifierWithArg;)"/>
 			<IncludeRules context="_default_fc_level"/>
 		</context>
 		<context name="_default_fc_level" attribute="File Contexts" lineEndContext="#pop">
@@ -1212,7 +1213,7 @@
 			<RegExpr context="#stay" attribute="Doc. Element Tag" String="&lt;/\s*&tagName;\s*&gt;" endRegion="DocElement"/>
 		</context>
 		<context name="_find_entityrefs" attribute="Documentation" lineEndContext="#pop">
-			<RegExpr context="#stay" attribute="Doc. EntityRef" String="&amp;(#[0-9]+|#[xX][0-9A-Fa-f]+|[a-zA-Z_]([\w\-]*\w)?);"/>
+			<RegExpr context="#stay" attribute="Doc. EntityRef" String="&amp;(?:#[0-9]+|#[xX][0-9A-Fa-f]+|[a-zA-Z_](?:[\w\-]*\w)?);"/>
 		</context>
 
 		<context name="_element_tag" attribute="Documentation" lineEndContext="#pop">
@@ -1254,16 +1255,16 @@
 			<!-- URLs -->
 			<RegExpr context="#stay" attribute="URL in Comment" String="\bhttps?://[^\s&lt;&gt;&quot;&apos;`]*[^\s&lt;&gt;&quot;&apos;`\}\)\]\.,;\|]"/>
 			<!-- Email (Source: http://emailregex.com) -->
-			<RegExpr context="#stay" attribute="URL in Comment" String="(([^&lt;&gt;\(\)\[\]\\\.,;:\s@&quot;]+(\.[^&lt;&gt;\(\)\[\]\\\.,;:\s@&quot;]+)*)|(&quot;[^&quot;]+&quot;))@((\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}])|(([a-zA-Z\-\d]+\.)+[a-zA-Z]{2,}))\b"/>
+			<RegExpr context="#stay" attribute="URL in Comment" String="(?:(?:[^&lt;&gt;\(\)\[\]\\\.,;:\s@&quot;]+(?:\.[^&lt;&gt;\(\)\[\]\\\.,;:\s@&quot;]+)*)|(?:&quot;[^&quot;]+&quot;))@(?:(?:\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}])|(?:(?:[a-zA-Z\-\d]+\.)+[a-zA-Z]{2,}))\b"/>
 		</context>
 
 		<!-- IP Addresses -->
 		<context name="_ip_addr" attribute="Normal Text" lineEndContext="#stay">
 			<!-- IPv4 -->
-			<RegExpr context="#stay" attribute="IP Address" String="\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b"/>
+			<RegExpr context="#stay" attribute="IP Address" String="\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b"/>
 			<!-- IPv6 (Source: https://community.helpsystems.com/forums/intermapper/miscellaneous-topics/5acc4fcf-fa83-e511-80cf-0050568460e4 ) -->
-			<RegExpr context="#stay" attribute="IP Address" String="((\b([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(\b([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(\b([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(\b([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(\b([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(\b([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(\b([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))"/> <!-- End: (\%\w+\b)? -->
-			<!-- NOTE: IPv6 in the SELinux parser ("selinux/checkpolicy/policy_scan.l"): "([\da-fA-F]{0,4}:){2}[\da-fA-F:\.]*" -->
+			<RegExpr context="#stay" attribute="IP Address" String="(?:(?:\b(?:[0-9A-Fa-f]{1,4}\:){7}(?:[0-9A-Fa-f]{1,4}|\:))|(?:\b(?:[0-9A-Fa-f]{1,4}\:){6}(?:\:[0-9A-Fa-f]{1,4}|(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|\:))|(?:\b(?:[0-9A-Fa-f]{1,4}\:){5}(?:(?:(?:\:[0-9A-Fa-f]{1,4}){1,2})|\:(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|\:))|(?:\b(?:[0-9A-Fa-f]{1,4}\:){4}(?:(?:(?:\:[0-9A-Fa-f]{1,4}){1,3})|(?:(?:\:[0-9A-Fa-f]{1,4})?\:(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|\:))|(?:\b(?:[0-9A-Fa-f]{1,4}\:){3}(?:(?:(?:\:[0-9A-Fa-f]{1,4}){1,4})|(?:(?:\:[0-9A-Fa-f]{1,4}){0,2}\:(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|\:))|(?:\b(?:[0-9A-Fa-f]{1,4}\:){2}(?:(?:(?:\:[0-9A-Fa-f]{1,4}){1,5})|(?:(?:\:[0-9A-Fa-f]{1,4}){0,3}\:(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|\:))|(?:\b(?:[0-9A-Fa-f]{1,4}\:){1}(?:(?:(?:\:[0-9A-Fa-f]{1,4}){1,6})|(?:(?:\:[0-9A-Fa-f]{1,4}){0,4}\:(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|\:))|(?:\:(?:(?:(?:\:[0-9A-Fa-f]{1,4}){1,7})|(?:(?:\:[0-9A-Fa-f]{1,4}){0,5}\:(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|\:)))"/> <!-- End: (\%\w+\b)? -->
+			<!-- NOTE: IPv6 in the SELinux parser ("selinux/checkpolicy/policy_scan.l"): "(?:[\da-fA-F]{0,4}\:){2}[\da-fA-F:\.]*" -->
 		</context>
 
 		<!-- AV Permissions Keywords -->
@@ -1277,7 +1278,7 @@
 			<keyword context="#stay" attribute="Policy Capability" String="policy_capabilities"/>
 		</context>
 
-		<!-- Filsystem Keywords -->
+		<!-- Filesystem Keywords -->
 		<context name="_filesystem" attribute="Normal Text" lineEndContext="#stay">
 			<keyword context="#stay" attribute="Filesystem" String="filesystem"/>
 		</context>
@@ -1340,7 +1341,7 @@
 			<DetectChar context="#pop" attribute="Normal Text" char=")" endRegion="ParenthesesBlock"/>
 			<DetectChar context="#stay" attribute="Normal Text" char=","/>
 			<!-- Default Quote: `text' -->
-			<RegExpr context="_simple_string_regexp" attribute="Text Quoted" String="`(?=(&m4Args;|[\w\-\s])*')"/>
+			<RegExpr context="_simple_string_regexp" attribute="Text Quoted" String="`(?=(?:&m4Args;|[\w\-\s])*')"/>
 			<IncludeRules context="_m4_quotes"/>
 
 			<IncludeRules context="_m4_special_arguments"/>
@@ -1357,7 +1358,7 @@
 			<DetectChar context="_find_m4_string_simple" char="`" lookAhead="true"/>
 		</context>
 		<context name="_find_m4_string_simple" attribute="Text Quoted" lineEndContext="#pop">
-			<RegExpr context="#pop!_block_quoted_simple" attribute="Text Quoted" String="`(?=(&m4Args;|[\w\-\.\s]|\(\))*&apos;)"/>
+			<RegExpr context="#pop!_block_quoted_simple" attribute="Text Quoted" String="`(?=(?:&m4Args;|[\w\-\.\s]|\(\))*&apos;)"/>
 			<DetectChar context="#pop" attribute="Default M4 Quote" char="`"/> <!-- &m4Quotes; -->
 		</context>
 		<context name="_block_quoted_simple" attribute="Text Quoted" lineEndContext="#pop">
@@ -1411,21 +1412,21 @@
 		<!-- Escapes -->
 		<context name="_escape" attribute="Normal Text" lineEndContext="#stay">
 			<!-- Escapes Not Supported by SELinux -->
-			<RegExpr context="#stay" attribute="Error" String="\\([LlUu]|N\{\w+\})"/>
+			<RegExpr context="#stay" attribute="Error" String="\\(?:[LlUu]|N\{\w+\})"/>
 			<!-- Hexadecimal -->
-			<RegExpr context="#stay" attribute="Escape Char" String="\\x(\{[\da-fA-F]+\}|[\da-fA-F]{2})"/>
+			<RegExpr context="#stay" attribute="Escape Char" String="\\x(?:\{[\da-fA-F]+\}|[\da-fA-F]{2})"/>
 			<!-- Octal. NOTE: only ASCII chars. for \ddd -->
-			<RegExpr context="#stay" attribute="Escape Char" String="\\(o\{[0-7]+\}|[0-3][0-7]{0,2}|[4-7][0-7]?)"/>
+			<RegExpr context="#stay" attribute="Escape Char" String="\\(?:o\{[0-7]+\}|[0-3][0-7]{0,2}|[4-7][0-7]?)"/>
 			<!-- References -->
-			<RegExpr context="#stay" attribute="Escape Char" String="\\[kg](&lt;\w+&gt;|&apos;\w+&apos;|\{\w+\})"/>
-			<RegExpr context="#stay" attribute="Escape Char" String="\\g(&lt;[\+\-]?\d+&gt;|&apos;[\+\-]?\d+&apos;|\{[\+\-]?\d+\}|[\+\-]?\d)"/>
+			<RegExpr context="#stay" attribute="Escape Char" String="\\[kg](?:&lt;\w+&gt;|&apos;\w+&apos;|\{\w+\})"/>
+			<RegExpr context="#stay" attribute="Escape Char" String="\\g(?:&lt;[\+\-]?\d+&gt;|&apos;[\+\-]?\d+&apos;|\{[\+\-]?\d+\}|[\+\-]?\d)"/>
 			<!-- Category Properties -->
-			<RegExpr context="#stay" attribute="Escape Char" String="\\[pP](C[cfnos]?|L[lmotu&amp;]?|M[cen]?|N[dlo]?|P[cdefios]?|S[ckmo]?|Z[lps]?)"/>
-			<RegExpr context="#stay" attribute="Escape Char" String="\\[pP]\{(Xan|Xps|Xsp|Xuc|Xwd|C[cfnos]?|L[lmotu&amp;]?|M[cen]?|N[dlo]?|P[cdefios]?|S[ckmo]?|Z[lps]?)\}"/>
+			<RegExpr context="#stay" attribute="Escape Char" String="\\[pP](?:C[cfnos]?|L[lmotu&amp;]?|M[cen]?|N[dlo]?|P[cdefios]?|S[ckmo]?|Z[lps]?)"/>
+			<RegExpr context="#stay" attribute="Escape Char" String="\\[pP]\{(?:Xan|Xps|Xsp|Xuc|Xwd|C[cfnos]?|L[lmotu&amp;]?|M[cen]?|N[dlo]?|P[cdefios]?|S[ckmo]?|Z[lps]?)\}"/>
 			<!-- Script Names -->
-			<RegExpr context="#stay" attribute="Escape Char" String="\\[pP]\{(Ahom|Anatolian_Hieroglyphs|Arabic|Armenian|Avestan|Balinese|Bamum|Bassa_Vah|Batak|Bengali|Bopomofo|Brahmi|Braille|Buginese|Buhid|Canadian_Aboriginal|Carian|Caucasian_Albanian|Chakma|Cham|Cherokee|Common|Coptic|Cuneiform|Cypriot|Cyrillic|Deseret|Devanagari|Duployan|Egyptian_Hieroglyphs|Elbasan|Ethiopic|Georgian|Glagolitic|Gothic|Grantha|Greek|Gujarati|Gurmukhi|Han|Hangul|Hanunoo|Hatran|Hebrew|Hiragana|Imperial_Aramaic|Inherited|Inscriptional_Pahlavi|Inscriptional_Parthian|Javanese|Kaithi|Kannada|Katakana|Kayah_Li|Kharoshthi|Khmer|Khojki|Khudawadi|Lao|Latin|Lepcha|Limbu|Linear_A|Linear_B|Lisu|Lycian|Lydian|Mahajani|Malayalam|Mandaic|Manichaean|Meetei_Mayek|Mende_Kikakui|Meroitic_Cursive|Meroitic_Hieroglyphs|Miao|Modi|Mongolian|Mro|Multani|Myanmar|Nabataean|New_Tai_Lue|Nko|Ogham|Ol_Chiki|Old_Hungarian|Old_Italic|Old_North_Arabian|Old_Permic|Old_Persian|Old_South_Arabian|Old_Turkic|Oriya|Osmanya|Pahawh_Hmong|Palmyrene|Pau_Cin_Hau|Phags_Pa|Phoenician|Psalter_Pahlavi|Rejang|Runic|Samaritan|Saurashtra|Sharada|Shavian|Siddham|SignWriting|Sinhala|Sora_Sompeng|Sundanese|Syloti_Nagri|Syriac|Tagalog|Tagbanwa|Tai_Le|Tai_Tham|Tai_Viet|Takri|Tamil|Telugu|Thaana|Thai|Tibetan|Tifinagh|Tirhuta|Ugaritic|Vai|Warang_Citi|Yi)\}"/>
+			<RegExpr context="#stay" attribute="Escape Char" String="\\[pP]\{(?:Ahom|Anatolian_Hieroglyphs|Arabic|Armenian|Avestan|Balinese|Bamum|Bassa_Vah|Batak|Bengali|Bopomofo|Brahmi|Braille|Buginese|Buhid|Canadian_Aboriginal|Carian|Caucasian_Albanian|Chakma|Cham|Cherokee|Common|Coptic|Cuneiform|Cypriot|Cyrillic|Deseret|Devanagari|Duployan|Egyptian_Hieroglyphs|Elbasan|Ethiopic|Georgian|Glagolitic|Gothic|Grantha|Greek|Gujarati|Gurmukhi|Han|Hangul|Hanunoo|Hatran|Hebrew|Hiragana|Imperial_Aramaic|Inherited|Inscriptional_Pahlavi|Inscriptional_Parthian|Javanese|Kaithi|Kannada|Katakana|Kayah_Li|Kharoshthi|Khmer|Khojki|Khudawadi|Lao|Latin|Lepcha|Limbu|Linear_A|Linear_B|Lisu|Lycian|Lydian|Mahajani|Malayalam|Mandaic|Manichaean|Meetei_Mayek|Mende_Kikakui|Meroitic_Cursive|Meroitic_Hieroglyphs|Miao|Modi|Mongolian|Mro|Multani|Myanmar|Nabataean|New_Tai_Lue|Nko|Ogham|Ol_Chiki|Old_Hungarian|Old_Italic|Old_North_Arabian|Old_Permic|Old_Persian|Old_South_Arabian|Old_Turkic|Oriya|Osmanya|Pahawh_Hmong|Palmyrene|Pau_Cin_Hau|Phags_Pa|Phoenician|Psalter_Pahlavi|Rejang|Runic|Samaritan|Saurashtra|Sharada|Shavian|Siddham|SignWriting|Sinhala|Sora_Sompeng|Sundanese|Syloti_Nagri|Syriac|Tagalog|Tagbanwa|Tai_Le|Tai_Tham|Tai_Viet|Takri|Tamil|Telugu|Thaana|Thai|Tibetan|Tifinagh|Tirhuta|Ugaritic|Vai|Warang_Citi|Yi)\}"/>
 			<!-- Escaped Characters -->
-			<RegExpr context="#stay" attribute="Escape Char" String="\\(Q.*\\E|c[a-zA-Z])"/>
+			<RegExpr context="#stay" attribute="Escape Char" String="\\(?:Q.*\\E|c[a-zA-Z])"/>
 			<!-- Reserved characters -->
 			<RegExpr context="#stay" attribute="Escape Char" String="\\[\ssSdDwWbBAZcCtrnaefvxhGHKNQRVXpPz\d]"/>
 			<!-- Punctuation Characters -->
@@ -1434,22 +1435,22 @@
 		</context>
 		<context name="_fix_escape" attribute="Normal Text" lineEndContext="#stay">
 			<AnyChar context="#stay" attribute="Special Char" String="^$"/>
-			<RegExpr context="#stay" attribute="Escape Char" String="\\(u[\da-fA-F]{4}|[LlUu]|N\{\w+\}|[0-7]{1,3})"/>
+			<RegExpr context="#stay" attribute="Escape Char" String="\\(?:u[\da-fA-F]{4}|[LlUu]|N\{\w+\}|[0-7]{1,3})"/>
 		</context>
 
 		<!-- Special Characters in Groups: (?...). Also see: &capGroup; -->
 		<context name="_special_group_round_brackets" attribute="Normal Text" lineEndContext="#stay">
 			<!-- References & Option Settings -->
-			<RegExpr context="#stay" attribute="Special Char of Brackets" String="\?(&amp;|P[&gt;\=])\w+(?=\))"/>
-			<RegExpr context="#stay" attribute="Special Char of Brackets" String="\?(xx|[iJmnsUxR]|C\d*|C&quot;[^\s&quot;]*&quot;|[\-\+]?\d+)(?=\))"/>
+			<RegExpr context="#stay" attribute="Special Char of Brackets" String="\?(?:&amp;|P[&gt;\=])\w+(?=\))"/>
+			<RegExpr context="#stay" attribute="Special Char of Brackets" String="\?(?:xx|[iJmnsUxR]|C\d*|C&quot;[^\s&quot;]*&quot;|[\-\+]?\d+)(?=\))"/>
 			<!-- Conditional Patterns -->
-			<RegExpr context="#stay" attribute="Special Char of Brackets" String="\?\((Rn?|R&amp;\w+|[\+\-]?\d+|&lt;\w+&gt;|&apos;\w+&apos;|VERSION&gt;?\=\d+(\.\d+)*|\w+)\)"/>
+			<RegExpr context="#stay" attribute="Special Char of Brackets" String="\?\((?:Rn?|R&amp;\w+|[\+\-]?\d+|&lt;\w+&gt;|&apos;\w+&apos;|VERSION&gt;?\=\d+(?:\.\d+)*|\w+)\)"/>
 			<RegExpr context="#stay" attribute="Special Char of Brackets" String="\?(?=\()"/>
 		</context>
 
 		<!-- {n} {min,} {,max} {min,max} -->
 		<context name="_quantification_brackets" attribute="Normal Text" lineEndContext="#stay">
-			<RegExpr context="_quantification_brackets_content" attribute="RegExp Brackets" String="\{(?=(\d+(,\d*)?|,\d+)\})"/>
+			<RegExpr context="_quantification_brackets_content" attribute="RegExp Brackets" String="\{(?=(?:\d+(?:,\d*)?|,\d+)\})"/>
 		</context>
 		<context name="_quantification_brackets_content" attribute="RegExp Brackets Content" lineEndContext="#pop">
 			<DetectChar context="#stay" attribute="Special Char of Brackets" char=","/>
@@ -1505,7 +1506,7 @@
 		<context name="_square_brackets_quoted_content" attribute="RegExp Brackets Content" lineEndContext="#pop">
 			<DetectChar context="#pop" attribute="RegExp Brackets" char="]"/>
 			<DetectChar context="#pop" char="&quot;" lookAhead="true"/>
-			<RegExpr context="#stay" attribute="Open RegExp Brackets" String="[^\s\[\]&quot;\\](?=\s*(&quot;|$))"/>
+			<RegExpr context="#stay" attribute="Open RegExp Brackets" String="[^\s\[\]&quot;\\](?=\s*(?:&quot;|$))"/>
 			<IncludeRules context="_default_square_brackets"/>
 		</context>
 
@@ -1518,7 +1519,7 @@
 		<context name="_round_brackets_quoted_content" attribute="RegExp Brackets Content" lineEndContext="#pop">
 			<DetectChar context="#pop" attribute="RegExp Brackets" char=")"/>
 			<DetectChar context="#pop" char="&quot;" lookAhead="true"/>
-			<RegExpr context="#stay" attribute="Open RegExp Brackets" String="[^\s\[\(\)&quot;\\](?=\s*(&quot;|$))"/>
+			<RegExpr context="#stay" attribute="Open RegExp Brackets" String="[^\s\[\(\)&quot;\\](?=\s*(?:&quot;|$))"/>
 			<IncludeRules context="_default_round_brackets"/>
 			<DetectChar context="_square_brackets_quoted" attribute="RegExp Brackets" char="["/>
 			<DetectChar context="_round_brackets_quoted" attribute="RegExp Brackets" char="("/>
@@ -1547,7 +1548,7 @@
 			<IncludeRules context="_line_continue_escape"/>
 			<DetectChar context="_square_brackets_otherquote" attribute="RegExp Brackets" char="["/>
 			<DetectChar context="_round_brackets_otherquote" attribute="RegExp Brackets" char="("/>
-			<RegExpr context="_comment" attribute="Comment" String="(^|\s)\#"/>
+			<RegExpr context="_comment" attribute="Comment" String="(?:^|\s)\#"/>
 		</context>
 
 	</contexts>

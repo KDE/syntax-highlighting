@@ -8,7 +8,7 @@
 	<!-- Characters not allowed in a path -->
 	<!ENTITY noPathChar  "\s\)&quot;">
 	<!ENTITY noPathCharWithoutSpace ")&quot;">
-	<!ENTITY endPath     ",([\s&quot;]|$)">
+	<!ENTITY endPath     ",(?:[\s&quot;]|$)">
 ]>
 
 <!--
@@ -42,6 +42,7 @@
       https://manpages.ubuntu.com/manpages/disco/en/man5/apparmor.d.5.html
 
   Change log:
+   * Version 10 [25-Oct-2019]: Use non-capturing groups in RegExpr.
    * Version 9 [20-Jun-2019]: (AppArmor 2.13.3):
       - Add new network domain keywords.
       - Fixes: drop unsupported 'to' operator for link rules and only highlight the 'in'
@@ -72,7 +73,7 @@
 -->
 
 <language name="AppArmor Security Profile"
-          version="9"
+          version="10"
           kateversion="5.0"
           section="Markup"
           extensions="usr.bin.*;usr.sbin.*;bin.*;sbin.*;usr.lib.*;usr.lib64.*;usr.lib32.*;usr.libx32.*;usr.libexec.*;usr.local.bin.*;usr.local.sbin.*;usr.local.lib*;opt.*;etc.cron.*;snap.*;snap-update-ns.*;snap-confine.*"
@@ -786,7 +787,7 @@
 			      - [Jul 24, 2018] Variables of type "@VAR" will only be highlighted in assignments, as long
 			        as they are not fully supported (apparently, they will be used in conditional expressions). -->
 			<Detect2Chars context="_variable_assignment" attribute="Variable" char="@" char1="{" lookAhead="true" firstNonSpace="true"/>
-			<RegExpr context="_variable_assignment_operator" attribute="Variable" String="@&varName;(?=\s*(\+?\=|$|\s#))" firstNonSpace="true"/>
+			<RegExpr context="_variable_assignment_operator" attribute="Variable" String="@&varName;(?=\s*(?:\+?\=|$|\s#))" firstNonSpace="true"/>
 			<DetectChar context="_variable_assignment_line_general" attribute="Operator 1" char="=" firstNonSpace="true"/>
 			<Detect2Chars context="_variable_assignment_line" attribute="Operator 1" char="+" char1="=" firstNonSpace="true"/>
 			<!-- Alias rule -->
@@ -807,12 +808,12 @@
 		<context name="_default_profile" attribute="Normal Text" lineEndContext="#stay">
 			<!-- Profile Header -->
 			<keyword context="_profile_name" attribute="Profile Head" String="profile_head"/>
-			<RegExpr context="_profile_name" attribute="Profile Head" String="(^|\s)\^(?=\S)"/>
+			<RegExpr context="_profile_name" attribute="Profile Head" String="(?:^|\s)\^(?=\S)"/>
 			<keyword context="#stay" attribute="Option" String="profile_options"/>
 
 			<!-- Line Rules -->
 			<StringDetect context="_include" attribute="Preprocessor" String="#include" insensitive="true"/>
-			<RegExpr context="_include" attribute="Preprocessor" String="(^|\s)include(?=\s)"/>
+			<RegExpr context="_include" attribute="Preprocessor" String="(?:^|\s)include(?=\s)"/>
 			<DetectChar context="_comment" attribute="Comment" char="#"/>
 
 			<!-- Variables -->
@@ -876,7 +877,7 @@
 			<!-- URL -->
 			<RegExpr context="#stay" attribute="URL in Comment" String="\bhttps?://[^\s&lt;&gt;&quot;&apos;`]*[^\s&lt;&gt;&quot;&apos;`\}\)\]\.,;\|]"/>
 			<!-- Email (Source: http://emailregex.com) -->
-			<RegExpr context="#stay" attribute="URL in Comment" String="(([^&lt;&gt;\(\)\[\]\\\.,;:\s@&quot;]+(\.[^&lt;&gt;\(\)\[\]\\\.,;:\s@&quot;]+)*)|(&quot;[^&quot;]+&quot;))@((\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}])|(([a-zA-Z\-\d]+\.)+[a-zA-Z]{2,}))\b"/>
+			<RegExpr context="#stay" attribute="URL in Comment" String="(?:(?:[^&lt;&gt;\(\)\[\]\\\.,;:\s@&quot;]+(?:\.[^&lt;&gt;\(\)\[\]\\\.,;:\s@&quot;]+)*)|(?:&quot;[^&quot;]+&quot;))@(?:(?:\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}])|(?:(?:[a-zA-Z\-\d]+\.)+[a-zA-Z]{2,}))\b"/>
 		</context>
 
 		<!-- Profile Header:
@@ -886,8 +887,8 @@
 			<DetectSpaces context="#stay" attribute="Normal Text"/>
 			<!-- Not highlighting paths and paths quoted.
 			     NOTE: Some profile labels may contain "/" (like [/]). These cases are not considered. -->
-			<RegExpr context="#pop" attribute="Normal Text" String="&quot;([^/&quot;\\]|\\.)*/" lookAhead="true"/>
-			<RegExpr context="#pop!_path_content" attribute="Path" String="([^\s&quot;\\]|\\.)*/" lookAhead="true"/>
+			<RegExpr context="#pop" attribute="Normal Text" String="&quot;(?:[^/&quot;\\]|\\.)*/" lookAhead="true"/>
+			<RegExpr context="#pop!_path_content" attribute="Path" String="(?:[^\s&quot;\\]|\\.)*/" lookAhead="true"/>
 			<DetectChar context="#pop!_profile_name_quoted" attribute="Profile Name" char="&quot;"/>
 			<!-- First word (the profile name) -->
 			<RegExpr context="#pop!_profile_name_content" attribute="Normal Text" String="[^\s/\^\{]" lookAhead="true"/>
@@ -1021,25 +1022,25 @@
 		<!-- Access Modes / File Permissions -->
 		<context name="_permissions" attribute="Normal Text" lineEndContext="#stay">
 			<IncludeRules context="_permissions_correction"/>
-			<RegExpr context="#stay" attribute="Permissions" String="(^|\s)([rwkml]|&exec;)+(?=[\s,]|$)"/>
-			<RegExpr context="#stay" attribute="Permissions" String="(^|\s)([rakml]|&exec;)+(?=[\s,]|$)"/>
+			<RegExpr context="#stay" attribute="Permissions" String="(?:^|\s)(?:[rwkml]|&exec;)+(?=[\s,]|$)"/>
+			<RegExpr context="#stay" attribute="Permissions" String="(?:^|\s)(?:[rakml]|&exec;)+(?=[\s,]|$)"/>
 		</context>
 		<context name="_file_rule_permissions" attribute="Normal Text" lineEndContext="#stay">
 			<IncludeRules context="_permissions_correction"/>
-			<RegExpr context="_rule_file" attribute="Permissions" String="(^|\s)([rwkml]|&exec;)+(?=[\s,]|$)"/>
-			<RegExpr context="_rule_file" attribute="Permissions" String="(^|\s)([rakml]|&exec;)+(?=[\s,]|$)"/>
+			<RegExpr context="_rule_file" attribute="Permissions" String="(?:^|\s)(?:[rwkml]|&exec;)+(?=[\s,]|$)"/>
+			<RegExpr context="_rule_file" attribute="Permissions" String="(?:^|\s)(?:[rakml]|&exec;)+(?=[\s,]|$)"/>
 		</context>
 		<context name="_permissions_correction" attribute="Normal Text" lineEndContext="#stay">
 			<!-- Incompatible execution modes -->
-			<RegExpr context="_perm_correction_in" String="(^|\s)[rwakml]*p[iUu]?x([rwakml]|p[iUu]?x)*[PcC]?[iUu]?x([rwakml]|&exec;)*([\s,]|$)" lookAhead="true"/> <!-- p -->
-			<RegExpr context="_perm_correction_in" String="(^|\s)[rwakml]*P[iUu]?x([rwakml]|P[iUu]?x)*[pcC]?[iUu]?x([rwakml]|&exec;)*([\s,]|$)" lookAhead="true"/> <!-- P -->
-			<RegExpr context="_perm_correction_in" String="(^|\s)[rwakml]*c[iUu]?x([rwakml]|c[iUu]?x)*[PpC]?[iUu]?x([rwakml]|&exec;)*([\s,]|$)" lookAhead="true"/> <!-- c -->
-			<RegExpr context="_perm_correction_in" String="(^|\s)[rwakml]*C[iUu]?x([rwakml]|C[iUu]?x)*[Ppc]?[iUu]?x([rwakml]|&exec;)*([\s,]|$)" lookAhead="true"/> <!-- C -->
-			<RegExpr context="_perm_correction_in" String="(^|\s)[rwakml]*[PpCc]?ix([rwakml]|[PpCc]?ix)*[PpCc]?[Uu]?x([rwakml]|&exec;)*([\s,]|$)" lookAhead="true"/> <!-- i -->
-			<RegExpr context="_perm_correction_in" String="(^|\s)[rwakml]*[PpCc]?ux([rwakml]|[PpCc]?ux)*[PpCc]?[iU]?x([rwakml]|&exec;)*([\s,]|$)" lookAhead="true"/> <!-- u -->
-			<RegExpr context="_perm_correction_in" String="(^|\s)[rwakml]*[PpCc]?Ux([rwakml]|[PpCc]?Ux)*[PpCc]?[iu]?x([rwakml]|&exec;)*([\s,]|$)" lookAhead="true"/> <!-- U -->
-			<RegExpr context="_perm_correction_in" String="(^|\s)[rwakml]*[iuU]?x([rwakml]|[iuU]?x)*[PpCc][iuU]?x([rwakml]|&exec;)*([\s,]|$)" lookAhead="true"/> <!-- x, ix, ux or Ux followed by P, p, C or c -->
-			<RegExpr context="_perm_correction_in" String="(^|\s)[rwakml]*x[rwakmlx]*[iuU]x([rwakml]|&exec;)*([\s,]|$)" lookAhead="true"/> <!-- x followed by ix, ux or Ux -->
+			<RegExpr context="_perm_correction_in" String="(?:^|\s)[rwakml]*p[iUu]?x(?:[rwakml]|p[iUu]?x)*[PcC]?[iUu]?x(?:[rwakml]|&exec;)*(?:[\s,]|$)" lookAhead="true"/> <!-- p -->
+			<RegExpr context="_perm_correction_in" String="(?:^|\s)[rwakml]*P[iUu]?x(?:[rwakml]|P[iUu]?x)*[pcC]?[iUu]?x(?:[rwakml]|&exec;)*(?:[\s,]|$)" lookAhead="true"/> <!-- P -->
+			<RegExpr context="_perm_correction_in" String="(?:^|\s)[rwakml]*c[iUu]?x(?:[rwakml]|c[iUu]?x)*[PpC]?[iUu]?x(?:[rwakml]|&exec;)*(?:[\s,]|$)" lookAhead="true"/> <!-- c -->
+			<RegExpr context="_perm_correction_in" String="(?:^|\s)[rwakml]*C[iUu]?x(?:[rwakml]|C[iUu]?x)*[Ppc]?[iUu]?x(?:[rwakml]|&exec;)*(?:[\s,]|$)" lookAhead="true"/> <!-- C -->
+			<RegExpr context="_perm_correction_in" String="(?:^|\s)[rwakml]*[PpCc]?ix(?:[rwakml]|[PpCc]?ix)*[PpCc]?[Uu]?x(?:[rwakml]|&exec;)*(?:[\s,]|$)" lookAhead="true"/> <!-- i -->
+			<RegExpr context="_perm_correction_in" String="(?:^|\s)[rwakml]*[PpCc]?ux(?:[rwakml]|[PpCc]?ux)*[PpCc]?[iU]?x(?:[rwakml]|&exec;)*(?:[\s,]|$)" lookAhead="true"/> <!-- u -->
+			<RegExpr context="_perm_correction_in" String="(?:^|\s)[rwakml]*[PpCc]?Ux(?:[rwakml]|[PpCc]?Ux)*[PpCc]?[iu]?x(?:[rwakml]|&exec;)*(?:[\s,]|$)" lookAhead="true"/> <!-- U -->
+			<RegExpr context="_perm_correction_in" String="(?:^|\s)[rwakml]*[iuU]?x(?:[rwakml]|[iuU]?x)*[PpCc][iuU]?x(?:[rwakml]|&exec;)*(?:[\s,]|$)" lookAhead="true"/> <!-- x, ix, ux or Ux followed by P, p, C or c -->
+			<RegExpr context="_perm_correction_in" String="(?:^|\s)[rwakml]*x[rwakmlx]*[iuU]x(?:[rwakml]|&exec;)*(?:[\s,]|$)" lookAhead="true"/> <!-- x followed by ix, ux or Ux -->
 		</context>
 		<context name="_perm_correction_in" attribute="Normal Text" lineEndContext="#pop">
 			<!-- Highlight the previous space or the full permission -->
@@ -1055,7 +1056,7 @@
 		</context>
 		<context name="_operators_in" attribute="Normal Text" lineEndContext="#stay">
 			<!-- Only in mount rules -->
-			<RegExpr context="#stay" attribute="Operator 2" String="\b(in)(?=[\s\(\{\[&quot;/@\$]|$)"/>
+			<RegExpr context="#stay" attribute="Operator 2" String="\b(?:in)(?=[\s\(\{\[&quot;/@\$]|$)"/>
 		</context>
 
 		<!-- RULES -->
@@ -1064,8 +1065,8 @@
 		<!-- Also see: _default_parentheses_block_rule -->
 		<context name="_common_rule" attribute="Normal Text" lineEndContext="#stay">
 			<!-- Highlight as path the text after the '=' operator, except keywords or simple words ([\w\-\+]+) -->
-			<RegExpr context="#stay" attribute="Error" String="\=(?=\s*($|&endPath;))"/>
-			<RegExpr context="_path_content" attribute="Operator 1" String="\=\s*(?=[^\s&quot;\(]*([^&noPathChar;\]\}\=\w\+\-\(,]|,[^&noPathChar;]))"/>
+			<RegExpr context="#stay" attribute="Error" String="\=(?=\s*(?:$|&endPath;))"/>
+			<RegExpr context="_path_content" attribute="Operator 1" String="\=\s*(?=[^\s&quot;\(]*(?:[^&noPathChar;\]\}\=\w\+\-\(,]|,[^&noPathChar;]))"/>
 			<Detect2Chars context="_variable" attribute="Variable" char="@" char1="{" lookAhead="true"/>
 			<IncludeRules context="_find_path"/>
 
@@ -1163,7 +1164,7 @@
 			<keyword context="#stay" attribute="Flags" String="rule_signal"/>
 			<keyword context="#stay" attribute="Permissions" String="rule_signal_access"/>
 			<keyword context="#stay" attribute="Permissions" String="base_accesses"/>
-			<RegExpr context="#stay" attribute="Flags" String="\b(rtmin\+)0*(3[012]|[12]?\d)\b"/>
+			<RegExpr context="#stay" attribute="Flags" String="\brtmin\+0*(?:3[012]|[12]?\d)\b"/> <!-- rtmin+0 ... rtmin+32 -->
 		</context>
 
 		<!-- DBus Rule -->
@@ -1213,14 +1214,14 @@
 		<context name="_rule_rlimit" attribute="Normal Text" lineEndContext="#stay">
 			<keyword context="#stay" attribute="Data" String="rule_rlimit"/>
 			<Detect2Chars context="#stay" attribute="Operator 2" char="&lt;" char1="="/>
-			<RegExpr context="#stay" attribute="Number" String="\-(20|1?\d)\b"/>
+			<RegExpr context="#stay" attribute="Number" String="\-(?:20|1?\d)\b"/>
 			<RegExpr context="_number_unit" attribute="Number" String="\b\d+"/> <!-- Rules Int don't use '-' as a delimiter -->
 			<WordDetect context="#stay" attribute="Number" String="infinity"/>
-			<RegExpr context="#stay" attribute="Numerical Unit" String="\b([KMG]B?|[shd]|us|ms|min|sec|(minute|day|hour|week|second)(s?)|(milli|micro)second(s?))\b"/>
+			<RegExpr context="#stay" attribute="Numerical Unit" String="\b(?:[KMG]B?|[shd]|us|ms|min|sec|(?:minute|day|hour|week|second)(?:s?)|(?:milli|micro)second(?:s?))\b"/>
 			<IncludeRules context="_default_rule"/>
 		</context>
 		<context name="_number_unit" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
-			<RegExpr context="#pop" attribute="Numerical Unit" String="([KMG]B?|[shd]|us|ms|min|sec|(minute|day|hour|week|second)(s?)|(milli|micro)second(s?))\b"/>
+			<RegExpr context="#pop" attribute="Numerical Unit" String="(?:[KMG]B?|[shd]|us|ms|min|sec|(?:minute|day|hour|week|second)(?:s?)|(?:milli|micro)second(?:s?))\b"/>
 		</context>
 
 		<!-- Link Rule -->
@@ -1248,14 +1249,14 @@
 		<context name="_profile_transition" attribute="Transition Profile Name" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop">
 			<DetectSpaces context="#stay" attribute="Normal Text"/>
 			<!-- Not highlighting paths and paths quoted -->
-			<RegExpr context="#pop!_default_rule_with_comments" attribute="Path" String="([^\s/\[\\]|//|\\.|\[([^\s\]\\]|\\.)*\])*/($|[^/])" lookAhead="true"/>
-			<RegExpr context="#pop!_default_rule_with_comments" attribute="Normal Text" String="&quot;([^/&quot;\[\\]|//|\\.|\[([^&quot;\]\\]|\\.)*\])*/($|[^/])" lookAhead="true"/>
+			<RegExpr context="#pop!_default_rule_with_comments" attribute="Path" String="(?:[^\s/\[\\]|//|\\.|\[(?:[^\s\]\\]|\\.)*\])*/(?:$|[^/])" lookAhead="true"/>
+			<RegExpr context="#pop!_default_rule_with_comments" attribute="Normal Text" String="&quot;(?:[^/&quot;\[\\]|//|\\.|\[(?:[^&quot;\]\\]|\\.)*\])*/(?:$|[^/])" lookAhead="true"/>
 
 			<DetectChar context="#pop!_t_profile_name_quoted" attribute="Transition Profile Name" char="&quot;"/>
 			<RegExpr context="#pop!_profile_transition_content" attribute="Normal Text" String="[^\s/]" lookAhead="true"/> <!-- First word -->
 		</context>
 		<context name="_profile_transition_content" attribute="Transition Profile Name" lineEndContext="#pop!_default_rule_with_comments">
-			<RegExpr context="#pop!_default_rule_with_comments" attribute="Error" String="\(\S*(?=,([&noPathChar;]|$))"/>
+			<RegExpr context="#pop!_default_rule_with_comments" attribute="Error" String="\(\S*(?=,(?:[&noPathChar;]|$))"/>
 			<RegExpr context="#pop!_default_rule_with_comments" attribute="Normal Text" String="&endPath;" lookAhead="true"/> <!-- End rule -->
 			<DetectSpaces context="#pop" attribute="Normal Text" lookAhead="true"/> <!-- End of the profile name -->
 
@@ -1279,15 +1280,15 @@
 		     NOTE: Old style (name^HAT) not included -->
 		<context name="_hat_path" attribute="Path" lineEndContext="#pop">
 			<RegExpr context="#pop" attribute="Path" String="/(?=/&endPath;)"/>
-			<RegExpr context="#pop!_hat_path_content" attribute="SubProfile/Hat Operator" String="//(?=([^\s&quot;/\\]|\\.)+([\s&quot;]|$))"/>
+			<RegExpr context="#pop!_hat_path_content" attribute="SubProfile/Hat Operator" String="//(?=(?:[^\s&quot;/\\]|\\.)+(?:[\s&quot;]|$))"/>
 			<DetectChar context="#pop" attribute="Path" char="/"/>
 		</context>
 		<context name="_hat_path_parentheses" attribute="Path" lineEndContext="#pop">
-			<RegExpr context="#pop!_hat_path_parentheses_content" attribute="SubProfile/Hat Operator" String="//(?=([^&noPathChar;/\\,]|\\.)+([&noPathChar;,]|$))"/>
+			<RegExpr context="#pop!_hat_path_parentheses_content" attribute="SubProfile/Hat Operator" String="//(?=(?:[^&noPathChar;/\\,]|\\.)+(?:[&noPathChar;,]|$))"/>
 			<DetectChar context="#pop" attribute="Path" char="/"/>
 		</context>
 		<context name="_hat_path_quoted" attribute="Text Quoted" lineEndContext="#pop">
-			<RegExpr context="#pop!_hat_path_quoted_content" attribute="SubProfile/Hat Operator" String="//(?=([^&quot;/\\]|\\.)+&quot;)"/>
+			<RegExpr context="#pop!_hat_path_quoted_content" attribute="SubProfile/Hat Operator" String="//(?=(?:[^&quot;/\\]|\\.)+&quot;)"/>
 			<DetectChar context="#pop" attribute="Text Quoted" char="/"/>
 		</context>
 
@@ -1309,7 +1310,7 @@
 		<context name="_common_parentheses_block" attribute="Normal Text" lineEndContext="#stay">
 			<DetectChar context="#pop" attribute="Normal Text" char=")"/>
 			<!-- Highlight as path the text after the '=' operator, except keywords or simple words ([\w\-\+]+) -->
-			<RegExpr context="#stay" attribute="Error" String="\=(?=\s*($|[,\)]))"/>
+			<RegExpr context="#stay" attribute="Error" String="\=(?=\s*(?:$|[,\)]))"/>
 			<RegExpr context="_parentheses_path_content" attribute="Operator 1" String="\=\s*(?=[^\s&quot;\(\),]*[^&noPathChar;\]\}\=\w\+\-\(,])"/>
 			<DetectChar context="_parentheses_path_content" attribute="Path" char="/" lookAhead="true"/>
 			<Detect2Chars context="_parentheses_variable" attribute="Variable" char="@" char1="{" lookAhead="true"/>
@@ -1323,7 +1324,7 @@
 		<context name="_parentheses_block_profile" attribute="Normal Text" lineEndContext="#stay">
 			<keyword context="#stay" attribute="Flags" String="profile_flags"/>
 			<!-- Used by xattrs -->
-			<RegExpr context="#stay" attribute="Other Option" String="\b[a-zA-Z](\.?[\w\-])*(?=\s*\=)"/>
+			<RegExpr context="#stay" attribute="Other Option" String="\b[a-zA-Z](?:\.?[\w\-])*(?=\s*\=)"/>
 			<IncludeRules context="_common_parentheses_block"/>
 			<IncludeRules context="_end_rule_irnc"/>
 		</context>
@@ -1335,7 +1336,7 @@
 
 		<!-- Finding the end of a rule -->
 		<context name="_end_rule" attribute="Normal Text" lineEndContext="#stay">
-			<RegExpr context="#stay" attribute="Normal Text" String=",(?=(\)|[\w\-]+[^\s\w\-,#\(&quot;]))"/> <!-- Fix possible incorrect rule closures -->
+			<RegExpr context="#stay" attribute="Normal Text" String=",(?=\)|[\w\-]+[^\s\w\-,#\(&quot;])"/> <!-- Fix possible incorrect rule closures -->
 			<DetectChar  context="#pop" attribute="End of Rule Char" char="," endRegion="Rule"/>
 			<IncludeRules context="_end_rule_irnc"/>
 		</context>
@@ -1390,7 +1391,7 @@
 
 		<context name="_find_path" attribute="Normal Text" lineEndContext="#stay">
 			<DetectChar context="_path_content" attribute="Path" char="/" lookAhead="true"/>
-			<RegExpr context="_path_content" String=":([^:&noPathChar;\(\\]|\\.)+:" lookAhead="true"/> <!-- :namespace: -->
+			<RegExpr context="_path_content" String=":(?:[^\:&noPathChar;\(\\]|\\.)+:" lookAhead="true"/> <!-- :namespace: -->
 		</context>
 		<context name="_path_content" attribute="Path" lineEndContext="#pop">
 			<RegExpr context="#pop" String="&endPath;" lookAhead="true"/>
@@ -1424,10 +1425,10 @@
 		<!-- Escapes: Hexadecimal (\xNN), decimal (\dNNN) & octal (\NNN). Also make literal any character.
 		     NOTE: Reserved character escape sequences: \\&quot;aefnrt0 -->
 		<context name="_escape" attribute="Normal Text" lineEndContext="#stay">
-			<RegExpr context="#stay" attribute="Escape Char" String="\\(x[a-fA-F\d]{1,2}|d\d{1,3}|[0-3][0-7]{0,2}|[4-7][0-7]?|.)"/>
+			<RegExpr context="#stay" attribute="Escape Char" String="\\(?:x[a-fA-F\d]{1,2}|d\d{1,3}|[0-3][0-7]{0,2}|[4-7][0-7]?|.)"/>
 		</context>
 		<context name="_profile_transition_escape" attribute="Transition Profile Name" lineEndContext="#stay">
-			<RegExpr context="#stay" attribute="Globbing Char in Tran. Prof." String="\\(x[a-fA-F\d]{1,2}|d\d{1,3}|[0-3][0-7]{0,2}|[4-7][0-7]?|.)"/>
+			<RegExpr context="#stay" attribute="Globbing Char in Tran. Prof." String="\\(?:x[a-fA-F\d]{1,2}|d\d{1,3}|[0-3][0-7]{0,2}|[4-7][0-7]?|.)"/>
 		</context>
 
 		<!-- Groups of brackets: { }, [ ] and ( ) -->

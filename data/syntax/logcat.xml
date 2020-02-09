@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd"
 [
-	<!ENTITY datetime "((.\[)?(\d{1,2};){2}\d{1,3}m\s*)?((\d{4}\-)?\d{2}\-\d{2}\s\d{2}(:\d{2}){2}\.\d{3,6}(\s[\-\+]\d{4})?|\d+\.\d{3,6}):?">
-	<!ENTITY priority_tag "([/\s][^:\(]*(\([^\)]+\))?:|\([^\)]+\):?)"> <!-- Tag/PID/Threads -->
+	<!ENTITY datetime "(?:(?:.\[)?(?:\d{1,2};){2}\d{1,3}m\s*)?(?:(?:\d{4}\-)?\d{2}\-\d{2}\s\d{2}(?:\:\d{2}){2}\.\d{3,6}(?:\s[\-\+]\d{4})?|\d+\.\d{3,6})\:?">
+	<!ENTITY priority_tag "(?:[/\s][^:\(]*(?:\([^\)]+\))?:|\([^\)]+\):?)"> <!-- Tag/PID/Threads -->
 	<!ENTITY delim        "[/\(\s]"> <!-- Delimiter between priority and tag -->
 ]>
 
@@ -30,11 +30,11 @@
    WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   ==========================================================================================
 
-  Last update: August 30, 2019 (v4)
+  Last update: October 25, 2019 (v5)
 -->
 
 <language name="Logcat"
-          version="4"
+          version="5"
           kateversion="5.0"
           section="Other"
           extensions="*.logcat"
@@ -55,13 +55,13 @@
 				<RegExpr context="#stay" attribute="DateTime" String="&datetime;" firstNonSpace="true" />
 
 				<!-- Priority & Tag -->
-				<RegExpr context="VerboseMsg" attribute="Verbose Tag" String="(^|\s)[V\?](&priority_tag;|(?=&delim;))" />
-				<RegExpr context="DebugMsg"   attribute="Debug Tag"   String="(^|\s)D(&priority_tag;|(?=&delim;))" />
-				<RegExpr context="InfoMsg"    attribute="Info Tag"    String="(^|\s)I(&priority_tag;|(?=&delim;))" />
-				<RegExpr context="WarningMsg" attribute="Warning Tag" String="(^|\s)W(&priority_tag;|(?=&delim;))" />
-				<RegExpr context="AssertMsg"  attribute="Assert Tag"  String="(^|\s)A(&priority_tag;|(?=&delim;))" />
-				<RegExpr context="SilentMsg"  attribute="Silent Tag"  String="(^|\s)S(&priority_tag;|(?=&delim;))" />
-				<RegExpr context="ErrorMsg"   attribute="Error Tag"   String="(^|\s)E(&priority_tag;|(?=&delim;))" />
+				<RegExpr context="VerboseMsg" attribute="Verbose Tag" String="(?:^|\s)[V\?](?:&priority_tag;|(?=&delim;))" />
+				<RegExpr context="DebugMsg"   attribute="Debug Tag"   String="(?:^|\s)D(?:&priority_tag;|(?=&delim;))" />
+				<RegExpr context="InfoMsg"    attribute="Info Tag"    String="(?:^|\s)I(?:&priority_tag;|(?=&delim;))" />
+				<RegExpr context="WarningMsg" attribute="Warning Tag" String="(?:^|\s)W(?:&priority_tag;|(?=&delim;))" />
+				<RegExpr context="AssertMsg"  attribute="Assert Tag"  String="(?:^|\s)A(?:&priority_tag;|(?=&delim;))" />
+				<RegExpr context="SilentMsg"  attribute="Silent Tag"  String="(?:^|\s)S(?:&priority_tag;|(?=&delim;))" />
+				<RegExpr context="ErrorMsg"   attribute="Error Tag"   String="(?:^|\s)E(?:&priority_tag;|(?=&delim;))" />
 
 				<RegExpr context="#stay"      attribute="Error Tag"   String="\sF&delim;.*\033\[\d{1,3}m$" />
 				<RegExpr context="FatalMsg"   attribute="Fatal"       String="^F&delim;" />
@@ -155,7 +155,7 @@
 				<StringDetect context="#pop!CommentLine" attribute="Comment" String="---------" firstNonSpace="true" />
 				<RegExpr context="#pop" attribute="Comment" String="\*\s.+\s\*$" column="0" />
 				<RegExpr context="#pop!LongLog" attribute="Normal Text" String="\[(?=\s+&datetime;\s.+\s\]$)" column="0" />
-				<RegExpr context="EmptyLine" attribute="Normal Text" String="^\s*$" />
+				<RegExpr context="EmptyLine" attribute="Normal Text" String="^\s*$" column="0" />
 			</context>
 			<context name="EmptyLine" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop">
 				<DetectChar context="#pop#pop!CommentLine" attribute="Comment" char="#" firstNonSpace="true" />
@@ -198,6 +198,10 @@
 		<comments>
 			<comment name="singleLine" start="#" />
 		</comments>
+
+		<emptyLines>
+			<emptyLine regexpr="\s+"/>
+		</emptyLines>
 	</general>
 
 </language>

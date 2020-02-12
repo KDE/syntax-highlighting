@@ -34,3 +34,20 @@ rempl := x
 foo := a b c
 bar := foo
 hello := $($(bar):a=$(rempl))
+
+# Conditionals
+bar =
+foo = $(bar)
+ifdef bar
+frobozz = yes
+else ifdef foo
+frobozz = no
+endif
+
+error_type := 0
+check:
+ifeq ($(error_type),0)
+else ifeq ($(error_type),1)
+else ifeq ($(error_type),2)
+else ifeq ($(error_type),3)
+endif

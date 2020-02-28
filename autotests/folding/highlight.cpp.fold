@@ -404,6 +404,17 @@ string)ab";
 // error
 u8"\x123xsk";
 
+// printf format
+"a%10sa%-10sa%*sa%-10.*sa%-*.*sa"
+"a%ca%*ca%%a%ia%da%.6ia%.0ia%+ia%ia%xa%#xa"
+"a%.0fa%.32fa%05.2fa%.2fa%5.2fa%Ea%aa"
+// std::format
+"a{{:6}}a{}a{:6}a{:*<6}a{:6d}a"
+"a{0:}a{0:+}a{0:-}a{0: }a"
+"a{:+06d}a{:#06x}a{:<06}a"
+"a{:{}}a{0:{1}.{2}f}a"
+;
+
 // UDL (c++11)
 
 operator""_a(const char*);

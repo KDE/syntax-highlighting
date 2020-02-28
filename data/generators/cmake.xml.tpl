@@ -9,7 +9,7 @@
   Copyright 2004 Alexander Neundorf (neundorf@kde.org)
   Copyright 2005 Dominik Haumann (dhdev@gmx.de)
   Copyright 2007,2008,2013,2014 Matthew Woehlke (mw_triad@users.sourceforge.net)
-  Copyright 2013-2015,2017-2019 Alex Turbov (i.zaufi@gmail.com)
+  Copyright 2013-2015,2017-2020 Alex Turbov (i.zaufi@gmail.com)
 
  **********************************************************************
  * This library is free software; you can redistribute it and/or      *
@@ -31,7 +31,7 @@
 
 <language
     name="CMake"
-    version="19"
+    version="20"
     kateversion="2.4"
     section="Other"
     extensions="CMakeLists.txt;*.cmake;*.cmake.in"

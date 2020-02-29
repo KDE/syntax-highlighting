@@ -151,3 +151,8 @@ const goodHighlighting = <T extends I>(
 <noTag /* comment */ ?
 <noTag#
 <noTag/*comment*/#
+
+// Conditionals expressions
+let y = foo == null ? null : <Tag/>;
+let x = (foo === null || foo === undefined) ?
+    undefined :<tag>hello</tag>;

@@ -198,6 +198,15 @@ function foo<T extends X>(arg: T): T extends B ? number : string {
   return <T extends B ? never : string>"returning a string";
 }
 
+let x = (foo === null || foo === undefined) ?
+    undefined :
+    foo.bar.baz();
+let y = (foo === null || foo === undefined) ? /* comment */ undefined :
+    foo.bar.baz();
+
+// Operator ??
+let x = foo ?? bar();
+
 // Types and logical `&&` and `||` operators after `as` expression
 Date as any || null;
 
@@ -223,3 +232,49 @@ console.log('4' / '2'); // 2
 // Template
 const a = `6` / 2; /*comment*/ const b = 5;
 console.log(`4` / `2`); // 2
+
+ [1, 2, 3].reduce<readonly number[]>((previous) => previous, []);
+
+// Multiline arrow assignment
+const h = {
+  setSubProperty: <
+      T extends A,
+      K extends keyof T,
+      J extends keyof T[K]
+    >(
+      property: K,
+      key: J,
+      value: T[K][J]
+    ) =>  {}
+}
+
+// Private-Named Instance Fields
+class Greeter {
+    #name: string;
+    constructor(name: string) {
+        this.#name = name;
+    }
+    greet() {
+        console.log(`hello ${this.#name}`);
+    }
+}
+class Test {
+    #NAME1: () => string;
+    prop1 = x.#NAMEabc.#NAMEabc;
+    prop2 = x.#NAMEabc.#NAMEabc();
+    prop3 = this.#NAMEabc.#NAME();
+}
+
+// Type-only imports and exports
+import type T from "mod";
+import type { U, V } from "mod";
+import type * as types from "mod";
+import type from "mod";
+import type = require("mod");
+import type T = require("mod");
+
+export { a as b, x };
+export * from "AnotherModule";
+export { k as m, l } from "AnotherModule";
+export type { T };
+export type { U } from "AnotherModule";

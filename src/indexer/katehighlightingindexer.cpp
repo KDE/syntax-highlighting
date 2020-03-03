@@ -71,7 +71,11 @@ QStringList readListing(const QString &fileName)
 bool checkExtensions(const QString &extensions)
 {
     // get list of extensions
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
     const QStringList extensionParts = extensions.split(QLatin1Char(';'), QString::SkipEmptyParts);
+#else
+    const QStringList extensionParts = extensions.split(QLatin1Char(';'), Qt::SkipEmptyParts);
+#endif
 
     // ok if empty
     if (extensionParts.isEmpty()) {
@@ -446,7 +450,11 @@ private:
 
         // handle cross-language context references
         if (context.contains(QStringLiteral("##"))) {
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
             const QStringList list = context.split(QStringLiteral("##"), QString::SkipEmptyParts);
+#else
+            const QStringList list = context.split(QStringLiteral("##"), Qt::SkipEmptyParts);
+#endif
             if (list.size() == 1) {
                 // nothing to do, other language is included: e.g. ##Doxygen
             } else if (list.size() == 2) {

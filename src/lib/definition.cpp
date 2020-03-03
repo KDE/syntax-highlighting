@@ -470,10 +470,18 @@ bool DefinitionData::loadMetaData(const QString &file, const QJsonObject &obj)
     fileName = file;
 
     const auto exts = obj.value(QLatin1String("extensions")).toString();
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
     for (const auto &ext : exts.split(QLatin1Char(';'), QString::SkipEmptyParts))
+#else
+    for (const auto &ext : exts.split(QLatin1Char(';'), Qt::SkipEmptyParts))
+#endif
         extensions.push_back(ext);
     const auto mts = obj.value(QLatin1String("mimetype")).toString();
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
     for (const auto &mt : mts.split(QLatin1Char(';'), QString::SkipEmptyParts))
+#else
+    for (const auto &mt : mts.split(QLatin1Char(';'), Qt::SkipEmptyParts))
+#endif
         mimetypes.push_back(mt);
 
     return true;
@@ -498,10 +506,18 @@ bool DefinitionData::loadLanguage(QXmlStreamReader &reader)
     author = reader.attributes().value(QStringLiteral("author")).toString();
     license = reader.attributes().value(QStringLiteral("license")).toString();
     const auto exts = reader.attributes().value(QStringLiteral("extensions")).toString();
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
     for (const auto &ext : exts.split(QLatin1Char(';'), QString::SkipEmptyParts))
+#else
+    for (const auto &ext : exts.split(QLatin1Char(';'), Qt::SkipEmptyParts))
+#endif
         extensions.push_back(ext);
     const auto mts = reader.attributes().value(QStringLiteral("mimetype")).toString();
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
     for (const auto &mt : mts.split(QLatin1Char(';'), QString::SkipEmptyParts))
+#else
+    for (const auto &mt : mts.split(QLatin1Char(';'), Qt::SkipEmptyParts))
+#endif
         mimetypes.push_back(mt);
     if (reader.attributes().hasAttribute(QStringLiteral("casesensitive")))
         caseSensitive = Xml::attrToBool(reader.attributes().value(QStringLiteral("casesensitive"))) ? Qt::CaseSensitive : Qt::CaseInsensitive;

@@ -31,7 +31,7 @@
 
 <language
     name="CMake"
-    version="20"
+    version="22"
     kateversion="2.4"
     section="Other"
     extensions="CMakeLists.txt;*.cmake;*.cmake.in"
@@ -191,9 +191,9 @@
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="Detect Builtin Variables">
+        <RegExpr attribute="Internal Name" context="#stay" String="\b_&id_re;\b" />
         <keyword attribute="Builtin Variable" context="#stay" String="variables" insensitive="false" />
         <IncludeRules context="Detect More Builtin Variables" />
-        <RegExpr attribute="Internal Name" context="#stay" String="\b_&id_re;\b" />
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="Detect More Builtin Variables">
@@ -278,6 +278,7 @@
       </context>
 
       <context attribute="Comment" lineEndContext="#stay" name="Bracketed Comment" dynamic="true">
+        <LineContinue attribute="Comment" context="#stay" />
         <RegExpr attribute="Comment" context="#pop" String=".*\]%1\]" dynamic="true" />
         <IncludeRules context="##Alerts" />
         <IncludeRules context="##Modelines" />

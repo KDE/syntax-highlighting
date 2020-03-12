@@ -113,6 +113,7 @@ bool checkExtensions(const QString &extensions)
 //! - is not empty
 //! - isValid()
 //! - character ranges such as [A-Z] are valid and not accidentally e.g. [A-z].
+//! - dynamic=true but no place holder used?
 bool checkRegularExpression(const QString &hlFilename, QXmlStreamReader &xml)
 {
     if (xml.name() == QLatin1String("RegExpr") || xml.name() == QLatin1String("emptyLine")) {
@@ -134,6 +135,15 @@ bool checkRegularExpression(const QString &hlFilename, QXmlStreamReader &xml)
         if (azOffset >= 0) {
             qWarning() << hlFilename << "line" << xml.lineNumber() << "broken regex:" << string << "problem: [a-Z] or [A-z] at offset" << azOffset;
             return false;
+        }
+
+        // dynamic == true and no place holder?
+        if (xml.name() == QLatin1String("RegExpr") && xml.attributes().value(QStringLiteral("dynamic")) == QStringLiteral("true")) {
+            static const QRegularExpression placeHolder(QStringLiteral("%\\d+"));
+            if (!string.contains(placeHolder)) {
+                qWarning() << hlFilename << "line" << xml.lineNumber() << "broken regex:" << string << "problem: dynamic=true but no %\\d+ placeholder";
+                return false;
+            }
         }
     }
 

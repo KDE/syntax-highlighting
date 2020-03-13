@@ -593,10 +593,9 @@ MatchResult RegExpr::doMatch(const QString &text, int offset, const QStringList 
 
     /**
      * no match
-     * the pattern of a dynamic regex depends on the previous contexts
-     * so that skipOffset cannot be computed
+     * we can always compute the skip offset as the highlighter will invalidate the cache for changed captures for dynamic rules!
      */
-    return MatchResult(offset, m_dynamic ? 0 : result.capturedStart());
+    return MatchResult(offset, result.capturedStart());
 }
 
 bool StringDetect::doLoad(QXmlStreamReader &reader)

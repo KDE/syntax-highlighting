@@ -178,6 +178,7 @@ State AbstractHighlighter::highlightLine(const QString &text, const State &state
     int offset = 0, beginOffset = 0;
     bool lineContinuation = false;
     QHash<Rule *, int> skipOffsets;
+    QStringList capturesForLastDynamicSkipOffset;
 
     /**
      * current active format
@@ -247,7 +248,12 @@ State AbstractHighlighter::highlightLine(const QString &text, const State &state
              * shall we skip application of this rule? two cases:
              *   - rule can't match at all => currentSkipOffset < 0
              *   - rule will only match for some higher offset => currentSkipOffset > offset
+             *
+             * we need to invalidate this if we are dynamic and have different captures then last time
              */
+            if (rule->isDynamic() && (capturesForLastDynamicSkipOffset != stateData->topCaptures())) {
+                skipOffsets.clear();
+            }
             const auto currentSkipOffset = skipOffsets.value(rule.get());
             if (currentSkipOffset < 0 || currentSkipOffset > offset)
                 continue;
@@ -258,8 +264,14 @@ State AbstractHighlighter::highlightLine(const QString &text, const State &state
             /**
              * update skip offset if new one rules out any later match or is larger than current one
              */
-            if (newResult.skipOffset() < 0 || newResult.skipOffset() > currentSkipOffset)
+            if (newResult.skipOffset() < 0 || newResult.skipOffset() > currentSkipOffset) {
                 skipOffsets.insert(rule.get(), newResult.skipOffset());
+
+                // remember new captures, if dynamic to enforce proper reset above on change!
+                if (rule->isDynamic()) {
+                    capturesForLastDynamicSkipOffset = stateData->topCaptures();
+                }
+            }
 
             if (newOffset <= offset)
                 continue;

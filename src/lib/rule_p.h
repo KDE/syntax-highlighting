@@ -69,6 +69,11 @@ public:
         return m_lookAhead;
     }
 
+    bool isDynamic() const
+    {
+        return m_dynamic;
+    }
+
     bool firstNonSpace() const
     {
         return m_firstNonSpace;
@@ -117,6 +122,9 @@ private:
 
     // cache for DefinitionData::wordDelimiters, is accessed VERY often
     QStringRef m_wordDelimiter;
+
+protected:
+    bool m_dynamic = false;
 };
 
 class AnyChar : public Rule
@@ -137,7 +145,7 @@ protected:
 
 private:
     QChar m_char;
-    bool m_dynamic = false;
+
     int m_captureIndex = 0;
 };
 
@@ -258,7 +266,6 @@ protected:
 
 private:
     QRegularExpression m_regexp;
-    bool m_dynamic = false;
 };
 
 class StringDetect : public Rule
@@ -270,7 +277,6 @@ protected:
 private:
     QString m_string;
     Qt::CaseSensitivity m_caseSensitivity;
-    bool m_dynamic = false;
 };
 
 class WordDetect : public Rule

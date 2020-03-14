@@ -145,7 +145,6 @@ protected:
 
 private:
     QChar m_char;
-
     int m_captureIndex = 0;
 };
 

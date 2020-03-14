@@ -177,6 +177,13 @@ State AbstractHighlighter::highlightLine(const QString &text, const State &state
 
     int offset = 0, beginOffset = 0;
     bool lineContinuation = false;
+
+    /**
+     * for expensive rules like regexes we do:
+     *   - match them for the complete line, as this is faster than re-trying them at all positions
+     *   - store the result of the first position that matches (or -1 for no match in the full line) in the skipOffsets hash for re-use
+     *   - have capturesForLastDynamicSkipOffset as guard for dynamic regexes to invalidate the cache if they might have changed
+     */
     QHash<Rule *, int> skipOffsets;
     QStringList capturesForLastDynamicSkipOffset;
 

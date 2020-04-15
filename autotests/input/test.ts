@@ -278,3 +278,12 @@ export * from "AnotherModule";
 export { k as m, l } from "AnotherModule";
 export type { T };
 export type { U } from "AnotherModule";
+
+// 'awaited' type operator: https://github.com/microsoft/TypeScript/pull/35998
+let v1: awaited number;
+let v2: awaited Promise<number>;
+function f7<U>() {
+    let v0: awaited U;
+    let v1: awaited Promise<U>;
+
+}

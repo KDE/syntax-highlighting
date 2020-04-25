@@ -37,16 +37,21 @@ comment
 	extends(parent)).
 
 	:- info([
-		version is 1.43,
+		version is 1:47:0,
 		author is 'Paulo Moura',
-		date is 2018/08/03,
+		date is 2019-09-18,
 		comment is 'Sample prototype for testing syntax coloring.'
 	]).
 
 	:- built_in.
 	:- threaded.
 	:- dynamic.
+
 	:- initialization(some_goal(X, Y)).
+
+	:- uses([
+		foobar as fb
+	]).
 
 	:- alias(set, [member/2 as set_member/2]).
 	:- alias(words, [singular//0 as peculiar//0]).
@@ -134,10 +139,15 @@ comment
 	multi_threading :-
 		threaded(Goals),
 		threaded_call(Goal),
+		threaded_call(Goal, Tag),
 		threaded_once(Goal),
+		threaded_once(Goal, Tag),
 		threaded_ignore(Goal),
 		threaded_exit(Goal),
+		threaded_exit(Goal, Tag),
 		threaded_peek(Goal),
+		threaded_peek(Goal, Tag),
+		threaded_cancel(Tag),
 		threaded_wait(Notification),
 		threaded_notify(Notification).
 
@@ -310,10 +320,10 @@ comment
 		numbervars(Term, Start, End),
 		term_variables(Term, Variables).
 
-	arithemtic_evaluation :-
+	arithmetic_evaluation :-
 		X is Expression.
 
-	arithemtic_comparison :-
+	arithmetic_comparison :-
 		Exp1 =:= Exp2,
 		Exp1 =\= Exp2,
 		Exp1 < Exp2,
@@ -399,10 +409,18 @@ comment
 
 	escape_sequences :-
 		write('Quoted atom with a quote ('') inside.'),
+		write('Quoted atom with a quote (\') inside using a control escape sequence.'),
 		write('Quoted atom with a backslash (\\) inside.'),
 		write('Quoted atom with control escape sequences: \a \b \r \f \t \n \v'),
 		write('Quoted atom with an octal escape sequence: \123\.'),
 		write('Quoted atom with an hexadecimal escape sequence: \x123f\.').
+
+	% nothing in the following predicate definition should be highlighted
+	sort :-
+		forall,
+		object,
+		write,
+		number.
 
 :- end_object.
 

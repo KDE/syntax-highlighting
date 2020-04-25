@@ -43,16 +43,21 @@
 	<span style="font-weight:bold;">extends</span>(parent)).
 
 	:-<span style="font-weight:bold;"> info</span>([
-		version <span style="color:#0057ae;">is</span> <span style="color:#b08000;">1.43</span>,
+		version <span style="color:#0057ae;">is</span> <span style="color:#b08000;">1</span><span style="color:#0057ae;">:</span><span style="color:#b08000;">47</span><span style="color:#0057ae;">:</span><span style="color:#b08000;">0</span>,
 		author <span style="color:#0057ae;">is</span> <span style="color:#bf0303;">'Paulo Moura'</span>,
-		date <span style="color:#0057ae;">is</span> <span style="color:#b08000;">2018</span><span style="color:#0057ae;">/</span><span style="color:#b08000;">08</span><span style="color:#0057ae;">/</span><span style="color:#b08000;">03</span>,
+		date <span style="color:#0057ae;">is</span> <span style="color:#b08000;">2019</span><span style="color:#0057ae;">-</span><span style="color:#b08000;">09</span><span style="color:#0057ae;">-</span><span style="color:#b08000;">18</span>,
 		comment <span style="color:#0057ae;">is</span> <span style="color:#bf0303;">'Sample prototype for testing syntax coloring.'</span>
 	]).
 
 	:-<span style="font-weight:bold;"> built_in</span>.
 	:-<span style="font-weight:bold;"> threaded</span>.
 	:-<span style="font-weight:bold;"> dynamic</span>.
+
 	:-<span style="font-weight:bold;"> initialization</span>(some_goal(<span style="color:#006e28;">X</span>, <span style="color:#006e28;">Y</span>)).
+
+	:-<span style="font-weight:bold;"> uses</span>([
+		foobar <span style="color:#0057ae;">as</span> fb
+	]).
 
 	:-<span style="font-weight:bold;"> alias</span>(set, [member<span style="color:#0057ae;">/</span><span style="color:#b08000;">2</span> <span style="color:#0057ae;">as</span> set_member<span style="color:#0057ae;">/</span><span style="color:#b08000;">2</span>]).
 	:-<span style="font-weight:bold;"> alias</span>(words, [singular<span style="color:#0057ae;">//</span><span style="color:#b08000;">0</span> <span style="color:#0057ae;">as</span> peculiar<span style="color:#0057ae;">//</span><span style="color:#b08000;">0</span>]).
@@ -140,10 +145,15 @@
 	multi_threading <span style="color:#0057ae;">:-</span>
 		<span style="color:#644a9b;">threaded</span>(<span style="color:#006e28;">Goals</span>),
 		<span style="color:#644a9b;">threaded_call</span>(<span style="color:#006e28;">Goal</span>),
+		<span style="color:#644a9b;">threaded_call</span>(<span style="color:#006e28;">Goal</span>, <span style="color:#006e28;">Tag</span>),
 		<span style="color:#644a9b;">threaded_once</span>(<span style="color:#006e28;">Goal</span>),
+		<span style="color:#644a9b;">threaded_once</span>(<span style="color:#006e28;">Goal</span>, <span style="color:#006e28;">Tag</span>),
 		<span style="color:#644a9b;">threaded_ignore</span>(<span style="color:#006e28;">Goal</span>),
 		<span style="color:#644a9b;">threaded_exit</span>(<span style="color:#006e28;">Goal</span>),
+		<span style="color:#644a9b;">threaded_exit</span>(<span style="color:#006e28;">Goal</span>, <span style="color:#006e28;">Tag</span>),
 		<span style="color:#644a9b;">threaded_peek</span>(<span style="color:#006e28;">Goal</span>),
+		<span style="color:#644a9b;">threaded_peek</span>(<span style="color:#006e28;">Goal</span>, <span style="color:#006e28;">Tag</span>),
+		<span style="color:#644a9b;">threaded_cancel</span>(<span style="color:#006e28;">Tag</span>),
 		<span style="color:#644a9b;">threaded_wait</span>(<span style="color:#006e28;">Notification</span>),
 		<span style="color:#644a9b;">threaded_notify</span>(<span style="color:#006e28;">Notification</span>).
 
@@ -316,10 +326,10 @@
 		<span style="color:#644a9b;">numbervars</span>(<span style="color:#006e28;">Term</span>, <span style="color:#006e28;">Start</span>, <span style="color:#006e28;">End</span>),
 		<span style="color:#644a9b;">term_variables</span>(<span style="color:#006e28;">Term</span>, <span style="color:#006e28;">Variables</span>).
 
-	arithemtic_evaluation <span style="color:#0057ae;">:-</span>
+	arithmetic_evaluation <span style="color:#0057ae;">:-</span>
 		<span style="color:#006e28;">X</span> <span style="color:#0057ae;">is</span> <span style="color:#006e28;">Expression</span>.
 
-	arithemtic_comparison <span style="color:#0057ae;">:-</span>
+	arithmetic_comparison <span style="color:#0057ae;">:-</span>
 		<span style="color:#006e28;">Exp1</span> <span style="color:#0057ae;">=:=</span> <span style="color:#006e28;">Exp2</span>,
 		<span style="color:#006e28;">Exp1</span> <span style="color:#0057ae;">=\=</span> <span style="color:#006e28;">Exp2</span>,
 		<span style="color:#006e28;">Exp1</span> <span style="color:#0057ae;">&lt;</span> <span style="color:#006e28;">Exp2</span>,
@@ -405,10 +415,18 @@
 
 	escape_sequences <span style="color:#0057ae;">:-</span>
 		<span style="color:#644a9b;">write</span>(<span style="color:#bf0303;">'Quoted atom with a quote ('') inside.'</span>),
+		<span style="color:#644a9b;">write</span>(<span style="color:#bf0303;">'Quoted atom with a quote (</span><span style="color:#3daee9;">\'</span><span style="color:#bf0303;">) inside using a control escape sequence.'</span>),
 		<span style="color:#644a9b;">write</span>(<span style="color:#bf0303;">'Quoted atom with a backslash (</span><span style="color:#3daee9;">\\</span><span style="color:#bf0303;">) inside.'</span>),
 		<span style="color:#644a9b;">write</span>(<span style="color:#bf0303;">'Quoted atom with control escape sequences: </span><span style="color:#3daee9;">\a</span><span style="color:#bf0303;"> </span><span style="color:#3daee9;">\b</span><span style="color:#bf0303;"> </span><span style="color:#3daee9;">\r</span><span style="color:#bf0303;"> </span><span style="color:#3daee9;">\f</span><span style="color:#bf0303;"> </span><span style="color:#3daee9;">\t</span><span style="color:#bf0303;"> </span><span style="color:#3daee9;">\n</span><span style="color:#bf0303;"> </span><span style="color:#3daee9;">\v</span><span style="color:#bf0303;">'</span>),
 		<span style="color:#644a9b;">write</span>(<span style="color:#bf0303;">'Quoted atom with an octal escape sequence: </span><span style="color:#3daee9;">\123\</span><span style="color:#bf0303;">.'</span>),
 		<span style="color:#644a9b;">write</span>(<span style="color:#bf0303;">'Quoted atom with an hexadecimal escape sequence: </span><span style="color:#3daee9;">\x123f\</span><span style="color:#bf0303;">.'</span>).
+
+	<span style="color:#898887;">% nothing in the following predicate definition should be highlighted</span>
+	sort <span style="color:#0057ae;">:-</span>
+		forall,
+		object,
+		write,
+		number.
 
 :-<span style="font-weight:bold;"> end_object</span>.
 

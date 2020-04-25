@@ -37,16 +37,21 @@
 <Normal>	</Normal><Directive>extends</Directive><Normal>(parent)).</Normal><br/>
 <Normal></Normal><br/>
 <Normal>	:-</Normal><Directive> info</Directive><Normal>([</Normal><br/>
-<Normal>		version </Normal><Operator>is</Operator><Normal> </Normal><Number>1.43</Number><Normal>,</Normal><br/>
+<Normal>		version </Normal><Operator>is</Operator><Normal> </Normal><Number>1</Number><Operator>:</Operator><Number>47</Number><Operator>:</Operator><Number>0</Number><Normal>,</Normal><br/>
 <Normal>		author </Normal><Operator>is</Operator><Normal> </Normal><String>'Paulo Moura'</String><Normal>,</Normal><br/>
-<Normal>		date </Normal><Operator>is</Operator><Normal> </Normal><Number>2018</Number><Operator>/</Operator><Number>08</Number><Operator>/</Operator><Number>03</Number><Normal>,</Normal><br/>
+<Normal>		date </Normal><Operator>is</Operator><Normal> </Normal><Number>2019</Number><Operator>-</Operator><Number>09</Number><Operator>-</Operator><Number>18</Number><Normal>,</Normal><br/>
 <Normal>		comment </Normal><Operator>is</Operator><Normal> </Normal><String>'Sample prototype for testing syntax coloring.'</String><br/>
 <Normal>	]).</Normal><br/>
 <Normal></Normal><br/>
 <Normal>	:-</Normal><Directive> built_in</Directive><Normal>.</Normal><br/>
 <Normal>	:-</Normal><Directive> threaded</Directive><Normal>.</Normal><br/>
 <Normal>	:-</Normal><Directive> dynamic</Directive><Normal>.</Normal><br/>
+<Normal></Normal><br/>
 <Normal>	:-</Normal><Directive> initialization</Directive><Normal>(some_goal(</Normal><Variable>X</Variable><Normal>, </Normal><Variable>Y</Variable><Normal>)).</Normal><br/>
+<Normal></Normal><br/>
+<Normal>	:-</Normal><Directive> uses</Directive><Normal>([</Normal><br/>
+<Normal>		foobar </Normal><Operator>as</Operator><Normal> fb</Normal><br/>
+<Normal>	]).</Normal><br/>
 <Normal></Normal><br/>
 <Normal>	:-</Normal><Directive> alias</Directive><Normal>(set, [member</Normal><Operator>/</Operator><Number>2</Number><Normal> </Normal><Operator>as</Operator><Normal> set_member</Normal><Operator>/</Operator><Number>2</Number><Normal>]).</Normal><br/>
 <Normal>	:-</Normal><Directive> alias</Directive><Normal>(words, [singular</Normal><Operator>//</Operator><Number>0</Number><Normal> </Normal><Operator>as</Operator><Normal> peculiar</Normal><Operator>//</Operator><Number>0</Number><Normal>]).</Normal><br/>
@@ -134,10 +139,15 @@
 <Normal>	multi_threading </Normal><Operator>:-</Operator><br/>
 <Normal>		</Normal><Built-in>threaded</Built-in><Normal>(</Normal><Variable>Goals</Variable><Normal>),</Normal><br/>
 <Normal>		</Normal><Built-in>threaded_call</Built-in><Normal>(</Normal><Variable>Goal</Variable><Normal>),</Normal><br/>
+<Normal>		</Normal><Built-in>threaded_call</Built-in><Normal>(</Normal><Variable>Goal</Variable><Normal>, </Normal><Variable>Tag</Variable><Normal>),</Normal><br/>
 <Normal>		</Normal><Built-in>threaded_once</Built-in><Normal>(</Normal><Variable>Goal</Variable><Normal>),</Normal><br/>
+<Normal>		</Normal><Built-in>threaded_once</Built-in><Normal>(</Normal><Variable>Goal</Variable><Normal>, </Normal><Variable>Tag</Variable><Normal>),</Normal><br/>
 <Normal>		</Normal><Built-in>threaded_ignore</Built-in><Normal>(</Normal><Variable>Goal</Variable><Normal>),</Normal><br/>
 <Normal>		</Normal><Built-in>threaded_exit</Built-in><Normal>(</Normal><Variable>Goal</Variable><Normal>),</Normal><br/>
+<Normal>		</Normal><Built-in>threaded_exit</Built-in><Normal>(</Normal><Variable>Goal</Variable><Normal>, </Normal><Variable>Tag</Variable><Normal>),</Normal><br/>
 <Normal>		</Normal><Built-in>threaded_peek</Built-in><Normal>(</Normal><Variable>Goal</Variable><Normal>),</Normal><br/>
+<Normal>		</Normal><Built-in>threaded_peek</Built-in><Normal>(</Normal><Variable>Goal</Variable><Normal>, </Normal><Variable>Tag</Variable><Normal>),</Normal><br/>
+<Normal>		</Normal><Built-in>threaded_cancel</Built-in><Normal>(</Normal><Variable>Tag</Variable><Normal>),</Normal><br/>
 <Normal>		</Normal><Built-in>threaded_wait</Built-in><Normal>(</Normal><Variable>Notification</Variable><Normal>),</Normal><br/>
 <Normal>		</Normal><Built-in>threaded_notify</Built-in><Normal>(</Normal><Variable>Notification</Variable><Normal>).</Normal><br/>
 <Normal></Normal><br/>
@@ -310,10 +320,10 @@
 <Normal>		</Normal><Built-in>numbervars</Built-in><Normal>(</Normal><Variable>Term</Variable><Normal>, </Normal><Variable>Start</Variable><Normal>, </Normal><Variable>End</Variable><Normal>),</Normal><br/>
 <Normal>		</Normal><Built-in>term_variables</Built-in><Normal>(</Normal><Variable>Term</Variable><Normal>, </Normal><Variable>Variables</Variable><Normal>).</Normal><br/>
 <Normal></Normal><br/>
-<Normal>	arithemtic_evaluation </Normal><Operator>:-</Operator><br/>
+<Normal>	arithmetic_evaluation </Normal><Operator>:-</Operator><br/>
 <Normal>		</Normal><Variable>X</Variable><Normal> </Normal><Operator>is</Operator><Normal> </Normal><Variable>Expression</Variable><Normal>.</Normal><br/>
 <Normal></Normal><br/>
-<Normal>	arithemtic_comparison </Normal><Operator>:-</Operator><br/>
+<Normal>	arithmetic_comparison </Normal><Operator>:-</Operator><br/>
 <Normal>		</Normal><Variable>Exp1</Variable><Normal> </Normal><Operator>=:=</Operator><Normal> </Normal><Variable>Exp2</Variable><Normal>,</Normal><br/>
 <Normal>		</Normal><Variable>Exp1</Variable><Normal> </Normal><Operator>=\=</Operator><Normal> </Normal><Variable>Exp2</Variable><Normal>,</Normal><br/>
 <Normal>		</Normal><Variable>Exp1</Variable><Normal> </Normal><Operator><</Operator><Normal> </Normal><Variable>Exp2</Variable><Normal>,</Normal><br/>
@@ -399,10 +409,18 @@
 <Normal></Normal><br/>
 <Normal>	escape_sequences </Normal><Operator>:-</Operator><br/>
 <Normal>		</Normal><Built-in>write</Built-in><Normal>(</Normal><String>'Quoted atom with a quote ('') inside.'</String><Normal>),</Normal><br/>
+<Normal>		</Normal><Built-in>write</Built-in><Normal>(</Normal><String>'Quoted atom with a quote (</String><String Char>\'</String Char><String>) inside using a control escape sequence.'</String><Normal>),</Normal><br/>
 <Normal>		</Normal><Built-in>write</Built-in><Normal>(</Normal><String>'Quoted atom with a backslash (</String><String Char>\\</String Char><String>) inside.'</String><Normal>),</Normal><br/>
 <Normal>		</Normal><Built-in>write</Built-in><Normal>(</Normal><String>'Quoted atom with control escape sequences: </String><String Char>\a</String Char><String> </String><String Char>\b</String Char><String> </String><String Char>\r</String Char><String> </String><String Char>\f</String Char><String> </String><String Char>\t</String Char><String> </String><String Char>\n</String Char><String> </String><String Char>\v</String Char><String>'</String><Normal>),</Normal><br/>
 <Normal>		</Normal><Built-in>write</Built-in><Normal>(</Normal><String>'Quoted atom with an octal escape sequence: </String><String Char>\123\</String Char><String>.'</String><Normal>),</Normal><br/>
 <Normal>		</Normal><Built-in>write</Built-in><Normal>(</Normal><String>'Quoted atom with an hexadecimal escape sequence: </String><String Char>\x123f\</String Char><String>.'</String><Normal>).</Normal><br/>
+<Normal></Normal><br/>
+<Normal>	</Normal><Comment>% nothing in the following predicate definition should be highlighted</Comment><br/>
+<Normal>	sort </Normal><Operator>:-</Operator><br/>
+<Normal>		forall,</Normal><br/>
+<Normal>		object,</Normal><br/>
+<Normal>		write,</Normal><br/>
+<Normal>		number.</Normal><br/>
 <Normal></Normal><br/>
 <Normal>:-</Normal><Directive> end_object</Directive><Normal>.</Normal><br/>
 <Normal></Normal><br/>

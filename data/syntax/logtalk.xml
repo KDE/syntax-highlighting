@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
 
-<language name="Logtalk" version="3" kateversion="2.4" section="Sources" extensions="*.lgt;.logtalk" mimetype="text/x-logtalk" author="Paulo Moura (pmoura@logtalk.org)" license="Apache License 2.0">
+<language name="Logtalk" version="4" kateversion="2.4" section="Sources" extensions="*.lgt;.logtalk" mimetype="text/x-logtalk" author="Paulo Moura (pmoura@logtalk.org)" license="Apache License 2.0">
 
 	<highlighting>
 
@@ -45,7 +45,7 @@
 				<!-- All solutions -->
 				<RegExpr String = "\b((bag|set)of|f(ind|or)all)(?=[(])" attribute = "Built-in" context = "#stay" />
 				<!-- Multi-threading predicates -->
-				<RegExpr String = "\bthreaded(_(call|once|ignore|exit|peek|wait|notify))?(?=[(])" attribute = "Built-in" context = "#stay" />
+				<RegExpr String = "\bthreaded(_(ca(ll|ncel)|once|ignore|exit|peek|wait|notify))?(?=[(])" attribute = "Built-in" context = "#stay" />
 				<!-- Engine predicates -->
 				<RegExpr String = "\bthreaded_engine(_(create|destroy|self|next|next_reified|yield|post|fetch))?(?=[(])" attribute = "Built-in" context = "#stay" />
 				<!-- Term unification -->
@@ -167,19 +167,19 @@
 			<context name = "directive" attribute = "Directive" lineEndContext = "#stay" >
 				<!-- Conditional compilation directives -->
 				<RegExpr String = "\bif(?=[(])" attribute = "Directive" context = "#pop" beginRegion = "CC" />
-				<RegExpr String = "\bendif[.]" attribute = "Directive" context = "#pop" endRegion = "CC" />
+				<RegExpr String = "\bendif(?=[.])" attribute = "Directive" context = "#pop" endRegion = "CC" />
 				<RegExpr String = "\belif(?=[(])" attribute = "Directive" context = "#pop"/>
-				<RegExpr String = "\belse[.]" attribute = "Directive" context = "#pop" />
+				<RegExpr String = "\belse(?=[.])" attribute = "Directive" context = "#pop" />
 				<!-- Entity directives -->
 				<RegExpr String = "\b(category|object|protocol)(?=[(])" attribute = "Directive" context = "entityrelations" beginRegion = "Entity" />
-				<RegExpr String = "\bend_(category|object|protocol)[.]" attribute = "Directive" context = "#pop" endRegion = "Entity" />
+				<RegExpr String = "\bend_(category|object|protocol)(?=[.])" attribute = "Directive" context = "#pop" endRegion = "Entity" />
 				<RegExpr String = "\bmodule(?=[(])" attribute = "Directive" context = "#pop"/>
  				<!-- Predicate scope directives -->
 				<RegExpr String = "\bp(ublic|r(otected|ivate))(?=[(])" attribute = "Directive" context = "#pop" />
 				<!-- Other directives -->
 				<RegExpr String = "\be(n(coding|sure_loaded)|xport)(?=[(])" attribute = "Directive" context = "#pop" />
 				<RegExpr String = "\bin(clude|itialization|fo)(?=[(])" attribute = "Directive" context = "#pop" />
-				<RegExpr String = "\b(built_in|dynamic|synchronized|threaded)[.]" attribute = "Directive" context = "#pop" />
+				<RegExpr String = "\b(built_in|dynamic|synchronized|threaded)(?=[.])" attribute = "Directive" context = "#pop" />
 				<RegExpr String = "\b(alias|d(ynamic|iscontiguous)|m(eta_(non_terminal|predicate)|ode|ultifile)|s(et_(logtalk|prolog)_flag|ynchronized))(?=[(])" attribute = "Directive" context = "#pop" />
 				<RegExpr String = "\bop(?=[(])" attribute = "Directive" context = "#pop" />
 				<RegExpr String = "\b(c(alls|oinductive)|reexport|use(s|_module))(?=[(])" attribute = "Directive" context = "#pop" />
@@ -219,6 +219,9 @@
 			</context>
 
 			<context name = "atom" attribute = "String" lineEndContext = "#stay" >
+				<RegExpr attribute="String Char" context="#stay" String="\\x[a-fA-F0-9]+\\"/>
+				<RegExpr attribute="String Char" context="#stay" String="\\[0-7]+\\"/>
+				<HlCStringChar attribute="String Char" context="#stay"/>
 				<DetectChar char = "'" attribute = "String" context = "#pop" />
 			</context>
 
@@ -231,7 +234,8 @@
 			<itemData name = "Operator" defStyleNum = "dsDataType" />
 			<itemData name = "Comment" defStyleNum = "dsComment" />
 			<itemData name = "Number" defStyleNum = "dsDecVal" />
-			<itemData name = "String"  defStyleNum = "dsString" />
+			<itemData name = "String" defStyleNum = "dsString" />
+			<itemData name="String Char" defStyleNum="dsSpecialChar" spellChecking="false"/>
 			<itemData name = "Variable" defStyleNum = "dsOthers" />
 		</itemDatas>
 

@@ -23,7 +23,10 @@ echo $"string meant to be translated"
 #this too
 echo this is#nt a comment
 dcop kate EditInterface#1 #this is
-
+grep -e "^default/linux/amd64/" |\ #this is a comment
+mkdir this\ isnt\ #a\ comment
+mkdir this\ isnt\\\;#a\ comment
+mkdir this\\ #is a comment
 
 # brace expansion
 mv my_file.{JPG,jpg}

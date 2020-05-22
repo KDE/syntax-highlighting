@@ -51,7 +51,7 @@
   <!-- <!ENTITY regadverb "(?!\()\s*(?::\w+\s*)*(?=[^\w\s])"> -->
   <!ENTITY regadverb "(?!\()\s*(?=[^\w\s])">
 ]>
-<language name="Raku" version="2" kateversion="5.53" section="Scripts" extensions="*.raku;*.rakumod;*.rakudoc;*.rakutest;*.pl6;*.PL6;*.p6;*.pm6;*.pod6" priority="6" author="Jonathan Poelen (jonathan.poelen@gmail.com)" license="MIT">
+<language name="Raku" version="3" kateversion="5.53" section="Scripts" extensions="*.raku;*.rakumod;*.rakudoc;*.rakutest;*.pl6;*.PL6;*.p6;*.pm6;*.pod6" priority="6" author="Jonathan Poelen (jonathan.poelen@gmail.com)" license="MIT">
   <highlighting>
 
     <list name="pod">
@@ -553,7 +553,11 @@
       </context>
 
       <context name="RegexKeyword" attribute="Normal Text" lineEndContext="#pop">
-        <DetectChar char="{" context="#pop!Pattern{" attribute="Operator" beginRegion="regex"/>
+        <DetectChar char="{" context="#pop!RegexKeyword-Pattern{" attribute="Operator" beginRegion="regex"/>
+      </context>
+      <context name="RegexKeyword-Pattern{" attribute="Pattern" lineEndContext="#stay">
+        <DetectChar char="}" context="#pop" attribute="Operator" endRegion="regex"/>
+        <IncludeRules context="find_Pattern"/>
       </context>
 
       <!-- Regex -->
@@ -1602,7 +1606,7 @@
         <AnyChar attribute="Pod Operator" context="MultilineComment" String="=|"/>
       </context>
 
-      <context name="MultilineComment" attribute="Comment" lineEndContext="#pop#pop" fallthrough="1" fallthroughContext="#pop#pop!SingleLineComment">
+      <context name="MultilineComment" attribute="Comment" lineEndContext="#pop#pop" fallthrough="1" fallthroughContext="#pop!SingleLineComment">
         <!-- TODO a new rule is needed to find the corresponding closures -->
         <StringDetect attribute="Comment" context="#pop#pop!MultilineComment(((" String="(((" beginRegion="comment"/>
         <StringDetect attribute="Comment" context="#pop#pop!MultilineComment[[[" String="[[[" beginRegion="comment"/>

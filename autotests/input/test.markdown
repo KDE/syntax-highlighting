@@ -422,6 +422,24 @@ f <- function(x, y) {
 }
 ```
 
+## Raku
+
+```raku
+grammar Parser {
+    rule  TOP  { I <love> <lang> }
+    token love { '♥' | love }
+    token lang { < Raku Perl Rust Go Python Ruby > }
+}
+
+say Parser.parse: 'I ♥ Raku';
+
+say 1 #`««« blah TODO blah
+here? »»» 2 ;
+say 1 #` ( blah TODO blah
+2 ;
+rx- regex -
+```
+
 ## Ruby
 
 ```ruby

@@ -63,13 +63,16 @@ markdown = `function () {
 }`
 
 ```
-	// Comment
-	var array = new Array(500);
-	var name = "Willy";
-	alert(`Hello ${name}!`);
+  // Comment
+  var array = new Array(500);
+  var name = "Willy";
+  alert(`Hello ${name}!`);
 ```
 ` String.raw\`String ${x} \` `
 
 ` // Regular Expression after template
   const a = \`6\` / 2; /*comment*/
   \`template\` /regex/ `
+
+` // Tagged template literals
+  tagFunc\`Setting ${setting} is ${value}!\` `

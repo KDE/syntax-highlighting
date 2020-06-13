@@ -156,3 +156,9 @@ const goodHighlighting = <T extends I>(
 let y = foo == null ? null : <Tag/>;
 let x = (foo === null || foo === undefined) ?
     undefined :<tag>hello</tag>;
+
+// Tagged template literals
+tagFunc`
+    Hello world!
+    ${ <Tag />; 22 + "11" }`;
+obj.something.tagFunc`Setting ${setting} is ${value}!`;

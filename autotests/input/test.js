@@ -41,3 +41,10 @@ JSON.stringify("hello");
 console.error("hello");
 Math.LOG10E;
 Number.MAX_SAFE_INTEGER;
+String.raw`raw text \.\n${}`
+
+// Tagged template literals
+tagFunc`
+    Hello world!
+    ${ alert("Hello!"); }`;
+obj.something.tagFunc`Setting ${setting} is ${value + 5}!`;

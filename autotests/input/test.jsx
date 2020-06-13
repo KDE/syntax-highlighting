@@ -96,3 +96,9 @@ class Handler {
 <noTag /* comment */ ?
 <noTag#
 <noTag/*comment*/#
+
+// Tagged template literals
+tagFunc`
+    Hello world!
+    ${ <Tag />; 22 + "11" }`;
+obj.something.tagFunc`Setting ${setting} is ${value}!`;

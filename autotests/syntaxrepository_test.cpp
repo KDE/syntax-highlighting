@@ -287,9 +287,9 @@ private Q_SLOTS:
 
             // collect all formats, shall be numbered from 1..
             QSet<int> formatIds;
-            for (auto d : qAsConst(includedDefs)) {
+            for (const auto &d : qAsConst(includedDefs)) {
                 const auto formats = d.formats();
-                for (const auto format : formats) {
+                for (const auto &format : formats) {
                     // no duplicates
                     QVERIFY(!formatIds.contains(format.id()));
                     formatIds.insert(format.id());

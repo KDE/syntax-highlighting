@@ -31,7 +31,7 @@
 
 <language
     name="CMake"
-    version="22"
+    version="24"
     kateversion="2.4"
     section="Other"
     extensions="CMakeLists.txt;*.cmake;*.cmake.in"
@@ -70,6 +70,12 @@
     {%- endfor %}
     </list>
 
+    <list name="deprecated-or-internal-variables">
+    {%- for var in deprecated_or_internal_variables.kw %}
+      <item>{{var}}</item>
+    {%- endfor %}
+    </list>
+
     <list name="environment-variables">
     {%- for var in environment_variables.kw %}
       <item>{{var}}</item>
@@ -95,7 +101,7 @@
       <context attribute="Normal Text" lineEndContext="#stay" name="Normal Text">
         <DetectSpaces/>
         {% for command in commands -%}
-        <WordDetect String="{{command.name}}" insensitive="true" attribute="Command" context="{{command.name}}_ctx" />
+        <WordDetect String="{{command.name}}" insensitive="true" attribute="Command" context="{{command.name}}_ctx"{% if command.start_region %} beginRegion="{{command.start_region}}"{% endif -%} {%- if command.end_region %} endRegion="{{command.end_region}}"{% endif %} />
         {% endfor -%}
         <RegExpr attribute="Region Marker" context="RST Documentation" String="^#\[(=*)\[\.rst:" column="0" />
         <RegExpr attribute="Comment" context="Bracketed Comment" String="#\[(=*)\[" />
@@ -192,11 +198,15 @@
 
       <context attribute="Normal Text" lineEndContext="#stay" name="Detect Builtin Variables">
         <RegExpr attribute="Internal Name" context="#stay" String="\b_&id_re;\b" />
+        <keyword attribute="CMake Internal Variable" context="#stay" String="deprecated-or-internal-variables" insensitive="false" />
         <keyword attribute="Builtin Variable" context="#stay" String="variables" insensitive="false" />
         <IncludeRules context="Detect More Builtin Variables" />
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="Detect More Builtin Variables">
+        {%- for var in deprecated_or_internal_variables.re %}
+        <RegExpr attribute="CMake Internal Variable" context="#stay" String="{{var}}" />
+        {%- endfor %}
         {%- for var in variables.re %}
         <RegExpr attribute="Builtin Variable" context="#stay" String="{{var}}" />
         {%- endfor %}
@@ -204,24 +214,19 @@
 
       <context attribute="Normal Text" lineEndContext="#stay" name="Detect Variable Substitutions">
         <RegExpr attribute="Cache Variable Substitution" context="#stay" String="\$CACHE\{\s*[\w-]+\s*\}" />
-        <RegExpr attribute="Environment Variable Substitution" context="EnvVarSubst" String="\$ENV\{\s*[\w-]+\s*\}" lookAhead="true" />
+        <RegExpr attribute="Environment Variable Substitution" context="EnvVarSubst" String="\$?ENV\{" />
         <Detect2Chars attribute="Variable Substitution" context="VarSubst" char="$" char1="{" />
         <RegExpr attribute="@Variable Substitution" context="@VarSubst" String="@&id_re;@" lookAhead="true" />
       </context>
 
       <context attribute="Environment Variable Substitution" lineEndContext="#pop" name="EnvVarSubst">
-        <DetectIdentifier />
-        <DetectChar attribute="Environment Variable Substitution" context="EnvVarSubstVar" char="{" />
-        <DetectChar attribute="Environment Variable Substitution" context="#pop" char="}" />
-      </context>
-
-      <context attribute="Environment Variable Substitution" lineEndContext="#pop" name="EnvVarSubstVar">
         <keyword attribute="Standard Environment Variable" context="#stay" String="environment-variables" insensitive="false" />
         {%- for var in environment_variables.re %}
         <RegExpr attribute="Standard Environment Variable" context="#stay" String="{{var}}" />
         {%- endfor %}
         <DetectIdentifier />
-        <DetectChar attribute="Environment Variable Substitution" context="#pop#pop" char="}" />
+        <IncludeRules context="Detect Variable Substitutions" />
+        <DetectChar attribute="Environment Variable Substitution" context="#pop" char="}" />
       </context>
 
       <context attribute="Variable Substitution" lineEndContext="#pop" name="VarSubst">
@@ -232,6 +237,7 @@
       </context>
 
       <context attribute="@Variable Substitution" lineEndContext="#pop" name="@VarSubst">
+        <IncludeRules context="Detect Builtin Variables" />
         <DetectChar attribute="@Variable Substitution" context="VarSubst@" char="@" />
       </context>
 
@@ -323,6 +329,7 @@
       <itemData name="Strings" defStyleNum="dsString" spellChecking="true" />
       <itemData name="Escapes" defStyleNum="dsChar" spellChecking="false" />
       <itemData name="Builtin Variable" defStyleNum="dsDecVal" color="#c09050" selColor="#c09050" spellChecking="false" />
+      <itemData name="CMake Internal Variable" defStyleNum="dsDecVal" color="#303030" selColor="#303030" spellChecking="false" />
       <itemData name="Internal Name" defStyleNum="dsDecVal" color="#303030" selColor="#303030" spellChecking="false" />
       <itemData name="Variable Substitution" defStyleNum="dsDecVal" spellChecking="false" />
       <itemData name="@Variable Substitution" defStyleNum="dsBaseN" spellChecking="false" />

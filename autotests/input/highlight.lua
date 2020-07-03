@@ -108,6 +108,7 @@ alo
 32p
 0xp-4
 0x.p-4
+3.x
 
 
 -- single comment
@@ -169,3 +170,14 @@ function foo()
     end
   end
 end
+
+-- attributes
+local a<const> = 2
+local a<const> print(a)
+local f <close>, const <    const >
+local a <cloe>, b< cons >, c<const, d<close> ; a<b
+local a <cloe> -- bla, 
+b< cons >
+local a <close> --[[
+b <const>]], b <const> --[[ xyz ]] , c <close>
+b< cons >

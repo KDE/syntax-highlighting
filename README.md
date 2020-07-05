@@ -22,7 +22,7 @@ as well as a ready-to-use QSyntaxHighlighter sub-class.
 ## Syntax Definition Files
 
 This library uses Kate syntax definition files for the actual highlighting,
-the file format is documented [here](https://docs.kde.org/stable5/en/applications/katepart/highlight.html).
+the file format is documented [here](https://docs.kde.org/?application=katepart&branch=trunk5&path=highlight.html).
 
 More than 300 syntax definition files are included, that are located
 in **data/syntax/** and have the **.xml** extension. Additional ones are
@@ -52,7 +52,7 @@ Usually it is:
     </tr>
 </table>
 
-For more details, see ["The Highlight Definition XML Format" (Working with Syntax Highlighting, KDE Documentation)](https://docs.kde.org/trunk5/en/applications/katepart/highlight.html#katehighlight-xml-format).
+For more details, see ["The Highlight Definition XML Format" (Working with Syntax Highlighting, KDE Documentation)](https://docs.kde.org/?application=katepart&branch=trunk5&path=highlight.html#katehighlight-xml-format).
 
 Also, in **data/schema/** there is a script to validate the syntax definiton XML
 files. Use the command `validatehl.sh mySyntax.xml`.
@@ -123,7 +123,7 @@ All the necessary information to send contributions is [here](https://community.
   themes. Prefer to use the default color styles.
 
   For more information, see:
-    * [Available Default Styles (Working with Syntax Highlighting, KDE Documentation)](https://docs.kde.org/trunk5/en/applications/katepart/highlight.html#kate-highlight-default-styles)
+    * [Available Default Styles (Working with Syntax Highlighting, KDE Documentation)](https://docs.kde.org/?application=katepart&branch=trunk5&path=highlight.html#kate-highlight-default-styles)
     * [Kate Part (KF5): New Default Styles for better Color Schemes (Kate Editor Website)](https://kate-editor.org/2014/03/07/kate-part-kf5-new-default-styles-for-better-color-schemes/)
 
 * Important: add test files, these are found in **autotests/input/**.

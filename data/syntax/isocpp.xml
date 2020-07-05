@@ -24,7 +24,7 @@
 <language
     name="ISO C++"
     section="Sources"
-    version="18"
+    version="19"
     kateversion="5.0"
     indenter="cstyle"
     style="C++"
@@ -305,7 +305,7 @@
         <Detect2Chars attribute="Symbol" context="Attribute" char="[" char1="[" />
         <StringDetect attribute="Symbol" context="Attribute" String="&lt;:&lt;:" /> <!-- Digraph: [[ -->
         <!-- Match numbers -->
-        <RegExpr attribute="Decimal" context="Number" String="\.?[0-9]" lookAhead="true" />
+        <IncludeRules context="FindNumbers" />
         <!-- Match comments -->
         <IncludeRules context="match comments and region markers" />
         <!-- Match keywords -->
@@ -391,9 +391,17 @@
         <DetectIdentifier />
       </context>
 
-      <context name="Number" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
-        <RegExpr attribute="Float" context="FloatSuffix" String="\.&int;&exp_float;?|&int;(?:&exp_float;|\.&int;?&exp_float;?)|0[xX](?:\.&hex_int;&exp_hexfloat;?|&hex_int;(?:&exp_hexfloat;|\.&hex_int;?&exp_hexfloat;?))" />
-        <IncludeRules context="Integer" />
+      <context name="FindNumbers" attribute="Normal Text" lineEndContext="#stay">
+        <!-- NOTE: This rule avoids slow highlighting when writing numbers.
+             The RegExpr rules in the "Float" context are slow and make high CPU usage (see bug 423680). -->
+        <RegExpr context="Float" String="\.\d|\d[\d']*(?:\.|[eE][+-]?\d)|0[xX][0-9a-fA-F']*(?:\.|[0-9a-fA-F'][pP][+-]?\d)" lookAhead="true" />
+        <AnyChar context="Integer" String="0123456789" lookAhead="true" />
+      </context>
+
+      <context name="Float" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+        <RegExpr attribute="Float" context="FloatSuffix" String="\.&int;&exp_float;?|&int;(?:&exp_float;|\.&int;?&exp_float;?)" />
+        <RegExpr attribute="Float" context="FloatSuffix" String="0[xX](?:\.&hex_int;&exp_hexfloat;?|&hex_int;(?:&exp_hexfloat;|\.&hex_int;?&exp_hexfloat;?))" />
+        <RegExpr attribute="Error" context="#pop" String="[._0-9A-Za-z']+" />
       </context>
 
       <context name="Integer" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
@@ -702,7 +710,7 @@
         <Detect2Chars attribute="Symbol" context="Attribute In PP" char="[" char1="[" />
         <StringDetect attribute="Symbol" context="Attribute In PP" String="&lt;:&lt;:" /> <!-- Digraph: [[ -->
         <!-- Match numbers -->
-        <RegExpr attribute="Decimal" context="Number" String="\.?[0-9]" lookAhead="true" />
+        <IncludeRules context="FindNumbers" />
         <!-- Match comments -->
         <IncludeRules context="match comments" />
         <!-- Match punctuators -->

@@ -39,7 +39,7 @@
 <!--                                                                       -->
 <!--***********************************************************************-->
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="Vera" version="5" kateversion="5.0" section="Hardware" extensions="*.vr;*.vri;*.vrh" mimetype="text/x-vera-src" author="Sean O'Boyle (seanoboyle@intelligentdv.com)" license="GPLv3+">
+<language name="Vera" version="6" kateversion="5.0" section="Hardware" extensions="*.vr;*.vri;*.vrh" mimetype="text/x-vera-src" author="Sean O'Boyle (seanoboyle@intelligentdv.com)" license="GPLv3+">
   <highlighting>
     <list name="keywords">
        <item>after</item>
@@ -534,9 +534,7 @@
         <RegExpr attribute="Binary" context="#stay" String="[\d_]*'b[01_zZxX]+"/>
         <Float attribute="Float" context="#stay"/>
         <Int attribute="Decimal" context="#stay"/>
-        <IncludeRules context="##Doxygen" />
-        <Detect2Chars attribute="Comment" context="Commentar 1" char="/" char1="/"/>
-        <Detect2Chars attribute="Comment" context="Commentar 2" char="/" char1="*" beginRegion="Comment"/>
+        <IncludeRules context="FindComments" />
         <DetectChar attribute="Symbol" context="#stay" char="{" beginRegion="Brace1" />
         <DetectChar attribute="Symbol" context="#stay" char="}" endRegion="Brace1" />
         <AnyChar attribute="Symbol" context="#stay" String=":!%&amp;()+,-/.*&lt;=&gt;?[]{|}~^&#59;"/>
@@ -546,6 +544,17 @@
         <LineContinue attribute="String" context="#stay"/>
         <HlCStringChar attribute="String Char" context="#stay"/>
         <DetectChar attribute="String" context="#pop" char="&quot;"/>
+      </context>
+
+      <context name="FindComments" attribute="Normal Text" lineEndContext="#pop">
+        <Detect2Chars attribute="Comment" context="MatchComment" char="/" char1="/" lookAhead="true"/>
+        <Detect2Chars attribute="Comment" context="MatchComment" char="/" char1="*" lookAhead="true" />
+      </context>
+
+      <context name="MatchComment" attribute="Comment" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+        <IncludeRules context="##Doxygen" />
+        <Detect2Chars attribute="Comment" context="#pop!Commentar 1" char="/" char1="/" />
+        <Detect2Chars attribute="Comment" context="#pop!Commentar 2" char="/" char1="*" beginRegion="Comment" />
       </context>
 
       <context attribute="Comment" lineEndContext="#pop" name="Commentar 1">
@@ -575,20 +584,11 @@
         <LineContinue attribute="Preprocessor" context="#stay"/>
         <RangeDetect attribute="Prep. Lib" context="#stay" char="&quot;" char1="&quot;"/>
         <RangeDetect attribute="Prep. Lib" context="#stay" char="&lt;" char1="&gt;"/>
-        <IncludeRules context="##Doxygen" />
-        <Detect2Chars attribute="Comment" context="Commentar/Preprocessor" char="/" char1="*" beginRegion="Comment2" />
-
-        <Detect2Chars attribute="Comment" context="Commentar 1" char="/" char1="/"/>
+        <IncludeRules context="FindComments" />
       </context>
 
       <context attribute="Preprocessor" lineEndContext="#pop" name="Define">
         <LineContinue attribute="Preprocessor" context="#stay"/>
-      </context>
-
-      <context attribute="Comment" lineEndContext="#stay" name="Commentar/Preprocessor">
-        <DetectSpaces />
-        <Detect2Chars attribute="Comment" context="#pop" char="*" char1="/" endRegion="Comment2" />
-        <DetectIdentifier />
       </context>
 
       <context attribute="Comment" lineEndContext="#stay" name="Outscoped" >
@@ -596,9 +596,7 @@
         <IncludeRules context="##Alerts" />
         <DetectIdentifier />
         <DetectChar attribute="String" context="String" char="&quot;"/>
-        <IncludeRules context="##Doxygen" />
-        <Detect2Chars attribute="Comment" context="Commentar 1" char="/" char1="/"/>
-        <Detect2Chars attribute="Comment" context="Commentar 2" char="/" char1="*" beginRegion="Comment"/>
+        <IncludeRules context="FindComments" />
         <RegExpr attribute="Comment" context="Outscoped intern" String="#\s*if" beginRegion="PP" firstNonSpace="true" />
         <RegExpr attribute="Preprocessor" context="#pop" String="#\s*el(?:se|if)" firstNonSpace="true" />
         <RegExpr attribute="Preprocessor" context="#pop" String="#\s*endif" endRegion="PP" firstNonSpace="true" />
@@ -609,9 +607,7 @@
         <IncludeRules context="##Alerts" />
         <DetectIdentifier />
         <DetectChar attribute="String" context="String" char="&quot;"/>
-        <IncludeRules context="##Doxygen" />
-        <Detect2Chars attribute="Comment" context="Commentar 1" char="/" char1="/"/>
-        <Detect2Chars attribute="Comment" context="Commentar 2" char="/" char1="*" beginRegion="Comment"/>
+        <IncludeRules context="FindComments" />
         <RegExpr attribute="Comment" context="Outscoped intern" String="#\s*if" beginRegion="PP" firstNonSpace="true" />
         <RegExpr attribute="Comment" context="#pop" String="#\s*endif" endRegion="PP" firstNonSpace="true" />
       </context>

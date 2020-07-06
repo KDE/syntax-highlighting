@@ -3,7 +3,7 @@
 [
 ]>
 <language name="Solidity" section="Sources"
-          version="1" kateversion="5.0"
+          version="2" kateversion="5.0"
           indenter="cstyle"
           mimetype=""
           extensions="*.sol"
@@ -285,10 +285,15 @@
       <Detect2Chars attribute="Built-in" context="#stay" char="+" char1="+" />
       <Detect2Chars attribute="Built-in" context="#stay" char="-" char1="-" />
 
-      <IncludeRules context="##Doxygen" />
-      <Detect2Chars attribute="Comment" context="Comment Single" char="/" char1="/" />
-      <Detect2Chars attribute="Comment" context="Comment Multi" char="/" char1="*" beginRegion="Comment" />
+      <Detect2Chars attribute="Comment" context="MatchComment" char="/" char1="/" lookAhead="true"/>
+      <Detect2Chars attribute="Comment" context="MatchComment" char="/" char1="*" lookAhead="true" />
       <AnyChar attribute="Symbol" context="#stay" String=":!%&amp;()+,-/.*&lt;=&gt;?[]|~^&#59;" />
+    </context>
+
+    <context name="MatchComment" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+      <IncludeRules context="##Doxygen" />
+      <Detect2Chars attribute="Comment" context="#pop!Comment Single" char="/" char1="/" />
+      <Detect2Chars attribute="Comment" context="#pop!Comment Multi" char="/" char1="*" beginRegion="Comment" />
     </context>
 
     <context name="Pragma" attribute="Normal Text" lineEndContext="#pop">

@@ -39,7 +39,7 @@
 <!--                                                                       -->
 <!--***********************************************************************-->
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="SystemVerilog" version="7" kateversion="2.4" section="Hardware" extensions="*.sv;*.svh" mimetype="text/x-systemverilog-src" author="Sean O'Boyle (seanoboyle@intelligentdv.com)" license="GPLv3+">
+<language name="SystemVerilog" version="8" kateversion="5.0" section="Hardware" extensions="*.sv;*.svh" mimetype="text/x-systemverilog-src" author="Sean O'Boyle (seanoboyle@intelligentdv.com)" license="GPLv3+">
   <highlighting>
     <list name="key_deprecated">
        <item>defparam</item>
@@ -870,9 +870,7 @@
         <RegExpr attribute="Port Connection" context="#stay" String="[^\w$]\.[a-zA-Z]+[\w$]*"/>
 
         <DetectChar attribute="String" context="String" char="&quot;"/>
-        <IncludeRules context="##Doxygen" />
-        <Detect2Chars attribute="Comment" context="Commentar 1" char="/" char1="/"/>
-        <Detect2Chars attribute="Comment" context="Commentar 2" char="/" char1="*" beginRegion="Comment"/>
+        <IncludeRules context="FindComments" />
         <AnyChar attribute="Symbol" context="#stay" String="!%&amp;()+,-&lt;=+/:;&gt;?[]^{|}~@"/>
 
         <DetectChar attribute="Preprocessor" context="Preprocessor" char="`" column="0"/>
@@ -900,6 +898,17 @@
         <DetectChar attribute="String" context="#pop" char="&quot;"/>
       </context>
 
+      <context name="FindComments" attribute="Normal Text" lineEndContext="#pop">
+        <Detect2Chars attribute="Comment" context="MatchComment" char="/" char1="/" lookAhead="true" />
+        <Detect2Chars attribute="Comment" context="MatchComment" char="/" char1="*" lookAhead="true" />
+      </context>
+
+      <context name="MatchComment" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+        <IncludeRules context="##Doxygen" />
+        <Detect2Chars attribute="Comment" context="#pop!Commentar 1" char="/" char1="/"/>
+        <Detect2Chars attribute="Comment" context="#pop!Commentar 2" char="/" char1="*" beginRegion="Comment"/>
+      </context>
+
       <context attribute="Comment" lineEndContext="#pop" name="Commentar 1">
         <LineContinue attribute="Comment" context="#stay"/>
         <DetectSpaces />
@@ -918,16 +927,7 @@
         <LineContinue attribute="Preprocessor" context="#stay"/>
         <RangeDetect attribute="Prep. Lib" context="#stay" char="&quot;" char1="&quot;"/>
         <RangeDetect attribute="Prep. Lib" context="#stay" char="&lt;" char1="&gt;"/>
-        <IncludeRules context="##Doxygen" />
-        <Detect2Chars attribute="Comment" context="Commentar/Preprocessor" char="/" char1="*" beginRegion="Comment2" />
-
-        <Detect2Chars attribute="Comment" context="Commentar 1" char="/" char1="/"/>
-      </context>
-
-      <context attribute="Comment" lineEndContext="#stay" name="Commentar/Preprocessor">
-        <DetectSpaces />
-        <Detect2Chars attribute="Comment" context="#pop" char="*" char1="/" endRegion="Comment2" />
-        <DetectIdentifier />
+        <IncludeRules context="FindComments" />
       </context>
 
       <context attribute="Comment" lineEndContext="#stay" name="Outscoped intern">
@@ -935,9 +935,7 @@
         <IncludeRules context="##Alerts" />
         <DetectIdentifier />
         <DetectChar attribute="String" context="String" char="&quot;"/>
-        <IncludeRules context="##Doxygen" />
-        <Detect2Chars attribute="Comment" context="Commentar 1" char="/" char1="/"/>
-        <Detect2Chars attribute="Comment" context="Commentar 2" char="/" char1="*" beginRegion="Comment"/>
+        <IncludeRules context="FindComments" />
         <RegExpr attribute="Comment" context="Outscoped intern" String="#\s*if" beginRegion="PP" firstNonSpace="true" />
         <RegExpr attribute="Comment" context="#pop" String="#\s*endif" endRegion="PP" firstNonSpace="true" />
       </context>

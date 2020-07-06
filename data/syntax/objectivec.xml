@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="Objective-C" version="3" kateversion="5.0" section="Sources" extensions="*.m;*.h" mimetype="text/x-objc-src;text/x-c-hdr">
+<language name="Objective-C" version="4" kateversion="5.0" section="Sources" extensions="*.m;*.h" mimetype="text/x-objc-src;text/x-c-hdr">
   <highlighting>
     <list name="keywords">
       <item>break</item>
@@ -63,8 +63,7 @@
         <Int attribute="Decimal" context="Int Suffixes"/>
         <HlCChar attribute="Char" context="#stay"/>
         <DetectChar attribute="String" context="String" char="&quot;"/>
-        <Detect2Chars attribute="Comment" context="SingleLineComment" char="/" char1="/"/>
-        <Detect2Chars attribute="Comment" context="MultiLineComment" char="/" char1="*"/>
+        <IncludeRules context="FindComments" />
         <AnyChar attribute="Symbol" context="#stay" String=":!%&amp;()+,-/.*&lt;=&gt;?[]|~^&#59;"/>
         <RegExpr attribute="Preprocessor" context="Preprocessor" String="^#"/>
         <Detect2Chars attribute="String" context="String" char="@" char1="&quot;" />
@@ -87,20 +86,24 @@
         <HlCStringChar attribute="String Char" context="#stay"/>
         <DetectChar attribute="String" context="#pop" char="&quot;"/>
       </context>
+      <context name="FindComments" attribute="Normal Text" lineEndContext="#pop">
+        <Detect2Chars attribute="Comment" context="MatchComment" char="/" char1="/" lookAhead="true"/>
+        <Detect2Chars attribute="Comment" context="MatchComment" char="/" char1="*" lookAhead="true"/>
+      </context>
+      <context name="MatchComment" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+        <IncludeRules context="##Doxygen" />
+        <Detect2Chars attribute="Comment" context="#pop!SingleLineComment" char="/" char1="/" />
+        <Detect2Chars attribute="Comment" context="#pop!MultiLineComment" char="/" char1="*" beginRegion="Comment" />
+      </context>
       <context attribute="Comment" lineEndContext="#pop" name="SingleLineComment"/>
       <context attribute="Comment" lineEndContext="#stay" name="MultiLineComment">
-        <Detect2Chars attribute="Comment" context="#pop" char="*" char1="/"/>
+        <Detect2Chars attribute="Comment" context="#pop" char="*" char1="/" endRegion="Comment"/>
       </context>
       <context attribute="Preprocessor" lineEndContext="Default" name="Preprocessor">
         <LineContinue attribute="Preprocessor" context="#stay"/>
         <RangeDetect attribute="Prep. Lib" context="#stay" char="&quot;" char1="&quot;"/>
         <RangeDetect attribute="Prep. Lib" context="#stay" char="&lt;" char1="&gt;"/>
-        <IncludeRules context="##Doxygen" />
-        <Detect2Chars attribute="Comment" context="SingleLineComment" char="/" char1="/"/>
-        <Detect2Chars attribute="Comment" context="MultiLineCommentPrep" char="/" char1="*"/>
-      </context>
-      <context attribute="Comment" lineEndContext="#stay" name="MultiLineCommentPrep">
-        <Detect2Chars attribute="Comment" context="#pop#pop" char="*" char1="/"/>
+        <IncludeRules context="FindComments" />
       </context>
     </contexts>
     <itemDatas>

@@ -22,7 +22,7 @@
  * Boston, MA  02110-1301, USA.                                       *
  **********************************************************************
  -->
-<language name="Vala" section="Sources" version="5" kateversion="3.4" indenter="cstyle" extensions="*.vala" mimetype="text/x-vala" priority="15" author="Antoni Boucher (bouanto@hotmail.com)" license="LGPLv2+">
+<language name="Vala" section="Sources" version="6" kateversion="5.0" indenter="cstyle" extensions="*.vala" mimetype="text/x-vala" priority="15" author="Antoni Boucher (bouanto@hotmail.com)" license="LGPLv2+">
     <highlighting>
         <list name="keywords">
             <item>abstract</item>
@@ -130,8 +130,6 @@
             <DetectSpaces />
             <RegExpr attribute="Preprocessor" context="Outscoped" String="#\s*if\s+0\s*$" beginRegion="PP" firstNonSpace="true" />
             <DetectChar context="AfterHash" char="#" firstNonSpace="true" lookAhead="true" />
-            <StringDetect attribute="Region Marker" context="Region Marker" String="//BEGIN" beginRegion="Region1" firstNonSpace="true" />
-            <StringDetect attribute="Region Marker" context="Region Marker" String="//END" endRegion="Region1" firstNonSpace="true" />
             <keyword attribute="Keyword" context="#stay" String="keywords" />
             <keyword attribute="Extensions" context="#stay" String="extensions" />
             <keyword attribute="Data Type" context="#stay" String="types" />
@@ -145,12 +143,23 @@
             <HlCOct attribute="Octal" context="#stay"/>
             <HlCHex attribute="Hex" context="#stay"/>
             <Int attribute="Decimal" context="Int Suffixes"/>
-            <IncludeRules context="##Doxygen" />
-            <Detect2Chars attribute="Comment" context="Comment" char="/" char1="/"/>
-            <Detect2Chars attribute="Comment" context="MultiLine Comment" char="/" char1="*" beginRegion="Comment"/>
+            <IncludeRules context="FindComments" />
             <DetectChar attribute="Symbol" context="#stay" char="{" beginRegion="Brace1" />
             <DetectChar attribute="Symbol" context="#stay" char="}" endRegion="Brace1" />
             <AnyChar attribute="Symbol" context="#stay" String=":!%&amp;()+,-/.*&lt;=&gt;?[]{|}~^&#59;"/>
+        </context>
+
+        <context name="FindComments" attribute="Normal Text" lineEndContext="#pop">
+            <Detect2Chars attribute="Comment" context="MatchComment" char="/" char1="/" lookAhead="true"/>
+            <Detect2Chars attribute="Comment" context="MatchComment" char="/" char1="*" lookAhead="true" />
+        </context>
+
+        <context name="MatchComment" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+            <StringDetect attribute="Region Marker" context="#pop!Region Marker" String="//BEGIN" beginRegion="Region1" firstNonSpace="true" />
+            <StringDetect attribute="Region Marker" context="#pop!Region Marker" String="//END" endRegion="Region1" firstNonSpace="true" />
+            <IncludeRules context="##Doxygen" />
+            <Detect2Chars attribute="Comment" context="#pop!Comment" char="/" char1="/"/>
+            <Detect2Chars attribute="Comment" context="#pop!MultiLine Comment" char="/" char1="*" beginRegion="Comment"/>
         </context>
 
         <context name="Float Suffixes" attribute="Float" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
@@ -220,25 +229,14 @@
             <LineContinue attribute="Preprocessor" context="#stay"/>
             <RangeDetect attribute="Prep. Lib" context="#stay" char="&quot;" char1="&quot;"/>
             <RangeDetect attribute="Prep. Lib" context="#stay" char="&lt;" char1="&gt;"/>
-            <IncludeRules context="##Doxygen" />
-            <Detect2Chars attribute="Comment" context="Comment/Preprocessor" char="/" char1="*" beginRegion="MultiLine Comment" />
-
-            <Detect2Chars attribute="Comment" context="Comment" char="/" char1="/"/>
-        </context>
-
-        <context attribute="Comment" lineEndContext="#stay" name="Comment/Preprocessor">
-            <DetectSpaces />
-            <Detect2Chars attribute="Comment" context="#pop" char="*" char1="/" endRegion="Comment2" />
-            <DetectIdentifier />
+            <IncludeRules context="FindComments" />
         </context>
 
         <context attribute="Comment" lineEndContext="#stay" name="Outscoped" >
             <DetectSpaces />
             <IncludeRules context="##Alerts" />
             <DetectIdentifier />
-            <IncludeRules context="##Doxygen" />
-            <Detect2Chars attribute="Comment" context="Comment" char="/" char1="/"/>
-            <Detect2Chars attribute="Comment" context="MultiLine Comment" char="/" char1="*" beginRegion="Comment"/>
+            <IncludeRules context="FindComments" />
             <RegExpr attribute="Comment" context="Outscoped intern" String="#\s*if" beginRegion="PP" firstNonSpace="true" />
             <RegExpr attribute="Preprocessor" context="#pop" String="#\s*el(?:se|if)" firstNonSpace="true" />
             <RegExpr attribute="Preprocessor" context="#pop" String="#\s*endif" endRegion="PP" firstNonSpace="true" />
@@ -249,9 +247,7 @@
             <IncludeRules context="##Alerts" />
             <DetectIdentifier />
             <DetectChar attribute="String" context="String" char="&quot;"/>
-            <IncludeRules context="##Doxygen" />
-            <Detect2Chars attribute="Comment" context="Comment" char="/" char1="/"/>
-            <Detect2Chars attribute="Comment" context="MultiLine Comment" char="/" char1="*" beginRegion="Comment"/>
+            <IncludeRules context="FindComments" />
             <RegExpr attribute="Comment" context="Outscoped intern" String="#\s*if" beginRegion="PP" firstNonSpace="true" />
             <RegExpr attribute="Comment" context="#pop" String="#\s*endif" endRegion="PP" firstNonSpace="true" />
         </context>

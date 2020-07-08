@@ -26,7 +26,7 @@
 #include <repository.h>
 
 #include <QObject>
-#include <qtest.h>
+#include <QTest>
 
 using namespace KSyntaxHighlighting;
 

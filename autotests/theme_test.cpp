@@ -37,7 +37,7 @@
 #include <QJsonParseError>
 #include <QObject>
 #include <QStandardPaths>
-#include <qtest.h>
+#include <QTest>
 
 namespace KSyntaxHighlighting
 {

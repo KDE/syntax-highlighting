@@ -34,7 +34,7 @@
 #include <QFile>
 #include <QObject>
 #include <QTextStream>
-#include <qtest.h>
+#include <QTest>
 
 using namespace KSyntaxHighlighting;
 

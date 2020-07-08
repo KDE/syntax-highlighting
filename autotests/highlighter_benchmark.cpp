@@ -31,7 +31,7 @@
 
 #include <QDir>
 #include <QObject>
-#include <qtest.h>
+#include <QTest>
 
 using namespace KSyntaxHighlighting;
 

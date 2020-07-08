@@ -24,7 +24,7 @@
 #include <wildcardmatcher_p.h>
 
 #include <QObject>
-#include <qtest.h>
+#include <QTest>
 
 class WildcardMatcherTest : public QObject
 {

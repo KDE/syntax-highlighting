@@ -31,7 +31,7 @@
 #include <QDir>
 #include <QObject>
 #include <QStandardPaths>
-#include <qtest.h>
+#include <QTest>
 
 using namespace KSyntaxHighlighting;
 

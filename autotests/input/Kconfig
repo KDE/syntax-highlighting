@@ -8,8 +8,193 @@ config BR2_PACKAGE_GAMMARAY
         help
           GammaRay Qt introspection probe.
           second line of help, with correct indentation
+
+          GammaRay Qt introspection probe.
+          second line of help, with correct indentation
          third line underindented and thus wrong
         default 'true'
+config W1_MASTER_GPIO_CUSTOM
+	tristate "Custom GPIO-based W1 driver"
+	depends on GENERIC_GPIO
+	select W1_GPIOconfig AG71XX
+	tristate "Atheros AR7XXX/AR9XXX built-in ethernet mac support"
+	depends on ATH79
+	imply HAS_TXX9_SERIAL
+	def_bool LD_VERSION >= 225000000 || LD_IS_LLD
+	select PHYLIB
+	---help---
+	  If you wish to compile a kernel for AR7XXX/91XXX and enable
+	  ethernet support, then you should always answer Y to this.
+
+comment "module support disabled"
+    depends on !MODULES
 
 menu myMenu
+      depends on NET
+config NETDEVICES
+	bool "Atheros AR71xx built-in ethernet driver debugging"
+	def_bool ds
+	default n
+	help
+	  Atheros AR71xx built-in ethernet driver debugging messages.
 endmenu
+if TARGET_OX820
+
+config SYS_CPU
+	default "arm1136"
+
+endif
+
+if AG71XX
+config AG71XX_DEBUG
+	bool "Atheros AR71xx built-in ethernet driver debugging"
+	default n
+	help
+	  Atheros AR71xx built-in ethernet driver debugging messages.
+endif
+
+# comment
+
+menu "System setup"
+
+choice
+	prompt "Alpha system type"
+	default ALPHA_GENERIC
+	string "bad"
+	---help---
+	  This is the system type of your hardware.
+
+	config HZ_32
+		bool "32 Hz"
+	config HZ_64
+		bool "64 Hz"
+
+config ALPHA_GENERIC
+	bool "Generic"
+	depends on TTY
+	select HAVE_EISA
+	select GENERIC_BUG_RELATIVE_POINTERS if X86_64
+	bool "64-bit kernel" if "$(SUBARCH)" = "x86"
+	bool "Support the legacy \"mmu-masters\" devicetree bindings"
+	depends on ARM_SMMU=y && OF
+	help
+	  A generic kernel will run on all supported Alpha hardware.
+
+endchoice
+
+config VGA_HOSE
+	bool
+	def_bool y
+	depends on VGA_CONSOLE && (ALPHA_GENERIC || ALPHA_TITAN || ALPHA_MARVEL || ALPHA_TSUNAMI)
+	default y
+	default n
+	default 3
+	bool "Use WTINT" if ALPHA_SRM || ALPHA_GENERIC
+	default y if ALPHA_QEMU
+	default n if ALPHA_EV5 || ALPHA_EV56 || (ALPHA_EV4 && !ALPHA_LCA)
+	default n if !ALPHA_SRM && !ALPHA_GENERIC
+	default y if SMP
+	default "y" if PPC_POWERNV
+	range 2 32
+	depends on SMP
+	default "32" if ALPHA_GENERIC || ALPHA_MARVEL
+	default '4' if !ALPHA_GENERIC && !ALPHA_MARVEL
+	help
+	  Support VGA on an arbitrary hose; needed for several platforms
+	  which always have multiple hoses, and whose consoles support it.
+
+endmenu
+
+menu "ARC Architecture Configuration"
+
+menu "ARC Platform/SoC/Board"
+
+#New platform adds here
+source "arch/arc/plat-eznps/Kconfig"
+source 'arch/arc/plat-hsdk/Kconfig'
+
+endmenu
+
+menu "ARC CPU Configuration"
+
+choice
+	prompt "ARC Core"
+	default ARC_CPU_HS if ISA_ARCV2
+	help
+	  bla bla
+
+if ISA_ARCOMPACT
+
+config ARC_CPU_750D
+	bool "ARC750D"
+	select ARC_CANT_LLSC
+	help
+	  Support for ARC750 core
+
+endif #ISA_ARCOMPACT
+
+endchoice
+
+if SMP
+
+config NR_CPUS
+	int "Maximum number of CPUs (2-4096)"
+	range 2 4096
+	default "4"
+
+endif #SMP
+
+config ARC_MMU_V4
+	bool "MMU v4"
+	depends on ISA_ARCV2
+
+endmenu   # "ARC CPU Configuration"
+
+menuconfig ARC_PLAT_EZNPS
+	bool "\"EZchip\" ARC dev platform"
+	depends on ISA_ARCOMPACT
+	select CPU_BIG_ENDIAN
+	select CLKSRC_NPS if !PHYS_ADDR_T_64BIT
+	help
+	  Support for EZchip development platforms,
+	  based on ARC700 cores.
+	  We handle few flavors:
+	    - Hardware Emulator AKA HE which is FPGA based chassis
+	    - Simulator based on MetaWare nSIM
+	    - NPS400 chip based on ASIC
+
+# SPDX-License-Identifier: GPL-2.0-only
+config ARM64
+	def_bool y
+	select HAVE_DYNAMIC_FTRACE_WITH_REGS \
+		if $(cc-option,-fpatchable-function-entry=2)
+	select HAVE_EFFICIENT_UNALIGNED_ACCESS
+	help
+	  ARM 64-bit (AArch64) Linux support.
+
+config PHYS_OFFSET
+	hex "Physical address of main memory" if MMU
+	depends on !ARM_PATCH_PHYS_VIRT
+	default DRAM_BASE if !MMU
+	default 0x00000000 if ARCH_EBSA110 || \
+			ARCH_FOOTBRIDGE || \
+			ARCH_INTEGRATOR || \
+			ARCH_REALVIEW
+	default 0x10000000 if ARCH_OMAP1 || ARCH_RPC
+	default 0x20000000 if ARCH_S5PV210
+	default 0xc0000000 if ARCH_SA1100
+	help
+	  Please provide the physical address corresponding to the
+	  location of main memory in your system.
+
+comment "S3C2416 Boards"
+
+config KERNEL_RAM_BASE_ADDRESS
+	hex "Virtual address of memory base"
+	default 0xe0000000 if SOC_TMS320C6455
+	default 0xe0000000 if SOC_TMS320C6457
+
+config CC_IS_GCC
+	def_bool $(success,echo "$(CC_VERSION_TEXT)" | grep -q gcc)
+
+endif # error

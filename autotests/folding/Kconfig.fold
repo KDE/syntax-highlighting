@@ -8,8 +8,193 @@ This is wrong but should not crash ] ) } !
         <beginfold id='1'>help</beginfold id='1'>
           GammaRay Qt introspection probe.
           second line of help, with correct indentation
-<endfold id='1'></endfold id='1'>         third line underindented and thus wrong
-        default 'true'
 
-<endfold id='4'></endfold id='4'><beginfold id='5'>menu</beginfold id='5'> myMenu
+          GammaRay Qt introspection probe.
+          second line of help, with correct indentation
+         <endfold id='1'></endfold id='1'>third line underindented and thus wrong
+        default 'true'
+<endfold id='4'></endfold id='4'><beginfold id='4'>config</beginfold id='4'> W1_MASTER_GPIO_CUSTOM
+	tristate "Custom GPIO-based W1 driver"
+	depends on GENERIC_GPIO
+	select W1_GPIOconfig AG71XX
+	tristate "Atheros AR7XXX/AR9XXX built-in ethernet mac support"
+	depends on ATH79
+	imply HAS_TXX9_SERIAL
+	def_bool LD_VERSION >= 225000000 || LD_IS_LLD
+	select PHYLIB
+	<beginfold id='1'>---help---</beginfold id='1'>
+	  If you wish to compile a kernel for AR7XXX/91XXX and enable
+	  ethernet support, then you should always answer Y to this.
+
+<endfold id='1'></endfold id='1'><endfold id='4'></endfold id='4'><beginfold id='3'>comment</beginfold id='3'> "module support disabled"
+    depends on !MODULES
+
+<endfold id='3'></endfold id='3'><beginfold id='5'>menu</beginfold id='5'> myMenu
+      depends on NET
+<beginfold id='4'>config</beginfold id='4'> NETDEVICES
+	bool "Atheros AR71xx built-in ethernet driver debugging"
+	def_bool ds
+	default n
+	<beginfold id='1'>help</beginfold id='1'>
+	  Atheros AR71xx built-in ethernet driver debugging messages.
+<endfold id='1'></endfold id='1'><endfold id='4'></endfold id='4'><endfold id='5'>endmenu</endfold id='5'>
+<beginfold id='6'>if</beginfold id='6'> TARGET_OX820
+
+<beginfold id='4'>config</beginfold id='4'> SYS_CPU
+	default "arm1136"
+
+<endfold id='4'></endfold id='4'><endfold id='6'>endif</endfold id='6'>
+
+<beginfold id='6'>if</beginfold id='6'> AG71XX
+<beginfold id='4'>config</beginfold id='4'> AG71XX_DEBUG
+	bool "Atheros AR71xx built-in ethernet driver debugging"
+	default n
+	<beginfold id='1'>help</beginfold id='1'>
+	  Atheros AR71xx built-in ethernet driver debugging messages.
+<endfold id='1'></endfold id='1'><endfold id='4'></endfold id='4'><endfold id='6'>endif</endfold id='6'>
+
+# comment
+
+<beginfold id='5'>menu</beginfold id='5'> "System setup"
+
+<beginfold id='2'>choice</beginfold id='2'>
+	prompt "Alpha system type"
+	default ALPHA_GENERIC
+	string "bad"
+	<beginfold id='1'>---help---</beginfold id='1'>
+	  This is the system type of your hardware.
+
+	<endfold id='1'></endfold id='1'><beginfold id='4'>config</beginfold id='4'> HZ_32
+		bool "32 Hz"
+	<endfold id='4'></endfold id='4'><beginfold id='4'>config</beginfold id='4'> HZ_64
+		bool "64 Hz"
+
+<endfold id='4'></endfold id='4'><beginfold id='4'>config</beginfold id='4'> ALPHA_GENERIC
+	bool "Generic"
+	depends on TTY
+	select HAVE_EISA
+	select GENERIC_BUG_RELATIVE_POINTERS if X86_64
+	bool "64-bit kernel" if "$(SUBARCH)" = "x86"
+	bool "Support the legacy \"mmu-masters\" devicetree bindings"
+	depends on ARM_SMMU=y && OF
+	<beginfold id='1'>help</beginfold id='1'>
+	  A generic kernel will run on all supported Alpha hardware.
+
+<endfold id='1'></endfold id='1'><endfold id='4'></endfold id='4'><endfold id='2'>endchoice</endfold id='2'>
+
+<beginfold id='4'>config</beginfold id='4'> VGA_HOSE
+	bool
+	def_bool y
+	depends on VGA_CONSOLE && <beginfold id='7'>(</beginfold id='7'>ALPHA_GENERIC || ALPHA_TITAN || ALPHA_MARVEL || ALPHA_TSUNAMI<endfold id='7'>)</endfold id='7'>
+	default y
+	default n
+	default 3
+	bool "Use WTINT" if ALPHA_SRM || ALPHA_GENERIC
+	default y if ALPHA_QEMU
+	default n if ALPHA_EV5 || ALPHA_EV56 || <beginfold id='7'>(</beginfold id='7'>ALPHA_EV4 && !ALPHA_LCA<endfold id='7'>)</endfold id='7'>
+	default n if !ALPHA_SRM && !ALPHA_GENERIC
+	default y if SMP
+	default "y" if PPC_POWERNV
+	range 2 32
+	depends on SMP
+	default "32" if ALPHA_GENERIC || ALPHA_MARVEL
+	default '4' if !ALPHA_GENERIC && !ALPHA_MARVEL
+	<beginfold id='1'>help</beginfold id='1'>
+	  Support VGA on an arbitrary hose; needed for several platforms
+	  which always have multiple hoses, and whose consoles support it.
+
+<endfold id='1'></endfold id='1'><endfold id='4'></endfold id='4'><endfold id='5'>endmenu</endfold id='5'>
+
+<beginfold id='5'>menu</beginfold id='5'> "ARC Architecture Configuration"
+
+<beginfold id='5'>menu</beginfold id='5'> "ARC Platform/SoC/Board"
+
+#New platform adds here
+source "arch/arc/plat-eznps/Kconfig"
+source 'arch/arc/plat-hsdk/Kconfig'
+
 <endfold id='5'>endmenu</endfold id='5'>
+
+<beginfold id='5'>menu</beginfold id='5'> "ARC CPU Configuration"
+
+<beginfold id='2'>choice</beginfold id='2'>
+	prompt "ARC Core"
+	default ARC_CPU_HS if ISA_ARCV2
+	<beginfold id='1'>help</beginfold id='1'>
+	  bla bla
+
+<endfold id='1'></endfold id='1'><beginfold id='6'>if</beginfold id='6'> ISA_ARCOMPACT
+
+<beginfold id='4'>config</beginfold id='4'> ARC_CPU_750D
+	bool "ARC750D"
+	select ARC_CANT_LLSC
+	<beginfold id='1'>help</beginfold id='1'>
+	  Support for ARC750 core
+
+<endfold id='1'></endfold id='1'><endfold id='4'></endfold id='4'><endfold id='6'>endif</endfold id='6'> #ISA_ARCOMPACT
+
+<endfold id='2'>endchoice</endfold id='2'>
+
+<beginfold id='6'>if</beginfold id='6'> SMP
+
+<beginfold id='4'>config</beginfold id='4'> NR_CPUS
+	int "Maximum number of CPUs (2-4096)"
+	range 2 4096
+	default "4"
+
+<endfold id='4'></endfold id='4'><endfold id='6'>endif</endfold id='6'> #SMP
+
+<beginfold id='4'>config</beginfold id='4'> ARC_MMU_V4
+	bool "MMU v4"
+	depends on ISA_ARCV2
+
+<endfold id='4'></endfold id='4'><endfold id='5'>endmenu</endfold id='5'>   # "ARC CPU Configuration"
+
+<beginfold id='4'>menuconfig</beginfold id='4'> ARC_PLAT_EZNPS
+	bool "\"EZchip\" ARC dev platform"
+	depends on ISA_ARCOMPACT
+	select CPU_BIG_ENDIAN
+	select CLKSRC_NPS if !PHYS_ADDR_T_64BIT
+	<beginfold id='1'>help</beginfold id='1'>
+	  Support for EZchip development platforms,
+	  based on ARC700 cores.
+	  We handle few flavors:
+	    - Hardware Emulator AKA HE which is FPGA based chassis
+	    - Simulator based on MetaWare nSIM
+	    - NPS400 chip based on ASIC
+
+<endfold id='1'></endfold id='1'># SPDX-License-Identifier: GPL-2.0-only
+<endfold id='4'></endfold id='4'><beginfold id='4'>config</beginfold id='4'> ARM64
+	def_bool y
+	select HAVE_DYNAMIC_FTRACE_WITH_REGS \
+		if $(cc-option,-fpatchable-function-entry=2)
+	select HAVE_EFFICIENT_UNALIGNED_ACCESS
+	<beginfold id='1'>help</beginfold id='1'>
+	  ARM 64-bit (AArch64) Linux support.
+
+<endfold id='1'></endfold id='1'><endfold id='4'></endfold id='4'><beginfold id='4'>config</beginfold id='4'> PHYS_OFFSET
+	hex "Physical address of main memory" if MMU
+	depends on !ARM_PATCH_PHYS_VIRT
+	default DRAM_BASE if !MMU
+	default 0x00000000 if ARCH_EBSA110 || \
+			ARCH_FOOTBRIDGE || \
+			ARCH_INTEGRATOR || \
+			ARCH_REALVIEW
+	default 0x10000000 if ARCH_OMAP1 || ARCH_RPC
+	default 0x20000000 if ARCH_S5PV210
+	default 0xc0000000 if ARCH_SA1100
+	<beginfold id='1'>help</beginfold id='1'>
+	  Please provide the physical address corresponding to the
+	  location of main memory in your system.
+
+<endfold id='1'></endfold id='1'><endfold id='4'></endfold id='4'><beginfold id='3'>comment</beginfold id='3'> "S3C2416 Boards"
+
+<endfold id='3'></endfold id='3'><beginfold id='4'>config</beginfold id='4'> KERNEL_RAM_BASE_ADDRESS
+	hex "Virtual address of memory base"
+	default 0xe0000000 if SOC_TMS320C6455
+	default 0xe0000000 if SOC_TMS320C6457
+
+<endfold id='4'></endfold id='4'><beginfold id='4'>config</beginfold id='4'> CC_IS_GCC
+	def_bool $(success,echo "$(CC_VERSION_TEXT)" | grep -q gcc)
+
+<endfold id='4'></endfold id='4'>endif # error

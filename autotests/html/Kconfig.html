@@ -9,14 +9,199 @@
 <span style="color:#898887;"># comment</span>
 
 <span style="font-weight:bold;">config</span> BR2_PACKAGE_GAMMARAY
-        <span style="color:#0057ae;">bool</span> &quot;gammaray&quot;
+        <span style="color:#0057ae;">bool</span> <span style="color:#bf0303;">&quot;gammaray&quot;</span>
         <span style="color:#006e28;">depends</span> <span style="color:#006e28;">on</span> BR2_PACKAGE_QT5
         <span style="color:#006e28;">help</span>
-          GammaRay Qt introspection probe.
-          second line of help, with correct indentation
-         <span style="color:#bf0303;text-decoration:underline;">third line underindented and thus wrong</span>
+<span style="color:#bf0303;">          GammaRay Qt introspection probe.</span>
+<span style="color:#bf0303;">          second line of help, with correct indentation</span>
+
+<span style="color:#bf0303;">          GammaRay Qt introspection probe.</span>
+<span style="color:#bf0303;">          second line of help, with correct indentation</span>
+<span style="color:#bf0303;">         </span><span style="color:#bf0303;text-decoration:underline;">third line underindented and thus wrong</span>
         <span style="color:#006e28;">default</span> <span style="color:#bf0303;">'true'</span>
+<span style="font-weight:bold;">config</span> W1_MASTER_GPIO_CUSTOM
+	<span style="color:#0057ae;">tristate</span> <span style="color:#bf0303;">&quot;Custom GPIO-based W1 driver&quot;</span>
+	<span style="color:#006e28;">depends</span> <span style="color:#006e28;">on</span> GENERIC_GPIO
+	<span style="color:#006e28;">select</span> W1_GPIOconfig <span style="color:#bf0303;text-decoration:underline;">AG71XX</span>
+	<span style="color:#0057ae;">tristate</span> <span style="color:#bf0303;">&quot;Atheros AR7XXX/AR9XXX built-in ethernet mac support&quot;</span>
+	<span style="color:#006e28;">depends</span> <span style="color:#006e28;">on</span> ATH79
+	<span style="color:#006e28;">imply</span> HAS_TXX9_SERIAL
+	<span style="color:#006e28;">def_</span><span style="color:#0057ae;">bool</span> LD_VERSION &gt;= 225000000 || LD_IS_LLD
+	<span style="color:#006e28;">select</span> PHYLIB
+	<span style="color:#006e28;">---help---</span>
+<span style="color:#bf0303;">	  If you wish to compile a kernel for AR7XXX/91XXX and enable</span>
+<span style="color:#bf0303;">	  ethernet support, then you should always answer Y to this.</span>
+
+<span style="font-weight:bold;">comment</span> <span style="color:#bf0303;">&quot;module support disabled&quot;</span>
+    <span style="color:#006e28;">depends</span> <span style="color:#006e28;">on</span> !MODULES
 
 <span style="font-weight:bold;">menu</span> myMenu
+      <span style="color:#006e28;">depends</span> <span style="color:#006e28;">on</span> NET
+<span style="font-weight:bold;">config</span> NETDEVICES
+	<span style="color:#0057ae;">bool</span> <span style="color:#bf0303;">&quot;Atheros AR71xx built-in ethernet driver debugging&quot;</span>
+	<span style="color:#006e28;">def_</span><span style="color:#0057ae;">bool</span> ds
+	<span style="color:#006e28;">default</span> <span style="font-weight:bold;">n</span>
+	<span style="color:#006e28;">help</span>
+<span style="color:#bf0303;">	  Atheros AR71xx built-in ethernet driver debugging messages.</span>
 <span style="font-weight:bold;">endmenu</span>
+<span style="font-weight:bold;">if</span> TARGET_OX820
+
+<span style="font-weight:bold;">config</span> SYS_CPU
+	<span style="color:#006e28;">default</span> <span style="color:#bf0303;">&quot;arm1136&quot;</span>
+
+<span style="font-weight:bold;">endif</span>
+
+<span style="font-weight:bold;">if</span> AG71XX
+<span style="font-weight:bold;">config</span> AG71XX_DEBUG
+	<span style="color:#0057ae;">bool</span> <span style="color:#bf0303;">&quot;Atheros AR71xx built-in ethernet driver debugging&quot;</span>
+	<span style="color:#006e28;">default</span> <span style="font-weight:bold;">n</span>
+	<span style="color:#006e28;">help</span>
+<span style="color:#bf0303;">	  Atheros AR71xx built-in ethernet driver debugging messages.</span>
+<span style="font-weight:bold;">endif</span>
+
+<span style="color:#898887;"># comment</span>
+
+<span style="font-weight:bold;">menu</span> <span style="color:#bf0303;">&quot;System setup&quot;</span>
+
+<span style="font-weight:bold;">choice</span>
+	<span style="color:#006e28;">prompt</span> <span style="color:#bf0303;">&quot;Alpha system type&quot;</span>
+	<span style="color:#006e28;">default</span> ALPHA_GENERIC
+	<span style="color:#bf0303;background-color:#f7e6e6;font-weight:bold;">string</span> <span style="color:#bf0303;">&quot;bad&quot;</span>
+	<span style="color:#006e28;">---help---</span>
+<span style="color:#bf0303;">	  This is the system type of your hardware.</span>
+
+<span style="color:#bf0303;">	</span><span style="font-weight:bold;">config</span> HZ_32
+		<span style="color:#0057ae;">bool</span> <span style="color:#bf0303;">&quot;32 Hz&quot;</span>
+	<span style="font-weight:bold;">config</span> HZ_64
+		<span style="color:#0057ae;">bool</span> <span style="color:#bf0303;">&quot;64 Hz&quot;</span>
+
+<span style="font-weight:bold;">config</span> ALPHA_GENERIC
+	<span style="color:#0057ae;">bool</span> <span style="color:#bf0303;">&quot;Generic&quot;</span>
+	<span style="color:#006e28;">depends</span> <span style="color:#006e28;">on</span> TTY
+	<span style="color:#006e28;">select</span> HAVE_EISA
+	<span style="color:#006e28;">select</span> GENERIC_BUG_RELATIVE_POINTERS <span style="font-weight:bold;">if</span> X86_64
+	<span style="color:#0057ae;">bool</span> <span style="color:#bf0303;">&quot;64-bit kernel&quot;</span> <span style="font-weight:bold;">if</span> <span style="color:#bf0303;">&quot;$(SUBARCH)&quot;</span> = <span style="color:#bf0303;">&quot;x86&quot;</span>
+	<span style="color:#0057ae;">bool</span> <span style="color:#bf0303;">&quot;Support the legacy </span><span style="color:#3daee9;">\&quot;</span><span style="color:#bf0303;">mmu-masters</span><span style="color:#3daee9;">\&quot;</span><span style="color:#bf0303;"> devicetree bindings&quot;</span>
+	<span style="color:#006e28;">depends</span> <span style="color:#006e28;">on</span> ARM_SMMU=<span style="font-weight:bold;">y</span> &amp;&amp; OF
+	<span style="color:#006e28;">help</span>
+<span style="color:#bf0303;">	  A generic kernel will run on all supported Alpha hardware.</span>
+
+<span style="font-weight:bold;">endchoice</span>
+
+<span style="font-weight:bold;">config</span> VGA_HOSE
+	<span style="color:#0057ae;">bool</span>
+	<span style="color:#006e28;">def_</span><span style="color:#0057ae;">bool</span> <span style="font-weight:bold;">y</span>
+	<span style="color:#006e28;">depends</span> <span style="color:#006e28;">on</span> VGA_CONSOLE &amp;&amp; (ALPHA_GENERIC || ALPHA_TITAN || ALPHA_MARVEL || ALPHA_TSUNAMI)
+	<span style="color:#006e28;">default</span> <span style="font-weight:bold;">y</span>
+	<span style="color:#006e28;">default</span> <span style="font-weight:bold;">n</span>
+	<span style="color:#006e28;">default</span> 3
+	<span style="color:#0057ae;">bool</span> <span style="color:#bf0303;">&quot;Use WTINT&quot;</span> <span style="font-weight:bold;">if</span> ALPHA_SRM || ALPHA_GENERIC
+	<span style="color:#006e28;">default</span> <span style="font-weight:bold;">y</span> <span style="font-weight:bold;">if</span> ALPHA_QEMU
+	<span style="color:#006e28;">default</span> <span style="font-weight:bold;">n</span> <span style="font-weight:bold;">if</span> ALPHA_EV5 || ALPHA_EV56 || (ALPHA_EV4 &amp;&amp; !ALPHA_LCA)
+	<span style="color:#006e28;">default</span> <span style="font-weight:bold;">n</span> <span style="font-weight:bold;">if</span> !ALPHA_SRM &amp;&amp; !ALPHA_GENERIC
+	<span style="color:#006e28;">default</span> <span style="font-weight:bold;">y</span> <span style="font-weight:bold;">if</span> SMP
+	<span style="color:#006e28;">default</span> <span style="color:#bf0303;">&quot;y&quot;</span> <span style="font-weight:bold;">if</span> PPC_POWERNV
+	<span style="color:#006e28;">range</span> 2 32
+	<span style="color:#006e28;">depends</span> <span style="color:#006e28;">on</span> SMP
+	<span style="color:#006e28;">default</span> <span style="color:#bf0303;">&quot;32&quot;</span> <span style="font-weight:bold;">if</span> ALPHA_GENERIC || ALPHA_MARVEL
+	<span style="color:#006e28;">default</span> <span style="color:#bf0303;">'4'</span> <span style="font-weight:bold;">if</span> !ALPHA_GENERIC &amp;&amp; !ALPHA_MARVEL
+	<span style="color:#006e28;">help</span>
+<span style="color:#bf0303;">	  Support VGA on an arbitrary hose; needed for several platforms</span>
+<span style="color:#bf0303;">	  which always have multiple hoses, and whose consoles support it.</span>
+
+<span style="font-weight:bold;">endmenu</span>
+
+<span style="font-weight:bold;">menu</span> <span style="color:#bf0303;">&quot;ARC Architecture Configuration&quot;</span>
+
+<span style="font-weight:bold;">menu</span> <span style="color:#bf0303;">&quot;ARC Platform/SoC/Board&quot;</span>
+
+<span style="color:#898887;">#New platform adds here</span>
+<span style="color:#006e28;">source </span><span style="color:#bf0303;">&quot;arch/arc/plat-eznps/Kconfig&quot;</span>
+<span style="color:#006e28;">source </span><span style="color:#bf0303;">'arch/arc/plat-hsdk/Kconfig'</span>
+
+<span style="font-weight:bold;">endmenu</span>
+
+<span style="font-weight:bold;">menu</span> <span style="color:#bf0303;">&quot;ARC CPU Configuration&quot;</span>
+
+<span style="font-weight:bold;">choice</span>
+	<span style="color:#006e28;">prompt</span> <span style="color:#bf0303;">&quot;ARC Core&quot;</span>
+	<span style="color:#006e28;">default</span> ARC_CPU_HS <span style="font-weight:bold;">if</span> ISA_ARCV2
+	<span style="color:#006e28;">help</span>
+<span style="color:#bf0303;">	  bla bla</span>
+
+<span style="font-weight:bold;">if</span> ISA_ARCOMPACT
+
+<span style="font-weight:bold;">config</span> ARC_CPU_750D
+	<span style="color:#0057ae;">bool</span> <span style="color:#bf0303;">&quot;ARC750D&quot;</span>
+	<span style="color:#006e28;">select</span> ARC_CANT_LLSC
+	<span style="color:#006e28;">help</span>
+<span style="color:#bf0303;">	  Support for ARC750 core</span>
+
+<span style="font-weight:bold;">endif</span> <span style="color:#898887;">#ISA_ARCOMPACT</span>
+
+<span style="font-weight:bold;">endchoice</span>
+
+<span style="font-weight:bold;">if</span> SMP
+
+<span style="font-weight:bold;">config</span> NR_CPUS
+	<span style="color:#0057ae;">int</span> <span style="color:#bf0303;">&quot;Maximum number of CPUs (2-4096)&quot;</span>
+	<span style="color:#006e28;">range</span> 2 4096
+	<span style="color:#006e28;">default</span> <span style="color:#bf0303;">&quot;4&quot;</span>
+
+<span style="font-weight:bold;">endif</span> <span style="color:#898887;">#SMP</span>
+
+<span style="font-weight:bold;">config</span> ARC_MMU_V4
+	<span style="color:#0057ae;">bool</span> <span style="color:#bf0303;">&quot;MMU v4&quot;</span>
+	<span style="color:#006e28;">depends</span> <span style="color:#006e28;">on</span> ISA_ARCV2
+
+<span style="font-weight:bold;">endmenu</span>   <span style="color:#898887;"># &quot;ARC CPU Configuration&quot;</span>
+
+<span style="font-weight:bold;">menuconfig</span> ARC_PLAT_EZNPS
+	<span style="color:#0057ae;">bool</span> <span style="color:#bf0303;">&quot;</span><span style="color:#3daee9;">\&quot;</span><span style="color:#bf0303;">EZchip</span><span style="color:#3daee9;">\&quot;</span><span style="color:#bf0303;"> ARC dev platform&quot;</span>
+	<span style="color:#006e28;">depends</span> <span style="color:#006e28;">on</span> ISA_ARCOMPACT
+	<span style="color:#006e28;">select</span> CPU_BIG_ENDIAN
+	<span style="color:#006e28;">select</span> CLKSRC_NPS <span style="font-weight:bold;">if</span> !PHYS_ADDR_T_64BIT
+	<span style="color:#006e28;">help</span>
+<span style="color:#bf0303;">	  Support for EZchip development platforms,</span>
+<span style="color:#bf0303;">	  based on ARC700 cores.</span>
+<span style="color:#bf0303;">	  We handle few flavors:</span>
+<span style="color:#bf0303;">	    - Hardware Emulator AKA HE which is FPGA based chassis</span>
+<span style="color:#bf0303;">	    - Simulator based on MetaWare nSIM</span>
+<span style="color:#bf0303;">	    - NPS400 chip based on ASIC</span>
+
+<span style="color:#898887;"># SPDX-License-Identifier: GPL-2.0-only</span>
+<span style="font-weight:bold;">config</span> ARM64
+	<span style="color:#006e28;">def_</span><span style="color:#0057ae;">bool</span> <span style="font-weight:bold;">y</span>
+	<span style="color:#006e28;">select</span> HAVE_DYNAMIC_FTRACE_WITH_REGS \
+		<span style="font-weight:bold;">if</span> $(cc-option,-fpatchable-function-entry=2)
+	<span style="color:#006e28;">select</span> HAVE_EFFICIENT_UNALIGNED_ACCESS
+	<span style="color:#006e28;">help</span>
+<span style="color:#bf0303;">	  ARM 64-bit (AArch64) Linux support.</span>
+
+<span style="font-weight:bold;">config</span> PHYS_OFFSET
+	<span style="color:#0057ae;">hex</span> <span style="color:#bf0303;">&quot;Physical address of main memory&quot;</span> <span style="font-weight:bold;">if</span> MMU
+	<span style="color:#006e28;">depends</span> <span style="color:#006e28;">on</span> !ARM_PATCH_PHYS_VIRT
+	<span style="color:#006e28;">default</span> DRAM_BASE <span style="font-weight:bold;">if</span> !MMU
+	<span style="color:#006e28;">default</span> 0x00000000 <span style="font-weight:bold;">if</span> ARCH_EBSA110 || \
+			ARCH_FOOTBRIDGE || \
+			ARCH_INTEGRATOR || \
+			ARCH_REALVIEW
+	<span style="color:#006e28;">default</span> 0x10000000 <span style="font-weight:bold;">if</span> ARCH_OMAP1 || ARCH_RPC
+	<span style="color:#006e28;">default</span> 0x20000000 <span style="font-weight:bold;">if</span> ARCH_S5PV210
+	<span style="color:#006e28;">default</span> 0xc0000000 <span style="font-weight:bold;">if</span> ARCH_SA1100
+	<span style="color:#006e28;">help</span>
+<span style="color:#bf0303;">	  Please provide the physical address corresponding to the</span>
+<span style="color:#bf0303;">	  location of main memory in your system.</span>
+
+<span style="font-weight:bold;">comment</span> <span style="color:#bf0303;">&quot;S3C2416 Boards&quot;</span>
+
+<span style="font-weight:bold;">config</span> KERNEL_RAM_BASE_ADDRESS
+	<span style="color:#0057ae;">hex</span> <span style="color:#bf0303;">&quot;Virtual address of memory base&quot;</span>
+	<span style="color:#006e28;">default</span> 0xe0000000 <span style="font-weight:bold;">if</span> SOC_TMS320C6455
+	<span style="color:#006e28;">default</span> 0xe0000000 <span style="font-weight:bold;">if</span> SOC_TMS320C6457
+
+<span style="font-weight:bold;">config</span> CC_IS_GCC
+	<span style="color:#006e28;">def_</span><span style="color:#0057ae;">bool</span> $(success,echo <span style="color:#bf0303;">&quot;$(CC_VERSION_TEXT)&quot;</span> | grep -q gcc)
+
+<span style="color:#bf0303;text-decoration:underline;">endif # error</span>
 </pre></body></html>

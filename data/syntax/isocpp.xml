@@ -305,7 +305,7 @@
         <Detect2Chars attribute="Symbol" context="Attribute" char="[" char1="[" />
         <StringDetect attribute="Symbol" context="Attribute" String="&lt;:&lt;:" /> <!-- Digraph: [[ -->
         <!-- Match numbers -->
-        <IncludeRules context="FindNumbers" />
+        <RegExpr context="Number" String="\.?\d" lookAhead="true" />
         <!-- Match comments -->
         <IncludeRules context="match comments and region markers" />
         <!-- Match keywords -->
@@ -391,16 +391,9 @@
         <DetectIdentifier />
       </context>
 
-      <context name="FindNumbers" attribute="Normal Text" lineEndContext="#stay">
-        <!-- NOTE: This rule avoids slow highlighting when writing numbers (see bug 423680) -->
-        <RegExpr context="Float" String="\.\d|\d[\d']*+(?:\.|[eE][+-]?\d)|0[xX][0-9a-fA-F']*+(?:\.|[pP][+-]?\d)" lookAhead="true" />
-        <AnyChar context="Integer" String="0123456789" lookAhead="true" />
-      </context>
-
-      <context name="Float" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
-        <RegExpr attribute="Float" context="FloatSuffix" String="0[xX](?:\.&hex_int;&exp_hexfloat;?|&hex_int;(?:&exp_hexfloat;|\.&hex_int;?&exp_hexfloat;?))" />
-        <RegExpr attribute="Float" context="FloatSuffix" String="\.&int;&exp_float;?|&int;(?:&exp_float;|\.&int;?&exp_float;?)" />
-        <RegExpr attribute="Error" context="#pop" String="[._0-9A-Za-z']+" />
+      <context name="Number" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+        <RegExpr attribute="Float" context="FloatSuffix" String="\.&int;&exp_float;?|0[xX](?:\.&hex_int;&exp_hexfloat;?|&hex_int;(?:&exp_hexfloat;|\.&hex_int;?&exp_hexfloat;?))|&int;(?:&exp_float;|\.&int;?&exp_float;?)" />
+        <IncludeRules context="Integer" />
       </context>
 
       <context name="Integer" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
@@ -408,7 +401,7 @@
         <RegExpr attribute="Binary" context="IntSuffix" String="0[Bb][01](?:'?[01]++)*+" />
         <RegExpr attribute="Octal" context="IntSuffix" String="0(?:'?[0-7]++)++" />
         <RegExpr attribute="Decimal" context="IntSuffix" String="0(?![xXbB0-9])|[1-9](?:'?[0-9]++)*+" />
-        <RegExpr attribute="Error" context="#pop" String="[._0-9A-Za-z']+" />
+        <RegExpr attribute="Error" context="#pop" String="[._0-9A-Za-z']++" />
       </context>
 
       <context name="IntSuffix" attribute="Error" lineEndContext="#pop#pop" fallthrough="true" fallthroughContext="NumericSuffixError">
@@ -709,7 +702,7 @@
         <Detect2Chars attribute="Symbol" context="Attribute In PP" char="[" char1="[" />
         <StringDetect attribute="Symbol" context="Attribute In PP" String="&lt;:&lt;:" /> <!-- Digraph: [[ -->
         <!-- Match numbers -->
-        <IncludeRules context="FindNumbers" />
+        <RegExpr context="Number" String="\.?\d" lookAhead="true" />
         <!-- Match comments -->
         <IncludeRules context="match comments" />
         <!-- Match punctuators -->

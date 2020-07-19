@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="Music Publisher" version="3" kateversion="2.4" section="Other" extensions="*.mup;*.not" mimetype="text/x-mup;audio/x-mup;application/x-mup;audio/x-notes" casesensitive="1" author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL">
+<language name="Music Publisher" version="4" kateversion="2.4" section="Other" extensions="*.mup;*.not" mimetype="text/x-mup;audio/x-mup;application/x-mup;audio/x-notes" casesensitive="1" author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL">
 
   <highlighting>
 
@@ -625,8 +625,9 @@
 
       <context attribute="Value" lineEndContext="#pop" name="Value"
 		fallthrough="true" fallthroughContext="#pop">
+	<DetectSpaces attribute="Normal Text" context="#stay" />
 	<DetectChar attribute="Normal Text" context="#pop" char=";" />
-	<RegExpr attribute="Normal Text" context="#stay" String="[\s,&amp;()-]+" />
+	<AnyChar attribute="Normal Text" context="#stay" String=",&amp;()-" />
 	<keyword attribute="Value" context="#stay" String="mupvalues" />
 	<keyword attribute="Value" context="#pop" String="mupfontnames" />
 	<keyword attribute="Value" context="#pop" String="mupfontstyles" />
@@ -644,8 +645,9 @@
 
       <context attribute="Parameter" lineEndContext="#pop" name="Unset"
 		fallthrough="true" fallthroughContext="#pop">
+	<DetectSpaces attribute="Normal Text" context="#stay" />
+	<DetectChar attribute="Normal Text" context="#stay" char="," />
 	<keyword attribute="Parameter" context="#stay" String="mupparameters" />
-	<RegExpr attribute="Normal Text" context="#stay" String="[\s,]+" />
 	<RegExpr attribute="Error" context="#pop" String="\w+" />
       </context>
 
@@ -698,8 +700,9 @@
 
       <context attribute="Note Attribute" lineEndContext="#pop" name="Bracket"
 		fallthrough="true" fallthroughContext="#pop">
+	<DetectSpaces attribute="Normal Text" context="#stay" />
 	<DetectChar attribute="Special Char" context="#pop" char="]" />
-	<RegExpr attribute="Normal Text" context="#stay" String="[\s;,]+" />
+	<AnyChar attribute="Normal Text" context="#stay" String=";," />
 	<RegExpr attribute="Note Attribute" context="#stay" String="\b(grace|xnote|cue|diam|up|down)\b" />
 	<RegExpr attribute="Note Attribute" context="#stay" String="\b(slash|len|pad|ho|dist)\s*[0-9.+-]*" />
 	<RegExpr attribute="Note Attribute" context="Bracket With" String="\bwith\s*(?=[A-Z&quot;^&gt;.-])" />
@@ -712,9 +715,10 @@
 
       <context attribute="Note Attribute" lineEndContext="#pop" name="Bracket With"
 		fallthrough="true" fallthroughContext="#pop">
+	<DetectSpaces attribute="Normal Text" context="#stay" />
 	<DetectChar attribute="String" context="String" char="&quot;" />
-	<RegExpr attribute="Note Attribute" context="#stay" String="[&gt;.^-]+" />
-	<RegExpr attribute="Normal Text" context="#stay" String="[\s,]+" />
+	<AnyChar attribute="Note Attribute" context="#stay" String="&gt;.^-" />
+	<DetectChar attribute="Normal Text" context="#stay" char="," />
 	<IncludeRules context="Macro" />
       </context>
 
@@ -740,7 +744,8 @@
 
       <context attribute="Normal Text" lineEndContext="#pop" name="Location"
 		fallthrough="true" fallthroughContext="#pop">
-	<RegExpr attribute="Normal Text" context="#stay" String="[\s+-]+" />
+	<DetectSpaces attribute="Normal Text" context="#stay" />
+	<AnyChar attribute="Normal Text" context="#stay" String="+-" />
 	<Float attribute="Normal Text" context="#stay" />
 	<RegExpr attribute="Location" context="#stay" String="\btime\b" />
 	<IncludeRules context="Macro" />

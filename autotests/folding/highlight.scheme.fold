@@ -2,20 +2,25 @@
 ; This is a comment
 
 ;; Another comment, usually used.
-<beginfold id='1'>;BEGIN region marker</beginfold id='1'>
+<beginfold id='2'>;BEGIN region marker</beginfold id='2'>
 ;; a vektor
 #(1 2 3 4 5)
-<endfold id='1'>;END region marker</endfold id='1'>
+['a 'b 'c]
+<endfold id='2'>;END region marker</endfold id='2'>
 ;; this represents integer 28 (FIXME: does not work perfectly atm!)
 28 028 #e28 #i28       ;; Normal, normal, exact, inexact
-#b11100 #o34 #d28 #x1c ;; Bin, okt, dec, hex
+#b11100 #o34 #d28 #x1c ;; Bin, oct, dec, hex
 #oe34 #eo34            ;; combined.
+#o#e34 #e#o34          ;; combined.
+;; inf
+#i+inf.0 3+inf.0
 
 ;; char.
 (#\y #\space) ;; list: `y' space.
 (#\  #\\ #\)) ;; list of spaces, backslash and`)'.
 #\newline     ;; a newline-char
 #\NewLine     ;; another one :)
+#\pager       ;; bad char
 
 "Hello, world" ;; a string
 
@@ -25,6 +30,53 @@ with that?"
 
 ;; R5RS definiert diese beiden.
 "Das ist \"in Anführungszeichen\" und mit \\ Backslash."
+
+"hexadecimal char \x1aF;."
+
+;; Kawa string templates
+&{Hello &[name]!} 'no-string
+&{This has a {braced} section.} 'no-string
+&{&#27; &#x1B; &amp; &lt; &gt; &quot; &apos;} 'no-string
+; Multiline string literals
+(string-capitalize &{one two three
+uno dos tres
+})
+(write (string-capitalize &{
+     &|one two three
+     &|uno dos tres
+}) out)
+&{abc&- <beginfold id='1'>#|</beginfold id='1'>comment<endfold id='1'>|#</endfold id='1'>
+  def} 'no-string
+&{<beginfold id='1'>&#|</beginfold id='1'>line 1<endfold id='1'>|#</endfold id='1'>one two
+  <beginfold id='1'>&#|</beginfold id='1'>line 2<endfold id='1'>|#</endfold id='1'> three
+  <beginfold id='1'>&#|</beginfold id='1'>line 3<endfold id='1'>|#</endfold id='1'>uno dos tres
+} 'no-string
+; Embedded expressions
+&{Hello &[(string-capitalize name)]!} 'no-string
+&{Hello &(string-capitalize name)!} 'no-string
+; formatting
+&{&~{&[arr]&~^_&~}} 'no-string
+&{&~{&~a[arr]&~^_&~}} 'no-string
+
+;; Kawa XML literals
+#<p>The result is <b>final</b>!</p> 'no-xml
+#<em>The result is &{result}.</em> 'no-xml
+#<p>This is <(if be-bold 'strong 'em)>important</>!</p> 'no-xml
+#<p>This is <{(if be-bold 'strong 'em)}>important</>!</p> 'no-xml
+#<p>Special characters <![CDATA[< > & ' "]]> here.</p> 'no-xml
+#<p>Special characters &lt; &gt; &amp; &quot; &apos; here.</p> 'no-xml
+#<gnu:b xmlns:gnu="http://gnu.org/"/> 'no-xml
+#<chapter><?dbhtml filename="intro.html" ?>
+<title>Introduction</title>
+...
+</chapter> 'no-xml
+
+
+;; Kawa Regular expression
+#/a\.c/
+#/a/i
+#/a/im
+
 
 (let ((x (+ 1 2)) (y "blah")) ;; `let' highlighting.
   (and (number? x)            ;; `and' highlighting.
@@ -159,6 +211,10 @@ lines}#
 ;; more chars.
 #\nul #\nl #\esc #\bs #\bel #\syn #\ack #\sp ;; etc, utc, itc, oops (this is boring)
 
+<beginfold id='1'>#|</beginfold id='1'> R6RS / SRFI-30 block comment
+supports <beginfold id='1'>#|</beginfold id='1'> nested block <endfold id='1'>|#</endfold id='1'> comments <endfold id='1'>|#</endfold id='1'>
+'now-no-comment-anymore
+
 <beginfold id='1'>#!</beginfold id='1'>
  guile block-comment.
 <endfold id='1'>!#</endfold id='1'>
@@ -175,6 +231,55 @@ still comment
 !# still comment!
 <endfold id='1'>!#</endfold id='1'>
 'now-no-comment-anymore
+
+;; Datum comment
+#;<beginfold id='1'>(</beginfold id='1'>1 2 3<endfold id='1'>)</endfold id='1'> 'now-no-comment-anymore
+#;1 'now-no-comment-anymore
+#;#o12 'now-no-comment-anymore
+#;"bla bla\"" 'now-no-comment-anymore
+#;<beginfold id='1'>[</beginfold id='1'>1 2 3<endfold id='1'>]</endfold id='1'> 'now-no-comment-anymore
+#;<beginfold id='1'>[</beginfold id='1'>1 [2 (3 (4))]<endfold id='1'>]</endfold id='1'> 'now-no-comment-anymore
+#;<beginfold id='1'>(</beginfold id='1'>1 (2 [3 [4]])<endfold id='1'>)</endfold id='1'> 'now-no-comment-anymore
+#;#/reg/im 'now-no-comment-anymore
+#;#<p>The result is <b>final</b>!</p> 'now-no-comment-anymore
+#;#<em>The result is &{result}.</em> 'now-no-comment-anymore
+#;#<p>This is <(if be-bold 'strong 'em)>important</>!</p> 'now-no-comment-anymore
+#;#<p>This is <{(if be-bold 'strong 'em)}>important</>!</p> 'now-no-comment-anymore
+#;#<p>Specal characters <![CDATA[< > & ' "]]> here.</p> 'now-no-comment-anymore
+#;#<p>Specal characters &lt; &gt; &amp; &quot; &apos; here.</p> 'now-no-comment-anymore
+#;#<gnu:b xmlns:gnu="http://gnu.org/"/> 'now-no-comment-anymore
+#;#<chapter><?dbhtml filename="intro.html" ?>
+<title>Introduction</title>
+...
+</chapter> 'now-no-comment-anymore
+#;#&{Hello &[name]!} 'now-no-comment-anymore
+#;&{This has a {braced} section.} 'now-no-comment-anymore
+#;&{&#27;&#x1B; &amp; &lt; &gt; &quot; &apos;} 'now-no-comment-anymore
+#;<beginfold id='1'>(</beginfold id='1'>string-capitalize &{one two three
+uno dos tres
+}<endfold id='1'>)</endfold id='1'> 'now-no-comment-anymore
+#;<beginfold id='1'>(</beginfold id='1'>write (string-capitalize &{
+     &|one two three
+     &|uno dos tres
+}) out<endfold id='1'>)</endfold id='1'> 'now-no-comment-anymore
+#;&{abc&-
+  def} 'now-no-comment-anymore
+#;&{&#|line 1|#one two
+  &#|line 2|# three
+  &#|line 3|#uno dos tres
+} 'now-no-comment-anymore
+#;&{Hello &[(string-capitalize name)]!} 'now-no-comment-anymore
+#;&{Hello &(string-capitalize name)!} 'now-no-comment-anymore
+#;&{&~{&[arr]&~^_&~}} 'now-no-comment-anymore
+#;&{&~{&~a[arr]&~^_&~}} 'now-no-comment-anymore
+#;<beginfold id='1'>(</beginfold id='1'>
+1
+2
+3<endfold id='1'>)</endfold id='1'> 'now-no-comment-anymore
+
+; identifier with hex-escape
+H\x65;llo; commment
+H\x65;\x6c;lo; commment
 
 (while (> foo 10) ;; Highlight `while'.
   (set! foo (- foo 1))

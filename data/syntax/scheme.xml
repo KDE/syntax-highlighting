@@ -4,6 +4,13 @@
   <!ENTITY xmlattrs "\s+([^&quot;/>]++|&quot;[^&quot;]*+&quot;)*+">
   <!ENTITY tab      "&#009;">
   <!ENTITY regex    "(?:[^\\(\[/]++|\\.|\[\^?\]?([^\\\[\]]++|\\.|\[(:[^:]+:\])?)++\]|\((?R)\))+">
+
+  <!ENTITY initial_ascii_set "a-zA-Z!$&#37;&amp;*/:&lt;=&gt;?~_^">
+  <!ENTITY initial_unicode_set "\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}\p{Mn}\p{Nl}\p{No}\p{Pd}\p{Pc}\p{Po}\p{Sc}\p{Sm}\p{Sk}\p{So}\p{Co}">
+  <!ENTITY initial_others "\\x[0-9a-fA-F]++;|(?![\x01-\x7f])[&initial_unicode_set;]">
+  <!ENTITY initial "(?:[&initial_ascii_set;]|&initial_others;)">
+  <!ENTITY subsequent "(?:[&initial_ascii_set;0-9-@.+\p{Nd}\p{Mc}\p{Me}]|&initial_others;)">
+  <!ENTITY symbol "(?:&initial;&subsequent;*+)">
 ]>
 <!--
   https://www.scheme.com/tspl4/
@@ -111,6 +118,37 @@
       <item>defmacro*-public</item>
     </list>
     <list name="keywords">
+      <item>&amp;assertion</item>
+      <item>&amp;condition</item>
+      <item>&amp;error</item>
+      <item>&amp;i/o-decoding</item>
+      <item>&amp;i/o-encoding</item>
+      <item>&amp;i/o-file-already-exists</item>
+      <item>&amp;i/o-file-does-not-exist</item>
+      <item>&amp;i/o-file-is-read-only</item>
+      <item>&amp;i/o-file-protection</item>
+      <item>&amp;i/o-filename</item>
+      <item>&amp;i/o-invalid-position</item>
+      <item>&amp;i/o-port</item>
+      <item>&amp;i/o-read</item>
+      <item>&amp;i/o-write</item>
+      <item>&amp;i/o</item>
+      <item>&amp;implementation-restriction</item>
+      <item>&amp;implementation-violation</item>
+      <item>&amp;irritants</item>
+      <item>&amp;lexical</item>
+      <item>&amp;message</item>
+      <item>&amp;mistake</item>
+      <item>&amp;no-infinities</item>
+      <item>&amp;no-nans</item>
+      <item>&amp;non-continuable</item>
+      <item>&amp;serious</item>
+      <item>&amp;syntax</item>
+      <item>&amp;undefined</item>
+      <item>&amp;violation</item>
+      <item>&amp;warning</item>
+      <item>&amp;who</item>
+      <item>&amp;xcond</item>
       <item>abs</item>
       <item>acos</item>
       <item>and</item>
@@ -783,19 +821,10 @@
         <keyword attribute="Keyword" context="#stay" String="keywords"/>
         <keyword attribute="Definition" context="function_decl" String="defines"/>
         <keyword attribute="Operator" context="#stay" String="operators"/>
-        <DetectChar attribute="Float" context="MaybeFloat" char="." lookAhead="1"/>
-        <DetectIdentifier/>
-        <AnyChar attribute="Decimal" context="Digit10" String="0123456789" lookAhead="1"/>
-        <Detect2Chars attribute="Normal" context="HexIdentifier" char="\" char1="x"/>
-      </context>
-
-      <context name="HexIdentifier" attribute="Normal" lineEndContext="#pop" fallthroughContext="#pop">
-        <RegExpr attribute="Normal" context="#pop" String="[0-9a-fA-F]+;([^\s#;&quot;{}()\[\]`'&amp;\\]|\\x[0-9a-fA-F]+;)*+"/>
-      </context>
-
-      <context name="MaybeFloat" attribute="Normal" lineEndContext="#stay">
-        <IncludeRules context="Digit10"/>
-        <DetectChar attribute="Normal" context="#pop" char="."/>
+        <RegExpr attribute="Normal" context="#stay" String="&symbol;"/>
+        <!-- s, f, d, l are extensions of Kawa -->
+        <RegExpr attribute="Float" context="#stay" String="[0-9]*+\.[0-9]++([esfdl][+-]?[0-9]++)?|[0-9]++[esfdl][+-]?[0-9]++"/>
+        <RegExpr attribute="Decimal" context="#stay" String="[0-9]++"/>
       </context>
 
 
@@ -1352,7 +1381,7 @@
     </itemDatas>
   </highlighting>
   <general>
-    <keywords casesensitive="1" weakDeliminator="-+*?!&lt;&gt;=/:.,\" additionalDeliminator="&quot;;#"/>
+    <keywords casesensitive="1" weakDeliminator="-+*?!&lt;&gt;=/:.,\&amp;" additionalDeliminator="&quot;;#"/>
     <comments>
       <comment name="singleLine" start=";;"/>
       <comment name="multiLine" start="#|" end="|#"/>

@@ -1,0 +1,48 @@
+version 12.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+
+! bla bla
+hostname R-site2
+
+logging queue-limit 100
+no logging console
+enable secret 5 $1$UzZM$BTdJlwFCg63tUdyLmq6cr0
+
+username admin password 0 Yas!8^VB5q$yZ53C35#nC
+ip subnet-zero
+
+no ip domain lookup
+ip domain name solea2.local
+ip dhcp excluded-address 10.1.22.200 10.1.22.254
+
+ip dhcp pool Administrateur
+   network 10.1.10.0 255.255.255.0
+   dns-server 8.8.8.8
+   default-router 10.1.10.254
+
+crypto map VPNSOLEA 20 ipsec-isakmp
+ set peer 192.168.141.4
+ set transform-set SETVPN
+ match address 110
+
+interface FastEthernet0/0.22
+ encapsulation dot1Q 22
+ ip address 10.1.22.254 255.255.255.0
+ ip nat inside
+
+access-list 110 permit ip 10.1.0.0 0.0.255.255 10.0.0.0 0.0.255.255
+
+route-map nonat permit 20
+ match ip address 150
+
+line con 0
+ password 57vmLD3
+line aux 0
+line vty 0 4
+ login local
+ transport input ssh
+line vty 5 15
+ login local
+ transport input ssh

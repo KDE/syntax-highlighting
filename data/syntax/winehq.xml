@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="WINE Config" version="4" kateversion="2.4" section="Configuration" extensions="*.reg" mimetype="">
+<language name="WINE Config" version="5" kateversion="2.4" section="Configuration" extensions="*.reg" mimetype="">
   <highlighting>
     <contexts>
       <context attribute="Normal Text" lineEndContext="#stay" name="Normal">
-        <RegExpr String="WINE REGISTRY Version.*$" attribute="RegistryBeginEnd" context="#stay" />
+        <StringDetect String="WINE REGISTRY Version" attribute="RegistryBeginEnd" context="RegistryBeginEnd" />
         <RegExpr String="#\s*&lt;\s*wineconf\s*&gt;" attribute="RegistryBeginEnd" context="#stay" column="0"/>
         <RegExpr String="#\s*&lt;\s*\/\s*wineconf\s*&gt;" attribute="RegistryBeginEnd" context="#stay" column="0"/>
         <RegExpr String="\[.*\]" attribute="Section" context="#stay" column="0"/>
-        <RegExpr String=";.*$" attribute="Comment" context="#stay"/>
+        <DetectChar char=";" attribute="Comment" context="Comment"/>
 
         <RegExpr String="\s*&quot;\s*[a-zA-Z0-9_.:*]*\s*&quot;" attribute="Key" context="#stay" />
 
@@ -17,8 +17,11 @@
 
       <context attribute="Normal Text" lineEndContext="#pop" name="Value">
         <RegExpr String="\s*&quot;.*&quot;" attribute="Value" context="#stay" />
-        <RegExpr String=";.*$" attribute="Comment" context="#stay"/>
+        <DetectChar char=";" attribute="Comment" context="Comment"/>
       </context>
+
+      <context attribute="RegistryBeginEnd" lineEndContext="#pop" name="RegistryBeginEnd"/>
+      <context attribute="Comment" lineEndContext="#pop" name="Comment"/>
 
     </contexts>
     <itemDatas>

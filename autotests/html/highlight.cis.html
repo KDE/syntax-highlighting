@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>highlight.cis</title>
+<meta name="generator" content="KF5::SyntaxHighlighting (Cisco)"/>
+</head><body style="color:#1f1c1b"><pre>
+version <span style="color:#b08000;">12</span>.<span style="color:#b08000;">2</span>
+service <span style="color:#0057ae;">timestamps</span> debug datetime msec
+service <span style="color:#0057ae;">timestamps</span> log datetime msec
+no service <span style="color:#0057ae;">password</span>-encryption
+
+! bla bla
+hostname R-site2
+
+logging queue-limit <span style="color:#b08000;">100</span>
+no logging console
+enable secret <span style="color:#b08000;">5</span> <span style="color:#0057ae;">$1$UzZM$BTdJlwFCg63tUdyLmq6cr0</span>
+
+username admin <span style="color:#0057ae;">password</span> <span style="color:#b08000;">0</span> Yas!<span style="color:#b08000;">8</span>^VB5q<span style="color:#0057ae;">$yZ53C35</span><span style="color:#898887;">#nC</span>
+ip subnet-zero
+
+no ip domain lookup
+ip domain name solea2.<span style="color:#0057ae;">local</span>
+ip <span style="color:#0057ae;">dhcp</span> excluded-address <span style="color:#b08000;">10</span>.<span style="color:#b08000;">1</span>.<span style="color:#b08000;">22</span>.<span style="color:#b08000;">200</span> <span style="color:#b08000;">10</span>.<span style="color:#b08000;">1</span>.<span style="color:#b08000;">22</span>.<span style="color:#b08000;">254</span>
+
+ip <span style="color:#0057ae;">dhcp</span> pool Administrateur
+   network <span style="color:#b08000;">10</span>.<span style="color:#b08000;">1</span>.<span style="color:#b08000;">10</span>.<span style="color:#b08000;">0</span> <span style="color:#b08000;">255</span>.<span style="color:#b08000;">255</span>.<span style="color:#b08000;">255</span>.<span style="color:#b08000;">0</span>
+   dns-server <span style="color:#b08000;">8</span>.<span style="color:#b08000;">8</span>.<span style="color:#b08000;">8</span>.<span style="color:#b08000;">8</span>
+   default-router <span style="color:#b08000;">10</span>.<span style="color:#b08000;">1</span>.<span style="color:#b08000;">10</span>.<span style="color:#b08000;">254</span>
+
+crypto map VPNSOLEA <span style="color:#b08000;">20</span> ipsec-isakmp
+ set peer <span style="color:#b08000;">192</span>.<span style="color:#b08000;">168</span>.<span style="color:#b08000;">141</span>.<span style="color:#b08000;">4</span>
+ set transform-set SETVPN
+ match address <span style="color:#b08000;">110</span>
+
+interface FastEthernet0/<span style="color:#b08000;">0</span>.<span style="color:#b08000;">22</span>
+ encapsulation dot1Q <span style="color:#b08000;">22</span>
+ ip address <span style="color:#b08000;">10</span>.<span style="color:#b08000;">1</span>.<span style="color:#b08000;">22</span>.<span style="color:#b08000;">254</span> <span style="color:#b08000;">255</span>.<span style="color:#b08000;">255</span>.<span style="color:#b08000;">255</span>.<span style="color:#b08000;">0</span>
+ ip <span style="color:#0057ae;">nat</span> inside
+
+access-list <span style="color:#b08000;">110</span> permit ip <span style="color:#b08000;">10</span>.<span style="color:#b08000;">1</span>.<span style="color:#b08000;">0</span>.<span style="color:#b08000;">0</span> <span style="color:#b08000;">0</span>.<span style="color:#b08000;">0</span>.<span style="color:#b08000;">255</span>.<span style="color:#b08000;">255</span> <span style="color:#b08000;">10</span>.<span style="color:#b08000;">0</span>.<span style="color:#b08000;">0</span>.<span style="color:#b08000;">0</span> <span style="color:#b08000;">0</span>.<span style="color:#b08000;">0</span>.<span style="color:#b08000;">255</span>.<span style="color:#b08000;">255</span>
+
+<span style="color:#0057ae;">route</span>-map nonat permit <span style="color:#b08000;">20</span>
+ match ip address <span style="color:#b08000;">150</span>
+
+line con <span style="color:#b08000;">0</span>
+ <span style="color:#0057ae;">password</span> <span style="color:#b08000;">57</span>vmLD3
+line aux <span style="color:#b08000;">0</span>
+line vty <span style="color:#b08000;">0</span> <span style="color:#b08000;">4</span>
+ login <span style="color:#0057ae;">local</span>
+ transport input ssh
+line vty <span style="color:#b08000;">5</span> <span style="color:#b08000;">15</span>
+ login <span style="color:#0057ae;">local</span>
+ transport input ssh
+</pre></body></html>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="Haml" version="7" kateversion="5.0" section="Markup"
+<language name="Haml" version="8" kateversion="5.0" section="Markup"
           extensions="*.haml"
           author="Cies Breijs (cies_at_kde_nl)" license="LGPL"
           mimetype="text/x-haml">
@@ -165,8 +165,8 @@
 
     <contexts>
       <context attribute="Normal Text" lineEndContext="#stay" name="normal" >
-        <RegExpr attribute="Error" firstNonSpace="false" context="#stay" String="^[ ]{1}([ ]{2})*[^ ]+" />
-        <RegExpr attribute="Doctype" context="#stay" String="^!!!.*$"/>
+        <RegExpr attribute="Error" firstNonSpace="false" context="#stay" String="[ ]{1}([ ]{2})*[^ ]+" column="0" />
+        <StringDetect attribute="Doctype" context="Doctype" String="!!!" column="0"/>
 
 <!--         2 failed attempts to implement multiline comments -->
 
@@ -330,7 +330,7 @@
 
         <RegExpr attribute="Comment" String="#\s*BEGIN.*$"  context="#stay" beginRegion="marker" column="0"/>
         <RegExpr attribute="Comment" String="#\s*END.*$"  context="#stay" endRegion="marker" column="0"/>
-        <RegExpr attribute="Comment" String="#"  context="General Comment"/>
+        <DetectChar attribute="Comment" char="#"  context="General Comment"/>
 
         <RegExpr attribute="Delimiter" String="[\[\]]+"  context="#stay"/>
         <DetectChar attribute="Delimiter" char="{" context="#stay" beginRegion="def block"/>
@@ -351,8 +351,9 @@
 
       <context name="Quoted String" attribute="String" lineEndContext="#stay">
         <StringDetect attribute="String" String="\\" context="#stay"/>
-        <RegExpr attribute="String" String="\\\&quot;" context="#stay"/>
-        <RegExpr attribute="Substitution" String="#@{1,2}" context="Short Subst"/>
+        <Detect2Chars attribute="String" char="\" char1="&quot;" context="#stay"/>
+        <StringDetect attribute="Substitution" String="#@@" context="Short Subst"/>
+        <Detect2Chars attribute="Substitution" char="#" char1="@" context="Short Subst"/>
         <Detect2Chars attribute="Substitution" char="#" char1="{" context="Subst"/>
         <!--HlCChar attribute="Char" context="#pop"/-->
         <DetectChar char="&quot;" attribute="String" context="#pop"/>
@@ -361,14 +362,15 @@
       <context name="Apostrophed String" attribute="Raw String" lineEndContext="#stay">
         <!-- <HlCChar attribute="Char" context="#pop"/> -->
         <StringDetect attribute="String" String="\\" context="#stay"/>
-        <RegExpr attribute="String" String="\\\'" context="#stay"/>
+        <Detect2Chars attribute="String" char="\" char1="'" context="#stay"/>
         <DetectChar char="'" attribute="Raw String" context="#pop"/>
       </context>
 
       <context name="Command String" attribute="Command" lineEndContext="#stay">
         <StringDetect attribute="String" String="\\" context="#stay"/>
-        <RegExpr attribute="String" String="\\\`" context="#stay"/>
-        <RegExpr attribute="Substitution" String="#@{1,2}" context="Short Subst"/>
+        <Detect2Chars attribute="String" char="\" char1="'" context="#stay"/>
+        <StringDetect attribute="Substitution" String="#@@" context="Short Subst"/>
+        <Detect2Chars attribute="Substitution" char="#" char1="@" context="Short Subst"/>
         <Detect2Chars attribute="Substitution" char="#" char1="{" context="Subst"/>
         <HlCChar attribute="Char" context="#pop"/>
         <DetectChar char="`" attribute="Command" context="#pop"/>
@@ -379,9 +381,10 @@
       </context>
 
       <context name="RegEx 1" attribute="Regular Expression" lineEndContext="#stay">
-        <RegExpr attribute="Regular Expression" String="\\\/" context="#stay"/>
+        <Detect2Chars attribute="Regular Expression" char="\" char1="/" context="#stay"/>
         <RegExpr attribute="Regular Expression" String="[^\\]$" context="#pop"/>
-        <RegExpr attribute="Substitution" String="#@{1,2}" context="Short Subst"/>
+        <StringDetect attribute="Substitution" String="#@@" context="Short Subst"/>
+        <Detect2Chars attribute="Substitution" char="#" char1="@" context="Short Subst"/>
         <Detect2Chars attribute="Substitution" char="#" char1="{" context="Subst"/>
         <RegExpr attribute="Regular Expression" String="/[uiomxn]*" context="#pop"/>
       </context>
@@ -395,7 +398,8 @@
 
       <context name="Short Subst" attribute="Substitution" lineEndContext="#pop">
         <!-- Check for e.g.: "#@var#@@xy" -->
-        <RegExpr attribute="Substitution" String="#@{1,2}" context="#stay"/>
+        <StringDetect attribute="Substitution" String="#@@" context="#stay"/>
+        <Detect2Chars attribute="Substitution" char="#" char1="@" context="#stay"/>
         <RegExpr attribute="Substitution" String="\w(?!\w)" context="#pop"/>
       </context>
 
@@ -420,6 +424,8 @@
       <context name="General Comment" attribute="Ruby Comment" lineEndContext="#pop">
         <keyword attribute="Dec" String="attention" context="#stay"/>
       </context>
+
+      <context name="Doctype" attribute="Doctype" lineEndContext="#pop"/>
     </contexts>
 
 

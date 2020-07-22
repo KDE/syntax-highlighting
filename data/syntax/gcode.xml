@@ -86,7 +86,7 @@
     </list>
 
     <contexts>
-      <context name="Alert" attribute="Alert" lineEndContext="#pop">
+      <context name="Alert" attribute="Alert" lineEndContext="#pop" fallthroughContext="alert">
         <RegExpr String="^[\s\t]*[nN][\s\t]*[\d]{1,5}" attribute="Line Number"/>
         <DetectSpaces attribute="Normal Text"/>
 				<DetectChar char="%" attribute="M-word"/>
@@ -99,7 +99,8 @@
         <RegExpr String="[.][\d\s\t]*" attribute="Number"/>
         <RegExpr String="[\d][\d\s\t]*[.][\d\s\t]*[.]" lookAhead="1" context="alert"/>
         <RegExpr String="[\d][\d\s\t]*[.]?[\d\s\t]*" attribute="Number"/>
-        <RegExpr String=";.*$" attribute="Comment"/>
+        <RegExpr String="[+\-*/=]" attribute="Operator"/>
+        <DetectChar char=";" attribute="Comment" context="comment"/>
         <keyword String="functions" attribute="Function"/>
         <keyword String="operators" attribute="Operator"/>
         <keyword String="o_sub" attribute="Sub-program"/>
@@ -107,7 +108,7 @@
         <RegExpr String="[oO][\s\t]*&lt;[\s\t]*&gt;" lookAhead="1" context="alert"/>
 				<RegExpr String="[oO][\s\t]*([\d]+|&lt;[^>]*&gt;)" attribute="O-word"/>
         <RegExpr String="[abcu-z][\s\t]*[+\-\d#\[.]" insensitive="1" lookAhead="1" context="coords"/>
-        <RegExpr String="[abcu-z].*$" insensitive="1" attribute="Alert"/>
+        <AnyChar String="abcuvwxyzABCUVWXYZ" attribute="Alert" context="alert"/>
         <RegExpr String="[deh-lpqr@^][\s\t]*[+\-\d#\[.]" insensitive="1" lookAhead="1" context="opts"/>
         <RegExpr String="[deh-lpqr@^].*$" insensitive="1" attribute="Alert"/>
         <RegExpr String="[gG][\s\t]*[\d]+[\s\t]*[.]?[\s\t]*[\d]*" attribute="G-word"/>
@@ -116,7 +117,6 @@
         <RegExpr String="[fF][\s\t]*[+\d#\[.]" lookAhead="1" context="feed"/>
         <RegExpr String="[mM][\s\t]*[1][\s\t]*[\d][\s\t]*[\d]" attribute="M-word (user)"/>
         <RegExpr String="[mM][\s\t]*([\d][\s\t]*[\d]?|[+#\[])" lookAhead="1" context="mword"/>
-        <RegExpr String=".*$" attribute="Alert"/>
       </context>
 
       <context name="feed" attribute="Alert" lineEndContext="#pop">
@@ -161,11 +161,11 @@
       </context>
 
       <context name="hash2" attribute= "Alert" lineEndContext="#pop">
-        <RegExpr String="#" attribute="Param (local)" context="#pop#pop"/>
+        <DetectChar char="#" attribute="Param (local)" context="#pop#pop"/>
       </context>
 
-      <context name="alert" attribute="Alert" lineEndContext="#pop">
-      </context>
+      <context name="alert" attribute="Alert" lineEndContext="#pop"/>
+      <context name="comment" attribute="Comment" lineEndContext="#pop"/>
     </contexts>
 
     <itemDatas>

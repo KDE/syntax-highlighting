@@ -1,0 +1,444 @@
+<Comment># Nim Sample file</Comment><br/>
+<Comment># Obtained form: https://nim-by-example.github.io/</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Comment </Comment><Alert Level 1>ALERT</Alert Level 1><Comment> </Comment><Alert Level 3>NOTE</Alert Level 3><Comment> </Comment><Alert Level 2>FIXME</Alert Level 2><br/>
+<Comment>#[ Multi-line</Comment><br/>
+<Comment>comment ]#</Comment><br/>
+<Normal Text></Normal Text><br/>
+<DocComment>## Documentation comment</DocComment><br/>
+<DocComment>##[ Multi-line</DocComment><br/>
+<DocComment>    documentation comment ]##</DocComment><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>import</Keywords><Normal Text> strformat</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>type</Keywords><br/>
+<Normal Text>    </Normal Text><Types>Person</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Keywords>object</Keywords><br/>
+<Normal Text>        name</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>string</Types><br/>
+<Normal Text>        age</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>Natural</Types><Normal Text> </Normal Text><Comment># Ensures the age is positive</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>let</Keywords><Normal Text> people </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Brackets>[</Brackets><br/>
+<Normal Text>    </Normal Text><Types>Person</Types><Brackets>(</Brackets><Normal Text>name</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><String>"John"</String><Brackets>,</Brackets><Normal Text> age</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Decimal>45</Decimal><Brackets>),</Brackets><br/>
+<Normal Text>    </Normal Text><Types>Person</Types><Brackets>(</Brackets><Normal Text>name</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><String>"Kate"</String><Brackets>,</Brackets><Normal Text> age</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Decimal>30</Decimal><Brackets>)</Brackets><br/>
+<Brackets>]</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Controls>for</Controls><Normal Text> person </Normal Text><Operators>in</Operators><Normal Text> people</Normal Text><Brackets>:</Brackets><br/>
+<Normal Text>    </Normal Text><Comment># Type-safe string interpolation,</Comment><br/>
+<Normal Text>    </Normal Text><Comment># evaluated at compile time.</Comment><br/>
+<Normal Text>    </Normal Text><Controls>echo</Controls><Brackets>(</Brackets><Funcs>fmt</Funcs><String>"{person.name} is {person.age} years old"</String><Brackets>)</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Thanks to Nim's 'iterator' and 'yield' constructs,</Comment><br/>
+<Comment># iterators are as easy to write as ordinary</Comment><br/>
+<Comment># functions. They are compiled to inline loops.</Comment><br/>
+<Keywords>iterator</Keywords><Normal Text> </Normal Text><ProcDefs>oddNumbers</ProcDefs><Brackets>[</Brackets><Types>Idx</Types><Brackets>,</Brackets><Normal Text> </Normal Text><Types>T</Types><Brackets>](</Brackets><Normal Text>a</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>array</Types><Brackets>[</Brackets><Types>Idx</Types><Brackets>,</Brackets><Normal Text> </Normal Text><Types>T</Types><Brackets>]):</Brackets><Normal Text> </Normal Text><Types>T</Types><Normal Text> </Normal Text><Symbols>=</Symbols><br/>
+<Normal Text>    </Normal Text><Controls>for</Controls><Normal Text> x </Normal Text><Operators>in</Operators><Normal Text> a</Normal Text><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Controls>if</Controls><Normal Text> x </Normal Text><Operators>mod</Operators><Normal Text> </Normal Text><Decimal>2</Decimal><Normal Text> </Normal Text><Symbols>==</Symbols><Normal Text> </Normal Text><Decimal>1</Decimal><Brackets>:</Brackets><br/>
+<Normal Text>            </Normal Text><Controls>yield</Controls><Normal Text> x</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Controls>for</Controls><Normal Text> odd </Normal Text><Operators>in</Operators><Normal Text> </Normal Text><Funcs>oddNumbers</Funcs><Brackets>([</Brackets><Decimal>3</Decimal><Brackets>,</Brackets><Normal Text> </Normal Text><Decimal>6</Decimal><Brackets>,</Brackets><Normal Text> </Normal Text><Decimal>9</Decimal><Brackets>,</Brackets><Normal Text> </Normal Text><Decimal>12</Decimal><Brackets>,</Brackets><Normal Text> </Normal Text><Decimal>15</Decimal><Brackets>,</Brackets><Normal Text> </Normal Text><Decimal>18</Decimal><Brackets>]):</Brackets><br/>
+<Normal Text>    </Normal Text><Controls>echo</Controls><Normal Text> odd</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Use Nim's macro system to transform a dense</Comment><br/>
+<Comment># data-centric description of x86 instructions</Comment><br/>
+<Comment># into lookup tables that are used by</Comment><br/>
+<Comment># assemblers and JITs.</Comment><br/>
+<Keywords>import</Keywords><Normal Text> macros</Normal Text><Brackets>,</Brackets><Normal Text> strutils</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>macro</Keywords><Normal Text> </Normal Text><ProcDefs>toLookupTable</ProcDefs><Brackets>(</Brackets><Normal Text>data</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Attrs>static</Attrs><Brackets>[</Brackets><Types>string</Types><Brackets>]):</Brackets><Normal Text> </Normal Text><Types>untyped</Types><Normal Text> </Normal Text><Symbols>=</Symbols><br/>
+<Normal Text>    </Normal Text><Others>result</Others><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Funcs>newTree</Funcs><Brackets>(</Brackets><Normal Text>nnkBracket</Normal Text><Brackets>)</Brackets><br/>
+<Normal Text>    </Normal Text><Controls>for</Controls><Normal Text> w </Normal Text><Operators>in</Operators><Normal Text> data</Normal Text><Brackets>.</Brackets><Funcs>split</Funcs><Brackets>(</Brackets><Char>';'</Char><Brackets>):</Brackets><br/>
+<Normal Text>        </Normal Text><Others>result</Others><Brackets>.</Brackets><Props>add</Props><Normal Text> </Normal Text><Funcs>newLit</Funcs><Brackets>(</Brackets><Normal Text>w</Normal Text><Brackets>)</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>const</Keywords><br/>
+<Normal Text>    data </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><String>"mov;btc;cli;xor"</String><br/>
+<Normal Text>    opcodes </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Funcs>toLookupTable</Funcs><Brackets>(</Brackets><Normal Text>data</Normal Text><Brackets>)</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Controls>for</Controls><Normal Text> o </Normal Text><Operators>in</Operators><Normal Text> opcodes</Normal Text><Brackets>:</Brackets><br/>
+<Normal Text>    </Normal Text><Controls>echo</Controls><Normal Text> o</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Variables</Comment><br/>
+<Keywords>proc</Keywords><Normal Text> </Normal Text><ProcDefs>getAlphabet</ProcDefs><Brackets>():</Brackets><Normal Text> </Normal Text><Types>string</Types><Normal Text> </Normal Text><Symbols>=</Symbols><br/>
+<Normal Text>    </Normal Text><Keywords>var</Keywords><Normal Text> accm </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><String>""</String><br/>
+<Normal Text>    </Normal Text><Controls>for</Controls><Normal Text> letter </Normal Text><Operators>in</Operators><Normal Text> </Normal Text><Char>'a'</Char><Brackets>..</Brackets><Char>'z'</Char><Brackets>:</Brackets><Normal Text>  </Normal Text><Comment># see iterators</Comment><br/>
+<Normal Text>        accm</Normal Text><Brackets>.</Brackets><Funcs>add</Funcs><Brackets>(</Brackets><Normal Text>letter</Normal Text><Brackets>)</Brackets><br/>
+<Normal Text>    </Normal Text><Controls>return</Controls><Normal Text> accm</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Computed at compilation time</Comment><br/>
+<Keywords>const</Keywords><Normal Text> alphabet </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Funcs>getAlphabet</Funcs><Brackets>()</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Mutable variables</Comment><br/>
+<Keywords>var</Keywords><br/>
+<Normal Text>    a </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><String>"foo"</String><br/>
+<Normal Text>    b </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Decimal>0</Decimal><br/>
+<Normal Text>    </Normal Text><Comment># Works fine, initialized to 0</Comment><br/>
+<Normal Text>    c</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>int</Types><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Immutable variables</Comment><br/>
+<Keywords>let</Keywords><br/>
+<Normal Text>    d </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><String>"foo"</String><br/>
+<Normal Text>    e </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Decimal>5</Decimal><br/>
+<Normal Text>    </Normal Text><Comment># Compile-time error, must be initialized at creation</Comment><br/>
+<Normal Text>    f</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>float</Types><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Works fine, `a` is mutable</Comment><br/>
+<Normal Text>a</Normal Text><Brackets>.</Brackets><Funcs>add</Funcs><Brackets>(</Brackets><String>"bar"</String><Brackets>)</Brackets><br/>
+<Normal Text>b </Normal Text><Symbols>+=</Symbols><Normal Text> </Normal Text><Decimal>1</Decimal><br/>
+<Normal Text>c </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Decimal>3</Decimal><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Compile-time error, const cannot be modified at run-time</Comment><br/>
+<Normal Text>alphabet </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><String>"abc"</String><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Compile-time error, `d` and `e` are immutable</Comment><br/>
+<Normal Text>d</Normal Text><Brackets>.</Brackets><Funcs>add</Funcs><Brackets>(</Brackets><String>"bar"</String><Brackets>)</Brackets><br/>
+<Normal Text>e </Normal Text><Symbols>+=</Symbols><Normal Text> </Normal Text><Decimal>1</Decimal><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Const</Comment><br/>
+<Types>STRING_LITERAL</Types><Brackets>(</Brackets><Types>TMP129</Types><Brackets>,</Brackets><Normal Text> </Normal Text><String>"abcdefghijklmnopqrstuvwxyz"</String><Brackets>,</Brackets><Normal Text> </Normal Text><Decimal>26</Decimal><Brackets>);</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Loops</Comment><br/>
+<Keywords>import</Keywords><Normal Text> strutils</Normal Text><Brackets>,</Brackets><Normal Text> random</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Funcs>randomize</Funcs><Brackets>()</Brackets><br/>
+<Keywords>let</Keywords><Normal Text> answer </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Funcs>random</Funcs><Brackets>(</Brackets><Decimal>10</Decimal><Brackets>)</Brackets><Normal Text> </Normal Text><Symbols>+</Symbols><Normal Text> </Normal Text><Decimal>1</Decimal><br/>
+<Controls>while</Controls><Normal Text> </Normal Text><Constants>true</Constants><Brackets>:</Brackets><br/>
+<Normal Text>    </Normal Text><Controls>echo</Controls><Normal Text> </Normal Text><String>"I have a number from 1 to 10, what is it? "</String><br/>
+<Normal Text>    </Normal Text><Keywords>let</Keywords><Normal Text> guess </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Funcs>parseInt</Funcs><Brackets>(</Brackets><Normal Text>stdin</Normal Text><Brackets>.</Brackets><Props>readLine</Props><Brackets>)</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Controls>if</Controls><Normal Text> guess </Normal Text><Symbols><</Symbols><Normal Text> answer</Normal Text><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Controls>echo</Controls><Normal Text> </Normal Text><String>"Too low, try again"</String><br/>
+<Normal Text>    </Normal Text><Controls>elif</Controls><Normal Text> guess </Normal Text><Symbols>></Symbols><Normal Text> answer</Normal Text><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Controls>echo</Controls><Normal Text> </Normal Text><String>"Too high, try again"</String><br/>
+<Normal Text>    </Normal Text><Controls>else</Controls><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Controls>echo</Controls><Normal Text> </Normal Text><String>"Correct!"</String><br/>
+<Normal Text>        </Normal Text><Controls>break</Controls><br/>
+<Normal Text></Normal Text><br/>
+<Controls>block</Controls><Normal Text> busyloops</Normal Text><Brackets>:</Brackets><br/>
+<Normal Text>    </Normal Text><Controls>while</Controls><Normal Text> </Normal Text><Constants>true</Constants><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Controls>while</Controls><Normal Text> </Normal Text><Constants>true</Constants><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Controls>break</Controls><Normal Text> busyloops</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Case Statements</Comment><br/>
+<Controls>case</Controls><Normal Text> </Normal Text><String>"charlie"</String><Brackets>:</Brackets><br/>
+<Normal Text>    </Normal Text><Operators>of</Operators><Normal Text> </Normal Text><String>"alfa"</String><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Controls>echo</Controls><Normal Text> </Normal Text><String>"A"</String><br/>
+<Normal Text>    </Normal Text><Operators>of</Operators><Normal Text> </Normal Text><String>"bravo"</String><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Controls>echo</Controls><Normal Text> </Normal Text><String>"B"</String><br/>
+<Normal Text>    </Normal Text><Operators>of</Operators><Normal Text> </Normal Text><String>"charlie"</String><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Controls>echo</Controls><Normal Text> </Normal Text><String>"C"</String><br/>
+<Normal Text>    </Normal Text><Controls>else</Controls><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Controls>echo</Controls><Normal Text> </Normal Text><String>"Unrecognized letter"</String><br/>
+<Normal Text></Normal Text><br/>
+<Controls>case</Controls><Normal Text> </Normal Text><Char>'h'</Char><Brackets>:</Brackets><br/>
+<Normal Text>    </Normal Text><Operators>of</Operators><Normal Text> </Normal Text><Char>'a'</Char><Brackets>,</Brackets><Normal Text> </Normal Text><Char>'e'</Char><Brackets>,</Brackets><Normal Text> </Normal Text><Char>'i'</Char><Brackets>,</Brackets><Normal Text> </Normal Text><Char>'o'</Char><Brackets>,</Brackets><Normal Text> </Normal Text><Char>'u'</Char><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Controls>echo</Controls><Normal Text> </Normal Text><String>"Vowel"</String><br/>
+<Normal Text>    </Normal Text><Operators>of</Operators><Normal Text> </Normal Text><Char>'\127'</Char><Brackets>..</Brackets><Char>'\255'</Char><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Controls>echo</Controls><Normal Text> </Normal Text><String>"Unknown"</String><br/>
+<Normal Text>    </Normal Text><Controls>else</Controls><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Controls>echo</Controls><Normal Text> </Normal Text><String>"Consonant"</String><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>proc</Keywords><Normal Text> </Normal Text><ProcDefs>positiveOrNegative</ProcDefs><Brackets>(</Brackets><Normal Text>num</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>int</Types><Brackets>):</Brackets><Normal Text> </Normal Text><Types>string</Types><Normal Text> </Normal Text><Symbols>=</Symbols><br/>
+<Normal Text>    </Normal Text><Others>result</Others><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Controls>case</Controls><Normal Text> num</Normal Text><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Operators>of</Operators><Normal Text> </Normal Text><Funcs>low</Funcs><Brackets>(</Brackets><Types>int</Types><Brackets>)..</Brackets><Normal Text> </Normal Text><Symbols>-</Symbols><Decimal>1</Decimal><Brackets>:</Brackets><br/>
+<Normal Text>            </Normal Text><String>"negative"</String><br/>
+<Normal Text>        </Normal Text><Operators>of</Operators><Normal Text> </Normal Text><Decimal>0</Decimal><Brackets>:</Brackets><br/>
+<Normal Text>            </Normal Text><String>"zero"</String><br/>
+<Normal Text>        </Normal Text><Operators>of</Operators><Normal Text> </Normal Text><Decimal>1</Decimal><Brackets>..</Brackets><Funcs>high</Funcs><Brackets>(</Brackets><Types>int</Types><Brackets>):</Brackets><br/>
+<Normal Text>            </Normal Text><String>"positive"</String><br/>
+<Normal Text>        </Normal Text><Controls>else</Controls><Brackets>:</Brackets><br/>
+<Normal Text>            </Normal Text><String>"impossible"</String><br/>
+<Normal Text></Normal Text><br/>
+<Controls>echo</Controls><Normal Text> </Normal Text><Funcs>positiveOrNegative</Funcs><Brackets>(</Brackets><Symbols>-</Symbols><Decimal>1</Decimal><Brackets>)</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Comment># items and pairs</Comment><br/>
+<Keywords>type</Keywords><br/>
+<Normal Text>    </Normal Text><Types>CustomRange</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Keywords>object</Keywords><br/>
+<Normal Text>        low</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>int</Types><br/>
+<Normal Text>        high</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>int</Types><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>iterator</Keywords><Normal Text> </Normal Text><ProcDefs>items</ProcDefs><Brackets>(</Brackets><Normal Text>range</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>CustomRange</Types><Brackets>):</Brackets><Normal Text> </Normal Text><Types>int</Types><Normal Text> </Normal Text><Symbols>=</Symbols><br/>
+<Normal Text>    </Normal Text><Keywords>var</Keywords><Normal Text> i </Normal Text><Symbols>=</Symbols><Normal Text> range</Normal Text><Brackets>.</Brackets><Props>low</Props><br/>
+<Normal Text>    </Normal Text><Controls>while</Controls><Normal Text> i </Normal Text><Symbols><=</Symbols><Normal Text> range</Normal Text><Brackets>.</Brackets><Props>high</Props><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Controls>yield</Controls><Normal Text> i</Normal Text><br/>
+<Normal Text>        </Normal Text><Funcs>inc</Funcs><Normal Text> i</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>iterator</Keywords><Normal Text> </Normal Text><ProcDefs>pairs</ProcDefs><Brackets>(</Brackets><Normal Text>range</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>CustomRange</Types><Brackets>):</Brackets><Normal Text> </Normal Text><Types>tuple</Types><Brackets>[</Brackets><Normal Text>a</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>int</Types><Brackets>,</Brackets><Normal Text> b</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>char</Types><Brackets>]</Brackets><Normal Text> </Normal Text><Symbols>=</Symbols><br/>
+<Normal Text>    </Normal Text><Controls>for</Controls><Normal Text> i </Normal Text><Operators>in</Operators><Normal Text> range</Normal Text><Brackets>:</Brackets><Normal Text>  </Normal Text><Comment># uses CustomRange.items</Comment><br/>
+<Normal Text>        </Normal Text><Controls>yield</Controls><Normal Text> </Normal Text><Brackets>(</Brackets><Normal Text>i</Normal Text><Brackets>,</Brackets><Normal Text> </Normal Text><Types>char</Types><Brackets>(</Brackets><Normal Text>i </Normal Text><Symbols>+</Symbols><Normal Text> </Normal Text><Funcs>ord</Funcs><Brackets>(</Brackets><Char>'a'</Char><Brackets>)))</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Controls>for</Controls><Normal Text> i</Normal Text><Brackets>,</Brackets><Normal Text> c </Normal Text><Operators>in</Operators><Normal Text> </Normal Text><Types>CustomRange</Types><Brackets>(</Brackets><Normal Text>low</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Decimal>1</Decimal><Brackets>,</Brackets><Normal Text> high</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Decimal>3</Decimal><Brackets>):</Brackets><br/>
+<Normal Text>    </Normal Text><Controls>echo</Controls><Normal Text> c</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Operators</Comment><br/>
+<Keywords>iterator</Keywords><Normal Text> </Normal Text><ProcDefs>`...`</ProcDefs><Symbols>*</Symbols><Brackets>[</Brackets><Types>T</Types><Brackets>](</Brackets><Normal Text>a</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>T</Types><Brackets>,</Brackets><Normal Text> b</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>T</Types><Brackets>):</Brackets><Normal Text> </Normal Text><Types>T</Types><Normal Text> </Normal Text><Symbols>=</Symbols><br/>
+<Normal Text>    </Normal Text><Keywords>var</Keywords><Normal Text> res</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>T</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Types>T</Types><Brackets>(</Brackets><Normal Text>a</Normal Text><Brackets>)</Brackets><br/>
+<Normal Text>    </Normal Text><Controls>while</Controls><Normal Text> res </Normal Text><Symbols><=</Symbols><Normal Text> b</Normal Text><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Controls>yield</Controls><Normal Text> res</Normal Text><br/>
+<Normal Text>        </Normal Text><Funcs>inc</Funcs><Normal Text> res</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Controls>for</Controls><Normal Text> i </Normal Text><Operators>in</Operators><Normal Text> </Normal Text><Decimal>0</Decimal><Brackets>...</Brackets><Decimal>5</Decimal><Brackets>:</Brackets><br/>
+<Normal Text>    </Normal Text><Controls>echo</Controls><Normal Text> i</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Inline Iterators</Comment><br/>
+<Keywords>iterator</Keywords><Normal Text> </Normal Text><ProcDefs>countTo</ProcDefs><Brackets>(</Brackets><Normal Text>n</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>int</Types><Brackets>):</Brackets><Normal Text> </Normal Text><Types>int</Types><Normal Text> </Normal Text><Symbols>=</Symbols><br/>
+<Normal Text>    </Normal Text><Keywords>var</Keywords><Normal Text> i </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Decimal>0</Decimal><br/>
+<Normal Text>    </Normal Text><Controls>while</Controls><Normal Text> i </Normal Text><Symbols><=</Symbols><Normal Text> n</Normal Text><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Controls>yield</Controls><Normal Text> i</Normal Text><br/>
+<Normal Text>        </Normal Text><Funcs>inc</Funcs><Normal Text> i</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Controls>for</Controls><Normal Text> i </Normal Text><Operators>in</Operators><Normal Text> </Normal Text><Funcs>countTo</Funcs><Brackets>(</Brackets><Decimal>5</Decimal><Brackets>):</Brackets><br/>
+<Normal Text>    </Normal Text><Controls>echo</Controls><Normal Text> i</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Closure Iterators</Comment><br/>
+<Keywords>proc</Keywords><Normal Text> </Normal Text><ProcDefs>countTo</ProcDefs><Brackets>(</Brackets><Normal Text>n</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>int</Types><Brackets>):</Brackets><Normal Text> </Normal Text><Keywords>iterator</Keywords><Brackets>():</Brackets><Normal Text> </Normal Text><Types>int</Types><Normal Text> </Normal Text><Symbols>=</Symbols><br/>
+<Normal Text>    </Normal Text><Controls>return</Controls><Normal Text> </Normal Text><Keywords>iterator</Keywords><Brackets>():</Brackets><Normal Text> </Normal Text><Types>int</Types><Normal Text> </Normal Text><Symbols>=</Symbols><br/>
+<Normal Text>        </Normal Text><Keywords>var</Keywords><Normal Text> i </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Decimal>0</Decimal><br/>
+<Normal Text>        </Normal Text><Controls>while</Controls><Normal Text> i </Normal Text><Symbols><=</Symbols><Normal Text> n</Normal Text><Brackets>:</Brackets><br/>
+<Normal Text>            </Normal Text><Controls>yield</Controls><Normal Text> i</Normal Text><br/>
+<Normal Text>            </Normal Text><Funcs>inc</Funcs><Normal Text> i</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>let</Keywords><Normal Text> countTo20 </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Funcs>countTo</Funcs><Brackets>(</Brackets><Decimal>20</Decimal><Brackets>)</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Controls>echo</Controls><Normal Text> </Normal Text><Funcs>countTo20</Funcs><Brackets>()</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>var</Keywords><Normal Text> output </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><String>""</String><br/>
+<Comment># Raw iterator usage:</Comment><br/>
+<Controls>while</Controls><Normal Text> </Normal Text><Constants>true</Constants><Brackets>:</Brackets><br/>
+<Normal Text>    </Normal Text><Comment># 1. grab an element</Comment><br/>
+<Normal Text>    </Normal Text><Keywords>let</Keywords><Normal Text> next </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Funcs>countTo20</Funcs><Brackets>()</Brackets><br/>
+<Normal Text>    </Normal Text><Comment># 2. Is the element bogus? It's the end of the loop, discard it</Comment><br/>
+<Normal Text>    </Normal Text><Controls>if</Controls><Normal Text> </Normal Text><Funcs>finished</Funcs><Brackets>(</Brackets><Normal Text>countTo20</Normal Text><Brackets>):</Brackets><br/>
+<Normal Text>        </Normal Text><Controls>break</Controls><br/>
+<Normal Text>    </Normal Text><Comment># 3. Loop body goes here:</Comment><br/>
+<Normal Text>    output</Normal Text><Brackets>.</Brackets><Funcs>add</Funcs><Brackets>(</Brackets><Symbols>$</Symbols><Normal Text>next </Normal Text><Symbols>&</Symbols><Normal Text> </Normal Text><String>" "</String><Brackets>)</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Controls>echo</Controls><Normal Text> output</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>output </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><String>""</String><br/>
+<Keywords>let</Keywords><Normal Text> countTo9 </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Funcs>countTo</Funcs><Brackets>(</Brackets><Decimal>9</Decimal><Brackets>)</Brackets><br/>
+<Controls>for</Controls><Normal Text> i </Normal Text><Operators>in</Operators><Normal Text> </Normal Text><Funcs>countTo9</Funcs><Brackets>():</Brackets><br/>
+<Normal Text>    output</Normal Text><Brackets>.</Brackets><Funcs>add</Funcs><Brackets>(</Brackets><Symbols>$</Symbols><Normal Text>i</Normal Text><Brackets>)</Brackets><br/>
+<Controls>echo</Controls><Normal Text> output</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Procs</Comment><br/>
+<Keywords>proc</Keywords><Normal Text> </Normal Text><ProcDefs>fibonacci</ProcDefs><Brackets>(</Brackets><Normal Text>n</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>int</Types><Brackets>):</Brackets><Normal Text> </Normal Text><Types>int</Types><Normal Text> </Normal Text><Symbols>=</Symbols><br/>
+<Normal Text>    </Normal Text><Controls>if</Controls><Normal Text> n </Normal Text><Symbols><</Symbols><Normal Text> </Normal Text><Decimal>2</Decimal><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Others>result</Others><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> n</Normal Text><br/>
+<Normal Text>    </Normal Text><Controls>else</Controls><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Others>result</Others><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Funcs>fibonacci</Funcs><Brackets>(</Brackets><Normal Text>n </Normal Text><Symbols>-</Symbols><Normal Text> </Normal Text><Decimal>1</Decimal><Brackets>)</Brackets><Normal Text> </Normal Text><Symbols>+</Symbols><Normal Text> </Normal Text><Brackets>(</Brackets><Normal Text>n </Normal Text><Symbols>-</Symbols><Normal Text> </Normal Text><Decimal>2</Decimal><Brackets>).</Brackets><Props>fibonacci</Props><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Operators</Comment><br/>
+<Keywords>proc</Keywords><Normal Text> </Normal Text><ProcDefs>`$`</ProcDefs><Brackets>(</Brackets><Normal Text>a</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>array</Types><Brackets>[</Brackets><Decimal>2</Decimal><Brackets>,</Brackets><Normal Text> </Normal Text><Types>array</Types><Brackets>[</Brackets><Decimal>2</Decimal><Brackets>,</Brackets><Normal Text> </Normal Text><Types>int</Types><Brackets>]]):</Brackets><Normal Text> </Normal Text><Types>string</Types><Normal Text> </Normal Text><Symbols>=</Symbols><br/>
+<Normal Text>    </Normal Text><Others>result</Others><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><String>""</String><br/>
+<Normal Text>    </Normal Text><Controls>for</Controls><Normal Text> v </Normal Text><Operators>in</Operators><Normal Text> a</Normal Text><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Controls>for</Controls><Normal Text> vx </Normal Text><Operators>in</Operators><Normal Text> v</Normal Text><Brackets>:</Brackets><br/>
+<Normal Text>            </Normal Text><Others>result</Others><Brackets>.</Brackets><Funcs>add</Funcs><Brackets>(</Brackets><Symbols>$</Symbols><Normal Text>vx </Normal Text><Symbols>&</Symbols><Normal Text> </Normal Text><String>", "</String><Brackets>)</Brackets><br/>
+<Normal Text>        </Normal Text><Others>result</Others><Brackets>.</Brackets><Funcs>add</Funcs><Brackets>(</Brackets><String>"</String><String Char>\n</String Char><String>"</String><Brackets>)</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Controls>echo</Controls><Brackets>([[</Brackets><Decimal>1</Decimal><Brackets>,</Brackets><Normal Text> </Normal Text><Decimal>2</Decimal><Brackets>],</Brackets><Normal Text> </Normal Text><Brackets>[</Brackets><Decimal>3</Decimal><Brackets>,</Brackets><Normal Text> </Normal Text><Decimal>4</Decimal><Brackets>]])</Brackets><Normal Text>  </Normal Text><Comment># See varargs for</Comment><br/>
+<Normal Text>                        </Normal Text><Comment># how echo works</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>proc</Keywords><Normal Text> </Normal Text><ProcDefs>`^&*^@%`</ProcDefs><Brackets>(</Brackets><Normal Text>a</Normal Text><Brackets>,</Brackets><Normal Text> b</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>string</Types><Brackets>):</Brackets><Normal Text> </Normal Text><Types>string</Types><Normal Text> </Normal Text><Symbols>=</Symbols><br/>
+<Normal Text>    </Normal Text><DocComment>## A confusingly named useless operator</DocComment><br/>
+<Normal Text>    </Normal Text><Others>result</Others><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> a</Normal Text><Brackets>[</Brackets><Decimal>0</Decimal><Brackets>]</Brackets><Normal Text> </Normal Text><Symbols>&</Symbols><Normal Text> b</Normal Text><Brackets>[</Brackets><Funcs>high</Funcs><Brackets>(</Brackets><Normal Text>b</Normal Text><Brackets>)]</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Controls>assert</Controls><Brackets>(</Brackets><String>"foo"</String><Normal Text> </Normal Text><Symbols>^&*^@%</Symbols><Normal Text> </Normal Text><String>"bar"</String><Normal Text> </Normal Text><Symbols>==</Symbols><Normal Text> </Normal Text><String>"fr"</String><Brackets>)</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Generic Functions</Comment><br/>
+<Comment># Not really good idea for obvious reasons</Comment><br/>
+<Keywords>let</Keywords><Normal Text> zero </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><String>""</String><br/>
+<Keywords>proc</Keywords><Normal Text> </Normal Text><ProcDefs>`+`</ProcDefs><Brackets>(</Brackets><Normal Text>a</Normal Text><Brackets>,</Brackets><Normal Text> b</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>string</Types><Brackets>):</Brackets><Normal Text> </Normal Text><Types>string</Types><Normal Text> </Normal Text><Symbols>=</Symbols><br/>
+<Normal Text>    a </Normal Text><Symbols>&</Symbols><Normal Text> b</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>proc</Keywords><Normal Text> </Normal Text><ProcDefs>`*`</ProcDefs><Brackets>[</Brackets><Types>T</Types><Brackets>](</Brackets><Normal Text>a</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>T</Types><Brackets>,</Brackets><Normal Text> b</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>int</Types><Brackets>):</Brackets><Normal Text> </Normal Text><Types>T</Types><Normal Text> </Normal Text><Symbols>=</Symbols><br/>
+<Normal Text>    </Normal Text><Others>result</Others><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> zero</Normal Text><br/>
+<Normal Text>    </Normal Text><Controls>for</Controls><Normal Text> i </Normal Text><Operators>in</Operators><Normal Text> </Normal Text><Decimal>0</Decimal><Brackets>..</Brackets><Normal Text>b</Normal Text><Symbols>-</Symbols><Decimal>1</Decimal><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Others>result</Others><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Others>result</Others><Normal Text> </Normal Text><Symbols>+</Symbols><Normal Text> </Normal Text><Funcs>a </Funcs><Normal Text> </Normal Text><Comment># calls `+` from line 3</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Controls>assert</Controls><Brackets>(</Brackets><String>"a"</String><Normal Text> </Normal Text><Symbols>*</Symbols><Normal Text> </Normal Text><Decimal>10</Decimal><Normal Text> </Normal Text><Symbols>==</Symbols><Normal Text> </Normal Text><String>"aaaaaaaaaa"</String><Brackets>)</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Blocks</Comment><br/>
+<Controls>block</Controls><Normal Text> outer</Normal Text><Brackets>:</Brackets><br/>
+<Normal Text>    </Normal Text><Controls>for</Controls><Normal Text> i </Normal Text><Operators>in</Operators><Normal Text> </Normal Text><Decimal>0</Decimal><Brackets>..</Brackets><Decimal>2000</Decimal><Brackets>:</Brackets><br/>
+<Normal Text>        </Normal Text><Controls>for</Controls><Normal Text> j </Normal Text><Operators>in</Operators><Normal Text> </Normal Text><Decimal>0</Decimal><Brackets>..</Brackets><Decimal>2000</Decimal><Brackets>:</Brackets><br/>
+<Normal Text>            </Normal Text><Controls>if</Controls><Normal Text> i</Normal Text><Symbols>+</Symbols><Normal Text>j </Normal Text><Symbols>==</Symbols><Normal Text> </Normal Text><Decimal>3145</Decimal><Brackets>:</Brackets><br/>
+<Normal Text>                </Normal Text><Controls>echo</Controls><Normal Text> i</Normal Text><Brackets>,</Brackets><Normal Text> </Normal Text><String>", "</String><Brackets>,</Brackets><Normal Text> j</Normal Text><br/>
+<Normal Text>                </Normal Text><Controls>break</Controls><Normal Text> outer</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>let</Keywords><Normal Text> b </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Decimal>3</Decimal><br/>
+<Controls>block</Controls><Brackets>:</Brackets><br/>
+<Normal Text>    </Normal Text><Keywords>let</Keywords><Normal Text> b </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><String>"3"</String><Normal Text>  </Normal Text><Comment># shadowing is probably a dumb idea</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Primitive types</Comment><br/>
+<Keywords>let</Keywords><br/>
+<Normal Text>    a</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>int8</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Hex>0x7F</Hex><Normal Text> </Normal Text><Comment># Works</Comment><br/>
+<Normal Text>    b</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>uint8</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Binary>0b1111_1111</Binary><Normal Text> </Normal Text><Comment># Works</Comment><br/>
+<Normal Text>    d </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Hex>0xFF</Hex><Normal Text> </Normal Text><Comment># type is int</Comment><br/>
+<Normal Text>    c</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>uint8</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Decimal>256</Decimal><Normal Text> </Normal Text><Comment># Compile time error</Comment><br/>
+<Keywords>let</Keywords><br/>
+<Normal Text>    a</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>int</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Decimal>2</Decimal><br/>
+<Normal Text>    b</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>int</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Decimal>4</Decimal><br/>
+<Controls>echo</Controls><Normal Text> </Normal Text><Decimal>4</Decimal><Symbols>/</Symbols><Decimal>2</Decimal><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Types Aliases</Comment><br/>
+<Keywords>type</Keywords><br/>
+<Normal Text>    </Normal Text><Types>MyInteger</Types><Symbols>*</Symbols><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Types>int</Types><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>let</Keywords><Normal Text> a</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>int</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Decimal>2</Decimal><br/>
+<Controls>discard</Controls><Normal Text> a </Normal Text><Symbols>+</Symbols><Normal Text> </Normal Text><Types>MyInteger</Types><Brackets>(</Brackets><Decimal>4</Decimal><Brackets>)</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Objects</Comment><br/>
+<Keywords>type</Keywords><br/>
+<Normal Text>    </Normal Text><Types>Animal</Types><Symbols>*</Symbols><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Keywords>object</Keywords><br/>
+<Normal Text>        name</Normal Text><Symbols>*</Symbols><Brackets>,</Brackets><Normal Text> species</Normal Text><Symbols>*</Symbols><Brackets>:</Brackets><Normal Text> </Normal Text><Types>string</Types><br/>
+<Normal Text>        age</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>int</Types><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>proc</Keywords><Normal Text> </Normal Text><ProcDefs>sleep</ProcDefs><Symbols>*</Symbols><Brackets>(</Brackets><Normal Text>a</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Keywords>var</Keywords><Normal Text> </Normal Text><Types>Animal</Types><Brackets>)</Brackets><Normal Text> </Normal Text><Symbols>=</Symbols><br/>
+<Normal Text>    a</Normal Text><Brackets>.</Brackets><Props>age</Props><Normal Text> </Normal Text><Symbols>+=</Symbols><Normal Text> </Normal Text><Decimal>1</Decimal><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>proc</Keywords><Normal Text> </Normal Text><ProcDefs>dead</ProcDefs><Symbols>*</Symbols><Brackets>(</Brackets><Normal Text>a</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>Animal</Types><Brackets>):</Brackets><Normal Text> </Normal Text><Types>bool</Types><Normal Text> </Normal Text><Symbols>=</Symbols><br/>
+<Normal Text>    </Normal Text><Others>result</Others><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> a</Normal Text><Brackets>.</Brackets><Props>age</Props><Normal Text> </Normal Text><Symbols>></Symbols><Normal Text> </Normal Text><Decimal>20</Decimal><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>var</Keywords><Normal Text> carl</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>Animal</Types><br/>
+<Normal Text>carl </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Types>Animal</Types><Brackets>(</Brackets><Funcs>name</Funcs><Normal Text> </Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><String>"Carl"</String><Brackets>,</Brackets><br/>
+<Normal Text>              </Normal Text><Funcs>species</Funcs><Normal Text> </Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><String>"L. glama"</String><Brackets>,</Brackets><br/>
+<Normal Text>              </Normal Text><Funcs>age</Funcs><Normal Text> </Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Decimal>12</Decimal><Brackets>)</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>let</Keywords><Normal Text> joe </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Types>Animal</Types><Brackets>(</Brackets><Funcs>name</Funcs><Normal Text> </Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><String>"Joe"</String><Brackets>,</Brackets><br/>
+<Normal Text>                 </Normal Text><Funcs>species</Funcs><Normal Text> </Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><String>"H. sapiens"</String><Brackets>,</Brackets><br/>
+<Normal Text>                 </Normal Text><Funcs>age</Funcs><Normal Text> </Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Decimal>23</Decimal><Brackets>)</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Controls>assert</Controls><Brackets>(</Brackets><Operators>not</Operators><Normal Text> carl</Normal Text><Brackets>.</Brackets><Props>dead</Props><Brackets>)</Brackets><br/>
+<Controls>for</Controls><Normal Text> i </Normal Text><Operators>in</Operators><Normal Text> </Normal Text><Decimal>0</Decimal><Brackets>..</Brackets><Decimal>10</Decimal><Brackets>:</Brackets><br/>
+<Normal Text>    carl</Normal Text><Brackets>.</Brackets><Funcs>sleep</Funcs><Brackets>()</Brackets><br/>
+<Controls>assert</Controls><Normal Text> carl</Normal Text><Brackets>.</Brackets><Props>dead</Props><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Enums</Comment><br/>
+<Keywords>type</Keywords><br/>
+<Normal Text>    </Normal Text><Types>CompassDirections</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Keywords>enum</Keywords><br/>
+<Normal Text>        cdNorth</Normal Text><Brackets>,</Brackets><Normal Text> cdEast</Normal Text><Brackets>,</Brackets><Normal Text> cdSouth</Normal Text><Brackets>,</Brackets><Normal Text> cdWest</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Types>Colors</Types><Normal Text> </Normal Text><Pragmas>{.pure.}</Pragmas><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Keywords>enum</Keywords><br/>
+<Normal Text>        </Normal Text><Types>Red</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><String>"FF0000"</String><Brackets>,</Brackets><Normal Text> </Normal Text><Types>Green</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Brackets>(</Brackets><Decimal>1</Decimal><Brackets>,</Brackets><Normal Text> </Normal Text><String>"00FF00"</String><Brackets>),</Brackets><Normal Text> </Normal Text><Types>Blue</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><String>"0000FF"</String><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Types>Signals</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Keywords>enum</Keywords><br/>
+<Normal Text>        sigQuit </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Decimal>3</Decimal><Brackets>,</Brackets><Normal Text> sigAbort </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Decimal>6</Decimal><Brackets>,</Brackets><Normal Text> sigKill </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Decimal>9</Decimal><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Distinct Types</Comment><br/>
+<Keywords>type</Keywords><br/>
+<Normal Text>    </Normal Text><Types>Dollars</Types><Symbols>*</Symbols><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Types>distinct</Types><Normal Text> </Normal Text><Types>float</Types><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>var</Keywords><Normal Text> a </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Float>20.</Float><Types>Dollars</Types><br/>
+<Normal Text>a </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Decimal>25</Decimal><Normal Text>  </Normal Text><Comment># Doesn't compile</Comment><br/>
+<Normal Text>a </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Float>25.</Float><Types>Dollars</Types><Normal Text>  </Normal Text><Comment># Works fine</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Strings</Comment><br/>
+<Controls>echo</Controls><Normal Text> </Normal Text><String>"words words words ⚑"</String><br/>
+<Controls>echo</Controls><Normal Text> </Normal Text><String>"""</String><br/>
+<String><html></String><br/>
+<String>  <head></String><br/>
+<String>  </head>\n\n</String><br/>
+<String></String><br/>
+<String>  <body></String><br/>
+<String>  </body></String><br/>
+<String></html> """</String><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>proc</Keywords><Normal Text> </Normal Text><ProcDefs>re</ProcDefs><Brackets>(</Brackets><Normal Text>s</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>string</Types><Brackets>):</Brackets><Normal Text> </Normal Text><Types>string</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> s</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Controls>echo</Controls><Normal Text> </Normal Text><String>r".</String><String Char>""</String Char><String>.\s\"</String><Normal Text>      </Normal Text><Comment># Raw string</Comment><br/>
+<Controls>echo</Controls><Normal Text> </Normal Text><String>re"</String><Pattern Internal Operator>\b</Pattern Internal Operator><Pattern Character Class>[a-z]</Pattern Character Class><Pattern Internal Operator>++\b</Pattern Internal Operator><String>"</String><Normal Text> </Normal Text><Comment># Regular expression</Comment><br/>
+<Controls>echo</Controls><Normal Text> </Normal Text><Funcs>function</Funcs><String>"text"</String><Normal Text>  </Normal Text><Comment># Tagged string</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Arrays</Comment><br/>
+<Keywords>type</Keywords><br/>
+<Normal Text>    </Normal Text><Types>ThreeStringAddress</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Types>array</Types><Brackets>[</Brackets><Decimal>3</Decimal><Brackets>,</Brackets><Normal Text> </Normal Text><Types>string</Types><Brackets>]</Brackets><br/>
+<Keywords>let</Keywords><Normal Text> names</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>ThreeStringAddress</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Brackets>[</Brackets><String>"Jasmine"</String><Brackets>,</Brackets><Normal Text> </Normal Text><String>"Ktisztina"</String><Brackets>,</Brackets><Normal Text> </Normal Text><String>"Kristof"</String><Brackets>]</Brackets><br/>
+<Keywords>let</Keywords><Normal Text> addresses</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>ThreeStringAddress</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Brackets>[</Brackets><String>"101 Betburweg"</String><Brackets>,</Brackets><Normal Text> </Normal Text><String>"66 Bellion Drive"</String><Brackets>,</Brackets><Normal Text> </Normal Text><String>"194 Laarderweg"</String><Brackets>]</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>type</Keywords><br/>
+<Normal Text>    </Normal Text><Types>Matrix</Types><Brackets>[</Brackets><Types>W</Types><Brackets>,</Brackets><Normal Text> </Normal Text><Types>H</Types><Brackets>:</Brackets><Normal Text> </Normal Text><Attrs>static</Attrs><Brackets>[</Brackets><Types>int</Types><Brackets>]]</Brackets><Normal Text> </Normal Text><Symbols>=</Symbols><br/>
+<Normal Text>        </Normal Text><Types>array</Types><Brackets>[</Brackets><Decimal>1</Decimal><Brackets>..</Brackets><Types>W</Types><Brackets>,</Brackets><Normal Text> </Normal Text><Types>array</Types><Brackets>[</Brackets><Decimal>1</Decimal><Brackets>..</Brackets><Types>H</Types><Brackets>,</Brackets><Normal Text> </Normal Text><Types>int</Types><Brackets>]]</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>let</Keywords><Normal Text> mat1</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>Matrix</Types><Brackets>[</Brackets><Decimal>2</Decimal><Brackets>,</Brackets><Normal Text> </Normal Text><Decimal>2</Decimal><Brackets>]</Brackets><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Brackets>[[</Brackets><Decimal>1</Decimal><Brackets>,</Brackets><Normal Text> </Normal Text><Decimal>0</Decimal><Brackets>],</Brackets><br/>
+<Normal Text>                          </Normal Text><Brackets>[</Brackets><Decimal>0</Decimal><Brackets>,</Brackets><Normal Text> </Normal Text><Decimal>1</Decimal><Brackets>]]</Brackets><br/>
+<Keywords>let</Keywords><Normal Text> mat2</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>Matrix</Types><Brackets>[</Brackets><Decimal>2</Decimal><Brackets>,</Brackets><Normal Text> </Normal Text><Decimal>2</Decimal><Brackets>]</Brackets><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Brackets>[[</Brackets><Decimal>0</Decimal><Brackets>,</Brackets><Normal Text> </Normal Text><Decimal>1</Decimal><Brackets>],</Brackets><br/>
+<Normal Text>                          </Normal Text><Brackets>[</Brackets><Decimal>1</Decimal><Brackets>,</Brackets><Normal Text> </Normal Text><Decimal>0</Decimal><Brackets>]]</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>proc</Keywords><Normal Text> </Normal Text><ProcDefs>`+`</ProcDefs><Brackets>[</Brackets><Types>W</Types><Brackets>,</Brackets><Normal Text> </Normal Text><Types>H</Types><Brackets>](</Brackets><Normal Text>a</Normal Text><Brackets>,</Brackets><Normal Text> b</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>Matrix</Types><Brackets>[</Brackets><Types>W</Types><Brackets>,</Brackets><Normal Text> </Normal Text><Types>H</Types><Brackets>]):</Brackets><br/>
+<Normal Text>    </Normal Text><Types>Matrix</Types><Brackets>[</Brackets><Types>W</Types><Brackets>,</Brackets><Normal Text> </Normal Text><Types>H</Types><Brackets>]</Brackets><Normal Text> </Normal Text><Symbols>=</Symbols><br/>
+<Normal Text>        </Normal Text><Controls>for</Controls><Normal Text> i </Normal Text><Operators>in</Operators><Normal Text> </Normal Text><Decimal>1</Decimal><Brackets>..</Brackets><Funcs>high</Funcs><Brackets>(</Brackets><Normal Text>a</Normal Text><Brackets>):</Brackets><br/>
+<Normal Text>            </Normal Text><Controls>for</Controls><Normal Text> j </Normal Text><Operators>in</Operators><Normal Text> </Normal Text><Decimal>1</Decimal><Brackets>..</Brackets><Funcs>high</Funcs><Brackets>(</Brackets><Normal Text>a</Normal Text><Brackets>[</Brackets><Decimal>0</Decimal><Brackets>]):</Brackets><br/>
+<Normal Text>                </Normal Text><Others>result</Others><Brackets>[</Brackets><Normal Text>i</Normal Text><Brackets>][</Brackets><Normal Text>j</Normal Text><Brackets>]</Brackets><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> a</Normal Text><Brackets>[</Brackets><Normal Text>i</Normal Text><Brackets>][</Brackets><Normal Text>j</Normal Text><Brackets>]</Brackets><Normal Text> </Normal Text><Symbols>+</Symbols><Normal Text> b</Normal Text><Brackets>[</Brackets><Normal Text>i</Normal Text><Brackets>][</Brackets><Normal Text>j</Normal Text><Brackets>]</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Seqs</Comment><br/>
+<Keywords>var</Keywords><br/>
+<Normal Text>    a </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Symbols>@</Symbols><Brackets>[</Brackets><Decimal>1</Decimal><Brackets>,</Brackets><Normal Text> </Normal Text><Decimal>2</Decimal><Brackets>,</Brackets><Normal Text> </Normal Text><Decimal>3</Decimal><Brackets>]</Brackets><br/>
+<Normal Text>    b </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Funcs>newSeq</Funcs><Brackets>[</Brackets><Types>int</Types><Brackets>](</Brackets><Decimal>3</Decimal><Brackets>)</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Controls>for</Controls><Normal Text> i</Normal Text><Brackets>,</Brackets><Normal Text> v </Normal Text><Operators>in</Operators><Normal Text> a</Normal Text><Brackets>:</Brackets><br/>
+<Normal Text>    b</Normal Text><Brackets>[</Brackets><Normal Text>i</Normal Text><Brackets>]</Brackets><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> v</Normal Text><Symbols>*</Symbols><Normal Text>v</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Controls>for</Controls><Normal Text> i </Normal Text><Operators>in</Operators><Normal Text> </Normal Text><Decimal>4</Decimal><Brackets>..</Brackets><Decimal>100</Decimal><Brackets>:</Brackets><br/>
+<Normal Text>    b</Normal Text><Brackets>.</Brackets><Funcs>add</Funcs><Brackets>(</Brackets><Normal Text>i </Normal Text><Symbols>*</Symbols><Normal Text> i</Normal Text><Brackets>)</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>b</Normal Text><Brackets>.</Brackets><Funcs>delete</Funcs><Brackets>(</Brackets><Decimal>0</Decimal><Brackets>)</Brackets><Normal Text>  </Normal Text><Comment># takes O(n) time</Comment><br/>
+<Normal Text>b </Normal Text><Symbols>=</Symbols><Normal Text> a</Normal Text><Brackets>[</Brackets><Decimal>0</Decimal><Brackets>]</Brackets><Normal Text> </Normal Text><Symbols>&</Symbols><Normal Text> </Normal Text><Funcs>b </Funcs><Normal Text> </Normal Text><Comment># Same as original b</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Comment># JSON</Comment><br/>
+<Keywords>import</Keywords><Normal Text> json</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>let</Keywords><Normal Text> element </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><String>"Hydrogen"</String><br/>
+<Keywords>let</Keywords><Normal Text> atomicNumber </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Decimal>1</Decimal><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>let</Keywords><Normal Text> jsonObject </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Symbols>%*</Symbols><Normal Text> </Normal Text><Brackets>{</Brackets><String>"element"</String><Brackets>:</Brackets><Normal Text> element</Normal Text><Brackets>,</Brackets><Normal Text> </Normal Text><String>"atomicNumber"</String><Brackets>:</Brackets><Normal Text> atomicNumber</Normal Text><Brackets>}</Brackets><br/>
+<Comment># This will print {"element":"Hydrogen", "atomicNumber": 1}</Comment><br/>
+<Controls>echo</Controls><Normal Text> </Normal Text><Symbols>$</Symbols><Normal Text>jsonObject</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment># We start with a string representation of a JSON object</Comment><br/>
+<Keywords>let</Keywords><Normal Text> jsonObject </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><String>"""{"name": "Sky", "age": 32}"""</String><br/>
+<Keywords>let</Keywords><Normal Text> jsonArray </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><String>"""[7, 8, 9]"""</String><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>let</Keywords><Normal Text> parsedObject </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Funcs>parseJson</Funcs><Brackets>(</Brackets><Normal Text>jsonObject</Normal Text><Brackets>)</Brackets><br/>
+<Keywords>let</Keywords><Normal Text> name </Normal Text><Symbols>=</Symbols><Normal Text> parsedObject</Normal Text><Brackets>[</Brackets><String>"name"</String><Brackets>].</Brackets><Funcs>getStr</Funcs><Brackets>()</Brackets><br/>
+<Comment># This will print Sky</Comment><br/>
+<Controls>echo</Controls><Normal Text> name</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>let</Keywords><Normal Text> parsedArray </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Funcs>parseJson</Funcs><Brackets>(</Brackets><Normal Text>jsonArray</Normal Text><Brackets>)</Brackets><br/>
+<Keywords>let</Keywords><Normal Text> eight </Normal Text><Symbols>=</Symbols><Normal Text> parsedArray</Normal Text><Brackets>[</Brackets><Decimal>1</Decimal><Brackets>].</Brackets><Funcs>getInt</Funcs><Brackets>()</Brackets><br/>
+<Comment># This will print 8</Comment><br/>
+<Controls>echo</Controls><Normal Text> eight</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment># First we'll define our types</Comment><br/>
+<Keywords>type</Keywords><br/>
+<Normal Text>    </Normal Text><Types>Element</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Keywords>object</Keywords><br/>
+<Normal Text>        name</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>string</Types><br/>
+<Normal Text>        atomicNumber</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>int</Types><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Let's say this is the JSON we want to convert</Comment><br/>
+<Keywords>let</Keywords><Normal Text> jsonObject </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Funcs>parseJson</Funcs><Brackets>(</Brackets><String>"""{"name": "Carbon", "atomicNumber": 6}"""</String><Brackets>)</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>let</Keywords><Normal Text> element </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Funcs>to</Funcs><Brackets>(</Brackets><Normal Text>jsonObject</Normal Text><Brackets>,</Brackets><Normal Text> </Normal Text><Types>Element</Types><Brackets>)</Brackets><br/>
+<Comment># This will print Carbon</Comment><br/>
+<Controls>echo</Controls><Normal Text> element</Normal Text><Brackets>.</Brackets><Props>name</Props><br/>
+<Comment># This will print 6</Comment><br/>
+<Controls>echo</Controls><Normal Text> element</Normal Text><Brackets>.</Brackets><Props>atomicNumber</Props><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Object Oriented Programming</Comment><br/>
+<Keywords>type</Keywords><Normal Text> </Normal Text><TypeDefs>Animal</TypeDefs><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Attrs>ref</Attrs><Normal Text> </Normal Text><Keywords>object</Keywords><Normal Text> </Normal Text><Operators>of</Operators><Normal Text> </Normal Text><Types>RootObj</Types><br/>
+<Normal Text>    name</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>string</Types><br/>
+<Normal Text>    age</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>int</Types><br/>
+<Keywords>method</Keywords><Normal Text> </Normal Text><ProcDefs>vocalize</ProcDefs><Brackets>(</Brackets><Normal Text>this</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>Animal</Types><Brackets>):</Brackets><Normal Text> </Normal Text><Types>string</Types><Normal Text> </Normal Text><Pragmas>{.base.}</Pragmas><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><String>"..."</String><br/>
+<Keywords>method</Keywords><Normal Text> </Normal Text><ProcDefs>ageHumanYrs</ProcDefs><Brackets>(</Brackets><Normal Text>this</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>Animal</Types><Brackets>):</Brackets><Normal Text> </Normal Text><Types>int</Types><Normal Text> </Normal Text><Pragmas>{.base.}</Pragmas><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> this</Normal Text><Brackets>.</Brackets><Props>age</Props><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>type</Keywords><Normal Text> </Normal Text><TypeDefs>Dog</TypeDefs><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Attrs>ref</Attrs><Normal Text> </Normal Text><Keywords>object</Keywords><Normal Text> </Normal Text><Operators>of</Operators><Normal Text> </Normal Text><Types>Animal</Types><br/>
+<Keywords>method</Keywords><Normal Text> </Normal Text><ProcDefs>vocalize</ProcDefs><Brackets>(</Brackets><Normal Text>this</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>Dog</Types><Brackets>):</Brackets><Normal Text> </Normal Text><Types>string</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><String>"woof"</String><br/>
+<Keywords>method</Keywords><Normal Text> </Normal Text><ProcDefs>ageHumanYrs</ProcDefs><Brackets>(</Brackets><Normal Text>this</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>Dog</Types><Brackets>):</Brackets><Normal Text> </Normal Text><Types>int</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> this</Normal Text><Brackets>.</Brackets><Props>age</Props><Normal Text> </Normal Text><Symbols>*</Symbols><Normal Text> </Normal Text><Decimal>7</Decimal><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>type</Keywords><Normal Text> </Normal Text><TypeDefs>Cat</TypeDefs><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Attrs>ref</Attrs><Normal Text> </Normal Text><Keywords>object</Keywords><Normal Text> </Normal Text><Operators>of</Operators><Normal Text> </Normal Text><Types>Animal</Types><br/>
+<Keywords>method</Keywords><Normal Text> </Normal Text><ProcDefs>vocalize</ProcDefs><Brackets>(</Brackets><Normal Text>this</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>Cat</Types><Brackets>):</Brackets><Normal Text> </Normal Text><Types>string</Types><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><String>"meow"</String><br/>
+<Normal Text></Normal Text><br/>
+<Keywords>var</Keywords><Normal Text> animals</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Types>seq</Types><Brackets>[</Brackets><Types>Animal</Types><Brackets>]</Brackets><Normal Text> </Normal Text><Symbols>=</Symbols><Normal Text> </Normal Text><Symbols>@</Symbols><Brackets>[]</Brackets><br/>
+<Normal Text>animals</Normal Text><Brackets>.</Brackets><Funcs>add</Funcs><Brackets>(</Brackets><Types>Dog</Types><Brackets>(</Brackets><Normal Text>name</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><String>"Sparky"</String><Brackets>,</Brackets><Normal Text> age</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Decimal>10</Decimal><Brackets>))</Brackets><br/>
+<Normal Text>animals</Normal Text><Brackets>.</Brackets><Funcs>add</Funcs><Brackets>(</Brackets><Types>Cat</Types><Brackets>(</Brackets><Normal Text>name</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><String>"Mitten"</String><Brackets>,</Brackets><Normal Text> age</Normal Text><Brackets>:</Brackets><Normal Text> </Normal Text><Decimal>10</Decimal><Brackets>))</Brackets><br/>
+<Normal Text></Normal Text><br/>
+<Controls>for</Controls><Normal Text> a </Normal Text><Operators>in</Operators><Normal Text> animals</Normal Text><Brackets>:</Brackets><br/>
+<Normal Text>    </Normal Text><Controls>echo</Controls><Normal Text> a</Normal Text><Brackets>.</Brackets><Funcs>vocalize</Funcs><Brackets>()</Brackets><br/>
+<Normal Text>    </Normal Text><Controls>echo</Controls><Normal Text> a</Normal Text><Brackets>.</Brackets><Funcs>ageHumanYrs</Funcs><Brackets>()</Brackets><br/>

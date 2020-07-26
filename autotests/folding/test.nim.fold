@@ -1,0 +1,444 @@
+<indentfold># Nim Sample file
+# Obtained form: https://nim-by-example.github.io/
+
+# Comment ALERT NOTE FIXME
+</indentfold><beginfold id='2'>#[</beginfold id='2'> Multi-line
+<indentfold>comment <endfold id='2'>]#</endfold id='2'>
+
+## Documentation comment
+</indentfold><beginfold id='1'>##[</beginfold id='1'> Multi-line
+<indentfold>    documentation comment <endfold id='1'>]##</endfold id='1'>
+
+import strformat
+
+type
+    Person = object
+        name: string
+        age: Natural # Ensures the age is positive
+
+let people = [
+    Person(name: <beginfold id='3'>"</beginfold id='3'>John<endfold id='3'>"</endfold id='3'>, age: 45),
+    Person(name: <beginfold id='3'>"</beginfold id='3'>Kate<endfold id='3'>"</endfold id='3'>, age: 30)
+]
+
+for person in people:
+    # Type-safe string interpolation,
+    # evaluated at compile time.
+    echo(fmt<beginfold id='3'>"</beginfold id='3'>{person.name} is {person.age} years old<endfold id='3'>"</endfold id='3'>)
+
+# Thanks to Nim's 'iterator' and 'yield' constructs,
+# iterators are as easy to write as ordinary
+# functions. They are compiled to inline loops.
+iterator oddNumbers[Idx, T](a: array[Idx, T]): T =
+    for x in a:
+        if x mod 2 == 1:
+            yield x
+
+for odd in oddNumbers([3, 6, 9, 12, 15, 18]):
+    echo odd
+
+# Use Nim's macro system to transform a dense
+# data-centric description of x86 instructions
+# into lookup tables that are used by
+# assemblers and JITs.
+import macros, strutils
+
+macro toLookupTable(data: static[string]): untyped =
+    result = newTree(nnkBracket)
+    for w in data.split(';'):
+        result.add newLit(w)
+
+const
+    data = <beginfold id='3'>"</beginfold id='3'>mov;btc;cli;xor<endfold id='3'>"</endfold id='3'>
+    opcodes = toLookupTable(data)
+
+for o in opcodes:
+    echo o
+
+# Variables
+proc getAlphabet(): string =
+    var accm = <beginfold id='3'>"</beginfold id='3'><endfold id='3'>"</endfold id='3'>
+    for letter in 'a'..'z':  # see iterators
+        accm.add(letter)
+    return accm
+
+# Computed at compilation time
+const alphabet = getAlphabet()
+
+# Mutable variables
+var
+    a = <beginfold id='3'>"</beginfold id='3'>foo<endfold id='3'>"</endfold id='3'>
+    b = 0
+    # Works fine, initialized to 0
+    c: int
+
+# Immutable variables
+let
+    d = <beginfold id='3'>"</beginfold id='3'>foo<endfold id='3'>"</endfold id='3'>
+    e = 5
+    # Compile-time error, must be initialized at creation
+    f: float
+
+# Works fine, `a` is mutable
+a.add(<beginfold id='3'>"</beginfold id='3'>bar<endfold id='3'>"</endfold id='3'>)
+b += 1
+c = 3
+
+# Compile-time error, const cannot be modified at run-time
+alphabet = <beginfold id='3'>"</beginfold id='3'>abc<endfold id='3'>"</endfold id='3'>
+
+# Compile-time error, `d` and `e` are immutable
+d.add(<beginfold id='3'>"</beginfold id='3'>bar<endfold id='3'>"</endfold id='3'>)
+e += 1
+
+# Const
+STRING_LITERAL(TMP129, <beginfold id='3'>"</beginfold id='3'>abcdefghijklmnopqrstuvwxyz<endfold id='3'>"</endfold id='3'>, 26);
+
+# Loops
+import strutils, random
+
+randomize()
+let answer = random(10) + 1
+while true:
+    echo <beginfold id='3'>"</beginfold id='3'>I have a number from 1 to 10, what is it? <endfold id='3'>"</endfold id='3'>
+    let guess = parseInt(stdin.readLine)
+
+    if guess < answer:
+        echo <beginfold id='3'>"</beginfold id='3'>Too low, try again<endfold id='3'>"</endfold id='3'>
+    elif guess > answer:
+        echo <beginfold id='3'>"</beginfold id='3'>Too high, try again<endfold id='3'>"</endfold id='3'>
+    else:
+        echo <beginfold id='3'>"</beginfold id='3'>Correct!<endfold id='3'>"</endfold id='3'>
+        break
+
+block busyloops:
+    while true:
+        while true:
+        break busyloops
+
+# Case Statements
+case <beginfold id='3'>"</beginfold id='3'>charlie<endfold id='3'>"</endfold id='3'>:
+    of <beginfold id='3'>"</beginfold id='3'>alfa<endfold id='3'>"</endfold id='3'>:
+        echo <beginfold id='3'>"</beginfold id='3'>A<endfold id='3'>"</endfold id='3'>
+    of <beginfold id='3'>"</beginfold id='3'>bravo<endfold id='3'>"</endfold id='3'>:
+        echo <beginfold id='3'>"</beginfold id='3'>B<endfold id='3'>"</endfold id='3'>
+    of <beginfold id='3'>"</beginfold id='3'>charlie<endfold id='3'>"</endfold id='3'>:
+        echo <beginfold id='3'>"</beginfold id='3'>C<endfold id='3'>"</endfold id='3'>
+    else:
+        echo <beginfold id='3'>"</beginfold id='3'>Unrecognized letter<endfold id='3'>"</endfold id='3'>
+
+case 'h':
+    of 'a', 'e', 'i', 'o', 'u':
+        echo <beginfold id='3'>"</beginfold id='3'>Vowel<endfold id='3'>"</endfold id='3'>
+    of '\127'..'\255':
+        echo <beginfold id='3'>"</beginfold id='3'>Unknown<endfold id='3'>"</endfold id='3'>
+    else:
+        echo <beginfold id='3'>"</beginfold id='3'>Consonant<endfold id='3'>"</endfold id='3'>
+
+proc positiveOrNegative(num: int): string =
+    result = case num:
+        of low(int).. -1:
+            <beginfold id='3'>"</beginfold id='3'>negative<endfold id='3'>"</endfold id='3'>
+        of 0:
+            <beginfold id='3'>"</beginfold id='3'>zero<endfold id='3'>"</endfold id='3'>
+        of 1..high(int):
+            <beginfold id='3'>"</beginfold id='3'>positive<endfold id='3'>"</endfold id='3'>
+        else:
+            <beginfold id='3'>"</beginfold id='3'>impossible<endfold id='3'>"</endfold id='3'>
+
+echo positiveOrNegative(-1)
+
+# items and pairs
+type
+    CustomRange = object
+        low: int
+        high: int
+
+iterator items(range: CustomRange): int =
+    var i = range.low
+    while i <= range.high:
+        yield i
+        inc i
+
+iterator pairs(range: CustomRange): tuple[a: int, b: char] =
+    for i in range:  # uses CustomRange.items
+        yield (i, char(i + ord('a')))
+
+for i, c in CustomRange(low: 1, high: 3):
+    echo c
+
+# Operators
+iterator `...`*[T](a: T, b: T): T =
+    var res: T = T(a)
+    while res <= b:
+        yield res
+        inc res
+
+for i in 0...5:
+    echo i
+
+# Inline Iterators
+iterator countTo(n: int): int =
+    var i = 0
+    while i <= n:
+        yield i
+        inc i
+
+for i in countTo(5):
+    echo i
+
+# Closure Iterators
+proc countTo(n: int): iterator(): int =
+    return iterator(): int =
+        var i = 0
+        while i <= n:
+            yield i
+            inc i
+
+let countTo20 = countTo(20)
+
+echo countTo20()
+
+var output = <beginfold id='3'>"</beginfold id='3'><endfold id='3'>"</endfold id='3'>
+# Raw iterator usage:
+while true:
+    # 1. grab an element
+    let next = countTo20()
+    # 2. Is the element bogus? It's the end of the loop, discard it
+    if finished(countTo20):
+        break
+    # 3. Loop body goes here:
+    output.add($next & <beginfold id='3'>"</beginfold id='3'> <endfold id='3'>"</endfold id='3'>)
+
+echo output
+
+output = <beginfold id='3'>"</beginfold id='3'><endfold id='3'>"</endfold id='3'>
+let countTo9 = countTo(9)
+for i in countTo9():
+    output.add($i)
+echo output
+
+# Procs
+proc fibonacci(n: int): int =
+    if n < 2:
+        result = n
+    else:
+        result = fibonacci(n - 1) + (n - 2).fibonacci
+
+# Operators
+proc `$`(a: array[2, array[2, int]]): string =
+    result = <beginfold id='3'>"</beginfold id='3'><endfold id='3'>"</endfold id='3'>
+    for v in a:
+        for vx in v:
+            result.add($vx & <beginfold id='3'>"</beginfold id='3'>, <endfold id='3'>"</endfold id='3'>)
+        result.add(<beginfold id='3'>"</beginfold id='3'>\n<endfold id='3'>"</endfold id='3'>)
+
+echo([[1, 2], [3, 4]])  # See varargs for
+                        # how echo works
+
+proc `^&*^@%`(a, b: string): string =
+    ## A confusingly named useless operator
+    result = a[0] & b[high(b)]
+
+assert(<beginfold id='3'>"</beginfold id='3'>foo<endfold id='3'>"</endfold id='3'> ^&*^@% <beginfold id='3'>"</beginfold id='3'>bar<endfold id='3'>"</endfold id='3'> == <beginfold id='3'>"</beginfold id='3'>fr<endfold id='3'>"</endfold id='3'>)
+
+# Generic Functions
+# Not really good idea for obvious reasons
+let zero = <beginfold id='3'>"</beginfold id='3'><endfold id='3'>"</endfold id='3'>
+proc `+`(a, b: string): string =
+    a & b
+
+proc `*`[T](a: T, b: int): T =
+    result = zero
+    for i in 0..b-1:
+        result = result + a  # calls `+` from line 3
+
+assert(<beginfold id='3'>"</beginfold id='3'>a<endfold id='3'>"</endfold id='3'> * 10 == <beginfold id='3'>"</beginfold id='3'>aaaaaaaaaa<endfold id='3'>"</endfold id='3'>)
+
+# Blocks
+block outer:
+    for i in 0..2000:
+        for j in 0..2000:
+            if i+j == 3145:
+                echo i, <beginfold id='3'>"</beginfold id='3'>, <endfold id='3'>"</endfold id='3'>, j
+                break outer
+
+let b = 3
+block:
+    let b = <beginfold id='3'>"</beginfold id='3'>3<endfold id='3'>"</endfold id='3'>  # shadowing is probably a dumb idea
+
+# Primitive types
+let
+    a: int8 = 0x7F # Works
+    b: uint8 = 0b1111_1111 # Works
+    d = 0xFF # type is int
+    c: uint8 = 256 # Compile time error
+let
+    a: int = 2
+    b: int = 4
+echo 4/2
+
+# Types Aliases
+type
+    MyInteger* = int
+
+let a: int = 2
+discard a + MyInteger(4)
+
+# Objects
+type
+    Animal* = object
+        name*, species*: string
+        age: int
+
+proc sleep*(a: var Animal) =
+    a.age += 1
+
+proc dead*(a: Animal): bool =
+    result = a.age > 20
+
+var carl: Animal
+carl = Animal(name : <beginfold id='3'>"</beginfold id='3'>Carl<endfold id='3'>"</endfold id='3'>,
+              species : <beginfold id='3'>"</beginfold id='3'>L. glama<endfold id='3'>"</endfold id='3'>,
+              age : 12)
+
+let joe = Animal(name : <beginfold id='3'>"</beginfold id='3'>Joe<endfold id='3'>"</endfold id='3'>,
+                 species : <beginfold id='3'>"</beginfold id='3'>H. sapiens<endfold id='3'>"</endfold id='3'>,
+                 age : 23)
+
+assert(not carl.dead)
+for i in 0..10:
+    carl.sleep()
+assert carl.dead
+
+# Enums
+type
+    CompassDirections = enum
+        cdNorth, cdEast, cdSouth, cdWest
+
+    Colors {.pure.} = enum
+        Red = <beginfold id='3'>"</beginfold id='3'>FF0000<endfold id='3'>"</endfold id='3'>, Green = (1, <beginfold id='3'>"</beginfold id='3'>00FF00<endfold id='3'>"</endfold id='3'>), Blue = <beginfold id='3'>"</beginfold id='3'>0000FF<endfold id='3'>"</endfold id='3'>
+
+    Signals = enum
+        sigQuit = 3, sigAbort = 6, sigKill = 9
+
+# Distinct Types
+type
+    Dollars* = distinct float
+
+var a = 20.Dollars
+a = 25  # Doesn't compile
+a = 25.Dollars  # Works fine
+
+# Strings
+echo <beginfold id='3'>"</beginfold id='3'>words words words ⚑<endfold id='3'>"</endfold id='3'>
+</indentfold>echo <beginfold id='3'>"""</beginfold id='3'>
+<html>
+  <head>
+  </head>\n\n
+
+  <body>
+  </body>
+<indentfold></html> <endfold id='3'>"""</endfold id='3'>
+
+proc re(s: string): string = s
+
+echo <beginfold id='3'>r"</beginfold id='3'>."".\s\<endfold id='3'>"</endfold id='3'>      # Raw string
+echo <beginfold id='3'>re"</beginfold id='3'>\b[a-z]++\b<endfold id='3'>"</endfold id='3'> # Regular expression
+echo function<beginfold id='3'>"</beginfold id='3'>text<endfold id='3'>"</endfold id='3'>  # Tagged string
+
+# Arrays
+type
+    ThreeStringAddress = array[3, string]
+let names: ThreeStringAddress = [<beginfold id='3'>"</beginfold id='3'>Jasmine<endfold id='3'>"</endfold id='3'>, <beginfold id='3'>"</beginfold id='3'>Ktisztina<endfold id='3'>"</endfold id='3'>, <beginfold id='3'>"</beginfold id='3'>Kristof<endfold id='3'>"</endfold id='3'>]
+let addresses: ThreeStringAddress = [<beginfold id='3'>"</beginfold id='3'>101 Betburweg<endfold id='3'>"</endfold id='3'>, <beginfold id='3'>"</beginfold id='3'>66 Bellion Drive<endfold id='3'>"</endfold id='3'>, <beginfold id='3'>"</beginfold id='3'>194 Laarderweg<endfold id='3'>"</endfold id='3'>]
+
+type
+    Matrix[W, H: static[int]] =
+        array[1..W, array[1..H, int]]
+
+let mat1: Matrix[2, 2] = [[1, 0],
+                          [0, 1]]
+let mat2: Matrix[2, 2] = [[0, 1],
+                          [1, 0]]
+
+proc `+`[W, H](a, b: Matrix[W, H]):
+    Matrix[W, H] =
+        for i in 1..high(a):
+            for j in 1..high(a[0]):
+                result[i][j] = a[i][j] + b[i][j]
+
+# Seqs
+var
+    a = @[1, 2, 3]
+    b = newSeq[int](3)
+
+for i, v in a:
+    b[i] = v*v
+
+for i in 4..100:
+    b.add(i * i)
+
+b.delete(0)  # takes O(n) time
+b = a[0] & b  # Same as original b
+
+# JSON
+import json
+
+let element = <beginfold id='3'>"</beginfold id='3'>Hydrogen<endfold id='3'>"</endfold id='3'>
+let atomicNumber = 1
+
+let jsonObject = %* {<beginfold id='3'>"</beginfold id='3'>element<endfold id='3'>"</endfold id='3'>: element, <beginfold id='3'>"</beginfold id='3'>atomicNumber<endfold id='3'>"</endfold id='3'>: atomicNumber}
+# This will print {"element":"Hydrogen", "atomicNumber": 1}
+echo $jsonObject
+
+# We start with a string representation of a JSON object
+let jsonObject = <beginfold id='3'>"""</beginfold id='3'>{"name": "Sky", "age": 32}<endfold id='3'>"""</endfold id='3'>
+let jsonArray = <beginfold id='3'>"""</beginfold id='3'>[7, 8, 9]<endfold id='3'>"""</endfold id='3'>
+
+let parsedObject = parseJson(jsonObject)
+let name = parsedObject[<beginfold id='3'>"</beginfold id='3'>name<endfold id='3'>"</endfold id='3'>].getStr()
+# This will print Sky
+echo name
+
+let parsedArray = parseJson(jsonArray)
+let eight = parsedArray[1].getInt()
+# This will print 8
+echo eight
+
+# First we'll define our types
+type
+    Element = object
+        name: string
+        atomicNumber: int
+
+# Let's say this is the JSON we want to convert
+let jsonObject = parseJson(<beginfold id='3'>"""</beginfold id='3'>{"name": "Carbon", "atomicNumber": 6}<endfold id='3'>"""</endfold id='3'>)
+
+let element = to(jsonObject, Element)
+# This will print Carbon
+echo element.name
+# This will print 6
+echo element.atomicNumber
+
+# Object Oriented Programming
+type Animal = ref object of RootObj
+    name: string
+    age: int
+method vocalize(this: Animal): string {.base.} = <beginfold id='3'>"</beginfold id='3'>...<endfold id='3'>"</endfold id='3'>
+method ageHumanYrs(this: Animal): int {.base.} = this.age
+
+type Dog = ref object of Animal
+method vocalize(this: Dog): string = <beginfold id='3'>"</beginfold id='3'>woof<endfold id='3'>"</endfold id='3'>
+method ageHumanYrs(this: Dog): int = this.age * 7
+
+type Cat = ref object of Animal
+method vocalize(this: Cat): string = <beginfold id='3'>"</beginfold id='3'>meow<endfold id='3'>"</endfold id='3'>
+
+var animals: seq[Animal] = @[]
+animals.add(Dog(name: <beginfold id='3'>"</beginfold id='3'>Sparky<endfold id='3'>"</endfold id='3'>, age: 10))
+animals.add(Cat(name: <beginfold id='3'>"</beginfold id='3'>Mitten<endfold id='3'>"</endfold id='3'>, age: 10))
+
+for a in animals:
+    echo a.vocalize()
+    echo a.ageHumanYrs()

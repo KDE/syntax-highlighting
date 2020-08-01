@@ -33,6 +33,10 @@ using namespace KSyntaxHighlighting;
 
 StateData *StateData::get(State &state)
 {
+    // create state data on demand, to make default state construction cheap
+    if (!state.d) {
+        state.d = new StateData();
+    }
     state.d.detach();
     return state.d.data();
 }
@@ -85,7 +89,6 @@ const QStringList &StateData::topCaptures() const
 }
 
 State::State()
-    : d(new StateData)
 {
 }
 
@@ -107,7 +110,7 @@ State &State::operator=(const State &other)
 bool State::operator==(const State &other) const
 {
     // use pointer equal as shortcut for shared states
-    return (d == other.d) || (d->m_contextStack == other.d->m_contextStack && d->m_defRef == other.d->m_defRef);
+    return (d == other.d) || (d && other.d && d->m_contextStack == other.d->m_contextStack && d->m_defRef == other.d->m_defRef);
 }
 
 bool State::operator!=(const State &other) const
@@ -117,7 +120,7 @@ bool State::operator!=(const State &other) const
 
 bool State::indentationBasedFoldingEnabled() const
 {
-    if (d->m_contextStack.isEmpty())
+    if (!d || d->m_contextStack.isEmpty())
         return false;
     return d->m_contextStack.last().first->indentationBasedFoldingEnabled();
 }

@@ -36,8 +36,9 @@ StateData *StateData::get(State &state)
     // create state data on demand, to make default state construction cheap
     if (!state.d) {
         state.d = new StateData();
+    } else {
+        state.d.detach();
     }
-    state.d.detach();
     return state.d.data();
 }
 

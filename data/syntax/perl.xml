@@ -39,7 +39,7 @@
 
    Enhance tr/// and y/// support.
 -->
-<language name="Perl" version="12" kateversion="2.4" section="Scripts" extensions="*.pl;*.PL;*.pm" mimetype="application/x-perl;text/x-perl" priority="5" author="Anders Lund (anders@alweb.dk)" license="LGPLv2">
+<language name="Perl" version="12" kateversion="5.0" section="Scripts" extensions="*.pl;*.PL;*.pm" mimetype="application/x-perl;text/x-perl" priority="5" author="Anders Lund (anders@alweb.dk)" license="LGPLv2">
   <highlighting>
     <list name="keywords">
       <item>if</item>
@@ -552,9 +552,12 @@
         <IncludeRules context="subst_curlybrace_pattern" />
       </context>
 
+      <context name="subst_maybe_comment" attribute="Pattern" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+        <DetectChar attribute="Comment" context="#pop!Comment" char="#" />
+      </context>
+
       <context name="subst_paren_pattern" attribute="Pattern" lineEndContext="#stay">
-        <DetectSpaces/>
-        <DetectChar attribute="Comment" context="Comment" char="#" />
+        <DetectSpaces attribute="Pattern" context="subst_maybe_comment" />
         <DetectChar attribute="Operator" context="subst_paren_replace" char=")" endRegion="Pattern" />
         <!-- Round brackets of RegExp pattern inside -->
         <DetectChar attribute="Pattern Internal Operator" context="subst_paren_pattern_internal_recursive" char="(" />
@@ -571,8 +574,7 @@
       </context>
 
       <context name="subst_bracket_pattern" attribute="Pattern" lineEndContext="#stay">
-        <DetectSpaces/>
-        <DetectChar attribute="Comment" context="Comment" char="#" />
+        <DetectSpaces attribute="Pattern" context="subst_maybe_comment" />
         <IncludeRules context="regex_pattern_internal_ip" />
         <DetectChar attribute="Operator" context="subst_bracket_replace" char="]" endRegion="Pattern" />
       </context>
@@ -594,8 +596,7 @@
       </context>
 
       <context name="subst_sq_pattern" attribute="Pattern" lineEndContext="#stay">
-        <DetectSpaces/>
-        <DetectChar attribute="Comment" context="Comment" char="#" />
+        <DetectSpaces attribute="Pattern" context="subst_maybe_comment" />
         <IncludeRules context="regex_pattern_internal" />
         <DetectChar attribute="Operator" context="subst_sq_replace" char="'" endRegion="Pattern" beginRegion="Pattern" />
       </context>

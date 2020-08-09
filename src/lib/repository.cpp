@@ -92,8 +92,9 @@ QVector<Definition> Repository::definitionsForFileName(const QString &fileName) 
     QFileInfo fi(fileName);
     const auto name = fi.fileName();
 
+    // use d->m_defs, sorted map by highlighting name, to be deterministic and independent of translations
     QVector<Definition> candidates;
-    for (const Definition &def : qAsConst(d->m_sortedDefs)) {
+    for (const Definition &def : qAsConst(d->m_defs)) {
         for (const auto &pattern : def.extensions()) {
             if (WildcardMatcher::exactMatch(name, pattern)) {
                 candidates.push_back(def);
@@ -113,8 +114,9 @@ Definition Repository::definitionForMimeType(const QString &mimeType) const
 
 QVector<Definition> Repository::definitionsForMimeType(const QString &mimeType) const
 {
+    // use d->m_defs, sorted map by highlighting name, to be deterministic and independent of translations
     QVector<Definition> candidates;
-    for (const Definition &def : qAsConst(d->m_sortedDefs)) {
+    for (const Definition &def : qAsConst(d->m_defs)) {
         for (const auto &matchType : def.mimeTypes()) {
             if (mimeType == matchType) {
                 candidates.push_back(def);

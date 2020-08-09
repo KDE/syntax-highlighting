@@ -58,7 +58,10 @@ public:
 
     QVector<QString> m_customSearchPaths;
 
-    QHash<QString, Definition> m_defs;
+    // sorted map to have deterministic iteration order for e.g. definitionsForFileName
+    QMap<QString, Definition> m_defs;
+
+    // this vector is sorted by translated sections/names
     QVector<Definition> m_sortedDefs;
 
     QVector<Theme> m_themes;

@@ -1,4 +1,4 @@
-﻿# Comment\
+# Comment\
 
 # kate: syntax Python ; scheme Normal;
 # kate: font-size 14; background-color #FAFAFA ;

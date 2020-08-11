@@ -3,7 +3,7 @@
 #
 # Generate Kate syntax file for CMake
 #
-# Copyright (c) 2017-2019 Alex Turbov <i.zaufi@gmail.com>
+# SPDX-FileCopyrightText: 2017-2019 Alex Turbov <i.zaufi@gmail.com>
 #
 # To install prerequisites:
 #

@@ -4,29 +4,14 @@
   <!ENTITY id_re "[_A-Za-z][\-_0-9A-Za-z]*">
 ]>
 <!--
-  This file is part of KDE's kate project.
+    This file is part of KDE's kate project.
 
-  Copyright 2004 Alexander Neundorf (neundorf@kde.org)
-  Copyright 2005 Dominik Haumann (dhdev@gmx.de)
-  Copyright 2007,2008,2013,2014 Matthew Woehlke (mw_triad@users.sourceforge.net)
-  Copyright 2013-2015,2017-2020 Alex Turbov (i.zaufi@gmail.com)
+    SPDX-FileCopyrightText: 2004 Alexander Neundorf (neundorf@kde.org)
+    SPDX-FileCopyrightText: 2005 Dominik Haumann (dhdev@gmx.de)
+    SPDX-FileCopyrightText: 2007, 2008, 2013, 2014 Matthew Woehlke (mw_triad@users.sourceforge.net)
+    SPDX-FileCopyrightText: 2013-2015, 2017-2020 Alex Turbov (i.zaufi@gmail.com>
 
- **********************************************************************
- * This library is free software; you can redistribute it and/or      *
- * modify it under the terms of the GNU Lesser General Public         *
- * License as published by the Free Software Foundation; either       *
- * version 2 of the License, or (at your option) any later version.   *
- *                                                                    *
- * This library is distributed in the hope that it will be useful,    *
- * but WITHOUT ANY WARRANTY; without even the implied warranty of     *
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  *
- * Lesser General Public License for more details.                    *
- *                                                                    *
- * You should have received a copy of the GNU Lesser General Public   *
- * License along with this library; if not, write to the              *
- * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,   *
- * Boston, MA  02110-1301, USA.                                       *
- **********************************************************************
+    SPDX-License-Identifier: LGPL-2.0-or-later
  -->
 
 <language

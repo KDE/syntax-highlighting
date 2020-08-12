@@ -1,0 +1,102 @@
+<beginfold id='1'><!---</beginfold id='1'> ColdFusion Sample File <endfold id='1'>---></endfold id='1'>
+<beginfold id='1'><!---</beginfold id='1'> Source: https://helpx.adobe.com/coldfusion/developing-applications/the-cfml-programming-language/using-arrays-and-structures/structure-examples.html <endfold id='1'>---></endfold id='1'>
+
+<head>
+<title>Add New Employees</title>
+</head>
+
+<body>
+<h1>Add New Employees</h1>
+<beginfold id='1'><!---</beginfold id='1'> Action page code for the form at the bottom of this page. <endfold id='1'>---></endfold id='1'>
+
+<beginfold id='1'><!---</beginfold id='1'> Establish parameters for first time through <endfold id='1'>---></endfold id='1'>
+<cfparam name="Form.firstname" default="">
+<cfparam name="Form.lastname" default="">
+<cfparam name="Form.email" default="">
+<cfparam name="Form.phone" default="">
+<cfparam name="Form.department" default="">
+
+<beginfold id='1'><!---</beginfold id='1'> If at least the firstname form field is passed, create
+a structure named employee and add values. <endfold id='1'>---></endfold id='1'>
+<cfif #Form.firstname# eq "">
+<p>Please fill out the form.</p>
+<cfelse>
+<cfoutput>
+<beginfold id='3'><cfscript</beginfold id='3'>>
+employee=StructNew();
+employee.firstname = Form.firstname;
+employee.lastname = Form.lastname;
+employee.email = Form.email;
+employee.phone = Form.phone;
+employee.department = Form.department;
+<endfold id='3'></cfscript></endfold id='3'>
+
+<beginfold id='1'><!---</beginfold id='1'> Display results of creating the structure. <endfold id='1'>---></endfold id='1'>
+First name is #StructFind(employee, "firstname")#<br>
+Last name is #StructFind(employee, "lastname")#<br>
+EMail is #StructFind(employee, "email")#<br>
+Phone is #StructFind(employee, "phone")#<br>
+Department is #StructFind(employee, "department")#<br>
+</cfoutput>
+
+<beginfold id='1'><!---</beginfold id='1'> Call the custom tag that adds employees. <endfold id='1'>---></endfold id='1'>
+<cf_addemployee empinfo="#employee#">
+</cfif>
+
+<beginfold id='1'><!---</beginfold id='1'> The form for adding the new employee information <endfold id='1'>---></endfold id='1'>
+<hr>
+<form action="newemployee.cfm" method="Post">
+First Name:&nbsp;
+<input name="firstname" type="text" hspace="30" maxlength="30"><br>
+Last Name:&nbsp;
+<input name="lastname" type="text" hspace="30" maxlength="30"><br>
+EMail:&nbsp;
+<input name="email" type="text" hspace="30" maxlength="30"><br>
+Phone:&nbsp;
+<input name="phone" type="text" hspace="20" maxlength="20"><br>
+Department:&nbsp;
+<input name="department" type="text" hspace="30" maxlength="30"><br>
+
+<input type="Submit" value="OK">
+</form>
+<br>
+</body>
+</html> 
+
+<cfoutput>
+Error. No employee data was passed.<br>
+</cfoutput>
+<cfexit method="ExitTag">
+<cfelse>
+<beginfold id='1'><!---</beginfold id='1'> Add the employee <endfold id='1'>---></endfold id='1'>
+<cfquery name="AddEmployee" datasource="cfdocexamples">
+INSERT INTO Employees
+(FirstName, LastName, Email, Phone, Department)
+VALUES (
+'#attributes.empinfo.firstname#' ,
+'#attributes.empinfo.lastname#' ,
+'#attributes.empinfo.email#' ,
+'#attributes.empinfo.phone#' ,
+'#attributes.empinfo.department#' )
+</cfquery>
+</cfif>
+<cfoutput>
+<hr>Employee Add Complete
+</cfoutput>
+
+<beginfold id='1'><!---</beginfold id='1'> temperature.cfc <endfold id='1'>---></endfold id='1'>
+<cfcomponent>
+  <cffunction name="FtoC" access="public" returntype="numeric">
+    <cfargument name="fahrenheit" required="yes" type="numeric" />
+    <cfset answer= (fahrenheit - 32)*100/180 />
+    <cfreturn answer />
+  </cffunction>
+</cfcomponent>
+<beginfold id='1'><!---</beginfold id='1'> test.cfm <endfold id='1'>---></endfold id='1'>
+<cfset fDegrees = 212 />
+<cfinvoke component="temperature" method="FtoC" returnvariable="result">
+  <cfinvokeargument name="fahrenheit" value="#fDegrees#" />
+</cfinvoke>
+<cfoutput>#fDegrees#&deg;F = #result#&deg;C</cfoutput> <br />
+
+<cfset person = CreateObject("component", "Person") />

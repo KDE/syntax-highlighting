@@ -7,7 +7,7 @@
 <!ENTITY ESC    "(\\[ntbr'&quot;\\]|\\[0-9]{3}|\\x[0-9A-Fa-f]{2})"> <!-- ATS character code escapes. -->
 <!ENTITY DEC    "[0-9][0-9_]*">                                     <!-- Decimal digits with underscores. -->
 ]>
-<language name="ATS" version="1" kateversion="2.4" section="Sources" extensions="*.dats;*.sats;*.hats" mimetype="" author="Kiwamu Okabe (kiwamu@debian.or.jp)" license="LGPL">
+<language name="ATS" version="2" kateversion="2.4" section="Sources" extensions="*.dats;*.sats;*.hats" mimetype="" author="Kiwamu Okabe (kiwamu@debian.or.jp)" license="LGPL">
   <highlighting>
     <list name="keywords">
       <item>abstype</item>
@@ -190,11 +190,18 @@
         <!-- Support for nested comments -->
         <Detect2Chars attribute="Comment" context="#pop" char="*" char1=")" endRegion="comment" />
         <Detect2Chars attribute="Comment" context="Multiline Comment" char="(" char1="*" beginRegion="comment" />
+        <IncludeRules context="##Alerts" />
+        <IncludeRules context="##Modelines" />
       </context>
       <context attribute="Comment" lineEndContext="#stay" name="Multiline C-style Comment">
         <Detect2Chars attribute="Comment" context="#pop" char="*" char1="/" endRegion="Comment"/>
+        <IncludeRules context="##Alerts" />
+        <IncludeRules context="##Modelines" />
       </context>
-      <context attribute="Comment" lineEndContext="#pop" name="Singleline C++ style Comment"/>
+      <context attribute="Comment" lineEndContext="#pop" name="Singleline C++ style Comment">
+        <IncludeRules context="##Alerts" />
+        <IncludeRules context="##Modelines" />
+      </context>
 
       <context attribute="Termination Metrics" lineEndContext="#stay" name="Termination Metrics Context">
         <Detect2Chars attribute="Termination Metrics" context="#pop" char="&gt;" char1="." />
@@ -202,8 +209,8 @@
 
       <context attribute="Normal Text" lineEndContext="#stay" name="Function Keyword Context">
         <DetectChar attribute="Normal Text" context="#pop" char="=" />
-	<DetectChar attribute="Universal" context="Universal Context" char="{" />
-	<DetectChar attribute="Existential" context="Existential Context" char="[" />
+        <DetectChar attribute="Universal" context="Universal Context" char="{" />
+        <DetectChar attribute="Existential" context="Existential Context" char="[" />
         <IncludeRules context="Normal"/>
       </context>
 
@@ -237,9 +244,7 @@
     <keywords casesensitive="1" />
     <comments>
       <comment name="singleLine" start="//" />
-      <comment name="multiLine" start="(*" end="*)" />
-      <comment name="multiLine" start="/*" end="*/" />
-      <comment name="multiLine" start="////" end="" />
+      <comment name="multiLine" start="(*" end="*)" region="comment" />
     </comments>
   </general>
 </language>

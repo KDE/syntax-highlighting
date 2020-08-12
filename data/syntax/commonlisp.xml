@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language version="7" kateversion="5.0" name="Common Lisp" section="Sources" extensions="*.lisp;*.cl;*.lsp" mimetype="" author="Dominik Haumann (dhaumann@kde.org)" license="MIT">
+<language version="8" kateversion="5.0" name="Common Lisp" section="Sources" extensions="*.lisp;*.cl;*.lsp" mimetype="" author="Dominik Haumann (dhaumann@kde.org)" license="MIT">
   <highlighting>
     <list name="symbols">
       <item>&lt;</item>
@@ -1115,7 +1115,7 @@
         <RegExpr attribute="Region Marker" context="#stay" String=";+\s*BEGIN.*$" beginRegion="region"/>
         <RegExpr attribute="Region Marker" context="#stay" String=";+\s*END.*$" endRegion="region"/>
         <DetectChar attribute="Comment" context="Comment" char=";"/>
-        <Detect2Chars attribute="Comment" context="MultiLineComment" char="#" char1="|" beginRegion="region"/>
+        <Detect2Chars attribute="Comment" context="MultiLineComment" char="#" char1="|" beginRegion="BlockComment"/>
         <DetectChar attribute="Brackets" context="#stay" char="("/>
         <DetectChar attribute="Brackets" context="#stay" char=")"/>
         <keyword attribute="Keyword" context="#stay" String="keywords"/>
@@ -1132,7 +1132,9 @@
         <Int attribute="Decimal" context="#stay"/>
       </context>
       <context name="MultiLineComment" attribute="Comment" lineEndContext="#stay">
-        <Detect2Chars attribute="Comment" context="#pop" char="|" char1="#" endRegion="region"/>
+        <Detect2Chars attribute="Comment" context="#pop" char="|" char1="#" endRegion="BlockComment"/>
+        <IncludeRules context="##Alerts"/>
+        <IncludeRules context="##Modelines"/>
       </context>
       <context name="function_decl" attribute="Function" lineEndContext="#stay">
         <RegExpr attribute="Function" context="#pop" String="\s*[A-Za-z0-9-+\&lt;\&gt;//\*]*\s*" />
@@ -1148,7 +1150,10 @@
         <HlCStringChar attribute="String Char" context="#stay"/>
         <DetectChar attribute="String" context="#pop" char="&quot;"/>
       </context>
-      <context name="Comment" attribute="Comment" lineEndContext="#pop"/>
+      <context name="Comment" attribute="Comment" lineEndContext="#pop">
+        <IncludeRules context="##Alerts"/>
+        <IncludeRules context="##Modelines"/>
+      </context>
     </contexts>
     <itemDatas>
       <itemData name="Normal"      defStyleNum="dsNormal"/>
@@ -1173,7 +1178,8 @@
     <keywords casesensitive="1" weakDeliminator="-+*?!&lt;&gt;=/:#\"/>
     <comments>
       <comment name="singleLine" start=";;" />
-      <comment name="multiLine" start="#|" end="|#" />
+      <comment name="multiLine" start="#|" end="|#" region="BlockComment" />
     </comments>
   </general>
 </language>
+<!-- kate: replace-tabs on; tab-width 2; indent-width 2; -->

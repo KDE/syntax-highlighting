@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
 
-<language name="Motorola 68k (VASM/Devpac)" section="Assembler" version="2" kateversion="5.0"  extensions="*.s;*.i;*.S;*.I" author="Miro Kropacek (miro.kropacek@gmail.com)" license="LGPL">
+<language name="Motorola 68k (VASM/Devpac)" section="Assembler" version="3" kateversion="5.0"  extensions="*.s;*.i;*.S;*.I" author="Miro Kropacek (miro.kropacek@gmail.com)" license="LGPL">
 
   <highlighting>
     <list name="Data Registers">
@@ -531,87 +531,90 @@
     <contexts>
       <!-- name = name of context, attribute = name of item data -->
       <context attribute="Normal Text" lineEndContext="#stay" name="Normal Text" >
-	<keyword attribute="Data Registers" context="#stay" String="Data Registers"/>
-	<keyword attribute="Address Registers" context="#stay" String="Address Registers"/>
-	<keyword attribute="Control Registers" context="#stay" String="Control Registers"/>
-	<keyword attribute="FPU Registers" context="#stay" String="FPU Registers"/>
-	<keyword attribute="Instructions (CPU)" context="#stay" String="Instructions (CPU)"/>
-	<keyword attribute="Instructions (FPU)" context="#stay" String="Instructions (FPU)"/>
-	<keyword attribute="Directives" context="#stay" String="Directives"/>
+        <keyword attribute="Data Registers" context="#stay" String="Data Registers"/>
+        <keyword attribute="Address Registers" context="#stay" String="Address Registers"/>
+        <keyword attribute="Control Registers" context="#stay" String="Control Registers"/>
+        <keyword attribute="FPU Registers" context="#stay" String="FPU Registers"/>
+        <keyword attribute="Instructions (CPU)" context="#stay" String="Instructions (CPU)"/>
+        <keyword attribute="Instructions (FPU)" context="#stay" String="Instructions (FPU)"/>
+        <keyword attribute="Directives" context="#stay" String="Directives"/>
 
-	<!-- precedes ".[bwlsdqpx]" match -->
-	<RegExpr attribute="Label" context="#stay" String="^[A-Za-z_][A-Za-z_.0-9]*:?"/>
-	<RegExpr attribute="Local label" context="#stay" String="^\.[A-Za-z_][A-Za-z_.0-9]*:?"/>
+        <!-- precedes ".[bwlsdqpx]" match -->
+        <RegExpr attribute="Label" context="#stay" String="^[A-Za-z_][A-Za-z_.0-9]*:?"/>
+        <RegExpr attribute="Local label" context="#stay" String="^\.[A-Za-z_][A-Za-z_.0-9]*:?"/>
 
-	<RegExpr attribute="Operand sizes (CPU)" context="#stay" insensitive="true" String="\.b[\s,]"/>
-	<RegExpr attribute="Operand sizes (CPU)" context="#stay" insensitive="true" String="\.w[\s,]"/>
-	<RegExpr attribute="Operand sizes (CPU)" context="#stay" insensitive="true" String="\.l[\s,]"/>
-	<RegExpr attribute="Operand sizes (FPU)" context="#stay" insensitive="true" String="\.s[\s,]"/>
-	<RegExpr attribute="Operand sizes (FPU)" context="#stay" insensitive="true" String="\.d[\s,]"/>
-	<RegExpr attribute="Operand sizes (FPU)" context="#stay" insensitive="true" String="\.p[\s,]"/>
-	<RegExpr attribute="Operand sizes (FPU)" context="#stay" insensitive="true" String="\.q[\s,]"/>
-	<RegExpr attribute="Operand sizes (FPU)" context="#stay" insensitive="true" String="\.x[\s,]"/>
+        <RegExpr attribute="Operand sizes (CPU)" context="#stay" insensitive="true" String="\.b[\s,]"/>
+        <RegExpr attribute="Operand sizes (CPU)" context="#stay" insensitive="true" String="\.w[\s,]"/>
+        <RegExpr attribute="Operand sizes (CPU)" context="#stay" insensitive="true" String="\.l[\s,]"/>
+        <RegExpr attribute="Operand sizes (FPU)" context="#stay" insensitive="true" String="\.s[\s,]"/>
+        <RegExpr attribute="Operand sizes (FPU)" context="#stay" insensitive="true" String="\.d[\s,]"/>
+        <RegExpr attribute="Operand sizes (FPU)" context="#stay" insensitive="true" String="\.p[\s,]"/>
+        <RegExpr attribute="Operand sizes (FPU)" context="#stay" insensitive="true" String="\.q[\s,]"/>
+        <RegExpr attribute="Operand sizes (FPU)" context="#stay" insensitive="true" String="\.x[\s,]"/>
 
-	<DetectChar attribute="Comment" context="Comment" char=";"/>
-	<DetectChar attribute="Comment" context="Comment" char="*" firstNonSpace="true"/>
-	<DetectChar attribute="Constant" context="Constant" char="#"/>
-	<DetectChar attribute="BaseN" context="Number16" char="$"/>
-	<DetectChar attribute="BaseN" context="Number2" char="%"/>
-	<DetectChar attribute="BaseN" context="Number8" char="@"/>
-	<Float attribute="Float" context="#stay"/>
-	<Int attribute="Number" context="#stay"/>
-	<RangeDetect attribute="Char" context="#stay" char="'"  char1="'"/>
-	<AnyChar attribute="String" context="String" String="&quot;'"/>
+        <DetectChar attribute="Comment" context="Comment" char=";"/>
+        <DetectChar attribute="Comment" context="Comment" char="*" firstNonSpace="true"/>
+        <DetectChar attribute="Constant" context="Constant" char="#"/>
+        <DetectChar attribute="BaseN" context="Number16" char="$"/>
+        <DetectChar attribute="BaseN" context="Number2" char="%"/>
+        <DetectChar attribute="BaseN" context="Number8" char="@"/>
+        <Float attribute="Float" context="#stay"/>
+        <Int attribute="Number" context="#stay"/>
+        <RangeDetect attribute="Char" context="#stay" char="'"  char1="'"/>
+        <AnyChar attribute="String" context="String" String="&quot;'"/>
       </context>
 
-      <context name="Comment" attribute="Comment" lineEndContext="#pop"/>
+      <context name="Comment" attribute="Comment" lineEndContext="#pop">
+        <IncludeRules context="##Alerts"/>
+        <IncludeRules context="##Modelines"/>
+      </context>
 
       <context name="String" attribute="String" lineEndContext="#pop">
-	      <AnyChar attribute="String" context="#pop" String="&quot;'"/>
+        <AnyChar attribute="String" context="#pop" String="&quot;'"/>
       </context>
 
       <context name="Constant" attribute="Constant" lineEndContext="#pop">
-	      <RegExpr attribute="Constant" context="Operators" String="[0-9]+"/>
-	      <RegExpr attribute="Constant" context="Operators" String="\$[A-Fa-f0-9]+"/>
-	      <RegExpr attribute="Constant" context="Operators" String="@[0-7]+"/>
-	      <RegExpr attribute="Constant" context="Operators" String="%[01]+"/>
-	      <RegExpr attribute="Label" context="Operators" String="[A-Za-z_][A-Za-z_.0-9]*"/>
-	      <RegExpr attribute="Local label" context="Operators" String="\.[A-Za-z_][A-Za-z_.0-9]*"/>
-	      <RangeDetect attribute="Char" context="#pop" char="'"  char1="'"/>
-	      <DetectChar attribute="Normal Text" char="," context="#pop"/>
-	      <DetectSpaces attribute="Normal Text" context="#pop"/>
-	      <DetectChar attribute="Normal Text" char="(" context="#stay"/>
+        <RegExpr attribute="Constant" context="Operators" String="[0-9]+"/>
+        <RegExpr attribute="Constant" context="Operators" String="\$[A-Fa-f0-9]+"/>
+        <RegExpr attribute="Constant" context="Operators" String="@[0-7]+"/>
+        <RegExpr attribute="Constant" context="Operators" String="%[01]+"/>
+        <RegExpr attribute="Label" context="Operators" String="[A-Za-z_][A-Za-z_.0-9]*"/>
+        <RegExpr attribute="Local label" context="Operators" String="\.[A-Za-z_][A-Za-z_.0-9]*"/>
+        <RangeDetect attribute="Char" context="#pop" char="'"  char1="'"/>
+        <DetectChar attribute="Normal Text" char="," context="#pop"/>
+        <DetectSpaces attribute="Normal Text" context="#pop"/>
+        <DetectChar attribute="Normal Text" char="(" context="#stay"/>
       </context>
 
       <context name="Operators" attribute="Normal Text" lineEndContext="#pop">
-	      <DetectChar attribute="Normal Text" char="|" context="#pop"/>
-	      <DetectChar attribute="Normal Text" char="&amp;" context="#pop"/>
-	      <DetectChar attribute="Normal Text" char="^" context="#pop"/>
-	      <DetectChar attribute="Normal Text" char="*" context="#pop"/>
-	      <DetectChar attribute="Normal Text" char="(" context="#pop"/>
-	      <DetectChar attribute="Normal Text" char=")" context="#pop"/>
-	      <DetectChar attribute="Normal Text" char="+" context="#pop"/>
-	      <DetectChar attribute="Normal Text" char="-" context="#pop"/>
-	      <DetectChar attribute="Normal Text" char="/" context="#pop"/>
-	      <DetectChar attribute="Normal Text" char="~" context="#pop"/>
-	      <DetectChar attribute="Normal Text" char="!" context="#pop"/>
-	      <DetectChar attribute="Normal Text" char="%" context="#pop"/>
-	      <Detect2Chars attribute="Normal Text" char="&lt;" char1="&lt;" context="#pop"/>
-	      <Detect2Chars attribute="Normal Text" char="&gt;" char1="&gt;" context="#pop"/>
-	      <DetectChar attribute="Normal Text" char="," context="#pop#pop"/>
-	      <DetectSpaces attribute="Normal Text" context="#pop#pop"/>
+        <DetectChar attribute="Normal Text" char="|" context="#pop"/>
+        <DetectChar attribute="Normal Text" char="&amp;" context="#pop"/>
+        <DetectChar attribute="Normal Text" char="^" context="#pop"/>
+        <DetectChar attribute="Normal Text" char="*" context="#pop"/>
+        <DetectChar attribute="Normal Text" char="(" context="#pop"/>
+        <DetectChar attribute="Normal Text" char=")" context="#pop"/>
+        <DetectChar attribute="Normal Text" char="+" context="#pop"/>
+        <DetectChar attribute="Normal Text" char="-" context="#pop"/>
+        <DetectChar attribute="Normal Text" char="/" context="#pop"/>
+        <DetectChar attribute="Normal Text" char="~" context="#pop"/>
+        <DetectChar attribute="Normal Text" char="!" context="#pop"/>
+        <DetectChar attribute="Normal Text" char="%" context="#pop"/>
+        <Detect2Chars attribute="Normal Text" char="&lt;" char1="&lt;" context="#pop"/>
+        <Detect2Chars attribute="Normal Text" char="&gt;" char1="&gt;" context="#pop"/>
+        <DetectChar attribute="Normal Text" char="," context="#pop#pop"/>
+        <DetectSpaces attribute="Normal Text" context="#pop#pop"/>
       </context>
 
       <context name="Number16" attribute="BaseN" lineEndContext="#pop">
-	      <RegExpr attribute="BaseN" context="#pop" String="[A-Fa-f0-9]+"/>
+        <RegExpr attribute="BaseN" context="#pop" String="[A-Fa-f0-9]+"/>
       </context>
 
       <context name="Number2" attribute="BaseN" lineEndContext="#pop">
-	      <RegExpr attribute="BaseN" context="#pop" String="[01]+"/>
+        <RegExpr attribute="BaseN" context="#pop" String="[01]+"/>
       </context>
 
       <context name="Number8" attribute="BaseN" lineEndContext="#pop">
-	      <RegExpr attribute="BaseN" context="#pop" String="[0-7]+"/>
+        <RegExpr attribute="BaseN" context="#pop" String="[0-7]+"/>
       </context>
     </contexts>
 
@@ -644,8 +647,8 @@
     <keywords casesensitive="0"/>
     <comments>
       <comment name="singleLine" start=";"/>
-      <comment name="singleLine" start="*"/>
     </comments>
   </general>
 
 </language>
+<!-- kate: replace-tabs on; tab-width 2; indent-width 2; -->

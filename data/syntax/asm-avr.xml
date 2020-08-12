@@ -33,7 +33,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 -->
 
-<language name="AVR Assembler" version="3" kateversion="5.0" section="Assembler" extensions="*.asm;*.ASM;*.asm-avr" mimetype="text/x-asm;text/x-asm-avr" author="Roland Nagy" license="GPLv2+">
+<language name="AVR Assembler" version="4" kateversion="5.0" section="Assembler" extensions="*.asm;*.ASM;*.asm-avr" mimetype="text/x-asm;text/x-asm-avr" author="Roland Nagy" license="GPLv2+">
   <highlighting>
     <list name="keywords">
       <item>adc</item>
@@ -164,16 +164,21 @@ with this program; if not, write to the Free Software Foundation, Inc.,
         <RegExpr      attribute="Normal Text" context="#stay" String="[A-Za-z_.$][A-Za-z0-9_.$]*" />
         <RegExpr      attribute="Char" context="#stay" String="'(\\x[0-9a-fA-F][0-9a-fA-F]?|\\[0-7]?[0-7]?[0-7]?|\\.|.)" />
         <DetectChar   attribute="String" context="String" char="&quot;" />
-        <Detect2Chars attribute="Comment" context="Commentar 1" char="/" char1="*" />
+        <Detect2Chars attribute="Comment" context="Commentar 1" char="/" char1="*" beginRegion="BlockComment" />
         <DetectChar   attribute="Comment" context="Commentar 2" char="@" />
         <DetectChar   attribute="Comment" context="Commentar 2" char=";" />
         <AnyChar      attribute="Symbol" context="#stay" String="!#%&amp;*()+,-&lt;=&gt;?/:[]^{|}~" />
         <RegExpr      attribute="Preprocessor" context="Preprocessor" String="^#" />
       </context>
       <context attribute="Comment" lineEndContext="#stay" name="Commentar 1">
-        <Detect2Chars attribute="Comment" context="#pop" char="*" char1="/" />
+        <Detect2Chars attribute="Comment" context="#pop" char="*" char1="/" endRegion="BlockComment" />
+        <IncludeRules context="##Alerts" />
+        <IncludeRules context="##Modelines" />
       </context>
-      <context attribute="Comment" lineEndContext="#pop" name="Commentar 2" />
+      <context attribute="Comment" lineEndContext="#pop" name="Commentar 2">
+        <IncludeRules context="##Alerts" />
+        <IncludeRules context="##Modelines" />
+      </context>
       <context attribute="Preprocessor" lineEndContext="#pop" name="Preprocessor" />
       <context attribute="String" lineEndContext="#pop" name="String">
         <LineContinue  attribute="String" context="Some Context" />
@@ -204,9 +209,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
   <general>
     <comments>
       <comment name="singleLine" start=";" />
-      <comment name="singleLine" start="@" />
-      <comment name="multiLine"  start="/*" end="*/" />
+      <comment name="multiLine"  start="/*" end="*/" region="BlockComment" />
     </comments>
     <keywords casesensitive="1" weakDeliminator="_.$" />
   </general>
 </language>
+<!-- kate: replace-tabs on; tab-width 2; indent-width 2; -->

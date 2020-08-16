@@ -25,3 +25,499 @@ main:
 	mov eax, 0b
 	leave
 	ret
+
+
+NULL              EQU 0                         ; Constants
+STD_OUTPUT_HANDLE EQU -11
+
+extern GetStdHandle                             ; Import external symbols
+
+global Start                                    ; Export symbols. The entry point
+
+section .data                                   ; Initialized data segment
+ Message        db "Console Message 64", 0Dh, 0Ah
+ MessageLength  EQU $-Message                   ; Address of this line ($) - address of Message
+
+section .bss                                    ; Uninitialized data segment
+alignb 8
+ Written        resq 1
+
+section .text                                   ; Code segment
+Start:
+ sub   RSP, 8                                   ; Align the stack to a multiple of 16 bytes
+
+ mov   ECX, STD_OUTPUT_HANDLE
+ call  GetStdHandle
+ mov   qword [REL StandardHandle], RAX
+
+ sub   RSP, 32 + 8 + 8                          ; Shadow space + 5th parameter + align stack
+                                                ; to a multiple of 16 bytes
+ mov   RCX, qword [REL StandardHandle]          ; 1st parameter
+ lea   RDX, [REL Message]                       ; 2nd parameter
+ mov   R8, MessageLength                        ; 3rd parameter
+ mov   qword [RSP + 4 * 8], NULL                ; 5th parameter
+                                                ; Message Box, 64 bit. V1.02
+.DisplayMessageBox:
+ xor   ECX, ECX                                 ; 1st parameter
+ lea   RDX, [REL MessageBoxText]                ; 2nd parameter
+ lea   R8, [REL MessageBoxCaption]              ; 3rd parameter
+ mov   R9D, MB_YESNO | MB_DEFBUTTON2            ; 4th parameter. 2 constants ORed together
+ call  MessageBoxA
+
+ cmp   RAX, IDNO                                ; Check the return value for "No"
+ je    .DisplayMessageBox
+
+extern _GetStdHandle@4                          ; Import external symbols
+Start:
+ call  _WriteFile@20
+
+section .data                                   ; Initialized data segment
+ Static1Colour    dd 0F0F0F0h,
+ Edit2            resq 1
+
+%define Screen.Width       RBP - 160            ; 4 bytes
+%define ClientArea         RBP - 152            ; RECT structure. 16 bytes
+
+ mov   dword [wc.cbSize], 80                    ; [RBP - 136]
+ mov   dword [wc.style], CS_HREDRAW | CS_VREDRAW | CS_BYTEALIGNWINDOW  ; [RBP - 132]
+ mov   qword [wc.lpfnWndProc], RAX              ; [RBP - 128]
+ mov   qword [wc.hIcon], RAX                    ; [RBP - 104]
+ mov   dword [RSP + 4 * 8], EAX                 ; X position, now centred
+
+ cmp   qword [uMsg], WM_CLOSE                   ; [RBP + 24]
+ je    WMCLOSE
+ call  DestroyWindow                            ; Send a WM_DESTROY message
+ jmp   Return.WM_Processed
+ mov   EDX, 0604060h
+ call  SetBkColor
+ mov   EDX, 0005000h
+
+db 0x55 ; just the byte 0x55
+db 0x55,0x56,0x57 ; three bytes in succession
+db 'a',0x55 ; character constants are OK
+db 'hello',13,10,'$' ; so are string constants
+dw 0x1234 ; 0x34 0x12
+dw 'a' ; 0x61 0x00 (it's just a number)
+dw 'ab' ; 0x61 0x62 (character constant)
+dw 'abc' ; 0x61 0x62 0x63 0x00 (string)
+dd 0x12345678 ; 0x78 0x56 0x34 0x12
+dd 1.234567e20 ; floating-point constant
+dq 0x123456789abcdef0 ; eight byte constant
+dq 1.234567e20 ; double-precision float
+dt 1.234567e20 ; extended-precision float
+
+db 33
+db (44)               ; Integer expression
+; db (44,55)            ; Invalid - error
+db %(44,55)
+db %('XX','YY')
+db ('AA')             ; Integer expression - outputs single byte
+db %('BB')            ; List, containing a string
+db ?
+db 6 dup (33)
+db 6 dup (33, 34)
+db 6 dup (33, 34), 35
+db 7 dup (99)
+db 7 dup dword (?, word ?, ?)
+dw byte (?,44)
+dw 3 dup (0xcc, 4 dup byte ('PQR'), ?), 0xabcd
+dd 16 dup (0xaaaa, ?, 0xbbbbbb)
+dd 64 dup (?)
+db `\u263a`            ; UTF-8 smiley face
+db `\xe2\x98\xba`      ; UTF-8 smiley face
+db 0E2h, 098h, 0BAh    ; UTF-8 smiley face
+buffer:         resb    64              ; reserve 64 bytes 
+wordvar:        resw    1               ; reserve a word 
+buffer:         db      64 dup (?)      ; reserve 64 bytes 
+wordvar:        dw      ?               ; reserve a word 
+
+incbin  "file.dat"             ; include the whole file
+incbin  "file.dat",1024        ; skip the first 1024 bytes
+incbin  "file.dat",1024,512    ; skip the first 1024, and
+                               ; actually include at most 512
+
+message         db      'hello, world' 
+msglen          equ     $-message
+
+buffer: db      'hello, world' 
+        times 64-$+buffer db ' '
+
+     bndstx [rbx*1+rax+0x3], bnd0    ; GAS - '*1' indecates an index reg
+     VDIVPS zmm4, zmm5, dword [rbx]{1to16}   ; single-precision float 
+     VDIVPS zmm4, zmm5, zword [rbx]          ; packed 512 bit memory
+
+mov     ax,200          ; decimal
+mov     ax,0200         ; still decimal
+mov     ax,0200d        ; explicitly decimal
+mov     ax,0d200        ; also decimal
+mov     ax,0c8h         ; hex
+mov     ax,$0c8         ; hex again: the 0 is required
+mov     ax,0xc8         ; hex yet again
+mov     ax,0hc8         ; still hex
+mov     ax,310q         ; octal
+mov     ax,310o         ; octal again
+mov     ax,0o310        ; octal yet again
+mov     ax,0q310        ; octal yet again
+mov     ax,11001000b    ; binary
+mov     ax,1100_1000b   ; same binary constant
+mov     ax,1100_1000y   ; same binary constant once more
+mov     ax,0b1100_1000  ; same binary constant yet again
+mov     ax,0y1100_1000  ; same binary constant yet again
+
+%define u(x) __?utf16?__(x) 
+%define w(x) __?utf32?__(x) 
+
+dw u('C:\WINDOWS'), 0       ; Pathname in UTF-16
+dd w(`A + B = \u206a`), 0   ; String in UTF-32
+
+db    -0.2                    ; "Quarter precision"
+dw    -0.5                    ; IEEE 754r/SSE5 half precision
+dd    1.2                     ; an easy one
+dd    1.222_222_222           ; underscores are permitted
+dd    0x1p+2                  ; 1.0x2^2 = 4.0
+dq    0x1p+32                 ; 1.0x2^32 = 4 294 967 296.0
+dq    1.e10                   ; 10 000 000 000.0
+dq    1.e+10                  ; synonymous with 1.e10
+dq    1.e-10                  ; 0.000 000 000 1
+dt    3.141592653589793238462 ; pi
+do    1.e+4000                ; IEEE 754r quad precision
+
+mov    rax,__?float64?__(3.141592653589793238462)
+mov    rax,0x400921fb54442d18
+
+%define Inf __?Infinity?__ 
+%define NaN __?QNaN?__ 
+
+dq    +1.5, -Inf, NaN         ; Double-precision constants
+dt 12_345_678_901_245_678p
+dt -12_345_678_901_245_678p
+dt +0p33
+dt 33p
+
+dq b * (a // b) + (a %% b)
+
+call    (seg procedure):procedure
+call    weird_seg:(procedure wrt weird_seg)
+
+push dword 33
+push strict dword 33
+
+times (label-$) db 0
+
+label:  db      'Where am I?'
+        times (label-$+1) db 0 
+label:  db      'NOW where am I?'
+
+label1  ; some code 
+
+.loop 
+        ; some more code 
+
+        jne     .loop 
+        ret 
+
+label1:                         ; a non-local label 
+.local:                         ; this is really label1.local 
+..@foo:                         ; this is a special symbol 
+label2:                         ; another non-local label 
+.local:                         ; this is really label2.local 
+
+        jmp     ..@foo          ; this will jump three lines up
+
+
+%define THIS_VERY_LONG_MACRO_NAME_IS_DEFINED_TO \ 
+        THIS_VALUE
+
+%define ctrl    0x1F & 
+%define param(a,b) ((a)+(a)*(b)) 
+
+        mov     byte [param(2,ebx)], ctrl 'D'
+        mov     byte [(2)+(2)*(ebx)], 0x1F & 'D'
+
+%define a(x)    1+b(x) 
+%define b(x)    2*x 
+
+        mov     ax,a(8)
+
+   %define foo (a,b)               ; no arguments, (a,b) is the expansion 
+   %define bar(a,b)                ; two arguments, empty expansion
+
+   %define ereg(foo,) e %+ foo 
+     mov eax,ereg(dx,cx)
+
+    %define xyzzy(=expr,&val) expr, str 
+    %define plugh(x) xyzzy(x,x) 
+    db plugh(3+5), `\0` ; Expands to: db 8, "3+5", `\0`
+
+     mov ax,Foo%[__?BITS?__] ; The Foo value
+%xdefine Bar         Quux    ; Expands due to %xdefine 
+%define  Bar         %[Quux] ; Expands due to %[...]
+
+
+
+%define BDASTART 400h                ; Start of BIOS data area
+
+struc   tBIOSDA                      ; its structure 
+        .COM1addr       RESW    1 
+        .COM2addr       RESW    1 
+        ; ..and so on 
+endstruc
+
+        mov     ax,BDASTART + tBIOSDA.COM1addr 
+        mov     bx,BDASTART + tBIOSDA.COM2addr
+; Macro to access BIOS variables by their names (from tBDA):
+
+%idefine Foo mov %?,%?? 
+
+%idefine keyword $%?
+
+%idefine pause $%?                  ; Hide the PAUSE instruction
+%define foo bar 
+%undef  foo 
+
+        mov     eax, foo
+%assign i i+1
+%defstr test TEST
+%define test 'TEST'
+%defstr PATH %!PATH          ; The operating system PATH variable
+
+%deftok test 'TEST'
+
+%define test TEST
+
+%define greedy(a,b,c+) a + 66 %, b * 3 %, c 
+
+       db greedy(1,2)          ; db 1 + 66, 2 * 3 
+       db greedy(1,2,3)        ; db 1 + 66, 2 * 3, 3 
+       db greedy(1,2,3,4)      ; db 1 + 66, 2 * 3, 3, 4 
+       db greedy(1,2,3,4,5)    ; db 1 + 66, 2 * 3, 3, 4, 5
+
+%macro  silly 2 
+    %2: db      %1 
+%endmacro 
+
+        silly 'a', letter_a             ; letter_a:  db 'a' 
+        silly 'ab', string_ab           ; string_ab: db 'ab' 
+        silly {13,10}, crlf             ; crlf:      db 13,10
+%pragma preproc sane_empty_expansion
+
+%macro mpar 1-*
+     db %{3:5} 
+     db %{-1:-3} 
+%endmacro
+
+mpar 1,2,3,4,5,6
+
+%macro  die 0-1 "Painful program death has occurred." 
+
+        writefile 2,%1 
+        mov     ax,0x4c01 
+        int     0x21 
+
+%endmacro
+
+%macro  multipush 1-* 
+
+  %rep  %0 
+        push    %1 
+  %rotate 1 
+  %endrep 
+
+        j%-1    %%skip 
+        ret 
+  %%skip: 
+
+%endmacro
+
+
+%macro foo 1.nolist
+
+%endmacro
+
+%macro  pushparam 1 
+
+  %ifidni %1,ip 
+        call    %%label 
+  %%label: 
+  %else 
+        push    %1 
+  %endif 
+
+%endmacro
+
+%assign i 0 
+%rep    64 
+        inc     word [table+2*i] 
+%assign i i+1 
+%endrep
+
+
+fibonacci: 
+%assign i 0 
+%assign j 1 
+%rep 100 
+%if j > 65535 
+    %exitrep 
+%endif 
+        dw j 
+%assign k j+i 
+%assign i j 
+%assign j k 
+%endrep 
+
+fib_number equ ($-fibonacci)/2
+
+
+%include "macros.mac"
+
+
+%ifndef MACROS_MAC 
+    %define MACROS_MAC 
+    ; now define some macros 
+%endif
+
+%pathsearch MyFoo "foo.bin"
+
+%imacro incbin 1-2+ 0 
+%pathsearch dep %1 
+%depend dep 
+        incbin dep,%2 
+%endmacro
+%use altreg 
+%use 'altreg'
+
+%push    foobar
+
+%macro repeat 0 
+
+    %push   repeat 
+    %$begin: 
+
+%endmacro
+
+%macro until 1
+
+        j%-1    %$begin
+    %pop 
+
+%endmacro
+
+%define %$localmac 3
+
+%macro else 0 
+
+  %ifctx if 
+        %repl   else 
+        jmp     %$ifend 
+        %$ifnot: 
+  %else 
+        %error  "expected `if' before `else'" 
+  %endif 
+
+%endmacro 
+
+%macro endif 0 
+
+  %ifctx if 
+        %$ifnot: 
+        %pop 
+  %elifctx      else 
+        %$ifend: 
+        %pop 
+  %else 
+        %error  "expected `if' or `else' before `endif'" 
+  %endif 
+
+%endmacro
+
+some_function: 
+    %push mycontext             ; save the current context 
+    %stacksize small            ; tell NASM to use bp 
+    %assign %$localsize 0       ; see text for explanation 
+    %local old_ax:word, old_dx:word 
+
+        enter   %$localsize,0   ; see text for explanation 
+        mov     [old_ax],ax     ; swap ax & bx 
+        mov     cx,[old_dx] 
+        leave                   ; restore old bp 
+        ret                     ; 
+
+    %pop                        ; restore original context
+
+
+%ifdef F1 
+    ; do some setup 
+%elifdef F2 
+    ; do some different setup 
+%else 
+    %error "Neither F1 nor F2 was defined." 
+%endif
+%ifdef F1 
+    ; do some setup 
+%elifdef F2 
+    ; do some different setup 
+%else 
+    %warning "Neither F1 nor F2 was defined, assuming F1." 
+    %define F1 
+%endif%if foo > 64 
+    %assign foo_over foo-64 
+    %error foo is foo_over bytes too large 
+%endif
+
+        db      __?NASM_VER?__
+
+struc   mytype 
+  mt_long:      resd    1 
+  .str:         resb    32 
+endstruc
+
+%use altreg 
+
+
+%macro  writefile 2+ 
+
+        [section .data] 
+
+  %%str:        db      %2 
+  %%endstr: 
+
+        __?SECT?__ 
+
+        mov     dx,%%str 
+        mov     cx,%%endstr-%%str 
+        mov     bx,%1 
+        mov     ah,0x40 
+        int     0x21 
+
+%endmacro
+
+ DEFAULT BND 
+     call foo            ; BND will be prefixed 
+     nobnd call foo      ; BND will NOT be prefixed
+
+global _main 
+_main: 
+global  hashlookup:function, hashtable:data
+
+common  intvar  4
+static foo 
+foo: 
+         ; codes
+
+%pragma macho lprefix L_
+; The most common conventions 
+%pragma output gprefix _ 
+%pragma output lprefix L_ 
+; ELF uses a different convention 
+%pragma elf    gprefix                       ; empty 
+%pragma elf    lprefix .L
+
+section .pdata  rdata align=4 
+        dd      main wrt ..imagebase 
+        dd      main_end wrt ..imagebase 
+        dd      xmain wrt ..imagebase 
+section .xdata  rdata align=8 
+xmain:  db      9,0,0,0 
+        dd      handler wrt ..imagebase 
+section .drectve info 
+        db      '/defaultlib:user32.lib /defaultlib:msvcrt.lib '

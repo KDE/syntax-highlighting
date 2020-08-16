@@ -1,0 +1,56 @@
+<Directive>.MEMORYMAP</Directive><br/>
+<Normal Text>        </Normal Text><Unknown Instruction>SLOTSIZE</Unknown Instruction><Normal Text> </Normal Text><Hex>$8000</Hex><Normal Text> </Normal Text><Comment>; The slot is $8000 bytes in size. More details on slots later.</Comment><br/>
+<Normal Text>        </Normal Text><Unknown Instruction>DEFAULTSLOT</Unknown Instruction><Normal Text> </Normal Text><Decimal>0</Decimal><Normal Text> </Normal Text><Comment>; There's only 1 slot in SNES, there are more in other consoles.</Comment><br/>
+<Normal Text>        </Normal Text><Unknown Instruction>SLOT</Unknown Instruction><Normal Text> </Normal Text><Decimal>0</Decimal><Normal Text> </Normal Text><Hex>$8000</Hex><Normal Text> </Normal Text><Comment>; Defines Slot 0's starting address.</Comment><br/>
+<Directive>.</Directive><Unknown Directive>ENDME</Unknown Directive><br/>
+<Normal Text></Normal Text><br/>
+<Directive>.</Directive><Unknown Directive>SNESHEADER</Unknown Directive><br/>
+<Normal Text>        </Normal Text><Unknown Instruction>ID</Unknown Instruction><Normal Text>    </Normal Text><String>"SNES"</String><br/>
+<Normal Text>        </Normal Text><Unknown Instruction>NAME</Unknown Instruction><Normal Text>  </Normal Text><String>"Test Demo Mode 7     "</String><br/>
+<Normal Text>        </Normal Text><Comment>;     "123456789012345678901"</Comment><br/>
+<Normal Text>        </Normal Text><Unknown Instruction>LOROM</Unknown Instruction><br/>
+<Normal Text>        </Normal Text><Unknown Instruction>SLOWROM</Unknown Instruction><br/>
+<Normal Text>        </Normal Text><Unknown Instruction>CARTRIDGETYPE</Unknown Instruction><Normal Text> </Normal Text><Hex>$00</Hex><br/>
+<Normal Text>        </Normal Text><Unknown Instruction>ROMSIZE</Unknown Instruction><Normal Text> </Normal Text><Hex>$09</Hex><Normal Text> </Normal Text><Comment>;size rom 09-0d</Comment><br/>
+<Normal Text>        </Normal Text><Unknown Instruction>VERSION</Unknown Instruction><Normal Text> </Normal Text><Decimal>00</Decimal><br/>
+<Directive>.</Directive><Unknown Directive>ENDSNES</Unknown Directive><br/>
+<Normal Text></Normal Text><br/>
+<Directive>.MACRO</Directive><Normal Text> Clear_RAM</Normal Text><br/>
+<Normal Text>    </Normal Text><Instruction>ldx</Instruction><Normal Text> </Normal Text><Keyword>#</Keyword><Hex>$0</Hex><br/>
+<Normal Text>        </Normal Text><Instruction>ldy</Instruction><Normal Text> </Normal Text><Keyword>#</Keyword><Decimal>0</Decimal><br/>
+<Normal Text>        </Normal Text><Label>-:</Label><br/>
+<Normal Text>                </Normal Text><Instruction>sty</Instruction><Normal Text> </Normal Text><Decimal>0</Decimal><Keyword>,x</Keyword><br/>
+<Normal Text>                </Normal Text><Instruction>inx</Instruction><br/>
+<Normal Text>                </Normal Text><Instruction>inx</Instruction><br/>
+<Normal Text>                </Normal Text><Instruction>cpx</Instruction><Normal Text> </Normal Text><Keyword>#</Keyword><Hex>$2000</Hex><br/>
+<Normal Text>        </Normal Text><Branch Instruction>bne</Branch Instruction><Normal Text> </Normal Text><Operator>-</Operator><br/>
+<Directive>.ENDM</Directive><br/>
+<Normal Text></Normal Text><br/>
+<Directive>.include</Directive><Normal Text> </Normal Text><String>"header.asm"</String><br/>
+<Normal Text></Normal Text><br/>
+<Directive>.</Directive><Unknown Directive>bank</Unknown Directive><Normal Text> </Normal Text><Decimal>0</Decimal><Normal Text> slot </Normal Text><Decimal>0</Decimal><br/>
+<Directive>.org</Directive><Normal Text> </Normal Text><Decimal>0</Decimal><br/>
+<Normal Text></Normal Text><br/>
+<Label>Main:</Label><br/>
+<Normal Text>        </Normal Text><Instruction>sei</Instruction><br/>
+<Normal Text>        </Normal Text><Instruction>clc</Instruction><br/>
+<Normal Text>        </Normal Text><Instruction>xce</Instruction><br/>
+<Normal Text>        </Normal Text><br/>
+<Normal Text>        </Normal Text><Instruction>rep</Instruction><Normal Text> </Normal Text><Keyword>#</Keyword><Hex>$10</Hex><Normal Text>        </Normal Text><Comment>;16 bit xy</Comment><br/>
+<Normal Text>        </Normal Text><Instruction>sep</Instruction><Normal Text> </Normal Text><Keyword>#</Keyword><Hex>$20</Hex><Normal Text>        </Normal Text><Comment>; 8 bit a</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Directive>.dw</Directive><Normal Text> </Normal Text><Hex>$1C02</Hex><Symbol Separator>,</Symbol Separator><Hex>$1C02</Hex><Symbol Separator>,</Symbol Separator><Hex>$1C02</Hex><Symbol Separator>,</Symbol Separator><Hex>$1C02</Hex><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Instruction>lda</Instruction><Normal Text> sincos.l </Normal Text><Operator>+</Operator><Normal Text> </Normal Text><Hex>$80</Hex><Keyword>,X</Keyword><br/>
+<Normal Text></Normal Text><br/>
+<Label>sincos2:</Label><br/>
+<Normal Text>        </Normal Text><Directive>.include</Directive><Normal Text> </Normal Text><String>"DATA/dsincos.asm"</String><br/>
+<Normal Text>        </Normal Text><br/>
+<Normal Text>        </Normal Text><Instruction>lda</Instruction><Normal Text> </Normal Text><Keyword>#</Keyword><Operator>\</Operator><Decimal>1</Decimal><Operator>&</Operator><Hex>$FF</Hex><br/>
+<Normal Text>        </Normal Text><Instruction>sta</Instruction><Normal Text> </Normal Text><Hex>$211B</Hex><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Instruction>cmp</Instruction><Normal Text> </Normal Text><Keyword>#</Keyword><Hex>$04</Hex><br/>
+<Normal Text>        </Normal Text><Branch Instruction>bne</Branch Instruction><Normal Text> </Normal Text><Operator>+++</Operator><br/>
+<Normal Text>                </Normal Text><Instruction>lda</Instruction><Normal Text> </Normal Text><Keyword>#</Keyword><Hex>$04</Hex><br/>
+<Normal Text>                </Normal Text><Branch Instruction>bra</Branch Instruction><Normal Text> lab</Normal Text><br/>
+<Normal Text>        </Normal Text><Label>+++:</Label><br/>

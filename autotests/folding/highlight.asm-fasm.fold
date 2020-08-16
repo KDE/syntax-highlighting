@@ -1,0 +1,516 @@
+    jmp near dword [0]
+    jmp far dword [0]
+
+    mov bx,ax       ; general register to general register
+    mov [char],al   ; general register to memory
+    mov dl,32       ; immediate value to general register
+    mov cr3,ebx     ; general register to control register
+
+    xchg ax,bx      ; swap two general registers
+    xchg al,[char]  ; swap register with memory
+
+    push ax         ; store general register
+    push es         ; store segment register
+    pushw [bx]      ; store memory
+    push 1000h      ; store immediate value
+
+    imul ax,[si],10 ; memory by immediate value to register
+
+    bt  ax,15        ; test bit in register
+    bts word [bx],15 ; test and set bit in memory
+
+    bswap edx        ; swap bytes in register
+
+    jmp 100h         ; direct near jump
+    jmp 0FFFFh:0     ; direct far jump
+    jmp ax           ; indirect near jump
+    jmp pword [ebx]  ; indirect far jump
+
+    movs byte [di],[si]        ; transfer byte
+    movs word [es:di],[ss:si]  ; transfer word
+    movsd                      ; transfer double word
+
+    cmpxchg8b [bx]   ; compare and exchange 8 bytes
+
+    movq2dq xmm0,mm1   ; move from MMX register to SSE register
+    movdq2q mm0,xmm1   ; move from SSE register to MMX register
+
+    enter 2048,0     ; enter and allocate 2048 bytes on stack
+
+    mov [rip+3],sil    ; manual RIP-relative addressing
+
+    blendvps xmm3,xmm7,xmm0 ; blend according to mask
+    vgatherqps xmm0,[xmm2],xmm3        ; gather two floats
+    vgatherqps xmm0,[ymm2+64],xmm3     ; gather four floats
+    vfmsub231ps ymm1,ymm2,ymm3     ; multiply and subtract
+    vfnmadd132sd xmm0,xmm5,[ebx]   ; multiply, negate and add
+    vpermil2ps ymm0,ymm3,ymm7,ymm2,0  ; permute from two sources
+
+    vscatterdps [eax+xmm1]{k1},xmm0    ; scatter four floats
+    vscatterdpd [ymm3*8]{k3},zmm0      ; scatter eight doubles
+
+    dd sum
+    x = 1
+    x = x+2
+    sum = x
+
+
+    if count>0
+        mov cx,count
+        rep movsb
+    end if
+
+
+    if count & ~ count mod 4
+        mov cx,count/4
+        rep movsd
+    else if count>4
+        mov cx,count/4
+        rep movsd
+        mov cx,count mod 4
+        rep movsb
+    else
+        mov cx,count
+        rep movsb
+    end if
+
+    repeat 8
+        mov byte [bx],%
+        inc bx
+    end repeat
+
+
+    s = x/2
+    repeat 100
+        if x/s = s
+            break
+        end if
+        s = (s+x/s)/2
+    end repeat
+
+    repeat $-$$
+        load a byte from $$+%-1
+        store byte a xor c at $$+%-1
+    end repeat
+
+    GDTR dp ?
+    virtual at GDTR
+        GDT_limit dw ?
+        GDT_address dd ?
+    end virtual
+
+    virtual at 0
+        file 'a.txt':10h,1
+        load char from 0
+    end virtual
+
+    virtual at 0 as 'asc'
+        times 256 db %-1
+    end virtual
+
+    virtual at 0
+        hex_digits::
+        db '0123456789ABCDEF'
+    end virtual
+    load a byte from hex_digits:10
+
+    bits = 16
+    display 'Current offset is 0x'
+    repeat bits/4
+        d = '0' + $ shr (bits-%*4) and 0Fh
+        if d > '9'
+            d = d + 'A'-'9'-1
+        end if
+        display d
+    end repeat
+    display 13,10
+
+    if ~ defined alpha
+        alpha:
+    end if
+
+    if ~ defined alpha | defined @f
+        alpha:
+        @@:
+    end if
+
+    include 'macros.inc'
+
+    d equ dword
+    NULL equ d 0
+    d equ edx
+
+    d equ d,eax
+
+    b equ byte
+    w equ word
+    d equ dword
+    p equ pword
+    f equ fword
+    q equ qword
+    t equ tword
+    x equ dqword
+    y equ qqword
+
+    incl fix include
+
+    macro tst {test al,0xFF}
+
+    macro stos0
+     {
+        xor al,al
+        stosb
+     }
+
+    macro align value { rb (value-1)-($+value-1) mod value }
+
+    macro mov op1,op2
+     {
+      if op1 in <ds,es,fs,gs,ss> & op2 in <cs,ds,es,fs,gs,ss>
+        push  op2
+        pop   op1
+      else
+        mov   op1,op2
+      end if
+     }
+
+    macro stoschar [char]
+     {
+        mov al,char
+        stosb
+     }
+
+    macro movstr
+     {
+        local move
+      move:
+        lodsb
+        stosb
+        test al,al
+        jnz move
+     }
+
+    macro strtbl name,[string]
+     {
+      common
+        label name dword
+      forward
+        local label
+        dd label
+      forward
+        label db string,0
+     }
+
+    push 3
+    push 2
+    push 1
+    call foo
+
+    macro invoke proc,[arg]
+     { common stdcall [proc],arg }
+
+    macro jif op1,cond,op2,label
+     {
+        cmp op1,op2
+        j#cond label
+     }
+
+    macro label name
+     {
+        label name
+        if ~ used name
+          display `name # " is defined but not used.",13,10
+        end if
+     }
+
+    macro message arg
+     {
+      if arg eqtype ""
+        local str
+        jmp   @f
+        str   db arg,0Dh,0Ah,24h
+        @@:
+        mov   dx,str
+      else
+        mov   dx,arg
+      end if
+        mov   ah,9
+        int   21h
+     }
+
+    macro ext instr
+     {
+      macro instr op1,op2,op3
+       \{
+        if op3 eq
+          instr op1,op2
+        else
+          instr op1,op2
+          instr op2,op3
+        end if
+       \}
+     }
+
+    ext add
+    ext sub
+
+
+    macro tmacro [params]
+     {
+      common macro params {
+     }
+    MACRO fix tmacro
+    ENDM fix }
+
+
+    MACRO stoschar char
+        mov al,char
+        stosb
+    ENDM
+
+    postpone
+     {
+      code_size = $
+     }
+
+    struc point x,y
+     {
+        .x dw x
+        .y dw y
+     }
+
+    struc db [data]
+     {
+       common
+        . db data
+        .size = $ - .
+     }
+
+    rept 5 { in al,dx }
+
+    rept 3 counter
+     {
+        byte#counter db counter
+     }
+
+    match +,+ { include 'first.inc' }
+    match +,- { include 'second.inc' }
+    match a b, 1+2+3 { db a }
+
+    V fix {
+      macro empty
+       V
+    V fix }
+       V
+
+
+    list equ
+
+    macro append item
+     {
+       match any, list \{ list equ list,item \}
+       match , list \{ list equ item \}
+     }
+
+    define a b+4
+    define b 3
+    rept 1 result:a*b+2 { define c result }
+
+    rept 8 n:0 { pxor xmm#n,xmm#n }
+
+
+   irps reg, al bx ecx
+    { xor reg,reg }
+
+
+    if 0
+    a = 1
+    b equ 2
+    end if
+    dd b
+
+
+    extrn exit
+    extrn '__imp__MessageBoxA@16' as MessageBox:dword
+
+    extrn 'printf' as _printf
+    printf = PLT _printf
+
+    tester? = 0
+
+        space:
+        space.x = 1
+        space.y = 2
+        space.color:
+        space.color.r = 0
+        space.color.g = 0
+        space.color.b = 0
+
+        space:
+        namespace space
+                x = 1
+                y = 2
+                color:
+                .r = 0
+                .g = 0
+                .b = 0
+        end namespace
+
+
+        first:
+                .child = 1
+                ..other = 0
+        second:
+                .child = 2
+                ..another = ..other
+
+
+        label character:byte
+        label char:1
+
+        byte? = 1       ; 8 bits
+        word? = 2       ; 16 bits
+        dword? = 4      ; 32 bits
+        fword? = 6      ; 48 bits
+        pword? = 6      ; 48 bits
+        qword? = 8      ; 64 bits
+        tbyte? = 10     ; 80 bits
+        tword? = 10     ; 80 bits
+        dqword? = 16    ; 128 bits
+        xword? = 16     ; 128 bits
+        qqword? = 32    ; 256 bits
+        yword? = 32     ; 256 bits
+        dqqword? = 64   ; 512 bits
+        zword? = 64     ; 512 bits
+
+        element A
+        linpoly = A + A + 3
+        vterm = linpoly scale 1 * linpoly element 1     ; vterm = 2 * A
+
+        db 4 dup 90h            ; generate 4 bytes
+        db 2 dup ('abc',10)     ; generate 8 bytes
+
+        macro measured name,string
+                local top
+                name db string
+                top: name.length = top - name
+        end macro
+
+        measured hello, 'Hello!'        ; hello.length = 6
+
+        A equ 1
+        A equ 2
+
+        drop A
+        drop A
+
+        data1 dw 1
+        buffer1 rb 10h          ; zeroed and present in the output
+
+        org 400h
+        data dw 2
+        buffer2 rb 20h          ; not in the output
+
+        section 1000h
+        data3 dw 3
+        buffer3 rb 30h          ; not in the output
+
+        virtual at 0
+                hex_digits::
+                db '0123456789ABCDEF'
+        end virtual
+        load a:byte from hex_digits:10  ; a = 'A'
+
+        db "Text"
+        key = 7Bh
+        repeat $-$$
+                load a : byte from $$+%-1
+                store a xor key : byte at $$+%-1
+        end repeat
+
+        load char : byte from const:0
+
+        if $>10000h
+                err 'segment too large'
+        end if
+        calminstruction please? cmd&
+                match =do? =not? cmd, cmd
+                jyes done
+                assemble cmd
+            done:
+        end calminstruction
+
+        please do not display 'Bye!'
+
+        macro jmpi target
+                if target-($+2) < 80h & target-($+2) >= -80h                    
+                        db 0EBh
+                        db target-($+1)
+                else
+                        db 0E9h
+                        dw target-($+2)
+                end if 
+        end macro
+
+        macro EX? first,second
+                match (=SP?), first
+                        match =HL?, second
+                                db 0E3h
+                        else match =IX?, second
+                                db 0DDh,0E3h
+                        else match =IY?, second
+                                db 0FDh,0E3h
+                        else
+                                err "incorrect second argument"
+                        end match
+                else match =AF?, first
+                        match =AF'?, second
+                                db 08h
+                        else
+                                err "incorrect second argument"
+                        end match
+                else match =DE?, first
+                        match =HL?, second
+                                db 0EBh
+                        else
+                                err "incorrect second argument"
+                        end match
+                else
+                        err "incorrect first argument"
+                end match
+        end macro
+
+        EX (SP),HL
+
+        macro INC? argument
+                match [:r:], argument
+                        db 100b + r shl 3
+                else match (=HL?), argument
+                        db 34h
+                else match (=IX?+d), argument
+                        db 0DDh,34h,d
+                else match (=IY?+d), argument
+                        db 0FDh,34h,d
+                else
+                        err "incorrect argument"
+                end match
+        end macro
+
+        INC (IX+2)
+
+        element IY? 
+
+        element L? : register + 101b
+
+        macro CALL? arguments&
+                local cc,nn
+                match condition =, target, arguments
+                        cc = condition - CC
+                        nn = target
+                        db 0C4h + cc shl 3
+                else
+                        nn = arguments
+                        db 0CDh                     
+                end match
+                dw nn
+        end macro

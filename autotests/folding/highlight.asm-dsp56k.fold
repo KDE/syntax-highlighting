@@ -1,0 +1,56 @@
+* initialization
+n       equ   20
+start   equ   $40
+wddr    equ   $0
+cddr    equ   $0
+input   equ   $ffe0
+output  equ   $ffe1
+;
+        org   p:start
+        move  #wddr,r0  ;r0 ¬ samples
+        move  #cddr,r4  ;r1 ¬ coefﬁcients
+        move  #n-1,m0   ;set modulo arithmetic
+        move  m0,m4     ;for the 2 circular buffers
+;
+        opt   cc
+;       filter loop :8+(n-1) cycles
+
+        movep y:input,x: (r0)              ;input sample in memory
+        clr   a                x:(r0)+,x0  y: (r4)+,y0
+        rep   #n-1
+        mac   x0,y0,a          x:(r0)+,x0  y:(r4)+,y0
+        macr  x0,x0,a          (r0)-
+
+        movep a,y:output                   ;output ﬁltered sample
+
+fftr2a macro points,data,coef
+fftr2a: ident 1,1
+
+        move #points/2,n0  ;initialize butterﬂies per group
+        move #1,n2         ;initialize groups per pass
+        move #points/4,n6  ;initialize C pointer offset
+        move #-1,m0        ;initialize A and B address modiﬁers
+        move m0,m1         ;for linear addressing
+        move m0,m4
+        move m0,m5
+        move #0,m6         ;initialize C address modiﬁer for
+                           ;reverse carry (bit-reversed) addressing
+
+        do   #@cvi (@log(points)/@log(2)+0.5),_end_pass
+        move #data,r0       ;initialize A input pointer
+        move r0,r4          ;initialize A output pointer
+
+_end_bfy
+        move a,x:(r5)+n5 y:(r1)+n1,y1
+
+end_cell
+        rnd a
+        movep #0,x:$fffe
+        dc @sin(@cvf(count)*freq)
+        move #twiddle,r2
+
+        MOVE L:<$1,A
+        SUB X,A L:<$3,B
+
+ bad_label
+ good_label:

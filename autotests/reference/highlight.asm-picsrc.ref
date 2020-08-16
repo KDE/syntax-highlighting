@@ -1,0 +1,60 @@
+<Normal Text>                </Normal Text><Comment>; Blank line</Comment><br/>
+<Label>loop</Label><Normal Text>  </Normal Text><Instructions>sleep</Instructions><Normal Text>     </Normal Text><Comment>; Label and operation</Comment><br/>
+<Normal Text>      </Normal Text><Instructions>incf</Instructions><Normal Text> </Normal Text><Unbased Numbers>6</Unbased Numbers><Symbol>,</Symbol><Unbased Numbers>1</Unbased Numbers><Normal Text>  </Normal Text><Comment>; Operation with 2 parameters</Comment><br/>
+<Normal Text>      </Normal Text><Branch Instructions>goto</Branch Instructions><Normal Text> loop </Normal Text><Comment>; Operation with 1 parameter</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>#define</Preprocessor><Normal Text> X Y</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>#undefine</Preprocessor><Normal Text> X</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Label>number</Label><Normal Text> </Normal Text><Directives>equ</Directives><Normal Text> </Normal Text><Unbased Numbers>5</Unbased Numbers><br/>
+<Normal Text></Normal Text><br/>
+<Label>label_</Label><Char>#v</Char><Symbol>((</Symbol><Normal Text>number </Normal Text><Symbol>+</Symbol><Normal Text> </Normal Text><Unbased Numbers>1</Unbased Numbers><Symbol>)</Symbol><Normal Text> </Normal Text><Symbol>*</Symbol><Normal Text> </Normal Text><Unbased Numbers>5</Unbased Numbers><Symbol>)</Symbol><Label>_suffix</Label><Normal Text> </Normal Text><Directives>equ</Directives><Normal Text> </Normal Text><Based Numbers>0x</Based Numbers><Hex>10</Hex><br/>
+<Normal Text></Normal Text><br/>
+<Directives>db</Directives><Normal Text> </Normal Text><Based Numbers>.</Based Numbers><Unbased Numbers>34</Unbased Numbers><Symbol>,</Symbol><Based Numbers>O'</Based Numbers><Octal>35</Octal><Based Numbers>'</Based Numbers><Symbol>,</Symbol><Based Numbers>O'</Based Numbers><Error>9</Error><Normal Text>3'</Normal Text><Symbol>,</Symbol><Based Numbers>0x</Based Numbers><Hex>Af</Hex><Symbol>,</Symbol><Based Numbers>0x</Based Numbers><Hex>ad</Hex><Error>y</Error><Symbol>,</Symbol><Char>a'a'</Char><Symbol>,</Symbol><Char>a'a</Char><Error>p</Error><Symbol>,</Symbol><Char>A'\'</Char><br/>
+<Normal Text></Normal Text><br/>
+<Label>any</Label><Normal Text>   </Normal Text><Directives>macro</Directives><Normal Text> parm</Normal Text><br/>
+<Normal Text>      </Normal Text><Instructions>movlw</Instructions><Normal Text> parm</Normal Text><br/>
+<Normal Text>      </Normal Text><Directives>endm</Directives><br/>
+<Normal Text>      </Normal Text><Unknown Instructions>any</Unknown Instructions><Normal Text> </Normal Text><Unbased Numbers>33</Unbased Numbers><br/>
+<Normal Text></Normal Text><br/>
+<Comment>; Shift reg left</Comment><br/>
+<Label>slf</Label><Normal Text>   </Normal Text><Directives>macro</Directives><Normal Text> reg</Normal Text><br/>
+<Normal Text>      </Normal Text><GPASM-macros>clrc</GPASM-macros><br/>
+<Normal Text>      </Normal Text><Instructions>rlf</Instructions><Normal Text>   reg</Normal Text><Symbol>,</Symbol><Normal Text>f</Normal Text><br/>
+<Directives>endm</Directives><br/>
+<Normal Text></Normal Text><br/>
+<Comment>; Scale W by “factor”. Result in “reg”, W unchanged.</Comment><br/>
+<Label>scale</Label><Normal Text> </Normal Text><Directives>macro</Directives><Normal Text> reg</Normal Text><Symbol>,</Symbol><Normal Text> factor</Normal Text><br/>
+<Normal Text>      </Normal Text><Preprocessor>if</Preprocessor><Normal Text> </Normal Text><Symbol>(</Symbol><Normal Text>factor </Normal Text><Symbol>==</Symbol><Normal Text> </Normal Text><Unbased Numbers>1</Unbased Numbers><Symbol>)</Symbol><br/>
+<Normal Text>          </Normal Text><Instructions>movwf</Instructions><Normal Text> reg                </Normal Text><Comment>; 1 X is easy</Comment><br/>
+<Normal Text>      </Normal Text><Preprocessor>else</Preprocessor><br/>
+<Normal Text>          </Normal Text><Unknown Instructions>scale</Unknown Instructions><Normal Text> reg</Normal Text><Symbol>,</Symbol><Normal Text> </Normal Text><Symbol>(</Symbol><Normal Text>factor </Normal Text><Symbol>/</Symbol><Normal Text> </Normal Text><Unbased Numbers>2</Unbased Numbers><Symbol>)</Symbol><Normal Text>  </Normal Text><Comment>; W * (factor / 2)</Comment><br/>
+<Normal Text>          </Normal Text><Unknown Instructions>slf</Unknown Instructions><Normal Text>   reg</Normal Text><Symbol>,</Symbol><Normal Text>f              </Normal Text><Comment>; double reg</Comment><br/>
+<Normal Text>          </Normal Text><Preprocessor>if</Preprocessor><Normal Text> </Normal Text><Symbol>((</Symbol><Normal Text>factor </Normal Text><Symbol>&</Symbol><Normal Text> </Normal Text><Unbased Numbers>1</Unbased Numbers><Symbol>)</Symbol><Normal Text> </Normal Text><Symbol>==</Symbol><Normal Text> </Normal Text><Unbased Numbers>1</Unbased Numbers><Symbol>)</Symbol><Normal Text>   </Normal Text><Comment>; if lo-bit set ..</Comment><br/>
+<Normal Text>              </Normal Text><Instructions>addwf</Instructions><Normal Text> reg</Normal Text><Symbol>,</Symbol><Normal Text>f          </Normal Text><Comment>; .. add W to reg</Comment><br/>
+<Normal Text>          </Normal Text><Preprocessor>endif</Preprocessor><br/>
+<Normal Text>      </Normal Text><Preprocessor>endif</Preprocessor><br/>
+<Directives>endm</Directives><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>      </Normal Text><Unknown Instructions>scale</Unknown Instructions><Normal Text> tmp</Normal Text><Symbol>,</Symbol><Based Numbers>D'</Based Numbers><Unbased Numbers>10</Unbased Numbers><Based Numbers>'</Based Numbers><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>      </Normal Text><Instructions>movwf</Instructions><Normal Text>  tmp</Normal Text><br/>
+<Normal Text>      </Normal Text><GPASM-macros>clrc</GPASM-macros><br/>
+<Normal Text>      </Normal Text><Instructions>rlf</Instructions><Normal Text>    tmp</Normal Text><Symbol>,</Symbol><Normal Text>f</Normal Text><br/>
+<Normal Text>      </Normal Text><Instructions>addwf</Instructions><Normal Text>  tmp</Normal Text><Symbol>,</Symbol><Normal Text>f</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Label>spin</Label><Normal Text>  </Normal Text><Directives>macro</Directives><Normal Text>  n</Normal Text><br/>
+<Normal Text>      </Normal Text><Instructions>movlw</Instructions><Normal Text>  n</Normal Text><br/>
+<Normal Text>      </Normal Text><Instructions>addlw</Instructions><Normal Text>  </Normal Text><Based Numbers>0x</Based Numbers><Hex>ff</Hex><br/>
+<Normal Text>      </Normal Text><Instructions>btfss</Instructions><Normal Text>  STATUS</Normal Text><Symbol>,</Symbol><Normal Text>Z</Normal Text><br/>
+<Normal Text>      </Normal Text><Branch Instructions>goto</Branch Instructions><Normal Text>   $</Normal Text><Symbol>-</Symbol><Unbased Numbers>2</Unbased Numbers><br/>
+<Directives>endm</Directives><br/>
+<Normal Text></Normal Text><br/>
+<Label>LOOP</Label><Symbol>:</Symbol><Normal Text> </Normal Text><Instructions>BTFSS</Instructions><Normal Text> flag</Normal Text><Symbol>,</Symbol><Based Numbers>0x</Based Numbers><Hex>00</Hex><br/>
+<Normal Text>      </Normal Text><Branch Instructions>GOTO</Branch Instructions><Normal Text> LOOP</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>      </Normal Text><br/>
+<Normal Text>      </Normal Text><Instructions>BTFSS</Instructions><Normal Text> flag</Normal Text><Symbol>,</Symbol><Based Numbers>0x</Based Numbers><Hex>00</Hex><br/>
+<Normal Text>      </Normal Text><Branch Instructions>GOTO</Branch Instructions><Normal Text> $ </Normal Text><Symbol>-</Symbol><Normal Text> </Normal Text><Unbased Numbers>1</Unbased Numbers><br/>
+<Normal Text></Normal Text><br/>

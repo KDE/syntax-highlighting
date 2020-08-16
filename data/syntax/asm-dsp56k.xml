@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
 
-<language name="Motorola DSP56k" section="Assembler" version="3" kateversion="5.0"  extensions="*.asm;*.inc;*.ASM;*.INC" author="Miro Kropacek (miro.kropacek@gmail.com)" license="LGPL">
+<language name="Motorola DSP56k" section="Assembler" version="4" kateversion="5.62" extensions="*.asm;*.inc;*.ASM;*.INC" author="Miro Kropacek (miro.kropacek@gmail.com)" license="LGPL">
 
   <highlighting>
     <list name="Data Registers">
@@ -217,85 +217,215 @@
       <item>equ</item>
     </list>
 
+    <list name="Functions">
+	    <item>@abs</item>
+	    <item>@acs</item>
+	    <item>@asn</item>
+	    <item>@at2</item>
+	    <item>@atn</item>
+	    <item>@cel</item>
+	    <item>@coh</item>
+	    <item>@cos</item>
+	    <item>@flr</item>
+	    <item>@l10</item>
+	    <item>@log</item>
+	    <item>@max</item>
+	    <item>@min</item>
+	    <item>@pow</item>
+	    <item>@rnd</item>
+	    <item>@sgn</item>
+	    <item>@sin</item>
+	    <item>@snh</item>
+	    <item>@sqt</item>
+	    <item>@tan</item>
+	    <item>@tnh</item>
+	    <item>@xpn</item>
+	    <item>@cvf</item>
+	    <item>@cvi</item>
+	    <item>@cvs</item>
+	    <item>@fld</item>
+	    <item>@frc</item>
+	    <item>@lfr</item>
+	    <item>@lng</item>
+	    <item>@lun</item>
+	    <item>@rvb</item>
+	    <item>@unf</item>
+	    <item>@len</item>
+	    <item>@pos</item>
+	    <item>@scp</item>
+	    <item>@arg</item>
+	    <item>@cnt</item>
+	    <item>@mac</item>
+	    <item>@mxp</item>
+	    <item>@ccc</item>
+	    <item>@chk</item>
+	    <item>@ctr</item>
+	    <item>@def</item>
+	    <item>@exp</item>
+	    <item>@int</item>
+	    <item>@lcv</item>
+	    <item>@lst</item>
+	    <item>@msp</item>
+	    <item>@rel</item>
+    </list>
+
     <contexts>
-      <!-- name = name of context, attribute = name of item data -->
-      <context attribute="Normal Text" lineEndContext="#stay" name="Normal Text" >
+      <context name="Normal Text" attribute="Normal Text" lineEndContext="#stay" fallthroughContext="Operation">
+        <DetectSpaces attribute="Normal Text"/>
+
+        <DetectChar attribute="Comment" context="Comment" char="*" firstNonSpace="1"/>
+
+        <DetectIdentifier attribute="Label" context="Label" column="0"/>
+        <DetectChar attribute="Local label" context="LocalLabel" char="_" column="0"/>
+
+        <keyword attribute="Instructions" context="Operation" String="Instructions"/>
+        <keyword attribute="Directives" context="Operation" String="Directives"/>
+
+        <RegExpr attribute="Label" context="EndLabel" String="[a-zA-Z][a-zA-Z0-9._]*+(?=:)"/>
+        <RegExpr attribute="Local label" context="EndLabel" String="_[a-zA-Z][a-zA-Z0-9._]*+(?=:)"/>
+
+        <DetectIdentifier attribute="Unknown Instructions" context="Operation"/>
+      </context>
+
+      <context name="Operation" attribute="Normal Text" lineEndContext="#pop" fallthroughContext="Expression">
+        <AnyChar attribute="Constant" context="Addressing Mode" String="#&lt;&gt;"/>
         <RegExpr attribute="Memory" context="#stay" String="[xylpXYLP]:"/>
+      </context>
+
+      <context name="Addressing Mode" attribute="Constant" lineEndContext="#pop" fallthroughContext="#pop!Constant_Expression">
+        <AnyChar attribute="Constant" context="#pop!Constant_Expression" String="&lt;&gt;"/>
+      </context>
+
+      <context name="Expression" attribute="Normal Text" lineEndContext="#pop">
+        <DetectChar attribute="Hex" context="Number16" char="$"/>
+        <DetectChar attribute="Binary" context="Number2" char="%"/>
+        <DetectChar attribute="Number" context="Number8OrFunc" char="@" lookAhead="1"/>
+        <Float attribute="Float" context="#stay"/>
+        <Int attribute="Number" context="#stay"/>
+        <IncludeRules context="Inc_Expression"/>
+        <DetectIdentifier attribute="Normal Text"/>
+      </context>
+
+      <context name="Constant_Expression" attribute="Constant" lineEndContext="#pop">
+        <DetectChar attribute="Constant" context="Constant_Number16" char="$"/>
+        <DetectChar attribute="Constant" context="Constant_Number2" char="%"/>
+        <DetectChar attribute="Constant" context="Constant_Number8OrFunc" char="@" lookAhead="1"/>
+        <Float attribute="Constant" context="#stay"/>
+        <Int attribute="Constant" context="#stay"/>
+        <IncludeRules context="Inc_Expression"/>
+        <DetectIdentifier attribute="Label"/>
+      </context>
+
+      <context name="Inc_Expression" attribute="Normal Text" lineEndContext="#pop">
+        <DetectChar attribute="Comment" context="#pop!Comment" char=";"/>
+        <DetectChar attribute="Symbol Separator" context="#pop" char=","/>
+        <DetectSpaces attribute="Normal Text" context="#pop"/>
+        <AnyChar attribute="Symbols" context="#stay" String="+-*/%?&amp;|&lt;&gt;^!=[]{}()"/>
+
+        <DetectChar attribute="String" context="SQ_String" char="'"/>
+        <DetectChar attribute="String" context="DQ_String" char="&quot;"/>
+
         <keyword attribute="Data Registers" context="#stay" String="Data Registers"/>
         <keyword attribute="Address Registers" context="#stay" String="Address Registers"/>
         <keyword attribute="Offset Registers" context="#stay" String="Offset Registers"/>
         <keyword attribute="Modifier Registers" context="#stay" String="Modifier Registers"/>
         <keyword attribute="Control Registers" context="#stay" String="Control Registers"/>
-        <keyword attribute="Instructions" context="#stay" String="Instructions"/>
-        <keyword attribute="Directives" context="#stay" String="Directives"/>
+      </context>
 
-        <RegExpr attribute="Label" context="#stay" String="^[A-Za-z][A-Za-z_.0-9]*:?"/>
-        <RegExpr attribute="Local label" context="#stay" String="^_[A-Za-z_][A-Za-z_.0-9]*:?"/>
+      <context name="Constant_Number16" attribute="Constant" lineEndContext="#pop" fallthroughContext="#pop">
+        <RegExpr attribute="Constant" context="#pop" String="[A-Fa-f0-9]+"/>
+      </context>
 
-        <DetectChar attribute="Comment" context="Comment" char=";"/>
-        <DetectChar attribute="Comment" context="Comment" char="*" firstNonSpace="true"/>
-        <DetectChar attribute="Constant" context="Constant" char="#"/>
-        <DetectChar attribute="BaseN" context="Number16" char="$"/>
-        <DetectChar attribute="BaseN" context="Number2" char="%"/>
-        <DetectChar attribute="BaseN" context="Number8" char="@"/>
-        <Float attribute="Float" context="#stay"/>
-        <Int attribute="Number" context="#stay"/>
-        <RangeDetect attribute="Char" context="#stay" char="'"  char1="'"/>
-        <AnyChar attribute="String" context="String" String="&quot;'"/>
+      <context name="Constant_Number2" attribute="Constant" lineEndContext="#pop" fallthroughContext="#pop">
+        <RegExpr attribute="Constant" context="#pop" String="[01]+"/>
+      </context>
+
+      <context name="Constant_Number8OrFunc" attribute="Constant" lineEndContext="#pop" fallthroughContext="#pop">
+        <keyword attribute="Functions" context="#pop!Constant_Func" String="Functions"/>
+        <DetectChar attribute="Constant" context="#pop!Constant_Number8OrFunc_2" char="@"/>
+      </context>
+      <context name="Constant_Number8OrFunc_2" attribute="Constant" lineEndContext="#pop" fallthroughContext="#pop">
+        <DetectIdentifier attribute="Constant" context="#pop!Constant_Func"/>
+        <RegExpr attribute="Constant" context="#pop" String="[0-7]+"/>
+      </context>
+      <context name="Constant_Func" attribute="Functions" lineEndContext="#pop" fallthroughContext="#pop">
+        <DetectChar attribute="Symbols" context="#pop!Constant_InnerFunc" char="("/>
+      </context>
+      <context name="Constant_InnerFunc" attribute="Functions" lineEndContext="#pop">
+        <DetectChar attribute="Symbols" context="#pop" char=")"/>
+        <DetectChar attribute="Symbols" context="Constant_InnerFunc" char="("/>
+        <DetectChar attribute="Symbol Separator" context="#stay" char=","/>
+        <DetectChar attribute="Constant" context="Constant_Number16" char="$"/>
+        <DetectChar attribute="Constant" context="Constant_Number2" char="%"/>
+        <DetectChar attribute="Constant" context="Constant_Number8OrFunc" char="@" lookAhead="1"/>
+        <Float attribute="Constant" context="#stay"/>
+        <Int attribute="Constant" context="#stay"/>
+        <IncludeRules context="Inc_Expression"/>
+        <DetectIdentifier attribute="Normal Text"/>
+      </context>
+
+      <context name="Number8OrFunc" attribute="Octal" lineEndContext="#pop" fallthroughContext="#pop">
+        <keyword attribute="Functions" context="#pop" String="Functions"/>
+        <DetectChar attribute="Octal" context="#pop!Number8OrFunc_2" char="@"/>
+      </context>
+      <context name="Number8OrFunc_2" attribute="Octal" lineEndContext="#pop" fallthroughContext="#pop">
+        <RegExpr attribute="Octal" context="#pop" String="[0-7]+"/>
+        <DetectIdentifier attribute="Functions" context="#pop"/>
+      </context>
+
+      <context name="Number16" attribute="Hex" lineEndContext="#pop" fallthroughContext="#pop">
+        <RegExpr attribute="Hex" context="#pop" String="[A-Fa-f0-9]+"/>
+      </context>
+
+      <context name="Number2" attribute="Binary" lineEndContext="#pop" fallthroughContext="#pop">
+        <RegExpr attribute="Binary" context="#pop" String="[01]+"/>
+      </context>
+
+      <context name="Label" attribute="Label" lineEndContext="#pop" fallthroughContext="#pop!EndLabel">
+        <DetectChar attribute="Label" context="Label2" char="."/>
+      </context>
+      <context name="Label2" attribute="Label" lineEndContext="#pop" fallthroughContext="#pop#pop!EndLabel">
+        <DetectIdentifier attribute="Label" context="#stay"/>
+        <DetectChar attribute="Label" context="#stay" char="."/>
+      </context>
+
+      <context name="LocalLabel" attribute="Local label" lineEndContext="#pop" fallthroughContext="#pop!EndLabel">
+        <DetectChar attribute="Local label" context="LocalLabel2" char="."/>
+      </context>
+      <context name="LocalLabel2" attribute="Local label" lineEndContext="#pop" fallthroughContext="#pop#pop!EndLabel">
+        <DetectIdentifier attribute="Local label" context="#stay"/>
+        <DetectChar attribute="Local label" context="#stay" char="."/>
+      </context>
+
+      <context name="EndLabel" attribute="Normal Text" lineEndContext="#pop" fallthroughContext="#pop">
+        <DetectChar attribute="Symbols" context="#stay" char=":"/>
+        <DetectSpaces attribute="Normal Text" context="#stay"/>
+        <keyword attribute="Instructions" context="#pop!Operation" String="Instructions"/>
+        <keyword attribute="Directives" context="#pop!Operation" String="Directives"/>
+        <DetectIdentifier attribute="Unknown Instructions" context="#pop!Operation"/>
+      </context>
+
+      <context name="SQ_String" attribute="String" lineEndContext="#pop">
+        <DetectChar attribute="String" context="#pop" char="'"/>
+        <DetectChar attribute="Char" context="Escape" char="\"/>
+      </context>
+
+      <context name="DQ_String" attribute="String" lineEndContext="#pop">
+        <DetectChar attribute="String" context="#pop" char="&quot;"/>
+        <DetectChar attribute="Char" context="Escape" char="\"/>
+      </context>
+
+      <context name="Escape" attribute="Char" lineEndContext="#pop" fallthroughContext="#pop">
+        <AnyChar attribute="Char" context="#pop" String="bfnrt\'"/>
       </context>
 
       <context name="Comment" attribute="Comment" lineEndContext="#pop">
-        <IncludeRules context="##Alerts" />
-        <IncludeRules context="##Modelines" />
+        <DetectSpaces attribute="Comment"/>
+        <IncludeRules context="##Alerts"/>
+        <IncludeRules context="##Modelines"/>
+        <DetectIdentifier attribute="Comment"/>
       </context>
 
-      <context name="String" attribute="String" lineEndContext="#pop">
-        <AnyChar attribute="String" context="#pop" String="&quot;'"/>
-      </context>
-
-      <context name="Constant" attribute="Constant" lineEndContext="#pop">
-        <RegExpr attribute="Constant" context="Operators" String="[0-9]+"/>
-        <RegExpr attribute="Constant" context="Operators" String="\$[A-Fa-f0-9]+"/>
-        <RegExpr attribute="Constant" context="Operators" String="@[0-7]+"/>
-        <RegExpr attribute="Constant" context="Operators" String="%[01]+"/>
-        <RegExpr attribute="Label" context="Operators" String="[A-Za-z_][A-Za-z_.0-9]*"/>
-        <RegExpr attribute="Local label" context="Operators" String="\.[A-Za-z_][A-Za-z_.0-9]*"/>
-        <RangeDetect attribute="Char" context="#pop" char="'"  char1="'"/>
-        <DetectChar attribute="Normal Text" char="," context="#pop"/>
-        <DetectSpaces attribute="Normal Text" context="#pop"/>
-        <DetectChar attribute="Normal Text" char="(" context="#stay"/>
-      </context>
-
-      <context name="Operators" attribute="Normal Text" lineEndContext="#pop">
-        <DetectChar attribute="Normal Text" char="|" context="#pop"/>
-        <DetectChar attribute="Normal Text" char="&amp;" context="#pop"/>
-        <DetectChar attribute="Normal Text" char="^" context="#pop"/>
-        <DetectChar attribute="Normal Text" char="*" context="#pop"/>
-        <DetectChar attribute="Normal Text" char="(" context="#pop"/>
-        <DetectChar attribute="Normal Text" char=")" context="#pop"/>
-        <DetectChar attribute="Normal Text" char="+" context="#pop"/>
-        <DetectChar attribute="Normal Text" char="-" context="#pop"/>
-        <DetectChar attribute="Normal Text" char="/" context="#pop"/>
-        <DetectChar attribute="Normal Text" char="~" context="#pop"/>
-        <DetectChar attribute="Normal Text" char="!" context="#pop"/>
-        <DetectChar attribute="Normal Text" char="%" context="#pop"/>
-        <Detect2Chars attribute="Normal Text" char="&lt;" char1="&lt;" context="#pop"/>
-        <Detect2Chars attribute="Normal Text" char="&gt;" char1="&gt;" context="#pop"/>
-        <DetectChar attribute="Normal Text" char="," context="#pop#pop"/>
-        <DetectSpaces attribute="Normal Text" context="#pop#pop"/>
-      </context>
-
-      <context name="Number16" attribute="BaseN" lineEndContext="#pop">
-        <RegExpr attribute="BaseN" context="#pop" String="[A-Fa-f0-9]+"/>
-      </context>
-
-      <context name="Number2" attribute="BaseN" lineEndContext="#pop">
-        <RegExpr attribute="BaseN" context="#pop" String="[01]+"/>
-      </context>
-
-      <context name="Number8" attribute="BaseN" lineEndContext="#pop">
-        <RegExpr attribute="BaseN" context="#pop" String="[0-7]+"/>
-      </context>
     </contexts>
 
     <itemDatas>
@@ -307,23 +437,29 @@
       <itemData name="Modifier Registers" defStyleNum="dsDataType"/>
       <itemData name="Control Registers" defStyleNum="dsDataType"/>
       <itemData name="Instructions" bold="true" defStyleNum="dsKeyword"/>
+      <itemData name="Unknown Instructions" defStyleNum="dsKeyword"/>
       <itemData name="Directives" bold="true" defStyleNum="dsControlFlow"/>
       <itemData name="Memory" bold="true" defStyleNum="dsOthers"/>
+      <itemData name="Functions" bold="true" defStyleNum="dsFunction"/>
       <!-- defined in contexts -->
       <itemData name="Comment" italic="false" defStyleNum="dsComment"/>
       <itemData name="Label" defStyleNum="dsFunction"/>
       <itemData name="Local label" defStyleNum="dsFunction"/>
       <itemData name="Constant" defStyleNum="dsConstant"/>
-      <itemData name="BaseN" defStyleNum="dsBaseN"/>
+      <itemData name="Octal" defStyleNum="dsBaseN"/>
+      <itemData name="Hex" defStyleNum="dsBaseN"/>
+      <itemData name="Binary" defStyleNum="dsBaseN"/>
       <itemData name="Float" defStyleNum="dsFloat"/>
       <itemData name="Number" defStyleNum="dsDecVal"/>
       <itemData name="Char" defStyleNum="dsChar"/>
       <itemData name="String" defStyleNum="dsString"/>
+      <itemData name="Symbol Separator" defStyleNum="dsOperator"/>
+      <itemData name="Symbols" defStyleNum="dsOperator"/>
     </itemDatas>
   </highlighting>
 
   <general>
-    <keywords casesensitive="0"/>
+    <keywords casesensitive="0" weakDeliminator="@"/>
     <comments>
       <comment name="singleLine" start=";"/>
     </comments>

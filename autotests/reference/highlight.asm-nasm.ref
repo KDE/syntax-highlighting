@@ -2,26 +2,522 @@
 <Comment>; compile with `nasm example.asm -f elf -o example.o`</Comment><br/>
 <Comment>; and link with 'gcc example.o -o example`</Comment><br/>
 <Comment>; Public domain</Comment><br/>
-<Comment>; kate: hl Intel x86 (NASM);</Comment><br/>
+<Comment>; </Comment><Keyword>kate:</Keyword><Comment> </Comment><Variable>hl</Variable><String> Intel x86 (NASM)</String><Variable>;</Variable><br/>
 <Normal Text></Normal Text><br/>
-<NASM Keywords>section</NASM Keywords><Normal Text> .data</Normal Text><br/>
+<NASM Keywords>section</NASM Keywords><Normal Text> </Normal Text><Label>.data</Label><br/>
 <Normal Text></Normal Text><br/>
-<Normal Text>hello </Normal Text><Data>dd</Data><Normal Text> </Normal Text><String>'Hello World'</String><BaseN>, 0x0A, </BaseN><Number>0</Number><Normal Text>h</Normal Text><br/>
-<Normal Text>printf_param </Normal Text><Data>dd</Data><Normal Text> </Normal Text><String>'%s'</String><BaseN>, 0q</BaseN><br/>
+<Unknown Instructions>hello</Unknown Instructions><Normal Text> </Normal Text><Data>dd</Data><Normal Text> </Normal Text><String>'Hello World'</String><Symbol>,</Symbol><Normal Text> </Normal Text><Radix>0x</Radix><BaseN>0A</BaseN><Symbol>,</Symbol><Normal Text> </Normal Text><BaseN>0</BaseN><Radix>h</Radix><br/>
+<Unknown Instructions>printf_param</Unknown Instructions><Normal Text> </Normal Text><Data>dd</Data><Normal Text> </Normal Text><String>'%s'</String><Symbol>,</Symbol><Normal Text> </Normal Text><BaseN>0</BaseN><Radix>q</Radix><br/>
 <Normal Text></Normal Text><br/>
-<NASM Keywords>section</NASM Keywords><Normal Text> .text</Normal Text><br/>
+<NASM Keywords>section</NASM Keywords><Normal Text> </Normal Text><Label>.text</Label><br/>
 <Normal Text></Normal Text><br/>
 <NASM Keywords>extern</NASM Keywords><Normal Text> printf</Normal Text><br/>
 <Normal Text></Normal Text><br/>
 <NASM Keywords>global</NASM Keywords><Normal Text> main</Normal Text><br/>
 <Label>main:</Label><br/>
 <Normal Text>	</Normal Text><Instructions>push</Instructions><Normal Text> </Normal Text><Registers>ebp</Registers><br/>
-<Normal Text>	</Normal Text><Instructions>mov</Instructions><Normal Text> </Normal Text><Registers>ebp</Registers><Normal Text>, </Normal Text><Registers>esp</Registers><br/>
+<Normal Text>	</Normal Text><Instructions>mov</Instructions><Normal Text> </Normal Text><Registers>ebp</Registers><Symbol>,</Symbol><Normal Text> </Normal Text><Registers>esp</Registers><br/>
 <Normal Text>	</Normal Text><br/>
 <Normal Text>	</Normal Text><Instructions>push</Instructions><Normal Text> hello</Normal Text><br/>
 <Normal Text>	</Normal Text><Instructions>push</Instructions><Normal Text> printf_param</Normal Text><br/>
-<Normal Text>	</Normal Text><Instructions>call</Instructions><Normal Text> printf</Normal Text><br/>
+<Normal Text>	</Normal Text><Branch Instructions>call</Branch Instructions><Normal Text> printf</Normal Text><br/>
 <Normal Text>	</Normal Text><br/>
-<Normal Text>	</Normal Text><Instructions>mov</Instructions><Normal Text> </Normal Text><Registers>eax</Registers><BaseN>, 0b</BaseN><br/>
+<Normal Text>	</Normal Text><Instructions>mov</Instructions><Normal Text> </Normal Text><Registers>eax</Registers><Symbol>,</Symbol><Normal Text> </Normal Text><BaseN>0</BaseN><Radix>b</Radix><br/>
 <Normal Text>	</Normal Text><Instructions>leave</Instructions><br/>
-<Normal Text>	</Normal Text><Instructions>ret</Instructions><br/>
+<Normal Text>	</Normal Text><Branch Instructions>ret</Branch Instructions><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Unknown Instructions>NULL</Unknown Instructions><Normal Text>              </Normal Text><Data>EQU</Data><Normal Text> </Normal Text><Number>0</Number><Normal Text>                         </Normal Text><Comment>; Constants</Comment><br/>
+<Unknown Instructions>STD_OUTPUT_HANDLE</Unknown Instructions><Normal Text> </Normal Text><Data>EQU</Data><Normal Text> </Normal Text><Symbol>-</Symbol><Number>11</Number><br/>
+<Normal Text></Normal Text><br/>
+<NASM Keywords>extern</NASM Keywords><Normal Text> GetStdHandle                             </Normal Text><Comment>; Import external symbols</Comment><br/>
+<Normal Text></Normal Text><br/>
+<NASM Keywords>global</NASM Keywords><Normal Text> Start                                    </Normal Text><Comment>; Export symbols. The entry point</Comment><br/>
+<Normal Text></Normal Text><br/>
+<NASM Keywords>section</NASM Keywords><Normal Text> </Normal Text><Label>.data</Label><Normal Text>                                   </Normal Text><Comment>; Initialized data segment</Comment><br/>
+<Normal Text> </Normal Text><Unknown Instructions>Message</Unknown Instructions><Normal Text>        </Normal Text><Data>db</Data><Normal Text> </Normal Text><String>"Console Message 64"</String><Symbol>,</Symbol><Normal Text> </Normal Text><BaseN>0D</BaseN><Radix>h</Radix><Symbol>,</Symbol><Normal Text> </Normal Text><BaseN>0A</BaseN><Radix>h</Radix><br/>
+<Normal Text> </Normal Text><Unknown Instructions>MessageLength</Unknown Instructions><Normal Text>  </Normal Text><Data>EQU</Data><Normal Text> </Normal Text><Symbol>$-</Symbol><Normal Text>Message                   </Normal Text><Comment>; Address of this line ($) - address of Message</Comment><br/>
+<Normal Text></Normal Text><br/>
+<NASM Keywords>section</NASM Keywords><Normal Text> </Normal Text><Label>.bss</Label><Normal Text>                                    </Normal Text><Comment>; Uninitialized data segment</Comment><br/>
+<NASM Keywords>alignb</NASM Keywords><Normal Text> </Normal Text><Number>8</Number><br/>
+<Normal Text> </Normal Text><Unknown Instructions>Written</Unknown Instructions><Normal Text>        </Normal Text><Data>resq</Data><Normal Text> </Normal Text><Number>1</Number><br/>
+<Normal Text></Normal Text><br/>
+<NASM Keywords>section</NASM Keywords><Normal Text> </Normal Text><Label>.text</Label><Normal Text>                                   </Normal Text><Comment>; Code segment</Comment><br/>
+<Label>Start:</Label><br/>
+<Normal Text> </Normal Text><Instructions>sub</Instructions><Normal Text>   </Normal Text><Registers>RSP</Registers><Symbol>,</Symbol><Normal Text> </Normal Text><Number>8</Number><Normal Text>                                   </Normal Text><Comment>; Align the stack to a multiple of 16 bytes</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text> </Normal Text><Instructions>mov</Instructions><Normal Text>   </Normal Text><Registers>ECX</Registers><Symbol>,</Symbol><Normal Text> STD_OUTPUT_HANDLE</Normal Text><br/>
+<Normal Text> </Normal Text><Branch Instructions>call</Branch Instructions><Normal Text>  GetStdHandle</Normal Text><br/>
+<Normal Text> </Normal Text><Instructions>mov</Instructions><Normal Text>   </Normal Text><Data>qword</Data><Normal Text> </Normal Text><Symbol>[</Symbol><NASM Keywords>REL</NASM Keywords><Normal Text> StandardHandle</Normal Text><Symbol>],</Symbol><Normal Text> </Normal Text><Registers>RAX</Registers><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text> </Normal Text><Instructions>sub</Instructions><Normal Text>   </Normal Text><Registers>RSP</Registers><Symbol>,</Symbol><Normal Text> </Normal Text><Number>32</Number><Normal Text> </Normal Text><Symbol>+</Symbol><Normal Text> </Normal Text><Number>8</Number><Normal Text> </Normal Text><Symbol>+</Symbol><Normal Text> </Normal Text><Number>8</Number><Normal Text>                          </Normal Text><Comment>; Shadow space + 5th parameter + align stack</Comment><br/>
+<Normal Text>                                                </Normal Text><Comment>; to a multiple of 16 bytes</Comment><br/>
+<Normal Text> </Normal Text><Instructions>mov</Instructions><Normal Text>   </Normal Text><Registers>RCX</Registers><Symbol>,</Symbol><Normal Text> </Normal Text><Data>qword</Data><Normal Text> </Normal Text><Symbol>[</Symbol><NASM Keywords>REL</NASM Keywords><Normal Text> StandardHandle</Normal Text><Symbol>]</Symbol><Normal Text>          </Normal Text><Comment>; 1st parameter</Comment><br/>
+<Normal Text> </Normal Text><Instructions>lea</Instructions><Normal Text>   </Normal Text><Registers>RDX</Registers><Symbol>,</Symbol><Normal Text> </Normal Text><Symbol>[</Symbol><NASM Keywords>REL</NASM Keywords><Normal Text> Message</Normal Text><Symbol>]</Symbol><Normal Text>                       </Normal Text><Comment>; 2nd parameter</Comment><br/>
+<Normal Text> </Normal Text><Instructions>mov</Instructions><Normal Text>   </Normal Text><Registers>R8</Registers><Symbol>,</Symbol><Normal Text> MessageLength                        </Normal Text><Comment>; 3rd parameter</Comment><br/>
+<Normal Text> </Normal Text><Instructions>mov</Instructions><Normal Text>   </Normal Text><Data>qword</Data><Normal Text> </Normal Text><Symbol>[</Symbol><Registers>RSP</Registers><Normal Text> </Normal Text><Symbol>+</Symbol><Normal Text> </Normal Text><Number>4</Number><Normal Text> </Normal Text><Symbol>*</Symbol><Normal Text> </Normal Text><Number>8</Number><Symbol>],</Symbol><Normal Text> NULL                </Normal Text><Comment>; 5th parameter</Comment><br/>
+<Normal Text>                                                </Normal Text><Comment>; Message Box, 64 bit. V1.02</Comment><br/>
+<Label>.DisplayMessageBox:</Label><br/>
+<Normal Text> </Normal Text><Instructions>xor</Instructions><Normal Text>   </Normal Text><Registers>ECX</Registers><Symbol>,</Symbol><Normal Text> </Normal Text><Registers>ECX</Registers><Normal Text>                                 </Normal Text><Comment>; 1st parameter</Comment><br/>
+<Normal Text> </Normal Text><Instructions>lea</Instructions><Normal Text>   </Normal Text><Registers>RDX</Registers><Symbol>,</Symbol><Normal Text> </Normal Text><Symbol>[</Symbol><NASM Keywords>REL</NASM Keywords><Normal Text> MessageBoxText</Normal Text><Symbol>]</Symbol><Normal Text>                </Normal Text><Comment>; 2nd parameter</Comment><br/>
+<Normal Text> </Normal Text><Instructions>lea</Instructions><Normal Text>   </Normal Text><Registers>R8</Registers><Symbol>,</Symbol><Normal Text> </Normal Text><Symbol>[</Symbol><NASM Keywords>REL</NASM Keywords><Normal Text> MessageBoxCaption</Normal Text><Symbol>]</Symbol><Normal Text>              </Normal Text><Comment>; 3rd parameter</Comment><br/>
+<Normal Text> </Normal Text><Instructions>mov</Instructions><Normal Text>   </Normal Text><Registers>R9D</Registers><Symbol>,</Symbol><Normal Text> MB_YESNO </Normal Text><Symbol>|</Symbol><Normal Text> MB_DEFBUTTON2            </Normal Text><Comment>; 4th parameter. 2 constants ORed together</Comment><br/>
+<Normal Text> </Normal Text><Branch Instructions>call</Branch Instructions><Normal Text>  MessageBoxA</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text> </Normal Text><Instructions>cmp</Instructions><Normal Text>   </Normal Text><Registers>RAX</Registers><Symbol>,</Symbol><Normal Text> IDNO                                </Normal Text><Comment>; Check the return value for "No"</Comment><br/>
+<Normal Text> </Normal Text><Branch Instructions>je</Branch Instructions><Normal Text>    </Normal Text><Label>.DisplayMessageBox</Label><br/>
+<Normal Text></Normal Text><br/>
+<NASM Keywords>extern</NASM Keywords><Normal Text> _GetStdHandle@4                          </Normal Text><Comment>; Import external symbols</Comment><br/>
+<Label>Start:</Label><br/>
+<Normal Text> </Normal Text><Branch Instructions>call</Branch Instructions><Normal Text>  _WriteFile@20</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<NASM Keywords>section</NASM Keywords><Normal Text> </Normal Text><Label>.data</Label><Normal Text>                                   </Normal Text><Comment>; Initialized data segment</Comment><br/>
+<Normal Text> </Normal Text><Unknown Instructions>Static1Colour</Unknown Instructions><Normal Text>    </Normal Text><Data>dd</Data><Normal Text> </Normal Text><BaseN>0F0F0F0</BaseN><Radix>h</Radix><Symbol>,</Symbol><br/>
+<Normal Text> </Normal Text><Unknown Instructions>Edit2</Unknown Instructions><Normal Text>            </Normal Text><Data>resq</Data><Normal Text> </Normal Text><Number>1</Number><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>Screen</Unknown Instructions><Symbol>.</Symbol><Unknown Instructions>Width</Unknown Instructions><Normal Text>       </Normal Text><Registers>RBP</Registers><Normal Text> </Normal Text><Symbol>-</Symbol><Normal Text> </Normal Text><Number>160</Number><Normal Text>            </Normal Text><Comment>; 4 bytes</Comment><br/>
+<Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>ClientArea</Unknown Instructions><Normal Text>         </Normal Text><Registers>RBP</Registers><Normal Text> </Normal Text><Symbol>-</Symbol><Normal Text> </Normal Text><Number>152</Number><Normal Text>            </Normal Text><Comment>; RECT structure. 16 bytes</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text> </Normal Text><Instructions>mov</Instructions><Normal Text>   </Normal Text><Data>dword</Data><Normal Text> </Normal Text><Symbol>[</Symbol><Normal Text>wc</Normal Text><Symbol>.</Symbol><Normal Text>cbSize</Normal Text><Symbol>],</Symbol><Normal Text> </Normal Text><Number>80</Number><Normal Text>                    </Normal Text><Comment>; [RBP - 136]</Comment><br/>
+<Normal Text> </Normal Text><Instructions>mov</Instructions><Normal Text>   </Normal Text><Data>dword</Data><Normal Text> </Normal Text><Symbol>[</Symbol><Normal Text>wc</Normal Text><Symbol>.</Symbol><Normal Text>style</Normal Text><Symbol>],</Symbol><Normal Text> CS_HREDRAW </Normal Text><Symbol>|</Symbol><Normal Text> CS_VREDRAW </Normal Text><Symbol>|</Symbol><Normal Text> CS_BYTEALIGNWINDOW  </Normal Text><Comment>; [RBP - 132]</Comment><br/>
+<Normal Text> </Normal Text><Instructions>mov</Instructions><Normal Text>   </Normal Text><Data>qword</Data><Normal Text> </Normal Text><Symbol>[</Symbol><Normal Text>wc</Normal Text><Symbol>.</Symbol><Normal Text>lpfnWndProc</Normal Text><Symbol>],</Symbol><Normal Text> </Normal Text><Registers>RAX</Registers><Normal Text>              </Normal Text><Comment>; [RBP - 128]</Comment><br/>
+<Normal Text> </Normal Text><Instructions>mov</Instructions><Normal Text>   </Normal Text><Data>qword</Data><Normal Text> </Normal Text><Symbol>[</Symbol><Normal Text>wc</Normal Text><Symbol>.</Symbol><Normal Text>hIcon</Normal Text><Symbol>],</Symbol><Normal Text> </Normal Text><Registers>RAX</Registers><Normal Text>                    </Normal Text><Comment>; [RBP - 104]</Comment><br/>
+<Normal Text> </Normal Text><Instructions>mov</Instructions><Normal Text>   </Normal Text><Data>dword</Data><Normal Text> </Normal Text><Symbol>[</Symbol><Registers>RSP</Registers><Normal Text> </Normal Text><Symbol>+</Symbol><Normal Text> </Normal Text><Number>4</Number><Normal Text> </Normal Text><Symbol>*</Symbol><Normal Text> </Normal Text><Number>8</Number><Symbol>],</Symbol><Normal Text> </Normal Text><Registers>EAX</Registers><Normal Text>                 </Normal Text><Comment>; X position, now centred</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text> </Normal Text><Instructions>cmp</Instructions><Normal Text>   </Normal Text><Data>qword</Data><Normal Text> </Normal Text><Symbol>[</Symbol><Normal Text>uMsg</Normal Text><Symbol>],</Symbol><Normal Text> WM_CLOSE                   </Normal Text><Comment>; [RBP + 24]</Comment><br/>
+<Normal Text> </Normal Text><Branch Instructions>je</Branch Instructions><Normal Text>    WMCLOSE</Normal Text><br/>
+<Normal Text> </Normal Text><Branch Instructions>call</Branch Instructions><Normal Text>  DestroyWindow                            </Normal Text><Comment>; Send a WM_DESTROY message</Comment><br/>
+<Normal Text> </Normal Text><Branch Instructions>jmp</Branch Instructions><Normal Text>   Return</Normal Text><Symbol>.</Symbol><Normal Text>WM_Processed</Normal Text><br/>
+<Normal Text> </Normal Text><Instructions>mov</Instructions><Normal Text>   </Normal Text><Registers>EDX</Registers><Symbol>,</Symbol><Normal Text> </Normal Text><BaseN>0604060</BaseN><Radix>h</Radix><br/>
+<Normal Text> </Normal Text><Branch Instructions>call</Branch Instructions><Normal Text>  SetBkColor</Normal Text><br/>
+<Normal Text> </Normal Text><Instructions>mov</Instructions><Normal Text>   </Normal Text><Registers>EDX</Registers><Symbol>,</Symbol><Normal Text> </Normal Text><BaseN>0005000</BaseN><Radix>h</Radix><br/>
+<Normal Text></Normal Text><br/>
+<Data>db</Data><Normal Text> </Normal Text><Radix>0x</Radix><BaseN>55</BaseN><Normal Text> </Normal Text><Comment>; just the byte 0x55</Comment><br/>
+<Data>db</Data><Normal Text> </Normal Text><Radix>0x</Radix><BaseN>55</BaseN><Symbol>,</Symbol><Radix>0x</Radix><BaseN>56</BaseN><Symbol>,</Symbol><Radix>0x</Radix><BaseN>57</BaseN><Normal Text> </Normal Text><Comment>; three bytes in succession</Comment><br/>
+<Data>db</Data><Normal Text> </Normal Text><String>'a'</String><Symbol>,</Symbol><Radix>0x</Radix><BaseN>55</BaseN><Normal Text> </Normal Text><Comment>; character constants are OK</Comment><br/>
+<Data>db</Data><Normal Text> </Normal Text><String>'hello'</String><Symbol>,</Symbol><Number>13</Number><Symbol>,</Symbol><Number>10</Number><Symbol>,</Symbol><String>'$'</String><Normal Text> </Normal Text><Comment>; so are string constants</Comment><br/>
+<Data>dw</Data><Normal Text> </Normal Text><Radix>0x</Radix><BaseN>1234</BaseN><Normal Text> </Normal Text><Comment>; 0x34 0x12</Comment><br/>
+<Data>dw</Data><Normal Text> </Normal Text><String>'a'</String><Normal Text> </Normal Text><Comment>; 0x61 0x00 (it's just a number)</Comment><br/>
+<Data>dw</Data><Normal Text> </Normal Text><String>'ab'</String><Normal Text> </Normal Text><Comment>; 0x61 0x62 (character constant)</Comment><br/>
+<Data>dw</Data><Normal Text> </Normal Text><String>'abc'</String><Normal Text> </Normal Text><Comment>; 0x61 0x62 0x63 0x00 (string)</Comment><br/>
+<Data>dd</Data><Normal Text> </Normal Text><Radix>0x</Radix><BaseN>12345678</BaseN><Normal Text> </Normal Text><Comment>; 0x78 0x56 0x34 0x12</Comment><br/>
+<Data>dd</Data><Normal Text> </Normal Text><Float>1.234567e20</Float><Normal Text> </Normal Text><Comment>; floating-point constant</Comment><br/>
+<Data>dq</Data><Normal Text> </Normal Text><Radix>0x</Radix><BaseN>123456789abcdef0</BaseN><Normal Text> </Normal Text><Comment>; eight byte constant</Comment><br/>
+<Data>dq</Data><Normal Text> </Normal Text><Float>1.234567e20</Float><Normal Text> </Normal Text><Comment>; double-precision float</Comment><br/>
+<Data>dt</Data><Normal Text> </Normal Text><Float>1.234567e20</Float><Normal Text> </Normal Text><Comment>; extended-precision float</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Data>db</Data><Normal Text> </Normal Text><Number>33</Number><br/>
+<Data>db</Data><Normal Text> </Normal Text><Symbol>(</Symbol><Number>44</Number><Symbol>)</Symbol><Normal Text>               </Normal Text><Comment>; Integer expression</Comment><br/>
+<Comment>; db (44,55)            ; Invalid - error</Comment><br/>
+<Data>db</Data><Normal Text> </Normal Text><Symbol>%(</Symbol><Number>44</Number><Symbol>,</Symbol><Number>55</Number><Symbol>)</Symbol><br/>
+<Data>db</Data><Normal Text> </Normal Text><Symbol>%(</Symbol><String>'XX'</String><Symbol>,</Symbol><String>'YY'</String><Symbol>)</Symbol><br/>
+<Data>db</Data><Normal Text> </Normal Text><Symbol>(</Symbol><String>'AA'</String><Symbol>)</Symbol><Normal Text>             </Normal Text><Comment>; Integer expression - outputs single byte</Comment><br/>
+<Data>db</Data><Normal Text> </Normal Text><Symbol>%(</Symbol><String>'BB'</String><Symbol>)</Symbol><Normal Text>            </Normal Text><Comment>; List, containing a string</Comment><br/>
+<Data>db</Data><Normal Text> </Normal Text><Symbol>?</Symbol><br/>
+<Data>db</Data><Normal Text> </Normal Text><Number>6</Number><Normal Text> dup </Normal Text><Symbol>(</Symbol><Number>33</Number><Symbol>)</Symbol><br/>
+<Data>db</Data><Normal Text> </Normal Text><Number>6</Number><Normal Text> dup </Normal Text><Symbol>(</Symbol><Number>33</Number><Symbol>,</Symbol><Normal Text> </Normal Text><Number>34</Number><Symbol>)</Symbol><br/>
+<Data>db</Data><Normal Text> </Normal Text><Number>6</Number><Normal Text> dup </Normal Text><Symbol>(</Symbol><Number>33</Number><Symbol>,</Symbol><Normal Text> </Normal Text><Number>34</Number><Symbol>),</Symbol><Normal Text> </Normal Text><Number>35</Number><br/>
+<Data>db</Data><Normal Text> </Normal Text><Number>7</Number><Normal Text> dup </Normal Text><Symbol>(</Symbol><Number>99</Number><Symbol>)</Symbol><br/>
+<Data>db</Data><Normal Text> </Normal Text><Number>7</Number><Normal Text> dup </Normal Text><Data>dword</Data><Normal Text> </Normal Text><Symbol>(?,</Symbol><Normal Text> </Normal Text><Data>word</Data><Normal Text> </Normal Text><Symbol>?,</Symbol><Normal Text> </Normal Text><Symbol>?)</Symbol><br/>
+<Data>dw</Data><Normal Text> </Normal Text><Data>byte</Data><Normal Text> </Normal Text><Symbol>(?,</Symbol><Number>44</Number><Symbol>)</Symbol><br/>
+<Data>dw</Data><Normal Text> </Normal Text><Number>3</Number><Normal Text> dup </Normal Text><Symbol>(</Symbol><Radix>0x</Radix><BaseN>cc</BaseN><Symbol>,</Symbol><Normal Text> </Normal Text><Number>4</Number><Normal Text> dup </Normal Text><Data>byte</Data><Normal Text> </Normal Text><Symbol>(</Symbol><String>'PQR'</String><Symbol>),</Symbol><Normal Text> </Normal Text><Symbol>?),</Symbol><Normal Text> </Normal Text><Radix>0x</Radix><BaseN>abcd</BaseN><br/>
+<Data>dd</Data><Normal Text> </Normal Text><Number>16</Number><Normal Text> dup </Normal Text><Symbol>(</Symbol><Radix>0x</Radix><BaseN>aaaa</BaseN><Symbol>,</Symbol><Normal Text> </Normal Text><Symbol>?,</Symbol><Normal Text> </Normal Text><Radix>0x</Radix><BaseN>bbbbbb</BaseN><Symbol>)</Symbol><br/>
+<Data>dd</Data><Normal Text> </Normal Text><Number>64</Number><Normal Text> dup </Normal Text><Symbol>(?)</Symbol><br/>
+<Data>db</Data><Normal Text> </Normal Text><String>`</String><Char>\u263a</Char><String>`</String><Normal Text>            </Normal Text><Comment>; UTF-8 smiley face</Comment><br/>
+<Data>db</Data><Normal Text> </Normal Text><String>`</String><Char>\xe2\x98\xba</Char><String>`</String><Normal Text>      </Normal Text><Comment>; UTF-8 smiley face</Comment><br/>
+<Data>db</Data><Normal Text> </Normal Text><BaseN>0E2</BaseN><Radix>h</Radix><Symbol>,</Symbol><Normal Text> </Normal Text><BaseN>098</BaseN><Radix>h</Radix><Symbol>,</Symbol><Normal Text> </Normal Text><BaseN>0BA</BaseN><Radix>h</Radix><Normal Text>    </Normal Text><Comment>; UTF-8 smiley face</Comment><br/>
+<Label>buffer:</Label><Normal Text>         </Normal Text><Data>resb</Data><Normal Text>    </Normal Text><Number>64</Number><Normal Text>              </Normal Text><Comment>; reserve 64 bytes </Comment><br/>
+<Label>wordvar:</Label><Normal Text>        </Normal Text><Data>resw</Data><Normal Text>    </Normal Text><Number>1</Number><Normal Text>               </Normal Text><Comment>; reserve a word </Comment><br/>
+<Label>buffer:</Label><Normal Text>         </Normal Text><Data>db</Data><Normal Text>      </Normal Text><Number>64</Number><Normal Text> dup </Normal Text><Symbol>(?)</Symbol><Normal Text>      </Normal Text><Comment>; reserve 64 bytes </Comment><br/>
+<Label>wordvar:</Label><Normal Text>        </Normal Text><Data>dw</Data><Normal Text>      </Normal Text><Symbol>?</Symbol><Normal Text>               </Normal Text><Comment>; reserve a word </Comment><br/>
+<Normal Text></Normal Text><br/>
+<Data>incbin</Data><Normal Text>  </Normal Text><String>"file.dat"</String><Normal Text>             </Normal Text><Comment>; include the whole file</Comment><br/>
+<Data>incbin</Data><Normal Text>  </Normal Text><String>"file.dat"</String><Symbol>,</Symbol><Number>1024</Number><Normal Text>        </Normal Text><Comment>; skip the first 1024 bytes</Comment><br/>
+<Data>incbin</Data><Normal Text>  </Normal Text><String>"file.dat"</String><Symbol>,</Symbol><Number>1024</Number><Symbol>,</Symbol><Number>512</Number><Normal Text>    </Normal Text><Comment>; skip the first 1024, and</Comment><br/>
+<Normal Text>                               </Normal Text><Comment>; actually include at most 512</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Unknown Instructions>message</Unknown Instructions><Normal Text>         </Normal Text><Data>db</Data><Normal Text>      </Normal Text><String>'hello, world'</String><Normal Text> </Normal Text><br/>
+<Unknown Instructions>msglen</Unknown Instructions><Normal Text>          </Normal Text><Data>equ</Data><Normal Text>     </Normal Text><Symbol>$-</Symbol><Normal Text>message</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Label>buffer:</Label><Normal Text> </Normal Text><Data>db</Data><Normal Text>      </Normal Text><String>'hello, world'</String><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Data>times</Data><Normal Text> </Normal Text><Number>64</Number><Symbol>-$+</Symbol><Normal Text>buffer </Normal Text><Data>db</Data><Normal Text> </Normal Text><String>' '</String><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>     </Normal Text><Instructions>bndstx</Instructions><Normal Text> </Normal Text><Symbol>[</Symbol><Registers>rbx</Registers><Symbol>*</Symbol><Number>1</Number><Symbol>+</Symbol><Registers>rax</Registers><Symbol>+</Symbol><Radix>0x</Radix><BaseN>3</BaseN><Symbol>],</Symbol><Normal Text> bnd0    </Normal Text><Comment>; GAS - '*1' indecates an index reg</Comment><br/>
+<Normal Text>     </Normal Text><Instructions>VDIVPS</Instructions><Normal Text> </Normal Text><Registers>zmm4</Registers><Symbol>,</Symbol><Normal Text> </Normal Text><Registers>zmm5</Registers><Symbol>,</Symbol><Normal Text> </Normal Text><Data>dword</Data><Normal Text> </Normal Text><Symbol>[</Symbol><Registers>rbx</Registers><Symbol>]{</Symbol><Number>1to16</Number><Symbol>}</Symbol><Normal Text>   </Normal Text><Comment>; single-precision float </Comment><br/>
+<Normal Text>     </Normal Text><Instructions>VDIVPS</Instructions><Normal Text> </Normal Text><Registers>zmm4</Registers><Symbol>,</Symbol><Normal Text> </Normal Text><Registers>zmm5</Registers><Symbol>,</Symbol><Normal Text> </Normal Text><Data>zword</Data><Normal Text> </Normal Text><Symbol>[</Symbol><Registers>rbx</Registers><Symbol>]</Symbol><Normal Text>          </Normal Text><Comment>; packed 512 bit memory</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>ax</Registers><Symbol>,</Symbol><Number>200</Number><Normal Text>          </Normal Text><Comment>; decimal</Comment><br/>
+<Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>ax</Registers><Symbol>,</Symbol><Number>0200</Number><Normal Text>         </Normal Text><Comment>; still decimal</Comment><br/>
+<Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>ax</Registers><Symbol>,</Symbol><Number>0200</Number><Radix>d</Radix><Normal Text>        </Normal Text><Comment>; explicitly decimal</Comment><br/>
+<Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>ax</Registers><Symbol>,</Symbol><Radix>0d</Radix><Number>200</Number><Normal Text>        </Normal Text><Comment>; also decimal</Comment><br/>
+<Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>ax</Registers><Symbol>,</Symbol><BaseN>0c8</BaseN><Radix>h</Radix><Normal Text>         </Normal Text><Comment>; hex</Comment><br/>
+<Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>ax</Registers><Symbol>,$</Symbol><BaseN>0c8</BaseN><Normal Text>         </Normal Text><Comment>; hex again: the 0 is required</Comment><br/>
+<Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>ax</Registers><Symbol>,</Symbol><Radix>0x</Radix><BaseN>c8</BaseN><Normal Text>         </Normal Text><Comment>; hex yet again</Comment><br/>
+<Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>ax</Registers><Symbol>,</Symbol><Radix>0h</Radix><BaseN>c8</BaseN><Normal Text>         </Normal Text><Comment>; still hex</Comment><br/>
+<Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>ax</Registers><Symbol>,</Symbol><BaseN>310</BaseN><Radix>q</Radix><Normal Text>         </Normal Text><Comment>; octal</Comment><br/>
+<Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>ax</Registers><Symbol>,</Symbol><BaseN>310</BaseN><Radix>o</Radix><Normal Text>         </Normal Text><Comment>; octal again</Comment><br/>
+<Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>ax</Registers><Symbol>,</Symbol><Radix>0o</Radix><BaseN>310</BaseN><Normal Text>        </Normal Text><Comment>; octal yet again</Comment><br/>
+<Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>ax</Registers><Symbol>,</Symbol><Radix>0q</Radix><BaseN>310</BaseN><Normal Text>        </Normal Text><Comment>; octal yet again</Comment><br/>
+<Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>ax</Registers><Symbol>,</Symbol><BaseN>11001000</BaseN><Radix>b</Radix><Normal Text>    </Normal Text><Comment>; binary</Comment><br/>
+<Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>ax</Registers><Symbol>,</Symbol><BaseN>1100_1000</BaseN><Radix>b</Radix><Normal Text>   </Normal Text><Comment>; same binary constant</Comment><br/>
+<Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>ax</Registers><Symbol>,</Symbol><BaseN>1100_1000</BaseN><Radix>y</Radix><Normal Text>   </Normal Text><Comment>; same binary constant once more</Comment><br/>
+<Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>ax</Registers><Symbol>,</Symbol><Radix>0b</Radix><BaseN>1100_1000</BaseN><Normal Text>  </Normal Text><Comment>; same binary constant yet again</Comment><br/>
+<Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>ax</Registers><Symbol>,</Symbol><Radix>0y</Radix><BaseN>1100_1000</BaseN><Normal Text>  </Normal Text><Comment>; same binary constant yet again</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>u</Unknown Instructions><Symbol>(</Symbol><Normal Text>x</Normal Text><Symbol>)</Symbol><Normal Text> </Normal Text><NASM Keywords>__?utf16?__</NASM Keywords><Symbol>(</Symbol><Normal Text>x</Normal Text><Symbol>)</Symbol><Normal Text> </Normal Text><br/>
+<Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>w</Unknown Instructions><Symbol>(</Symbol><Normal Text>x</Normal Text><Symbol>)</Symbol><Normal Text> </Normal Text><NASM Keywords>__?utf32?__</NASM Keywords><Symbol>(</Symbol><Normal Text>x</Normal Text><Symbol>)</Symbol><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Data>dw</Data><Normal Text> u</Normal Text><Symbol>(</Symbol><String>'C:\WINDOWS'</String><Symbol>),</Symbol><Normal Text> </Normal Text><Number>0</Number><Normal Text>       </Normal Text><Comment>; Pathname in UTF-16</Comment><br/>
+<Data>dd</Data><Normal Text> w</Normal Text><Symbol>(</Symbol><String>`A + B = </String><Char>\u206a</Char><String>`</String><Symbol>),</Symbol><Normal Text> </Normal Text><Number>0</Number><Normal Text>   </Normal Text><Comment>; String in UTF-32</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Data>db</Data><Normal Text>    </Normal Text><Symbol>-</Symbol><Float>0.2</Float><Normal Text>                    </Normal Text><Comment>; "Quarter precision"</Comment><br/>
+<Data>dw</Data><Normal Text>    </Normal Text><Symbol>-</Symbol><Float>0.5</Float><Normal Text>                    </Normal Text><Comment>; IEEE 754r/SSE5 half precision</Comment><br/>
+<Data>dd</Data><Normal Text>    </Normal Text><Float>1.2</Float><Normal Text>                     </Normal Text><Comment>; an easy one</Comment><br/>
+<Data>dd</Data><Normal Text>    </Normal Text><Float>1.222_222_222</Float><Normal Text>           </Normal Text><Comment>; underscores are permitted</Comment><br/>
+<Data>dd</Data><Normal Text>    </Normal Text><Float>0x1p+2</Float><Normal Text>                  </Normal Text><Comment>; 1.0x2^2 = 4.0</Comment><br/>
+<Data>dq</Data><Normal Text>    </Normal Text><Float>0x1p+32</Float><Normal Text>                 </Normal Text><Comment>; 1.0x2^32 = 4 294 967 296.0</Comment><br/>
+<Data>dq</Data><Normal Text>    </Normal Text><Float>1.e10</Float><Normal Text>                   </Normal Text><Comment>; 10 000 000 000.0</Comment><br/>
+<Data>dq</Data><Normal Text>    </Normal Text><Float>1.e+10</Float><Normal Text>                  </Normal Text><Comment>; synonymous with 1.e10</Comment><br/>
+<Data>dq</Data><Normal Text>    </Normal Text><Float>1.e-10</Float><Normal Text>                  </Normal Text><Comment>; 0.000 000 000 1</Comment><br/>
+<Data>dt</Data><Normal Text>    </Normal Text><Float>3.141592653589793238462</Float><Normal Text> </Normal Text><Comment>; pi</Comment><br/>
+<Data>do</Data><Normal Text>    </Normal Text><Float>1.e+4000</Float><Normal Text>                </Normal Text><Comment>; IEEE 754r quad precision</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Instructions>mov</Instructions><Normal Text>    </Normal Text><Registers>rax</Registers><Symbol>,</Symbol><NASM Keywords>__?float64?__</NASM Keywords><Symbol>(</Symbol><Float>3.141592653589793238462</Float><Symbol>)</Symbol><br/>
+<Instructions>mov</Instructions><Normal Text>    </Normal Text><Registers>rax</Registers><Symbol>,</Symbol><Radix>0x</Radix><BaseN>400921fb54442d18</BaseN><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>Inf</Unknown Instructions><Normal Text> </Normal Text><NASM Keywords>__?Infinity?__</NASM Keywords><Normal Text> </Normal Text><br/>
+<Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>NaN</Unknown Instructions><Normal Text> </Normal Text><NASM Keywords>__?QNaN?__</NASM Keywords><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Data>dq</Data><Normal Text>    </Normal Text><Symbol>+</Symbol><Float>1.5</Float><Symbol>,</Symbol><Normal Text> </Normal Text><Symbol>-</Symbol><Normal Text>Inf</Normal Text><Symbol>,</Symbol><Normal Text> NaN         </Normal Text><Comment>; Double-precision constants</Comment><br/>
+<Data>dt</Data><Normal Text> </Normal Text><Float>12_345_678_901_245_678</Float><Radix>p</Radix><br/>
+<Data>dt</Data><Normal Text> </Normal Text><Symbol>-</Symbol><Float>12_345_678_901_245_678</Float><Radix>p</Radix><br/>
+<Data>dt</Data><Normal Text> </Normal Text><Symbol>+</Symbol><Float>0p33</Float><br/>
+<Data>dt</Data><Normal Text> </Normal Text><Float>33</Float><Radix>p</Radix><br/>
+<Normal Text></Normal Text><br/>
+<Data>dq</Data><Normal Text> b </Normal Text><Symbol>*</Symbol><Normal Text> </Normal Text><Symbol>(</Symbol><Normal Text>a </Normal Text><Symbol>//</Symbol><Normal Text> b</Normal Text><Symbol>)</Symbol><Normal Text> </Normal Text><Symbol>+</Symbol><Normal Text> </Normal Text><Symbol>(</Symbol><Normal Text>a </Normal Text><Label>%%</Label><Normal Text> b</Normal Text><Symbol>)</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Branch Instructions>call</Branch Instructions><Normal Text>    </Normal Text><Symbol>(</Symbol><NASM Keywords>seg</NASM Keywords><Normal Text> procedure</Normal Text><Symbol>):</Symbol><Normal Text>procedure</Normal Text><br/>
+<Branch Instructions>call</Branch Instructions><Normal Text>    weird_seg</Normal Text><Symbol>:(</Symbol><Normal Text>procedure </Normal Text><NASM Keywords>wrt</NASM Keywords><Normal Text> weird_seg</Normal Text><Symbol>)</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Instructions>push</Instructions><Normal Text> </Normal Text><Data>dword</Data><Normal Text> </Normal Text><Number>33</Number><br/>
+<Instructions>push</Instructions><Normal Text> </Normal Text><NASM Keywords>strict</NASM Keywords><Normal Text> </Normal Text><Data>dword</Data><Normal Text> </Normal Text><Number>33</Number><br/>
+<Normal Text></Normal Text><br/>
+<Data>times</Data><Normal Text> </Normal Text><Symbol>(</Symbol><Normal Text>label</Normal Text><Symbol>-$)</Symbol><Normal Text> </Normal Text><Data>db</Data><Normal Text> </Normal Text><Number>0</Number><br/>
+<Normal Text></Normal Text><br/>
+<Label>label:</Label><Normal Text>  </Normal Text><Data>db</Data><Normal Text>      </Normal Text><String>'Where am I?'</String><br/>
+<Normal Text>        </Normal Text><Data>times</Data><Normal Text> </Normal Text><Symbol>(</Symbol><Normal Text>label</Normal Text><Symbol>-$+</Symbol><Normal Text>1</Normal Text><Symbol>)</Symbol><Normal Text> </Normal Text><Data>db</Data><Normal Text> </Normal Text><Number>0</Number><Normal Text> </Normal Text><br/>
+<Label>label:</Label><Normal Text>  </Normal Text><Data>db</Data><Normal Text>      </Normal Text><String>'NOW where am I?'</String><br/>
+<Normal Text></Normal Text><br/>
+<Unknown Instructions>label1</Unknown Instructions><Normal Text>  </Normal Text><Comment>; some code </Comment><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>.</Normal Text><Instructions>loop</Instructions><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Comment>; some more code </Comment><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Branch Instructions>jne</Branch Instructions><Normal Text>     </Normal Text><Label>.loop</Label><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Branch Instructions>ret</Branch Instructions><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Label>label1:</Label><Normal Text>                         </Normal Text><Comment>; a non-local label </Comment><br/>
+<Label>.local:</Label><Normal Text>                         </Normal Text><Comment>; this is really label1.local </Comment><br/>
+<Label>..@foo:</Label><Normal Text>                         </Normal Text><Comment>; this is a special symbol </Comment><br/>
+<Label>label2:</Label><Normal Text>                         </Normal Text><Comment>; another non-local label </Comment><br/>
+<Label>.local:</Label><Normal Text>                         </Normal Text><Comment>; this is really label2.local </Comment><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Branch Instructions>jmp</Branch Instructions><Normal Text>     </Normal Text><Label>..@foo</Label><Normal Text>          </Normal Text><Comment>; this will jump three lines up</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>THIS_VERY_LONG_MACRO_NAME_IS_DEFINED_TO</Unknown Instructions><Normal Text> \ </Normal Text><br/>
+<Normal Text>        </Normal Text><Unknown Instructions>THIS_VALUE</Unknown Instructions><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>ctrl</Unknown Instructions><Normal Text>    </Normal Text><Radix>0x</Radix><BaseN>1F</BaseN><Normal Text> </Normal Text><Symbol>&</Symbol><Normal Text> </Normal Text><br/>
+<Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>param</Unknown Instructions><Symbol>(</Symbol><Normal Text>a</Normal Text><Symbol>,</Symbol><Normal Text>b</Normal Text><Symbol>)</Symbol><Normal Text> </Normal Text><Symbol>((</Symbol><Normal Text>a</Normal Text><Symbol>)+(</Symbol><Normal Text>a</Normal Text><Symbol>)*(</Symbol><Normal Text>b</Normal Text><Symbol>))</Symbol><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Instructions>mov</Instructions><Normal Text>     </Normal Text><Data>byte</Data><Normal Text> </Normal Text><Symbol>[</Symbol><Normal Text>param</Normal Text><Symbol>(</Symbol><Number>2</Number><Symbol>,</Symbol><Registers>ebx</Registers><Symbol>)],</Symbol><Normal Text> ctrl </Normal Text><String>'D'</String><br/>
+<Normal Text>        </Normal Text><Instructions>mov</Instructions><Normal Text>     </Normal Text><Data>byte</Data><Normal Text> </Normal Text><Symbol>[(</Symbol><Number>2</Number><Symbol>)+(</Symbol><Number>2</Number><Symbol>)*(</Symbol><Registers>ebx</Registers><Symbol>)],</Symbol><Normal Text> </Normal Text><Radix>0x</Radix><BaseN>1F</BaseN><Normal Text> </Normal Text><Symbol>&</Symbol><Normal Text> </Normal Text><String>'D'</String><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>a</Unknown Instructions><Symbol>(</Symbol><Normal Text>x</Normal Text><Symbol>)</Symbol><Normal Text>    </Normal Text><Number>1</Number><Symbol>+</Symbol><Normal Text>b</Normal Text><Symbol>(</Symbol><Normal Text>x</Normal Text><Symbol>)</Symbol><Normal Text> </Normal Text><br/>
+<Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>b</Unknown Instructions><Symbol>(</Symbol><Normal Text>x</Normal Text><Symbol>)</Symbol><Normal Text>    </Normal Text><Number>2</Number><Symbol>*</Symbol><Normal Text>x </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>ax</Registers><Symbol>,</Symbol><Normal Text>a</Normal Text><Symbol>(</Symbol><Number>8</Number><Symbol>)</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>   </Normal Text><Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>foo</Unknown Instructions><Normal Text> </Normal Text><Symbol>(</Symbol><Normal Text>a</Normal Text><Symbol>,</Symbol><Normal Text>b</Normal Text><Symbol>)</Symbol><Normal Text>               </Normal Text><Comment>; no arguments, (a,b) is the expansion </Comment><br/>
+<Normal Text>   </Normal Text><Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>bar</Unknown Instructions><Symbol>(</Symbol><Normal Text>a</Normal Text><Symbol>,</Symbol><Normal Text>b</Normal Text><Symbol>)</Symbol><Normal Text>                </Normal Text><Comment>; two arguments, empty expansion</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>   </Normal Text><Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>ereg</Unknown Instructions><Symbol>(</Symbol><Normal Text>foo</Normal Text><Symbol>,)</Symbol><Normal Text> e </Normal Text><Symbol>%+</Symbol><Normal Text> foo </Normal Text><br/>
+<Normal Text>     </Normal Text><Instructions>mov</Instructions><Normal Text> </Normal Text><Registers>eax</Registers><Symbol>,</Symbol><Normal Text>ereg</Normal Text><Symbol>(</Symbol><Registers>dx</Registers><Symbol>,</Symbol><Registers>cx</Registers><Symbol>)</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>xyzzy</Unknown Instructions><Symbol>(=</Symbol><Normal Text>expr</Normal Text><Symbol>,&</Symbol><Normal Text>val</Normal Text><Symbol>)</Symbol><Normal Text> expr</Normal Text><Symbol>,</Symbol><Normal Text> str </Normal Text><br/>
+<Normal Text>    </Normal Text><Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>plugh</Unknown Instructions><Symbol>(</Symbol><Normal Text>x</Normal Text><Symbol>)</Symbol><Normal Text> xyzzy</Normal Text><Symbol>(</Symbol><Normal Text>x</Normal Text><Symbol>,</Symbol><Normal Text>x</Normal Text><Symbol>)</Symbol><Normal Text> </Normal Text><br/>
+<Normal Text>    </Normal Text><Data>db</Data><Normal Text> plugh</Normal Text><Symbol>(</Symbol><Number>3</Number><Symbol>+</Symbol><Number>5</Number><Symbol>),</Symbol><Normal Text> </Normal Text><String>`</String><Char>\0</Char><String>`</String><Normal Text> </Normal Text><Comment>; Expands to: db 8, "3+5", `\0`</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>     </Normal Text><Instructions>mov</Instructions><Normal Text> </Normal Text><Registers>ax</Registers><Symbol>,</Symbol><Normal Text>Foo</Normal Text><Symbol>%[</Symbol><NASM Keywords>__?BITS?__</NASM Keywords><Symbol>]</Symbol><Normal Text> </Normal Text><Comment>; The Foo value</Comment><br/>
+<Preprocessor>%xdefine</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>Bar</Unknown Instructions><Normal Text>         Quux    </Normal Text><Comment>; Expands due to %xdefine </Comment><br/>
+<Preprocessor>%define</Preprocessor><Normal Text>  </Normal Text><Unknown Instructions>Bar</Unknown Instructions><Normal Text>         </Normal Text><Symbol>%[</Symbol><Normal Text>Quux</Normal Text><Symbol>]</Symbol><Normal Text> </Normal Text><Comment>; Expands due to %[...]</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>BDASTART</Unknown Instructions><Normal Text> </Normal Text><BaseN>400</BaseN><Radix>h</Radix><Normal Text>                </Normal Text><Comment>; Start of BIOS data area</Comment><br/>
+<Normal Text></Normal Text><br/>
+<NASM Keywords>struc</NASM Keywords><Normal Text>   tBIOSDA                      </Normal Text><Comment>; its structure </Comment><br/>
+<Normal Text>        .</Normal Text><Unknown Instructions>COM1addr</Unknown Instructions><Normal Text>       </Normal Text><Data>RESW</Data><Normal Text>    </Normal Text><Number>1</Number><Normal Text> </Normal Text><br/>
+<Normal Text>        .</Normal Text><Unknown Instructions>COM2addr</Unknown Instructions><Normal Text>       </Normal Text><Data>RESW</Data><Normal Text>    </Normal Text><Number>1</Number><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Comment>; ..and so on </Comment><br/>
+<NASM Keywords>endstruc</NASM Keywords><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>ax</Registers><Symbol>,</Symbol><Normal Text>BDASTART </Normal Text><Symbol>+</Symbol><Normal Text> tBIOSDA</Normal Text><Symbol>.</Symbol><Normal Text>COM1addr </Normal Text><br/>
+<Normal Text>        </Normal Text><Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>bx</Registers><Symbol>,</Symbol><Normal Text>BDASTART </Normal Text><Symbol>+</Symbol><Normal Text> tBIOSDA</Normal Text><Symbol>.</Symbol><Normal Text>COM2addr</Normal Text><br/>
+<Comment>; Macro to access BIOS variables by their names (from tBDA):</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%idefine</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>Foo</Unknown Instructions><Normal Text> mov </Normal Text><Symbol>%?,%??</Symbol><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%idefine</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>keyword</Unknown Instructions><Normal Text> </Normal Text><Symbol>$%?</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%idefine</Preprocessor><Normal Text> </Normal Text><Instructions>pause</Instructions><Normal Text> </Normal Text><Symbol>$%?</Symbol><Normal Text>                  </Normal Text><Comment>; Hide the PAUSE instruction</Comment><br/>
+<Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>foo</Unknown Instructions><Normal Text> bar </Normal Text><br/>
+<Preprocessor>%undef</Preprocessor><Normal Text>  </Normal Text><Unknown Instructions>foo</Unknown Instructions><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>eax</Registers><Symbol>,</Symbol><Normal Text> foo</Normal Text><br/>
+<Preprocessor>%assign</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>i</Unknown Instructions><Normal Text> i</Normal Text><Symbol>+</Symbol><Number>1</Number><br/>
+<Preprocessor>%defstr</Preprocessor><Normal Text> </Normal Text><Instructions>test</Instructions><Normal Text> TEST</Normal Text><br/>
+<Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Instructions>test</Instructions><Normal Text> </Normal Text><String>'TEST'</String><br/>
+<Preprocessor>%defstr</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>PATH</Unknown Instructions><Normal Text> </Normal Text><Symbol>%!</Symbol><Normal Text>PATH          </Normal Text><Comment>; The operating system PATH variable</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%deftok</Preprocessor><Normal Text> </Normal Text><Instructions>test</Instructions><Normal Text> </Normal Text><String>'TEST'</String><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Instructions>test</Instructions><Normal Text> TEST</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>greedy</Unknown Instructions><Symbol>(</Symbol><Normal Text>a</Normal Text><Symbol>,</Symbol><Normal Text>b</Normal Text><Symbol>,</Symbol><Normal Text>c</Normal Text><Symbol>+)</Symbol><Normal Text> a </Normal Text><Symbol>+</Symbol><Normal Text> </Normal Text><Number>66</Number><Normal Text> </Normal Text><Symbol>%,</Symbol><Normal Text> b </Normal Text><Symbol>*</Symbol><Normal Text> </Normal Text><Number>3</Number><Normal Text> </Normal Text><Symbol>%,</Symbol><Normal Text> c </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>       </Normal Text><Data>db</Data><Normal Text> greedy</Normal Text><Symbol>(</Symbol><Number>1</Number><Symbol>,</Symbol><Number>2</Number><Symbol>)</Symbol><Normal Text>          </Normal Text><Comment>; db 1 + 66, 2 * 3 </Comment><br/>
+<Normal Text>       </Normal Text><Data>db</Data><Normal Text> greedy</Normal Text><Symbol>(</Symbol><Number>1</Number><Symbol>,</Symbol><Number>2</Number><Symbol>,</Symbol><Number>3</Number><Symbol>)</Symbol><Normal Text>        </Normal Text><Comment>; db 1 + 66, 2 * 3, 3 </Comment><br/>
+<Normal Text>       </Normal Text><Data>db</Data><Normal Text> greedy</Normal Text><Symbol>(</Symbol><Number>1</Number><Symbol>,</Symbol><Number>2</Number><Symbol>,</Symbol><Number>3</Number><Symbol>,</Symbol><Number>4</Number><Symbol>)</Symbol><Normal Text>      </Normal Text><Comment>; db 1 + 66, 2 * 3, 3, 4 </Comment><br/>
+<Normal Text>       </Normal Text><Data>db</Data><Normal Text> greedy</Normal Text><Symbol>(</Symbol><Number>1</Number><Symbol>,</Symbol><Number>2</Number><Symbol>,</Symbol><Number>3</Number><Symbol>,</Symbol><Number>4</Number><Symbol>,</Symbol><Number>5</Number><Symbol>)</Symbol><Normal Text>    </Normal Text><Comment>; db 1 + 66, 2 * 3, 3, 4, 5</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%macro</Preprocessor><Normal Text>  </Normal Text><Unknown Instructions>silly</Unknown Instructions><Normal Text> </Normal Text><Number>2</Number><Normal Text> </Normal Text><br/>
+<Normal Text>    </Normal Text><Preprocessor>%</Preprocessor><Number>2</Number><Normal Text>: </Normal Text><Data>db</Data><Normal Text>      </Normal Text><Symbol>%</Symbol><Number>1</Number><Normal Text> </Normal Text><br/>
+<Preprocessor>%endmacro</Preprocessor><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Unknown Instructions>silly</Unknown Instructions><Normal Text> </Normal Text><String>'a'</String><Symbol>,</Symbol><Normal Text> letter_a             </Normal Text><Comment>; letter_a:  db 'a' </Comment><br/>
+<Normal Text>        </Normal Text><Unknown Instructions>silly</Unknown Instructions><Normal Text> </Normal Text><String>'ab'</String><Symbol>,</Symbol><Normal Text> string_ab           </Normal Text><Comment>; string_ab: db 'ab' </Comment><br/>
+<Normal Text>        </Normal Text><Unknown Instructions>silly</Unknown Instructions><Normal Text> </Normal Text><Symbol>{</Symbol><Number>13</Number><Symbol>,</Symbol><Number>10</Number><Symbol>},</Symbol><Normal Text> crlf             </Normal Text><Comment>; crlf:      db 13,10</Comment><br/>
+<Preprocessor>%pragma</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>preproc</Unknown Instructions><Normal Text> sane_empty_expansion</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%macro</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>mpar</Unknown Instructions><Normal Text> </Normal Text><Number>1</Number><Symbol>-*</Symbol><br/>
+<Normal Text>     </Normal Text><Data>db</Data><Normal Text> </Normal Text><Symbol>%{</Symbol><Number>3</Number><Symbol>:</Symbol><Number>5</Number><Symbol>}</Symbol><Normal Text> </Normal Text><br/>
+<Normal Text>     </Normal Text><Data>db</Data><Normal Text> </Normal Text><Symbol>%{-</Symbol><Number>1</Number><Symbol>:-</Symbol><Number>3</Number><Symbol>}</Symbol><Normal Text> </Normal Text><br/>
+<Preprocessor>%endmacro</Preprocessor><br/>
+<Normal Text></Normal Text><br/>
+<Unknown Instructions>mpar</Unknown Instructions><Normal Text> </Normal Text><Number>1</Number><Symbol>,</Symbol><Number>2</Number><Symbol>,</Symbol><Number>3</Number><Symbol>,</Symbol><Number>4</Number><Symbol>,</Symbol><Number>5</Number><Symbol>,</Symbol><Number>6</Number><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%macro</Preprocessor><Normal Text>  </Normal Text><Unknown Instructions>die</Unknown Instructions><Normal Text> </Normal Text><Number>0</Number><Symbol>-</Symbol><Number>1</Number><Normal Text> </Normal Text><String>"Painful program death has occurred."</String><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Unknown Instructions>writefile</Unknown Instructions><Normal Text> </Normal Text><Number>2</Number><Symbol>,%</Symbol><Number>1</Number><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>ax</Registers><Symbol>,</Symbol><Radix>0x</Radix><BaseN>4c01</BaseN><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Instructions>int</Instructions><Normal Text>     </Normal Text><Radix>0x</Radix><BaseN>21</BaseN><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%endmacro</Preprocessor><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%macro</Preprocessor><Normal Text>  </Normal Text><Unknown Instructions>multipush</Unknown Instructions><Normal Text> </Normal Text><Number>1</Number><Symbol>-*</Symbol><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>  </Normal Text><Preprocessor>%rep</Preprocessor><Normal Text>  %0 </Normal Text><br/>
+<Normal Text>        </Normal Text><Instructions>push</Instructions><Normal Text>    </Normal Text><Symbol>%</Symbol><Number>1</Number><Normal Text> </Normal Text><br/>
+<Normal Text>  </Normal Text><Preprocessor>%rotate</Preprocessor><Normal Text> 1 </Normal Text><br/>
+<Normal Text>  </Normal Text><Preprocessor>%endrep</Preprocessor><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Unknown Instructions>j</Unknown Instructions><Symbol>%-</Symbol><Number>1</Number><Normal Text>    </Normal Text><Label>%%skip</Label><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Branch Instructions>ret</Branch Instructions><Normal Text> </Normal Text><br/>
+<Normal Text>  </Normal Text><Label>%%skip:</Label><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%endmacro</Preprocessor><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%macro</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>foo</Unknown Instructions><Normal Text> </Normal Text><Number>1</Number><NASM Keywords>.nolist</NASM Keywords><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%endmacro</Preprocessor><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%macro</Preprocessor><Normal Text>  </Normal Text><Unknown Instructions>pushparam</Unknown Instructions><Normal Text> </Normal Text><Number>1</Number><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>  </Normal Text><Preprocessor>%ifidni</Preprocessor><Normal Text> %1,</Normal Text><Unknown Instructions>ip</Unknown Instructions><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Branch Instructions>call</Branch Instructions><Normal Text>    </Normal Text><Label>%%label</Label><Normal Text> </Normal Text><br/>
+<Normal Text>  </Normal Text><Label>%%label:</Label><Normal Text> </Normal Text><br/>
+<Normal Text>  </Normal Text><Preprocessor>%else</Preprocessor><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Instructions>push</Instructions><Normal Text>    </Normal Text><Symbol>%</Symbol><Number>1</Number><Normal Text> </Normal Text><br/>
+<Normal Text>  </Normal Text><Preprocessor>%endif</Preprocessor><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%endmacro</Preprocessor><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%assign</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>i</Unknown Instructions><Normal Text> </Normal Text><Number>0</Number><Normal Text> </Normal Text><br/>
+<Preprocessor>%rep</Preprocessor><Normal Text>    64 </Normal Text><br/>
+<Normal Text>        </Normal Text><Instructions>inc</Instructions><Normal Text>     </Normal Text><Data>word</Data><Normal Text> </Normal Text><Symbol>[</Symbol><Normal Text>table</Normal Text><Symbol>+</Symbol><Number>2</Number><Symbol>*</Symbol><Normal Text>i</Normal Text><Symbol>]</Symbol><Normal Text> </Normal Text><br/>
+<Preprocessor>%assign</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>i</Unknown Instructions><Normal Text> i</Normal Text><Symbol>+</Symbol><Number>1</Number><Normal Text> </Normal Text><br/>
+<Preprocessor>%endrep</Preprocessor><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Label>fibonacci:</Label><Normal Text> </Normal Text><br/>
+<Preprocessor>%assign</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>i</Unknown Instructions><Normal Text> </Normal Text><Number>0</Number><Normal Text> </Normal Text><br/>
+<Preprocessor>%assign</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>j</Unknown Instructions><Normal Text> </Normal Text><Number>1</Number><Normal Text> </Normal Text><br/>
+<Preprocessor>%rep</Preprocessor><Normal Text> 100 </Normal Text><br/>
+<Preprocessor>%if</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>j</Unknown Instructions><Normal Text> </Normal Text><Symbol>></Symbol><Normal Text> </Normal Text><Number>65535</Number><Normal Text> </Normal Text><br/>
+<Normal Text>    </Normal Text><Preprocessor>%exitrep</Preprocessor><Normal Text> </Normal Text><br/>
+<Preprocessor>%endif</Preprocessor><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Data>dw</Data><Normal Text> j </Normal Text><br/>
+<Preprocessor>%assign</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>k</Unknown Instructions><Normal Text> j</Normal Text><Symbol>+</Symbol><Normal Text>i </Normal Text><br/>
+<Preprocessor>%assign</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>i</Unknown Instructions><Normal Text> j </Normal Text><br/>
+<Preprocessor>%assign</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>j</Unknown Instructions><Normal Text> k </Normal Text><br/>
+<Preprocessor>%endrep</Preprocessor><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Unknown Instructions>fib_number</Unknown Instructions><Normal Text> </Normal Text><Data>equ</Data><Normal Text> </Normal Text><Symbol>($-</Symbol><Normal Text>fibonacci</Normal Text><Symbol>)/</Symbol><Number>2</Number><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%include</Preprocessor><Normal Text> "</Normal Text><Unknown Instructions>macros</Unknown Instructions><Symbol>.</Symbol><Unknown Instructions>mac</Unknown Instructions><String>"</String><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%ifndef</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>MACROS_MAC</Unknown Instructions><Normal Text> </Normal Text><br/>
+<Normal Text>    </Normal Text><Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>MACROS_MAC</Unknown Instructions><Normal Text> </Normal Text><br/>
+<Normal Text>    </Normal Text><Comment>; now define some macros </Comment><br/>
+<Preprocessor>%endif</Preprocessor><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%pathsearch</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>MyFoo</Unknown Instructions><Normal Text> </Normal Text><String>"foo.bin"</String><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%imacro</Preprocessor><Normal Text> </Normal Text><Data>incbin</Data><Normal Text> </Normal Text><Number>1</Number><Symbol>-</Symbol><Number>2</Number><Symbol>+</Symbol><Normal Text> </Normal Text><Number>0</Number><Normal Text> </Normal Text><br/>
+<Preprocessor>%pathsearch</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>dep</Unknown Instructions><Normal Text> </Normal Text><Symbol>%</Symbol><Number>1</Number><Normal Text> </Normal Text><br/>
+<Preprocessor>%depend</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>dep</Unknown Instructions><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Data>incbin</Data><Normal Text> dep</Normal Text><Symbol>,%</Symbol><Number>2</Number><Normal Text> </Normal Text><br/>
+<Preprocessor>%endmacro</Preprocessor><br/>
+<Preprocessor>%use</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>altreg</Unknown Instructions><Normal Text> </Normal Text><br/>
+<Preprocessor>%use</Preprocessor><Normal Text> '</Normal Text><Unknown Instructions>altreg</Unknown Instructions><String>'</String><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%push</Preprocessor><Normal Text>    </Normal Text><Unknown Instructions>foobar</Unknown Instructions><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%macro</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>repeat</Unknown Instructions><Normal Text> </Normal Text><Number>0</Number><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Preprocessor>%push</Preprocessor><Normal Text>   </Normal Text><Unknown Instructions>repeat</Unknown Instructions><Normal Text> </Normal Text><br/>
+<Normal Text>    </Normal Text><Preprocessor>%</Preprocessor><Normal Text>$</Normal Text><Unknown Instructions>begin</Unknown Instructions><Symbol>:</Symbol><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%endmacro</Preprocessor><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%macro</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>until</Unknown Instructions><Normal Text> </Normal Text><Number>1</Number><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Unknown Instructions>j</Unknown Instructions><Symbol>%-</Symbol><Number>1</Number><Normal Text>    </Normal Text><Symbol>%$</Symbol><Normal Text>begin</Normal Text><br/>
+<Normal Text>    </Normal Text><Preprocessor>%pop</Preprocessor><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%endmacro</Preprocessor><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%define</Preprocessor><Normal Text> %$</Normal Text><Unknown Instructions>localmac</Unknown Instructions><Normal Text> </Normal Text><Number>3</Number><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%macro</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>else</Unknown Instructions><Normal Text> </Normal Text><Number>0</Number><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>  </Normal Text><Preprocessor>%ifctx</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>if</Unknown Instructions><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Preprocessor>%repl</Preprocessor><Normal Text>   </Normal Text><Unknown Instructions>else</Unknown Instructions><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Branch Instructions>jmp</Branch Instructions><Normal Text>     </Normal Text><Symbol>%$</Symbol><Normal Text>ifend </Normal Text><br/>
+<Normal Text>        </Normal Text><Preprocessor>%</Preprocessor><Normal Text>$</Normal Text><Unknown Instructions>ifnot</Unknown Instructions><Symbol>:</Symbol><Normal Text> </Normal Text><br/>
+<Normal Text>  </Normal Text><Preprocessor>%else</Preprocessor><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Preprocessor>%error</Preprocessor><Normal Text>  "</Normal Text><Unknown Instructions>expected</Unknown Instructions><Normal Text> </Normal Text><String>`if' before `</String><Normal Text>else</Normal Text><String>'" </String><br/>
+<Normal Text>  </Normal Text><Preprocessor>%endif</Preprocessor><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%endmacro</Preprocessor><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%macro</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>endif</Unknown Instructions><Normal Text> </Normal Text><Number>0</Number><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>  </Normal Text><Preprocessor>%ifctx</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>if</Unknown Instructions><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Preprocessor>%</Preprocessor><Normal Text>$</Normal Text><Unknown Instructions>ifnot</Unknown Instructions><Symbol>:</Symbol><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Preprocessor>%pop</Preprocessor><Normal Text> </Normal Text><br/>
+<Normal Text>  </Normal Text><Preprocessor>%elifctx</Preprocessor><Normal Text>      </Normal Text><Unknown Instructions>else</Unknown Instructions><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Preprocessor>%</Preprocessor><Normal Text>$</Normal Text><Unknown Instructions>ifend</Unknown Instructions><Symbol>:</Symbol><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Preprocessor>%pop</Preprocessor><Normal Text> </Normal Text><br/>
+<Normal Text>  </Normal Text><Preprocessor>%else</Preprocessor><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Preprocessor>%error</Preprocessor><Normal Text>  "</Normal Text><Unknown Instructions>expected</Unknown Instructions><Normal Text> </Normal Text><String>`if' or `</String><Normal Text>else</Normal Text><String>' before `endif'" </String><br/>
+<Normal Text>  </Normal Text><Preprocessor>%endif</Preprocessor><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%endmacro</Preprocessor><br/>
+<Normal Text></Normal Text><br/>
+<Label>some_function:</Label><Normal Text> </Normal Text><br/>
+<Normal Text>    </Normal Text><Preprocessor>%push</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>mycontext</Unknown Instructions><Normal Text>             </Normal Text><Comment>; save the current context </Comment><br/>
+<Normal Text>    </Normal Text><Preprocessor>%stacksize</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>small</Unknown Instructions><Normal Text>            </Normal Text><Comment>; tell NASM to use bp </Comment><br/>
+<Normal Text>    </Normal Text><Preprocessor>%assign</Preprocessor><Normal Text> %$</Normal Text><Unknown Instructions>localsize</Unknown Instructions><Normal Text> </Normal Text><Number>0</Number><Normal Text>       </Normal Text><Comment>; see text for explanation </Comment><br/>
+<Normal Text>    </Normal Text><Preprocessor>%local</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>old_ax</Unknown Instructions><Symbol>:</Symbol><Data>word</Data><Symbol>,</Symbol><Normal Text> old_dx</Normal Text><Symbol>:</Symbol><Data>word</Data><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Instructions>enter</Instructions><Normal Text>   </Normal Text><Symbol>%$</Symbol><Normal Text>localsize</Normal Text><Symbol>,</Symbol><Number>0</Number><Normal Text>   </Normal Text><Comment>; see text for explanation </Comment><br/>
+<Normal Text>        </Normal Text><Instructions>mov</Instructions><Normal Text>     </Normal Text><Symbol>[</Symbol><Normal Text>old_ax</Normal Text><Symbol>],</Symbol><Registers>ax</Registers><Normal Text>     </Normal Text><Comment>; swap ax & bx </Comment><br/>
+<Normal Text>        </Normal Text><Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>cx</Registers><Symbol>,[</Symbol><Normal Text>old_dx</Normal Text><Symbol>]</Symbol><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Instructions>leave</Instructions><Normal Text>                   </Normal Text><Comment>; restore old bp </Comment><br/>
+<Normal Text>        </Normal Text><Branch Instructions>ret</Branch Instructions><Normal Text>                     </Normal Text><Comment>; </Comment><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Preprocessor>%pop</Preprocessor><Normal Text>                        </Normal Text><Comment>; restore original context</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%ifdef</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>F1</Unknown Instructions><Normal Text> </Normal Text><br/>
+<Normal Text>    </Normal Text><Comment>; do some setup </Comment><br/>
+<Preprocessor>%elifdef</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>F2</Unknown Instructions><Normal Text> </Normal Text><br/>
+<Normal Text>    </Normal Text><Comment>; do some different setup </Comment><br/>
+<Preprocessor>%else</Preprocessor><Normal Text> </Normal Text><br/>
+<Normal Text>    </Normal Text><Preprocessor>%error</Preprocessor><Normal Text> "</Normal Text><Unknown Instructions>Neither</Unknown Instructions><Normal Text> F1 nor F2 was defined</Normal Text><Symbol>.</Symbol><String>" </String><br/>
+<Preprocessor>%endif</Preprocessor><br/>
+<Preprocessor>%ifdef</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>F1</Unknown Instructions><Normal Text> </Normal Text><br/>
+<Normal Text>    </Normal Text><Comment>; do some setup </Comment><br/>
+<Preprocessor>%elifdef</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>F2</Unknown Instructions><Normal Text> </Normal Text><br/>
+<Normal Text>    </Normal Text><Comment>; do some different setup </Comment><br/>
+<Preprocessor>%else</Preprocessor><Normal Text> </Normal Text><br/>
+<Normal Text>    </Normal Text><Preprocessor>%warning</Preprocessor><Normal Text> "</Normal Text><Unknown Instructions>Neither</Unknown Instructions><Normal Text> F1 nor F2 was defined</Normal Text><Symbol>,</Symbol><Normal Text> assuming F1</Normal Text><Symbol>.</Symbol><String>" </String><br/>
+<Normal Text>    </Normal Text><Preprocessor>%define</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>F1</Unknown Instructions><Normal Text> </Normal Text><br/>
+<Preprocessor>%endif</Preprocessor><Normal Text>%</Normal Text><Unknown Instructions>if</Unknown Instructions><Normal Text> foo </Normal Text><Symbol>></Symbol><Normal Text> </Normal Text><Number>64</Number><Normal Text> </Normal Text><br/>
+<Normal Text>    </Normal Text><Preprocessor>%assign</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>foo_over</Unknown Instructions><Normal Text> foo</Normal Text><Symbol>-</Symbol><Number>64</Number><Normal Text> </Normal Text><br/>
+<Normal Text>    </Normal Text><Preprocessor>%error</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>foo</Unknown Instructions><Normal Text> is foo_over bytes too large </Normal Text><br/>
+<Preprocessor>%endif</Preprocessor><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Data>db</Data><Normal Text>      </Normal Text><NASM Keywords>__?NASM_VER?__</NASM Keywords><br/>
+<Normal Text></Normal Text><br/>
+<NASM Keywords>struc</NASM Keywords><Normal Text>   mytype </Normal Text><br/>
+<Normal Text>  </Normal Text><Label>mt_long:</Label><Normal Text>      </Normal Text><Data>resd</Data><Normal Text>    </Normal Text><Number>1</Number><Normal Text> </Normal Text><br/>
+<Normal Text>  </Normal Text><Label>.str:</Label><Normal Text>         </Normal Text><Data>resb</Data><Normal Text>    </Normal Text><Number>32</Number><Normal Text> </Normal Text><br/>
+<NASM Keywords>endstruc</NASM Keywords><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%use</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>altreg</Unknown Instructions><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%macro</Preprocessor><Normal Text>  </Normal Text><Unknown Instructions>writefile</Unknown Instructions><Normal Text> </Normal Text><Number>2</Number><Symbol>+</Symbol><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        [</Normal Text><NASM Keywords>section</NASM Keywords><Normal Text> </Normal Text><Label>.data</Label><Symbol>]</Symbol><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>  </Normal Text><Label>%%str:</Label><Normal Text>        </Normal Text><Data>db</Data><Normal Text>      </Normal Text><Symbol>%</Symbol><Number>2</Number><Normal Text> </Normal Text><br/>
+<Normal Text>  </Normal Text><Label>%%endstr:</Label><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><NASM Keywords>__?SECT?__</NASM Keywords><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>dx</Registers><Symbol>,</Symbol><Label>%%str</Label><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>cx</Registers><Symbol>,</Symbol><Label>%%endstr</Label><Symbol>-</Symbol><Label>%%str</Label><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>bx</Registers><Symbol>,%</Symbol><Number>1</Number><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Instructions>mov</Instructions><Normal Text>     </Normal Text><Registers>ah</Registers><Symbol>,</Symbol><Radix>0x</Radix><BaseN>40</BaseN><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Instructions>int</Instructions><Normal Text>     </Normal Text><Radix>0x</Radix><BaseN>21</BaseN><Normal Text> </Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%endmacro</Preprocessor><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text> </Normal Text><NASM Keywords>DEFAULT</NASM Keywords><Normal Text> </Normal Text><NASM Keywords>BND</NASM Keywords><Normal Text> </Normal Text><br/>
+<Normal Text>     </Normal Text><Branch Instructions>call</Branch Instructions><Normal Text> foo            </Normal Text><Comment>; BND will be prefixed </Comment><br/>
+<Normal Text>     </Normal Text><NASM Keywords>nobnd</NASM Keywords><Normal Text> call foo      </Normal Text><Comment>; BND will NOT be prefixed</Comment><br/>
+<Normal Text></Normal Text><br/>
+<NASM Keywords>global</NASM Keywords><Normal Text> _main </Normal Text><br/>
+<Label>_main:</Label><Normal Text> </Normal Text><br/>
+<NASM Keywords>global</NASM Keywords><Normal Text>  hashlookup</Normal Text><Symbol>:</Symbol><Normal Text>function</Normal Text><Symbol>,</Symbol><Normal Text> hashtable</Normal Text><Symbol>:</Symbol><Normal Text>data</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<NASM Keywords>common</NASM Keywords><Normal Text>  intvar  </Normal Text><Number>4</Number><br/>
+<NASM Keywords>static</NASM Keywords><Normal Text> foo </Normal Text><br/>
+<Label>foo:</Label><Normal Text> </Normal Text><br/>
+<Normal Text>         </Normal Text><Comment>; codes</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>%pragma</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>macho</Unknown Instructions><Normal Text> lprefix L_</Normal Text><br/>
+<Comment>; The most common conventions </Comment><br/>
+<Preprocessor>%pragma</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>output</Unknown Instructions><Normal Text> gprefix _ </Normal Text><br/>
+<Preprocessor>%pragma</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>output</Unknown Instructions><Normal Text> lprefix L_ </Normal Text><br/>
+<Comment>; ELF uses a different convention </Comment><br/>
+<Preprocessor>%pragma</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>elf</Unknown Instructions><Normal Text>    gprefix                       </Normal Text><Comment>; empty </Comment><br/>
+<Preprocessor>%pragma</Preprocessor><Normal Text> </Normal Text><Unknown Instructions>elf</Unknown Instructions><Normal Text>    lprefix </Normal Text><Label>.L</Label><br/>
+<Normal Text></Normal Text><br/>
+<NASM Keywords>section</NASM Keywords><Normal Text> </Normal Text><Label>.pdata</Label><Normal Text>  rdata </Normal Text><NASM Keywords>align</NASM Keywords><Symbol>=</Symbol><Number>4</Number><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Data>dd</Data><Normal Text>      main </Normal Text><NASM Keywords>wrt</NASM Keywords><Normal Text> </Normal Text><Label>..imagebase</Label><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Data>dd</Data><Normal Text>      main_end </Normal Text><NASM Keywords>wrt</NASM Keywords><Normal Text> </Normal Text><Label>..imagebase</Label><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Data>dd</Data><Normal Text>      xmain </Normal Text><NASM Keywords>wrt</NASM Keywords><Normal Text> </Normal Text><Label>..imagebase</Label><Normal Text> </Normal Text><br/>
+<NASM Keywords>section</NASM Keywords><Normal Text> </Normal Text><Label>.xdata</Label><Normal Text>  rdata </Normal Text><NASM Keywords>align</NASM Keywords><Symbol>=</Symbol><Number>8</Number><Normal Text> </Normal Text><br/>
+<Label>xmain:</Label><Normal Text>  </Normal Text><Data>db</Data><Normal Text>      </Normal Text><Number>9</Number><Symbol>,</Symbol><Number>0</Number><Symbol>,</Symbol><Number>0</Number><Symbol>,</Symbol><Number>0</Number><Normal Text> </Normal Text><br/>
+<Normal Text>        </Normal Text><Data>dd</Data><Normal Text>      handler </Normal Text><NASM Keywords>wrt</NASM Keywords><Normal Text> </Normal Text><Label>..imagebase</Label><Normal Text> </Normal Text><br/>
+<NASM Keywords>section</NASM Keywords><Normal Text> </Normal Text><Label>.drectve</Label><Normal Text> info </Normal Text><br/>
+<Normal Text>        </Normal Text><Data>db</Data><Normal Text>      </Normal Text><String>'/defaultlib:user32.lib /defaultlib:msvcrt.lib '</String><br/>

@@ -73,3 +73,36 @@ flash:
 	ldi   temp, X		;X sec delay
 	rcall longDelay
 	rjmp  flash		;another run
+
+<beginfold id='1'>/*</beginfold id='1'> other 
+tests <endfold id='1'>*/</endfold id='1'>
+
+.org LARGEBOOTSTART
+; the following sets up RAMPZ:Z to point to a FLASH data object, typically
+; for use with ELPM.
+ldi ZL, low (cmdtable * 2)
+ldi ZH, high (cmdtable * 2)
+.if ((cmdtable * 2) > 65535)
+ldi r16, 1
+sts RAMPZ, r16
+.endif
+; more code follows here
+cmdtable: .db "foo", 0x0
+.db "Hello\n" // is equivalent to:
+.db 'H', 'e', 'l', 'l', 'o', '\\', 'n'
+.db '\0', '\177', '\xff'
+.db "\nx\rx\ax\bx\fx\tx\vx\\x\0000\xfff\0\1"
+0b10_111_2 0xaf3_4 0_12 32_32 $32_3
+
+.macro m
+ldi @0, @1
+.endm m r16,\ 0
+
+#define TEST \
+.IF val \
+.DW __TIME__ \
+.ELSE \
+.DW 1 \
+.ENDIF
+
+#defi TEST

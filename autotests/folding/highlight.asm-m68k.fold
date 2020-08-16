@@ -1,0 +1,87 @@
+map_collision_rom:
+        dc.b 0,0,7,7
+
+hud_tile:
+        dc.w $6268,$6269,$6268,$6269
+
+MAP_DATA1 macro
+
+        dc.w $4200+\2+(\1*$400),$4200+\2+2+(\1*$400)
+        move.w  \2,Sprite+0+(8*\1)
+
+endm
+
+        move.w  MarioArmy+0+6*\2,d0
+        move.w  #$050B+2*\2,d1
+
+        cmp.w   #15,MarioAnim
+        if_mi
+                addi.w  #$0800,d2
+        endi
+
+        if_eq
+
+                andi.w  #$01,d5
+                cmp.w   #$1,d5
+                if_ne
+                        move.w  #$200,d0
+                endi
+        endi
+
+        Draw_Sprite 0,Selecty,#$0501,SelectTile,Selectx
+
+        move.w  #$0030,d6
+
+        cmp.w #0,SelectChoix
+
+    ;Mario3 Menu
+    Draw_Sprite 4,#$80+28,#$0505,d4,#$80+8*9
+
+        move.w  #1,d1
+
+        lea EnemyArmyDgt,a0
+        lea EnemyArmy,a1
+        move.w  #9,d0
+        move.w  d4,d2
+        subi.w  #$80,d2
+        lsr.w   #4,d2
+
+        move.w d3,d7
+        subi.w  #$C0,d7
+        asr.w   #4,d7
+        asl.w   #4,d7
+
+        move.l  a1,a2
+        move.w  #0,(a2)+
+        move.w  #$0,(a0)  ;remove de l'écran
+
+        move.l  a1,a2
+        move.w  Selectx,(a2)+
+        move.w  #$1,(a3) ;est a l'écran
+        add.w   #$6,a3
+
+        org     $000000
+        dc.l    $0,Main
+        dc.l    INT,INT,INT,INT,INT,INT,INT
+        dc.b    ' 00000000-00'                     ; Product code, version nu
+mber. 12 bytes long
+        dc.w    $FDDB                              ; Checksum. 2 bytes long
+        dc.b    'J               '                 ; I/O support. 16 bytes
+        dc.l    $00000000,$00020000
+        do
+                move.l  (a2)+,VDP_DATA
+        while_dbra d0
+
+if_ne   macro
+        bne     L1\@!
+endm
+
+_A      = 12
+
+    VDP_Port_VRAMW #$A000+(2*\2)+($40*\3)
+
+    lea     \1,a2
+    move.w #3,d7
+
+VDP_DATA        equ     $C00000
+VDP_CTRL        equ     $C00004

@@ -23,7 +23,7 @@
 <span style="color:#898887;">;* Target MCU        :AT90S1200-12PI@4MHz					   </span>
 <span style="color:#898887;">;********************************************************************</span>
 
-.include <span style="color:#bf0303;">&quot;1200def.inc&quot;</span>
+<span style="font-weight:bold;">.include</span> <span style="color:#bf0303;">&quot;1200def.inc&quot;</span>
 
 	<span style="font-weight:bold;">rjmp</span>	RESET		<span style="color:#898887;">;reset handle</span>
 
@@ -32,9 +32,9 @@
 
 <span style="color:#898887;">;* Register variables</span>
 
-	.def  T1      = r1
-	.def  T2      = r2
-	.def  temp    = r19
+	<span style="font-weight:bold;">.def</span>  T1      = r1
+	<span style="font-weight:bold;">.def</span>  T2      = r2
+	<span style="font-weight:bold;">.def</span>  temp    = r19
 
 <span style="color:#898887;">;* Code</span>
 	    
@@ -55,7 +55,7 @@
 
 <span style="color:#898887;">;* Defines</span>
 
-	.equ  led   = <span style="color:#b08000;">6</span>		<span style="color:#898887;">;LED at PD6</span>
+	<span style="font-weight:bold;">.equ</span>  led   = <span style="color:#b08000;">6</span>		<span style="color:#898887;">;LED at PD6</span>
 
 <span style="color:#898887;">;* Code</span>
 
@@ -69,7 +69,7 @@
 
 <span style="color:#898887;">;* Register variables</span>
 
-	.equ  X   =  <span style="color:#b08000;">10</span> 	<span style="color:#898887;">;enter delaytime X</span>
+	<span style="font-weight:bold;">.equ</span>  X   =  <span style="color:#b08000;">10</span> 	<span style="color:#898887;">;enter delaytime X</span>
 
 <span style="color:#644a9b;">flash:</span> 
 	<span style="font-weight:bold;">sbi</span>   PORTD, led	<span style="color:#898887;">;LED on</span>
@@ -79,4 +79,37 @@
 	<span style="font-weight:bold;">ldi</span>   temp, X		<span style="color:#898887;">;X sec delay</span>
 	<span style="font-weight:bold;">rcall</span> longDelay
 	<span style="font-weight:bold;">rjmp</span>  flash		<span style="color:#898887;">;another run</span>
+
+<span style="color:#898887;">/* other </span>
+<span style="color:#898887;">tests */</span>
+
+<span style="font-weight:bold;">.org</span> LARGEBOOTSTART
+<span style="color:#898887;">; the following sets up RAMPZ:Z to point to a FLASH data object, typically</span>
+<span style="color:#898887;">; for use with ELPM.</span>
+<span style="font-weight:bold;">ldi</span> ZL, <span style="color:#644a9b;">low</span> (cmdtable * <span style="color:#b08000;">2</span>)
+<span style="font-weight:bold;">ldi</span> ZH, <span style="color:#644a9b;">high</span> (cmdtable * <span style="color:#b08000;">2</span>)
+<span style="font-weight:bold;">.if</span> ((cmdtable * <span style="color:#b08000;">2</span>) &gt; <span style="color:#b08000;">65535</span>)
+<span style="font-weight:bold;">ldi</span> r16, <span style="color:#b08000;">1</span>
+<span style="font-weight:bold;">sts</span> RAMPZ, r16
+<span style="font-weight:bold;">.endif</span>
+<span style="color:#898887;">; more code follows here</span>
+<span style="color:#644a9b;">cmdtable:</span> <span style="font-weight:bold;">.db</span> <span style="color:#bf0303;">&quot;foo&quot;</span>, <span style="color:#b08000;">0x0</span>
+<span style="font-weight:bold;">.db</span> <span style="color:#bf0303;">&quot;Hello</span><span style="color:#3daee9;">\n</span><span style="color:#bf0303;">&quot;</span> <span style="color:#898887;">// is equivalent to:</span>
+<span style="font-weight:bold;">.db</span> <span style="color:#924c9d;">'H'</span>, <span style="color:#924c9d;">'e'</span>, <span style="color:#924c9d;">'l'</span>, <span style="color:#924c9d;">'l'</span>, <span style="color:#924c9d;">'o'</span>, <span style="color:#924c9d;">'\\'</span>, <span style="color:#924c9d;">'n'</span>
+<span style="font-weight:bold;">.db</span> <span style="color:#924c9d;">'\0'</span>, <span style="color:#924c9d;">'\177'</span>, <span style="color:#924c9d;">'\xff'</span>
+<span style="font-weight:bold;">.db</span> <span style="color:#bf0303;">&quot;</span><span style="color:#3daee9;">\n</span><span style="color:#bf0303;">x</span><span style="color:#3daee9;">\r</span><span style="color:#bf0303;">x</span><span style="color:#3daee9;">\a</span><span style="color:#bf0303;">x</span><span style="color:#3daee9;">\b</span><span style="color:#bf0303;">x</span><span style="color:#3daee9;">\f</span><span style="color:#bf0303;">x</span><span style="color:#3daee9;">\t</span><span style="color:#bf0303;">x</span><span style="color:#3daee9;">\v</span><span style="color:#bf0303;">x</span><span style="color:#3daee9;">\\</span><span style="color:#bf0303;">x</span><span style="color:#3daee9;">\000</span><span style="color:#bf0303;">0</span><span style="color:#3daee9;">\xff</span><span style="color:#bf0303;">f</span><span style="color:#3daee9;">\0\1</span><span style="color:#bf0303;">&quot;</span>
+<span style="color:#b08000;">0b10_111_</span>2 <span style="color:#b08000;">0xaf3_4</span> <span style="color:#b08000;">0_12</span> <span style="color:#b08000;">32_32</span> <span style="color:#b08000;">$32_3</span>
+
+<span style="font-weight:bold;">.macro</span> m
+<span style="font-weight:bold;">ldi</span> <span style="color:#0057ae;">@0</span>, <span style="color:#0057ae;">@1</span>
+<span style="font-weight:bold;">.endm</span> m r16,\ <span style="color:#b08000;">0</span>
+
+<span style="color:#006e28;">#define</span> <span style="color:#006e28;">TEST</span> \
+<span style="font-weight:bold;">.IF</span> <span style="color:#006e28;">val</span> \
+<span style="font-weight:bold;">.DW</span> <span style="color:#006e28;">__TIME__</span> \
+<span style="font-weight:bold;">.ELSE</span> \
+<span style="font-weight:bold;">.DW</span> <span style="color:#b08000;">1</span> \
+<span style="font-weight:bold;">.ENDIF</span>
+
+<span style="color:#006e28;">#</span><span style="color:#bf0303;text-decoration:underline;">defi</span> <span style="color:#006e28;">TEST</span>
 </pre></body></html>

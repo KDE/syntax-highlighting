@@ -17,18 +17,18 @@
 <Comment>;* Target MCU        :AT90S1200-12PI@4MHz					   </Comment><br/>
 <Comment>;********************************************************************</Comment><br/>
 <Normal Text></Normal Text><br/>
-<Normal Text>.include </Normal Text><String>"1200def.inc"</String><br/>
+<Directive>.include</Directive><Normal Text> </Normal Text><String>"1200def.inc"</String><br/>
 <Normal Text></Normal Text><br/>
-<Normal Text>	</Normal Text><Keyword>rjmp</Keyword><Normal Text>	RESET		</Normal Text><Comment>;reset handle</Comment><br/>
+<Normal Text>	</Normal Text><Branch Instructions>rjmp</Branch Instructions><Normal Text>	RESET		</Normal Text><Comment>;reset handle</Comment><br/>
 <Normal Text></Normal Text><br/>
 <Normal Text></Normal Text><br/>
 <Comment>;* Long delay </Comment><br/>
 <Normal Text></Normal Text><br/>
 <Comment>;* Register variables</Comment><br/>
 <Normal Text></Normal Text><br/>
-<Normal Text>	.def  T1      </Normal Text><Symbol>=</Symbol><Normal Text> r1</Normal Text><br/>
-<Normal Text>	.def  T2      </Normal Text><Symbol>=</Symbol><Normal Text> r2</Normal Text><br/>
-<Normal Text>	.def  temp    </Normal Text><Symbol>=</Symbol><Normal Text> r19</Normal Text><br/>
+<Normal Text>	</Normal Text><Directive>.def</Directive><Normal Text>  T1      </Normal Text><Symbol>=</Symbol><Normal Text> r1</Normal Text><br/>
+<Normal Text>	</Normal Text><Directive>.def</Directive><Normal Text>  T2      </Normal Text><Symbol>=</Symbol><Normal Text> r2</Normal Text><br/>
+<Normal Text>	</Normal Text><Directive>.def</Directive><Normal Text>  temp    </Normal Text><Symbol>=</Symbol><Normal Text> r19</Normal Text><br/>
 <Normal Text></Normal Text><br/>
 <Comment>;* Code</Comment><br/>
 <Normal Text>	    </Normal Text><br/>
@@ -37,19 +37,19 @@
 <Normal Text>	</Normal Text><Keyword>clr</Keyword><Normal Text>   T2		</Normal Text><Comment>;T2 used as delay 3d count</Comment><br/>
 <Label>delay_1:</Label><Normal Text>    </Normal Text><br/>
 <Normal Text>	</Normal Text><Keyword>dec</Keyword><Normal Text>   T2</Normal Text><br/>
-<Normal Text>	</Normal Text><Keyword>brne</Keyword><Normal Text>  delay_1            </Normal Text><br/>
+<Normal Text>	</Normal Text><Branch Instructions>brne</Branch Instructions><Normal Text>  delay_1            </Normal Text><br/>
 <Normal Text>	</Normal Text><Keyword>dec</Keyword><Normal Text>   T1</Normal Text><br/>
-<Normal Text>	</Normal Text><Keyword>brne</Keyword><Normal Text>  delay_1           </Normal Text><br/>
+<Normal Text>	</Normal Text><Branch Instructions>brne</Branch Instructions><Normal Text>  delay_1           </Normal Text><br/>
 <Normal Text>	</Normal Text><Keyword>dec</Keyword><Normal Text>   temp		</Normal Text><Comment>;temp must be preset as </Comment><br/>
-<Normal Text>	</Normal Text><Keyword>brne</Keyword><Normal Text>  delay_1		</Normal Text><Comment>; delay master count</Comment><br/>
-<Normal Text>	</Normal Text><Keyword>ret</Keyword><Normal Text>                     </Normal Text><br/>
+<Normal Text>	</Normal Text><Branch Instructions>brne</Branch Instructions><Normal Text>  delay_1		</Normal Text><Comment>; delay master count</Comment><br/>
+<Normal Text>	</Normal Text><Branch Instructions>ret</Branch Instructions><Normal Text>                     </Normal Text><br/>
 <Normal Text></Normal Text><br/>
 <Normal Text></Normal Text><br/>
 <Comment>;* Resets the data direction register D</Comment><br/>
 <Normal Text></Normal Text><br/>
 <Comment>;* Defines</Comment><br/>
 <Normal Text></Normal Text><br/>
-<Normal Text>	.equ  led   </Normal Text><Symbol>=</Symbol><Normal Text> </Normal Text><Decimal>6</Decimal><Normal Text>		</Normal Text><Comment>;LED at PD6</Comment><br/>
+<Normal Text>	</Normal Text><Directive>.equ</Directive><Normal Text>  led   </Normal Text><Symbol>=</Symbol><Normal Text> </Normal Text><Decimal>6</Decimal><Normal Text>		</Normal Text><Comment>;LED at PD6</Comment><br/>
 <Normal Text></Normal Text><br/>
 <Comment>;* Code</Comment><br/>
 <Normal Text></Normal Text><br/>
@@ -63,13 +63,46 @@
 <Normal Text></Normal Text><br/>
 <Comment>;* Register variables</Comment><br/>
 <Normal Text></Normal Text><br/>
-<Normal Text>	.equ  X   </Normal Text><Symbol>=</Symbol><Normal Text>  </Normal Text><Decimal>10</Decimal><Normal Text> 	</Normal Text><Comment>;enter delaytime X</Comment><br/>
+<Normal Text>	</Normal Text><Directive>.equ</Directive><Normal Text>  X   </Normal Text><Symbol>=</Symbol><Normal Text>  </Normal Text><Decimal>10</Decimal><Normal Text> 	</Normal Text><Comment>;enter delaytime X</Comment><br/>
 <Normal Text></Normal Text><br/>
 <Label>flash:</Label><Normal Text> </Normal Text><br/>
 <Normal Text>	</Normal Text><Keyword>sbi</Keyword><Normal Text>   PORTD</Normal Text><Symbol>,</Symbol><Normal Text> led	</Normal Text><Comment>;LED on</Comment><br/>
 <Normal Text>	</Normal Text><Keyword>ldi</Keyword><Normal Text>   temp</Normal Text><Symbol>,</Symbol><Normal Text> X		</Normal Text><Comment>;X sec delay           </Comment><br/>
-<Normal Text>	</Normal Text><Keyword>rcall</Keyword><Normal Text> longDelay             </Normal Text><br/>
+<Normal Text>	</Normal Text><Branch Instructions>rcall</Branch Instructions><Normal Text> longDelay             </Normal Text><br/>
 <Normal Text>	</Normal Text><Keyword>cbi</Keyword><Normal Text>   PORTD</Normal Text><Symbol>,</Symbol><Normal Text> led	</Normal Text><Comment>;LED off            </Comment><br/>
 <Normal Text>	</Normal Text><Keyword>ldi</Keyword><Normal Text>   temp</Normal Text><Symbol>,</Symbol><Normal Text> X		</Normal Text><Comment>;X sec delay</Comment><br/>
-<Normal Text>	</Normal Text><Keyword>rcall</Keyword><Normal Text> longDelay</Normal Text><br/>
-<Normal Text>	</Normal Text><Keyword>rjmp</Keyword><Normal Text>  flash		</Normal Text><Comment>;another run</Comment><br/>
+<Normal Text>	</Normal Text><Branch Instructions>rcall</Branch Instructions><Normal Text> longDelay</Normal Text><br/>
+<Normal Text>	</Normal Text><Branch Instructions>rjmp</Branch Instructions><Normal Text>  flash		</Normal Text><Comment>;another run</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Comment>/* other </Comment><br/>
+<Comment>tests */</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Directive>.org</Directive><Normal Text> LARGEBOOTSTART</Normal Text><br/>
+<Comment>; the following sets up RAMPZ:Z to point to a FLASH data object, typically</Comment><br/>
+<Comment>; for use with ELPM.</Comment><br/>
+<Keyword>ldi</Keyword><Normal Text> ZL</Normal Text><Symbol>,</Symbol><Normal Text> </Normal Text><Function>low</Function><Normal Text> </Normal Text><Symbol>(</Symbol><Normal Text>cmdtable </Normal Text><Symbol>*</Symbol><Normal Text> </Normal Text><Decimal>2</Decimal><Symbol>)</Symbol><br/>
+<Keyword>ldi</Keyword><Normal Text> ZH</Normal Text><Symbol>,</Symbol><Normal Text> </Normal Text><Function>high</Function><Normal Text> </Normal Text><Symbol>(</Symbol><Normal Text>cmdtable </Normal Text><Symbol>*</Symbol><Normal Text> </Normal Text><Decimal>2</Decimal><Symbol>)</Symbol><br/>
+<Directive>.if</Directive><Normal Text> </Normal Text><Symbol>((</Symbol><Normal Text>cmdtable </Normal Text><Symbol>*</Symbol><Normal Text> </Normal Text><Decimal>2</Decimal><Symbol>)</Symbol><Normal Text> </Normal Text><Symbol>></Symbol><Normal Text> </Normal Text><Decimal>65535</Decimal><Symbol>)</Symbol><br/>
+<Keyword>ldi</Keyword><Normal Text> r16</Normal Text><Symbol>,</Symbol><Normal Text> </Normal Text><Decimal>1</Decimal><br/>
+<Keyword>sts</Keyword><Normal Text> RAMPZ</Normal Text><Symbol>,</Symbol><Normal Text> r16</Normal Text><br/>
+<Directive>.endif</Directive><br/>
+<Comment>; more code follows here</Comment><br/>
+<Label>cmdtable:</Label><Normal Text> </Normal Text><Directive>.db</Directive><Normal Text> </Normal Text><String>"foo"</String><Symbol>,</Symbol><Normal Text> </Normal Text><Hex>0x0</Hex><br/>
+<Directive>.db</Directive><Normal Text> </Normal Text><String>"Hello</String><String Char>\n</String Char><String>"</String><Normal Text> </Normal Text><Comment>// is equivalent to:</Comment><br/>
+<Directive>.db</Directive><Normal Text> </Normal Text><Char>'H'</Char><Symbol>,</Symbol><Normal Text> </Normal Text><Char>'e'</Char><Symbol>,</Symbol><Normal Text> </Normal Text><Char>'l'</Char><Symbol>,</Symbol><Normal Text> </Normal Text><Char>'l'</Char><Symbol>,</Symbol><Normal Text> </Normal Text><Char>'o'</Char><Symbol>,</Symbol><Normal Text> </Normal Text><Char>'\\'</Char><Symbol>,</Symbol><Normal Text> </Normal Text><Char>'n'</Char><br/>
+<Directive>.db</Directive><Normal Text> </Normal Text><Char>'\0'</Char><Symbol>,</Symbol><Normal Text> </Normal Text><Char>'\177'</Char><Symbol>,</Symbol><Normal Text> </Normal Text><Char>'\xff'</Char><br/>
+<Directive>.db</Directive><Normal Text> </Normal Text><String>"</String><String Char>\n</String Char><String>x</String><String Char>\r</String Char><String>x</String><String Char>\a</String Char><String>x</String><String Char>\b</String Char><String>x</String><String Char>\f</String Char><String>x</String><String Char>\t</String Char><String>x</String><String Char>\v</String Char><String>x</String><String Char>\\</String Char><String>x</String><String Char>\000</String Char><String>0</String><String Char>\xff</String Char><String>f</String><String Char>\0\1</String Char><String>"</String><br/>
+<Binary>0b10_111_</Binary><Normal Text>2 </Normal Text><Hex>0xaf3_4</Hex><Normal Text> </Normal Text><Octal>0_12</Octal><Normal Text> </Normal Text><Decimal>32_32</Decimal><Normal Text> </Normal Text><Hex>$32_3</Hex><br/>
+<Normal Text></Normal Text><br/>
+<Directive>.macro</Directive><Normal Text> m</Normal Text><br/>
+<Keyword>ldi</Keyword><Normal Text> </Normal Text><Referred Macro Parameter>@0</Referred Macro Parameter><Symbol>,</Symbol><Normal Text> </Normal Text><Referred Macro Parameter>@1</Referred Macro Parameter><br/>
+<Directive>.endm</Directive><Normal Text> m r16</Normal Text><Symbol>,\</Symbol><Normal Text> </Normal Text><Decimal>0</Decimal><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>#define</Preprocessor><Normal Text> </Normal Text><Preprocessor>TEST</Preprocessor><Normal Text> </Normal Text><Symbol>\</Symbol><br/>
+<Directive>.IF</Directive><Normal Text> </Normal Text><Preprocessor>val</Preprocessor><Normal Text> </Normal Text><Symbol>\</Symbol><br/>
+<Directive>.DW</Directive><Normal Text> </Normal Text><Constant>__TIME__</Constant><Normal Text> </Normal Text><Symbol>\</Symbol><br/>
+<Directive>.ELSE</Directive><Normal Text> </Normal Text><Symbol>\</Symbol><br/>
+<Directive>.DW</Directive><Normal Text> </Normal Text><Decimal>1</Decimal><Normal Text> </Normal Text><Symbol>\</Symbol><br/>
+<Directive>.ENDIF</Directive><br/>
+<Normal Text></Normal Text><br/>
+<Preprocessor>#</Preprocessor><Unknown Preprocessor>defi</Unknown Preprocessor><Normal Text> </Normal Text><Preprocessor>TEST</Preprocessor><br/>

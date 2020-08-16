@@ -1,0 +1,60 @@
+                ; Blank line
+loop  sleep     ; Label and operation
+      incf 6,1  ; Operation with 2 parameters
+      goto loop ; Operation with 1 parameter
+
+#define X Y
+
+#undefine X
+
+number equ 5
+
+label_#v((number + 1) * 5)_suffix equ 0x10
+
+db .34,O'35',O'93',0xAf,0xady,a'a',a'ap,A'\'
+
+any   macro parm
+      movlw parm
+      endm
+      any 33
+
+; Shift reg left
+slf   macro reg
+      clrc
+      rlf   reg,f
+endm
+
+; Scale W by “factor”. Result in “reg”, W unchanged.
+scale macro reg, factor
+      if (factor == 1)
+          movwf reg                ; 1 X is easy
+      else
+          scale reg, (factor / 2)  ; W * (factor / 2)
+          slf   reg,f              ; double reg
+          if ((factor & 1) == 1)   ; if lo-bit set ..
+              addwf reg,f          ; .. add W to reg
+          endif
+      endif
+endm
+
+      scale tmp,D'10'
+
+      movwf  tmp
+      clrc
+      rlf    tmp,f
+      addwf  tmp,f
+
+spin  macro  n
+      movlw  n
+      addlw  0xff
+      btfss  STATUS,Z
+      goto   $-2
+endm
+
+LOOP: BTFSS flag,0x00
+      GOTO LOOP
+
+      
+      BTFSS flag,0x00
+      GOTO $ - 1
+

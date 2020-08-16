@@ -1,0 +1,56 @@
+.MEMORYMAP
+        SLOTSIZE $8000 ; The slot is $8000 bytes in size. More details on slots later.
+        DEFAULTSLOT 0 ; There's only 1 slot in SNES, there are more in other consoles.
+        SLOT 0 $8000 ; Defines Slot 0's starting address.
+.ENDME
+
+.SNESHEADER
+        ID    "SNES"
+        NAME  "Test Demo Mode 7     "
+        ;     "123456789012345678901"
+        LOROM
+        SLOWROM
+        CARTRIDGETYPE $00
+        ROMSIZE $09 ;size rom 09-0d
+        VERSION 00
+.ENDSNES
+
+.MACRO Clear_RAM
+    ldx #$0
+        ldy #0
+        -:
+                sty 0,x
+                inx
+                inx
+                cpx #$2000
+        bne -
+.ENDM
+
+.include "header.asm"
+
+.bank 0 slot 0
+.org 0
+
+Main:
+        sei
+        clc
+        xce
+        
+        rep #$10        ;16 bit xy
+        sep #$20        ; 8 bit a
+
+        .dw $1C02,$1C02,$1C02,$1C02
+
+        lda sincos.l + $80,X
+
+sincos2:
+        .include "DATA/dsincos.asm"
+        
+        lda #\1&$FF
+        sta $211B
+
+        cmp #$04
+        bne +++
+                lda #$04
+                bra lab
+        +++:

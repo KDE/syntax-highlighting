@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="k" version="3" kateversion="3.4" section="Scripts" extensions="*.k" license="LGPLv2+" author="James Schmitz (james.schmitz@gmail.com)">
+<language name="k" version="4" kateversion="3.4" section="Scripts" extensions="*.k" license="LGPLv2+" author="James Schmitz (james.schmitz@gmail.com)">
 <highlighting>
     <list name="flowcontrol" >
       <item>while</item>
@@ -339,15 +339,6 @@
       <item>.q.xprev</item>
       <item>.q.xrank</item>
     </list>
-    <list name="todos" >
-      <item>TODO</item>
-      <item>FIXME</item>
-      <item>FIX</item>
-      <item>HACK</item>
-      <item>XXX</item>
-      <item>NOTE</item>
-      <item>GOTCHA</item>
-    </list>
     <contexts>
       <context attribute="Normal Text" lineEndContext="#stay" name="Normal Text" >
         <RegExpr attribute="kSystemCommand" String="^\\[^\s].*$" context="#stay" />
@@ -384,21 +375,25 @@
         <DetectChar attribute="String" context="#pop" char="&quot;" />
       </context>
       <context name="comment" attribute="Comment" lineEndContext="#pop" >
-        <keyword attribute="Todos" context="#stay" String="todos" />
+        <DetectSpaces />
+        <IncludeRules context="##Alerts" />
+        <IncludeRules context="##Modelines" />
       </context>
       <context name="multicomment" attribute="MultiLineComment" lineEndContext="#stay" >
-        <keyword attribute="Todos" context="#stay" String="todos" />
         <RegExpr String="^\\[\s]*$" attribute="MultiLineComment" context="#pop" endRegion="Comment" />
+        <DetectSpaces />
+        <IncludeRules context="##Alerts" />
+        <IncludeRules context="##Modelines" />
       </context>
       <context name="commentToEOF" attribute="CommentToEOF" lineEndContext="#stay" >
-        <keyword attribute="Todos" context="#stay" String="todos" />
+        <DetectSpaces />
+        <IncludeRules context="##Alerts" />
       </context>
     </contexts>
     <itemDatas>
       <itemData name="Normal Text" spellChecking="false" defStyleNum="dsNormal" />
       <itemData name="kSystemCommand" spellChecking="false" defStyleNum="dsOthers" />
       <itemData name="kSeparators" defStyleNum="dsNormal" />
-      <itemData name="Todos" defStyleNum="dsComment" />
       <itemData name="kSymbol" spellChecking="false" defStyleNum="dsOthers" />
       <itemData name="kHSym" spellChecking="false" defStyleNum="dsOthers" />
       <itemData name="FlowControl" defStyleNum="dsKeyword" />
@@ -423,8 +418,8 @@
   <general>
     <comments>
       <comment name="singleLine" start="/" />
-      <comment name="multiLine" start="/" end="\" region="Comment" />
     </comments>
     <keywords casesensitive="1" weakDeliminator="." additionalDeliminator="`#'@$&quot;" />
   </general>
 </language>
+<!-- kate: replace-tabs on; tab-width 2; indent-width 2; -->

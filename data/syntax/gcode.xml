@@ -25,7 +25,7 @@
 
 -->
 <language name="G-Code"
-	version="5"
+	version="6"
 	kateversion="3.8"
 	section="3D"
 	extensions="*.ngc"
@@ -89,8 +89,8 @@
       <context name="Alert" attribute="Alert" lineEndContext="#pop" fallthroughContext="alert">
         <RegExpr String="^[\s\t]*[nN][\s\t]*[\d]{1,5}" attribute="Line Number"/>
         <DetectSpaces attribute="Normal Text"/>
-				<DetectChar char="%" attribute="M-word"/>
-				<DetectChar char="[" attribute="Brackets"/>
+        <DetectChar char="%" attribute="M-word"/>
+        <DetectChar char="[" attribute="Brackets"/>
         <DetectChar char="]" attribute="Brackets"/>
         <DetectChar char="(" lookAhead="1" context="parenthese"/>
         <DetectChar char="#" lookAhead="1" context="hash1"/>
@@ -106,7 +106,7 @@
         <keyword String="o_sub" attribute="Sub-program"/>
         <keyword String="keyword" attribute="Keyword"/>
         <RegExpr String="[oO][\s\t]*&lt;[\s\t]*&gt;" lookAhead="1" context="alert"/>
-				<RegExpr String="[oO][\s\t]*([\d]+|&lt;[^>]*&gt;)" attribute="O-word"/>
+        <RegExpr String="[oO][\s\t]*([\d]+|&lt;[^>]*&gt;)" attribute="O-word"/>
         <RegExpr String="[abcu-z][\s\t]*[+\-\d#\[.]" insensitive="1" lookAhead="1" context="coords"/>
         <AnyChar String="abcuvwxyzABCUVWXYZ" attribute="Alert" context="alert"/>
         <RegExpr String="[deh-lpqr@^][\s\t]*[+\-\d#\[.]" insensitive="1" lookAhead="1" context="opts"/>
@@ -151,9 +151,9 @@
 
       <context name="hash1" attribute="Alert" lineEndContext="#pop">
         <RegExpr String="#[\s\t]*&lt;[\s\t]*&gt;" context="alert"/>
-				<RegExpr String="#[\s\t]*[\d]{1,4}" attribute="Param (global)" context="#pop"/>
-				<RegExpr String="#[\s\t]*&lt;[\s\t]*_[^>]*&gt;" attribute="Param (global)" context="#pop"/>
-				<RegExpr String="#[\s\t]*&lt;[^>]*&gt;" attribute="Param (local)" context="#pop"/>
+        <RegExpr String="#[\s\t]*[\d]{1,4}" attribute="Param (global)" context="#pop"/>
+        <RegExpr String="#[\s\t]*&lt;[\s\t]*_[^>]*&gt;" attribute="Param (global)" context="#pop"/>
+        <RegExpr String="#[\s\t]*&lt;[^>]*&gt;" attribute="Param (local)" context="#pop"/>
         <RegExpr String="[#][\s\t]*[#][\s\t]*[#]+" lookAhead="1" context="alert"/>
         <RegExpr String="#[\s\t]*#[\s\t]*[&lt;\[]" lookAhead="1" context="hash2"/>
         <RegExpr String="#[\s\t]*#" attribute="Param (local)" context="#pop"/>
@@ -165,7 +165,11 @@
       </context>
 
       <context name="alert" attribute="Alert" lineEndContext="#pop"/>
-      <context name="comment" attribute="Comment" lineEndContext="#pop"/>
+      <context name="comment" attribute="Comment" lineEndContext="#pop">
+        <DetectSpaces />
+        <IncludeRules context="##Alerts"/>
+        <IncludeRules context="##Modelines"/>
+      </context>
     </contexts>
 
     <itemDatas>
@@ -195,8 +199,9 @@
   <general>
     <folding indentationsensitive="1"/>
     <comments>
-      <comment name="multiLine" start="(" end=")"/>
+      <comment name="singleLine" start=";"/>
     </comments>
     <keywords casesensitive="0"/>
   </general>
 </language>
+<!-- kate: replace-tabs on; indent-width 2; tab-width 2; -->

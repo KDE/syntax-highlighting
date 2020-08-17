@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="GDL" version="2" kateversion="2.2" section="Scientific" extensions="*.gdl;*.vcg;*.GDL;*.VCG" mimetype="" author="Christoph Cullmann (cullmann@absint.com)" license="MIT">
+<language name="GDL" version="3" kateversion="2.2" section="Scientific" extensions="*.gdl;*.vcg;*.GDL;*.VCG" mimetype="" author="Christoph Cullmann (cullmann@absint.com)" license="MIT">
  <highlighting>
   <list name="colors">
    <item>white</item>
@@ -127,7 +127,7 @@
   <contexts>
    <context name="default" attribute="Normal" lineEndContext="#stay">
     <Detect2Chars attribute="Comment" context="ccomment" char="/" char1="/"/>
-    <Detect2Chars attribute="Comment" context="cppcomment" char="/" char1="*"/>
+    <Detect2Chars attribute="Comment" context="cppcomment" char="/" char1="*" beginRegion="BlockComment"/>
     <StringDetect attribute="Keyword" context="#stay" String="focus"/>
     <RegExpr attribute="Keyword" context="#stay" String="(graph|edge|node|region|backedge|(left|right|)(bent|)nearedge):"/>
     <RegExpr attribute="Value" context="#stay" String="loc *:"/>
@@ -202,9 +202,15 @@
     <Float attribute="Float" context="default"/>
    </context>
    <context name="ccomment" attribute="Comment" lineEndContext="default">
+     <DetectSpaces />
+     <IncludeRules context="##Alerts"/>
+     <IncludeRules context="##Modelines"/>
    </context>
    <context name="cppcomment" attribute="Comment" lineEndContext="#stay">
-    <Detect2Chars attribute="Comment" context="default" char="*" char1="/"/>
+    <Detect2Chars attribute="Comment" context="default" char="*" char1="/" endRegion="BlockComment"/>
+    <DetectSpaces />
+    <IncludeRules context="##Alerts"/>
+    <IncludeRules context="##Modelines"/>
    </context>
    <context name="colorid" attribute="Normal" lineEndContext="#stay">
     <keyword attribute="Datatype" context="default" String="colors"/>
@@ -306,8 +312,9 @@
  <general>
   <comments>
    <comment name="singleLine" start="//" />
-   <comment name="multiLine" start="/*" end="*/"/>
+   <comment name="multiLine" start="/*" end="*/" region="BlockComment"/>
   </comments>
   <keywords casesensitive="1"/>
  </general>
 </language>
+<!-- kate: replace-tabs on; tab-width 2; indent-width 2; -->

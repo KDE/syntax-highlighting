@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="Haml" version="8" kateversion="5.0" section="Markup"
+<language name="Haml" version="9" kateversion="5.0" section="Markup"
           extensions="*.haml"
           author="Cies Breijs (cies_at_kde_nl)" license="LGPL"
           mimetype="text/x-haml">
@@ -157,12 +157,6 @@
       <item>warn</item>
     </list>
 
-    <list name="attention">
-      <item>TODO</item>
-      <item>FIXME</item>
-      <item>NOTE</item>
-    </list>
-
     <contexts>
       <context attribute="Normal Text" lineEndContext="#stay" name="normal" >
         <RegExpr attribute="Error" firstNonSpace="false" context="#stay" String="[ ]{1}([ ]{2})*[^ ]+" column="0" />
@@ -237,6 +231,7 @@
       <context attribute="Comment" lineEndContext="#pop" name="comment">
         <DetectSpaces/>
         <IncludeRules context="##Alerts" />
+        <IncludeRules context="##Modelines" />
         <DetectIdentifier/>
         <StringDetect attribute="Comment" context="#pop" String="--&gt;" endRegion="comment" />
       </context>
@@ -378,6 +373,8 @@
 
       <context name="Embedded documentation" attribute="Ruby Comment" lineEndContext="#stay">
         <StringDetect attribute="Ruby Comment" String="=end" context="#pop" endRegion="comment block" column="0"/>
+        <DetectSpaces />
+        <IncludeRules context="##Alerts"/>
       </context>
 
       <context name="RegEx 1" attribute="Regular Expression" lineEndContext="#stay">
@@ -422,7 +419,8 @@
       </context>
 
       <context name="General Comment" attribute="Ruby Comment" lineEndContext="#pop">
-        <keyword attribute="Dec" String="attention" context="#stay"/>
+        <DetectSpaces />
+        <IncludeRules context="##Alerts"/>
       </context>
 
       <context name="Doctype" attribute="Doctype" lineEndContext="#pop"/>
@@ -496,11 +494,12 @@
   <general>
     <folding indentationsensitive="1" />
     <emptyLines>
-      <emptyLine regexpr="\s+" casesensitive="false"/>
+      <emptyLine regexpr="\s+"/>
     </emptyLines>
     <comments>
-      <comment name="singleLine" start="/"/>
+      <comment name="singleLine" start="/" position="afterwhitespace"/>
     </comments>
     <keywords casesensitive="1"/>
   </general>
 </language>
+<!-- kate: replace-tabs on; tab-width 2; indent-width 2; -->

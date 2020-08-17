@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
 <!-- Nemerle syntax highlighting v0.2 by caminoix, approved of and corrected by Kamil Skalski (Nazgul) -->
-<language name="Nemerle" version="1" kateversion="2.3" section="Sources" extensions="*.n" mimetype="text/x-nemerle" casesensitive="1" author="caminoix + Kamil Skalski (Nazgul)" license="">
+<language name="Nemerle" version="2" kateversion="2.3" section="Sources" extensions="*.n" mimetype="text/x-nemerle" casesensitive="1" author="caminoix + Kamil Skalski (Nazgul)" license="">
 	<highlighting>
 		<list name="Attributes">
 			<item>abstract</item>
@@ -120,7 +120,7 @@
 		<contexts>
 			<context name="Normal" attribute="Normal Text" lineEndContext="#stay">
 				<StringDetect attribute="Comment" context="SingleLineComment" String="//" />
-				<StringDetect attribute="Comment" context="MultiLineComment" String="/*" />
+				<StringDetect attribute="Comment" context="MultiLineComment" String="/*" beginRegion="BlockComment" />
 				<DetectChar attribute="String" context="NormalString" char="&quot;" />
 				<Detect2Chars attribute="String" context="StringInterpolation" char="$" char1="&quot;" />
 
@@ -144,9 +144,15 @@
 
 			<context name="SingleLineComment" attribute="Comment" lineEndContext="#pop">
 				<StringDetect attribute="Comment" String="//" context="#pop" />
+				<DetectSpaces />
+				<IncludeRules context="##Alerts" />
+				<IncludeRules context="##Modelines" />
 			</context>
 			<context name="MultiLineComment" attribute="Comment" lineEndContext="#stay">
-				<StringDetect attribute="Comment" String="*/" context="#pop" />
+				<StringDetect attribute="Comment" String="*/" context="#pop" endRegion="BlockComment" />
+				<DetectSpaces />
+				<IncludeRules context="##Alerts" />
+				<IncludeRules context="##Modelines" />
 			</context>
 
 			<context name="NormalString" attribute="String" lineEndContext="#stay">
@@ -202,7 +208,8 @@
 	<general>
 		<comments>
 			<comment name="singleLine" start="//" />
-			<comment name="multiLine" start="/*" end="*/" />
+			<comment name="multiLine" start="/*" end="*/" region="BlockComment" />
 		</comments>
 	</general>
 </language>
+<!-- kate: replace-tabs off; -->

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
 <!-- Based on haskell.xml and idris.vim (https://github.com/idris-hackers/idris-vim/blob/6bdb44b85406b75e3b3a4fa265deab1dbe8c6ff1/syntax/idris.vim) -->
-<language name="Idris" version="2" kateversion="3.4" section="Sources" extensions="*.idr" author="Alexander Shabalin" license="LGPL">
+<language name="Idris" version="3" kateversion="3.4" section="Sources" extensions="*.idr" author="Alexander Shabalin" license="LGPL">
   <highlighting>
   <list name="keywords">
     <item>abstract</item>
@@ -96,10 +96,10 @@
   <contexts>
      <context attribute="Normal" lineEndContext="#stay" name="code">
         <RegExpr attribute="Comment" context="line comment"
-           String="---*[^!#\$%&amp;\*\+/&lt;=&gt;\?&#92;@\^\|~\.:]?" />
+           String="---*(?=[^!#\$%&amp;\*\+/&lt;=&gt;\?&#92;@\^\|~\.:]|$)" />
         <RegExpr attribute="Comment" context="line comment"
-           String="\|\|\|[^\-!#\$%&amp;\*\+/&lt;=&gt;\?&#92;@\^\|~\.:]?" />
-        <Detect2Chars attribute="Comment" context="block comment" char="{" char1="-" />
+           String="\|\|\|(?=[^\-!#\$%&amp;\*\+/&lt;=&gt;\?&#92;@\^\|~\.:]|$)" />
+        <Detect2Chars attribute="Comment" context="block comment" char="{" char1="-" beginRegion="BlockComment" />
         <RegExpr attribute="Normal" context="declaration" lookAhead="true"
            String="^\s*([a-z]+\s+)*([A-Za-z][A-Za-z0-9_]*'*|\([\-!#\$%&amp;\*\+\./&lt;=&gt;\?@&#92;\^\|~:]+\))\s*:" />
         <keyword attribute="Keyword" context="#stay" String="keywords" />
@@ -139,10 +139,17 @@
         <RegExpr attribute="String" context="#stay" String="\\." />
         <RegExpr attribute="String" context="#pop" String="&quot;" />
      </context>
-     <context attribute="Comment" lineEndContext="#pop" name="line comment" />
+     <context attribute="Comment" lineEndContext="#pop" name="line comment">
+         <DetectSpaces />
+         <IncludeRules context="##Alerts" />
+        <IncludeRules context="##Modelines" />
+     </context>
      <context attribute="Comment" lineEndContext="#stay" name="block comment">
-        <Detect2Chars attribute="Comment" context="#pop" char="-" char1="}" />
-        <Detect2Chars attribute="Comment" context="block comment" char="{" char1="-" />
+        <Detect2Chars attribute="Comment" context="#pop" char="-" char1="}" endRegion="BlockComment" />
+        <Detect2Chars attribute="Comment" context="block comment" char="{" char1="-" beginRegion="BlockComment" />
+        <DetectSpaces />
+        <IncludeRules context="##Alerts" />
+        <IncludeRules context="##Modelines" />
      </context>
   </contexts>
   <itemDatas>
@@ -167,7 +174,7 @@
     <folding indentationsensitive="1"/>
     <comments>
       <comment name="singleLine" start="--" />
-      <comment name="multiLine" start="{-" end="-}" />
+      <comment name="multiLine" start="{-" end="-}" region="BlockComment" />
     </comments>
     <keywords casesensitive="1" />
 </general>

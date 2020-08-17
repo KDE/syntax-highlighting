@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language version="4" kateversion="2.4" name="Mason" section="Scripts" extensions="*.html;" mimetype="">
+<language version="5" kateversion="2.4" name="Mason" section="Scripts" extensions="*.html;" mimetype="">
 <highlighting>
 	<list name="keywords">
 		<item>sub</item>
@@ -71,7 +71,7 @@
 			<RegExpr attribute="Mason Tag" context="EmbeddedPerl" String="&lt;\%method[^&gt;]*&gt;" />
 			<RegExpr attribute="Mason Tag" context="EmbeddedPerl" String="&lt;\%def[^&gt;]*&gt;" />
 			<StringDetect attribute="Mason Tag" context="EmbeddedPerl" String="&lt;%method&gt;" insensitive="false" />
-			<StringDetect attribute="Comment" context="Documentation" String="&lt;%doc&gt;" insensitive="false" />
+			<StringDetect attribute="Comment" context="Documentation" String="&lt;%doc&gt;" insensitive="false" beginRegion="Documentation" />
 
 			<StringDetect attribute="Mason Tag" context="EmbeddedPerl" String="&lt;%perl&gt;" insensitive="false" />
 			<StringDetect attribute="Mason Tag" context="EmbeddedPerl" String="&lt;%init&gt;" insensitive="false" />
@@ -112,7 +112,7 @@
 			<DetectChar attribute="String" context="String2" char="'"/>
 			<DetectChar attribute="String Char" context="String" char="`"/>
 			<Detect2Chars attribute="Comment" context="Commentar 1" char="/" char1="/"/>
-			<Detect2Chars attribute="Comment" context="Commentar 2" char="/" char1="*"/>
+			<Detect2Chars attribute="Comment" context="Commentar 2" char="/" char1="*" beginRegion="BlockComment"/>
 			<Detect2Chars attribute="Pattern" context="Pattern2" char="s" char1="/" />
 			<DetectChar attribute="Pattern" context="Pattern" char="/" />
 			<DetectIdentifier attribute="normal" context="#stay" />
@@ -142,10 +142,17 @@
 			<AnyChar attribute="normal" context="#pop" String=" &amp;	()+,-&lt;=&gt;?^|~" />
 		</context>
 
-		<context attribute="Comment" lineEndContext="#pop" name="Commentar 1"/>
+		<context attribute="Comment" lineEndContext="#pop" name="Commentar 1">
+			<DetectSpaces />
+			<IncludeRules context="##Alerts"/>
+			<IncludeRules context="##Modelines"/>
+		</context>
 
 		<context attribute="Comment" lineEndContext="#stay" name="Commentar 2">
-			<Detect2Chars attribute="Comment" context="#pop" char="*" char1="/"/>
+			<Detect2Chars attribute="Comment" context="#pop" char="*" char1="/" endRegion="BlockComment"/>
+			<DetectSpaces />
+			<IncludeRules context="##Alerts"/>
+			<IncludeRules context="##Modelines"/>
 		</context>
 
 		<context attribute="Pattern" lineEndContext="#stay" name="Pattern">
@@ -187,7 +194,7 @@
 			<RegExpr attribute="String" context="#stay" String="'[^']*'"/>
 			<DetectChar attribute="String Char" context="Something" char="`"/>
 			<Detect2Chars attribute="Comment" context="Commentar 1" char="/" char1="/"/>
-			<Detect2Chars attribute="Comment" context="Commentar 2" char="/" char1="*"/>
+			<Detect2Chars attribute="Comment" context="Commentar 2" char="/" char1="*" beginRegion="BlockComment"/>
 			<Detect2Chars attribute="Pattern" context="Pattern2" char="s" char1="/" />
 			<RegExpr attribute="Decimal" context="#stay" String="[0-9]+" />
 			<AnyChar attribute="Data Type" context="Variable" String="$@%" />
@@ -197,7 +204,9 @@
 		</context>
 
 		<context attribute="Comment" lineEndContext="#stay" name="Documentation">
-			<StringDetect attribute="Comment" context="#pop" String="&lt;/%doc&gt;" insensitive="false" />
+			<StringDetect attribute="Comment" context="#pop" String="&lt;/%doc&gt;" insensitive="false" endRegion="Documentation" />
+			<DetectSpaces />
+			<IncludeRules context="##Alerts"/>
 		</context>
 
 		<context attribute="Mason Method" lineEndContext="#stay" name="MethodCall">
@@ -226,8 +235,9 @@
   <general>
     <comments>
 	  <comment name="singleLine" start="#" />
-	  <comment name="multiLine" start="&lt;%doc&gt;" end="&lt;%doc&gt;"/>
+	  <comment name="multiLine" start="&lt;%doc&gt;" end="&lt;%doc&gt;" region="Documentation"/>
      </comments>
     <keywords casesensitive="1" />
   </general>
 </language>
+<!-- kate: replace-tabs off; -->

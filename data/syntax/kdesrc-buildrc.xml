@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
 <language name = "kdesrc-buildrc"
-       version = "2"
+       version = "3"
    kateversion = "3.5"
        section = "Configuration"
     extensions = ".kdesrc-buildrc;kdesrc-buildrc"
@@ -123,10 +123,13 @@
         <keyword String="openModule" attribute="Module Declaration" context="Module Decl" firstNonSpace="true" beginRegion="Module Options"/>
 
         <keyword String="includeKeyword" attribute="Option Name" context="Include Decl" firstNonSpace="true"/>
-        <DetectChar context="Comment" char="#"/>
+        <DetectChar attribute="Comment" context="Comment" char="#"/>
       </context>
 
       <context name="Comment" attribute="Comment" lineEndContext="#pop">
+        <DetectSpaces />
+        <IncludeRules context="##Alerts"/>
+        <IncludeRules context="##Modelines"/>
       </context>
 
       <context name="Include Decl" attribute="Option Value" lineEndContext="#pop">
@@ -135,7 +138,7 @@
       <context name="Module Decl" attribute="Module Name" lineEndContext="Module Options">
         <DetectSpaces/>
         <RegExpr attribute="Module Name" String="[a-zA-Z0-9/-]+"/>
-        <DetectChar context="Comment" char="#"/>
+        <DetectChar attribute="Comment" context="Comment" char="#"/>
       </context>
 
       <context name="Common Module Options" attribute="Normal Text" lineEndContext="#stay">
@@ -148,7 +151,7 @@
         <!-- No kdesrc-build options start with digits or a dash. -->
         <RegExpr attribute="Possible Error" context="Option Value" String="[0-9-][a-zA-Z0-9_-]+" />
         <RegExpr attribute="Unknown Option Name" context="Option Value" String="[a-zA-Z0-9_-]+" />
-        <DetectChar context="Comment" char="#"/>
+        <DetectChar attribute="Comment" context="Comment" char="#"/>
       </context>
 
       <context attribute="Normal Text" name="CMake Option" lineEndContext="#pop">
@@ -196,7 +199,7 @@
       </context>
 
       <context name="ModuleSet use-module" attribute="Module Name" lineEndContext="#pop">
-        <DetectChar context="Comment" char="#"/>
+        <DetectChar attribute="Comment" context="Comment" char="#"/>
         <LineContinue attribute="Possible Error" context="#stay"/>
       </context>
 
@@ -204,21 +207,21 @@
         <DetectSpaces/>
         <RegExpr attribute="Variable" String="\$\{[a-zA-Z0-9_-]+\}"/>
         <RegExpr attribute="Option Value" String="[a-zA-Z:0-9,./+!=@_-]*" context="#stay" />
-        <DetectChar context="Comment" char="#"/>
+        <DetectChar attribute="Comment" context="Comment" char="#"/>
         <LineContinue attribute="Option Value" context="#stay"/>
       </context>
 
       <context name="Bool Option Value" attribute="Possible Error" lineEndContext="#pop">
         <DetectSpaces attribute="Normal Text"/>
         <keyword attribute="Option Value" context="#stay" String="bools"/>
-        <DetectChar context="Comment" char="#"/>
+        <DetectChar attribute="Comment" context="Comment" char="#"/>
         <LineContinue attribute="Possible Error" context="#stay"/>
       </context>
 
       <context name="Environment Name" attribute="Environment Variable Name" lineEndContext="#pop">
         <DetectSpaces/>
         <RegExpr attribute="Environment Variable Name" context="Option Value" String="[a-zA-Z0-9_-]+" />
-        <DetectChar context="Comment" char="#"/>
+        <DetectChar attribute="Comment" context="Comment" char="#"/>
       </context>
     </contexts>
 
@@ -245,3 +248,4 @@
   </general>
 
 </language>
+<!-- kate: replace-tabs on; tab-width 2; indent-width 2; -->

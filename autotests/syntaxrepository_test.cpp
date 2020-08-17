@@ -18,6 +18,8 @@
 #include <QStandardPaths>
 #include <QTest>
 
+#include <algorithm>
+
 namespace KSyntaxHighlighting
 {
 class NullHighlighter : public AbstractHighlighter
@@ -222,7 +224,7 @@ private Q_SLOTS:
         QVERIFY(def.isValid());
         auto defs = def.includedDefinitions();
 
-        const QStringList expectedDefinitionNames = {QStringLiteral("PHP/PHP"),
+        QStringList expectedDefinitionNames = {QStringLiteral("PHP/PHP"),
                                                      QStringLiteral("Alerts"),
                                                      QStringLiteral("CSS/PHP"),
                                                      QStringLiteral("JavaScript/PHP"),
@@ -242,14 +244,11 @@ private Q_SLOTS:
         for (auto d : defs) {
             QVERIFY(d.isValid());
             definitionNames.push_back(d.name());
-
-            // already check here a bit to make the test fails better fixable
-            if (definitionNames.size() <= expectedDefinitionNames.size()) {
-                QCOMPARE(d.name(), expectedDefinitionNames[definitionNames.size() - 1]);
-            } else {
-                QCOMPARE(d.name(), QStringLiteral("too many included defs found, first one is this one"));
-            }
         }
+
+        // work on sorted lists to make test more stable to changes in structure of XML files
+        std::sort(expectedDefinitionNames.begin(), expectedDefinitionNames.end());
+        std::sort(definitionNames.begin(), definitionNames.end());
         QCOMPARE(definitionNames, expectedDefinitionNames);
     }
 

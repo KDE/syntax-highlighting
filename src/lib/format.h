@@ -20,7 +20,6 @@ QT_END_NAMESPACE
 
 namespace KSyntaxHighlighting
 {
-class DefinitionRef;
 class FormatPrivate;
 
 /** Describes the format to be used for a specific text fragment.

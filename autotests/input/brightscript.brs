@@ -107,3 +107,24 @@ end function
 unnamed_sub = sub ( a as Integer ) as Void
 end sub
 endFunction
+
+sub exceptions()
+	try=1
+	try()
+	try.foo
+	try foo
+
+	catch=1
+	catch()
+	catch.foo
+	catch foo
+
+	try
+	catch foo
+	end try
+
+	try ' comment
+	endtry
+
+	throw {a: "abc"}
+end sub

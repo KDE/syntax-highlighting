@@ -4,7 +4,7 @@
 	name="BrightScript"
 	section="Scripts"
 	extensions="*.brs"
-	version="6"
+	version="7"
 	kateversion="5.0"
 	author="Daniel Levin (dendy.ua@gmail.com)"
 	license="MIT">
@@ -48,6 +48,11 @@
 <list name="dim"><item>dim</item></list>
 <list name="stop"><item>stop</item></list>
 <list name="goto"><item>goto</item></list>
+
+<list name="try"><item>try</item></list>
+<list name="endtry"><item>endtry</item></list>
+<list name="catch"><item>catch</item></list>
+<list name="throw"><item>throw</item></list>
 
 <list name="m"><item>m</item></list>
 <list name="top">
@@ -382,9 +387,47 @@
 
 	<keyword String="exit" attribute="control" context="exit"/>
 
+	<keyword String="try" context="try_test" lookAhead="true"/>
+	<keyword String="throw" attribute="keyword" context="rvalue"/>
+
 	<DetectChar char=":" context="line_break" lookAhead="true"/>
 
 	<DetectIdentifier context="lvalue" lookAhead="true"/>
+</context>
+
+<context name="try_test" attribute="g" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!lvalue">
+	<RegExpr String="try\s*$" context="#pop!try_begin" lookAhead="true"/>
+	<RegExpr String="try\s*'" context="#pop!try_begin" lookAhead="true"/>
+</context>
+
+<context name="try_begin" attribute="g" lineEndContext="#pop">
+	<DetectIdentifier attribute="keyword" context="#pop!try_body"/>
+</context>
+
+<context name="try_body" attribute="g" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop">
+	<DetectSpaces/>
+	<StringDetect String="end" insensitive="true" attribute="keyword" context="#pop!try_end"/>
+	<keyword String="endtry" attribute="keyword" context="#pop"/>
+	<keyword String="catch" context="catch_test" lookAhead="true"/>
+	<IncludeRules context="@code"/>
+</context>
+
+<context name="try_end" attribute="g" lineEndContext="#pop">
+	<DetectSpaces/>
+	<keyword String="try" attribute="keyword" context="#pop"/>
+</context>
+
+<context name="catch_test" attribute="g" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!lvalue">
+	<RegExpr String="catch\s*[a-zA-Z_]" attribute="control" context="#pop!catch_expr" lookAhead="true"/>
+</context>
+
+<context name="catch_expr" attribute="g" fallthrough="true" fallthroughContext="#pop">
+	<keyword String="catch" attribute="keyword" context="#pop!catch_var"/>
+</context>
+
+<context name="catch_var" attribute="g" fallthrough="true" fallthroughContext="#pop">
+	<DetectSpaces/>
+	<DetectIdentifier attribute="var" context="#pop"/>
 </context>
 
 <context name="print" attribute="g" lineEndContext="#pop" fallthrough="true" fallthroughContext="rvalue">

@@ -59,8 +59,8 @@ Definition::Definition(const Definition &other)
     d->q = *this;
 }
 
-Definition::Definition(const std::shared_ptr<DefinitionData> &dd)
-    : d(dd)
+Definition::Definition(std::shared_ptr<DefinitionData> &&dd)
+    : d(std::move(dd))
 {
 }
 

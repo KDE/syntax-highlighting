@@ -386,7 +386,7 @@ public:
 private:
     friend class DefinitionData;
     friend class DefinitionRef;
-    explicit Definition(const std::shared_ptr<DefinitionData> &dd);
+    explicit Definition(std::shared_ptr<DefinitionData> &&dd);
     std::shared_ptr<DefinitionData> d;
 };
 

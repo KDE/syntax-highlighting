@@ -114,10 +114,12 @@ bool Rule::load(QXmlStreamReader &reader)
 
 void Rule::resolveContext()
 {
-    m_context.resolve(m_def.definition());
+    auto const& def = m_def.definition();
+
+    m_context.resolve(def);
 
     // cache for DefinitionData::wordDelimiters, is accessed VERY often
-    m_wordDelimiter = &DefinitionData::get(m_def.definition())->wordDelimiters;
+    m_wordDelimiter = &DefinitionData::get(def)->wordDelimiters;
 }
 
 void Rule::resolveAttributeFormat(Context *lookupContext)
@@ -141,47 +143,45 @@ bool Rule::doLoad(QXmlStreamReader &reader)
 
 Rule::Ptr Rule::create(const QStringRef &name)
 {
-    Rule *rule = nullptr;
     if (name == QLatin1String("AnyChar"))
-        rule = new AnyChar;
-    else if (name == QLatin1String("DetectChar"))
-        rule = new DetectChar;
-    else if (name == QLatin1String("Detect2Chars"))
-        rule = new Detect2Char;
-    else if (name == QLatin1String("DetectIdentifier"))
-        rule = new DetectIdentifier;
-    else if (name == QLatin1String("DetectSpaces"))
-        rule = new DetectSpaces;
-    else if (name == QLatin1String("Float"))
-        rule = new Float;
-    else if (name == QLatin1String("Int"))
-        rule = new Int;
-    else if (name == QLatin1String("HlCChar"))
-        rule = new HlCChar;
-    else if (name == QLatin1String("HlCHex"))
-        rule = new HlCHex;
-    else if (name == QLatin1String("HlCOct"))
-        rule = new HlCOct;
-    else if (name == QLatin1String("HlCStringChar"))
-        rule = new HlCStringChar;
-    else if (name == QLatin1String("IncludeRules"))
-        rule = new IncludeRules;
-    else if (name == QLatin1String("keyword"))
-        rule = new KeywordListRule;
-    else if (name == QLatin1String("LineContinue"))
-        rule = new LineContinue;
-    else if (name == QLatin1String("RangeDetect"))
-        rule = new RangeDetect;
-    else if (name == QLatin1String("RegExpr"))
-        rule = new RegExpr;
-    else if (name == QLatin1String("StringDetect"))
-        rule = new StringDetect;
-    else if (name == QLatin1String("WordDetect"))
-        rule = new WordDetect;
-    else
-        qCWarning(Log) << "Unknown rule type:" << name;
+        return std::make_shared<AnyChar>();
+    if (name == QLatin1String("DetectChar"))
+        return std::make_shared<DetectChar>();
+    if (name == QLatin1String("Detect2Chars"))
+        return std::make_shared<Detect2Char>();
+    if (name == QLatin1String("DetectIdentifier"))
+        return std::make_shared<DetectIdentifier>();
+    if (name == QLatin1String("DetectSpaces"))
+        return std::make_shared<DetectSpaces>();
+    if (name == QLatin1String("Float"))
+        return std::make_shared<Float>();
+    if (name == QLatin1String("Int"))
+        return std::make_shared<Int>();
+    if (name == QLatin1String("HlCChar"))
+        return std::make_shared<HlCChar>();
+    if (name == QLatin1String("HlCHex"))
+        return std::make_shared<HlCHex>();
+    if (name == QLatin1String("HlCOct"))
+        return std::make_shared<HlCOct>();
+    if (name == QLatin1String("HlCStringChar"))
+        return std::make_shared<HlCStringChar>();
+    if (name == QLatin1String("IncludeRules"))
+        return std::make_shared<IncludeRules>();
+    if (name == QLatin1String("keyword"))
+        return std::make_shared<KeywordListRule>();
+    if (name == QLatin1String("LineContinue"))
+        return std::make_shared<LineContinue>();
+    if (name == QLatin1String("RangeDetect"))
+        return std::make_shared<RangeDetect>();
+    if (name == QLatin1String("RegExpr"))
+        return std::make_shared<RegExpr>();
+    if (name == QLatin1String("StringDetect"))
+        return std::make_shared<StringDetect>();
+    if (name == QLatin1String("WordDetect"))
+        return std::make_shared<WordDetect>();
 
-    return Ptr(rule);
+    qCWarning(Log) << "Unknown rule type:" << name;
+    return Ptr(nullptr);
 }
 
 bool Rule::isWordDelimiter(QChar c) const

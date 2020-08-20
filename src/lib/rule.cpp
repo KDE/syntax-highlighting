@@ -85,13 +85,13 @@ bool Rule::load(QXmlStreamReader &reader)
 {
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
 
-    m_attribute = reader.attributes().value(QStringLiteral("attribute")).toString();
+    m_attribute = reader.attributes().value(QLatin1String("attribute")).toString();
     if (reader.name() != QLatin1String("IncludeRules")) // IncludeRules uses this with a different semantic
-        m_context.parse(reader.attributes().value(QStringLiteral("context")));
-    m_firstNonSpace = Xml::attrToBool(reader.attributes().value(QStringLiteral("firstNonSpace")));
-    m_lookAhead = Xml::attrToBool(reader.attributes().value(QStringLiteral("lookAhead")));
+        m_context.parse(reader.attributes().value(QLatin1String("context")));
+    m_firstNonSpace = Xml::attrToBool(reader.attributes().value(QLatin1String("firstNonSpace")));
+    m_lookAhead = Xml::attrToBool(reader.attributes().value(QLatin1String("lookAhead")));
     bool colOk = false;
-    m_column = reader.attributes().value(QStringLiteral("column")).toInt(&colOk);
+    m_column = reader.attributes().value(QLatin1String("column")).toInt(&colOk);
     if (!colOk)
         m_column = -1;
 
@@ -192,7 +192,7 @@ bool Rule::isWordDelimiter(QChar c) const
 
 bool AnyChar::doLoad(QXmlStreamReader &reader)
 {
-    m_chars = reader.attributes().value(QStringLiteral("String")).toString();
+    m_chars = reader.attributes().value(QLatin1String("String")).toString();
     if (m_chars.size() == 1)
         qCDebug(Log) << "AnyChar rule with just one char: use DetectChar instead.";
     return !m_chars.isEmpty();
@@ -207,11 +207,11 @@ MatchResult AnyChar::doMatch(const QString &text, int offset, const QStringList 
 
 bool DetectChar::doLoad(QXmlStreamReader &reader)
 {
-    const auto s = reader.attributes().value(QStringLiteral("char"));
+    const auto s = reader.attributes().value(QLatin1String("char"));
     if (s.isEmpty())
         return false;
     m_char = s.at(0);
-    m_dynamic = Xml::attrToBool(reader.attributes().value(QStringLiteral("dynamic")));
+    m_dynamic = Xml::attrToBool(reader.attributes().value(QLatin1String("dynamic")));
     if (m_dynamic) {
         m_captureIndex = m_char.digitValue();
     }
@@ -235,8 +235,8 @@ MatchResult DetectChar::doMatch(const QString &text, int offset, const QStringLi
 
 bool Detect2Char::doLoad(QXmlStreamReader &reader)
 {
-    const auto s1 = reader.attributes().value(QStringLiteral("char"));
-    const auto s2 = reader.attributes().value(QStringLiteral("char1"));
+    const auto s1 = reader.attributes().value(QLatin1String("char"));
+    const auto s2 = reader.attributes().value(QLatin1String("char1"));
     if (s1.isEmpty() || s2.isEmpty())
         return false;
     m_char1 = s1.at(0);
@@ -482,7 +482,7 @@ MatchResult KeywordListRule::doMatch(const QString &text, int offset, const QStr
 
 bool LineContinue::doLoad(QXmlStreamReader &reader)
 {
-    const auto s = reader.attributes().value(QStringLiteral("char"));
+    const auto s = reader.attributes().value(QLatin1String("char"));
     if (s.isEmpty())
         m_char = QLatin1Char('\\');
     else
@@ -499,8 +499,8 @@ MatchResult LineContinue::doMatch(const QString &text, int offset, const QString
 
 bool RangeDetect::doLoad(QXmlStreamReader &reader)
 {
-    const auto s1 = reader.attributes().value(QStringLiteral("char"));
-    const auto s2 = reader.attributes().value(QStringLiteral("char1"));
+    const auto s1 = reader.attributes().value(QLatin1String("char"));
+    const auto s2 = reader.attributes().value(QLatin1String("char1"));
     if (s1.isEmpty() || s2.isEmpty())
         return false;
     m_begin = s1.at(0);
@@ -526,14 +526,14 @@ MatchResult RangeDetect::doMatch(const QString &text, int offset, const QStringL
 
 bool RegExpr::doLoad(QXmlStreamReader &reader)
 {
-    m_regexp.setPattern(reader.attributes().value(QStringLiteral("String")).toString());
+    m_regexp.setPattern(reader.attributes().value(QLatin1String("String")).toString());
 
-    const auto isMinimal = Xml::attrToBool(reader.attributes().value(QStringLiteral("minimal")));
-    const auto isCaseInsensitive = Xml::attrToBool(reader.attributes().value(QStringLiteral("insensitive")));
+    const auto isMinimal = Xml::attrToBool(reader.attributes().value(QLatin1String("minimal")));
+    const auto isCaseInsensitive = Xml::attrToBool(reader.attributes().value(QLatin1String("insensitive")));
     m_regexp.setPatternOptions((isMinimal ? QRegularExpression::InvertedGreedinessOption : QRegularExpression::NoPatternOption) | (isCaseInsensitive ? QRegularExpression::CaseInsensitiveOption : QRegularExpression::NoPatternOption));
 
     // optimize the pattern for the non-dynamic case, we use them OFTEN
-    m_dynamic = Xml::attrToBool(reader.attributes().value(QStringLiteral("dynamic")));
+    m_dynamic = Xml::attrToBool(reader.attributes().value(QLatin1String("dynamic")));
     if (!m_dynamic) {
         m_regexp.optimize();
     }
@@ -583,9 +583,9 @@ MatchResult RegExpr::doMatch(const QString &text, int offset, const QStringList 
 
 bool StringDetect::doLoad(QXmlStreamReader &reader)
 {
-    m_string = reader.attributes().value(QStringLiteral("String")).toString();
-    m_caseSensitivity = Xml::attrToBool(reader.attributes().value(QStringLiteral("insensitive"))) ? Qt::CaseInsensitive : Qt::CaseSensitive;
-    m_dynamic = Xml::attrToBool(reader.attributes().value(QStringLiteral("dynamic")));
+    m_string = reader.attributes().value(QLatin1String("String")).toString();
+    m_caseSensitivity = Xml::attrToBool(reader.attributes().value(QLatin1String("insensitive"))) ? Qt::CaseInsensitive : Qt::CaseSensitive;
+    m_dynamic = Xml::attrToBool(reader.attributes().value(QLatin1String("dynamic")));
     return !m_string.isEmpty();
 }
 
@@ -603,8 +603,8 @@ MatchResult StringDetect::doMatch(const QString &text, int offset, const QString
 
 bool WordDetect::doLoad(QXmlStreamReader &reader)
 {
-    m_word = reader.attributes().value(QStringLiteral("String")).toString();
-    m_caseSensitivity = Xml::attrToBool(reader.attributes().value(QStringLiteral("insensitive"))) ? Qt::CaseInsensitive : Qt::CaseSensitive;
+    m_word = reader.attributes().value(QLatin1String("String")).toString();
+    m_caseSensitivity = Xml::attrToBool(reader.attributes().value(QLatin1String("insensitive"))) ? Qt::CaseInsensitive : Qt::CaseSensitive;
     return !m_word.isEmpty();
 }
 

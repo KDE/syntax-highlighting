@@ -475,35 +475,35 @@ bool DefinitionData::loadLanguage(QXmlStreamReader &reader)
     Q_ASSERT(reader.name() == QLatin1String("language"));
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
 
-    if (!checkKateVersion(reader.attributes().value(QStringLiteral("kateversion"))))
+    if (!checkKateVersion(reader.attributes().value(QLatin1String("kateversion"))))
         return false;
 
-    name = reader.attributes().value(QStringLiteral("name")).toString();
-    section = reader.attributes().value(QStringLiteral("section")).toString();
+    name = reader.attributes().value(QLatin1String("name")).toString();
+    section = reader.attributes().value(QLatin1String("section")).toString();
     // toFloat instead of toInt for backward compatibility with old Kate files
-    version = reader.attributes().value(QStringLiteral("version")).toFloat();
-    priority = reader.attributes().value(QStringLiteral("priority")).toInt();
-    hidden = Xml::attrToBool(reader.attributes().value(QStringLiteral("hidden")));
-    style = reader.attributes().value(QStringLiteral("style")).toString();
-    indenter = reader.attributes().value(QStringLiteral("indenter")).toString();
-    author = reader.attributes().value(QStringLiteral("author")).toString();
-    license = reader.attributes().value(QStringLiteral("license")).toString();
-    const auto exts = reader.attributes().value(QStringLiteral("extensions")).toString();
+    version = reader.attributes().value(QLatin1String("version")).toFloat();
+    priority = reader.attributes().value(QLatin1String("priority")).toInt();
+    hidden = Xml::attrToBool(reader.attributes().value(QLatin1String("hidden")));
+    style = reader.attributes().value(QLatin1String("style")).toString();
+    indenter = reader.attributes().value(QLatin1String("indenter")).toString();
+    author = reader.attributes().value(QLatin1String("author")).toString();
+    license = reader.attributes().value(QLatin1String("license")).toString();
+    const auto exts = reader.attributes().value(QLatin1String("extensions")).toString();
 #if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
     for (const auto &ext : exts.split(QLatin1Char(';'), QString::SkipEmptyParts))
 #else
     for (const auto &ext : exts.split(QLatin1Char(';'), Qt::SkipEmptyParts))
 #endif
         extensions.push_back(ext);
-    const auto mts = reader.attributes().value(QStringLiteral("mimetype")).toString();
+    const auto mts = reader.attributes().value(QLatin1String("mimetype")).toString();
 #if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
     for (const auto &mt : mts.split(QLatin1Char(';'), QString::SkipEmptyParts))
 #else
     for (const auto &mt : mts.split(QLatin1Char(';'), Qt::SkipEmptyParts))
 #endif
         mimetypes.push_back(mt);
-    if (reader.attributes().hasAttribute(QStringLiteral("casesensitive")))
-        caseSensitive = Xml::attrToBool(reader.attributes().value(QStringLiteral("casesensitive"))) ? Qt::CaseSensitive : Qt::CaseInsensitive;
+    if (reader.attributes().hasAttribute(QLatin1String("casesensitive")))
+        caseSensitive = Xml::attrToBool(reader.attributes().value(QLatin1String("casesensitive"))) ? Qt::CaseSensitive : Qt::CaseInsensitive;
     return true;
 }
 
@@ -630,11 +630,11 @@ void DefinitionData::loadGeneral(QXmlStreamReader &reader)
             ++elementRefCounter;
 
             if (reader.name() == QLatin1String("keywords")) {
-                if (reader.attributes().hasAttribute(QStringLiteral("casesensitive")))
-                    caseSensitive = Xml::attrToBool(reader.attributes().value(QStringLiteral("casesensitive"))) ? Qt::CaseSensitive : Qt::CaseInsensitive;
+                if (reader.attributes().hasAttribute(QLatin1String("casesensitive")))
+                    caseSensitive = Xml::attrToBool(reader.attributes().value(QLatin1String("casesensitive"))) ? Qt::CaseSensitive : Qt::CaseInsensitive;
 
                 // adapt sorted wordDelimiters
-                wordDelimiters += reader.attributes().value(QStringLiteral("additionalDeliminator"));
+                wordDelimiters += reader.attributes().value(QLatin1String("additionalDeliminator"));
                 std::sort(wordDelimiters.begin(), wordDelimiters.end());
                 auto it = std::unique(wordDelimiters.begin(), wordDelimiters.end());
                 wordDelimiters.truncate(std::distance(wordDelimiters.begin(), it));
@@ -642,13 +642,13 @@ void DefinitionData::loadGeneral(QXmlStreamReader &reader)
                     wordDelimiters.remove(c);
 
                 // adaptWordWrapDelimiters, and sort
-                wordWrapDelimiters = reader.attributes().value(QStringLiteral("wordWrapDeliminator")).toString();
+                wordWrapDelimiters = reader.attributes().value(QLatin1String("wordWrapDeliminator")).toString();
                 std::sort(wordWrapDelimiters.begin(), wordWrapDelimiters.end());
                 if (wordWrapDelimiters.isEmpty())
                     wordWrapDelimiters = wordDelimiters;
             } else if (reader.name() == QLatin1String("folding")) {
-                if (reader.attributes().hasAttribute(QStringLiteral("indentationsensitive")))
-                    indentationBasedFolding = Xml::attrToBool(reader.attributes().value(QStringLiteral("indentationsensitive")));
+                if (reader.attributes().hasAttribute(QLatin1String("indentationsensitive")))
+                    indentationBasedFolding = Xml::attrToBool(reader.attributes().value(QLatin1String("indentationsensitive")));
             } else if (reader.name() == QLatin1String("emptyLines")) {
                 loadFoldingIgnoreList(reader);
             } else if (reader.name() == QLatin1String("comments")) {
@@ -687,14 +687,14 @@ void DefinitionData::loadComments(QXmlStreamReader &reader)
         case QXmlStreamReader::StartElement:
             ++elementRefCounter;
             if (reader.name() == QLatin1String("comment")) {
-                const bool isSingleLine = reader.attributes().value(QStringLiteral("name")) == QStringLiteral("singleLine");
+                const bool isSingleLine = reader.attributes().value(QLatin1String("name")) == QLatin1String("singleLine");
                 if (isSingleLine) {
-                    singleLineCommentMarker = reader.attributes().value(QStringLiteral("start")).toString();
-                    const bool afterWhiteSpace = reader.attributes().value(QStringLiteral("position")).toString() == QStringLiteral("afterwhitespace");
+                    singleLineCommentMarker = reader.attributes().value(QLatin1String("start")).toString();
+                    const bool afterWhiteSpace = reader.attributes().value(QLatin1String("position")).toString() == QLatin1String("afterwhitespace");
                     singleLineCommentPosition = afterWhiteSpace ? CommentPosition::AfterWhitespace : CommentPosition::StartOfLine;
                 } else {
-                    multiLineCommentStartMarker = reader.attributes().value(QStringLiteral("start")).toString();
-                    multiLineCommentEndMarker = reader.attributes().value(QStringLiteral("end")).toString();
+                    multiLineCommentStartMarker = reader.attributes().value(QLatin1String("start")).toString();
+                    multiLineCommentEndMarker = reader.attributes().value(QLatin1String("end")).toString();
                 }
             }
             reader.readNext();
@@ -726,7 +726,7 @@ void DefinitionData::loadFoldingIgnoreList(QXmlStreamReader &reader)
         case QXmlStreamReader::StartElement:
             ++elementRefCounter;
             if (reader.name() == QLatin1String("emptyLine")) {
-                foldingIgnoreList << reader.attributes().value(QStringLiteral("regexpr")).toString();
+                foldingIgnoreList << reader.attributes().value(QLatin1String("regexpr")).toString();
             }
             reader.readNext();
             break;
@@ -757,9 +757,9 @@ void DefinitionData::loadSpellchecking(QXmlStreamReader &reader)
         case QXmlStreamReader::StartElement:
             ++elementRefCounter;
             if (reader.name() == QLatin1String("encoding")) {
-                const auto charRef = reader.attributes().value(QStringLiteral("char"));
+                const auto charRef = reader.attributes().value(QLatin1String("char"));
                 if (!charRef.isEmpty()) {
-                    const auto str = reader.attributes().value(QStringLiteral("string")).toString();
+                    const auto str = reader.attributes().value(QLatin1String("string")).toString();
                     characterEncodings.push_back({charRef[0], str});
                 }
             }

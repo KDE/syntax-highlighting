@@ -33,7 +33,7 @@ void KeywordList::load(QXmlStreamReader &reader)
     Q_ASSERT(reader.name() == QLatin1String("list"));
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
 
-    m_name = reader.attributes().value(QStringLiteral("name")).toString();
+    m_name = reader.attributes().value(QLatin1String("name")).toString();
 
     while (!reader.atEnd()) {
         switch (reader.tokenType()) {

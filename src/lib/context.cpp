@@ -56,7 +56,7 @@ void Context::load(QXmlStreamReader &reader)
             if (rule) {
                 rule->setDefinition(m_def.definition());
                 if (rule->load(reader))
-                    m_rules.push_back(rule);
+                    m_rules.push_back(std::move(rule));
             } else {
                 reader.skipCurrentElement();
             }

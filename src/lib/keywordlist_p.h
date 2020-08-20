@@ -8,6 +8,7 @@
 #define KSYNTAXHIGHLIGHTING_KEYWORDLIST_P_H
 
 #include <QString>
+#include <QStringView>
 #include <QStringList>
 
 #include <vector>
@@ -88,12 +89,12 @@ private:
     /**
      * case-sensitive sorted string references to m_keywords for lookup
      */
-    std::vector<QStringRef> m_keywordsSortedCaseSensitive;
+    std::vector<QStringView> m_keywordsSortedCaseSensitive;
 
     /**
      * case-insensitive sorted string references to m_keywords for lookup
      */
-    std::vector<QStringRef> m_keywordsSortedCaseInsensitive;
+    std::vector<QStringView> m_keywordsSortedCaseInsensitive;
 };
 }
 

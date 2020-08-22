@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>highlight.sml</title>
+<meta name="generator" content="KF5::SyntaxHighlighting (SML)"/>
+</head><body style="color:#1f1c1b"><pre>
+<span style="font-weight:bold;">datatype</span> Colour = R | B
+
+<span style="font-weight:bold;">datatype</span> 'a RBtree = E | N <span style="font-weight:bold;">of</span> Colour * 'a * 'a RBtree * 'a RBtree
+
+<span style="color:#898887;">(* Dieses lookup funktioniert nur fuer Elemente vom Typ int *)</span>
+
+<span style="font-weight:bold;">fun</span> lookup (x,E) = <span style="font-weight:bold;">false</span>
+  | lookup (x,N(_,y,l,r)) = 
+       <span style="font-weight:bold;">if</span> x &lt; y <span style="font-weight:bold;">then</span> lookup(x,l)
+       <span style="font-weight:bold;">else</span> <span style="font-weight:bold;">if</span> y &lt; x <span style="font-weight:bold;">then</span> lookup(x,r)
+       <span style="font-weight:bold;">else</span> <span style="font-weight:bold;">true</span>
+
+<span style="font-weight:bold;">fun</span> balance (B,x,N(R,y,N(R,z,t1,t2),t3),t4) =
+       N(R,y,N(B,z,t1,t2),N(B,x,t3,t4))
+  | balance (B,x,N(R,y,t1,N(R,z,t2,t3)),t4) =
+       N(R,z,N(B,y,t1,t2),N(B,x,t3,t4))
+  | balance (B,x,t1,N(R,y,N(R,z,t2,t3),t4)) =
+       N(R,z,N(B,x,t1,t2),N(B,y,t3,t4))
+  | balance (B,x,t1,N(R,y,t2,N(R,z,t3,t4))) =
+       N(R,y,N(B,x,t1,t2),N(B,z,t3,t4))
+  | balance t = N t
+
+<span style="font-weight:bold;">fun</span> insert(x,t) =
+   <span style="font-weight:bold;">let</span>
+      <span style="font-weight:bold;">fun</span> ins E = N(R,x,E,E)
+        | ins (t <span style="font-weight:bold;">as</span> N(c,y,l,r)) = 
+             <span style="font-weight:bold;">if</span> x &lt; y <span style="font-weight:bold;">then</span> balance (c,y,ins l,r)
+             <span style="font-weight:bold;">else</span> <span style="font-weight:bold;">if</span> y &lt; x <span style="font-weight:bold;">then</span> balance (c,y,l,ins r)
+             <span style="font-weight:bold;">else</span> t
+      <span style="font-weight:bold;">val</span> N(_,y,l,r) = ins t
+   <span style="font-weight:bold;">in</span> N(B,y,l,r)
+   <span style="font-weight:bold;">end</span>
+</pre></body></html>

@@ -44,7 +44,7 @@
 -->
 	
 <!-- Hold the "language" opening tag on a single line, as mentioned in "language.dtd". -->
-<language name="Ruby/Rails/RHTML" version="9" kateversion="5.0" section="Markup" extensions="*.rhtml;*.RHTML;*.html.erb" mimetype="" author="Richard Dale rdale@foton.es" license="LGPLv2+">
+<language name="Ruby/Rails/RHTML" version="10" kateversion="5.0" section="Markup" extensions="*.rhtml;*.RHTML;*.html.erb" mimetype="" author="Richard Dale rdale@foton.es" license="LGPLv2+">
 	
 	<highlighting>
 	
@@ -315,12 +315,6 @@
 			<item>word_wrap</item>
 		</list>
 		
-		<list name="attention">
-			<item>TODO</item>
-			<item>FIXME</item>
-			<item>NOTE</item>
-		</list>
-		
 		<contexts>
 			
 		<!-- BEGIN HTML contexts -->
@@ -377,9 +371,10 @@
 			
 			<context name="Comment" attribute="Comment" lineEndContext="#stay">
 				<DetectSpaces/>
-				<IncludeRules context="##Alerts" />
-				<DetectIdentifier/>
 				<StringDetect attribute="Comment" context="#pop" String="--&gt;" endRegion="comment" />
+				<IncludeRules context="##Alerts" />
+				<IncludeRules context="##Modelines" />
+				<DetectIdentifier/>
 				<RegExpr attribute="Error" context="#stay" String="-(-(?!-&gt;))+" />
 			</context>
 			
@@ -728,12 +723,13 @@
 			
 			<context name="Comment Line" attribute="Ruby Comment" lineEndContext="#pop">
 				<RegExpr attribute="Ruby Comment" String="\w\:\:\s" context="RDoc Label"/>
-				<keyword attribute="Alert" String="attention" context="#stay"/>
+				<IncludeRules context="##Alerts"/>
 				<RegExpr attribute="Keyword" context="#pop#pop" String="-?%&gt;" />
 			</context>
 			
 			<context name="General Comment" attribute="Ruby Comment" lineEndContext="#pop">
-				<keyword attribute="Dec" String="attention" context="#stay"/>
+				<DetectSpaces/>
+				<IncludeRules context="##Alerts"/>
 			</context>
 			
 			<context name="RDoc Label" attribute="RDoc Value" lineEndContext="#pop"/>
@@ -1207,7 +1203,6 @@
 			
 			<!-- use these to mark errors and alerts things -->
 			<itemData name="Error" defStyleNum="dsError" />
-			<itemData name="Alert" defStyleNum="dsAlert" />
 
 			<itemData name="Delimiter" defStyleNum="dsChar"/>
 			<itemData name="Operator" defStyleNum="dsChar"/>
@@ -1230,8 +1225,9 @@
 	</highlighting>
 	<general>
 		<comments>
-			<comment name="multiLine" start="&lt;!--" end="--&gt;" />
+			<comment name="multiLine" start="&lt;!--" end="--&gt;" region="comment" />
 		</comments>
 		<keywords casesensitive="1" weakDeliminator="!?"/> 
 	</general>
 </language>
+<!-- kate: replace-tabs off; -->

@@ -16,7 +16,7 @@
     Changelog :)
     0.02 Added highliting for interpolated variables
         -->
-<language version="5" kateversion="5.0"
+<language version="6" kateversion="5.0"
           author="Красимир Беров (k.berov@gmail.com)" license="Artistic"
           name="TT2" section="Markup" extensions="*.tt*;" casesensitive="true">
 <highlighting>
@@ -185,7 +185,7 @@
             <Detect2Chars attribute="Keyword" context="tt2source" char="[" char1="%" />
             <RegExpr attribute="HTML Tag" context="scripts" String="&lt;\s*script(\s|&gt;)" insensitive="true" />
             <RegExpr attribute="HTML Tag" context="htmltag" String="&lt;\s*\/?\s*[a-zA-Z_:][a-zA-Z0-9._:-]*" />
-            <StringDetect attribute="HTML Comment" context="htmlcomment" String="&lt;!--" />
+            <StringDetect attribute="HTML Comment" context="htmlcomment" String="&lt;!--" beginRegion="HTMLComment"/>
             <!-- Interpolated variables -->
             <RegExpr attribute="Variable" context="#stay" String="&var1;" />
             <RegExpr attribute="Variable" context="#stay" String="&varwithbraces;" />
@@ -218,7 +218,10 @@
             <keyword attribute="Control Structures" context="#stay" String="control structures" />
         </context>
         <context name="tt2_onelinecomment" attribute="Comment" lineEndContext="#pop">
+            <DetectSpaces />
             <Detect2Chars attribute="Keyword" context="#pop#pop" char="%" char1="]" />
+            <IncludeRules context="##Alerts" />
+            <IncludeRules context="##Modelines" />
         </context>
         <context name="doublequotestring" attribute="String" lineEndContext="#stay">
             <Detect2Chars attribute="Escape Code" context="#stay" char="&quot;" char1="&quot;" />
@@ -241,8 +244,11 @@
         </context>
         <context name="htmlcomment" attribute="HTML Comment" lineEndContext="#stay">
             <Detect2Chars attribute="Keyword" context="tt2source" char="[" char1="%" />
-            <StringDetect attribute="HTML Comment" context="#pop" String="--&gt;" />
+            <StringDetect attribute="HTML Comment" context="#pop" String="--&gt;" endRegion="HTMLComment" />
             <RegExpr attribute="Normal Text" context="identifiers" String="\s*=\s*"/>
+            <DetectSpaces />
+            <IncludeRules context="##Alerts" />
+            <IncludeRules context="##Modelines" />
         </context>
         <context name="identifiers" attribute="Identifier" lineEndContext="#stay">
             <RegExpr attribute="String" context="#pop" String="\s*#?[a-zA-Z0-9]*" />
@@ -262,7 +268,7 @@
         
         <context name="scripts" attribute="Normal Text" lineEndContext="#stay">
             <Detect2Chars attribute="Comment" context="scripts_onelinecomment" char="/" char1="/" />
-            <Detect2Chars attribute="Comment" context="twolinecomment" char="/" char1="*" />
+            <Detect2Chars attribute="Comment" context="twolinecomment" char="/" char1="*" beginRegion="Comment" />
             <keyword attribute="Control Structures" context="#stay" String="control structures" />
             <keyword attribute="Keyword" context="#stay" String="keywords" />
             <keyword attribute="Function" context="#stay" String="functions" />
@@ -280,10 +286,14 @@
             <AnyChar attribute="Other" context="#stay" String=";()}{:,[]" />
         </context>
         <context name="scripts_onelinecomment" attribute="Comment" lineEndContext="#pop">
+            <DetectSpaces />
             <RegExpr attribute="HTML Tag" context="#pop#pop" String="&lt;\s*\/\s*script\s*&gt;" insensitive="true" />
+            <IncludeRules context="##Alerts" />
         </context>
         <context name="twolinecomment" attribute="Comment" lineEndContext="#stay">
+            <DetectSpaces />
             <Detect2Chars attribute="Comment" context="#pop" char="*" char1="/" endRegion="Comment" />
+            <IncludeRules context="##Alerts" />
         </context>
         
     </contexts>
@@ -312,10 +322,10 @@
 </highlighting>
 <general>
     <comments>
-        <comment name="multiLine" start="&lt;!--" end="--&gt;" />
+        <comment name="multiLine" start="&lt;!--" end="--&gt;" region="HTMLComment" />
         <comment name="singleLine" start="#" />
-        <comment name="multiLine" start="[%#" end="%]"/>
     </comments>
     <keywords casesensitive="1" />
   </general>
 </language>
+<!-- kate: replace-tabs on; tab-width 4; indent-width 4; -->

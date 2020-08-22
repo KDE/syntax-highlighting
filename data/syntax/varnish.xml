@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="Varnish Configuration Language" version="3" kateversion="5.0" section="Configuration" extensions="*.vcl;" mimetype="" author="Xavier Guerrin (xavier@tuxfamily.org)" license="WTFPL">
+<language name="Varnish Configuration Language" version="4" kateversion="5.0" section="Configuration" extensions="*.vcl;" mimetype="" author="Xavier Guerrin (xavier@tuxfamily.org)" license="WTFPL">
   <highlighting>
     <list name="vclStandardSubs">
       <item>vcl_recv</item>
@@ -94,13 +94,13 @@
     <contexts>
       <context name="normal_text" attribute="Normal Text" lineEndContext="#stay">
         <IncludeRules context="comments" />
-        <RegExpr attribute="Keyword" context="sub_declaration"      String="^\s*sub\s+" />
-        <RegExpr attribute="Keyword" context="probe_declaration"    String="^\s*probe\s+" />
-        <RegExpr attribute="Keyword" context="backend_declaration"  String="^\s*backend\s+" />
-        <RegExpr attribute="Keyword" context="director_declaration" String="^\s*director\s+" />
-        <RegExpr attribute="Keyword" context="acl_declaration"      String="^\s*acl\s+" />
-        <RegExpr attribute="Keyword" context="import_declaration"   String="^\s*import\s+" />
-        <RegExpr attribute="Keyword" context="include_declaration"  String="^\s*include\s+" />
+        <RegExpr attribute="Keyword" context="sub_declaration"      String="sub\s+"      firstNonSpace="true" />
+        <RegExpr attribute="Keyword" context="probe_declaration"    String="probe\s+"    firstNonSpace="true" />
+        <RegExpr attribute="Keyword" context="backend_declaration"  String="backend\s+"  firstNonSpace="true" />
+        <RegExpr attribute="Keyword" context="director_declaration" String="director\s+" firstNonSpace="true" />
+        <RegExpr attribute="Keyword" context="acl_declaration"      String="acl\s+"      firstNonSpace="true" />
+        <RegExpr attribute="Keyword" context="import_declaration"   String="import\s+"   firstNonSpace="true" />
+        <RegExpr attribute="Keyword" context="include_declaration"  String="include\s+"  firstNonSpace="true" />
         <IncludeRules context="embedded-c" />
       </context>
       <context name="embedded-c" attribute="Normal Text" lineEndContext="#stay">
@@ -111,15 +111,24 @@
         <IncludeRules context="##C" />
       </context>
       <context name="shell-like-comment" attribute="Comment" lineEndContext="#pop">
+        <DetectSpaces />
+        <IncludeRules context="##Alerts" />
+        <IncludeRules context="##Modelines" />
       </context>
       <context name="c-like-comment" attribute="Comment" lineEndContext="#stay">
-        <Detect2Chars char="*" char1="/" context="#pop" attribute="Comment" />
+        <DetectSpaces />
+        <Detect2Chars char="*" char1="/" context="#pop" attribute="Comment" endRegion="BlockComment" />
+        <IncludeRules context="##Alerts" />
+        <IncludeRules context="##Modelines" />
       </context>
       <context name="cplusplus-like-comment" attribute="Comment" lineEndContext="#pop">
+        <DetectSpaces />
+        <IncludeRules context="##Alerts" />
+        <IncludeRules context="##Modelines" />
       </context>
       <context name="comments" attribute="Comment" lineEndContext="#pop">
         <DetectChar   char="#"           context="shell-like-comment"       attribute="Comment" />
-        <Detect2Chars char="/" char1="*" context="c-like-comment"           attribute="Comment" />
+        <Detect2Chars char="/" char1="*" context="c-like-comment"           attribute="Comment" beginRegion="BlockComment" />
         <Detect2Chars char="/" char1="/" context="cplusplus-like-comment"   attribute="Comment" />
       </context>
       <context name="vcl_variables" attribute="Normal Text" lineEndContext="#stay">
@@ -342,6 +351,7 @@
   <general>
     <comments>
       <comment name="singleLine" start="#" />
+      <comment name="multiLine" start="/*" end="*/" region="BlockComment"/>
     </comments>
     <keywords casesensitive="1" />
   </general>

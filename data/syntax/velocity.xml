@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="Velocity" version="2" kateversion="2.3" section="Scripts" extensions="*.vm;" mimetype="text/x-velocity-src;text/x-vm-src" author="John Christopher (John@animalsinneed.net)" license="">
+<language name="Velocity" version="3" kateversion="2.3" section="Scripts" extensions="*.vm;" mimetype="text/x-velocity-src;text/x-vm-src" author="John Christopher (John@animalsinneed.net)" license="">
 	<highlighting>
 		<list name="keywords">
 			<item>#set</item>
@@ -24,12 +24,18 @@
 				<RegExpr attribute="Properties" context="#stay" String="[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff\-]*(\[[a-zA-Z0-9_]*\])*\.[a-zA-Z0-9_\x7f-\xff\-]*" />
 				<AnyChar attribute="Other" context="#stay" String="(),[]" />
 				<Detect2Chars attribute="Comment" context="singleline comment" char="#" char1="#" />
-				<Detect2Chars attribute="Comment" context="multilinecomment" char="#" char1="&#42;" />
+				<Detect2Chars attribute="Comment" context="multilinecomment" char="#" char1="&#42;" beginRegion="BlockComment" />
 			</context>
 			<context attribute="Comment" name="singleline comment" lineEndContext="#pop">
+				<DetectSpaces />
+				<IncludeRules context="##Alerts" />
+				<IncludeRules context="##Modelines" />
 			</context>
 			<context attribute="Comment" lineEndContext="#stay" name="multilinecomment" >
-				<Detect2Chars attribute="Comment" context="#pop" char="*" char1="#" />
+				<DetectSpaces />
+				<Detect2Chars attribute="Comment" context="#pop" char="*" char1="#" endRegion="BlockComment" />
+				<IncludeRules context="##Alerts" />
+				<IncludeRules context="##Modelines" />
 			</context>
 		</contexts>
 		<itemDatas>
@@ -44,8 +50,9 @@
 	<general>
 		<comments>
 			<comment name="singleLine" start="##" />
-			<comment name="multiLine" start="#*" end="*#" />
+			<comment name="multiLine" start="#*" end="*#" region="BlockComment" />
 		</comments>
 		<keywords casesensitive="1" weakDeliminator="+"/>
 	</general>
 </language>
+<!-- kate: replace-tabs off; -->

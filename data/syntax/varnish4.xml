@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="Varnish 4 Configuration Language" version="3" kateversion="3.4" section="Configuration" extensions="*.vcl;" mimetype="" author="Xavier Guerrin (xavier@tuxfamily.org)" license="WTFPL" priority="4">
+<language name="Varnish 4 Configuration Language" version="4" kateversion="3.4" section="Configuration" extensions="*.vcl;" mimetype="" author="Xavier Guerrin (xavier@tuxfamily.org)" license="WTFPL" priority="4">
   <highlighting>
     <list name="vclStandardSubs">
       <item>vcl_recv</item>
@@ -118,15 +118,24 @@
         <IncludeRules context="##C" />
       </context>
       <context name="shell-like-comment" attribute="Comment" lineEndContext="#pop">
+        <DetectSpaces />
+        <IncludeRules context="##Alerts" />
+        <IncludeRules context="##Modelines" />
       </context>
       <context name="c-like-comment" attribute="Comment" lineEndContext="#stay">
-        <Detect2Chars char="*" char1="/" context="#pop" attribute="Comment" />
+        <DetectSpaces />
+        <Detect2Chars char="*" char1="/" context="#pop" attribute="Comment" endRegion="BlockComment" />
+        <IncludeRules context="##Alerts" />
+        <IncludeRules context="##Modelines" />
       </context>
       <context name="cplusplus-like-comment" attribute="Comment" lineEndContext="#pop">
+        <DetectSpaces />
+        <IncludeRules context="##Alerts" />
+        <IncludeRules context="##Modelines" />
       </context>
       <context name="comments" attribute="Comment" lineEndContext="#pop">
         <DetectChar   char="#"           context="shell-like-comment"       attribute="Comment" />
-        <Detect2Chars char="/" char1="*" context="c-like-comment"           attribute="Comment" />
+        <Detect2Chars char="/" char1="*" context="c-like-comment"           attribute="Comment" beginRegion="BlockComment" />
         <Detect2Chars char="/" char1="/" context="cplusplus-like-comment"   attribute="Comment" />
       </context>
       <context name="vcl_variables" attribute="Normal Text" lineEndContext="#stay">
@@ -365,6 +374,7 @@
   <general>
     <comments>
       <comment name="singleLine" start="#" />
+      <comment name="multiLine" start="/*" end="*/" region="BlockComment" />
     </comments>
     <keywords casesensitive="1" />
   </general>

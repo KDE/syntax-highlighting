@@ -17,7 +17,7 @@ Version 1 - Guo Yunhe guoyunhebrave@gmail.com - 2017-04-14
 - Do NOT support multi-line comment or text block
 
 -->
-<language name="Pug" version="5" kateversion="5.0" section="Markup" extensions="*.pug;*.jade" mimetype="" priority="10" author="Guo Yunhe (guoyunhebrave@gmail.com)" license="LGPL">
+<language name="Pug" version="6" kateversion="5.0" section="Markup" extensions="*.pug;*.jade" mimetype="" priority="10" author="Guo Yunhe (guoyunhebrave@gmail.com)" license="LGPL">
   <highlighting>
     <list name="controlflow">
       <item>case</item>
@@ -31,6 +31,7 @@ Version 1 - Guo Yunhe guoyunhebrave@gmail.com - 2017-04-14
     </list>
     <contexts>
       <context name="Start" attribute="Normal Text" lineEndContext="#stay">
+        <RegExpr attribute="Comment" context="BlockComment" String="^(\s*)//" column="0"/>
         <Detect2Chars attribute="Comment" context="Comment" char="/" char1="/"/>
         <StringDetect attribute="Doctype" context="#stay" String="doctype" insensitive="true"/>
         <RegExpr attribute="ControlFlow" context="JavaScript" String="\belse\s+if\b" firstNonSpace="true"/>
@@ -87,7 +88,15 @@ Version 1 - Guo Yunhe guoyunhebrave@gmail.com - 2017-04-14
         <AnyChar attribute="Normal Text" context="#pop" String=",)}:" lookAhead="true"/>
       </context>
       <context name="Comment" attribute="Comment" lineEndContext="#pop">
+        <DetectSpaces />
         <IncludeRules context="##Alerts"/>
+        <IncludeRules context="##Modelines"/>
+      </context>
+      <context name="BlockComment" attribute="Comment" lineEndContext="#stay">
+        <RegExpr attribute="Comment" context="#stay" String="^%1\s" column="0" dynamic="true"/>
+        <RegExpr attribute="Comment" context="#stay" String="^\s*$" column="0"/>
+        <RegExpr attribute="Comment" context="#pop" String="." lookAhead="true" column="0"/>
+        <IncludeRules context="Comment"/>
       </context>
     </contexts>
     <itemDatas>
@@ -107,12 +116,13 @@ Version 1 - Guo Yunhe guoyunhebrave@gmail.com - 2017-04-14
   <general>
     <keywords casesensitive="1" weakDeliminator="-"/>
     <comments>
-      <comment name="singleLine" start="//-"/>
-      <comment name="singleLine" start="//"/>
+      <comment name="singleLine" start="//" position="afterwhitespace"/>
     </comments>
     <folding indentationsensitive="1"/>
     <emptyLines>
-      <emptyLine regexpr="(?:\s+|\s*#.*)"/>
+      <emptyLine regexpr="\s+"/>
+      <emptyLine regexpr="\s*//.*"/>
     </emptyLines>
   </general>
 </language>
+<!-- kate: replace-tabs on; tab-width 2; indent-width 2; -->

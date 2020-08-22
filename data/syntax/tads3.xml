@@ -3,7 +3,7 @@
 <!-- TADS 3 syntax highlight definition for Kate. -->
 <!-- Author: Nikos Chantziaras <realnc@gmail.com> -->
 <language name="TADS 3" section="Sources"
-          version="4" kateversion="3.3"
+          version="5" kateversion="3.3"
           indenter="cstyle"
           extensions="*.t;*.h"
           mimetype=""
@@ -115,12 +115,16 @@
 		</context>
 
 		<context attribute="Comment" lineEndContext="#pop" name="ShortComment">
-			<RegExpr attribute="Preprocessor" context="#stay" String="(FIXME|TODO)"/>
+			<DetectSpaces />
+			<IncludeRules context="##Alerts"/>
+			<IncludeRules context="##Modelines"/>
 		</context>
 
 		<context attribute="Comment" lineEndContext="#stay" name="LongComment">
-			<RegExpr attribute="Preprocessor" context="#stay" String="(FIXME|TODO)"/>
+			<DetectSpaces />
 			<Detect2Chars attribute="Comment" context="#pop" char="*" char1="/" endRegion="Comment"/>
+			<IncludeRules context="##Alerts"/>
+			<IncludeRules context="##Modelines"/>
 		</context>
 
 		<context attribute="Preprocessor" lineEndContext="#pop" name="Preprocessor">
@@ -132,8 +136,9 @@
 		</context>
 
 		<context attribute="Comment" lineEndContext="#stay" name="LongComment/Preprocessor">
-			<RegExpr attribute="Preprocessor" context="#stay" String="(FIXME|TODO)"/>
+			<DetectSpaces />
 			<Detect2Chars attribute="Comment" context="#pop" char="*" char1="/"/>
+			<IncludeRules context="##Alerts"/>
 		</context>
 
 		<context name="embedded" attribute="Embedded Expression" lineEndContext="#stay">
@@ -167,10 +172,11 @@
 <general>
 	<comments>
 		<comment name="singleLine" start="//"/>
-		<comment name="multiLine" start="/*" end="*/"/>
+		<comment name="multiLine" start="/*" end="*/" region="Comment"/>
 	</comments>
 
 	<keywords casesensitive="1"/>
 </general>
 
 </language>
+<!-- kate: replace-tabs off; -->

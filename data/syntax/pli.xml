@@ -2,7 +2,7 @@
 <!DOCTYPE language SYSTEM "language.dtd">
 <language name="PL/I"
 	  section="Sources"
-	  version="3"
+	  version="4"
 	  kateversion="5.0"
 	  extensions="*.pli"
 	  mimetype="text/x-pli"
@@ -386,8 +386,8 @@
     </list>
     <contexts>
       <context attribute="Normal Text" lineEndContext="#stay" name="Normal">
-	<RegExpr      attribute="Comment"   context="CommentW"  String="^\s*/\*.*\*/\s*([0-9]{1,8})?$" beginRegion="CommentW"/>
-	<RegExpr      attribute="Comment"   context="Comment"   String="/\*"              beginRegion="Comment"/>
+	<RegExpr      attribute="Comment"   context="CommentW"  String="^\s*/\*.*\*/\s*([0-9]{1,8})?$" beginRegion="CommentW" column="0"/>
+	<Detect2Chars attribute="Comment"   context="Comment"   char="/" char1="*"                     beginRegion="Comment"/>
 	<RegExpr      attribute="Comment"   context="#stay"     String="[0-9]{1,8}$"/> <!-- Sequence number -->
 	<RegExpr      attribute="Comment"   context="#stay"     String="^1"/>          <!-- Printer control char -->
 	<RegExpr      attribute="PreProc"   context="#stay"     String="^\s*%"/>       <!-- Preprocessor directive -->
@@ -410,13 +410,15 @@
 	<RegExpr      attribute="Identifier" context="#stay"    String="[#a-zA-Z][#_0-9a-zA-Z]*"/>
       </context>
       <context attribute="Comment" lineEndContext="#stay" name="CommentW">
-	<RegExpr attribute="Comment" context="#stay" String="^\s*/\*.*\*/\s*([0-9]{8})?$"/>
-	<RegExpr attribute="Comment" context="#stay" String="^\s*$"/>
+	<RegExpr attribute="Comment" context="#stay" String="^\s*/\*.*\*/\s*([0-9]{8})?$" column="0"/>
+	<RegExpr attribute="Comment" context="#stay" String="^\s*$" column="0"/>
 	<RegExpr                     context="#pop"   String="." endRegion="CommentW" lookAhead="true"/>
       </context>
       <context attribute="Comment" lineEndContext="#stay" name="Comment">
-	<RegExpr attribute="Comment" context="#pop"  String="\*/" endRegion="Comment"/>
-	<RegExpr attribute="Comment" context="#stay" String="."/>
+	<DetectSpaces />
+	<Detect2Chars attribute="Comment" context="#pop"  char="*" char1="/" endRegion="Comment"/>
+	<IncludeRules context="##Alerts"/>
+	<IncludeRules context="##Modelines"/>
       </context>
       <context attribute="String" lineEndContext="#stay" name="String1">
 	<DetectChar attribute="String" context="#pop" char="'"/>
@@ -447,8 +449,7 @@
   <general>
     <keywords casesensitive="0" />
     <comments>
-      <!--comment name="singleLine" start="//" /-->
-      <comment name="multiLine" start="/*" end="*/" />
+      <comment name="multiLine" start="/*" end="*/" region="Comment" />
     </comments>
   </general>
 </language>

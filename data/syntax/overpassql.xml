@@ -4,7 +4,7 @@
   Overpass Query Language: https://wiki.openstreetmap.org/wiki/Overpass_API/Overpass_QL
   Examples: https://wiki.openstreetmap.org/wiki/Overpass_API/Overpass_API_by_Example
 -->
-<language name="Overpass QL" section="Other" version="1" kateversion="5.0" extensions="*.overpassql" author="Volker Krause (vkrause@kde.org)" license="MIT">
+<language name="Overpass QL" section="Other" version="2" kateversion="5.0" extensions="*.overpassql" author="Volker Krause (vkrause@kde.org)" license="MIT">
   <highlighting>
     <list name="listSets">
       <item>node</item>
@@ -103,7 +103,7 @@
         <keyword String="listOther" attribute="Evaluators"/>
         <DetectChar attribute="String" context="ctxString" char="&quot;"/>
         <Detect2Chars attribute="Comment" context="ctxSingeLineComment" char="/" char1="/"/>
-        <Detect2Chars attribute="Comment" context="ctxMultiLineComment" char="/" char1="*"/>
+        <Detect2Chars attribute="Comment" context="ctxMultiLineComment" char="/" char1="*" beginRegion="Comment"/>
         <RegExpr String="\b[_A-Za-z][_0-9A-Za-z]*(?=:)" attribute="Named Argument"/>
         <StringDetect String="{{bbox}}" attribute="Overpass Turbo Placeholders"/>
       </context>
@@ -114,11 +114,15 @@
       </context>
 
       <context name="ctxSingeLineComment" attribute="Comment" lineEndContext="#pop">
+        <DetectSpaces />
         <IncludeRules context="##Alerts"/>
+        <IncludeRules context="##Modelines"/>
       </context>
       <context name="ctxMultiLineComment" attribute="Comment" lineEndContext="#stay">
-        <Detect2Chars context="#pop" char="*" char1="/"/>
+        <DetectSpaces />
+        <Detect2Chars context="#pop" char="*" char1="/" endRegion="Comment"/>
         <IncludeRules context="##Alerts"/>
+        <IncludeRules context="##Modelines"/>
       </context>
     </contexts>
 
@@ -136,4 +140,11 @@
       <itemData name="Overpass Turbo Placeholders" defStyleNum="dsPreprocessor" spellChecking="false"/>
     </itemDatas>
   </highlighting>
+  <general>
+    <comments>
+      <comment name="singleLine" start="//"/>
+      <comment name="multiLine" start="/*" end="*/" region="Comment"/>
+    </comments>
+  </general>
 </language>
+<!-- kate: replace-tabs on; tab-width 2; indent-width 2; -->

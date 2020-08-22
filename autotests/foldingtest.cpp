@@ -127,7 +127,7 @@ private Q_SLOTS:
         QTest::addColumn<QString>("syntax");
 
         const QDir dir(QStringLiteral(TESTSRCDIR "/input"));
-        for (const auto &fileName : dir.entryList(QDir::Files | QDir::NoSymLinks | QDir::Readable, QDir::Name)) {
+        for (const auto &fileName : dir.entryList(QDir::Files | QDir::NoSymLinks | QDir::Readable | QDir::Hidden, QDir::Name)) {
             const auto inFile = dir.absoluteFilePath(fileName);
             if (inFile.endsWith(QLatin1String(".syntax")))
                 continue;

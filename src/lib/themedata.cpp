@@ -147,10 +147,9 @@ bool ThemeData::load(const QString &filePath)
     const auto customStyles = obj.value(QLatin1String("custom-styles")).toObject();
     for (auto it = customStyles.begin(); it != customStyles.end(); ++it) {
         const auto obj = it.value().toObject();
-        QHash<QString, TextStyleData> overrideStyle;
+        auto &overrideStyle = m_textStyleOverrides[it.key()];
         for (auto it2 = obj.begin(); it2 != obj.end(); ++it2)
             overrideStyle.insert(it2.key(), readThemeData(it2.value().toObject()));
-        m_textStyleOverrides.insert(it.key(), overrideStyle);
     }
 
     return true;

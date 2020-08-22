@@ -1,0 +1,76 @@
+##RenderMan RIB-Structure 1.1
+##Scene Bouncing Ball
+##Creator /usr/ucb/vi
+##CreationDate 12:30pm 8/24/89
+##For RenderMan Jones
+##Frames 2
+##Shaders PIXARmarble, PIXARwood, MyUserShader
+##CapabilitiesNeeded ShadingLanguage Displacements
+version 3.03
+Declare "d" "uniform point"
+Declare "squish" "uniform float"
+Option "limits" "bucketsize" [6 6]  #renderer specific
+Option "limits" "gridsize" [18]  #renderer specific
+Format 1024 768 1  #mandatory resolution
+Projection "perspective"
+Clipping 10 1000.0
+FrameBegin 1
+##Shaders MyUserShader, PIXARmarble, PIXARwood
+##CameraOrientation 10.0 10.0 10.0 0.0 0.0 0.0
+Transform  [.707107  -.408248  -.57735 0
+            0  .816497  -.57735  0
+            -.707107  -.408248  -.57735  0
+            0  0  17.3205  1 ]
+WorldBegin
+AttributeBegin
+Attribute "identifier" "name" "myball"
+Displacement "MyUserShader" "squish" 5
+AttributeBegin
+Attribute "identifier" "shadinggroup" ["tophalf"]
+Surface "PIXARmarble"
+Sphere .5 0 .5 360
+AttributeEnd
+AttributeBegin
+Attribute "identifier" "shadinggroup" ["bothalf"]
+Surface "plastic"
+Sphere .5 -.5 0. 360
+AttributeEnd
+AttributeEnd
+AttributeBegin
+Attribute "identifier" "name" ["floor"]
+Surface "PIXARwood" "roughness" [.3] "d" [1]
+# geometry for floor
+Polygon "P" [-100. 0. -100.  -100. 0. 100.  100. 0. 100.  10.0 0. -100.]
+AttributeEnd
+WorldEnd
+FrameEnd
+FrameBegin 2
+##Shaders PIXARwood, PIXARmarble
+##CameraOrientation 10.0 20.0 10.0 0.0 0.0 0.0
+Transform [.707107  -.57735  -.408248  0
+           0   .57735
+           -.815447 0
+           -.707107  -.57735  -.408248  0
+           0  0  24.4949 1 ]
+WorldBegin
+AttributeBegin
+Attribute "identifier" "name" ["myball"]
+AttributeBegin
+Attribute "identifier" "shadinggroup" ["tophalf"]
+Surface "PIXARmarble"
+ShadingRate .1
+Sphere .5 0 .5 360
+AttributeEnd
+AttributeBegin
+Attribute "identifier" "shadinggroup" ["bothalf"]
+Surface "plastic"
+Sphere .5 -.5 0 360
+AttributeEnd
+AttributeEnd
+AttributeBegin
+Attribute "identifier" "name" ["floor"]
+Surface "PIXARwood" "roughness" [.3] "d" [1]
+# geometry for floor
+AttributeEnd
+WorldEnd
+FrameEnd

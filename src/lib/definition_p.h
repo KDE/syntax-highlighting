@@ -9,6 +9,7 @@
 
 #include "definition.h"
 #include "definitionref_p.h"
+#include "worddelimiters_p.h"
 
 #include <QHash>
 #include <QString>
@@ -56,7 +57,6 @@ public:
     void resolveIncludeKeywords();
 
     KeywordList *keywordList(const QString &name);
-    bool isWordDelimiter(QChar c) const;
 
     Context *initialContext() const;
     Context *contextByName(const QString &name) const;
@@ -71,8 +71,8 @@ public:
     QHash<QString, KeywordList> keywordLists;
     QVector<Context *> contexts;
     QHash<QString, Format> formats;
-    QString wordDelimiters;
-    QString wordWrapDelimiters;
+    WordDelimiters wordDelimiters;
+    WordDelimiters wordWrapDelimiters;
     bool keywordIsLoaded = false;
     bool hasFoldingRegions = false;
     bool indentationBasedFolding = false;

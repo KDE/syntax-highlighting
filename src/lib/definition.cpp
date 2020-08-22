@@ -19,6 +19,7 @@
 #include "repository_p.h"
 #include "rule_p.h"
 #include "xml_p.h"
+#include "worddelimiters_p.h"
 
 #include <QCborMap>
 #include <QCoreApplication>
@@ -33,7 +34,7 @@
 using namespace KSyntaxHighlighting;
 
 DefinitionData::DefinitionData()
-    : wordDelimiters(QStringLiteral("\t !%&()*+,-./:;<=>?[\\]^{|}~")) // must be sorted!
+    : wordDelimiters()
     , wordWrapDelimiters(wordDelimiters)
 {
 }
@@ -162,13 +163,13 @@ QString Definition::license() const
 bool Definition::isWordDelimiter(QChar c) const
 {
     d->load();
-    return d->isWordDelimiter(c);
+    return d->wordDelimiters.contains(c);
 }
 
 bool Definition::isWordWrapDelimiter(QChar c) const
 {
     d->load();
-    return std::binary_search(d->wordWrapDelimiters.constBegin(), d->wordWrapDelimiters.constEnd(), c);
+    return d->wordWrapDelimiters.contains(c);
 }
 
 bool Definition::foldingEnabled() const
@@ -329,11 +330,6 @@ KeywordList *DefinitionData::keywordList(const QString &wantedName)
     return (it == keywordLists.end()) ? nullptr : &it.value();
 }
 
-bool DefinitionData::isWordDelimiter(QChar c) const
-{
-    return std::binary_search(wordDelimiters.constBegin(), wordDelimiters.constEnd(), c);
-}
-
 Format DefinitionData::formatByName(const QString &wantedName) const
 {
     const auto it = formats.constFind(wantedName);
@@ -390,7 +386,6 @@ bool DefinitionData::load(OnlyKeywords onlyKeywords)
         context->resolveAttributeFormat();
     }
 
-    Q_ASSERT(std::is_sorted(wordDelimiters.constBegin(), wordDelimiters.constEnd()));
     return true;
 }
 
@@ -410,7 +405,7 @@ void DefinitionData::clear()
     license.clear();
     mimetypes.clear();
     extensions.clear();
-    wordDelimiters = QStringLiteral("\t !%&()*+,-./:;<=>?[\\]^{|}~"); // must be sorted!
+    wordDelimiters = WordDelimiters();
     wordWrapDelimiters = wordDelimiters;
     caseSensitive = Qt::CaseSensitive;
     version = 0.0f;
@@ -633,19 +628,20 @@ void DefinitionData::loadGeneral(QXmlStreamReader &reader)
                 if (reader.attributes().hasAttribute(QLatin1String("casesensitive")))
                     caseSensitive = Xml::attrToBool(reader.attributes().value(QLatin1String("casesensitive"))) ? Qt::CaseSensitive : Qt::CaseInsensitive;
 
-                // adapt sorted wordDelimiters
-                wordDelimiters += reader.attributes().value(QLatin1String("additionalDeliminator"));
-                std::sort(wordDelimiters.begin(), wordDelimiters.end());
-                auto it = std::unique(wordDelimiters.begin(), wordDelimiters.end());
-                wordDelimiters.truncate(std::distance(wordDelimiters.begin(), it));
-                for (const auto c : reader.attributes().value(QLatin1String("weakDeliminator")))
+                // adapt wordDelimiters
+                for (QChar c : reader.attributes().value(QLatin1String("additionalDeliminator")))
+                    wordDelimiters.append(c);
+                for (QChar c : reader.attributes().value(QLatin1String("weakDeliminator")))
                     wordDelimiters.remove(c);
 
-                // adaptWordWrapDelimiters, and sort
-                wordWrapDelimiters = reader.attributes().value(QLatin1String("wordWrapDeliminator")).toString();
-                std::sort(wordWrapDelimiters.begin(), wordWrapDelimiters.end());
-                if (wordWrapDelimiters.isEmpty())
+                // adapt WordWrapDelimiters
+                QStringRef wordWrapDeliminatorAttr = reader.attributes().value(QLatin1String("wordWrapDeliminator"));
+                if (wordWrapDeliminatorAttr.isEmpty())
                     wordWrapDelimiters = wordDelimiters;
+                else {
+                    for (QChar c : wordWrapDeliminatorAttr)
+                        wordWrapDelimiters.append(c);
+                }
             } else if (reader.name() == QLatin1String("folding")) {
                 if (reader.attributes().hasAttribute(QLatin1String("indentationsensitive")))
                     indentationBasedFolding = Xml::attrToBool(reader.attributes().value(QLatin1String("indentationsensitive")));

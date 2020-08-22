@@ -17,6 +17,7 @@ set(syntax_highlighting_srcs
     theme.cpp
     wildcardmatcher.cpp
     themedata.cpp
+    worddelimiters.cpp
     ${syntax_highlighting_QM_LOADER}
 )
 ecm_qt_declare_logging_category(syntax_highlighting_srcs

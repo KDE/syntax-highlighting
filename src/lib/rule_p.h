@@ -26,6 +26,8 @@ QT_END_NAMESPACE
 
 namespace KSyntaxHighlighting
 {
+class WordDelimiters;
+
 class Rule
 {
 public:
@@ -104,7 +106,7 @@ private:
     bool m_lookAhead = false;
 
     // cache for DefinitionData::wordDelimiters, is accessed VERY often
-    QStringRef m_wordDelimiter;
+    WordDelimiters* m_wordDelimiters = nullptr;
 
 protected:
     bool m_dynamic = false;

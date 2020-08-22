@@ -10,6 +10,7 @@
 #include "ksyntaxhighlighting_logging.h"
 #include "rule_p.h"
 #include "xml_p.h"
+#include "worddelimiters_p.h"
 
 #include <QString>
 #include <QXmlStreamReader>
@@ -119,7 +120,7 @@ void Rule::resolveContext()
     m_context.resolve(def);
 
     // cache for DefinitionData::wordDelimiters, is accessed VERY often
-    m_wordDelimiter = &DefinitionData::get(def)->wordDelimiters;
+    m_wordDelimiters = &DefinitionData::get(def)->wordDelimiters;
 }
 
 void Rule::resolveAttributeFormat(Context *lookupContext)
@@ -186,8 +187,7 @@ Rule::Ptr Rule::create(const QStringRef &name)
 
 bool Rule::isWordDelimiter(QChar c) const
 {
-    // perf tells contains is MUCH faster than binary search here, very short array
-    return m_wordDelimiter.contains(c);
+    return m_wordDelimiters->contains(c);
 }
 
 bool AnyChar::doLoad(QXmlStreamReader &reader)

@@ -1,5 +1,5 @@
 /*
-    SPDX-FileCopyrightText: 2018 Christoph Cullmann <cullmann@kde.org>
+    SPDX-FileCopyrightText: 2020 Jonathan Poelen <jonathan.poelen@gmail.com>
 
     SPDX-License-Identifier: MIT
 */

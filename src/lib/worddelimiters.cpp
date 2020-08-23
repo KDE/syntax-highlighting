@@ -28,14 +28,16 @@ void WordDelimiters::append(QChar c)
 {
     if (c.unicode() < 128) {
         asciiDelimiters[c.unicode()] = true;
+    } else {
+        notAsciiDelimiters.append(c);
     }
-    notAsciiDelimiters.append(c);
 }
 
 void WordDelimiters::remove(QChar c)
 {
     if (c.unicode() < 128) {
         asciiDelimiters[c.unicode()] = false;
+    } else {
+        notAsciiDelimiters.remove(c);
     }
-    notAsciiDelimiters.remove(c);
 }

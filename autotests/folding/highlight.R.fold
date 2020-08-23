@@ -100,3 +100,25 @@ append(LETTERS[1:13],letters[14:26])
 c(1,6,4,9)*2
 something <- c(1,4,letters[2])  # indices start at one, you get (1,4,"b")
 length(something)
+
+## Pipe
+diamonds %>%
+  filter(price > 1000) %>%
+  group_by(cut) %>%
+  tally() %>% 
+  rename(tally = n) %>% 
+  arrange(-tally) %>% 
+  mutate(pct = tally / sum(tally)) -> df
+
+## ggplot2 
+plot = ggplot(diamonds, aes(x = price, y = carat)) +
+  geom_point(alpha = 0.3, colour = 'steelblue') +
+  labs(
+    title = "ggplot diamonds",
+    x = "Price, $",
+    y = "Carat"
+  ) +
+  facet_wrap(~ cut) +
+  theme_minimal()
+
+plot + coord_flip()

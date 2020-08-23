@@ -1,0 +1,627 @@
+<Comment>#-</Comment><br/>
+<Comment># Copyright (c) 2010-2017 Varnish Software AS</Comment><br/>
+<Comment># All rights reserved.</Comment><br/>
+<Comment>#</Comment><br/>
+<Comment># Author: Poul-Henning Kamp <phk@FreeBSD.org></Comment><br/>
+<Comment>#</Comment><br/>
+<Comment># SPDX-License-Identifier: BSD-2-Clause</Comment><br/>
+<Comment>#</Comment><br/>
+<Comment># Redistribution and use in source and binary forms, with or without</Comment><br/>
+<Comment># modification, are permitted provided that the following conditions</Comment><br/>
+<Comment># are met:</Comment><br/>
+<Comment># 1. Redistributions of source code must retain the above copyright</Comment><br/>
+<Comment>#    notice, this list of conditions and the following disclaimer.</Comment><br/>
+<Comment># 2. Redistributions in binary form must reproduce the above copyright</Comment><br/>
+<Comment>#    notice, this list of conditions and the following disclaimer in the</Comment><br/>
+<Comment>#    documentation and/or other materials provided with the distribution.</Comment><br/>
+<Comment>#</Comment><br/>
+<Comment># THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND</Comment><br/>
+<Comment># ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</Comment><br/>
+<Comment># IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</Comment><br/>
+<Comment># ARE DISCLAIMED.  IN NO EVENT SHALL AUTHOR OR CONTRIBUTORS BE LIABLE</Comment><br/>
+<Comment># FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</Comment><br/>
+<Comment># DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</Comment><br/>
+<Comment># OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</Comment><br/>
+<Comment># HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT</Comment><br/>
+<Comment># LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY</Comment><br/>
+<Comment># OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF</Comment><br/>
+<Comment># SUCH DAMAGE.</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>$ABI strict</Normal Text><br/>
+<Keyword>$Module</Keyword><Normal Text> </Normal Text><VMod Identifier>std</VMod Identifier><Normal Text> </Normal Text><Decimal>3</Decimal><String> "Varnish Standard Module"</String><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>DESCRIPTION</Normal Text><br/>
+<Normal Text>===========</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment>.. note: not using :ref:`vmod_std(3)` because it expands to "VMOD</Comment><br/>
+<Code>   </Code><Comment>std - Varnish Standard Module" and here just the plan vmod name</Comment><br/>
+<Code>   </Code><Comment>makes more sense.</Comment><br/>
+<Comment></Comment><br/>
+<Italic>*vmod_std*</Italic><Normal Text> contains basic functions which are part and parcel of</Normal Text><br/>
+<Normal Text>Varnish, but which for reasons of architecture fit better in a VMOD.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Numeric functions</Normal Text><br/>
+<Normal Text>=================</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>REAL</Data Type><Normal Text> </Normal Text><Function Identifier>random</Function Identifier><Normal Text>(</Normal Text><Data Type>REAL</Data Type><Normal Text> lo, </Normal Text><Data Type>REAL</Data Type><Normal Text> hi)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Returns a random real number between </Normal Text><Italic>*lo*</Italic><Normal Text> and </Normal Text><Italic>*hi*</Italic><Normal Text>.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>This function uses the "testable" random generator in varnishd which</Normal Text><br/>
+<Normal Text>enables determinstic tests to be run (See </Normal Text><InlineLiteral>``m00002.vtc``</InlineLiteral><Normal Text>).  This</Normal Text><br/>
+<Normal Text>function should not be used for cryptographic applications.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	set beresp.http.random-number = std.random(1, 100);</Code><br/>
+<Code></Code><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>REAL</Data Type><Normal Text> </Normal Text><Function Identifier>round</Function Identifier><Normal Text>(</Normal Text><Data Type>REAL</Data Type><Normal Text> r)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Rounds the real </Normal Text><Italic>*r*</Italic><Normal Text> to the nearest integer, but round halfway cases</Normal Text><br/>
+<Normal Text>away from zero (see </Normal Text><DefaultRole>`round(3)`</DefaultRole><Normal Text>).</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>String functions</Normal Text><br/>
+<Normal Text>================</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>VOID</Data Type><Normal Text> </Normal Text><Function Identifier>collect</Function Identifier><Normal Text>(</Normal Text><Data Type>HEADER</Data Type><Normal Text> hdr, </Normal Text><Data Type>STRING</Data Type><Normal Text> sep=", ")</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Collapses multiple </Normal Text><Italic>*hdr*</Italic><Normal Text> headers into one long header. The default</Normal Text><br/>
+<Normal Text>separator </Normal Text><Italic>*sep*</Italic><Normal Text> is the standard comma separator to use when collapsing</Normal Text><br/>
+<Normal Text>headers, with an additional whitespace for pretty printing.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Care should be taken when collapsing headers. In particular collapsing</Normal Text><br/>
+<InlineLiteral>``Set-Cookie``</InlineLiteral><Normal Text> will lead to unexpected results on the browser side.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Examples</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	std.collect(req.http.accept);</Code><br/>
+<Code>	std.collect(req.http.cookie, "; ");</Code><br/>
+<Code></Code><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>STRING</Data Type><Normal Text> </Normal Text><Function Identifier>querysort</Function Identifier><Normal Text>(</Normal Text><Data Type>STRING</Data Type><Normal Text>)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Sorts the query string for cache normalization purposes.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	set req.url = std.querysort(req.url);</Code><br/>
+<Code></Code><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>STRING</Data Type><Normal Text> </Normal Text><Function Identifier>toupper</Function Identifier><Normal Text>(STRANDS s)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Converts the string </Normal Text><Italic>*s*</Italic><Normal Text> to uppercase.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	set beresp.http.scream = std.toupper("yes!");</Code><br/>
+<Code></Code><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>STRING</Data Type><Normal Text> </Normal Text><Function Identifier>tolower</Function Identifier><Normal Text>(STRANDS s)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Converts the string </Normal Text><Italic>*s*</Italic><Normal Text> to lowercase.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	set beresp.http.nice = std.tolower("VerY");</Code><br/>
+<Code></Code><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>STRING</Data Type><Normal Text> </Normal Text><Function Identifier>strstr</Function Identifier><Normal Text>(</Normal Text><Data Type>STRING</Data Type><Normal Text> s1, </Normal Text><Data Type>STRING</Data Type><Normal Text> s2)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Returns a string beginning at the first occurrence of the string </Normal Text><Italic>*s2*</Italic><br/>
+<Normal Text>in the string </Normal Text><Italic>*s1*</Italic><Normal Text>, or an empty string if </Normal Text><Italic>*s2*</Italic><Normal Text> is not found.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Note that the comparison is case sensitive.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	if (std.strstr(req.url, req.http.restrict)) {</Code><br/>
+<Code>		...</Code><br/>
+<Code>	}</Code><br/>
+<Code></Code><br/>
+<Normal Text>This will check if the content of </Normal Text><InlineLiteral>``req.http.restrict``</InlineLiteral><Normal Text> occurs</Normal Text><br/>
+<Normal Text>anywhere in </Normal Text><InlineLiteral>``req.url``</InlineLiteral><Normal Text>.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>BOOL</Data Type><Normal Text> </Normal Text><Function Identifier>fnmatch</Function Identifier><Normal Text>(</Normal Text><Data Type>STRING</Data Type><Normal Text> pattern, </Normal Text><Data Type>STRING</Data Type><Normal Text> subject, </Normal Text><Data Type>BOOL</Data Type><Normal Text> pathname=1,</Normal Text><br/>
+<Normal Text>		       BOOL noescape=0, BOOL period=0)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Shell-style pattern matching; returns </Normal Text><InlineLiteral>``true``</InlineLiteral><Normal Text> if </Normal Text><Italic>*subject*</Italic><Normal Text> matches</Normal Text><br/>
+<Italic>*pattern*</Italic><Normal Text>, where </Normal Text><Italic>*pattern*</Italic><Normal Text> may contain wildcard characters such as </Normal Text><InlineLiteral>``*``</InlineLiteral><br/>
+<Normal Text>or </Normal Text><InlineLiteral>``?``</InlineLiteral><Normal Text>.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>The match is executed by the implementation of </Normal Text><DefaultRole>`fnmatch(3)`</DefaultRole><Normal Text> on your</Normal Text><br/>
+<Normal Text>system. The rules for pattern matching on most systems include the</Normal Text><br/>
+<Normal Text>following:</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>* </Normal Text><InlineLiteral>``*``</InlineLiteral><Normal Text> matches any sequence of characters</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>* </Normal Text><InlineLiteral>``?``</InlineLiteral><Normal Text> matches a single character</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>* a bracket expression such as </Normal Text><InlineLiteral>``[abc]``</InlineLiteral><Normal Text> or </Normal Text><InlineLiteral>``[!0-9]``</InlineLiteral><Normal Text> is interpreted</Normal Text><br/>
+<Normal Text>  as a character class according to the rules of basic regular</Normal Text><br/>
+<Normal Text>  expressions (</Normal Text><Italic>*not*</Italic><Normal Text> </Normal Text><DefaultRole>`pcre(3)`</DefaultRole><Normal Text> regexen), except that </Normal Text><InlineLiteral>``!``</InlineLiteral><Normal Text> is used for</Normal Text><br/>
+<Normal Text>  character class negation instead of </Normal Text><InlineLiteral>``^``</InlineLiteral><Normal Text>.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>If </Normal Text><Italic>*pathname*</Italic><Normal Text> is </Normal Text><InlineLiteral>``true``</InlineLiteral><Normal Text>, then the forward slash character </Normal Text><InlineLiteral>``/``</InlineLiteral><Normal Text> is</Normal Text><br/>
+<Normal Text>only matched literally, and never matches </Normal Text><InlineLiteral>``*``</InlineLiteral><Normal Text>, </Normal Text><InlineLiteral>``?``</InlineLiteral><Normal Text> or a bracket</Normal Text><br/>
+<Normal Text>expression. Otherwise, </Normal Text><InlineLiteral>``/``</InlineLiteral><Normal Text> may match one of those patterns.  By</Normal Text><br/>
+<Normal Text>default, </Normal Text><Italic>*pathname*</Italic><Normal Text> is </Normal Text><InlineLiteral>``true``</InlineLiteral><Normal Text>.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>If </Normal Text><Italic>*noescape*</Italic><Normal Text> is </Normal Text><InlineLiteral>``true``</InlineLiteral><Normal Text>, then the backslash character </Normal Text><InlineLiteral>``\``</InlineLiteral><Normal Text> is</Normal Text><br/>
+<Normal Text>matched as an ordinary character. Otherwise, </Normal Text><InlineLiteral>``\``</InlineLiteral><Normal Text> is an escape</Normal Text><br/>
+<Normal Text>character, and matches the character that follows it in the</Normal Text><br/>
+<Italic>*pattern*</Italic><Normal Text>. For example, </Normal Text><InlineLiteral>``\\``</InlineLiteral><Normal Text> matches </Normal Text><InlineLiteral>``\``</InlineLiteral><Normal Text> when </Normal Text><Italic>*noescape*</Italic><Normal Text> is</Normal Text><br/>
+<InlineLiteral>``true``</InlineLiteral><Normal Text>, and </Normal Text><InlineLiteral>``\\``</InlineLiteral><Normal Text> when </Normal Text><InlineLiteral>``false``</InlineLiteral><Normal Text>. By default, </Normal Text><Italic>*noescape*</Italic><Normal Text> is</Normal Text><br/>
+<InlineLiteral>``false``</InlineLiteral><Normal Text>.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>If </Normal Text><Italic>*period*</Italic><Normal Text> is </Normal Text><InlineLiteral>``true``</InlineLiteral><Normal Text>, then a leading period character </Normal Text><InlineLiteral>``.``</InlineLiteral><Normal Text> only</Normal Text><br/>
+<Normal Text>matches literally, and never matches </Normal Text><InlineLiteral>``*``</InlineLiteral><Normal Text>, </Normal Text><InlineLiteral>``?``</InlineLiteral><Normal Text> or a bracket</Normal Text><br/>
+<Normal Text>expression. A period is leading if it is the first character in</Normal Text><br/>
+<Italic>*subject*</Italic><Normal Text>; if </Normal Text><Italic>*pathname*</Italic><Normal Text> is also </Normal Text><InlineLiteral>``true``</InlineLiteral><Normal Text>, then a period that</Normal Text><br/>
+<Normal Text>immediately follows a </Normal Text><InlineLiteral>``/``</InlineLiteral><Normal Text> is also leading (as in </Normal Text><InlineLiteral>``/.``</InlineLiteral><Normal Text>).  By</Normal Text><br/>
+<Normal Text>default, </Normal Text><Italic>*period*</Italic><Normal Text> is </Normal Text><InlineLiteral>``false``</InlineLiteral><Normal Text>.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<HyperlinkReference>`std.fnmatch()`_</HyperlinkReference><Normal Text> invokes VCL failure and returns </Normal Text><InlineLiteral>``false``</InlineLiteral><Normal Text> if</Normal Text><br/>
+<Normal Text>either of </Normal Text><Italic>*pattern*</Italic><Normal Text> or </Normal Text><Italic>*subject*</Italic><Normal Text> is </Normal Text><InlineLiteral>``NULL``</InlineLiteral><Normal Text> -- for example, if an</Normal Text><br/>
+<Normal Text>unset header is specified.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Examples</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	# Matches URLs such as /foo/bar and /foo/baz</Code><br/>
+<Code>	if (std.fnmatch("/foo/\*", req.url)) { ... }</Code><br/>
+<Code></Code><br/>
+<Code>	# Matches URLs such as /foo/bar/baz and /foo/baz/quux</Code><br/>
+<Code>	if (std.fnmatch("/foo/\*/\*", bereq.url)) { ... }</Code><br/>
+<Code></Code><br/>
+<Code>	# Matches /foo/bar/quux, but not /foo/bar/baz/quux</Code><br/>
+<Code>	if (std.fnmatch("/foo/\*/quux", req.url)) { ... }</Code><br/>
+<Code></Code><br/>
+<Code>	# Matches /foo/bar/quux and /foo/bar/baz/quux</Code><br/>
+<Code>	if (std.fnmatch("/foo/\*/quux", req.url, pathname=false)) { ... }</Code><br/>
+<Code></Code><br/>
+<Code>	# Matches /foo/bar, /foo/car and /foo/far</Code><br/>
+<Code>	if (std.fnmatch("/foo/?ar", req.url)) { ... }</Code><br/>
+<Code></Code><br/>
+<Code>	# Matches /foo/ followed by a non-digit</Code><br/>
+<Code>	if (std.fnmatch("/foo/[!0-9]", req.url)) { ... }</Code><br/>
+<Code></Code><br/>
+<Code></Code><br/>
+<Normal Text>File(system) functions</Normal Text><br/>
+<Normal Text>======================</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>STRING</Data Type><Normal Text> </Normal Text><Function Identifier>fileread</Function Identifier><Normal Text>(</Normal Text><Data Type>PRIV_CALL</Data Type><Normal Text>, </Normal Text><Data Type>STRING</Data Type><Normal Text>)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Reads a file and returns a string with the content. The result is</Normal Text><br/>
+<Normal Text>cached indefinitely per filename.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>This function should not be used for reading binary files.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	synthetic("Response was served by " + std.fileread("/etc/hostname"));</Code><br/>
+<Code></Code><br/>
+<Normal Text>Consider that the entire contents of the file appear in the string</Normal Text><br/>
+<Normal Text>that is returned, including newlines that may result in invalid</Normal Text><br/>
+<Normal Text>headers if </Normal Text><HyperlinkReference>`std.fileread()`_</HyperlinkReference><Normal Text> is used to form a header. In that</Normal Text><br/>
+<Normal Text>case, you may need to modify the string, for example with</Normal Text><br/>
+<InlineLiteral>``regsub()``</InlineLiteral><Normal Text> (see </Normal Text><Role>:ref:</Role><InterpretedText>`vcl(7)`</InterpretedText><Normal Text>)</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>  set beresp.http.served-by = regsub(std.fileread("/etc/hostname"), "\R$", "");</Code><br/>
+<Code></Code><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>BOOL</Data Type><Normal Text> </Normal Text><Function Identifier>file_exists</Function Identifier><Normal Text>(</Normal Text><Data Type>STRING</Data Type><Normal Text> path)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Returns </Normal Text><InlineLiteral>``true``</InlineLiteral><Normal Text> if path or the file pointed to by path exists,</Normal Text><br/>
+<InlineLiteral>``false``</InlineLiteral><Normal Text> otherwise.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	if (std.file_exists("/etc/return_503")) {</Code><br/>
+<Code>		return (synth(503, "Varnish is in maintenance"));</Code><br/>
+<Code>	}</Code><br/>
+<Code></Code><br/>
+<Code></Code><br/>
+<Normal Text>Type Inspection functions</Normal Text><br/>
+<Normal Text>=========================</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>BOOL</Data Type><Normal Text> </Normal Text><Function Identifier>healthy</Function Identifier><Normal Text>(</Normal Text><Data Type>BACKEND</Data Type><Normal Text> be)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Returns </Normal Text><InlineLiteral>``true``</InlineLiteral><Normal Text> if the backend </Normal Text><Italic>*be*</Italic><Normal Text> is healthy.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>INT</Data Type><Normal Text> </Normal Text><Function Identifier>port</Function Identifier><Normal Text>(</Normal Text><Data Type>IP</Data Type><Normal Text> ip)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Returns the port number of the IP address </Normal Text><Italic>*ip*</Italic><Normal Text>. Always returns </Normal Text><InlineLiteral>``0``</InlineLiteral><br/>
+<Normal Text>for a </Normal Text><InlineLiteral>``*.ip``</InlineLiteral><Normal Text> variable when the address is a Unix domain socket.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Type Conversion functions</Normal Text><br/>
+<Normal Text>=========================</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>These functions all have the same form</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	TYPE type([arguments], [fallback TYPE])</Code><br/>
+<Code></Code><br/>
+<Normal Text>Precisely one of the </Normal Text><Italic>*arguments*</Italic><Normal Text> must be provided (besides the</Normal Text><br/>
+<Normal Text>optional </Normal Text><Italic>*fallback*</Italic><Normal Text>), and it will be converted to </Normal Text><Italic>*TYPE*</Italic><Normal Text>.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>If conversion fails, </Normal Text><Italic>*fallback*</Italic><Normal Text> will be returned and if no</Normal Text><br/>
+<Normal Text>fallback was specified, the VCL will be failed.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>DURATION</Data Type><Normal Text> </Normal Text><Function Identifier>duration</Function Identifier><Normal Text>([</Normal Text><Data Type>STRING</Data Type><Normal Text> s], [</Normal Text><Data Type>DURATION</Data Type><Normal Text> fallback],</Normal Text><br/>
+<Normal Text>    [REAL real], [INT integer])</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Returns a DURATION from a STRING, REAL or INT argument.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>For a STRING </Normal Text><Italic>*s*</Italic><Normal Text> argument, </Normal Text><Italic>*s*</Italic><Normal Text> must be quantified by </Normal Text><InlineLiteral>``ms``</InlineLiteral><br/>
+<Normal Text>(milliseconds), </Normal Text><InlineLiteral>``s``</InlineLiteral><Normal Text> (seconds), </Normal Text><InlineLiteral>``m``</InlineLiteral><Normal Text> (minutes), </Normal Text><InlineLiteral>``h``</InlineLiteral><Normal Text> (hours),``d``</Normal Text><br/>
+<Normal Text>(days), </Normal Text><InlineLiteral>``w``</InlineLiteral><Normal Text> (weeks) or </Normal Text><InlineLiteral>``y``</InlineLiteral><Normal Text> (years) units.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Italic>*real*</Italic><Normal Text> and </Normal Text><Italic>*integer*</Italic><Normal Text> arguments are taken as seconds.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>If the conversion of an </Normal Text><Italic>*s*</Italic><Normal Text> argument fails, </Normal Text><Italic>*fallback*</Italic><Normal Text> will be</Normal Text><br/>
+<Normal Text>returned if provided, or a VCL failure will be triggered.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Conversions from </Normal Text><Italic>*real*</Italic><Normal Text> and </Normal Text><Italic>*integer*</Italic><Normal Text> arguments never fail.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Only one of the </Normal Text><Italic>*s*</Italic><Normal Text>, </Normal Text><Italic>*real*</Italic><Normal Text> or </Normal Text><Italic>*integer*</Italic><Normal Text> arguments may be given or a VCL</Normal Text><br/>
+<Normal Text>failure will be triggered.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Examples</Normal Text><Code>::</Code><br/>
+<Code>	set beresp.ttl = std.duration("1w", 3600s);</Code><br/>
+<Code>	set beresp.ttl = std.duration(real=1.5);</Code><br/>
+<Code>	set beresp.ttl = std.duration(integer=10);</Code><br/>
+<Code></Code><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>BYTES</Data Type><Normal Text> </Normal Text><Function Identifier>bytes</Function Identifier><Normal Text>([</Normal Text><Data Type>STRING</Data Type><Normal Text> s], [</Normal Text><Data Type>BYTES</Data Type><Normal Text> fallback], [</Normal Text><Data Type>REAL</Data Type><Normal Text> real], [</Normal Text><Data Type>INT</Data Type><Normal Text> integer])</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Returns BYTES from a STRING, REAL or INT argument.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>A STRING </Normal Text><Italic>*s*</Italic><Normal Text> argument can be quantified with a multiplier (</Normal Text><InlineLiteral>``k``</InlineLiteral><br/>
+<Normal Text>(kilo), </Normal Text><InlineLiteral>``m``</InlineLiteral><Normal Text> (mega), </Normal Text><InlineLiteral>``g``</InlineLiteral><Normal Text> (giga), </Normal Text><InlineLiteral>``t``</InlineLiteral><Normal Text> (tera) or </Normal Text><InlineLiteral>``p``</InlineLiteral><Normal Text> (peta)).</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Italic>*real*</Italic><Normal Text> and </Normal Text><Italic>*integer*</Italic><Normal Text> arguments are taken as bytes.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>If the conversion of an </Normal Text><Italic>*s*</Italic><Normal Text> argument fails, </Normal Text><Italic>*fallback*</Italic><Normal Text> will be</Normal Text><br/>
+<Normal Text>returned if provided, or a VCL failure will be triggered.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Other conversions may fail if the argument can not be represented,</Normal Text><br/>
+<Normal Text>because it is negative, too small or too large. Again, </Normal Text><Italic>*fallback*</Italic><Normal Text> will</Normal Text><br/>
+<Normal Text>be returned if provided, or a VCL failure will be triggered.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Italic>*real*</Italic><Normal Text> arguments will be rounded down.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Only one of the </Normal Text><Italic>*s*</Italic><Normal Text>, </Normal Text><Italic>*real*</Italic><Normal Text> or </Normal Text><Italic>*integer*</Italic><Normal Text> arguments may be given or a VCL</Normal Text><br/>
+<Normal Text>failure will be triggered.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Example</Normal Text><Code>::</Code><br/>
+<Code>	std.cache_req_body(std.bytes(something.somewhere, 10K));</Code><br/>
+<Code>	std.cache_req_body(std.bytes(integer=10*1024));</Code><br/>
+<Code>	std.cache_req_body(std.bytes(real=10.0*1024));</Code><br/>
+<Code></Code><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>INT</Data Type><Normal Text> </Normal Text><Function Identifier>integer</Function Identifier><Normal Text>([</Normal Text><Data Type>STRING</Data Type><Normal Text> s], [</Normal Text><Data Type>INT</Data Type><Normal Text> fallback],</Normal Text><br/>
+<Normal Text>    [BOOL bool], [BYTES bytes], [DURATION duration], [REAL real],</Normal Text><br/>
+<Normal Text>    [TIME time])</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Returns an INT from a STRING, BOOL or other quantity.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>If the conversion of an </Normal Text><Italic>*s*</Italic><Normal Text> argument fails, </Normal Text><Italic>*fallback*</Italic><Normal Text> will be</Normal Text><br/>
+<Normal Text>returned if provided, or a VCL failure will be triggered.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>A </Normal Text><Italic>*bool*</Italic><Normal Text> argument will be returned as 0 for </Normal Text><InlineLiteral>``false``</InlineLiteral><Normal Text> and 1 for</Normal Text><br/>
+<InlineLiteral>``true``</InlineLiteral><Normal Text>. This conversion will never fail.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>For a </Normal Text><Italic>*bytes*</Italic><Normal Text> argument, the number of bytes will be returned.  This</Normal Text><br/>
+<Normal Text>conversion will never fail.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>A </Normal Text><Italic>*duration*</Italic><Normal Text> argument will be rounded down to the number of seconds</Normal Text><br/>
+<Normal Text>and returned.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>A </Normal Text><Italic>*real*</Italic><Normal Text> argument will be rounded down and returned.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>For a </Normal Text><Italic>*time*</Italic><Normal Text> argument, the number of seconds since the UNIX epoch</Normal Text><br/>
+<Normal Text>(1970-01-01 00:00:00 UTC) will be returned.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Italic>*duration*</Italic><Normal Text>, </Normal Text><Italic>*real*</Italic><Normal Text> and </Normal Text><Italic>*time*</Italic><Normal Text> conversions may fail if the argument can</Normal Text><br/>
+<Normal Text>not be represented because it is too small or too large. If so,</Normal Text><br/>
+<Italic>*fallback*</Italic><Normal Text> will be returned if provided, or a VCL failure will be</Normal Text><br/>
+<Normal Text>triggered.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Only one of the </Normal Text><Italic>*s*</Italic><Normal Text>, </Normal Text><Italic>*bool*</Italic><Normal Text>, </Normal Text><Italic>*bytes*</Italic><Normal Text>, </Normal Text><Italic>*duration*</Italic><Normal Text>, </Normal Text><Italic>*real*</Italic><Normal Text> or </Normal Text><Italic>*time*</Italic><br/>
+<Normal Text>arguments may be given or a VCL failure will be triggered.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Examples</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	if (std.integer(req.http.foo, 0) > 5) {</Code><br/>
+<Code>		...</Code><br/>
+<Code>	}</Code><br/>
+<Code></Code><br/>
+<Code>	set resp.http.answer = std.integer(real=126.42/3);</Code><br/>
+<Code></Code><br/>
+<Code></Code><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>IP</Data Type><Normal Text> </Normal Text><Function Identifier>ip</Function Identifier><Normal Text>(</Normal Text><Data Type>STRING</Data Type><Normal Text> s, [</Normal Text><Data Type>IP</Data Type><Normal Text> fallback], </Normal Text><Data Type>BOOL</Data Type><Normal Text> resolve = 1, [</Normal Text><Data Type>STRING</Data Type><Normal Text> p])</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Converts the string </Normal Text><Italic>*s*</Italic><Normal Text> to the first IP number returned by the system</Normal Text><br/>
+<Normal Text>library function </Normal Text><DefaultRole>`getaddrinfo(3)`</DefaultRole><Normal Text>. If conversion fails, </Normal Text><Italic>*fallback*</Italic><Normal Text> will</Normal Text><br/>
+<Normal Text>be returned or VCL failure will happen.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>The IP address includes a port number that can be found with </Normal Text><InlineLiteral>``std.port()``</InlineLiteral><br/>
+<Normal Text>that defaults to 80. The default port can be set to a different value with</Normal Text><br/>
+<Normal Text>the </Normal Text><Italic>*p*</Italic><Normal Text> argument. It will be overriden if </Normal Text><Italic>*s*</Italic><Normal Text> contains both an IP address</Normal Text><br/>
+<Normal Text>and a port number or service name.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>When </Normal Text><Italic>*s*</Italic><Normal Text> contains both, the syntax is either </Normal Text><InlineLiteral>``address:port``</InlineLiteral><Normal Text> or</Normal Text><br/>
+<InlineLiteral>``address port``</InlineLiteral><Normal Text>. If the address is a numerical IPv6 address it must be</Normal Text><br/>
+<Normal Text>enclosed between brackets, for example </Normal Text><InlineLiteral>``[::1] 80``</InlineLiteral><Normal Text> or </Normal Text><InlineLiteral>``[::1]:http``</InlineLiteral><Normal Text>.</Normal Text><br/>
+<Normal Text>The </Normal Text><Italic>*fallback*</Italic><Normal Text> may also contain both an address and a port, but its default</Normal Text><br/>
+<Normal Text>port is always 80.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>If </Normal Text><Italic>*resolve*</Italic><Normal Text> is false, </Normal Text><DefaultRole>`getaddrinfo(3)`</DefaultRole><Normal Text> is called using </Normal Text><InlineLiteral>``AI_NUMERICHOST``</InlineLiteral><br/>
+<Normal Text>and </Normal Text><InlineLiteral>``AI_NUMERICSERV``</InlineLiteral><Normal Text> to avoid network lookups depending on the system's</Normal Text><br/>
+<DefaultRole>`getaddrinfo(3)`</DefaultRole><Normal Text> or nsswitch configuration. This makes "numerical" IP</Normal Text><br/>
+<Normal Text>strings and services cheaper to convert.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	if (std.ip(req.http.X-forwarded-for, "0.0.0.0") ~ my_acl) {</Code><br/>
+<Code>		...</Code><br/>
+<Code>	}</Code><br/>
+<Code></Code><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>REAL</Data Type><Normal Text> </Normal Text><Function Identifier>real</Function Identifier><Normal Text>([</Normal Text><Data Type>STRING</Data Type><Normal Text> s], [</Normal Text><Data Type>REAL</Data Type><Normal Text> fallback], [</Normal Text><Data Type>INT</Data Type><Normal Text> integer],</Normal Text><br/>
+<Normal Text>    [BOOL bool], [BYTES bytes], [DURATION duration],</Normal Text><br/>
+<Normal Text>    [TIME time])</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Returns a REAL from a STRING, BOOL or other quantity.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>If the conversion of an </Normal Text><Italic>*s*</Italic><Normal Text> argument fails, </Normal Text><Italic>*fallback*</Italic><Normal Text> will be</Normal Text><br/>
+<Normal Text>returned if provided, or a VCL failure will be triggered.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>A </Normal Text><Italic>*bool*</Italic><Normal Text> argument will be returned as 0.0 for </Normal Text><InlineLiteral>``false``</InlineLiteral><Normal Text> and 1.0 for</Normal Text><br/>
+<InlineLiteral>``true``</InlineLiteral><Normal Text>.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>For a </Normal Text><Italic>*bytes*</Italic><Normal Text> argument, the number of bytes will be returned.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>For a </Normal Text><Italic>*duration*</Italic><Normal Text> argument, the number of seconds will be returned.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>An </Normal Text><Italic>*integer*</Italic><Normal Text> argument will be returned as a REAL.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>For a </Normal Text><Italic>*time*</Italic><Normal Text> argument, the number of seconds since the UNIX epoch</Normal Text><br/>
+<Normal Text>(1970-01-01 00:00:00 UTC) will be returned.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>None of these conversions other than </Normal Text><Italic>*s*</Italic><Normal Text> will fail.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Only one of the </Normal Text><Italic>*s*</Italic><Normal Text>, </Normal Text><Italic>*integer*</Italic><Normal Text>, </Normal Text><Italic>*bool*</Italic><Normal Text>, </Normal Text><Italic>*bytes*</Italic><Normal Text>, </Normal Text><Italic>*duration*</Italic><Normal Text> or </Normal Text><Italic>*time*</Italic><br/>
+<Normal Text>arguments may be given or a VCL failure will be triggered.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	if (std.real(req.http.foo, 0.0) > 5.5) {</Code><br/>
+<Code>		...</Code><br/>
+<Code>	}</Code><br/>
+<Code></Code><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>TIME</Data Type><Normal Text> </Normal Text><Function Identifier>time</Function Identifier><Normal Text>([</Normal Text><Data Type>STRING</Data Type><Normal Text> s], [</Normal Text><Data Type>TIME</Data Type><Normal Text> fallback], [</Normal Text><Data Type>REAL</Data Type><Normal Text> real], [</Normal Text><Data Type>INT</Data Type><Normal Text> integer])</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Returns a TIME from a STRING, REAL or INT argument.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>For a STRING </Normal Text><Italic>*s*</Italic><Normal Text> argument, the following formats are supported</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	"Sun, 06 Nov 1994 08:49:37 GMT"</Code><br/>
+<Code>	"Sunday, 06-Nov-94 08:49:37 GMT"</Code><br/>
+<Code>	"Sun Nov  6 08:49:37 1994"</Code><br/>
+<Code>	"1994-11-06T08:49:37"</Code><br/>
+<Code>	"784111777.00"</Code><br/>
+<Code>	"784111777"</Code><br/>
+<Code></Code><br/>
+<Italic>*real*</Italic><Normal Text> and </Normal Text><Italic>*integer*</Italic><Normal Text> arguments are taken as seconds since the epoch.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>If the conversion of an </Normal Text><Italic>*s*</Italic><Normal Text> argument fails or a negative </Normal Text><Italic>*real*</Italic><Normal Text> or</Normal Text><br/>
+<Italic>*integer*</Italic><Normal Text> argument is given, </Normal Text><Italic>*fallback*</Italic><Normal Text> will be returned if provided,</Normal Text><br/>
+<Normal Text>or a VCL failure will be triggered.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Examples</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	if (std.time(resp.http.last-modified, now) < now - 1w) {</Code><br/>
+<Code>		...</Code><br/>
+<Code>	}</Code><br/>
+<Code></Code><br/>
+<Code>	if (std.time(int=2147483647) < now - 1w) {</Code><br/>
+<Code>		...</Code><br/>
+<Code>	}</Code><br/>
+<Code></Code><br/>
+<Normal Text>LOGGING functions</Normal Text><br/>
+<Normal Text>=================</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>VOID</Data Type><Normal Text> </Normal Text><Function Identifier>log</Function Identifier><Normal Text>(STRANDS s)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Logs the string </Normal Text><Italic>*s*</Italic><Normal Text> to the shared memory log, using </Normal Text><Role>:ref:</Role><InterpretedText>`vsl(7)`</InterpretedText><Normal Text> tag</Normal Text><br/>
+<InlineLiteral>``SLT_VCL_Log``</InlineLiteral><Normal Text>.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	std.log("Something fishy is going on with the vhost " + req.http.host);</Code><br/>
+<Code></Code><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>VOID</Data Type><Normal Text> </Normal Text><Function Identifier>syslog</Function Identifier><Normal Text>(</Normal Text><Data Type>INT</Data Type><Normal Text> priority, STRANDS s)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Logs the string </Normal Text><Italic>*s*</Italic><Normal Text> to syslog tagged with </Normal Text><Italic>*priority*</Italic><Normal Text>. </Normal Text><Italic>*priority*</Italic><Normal Text> is</Normal Text><br/>
+<Normal Text>formed by ORing the facility and level values. See your system's</Normal Text><br/>
+<InlineLiteral>``syslog.h``</InlineLiteral><Normal Text> file for possible values.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Notice: Unlike VCL and other functions in the std vmod, this function</Normal Text><br/>
+<Normal Text>will not fail VCL processing for workspace overflows: For an out of</Normal Text><br/>
+<Normal Text>workspace condition, the </Normal Text><HyperlinkReference>`std.syslog()`_</HyperlinkReference><Normal Text> function has no effect.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	std.syslog(9, "Something is wrong");</Code><br/>
+<Code></Code><br/>
+<Normal Text>This will send a message to syslog using </Normal Text><InlineLiteral>``LOG_USER | LOG_ALERT``</InlineLiteral><Normal Text>.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>VOID</Data Type><Normal Text> </Normal Text><Function Identifier>timestamp</Function Identifier><Normal Text>(</Normal Text><Data Type>STRING</Data Type><Normal Text> s)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Introduces a timestamp in the log with the current time, using the</Normal Text><br/>
+<Normal Text>string </Normal Text><Italic>*s*</Italic><Normal Text> as the label. This is useful to time the execution of lengthy</Normal Text><br/>
+<Normal Text>VCL subroutines, and makes the timestamps inserted automatically by</Normal Text><br/>
+<Normal Text>Varnish more accurate.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	std.timestamp("curl-request");</Code><br/>
+<Code></Code><br/>
+<Code></Code><br/>
+<Normal Text>CONTROL and INFORMATION functions</Normal Text><br/>
+<Normal Text>=================================</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>BOOL</Data Type><Normal Text> </Normal Text><Function Identifier>syntax</Function Identifier><Normal Text>(</Normal Text><Data Type>REAL</Data Type><Normal Text>)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Returns </Normal Text><InlineLiteral>``true``</InlineLiteral><Normal Text> if VCL version is at least </Normal Text><Italic>*REAL*</Italic><Normal Text>.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>STRING</Data Type><Normal Text> </Normal Text><Function Identifier>getenv</Function Identifier><Normal Text>(</Normal Text><Data Type>STRING</Data Type><Normal Text> name)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Return environment variable </Normal Text><Italic>*name*</Italic><Normal Text> or the empty string. See </Normal Text><DefaultRole>`getenv(3)`</DefaultRole><Normal Text>.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	set req.http.My-Env = std.getenv("MY_ENV");</Code><br/>
+<Code></Code><br/>
+<Code></Code><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>BOOL</Data Type><Normal Text> </Normal Text><Function Identifier>cache_req_body</Function Identifier><Normal Text>(</Normal Text><Data Type>BYTES</Data Type><Normal Text> size)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Caches the request body if it is smaller than </Normal Text><Italic>*size*</Italic><Normal Text>.  Returns</Normal Text><br/>
+<InlineLiteral>``true``</InlineLiteral><Normal Text> if the body was cached, </Normal Text><InlineLiteral>``false``</InlineLiteral><Normal Text> otherwise.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Normally the request body can only be sent once. Caching it enables</Normal Text><br/>
+<Normal Text>retrying backend requests with a request body, as usually the case</Normal Text><br/>
+<Normal Text>with </Normal Text><InlineLiteral>``POST``</InlineLiteral><Normal Text> and </Normal Text><InlineLiteral>``PUT``</InlineLiteral><Normal Text>.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	if (std.cache_req_body(1KB)) {</Code><br/>
+<Code>		...</Code><br/>
+<Code>	}</Code><br/>
+<Code></Code><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>VOID</Data Type><Normal Text> </Normal Text><Function Identifier>late_100_continue</Function Identifier><Normal Text>(</Normal Text><Data Type>BOOL</Data Type><Normal Text> late)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Controls when varnish reacts to an </Normal Text><InlineLiteral>``Expect: 100-continue``</InlineLiteral><Normal Text> client</Normal Text><br/>
+<Normal Text>request header.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Varnish always generates a </Normal Text><InlineLiteral>``100 Continue``</InlineLiteral><Normal Text> response if requested by</Normal Text><br/>
+<Normal Text>the client trough the </Normal Text><InlineLiteral>``Expect: 100-continue``</InlineLiteral><Normal Text> header when waiting for</Normal Text><br/>
+<Normal Text>request body data.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>But, by default, the </Normal Text><InlineLiteral>``100 Continue``</InlineLiteral><Normal Text> response is already generated</Normal Text><br/>
+<Normal Text>immediately after </Normal Text><InlineLiteral>``vcl_recv``</InlineLiteral><Normal Text> returns to reduce latencies under the</Normal Text><br/>
+<Normal Text>assumption that the request body will be read eventually.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Calling </Normal Text><InlineLiteral>``std.late_100_continue(true)``</InlineLiteral><Normal Text> in </Normal Text><InlineLiteral>``vcl_recv``</InlineLiteral><Normal Text> will cause the</Normal Text><br/>
+<InlineLiteral>``100 Continue``</InlineLiteral><Normal Text> response to only be sent when needed. This may cause</Normal Text><br/>
+<Normal Text>additional latencies for processing request bodies, but is the correct</Normal Text><br/>
+<Normal Text>behavior by strict interpretation of RFC7231.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>This function has no effect outside </Normal Text><InlineLiteral>``vcl_recv``</InlineLiteral><Normal Text> and after calling</Normal Text><br/>
+<InlineLiteral>``std.cache_req_body()``</InlineLiteral><Normal Text> or any other function consuming the request</Normal Text><br/>
+<Normal Text>body.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	vcl_recv {</Code><br/>
+<Code>		std.late_100_continue(true);</Code><br/>
+<Code></Code><br/>
+<Code>		if (req.method == "POST") {</Code><br/>
+<Code>			std.late_100_continue(false);</Code><br/>
+<Code>			return (pass);</Code><br/>
+<Code>		}</Code><br/>
+<Code>		...</Code><br/>
+<Code>	 }</Code><br/>
+<Code></Code><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>VOID</Data Type><Normal Text> </Normal Text><Function Identifier>set_ip_tos</Function Identifier><Normal Text>(</Normal Text><Data Type>INT</Data Type><Normal Text> tos)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Sets the IP type-of-service (TOS) field for the current session to</Normal Text><br/>
+<Italic>*tos*</Italic><Normal Text>. Silently ignored if the listen address is a Unix domain socket.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Please note that the TOS field is not removed by the end of the</Normal Text><br/>
+<Normal Text>request so probably want to set it on every request should you utilize</Normal Text><br/>
+<Normal Text>it.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	if (req.url ~ "^/slow/") {</Code><br/>
+<Code>		std.set_ip_tos(0);</Code><br/>
+<Code>	}</Code><br/>
+<Code></Code><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>VOID</Data Type><Normal Text> </Normal Text><Function Identifier>rollback</Function Identifier><Normal Text>(</Normal Text><Data Type>HTTP</Data Type><Normal Text> h)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Restores the </Normal Text><Italic>*h*</Italic><Normal Text> HTTP headers to their original state.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	std.rollback(bereq);</Code><br/>
+<Code></Code><br/>
+<Code></Code><br/>
+<Normal Text>DEPRECATED functions</Normal Text><br/>
+<Normal Text>====================</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>INT</Data Type><Normal Text> </Normal Text><Function Identifier>real2integer</Function Identifier><Normal Text>(</Normal Text><Data Type>REAL</Data Type><Normal Text> r, </Normal Text><Data Type>INT</Data Type><Normal Text> fallback)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Bold>**DEPRECATED**</Bold><Normal Text>: This function will be removed in a future version of</Normal Text><br/>
+<Normal Text>varnish, use </Normal Text><HyperlinkReference>`std.integer()`_</HyperlinkReference><Normal Text> with a </Normal Text><Italic>*real*</Italic><Normal Text> argument and the</Normal Text><br/>
+<HyperlinkReference>`std.round()`_</HyperlinkReference><Normal Text> function instead, for example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	std.integer(real=std.round(...), fallback=...)</Code><br/>
+<Code></Code><br/>
+<Normal Text>Rounds the real </Normal Text><Italic>*r*</Italic><Normal Text> to the nearest integer, but round halfway cases</Normal Text><br/>
+<Normal Text>away from zero (see </Normal Text><DefaultRole>`round(3)`</DefaultRole><Normal Text>). If conversion fails, </Normal Text><Italic>*fallback*</Italic><Normal Text> will</Normal Text><br/>
+<Normal Text>be returned.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Examples</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	set req.http.integer = std.real2integer(1140618699.00, 0);</Code><br/>
+<Code>	set req.http.posone = real2integer( 0.5, 0);	# =  1.0</Code><br/>
+<Code>	set req.http.negone = real2integer(-0.5, 0);	# = -1.0</Code><br/>
+<Code></Code><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>TIME</Data Type><Normal Text> </Normal Text><Function Identifier>real2time</Function Identifier><Normal Text>(</Normal Text><Data Type>REAL</Data Type><Normal Text> r, </Normal Text><Data Type>TIME</Data Type><Normal Text> fallback)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Bold>**DEPRECATED**</Bold><Normal Text>: This function will be removed in a future version of</Normal Text><br/>
+<Normal Text>varnish, use </Normal Text><HyperlinkReference>`std.time()`_</HyperlinkReference><Normal Text> with a </Normal Text><Italic>*real*</Italic><Normal Text> argument and the</Normal Text><br/>
+<HyperlinkReference>`std.round()`_</HyperlinkReference><Normal Text> function instead, for example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	std.time(real=std.round(...), fallback=...)</Code><br/>
+<Code></Code><br/>
+<Normal Text>Rounds the real </Normal Text><Italic>*r*</Italic><Normal Text> to the nearest integer (see</Normal Text><br/>
+<HyperlinkReference>`std.real2integer()`_</HyperlinkReference><Normal Text>) and returns the corresponding time when</Normal Text><br/>
+<Normal Text>interpreted as a unix epoch. If conversion fails, </Normal Text><Italic>*fallback*</Italic><Normal Text> will be</Normal Text><br/>
+<Normal Text>returned.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	set req.http.time = std.real2time(1140618699.00, now);</Code><br/>
+<Code></Code><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>INT</Data Type><Normal Text> </Normal Text><Function Identifier>time2integer</Function Identifier><Normal Text>(</Normal Text><Data Type>TIME</Data Type><Normal Text> t, </Normal Text><Data Type>INT</Data Type><Normal Text> fallback)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Bold>**DEPRECATED**</Bold><Normal Text>: This function will be removed in a future version of</Normal Text><br/>
+<Normal Text>varnish, use </Normal Text><HyperlinkReference>`std.integer()`_</HyperlinkReference><Normal Text> with a </Normal Text><Italic>*time*</Italic><Normal Text> argument instead, for</Normal Text><br/>
+<Normal Text>example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	std.integer(time=..., fallback=...)</Code><br/>
+<Code></Code><br/>
+<Normal Text>Converts the time </Normal Text><Italic>*t*</Italic><Normal Text> to a integer. If conversion fails,</Normal Text><br/>
+<Italic>*fallback*</Italic><Normal Text> will be returned.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	set req.http.int = std.time2integer(now, 0);</Code><br/>
+<Code></Code><br/>
+<Keyword>$Function</Keyword><Normal Text> </Normal Text><Data Type>REAL</Data Type><Normal Text> </Normal Text><Function Identifier>time2real</Function Identifier><Normal Text>(</Normal Text><Data Type>TIME</Data Type><Normal Text> t, </Normal Text><Data Type>REAL</Data Type><Normal Text> fallback)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Bold>**DEPRECATED**</Bold><Normal Text>: This function will be removed in a future version of</Normal Text><br/>
+<Normal Text>varnish, use </Normal Text><HyperlinkReference>`std.real()`_</HyperlinkReference><Normal Text> with a </Normal Text><Italic>*time*</Italic><Normal Text> argument instead, for</Normal Text><br/>
+<Normal Text>example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	std.real(time=..., fallback=...)</Code><br/>
+<Code></Code><br/>
+<Normal Text>Converts the time </Normal Text><Italic>*t*</Italic><Normal Text> to a real. If conversion fails, </Normal Text><Italic>*fallback*</Italic><Normal Text> will</Normal Text><br/>
+<Normal Text>be returned.</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Example</Normal Text><Code>::</Code><br/>
+<Code></Code><br/>
+<Code>	set req.http.real = std.time2real(now, 1.0);</Code><br/>
+<Code></Code><br/>
+<Code></Code><br/>
+<Code></Code><br/>
+<Normal Text>SEE ALSO</Normal Text><br/>
+<Normal Text>========</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>* </Normal Text><Role>:ref:</Role><InterpretedText>`varnishd(1)`</InterpretedText><br/>
+<Normal Text>* </Normal Text><Role>:ref:</Role><InterpretedText>`vsl(7)`</InterpretedText><br/>
+<Normal Text>* </Normal Text><DefaultRole>`fnmatch(3)`</DefaultRole><br/>

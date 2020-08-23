@@ -1,0 +1,28 @@
+<Keyword>varnishtest</Keyword><Normal Text> </Normal Text><String>"Test std.random()"</String><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>server</Keyword><Normal Text> </Normal Text><Server Identifier>s1</Server Identifier><String> </String><Region Marker>{</Region Marker><br/>
+<Normal Text>	</Normal Text><Action Keyword>rxreq</Action Keyword><br/>
+<Normal Text>	</Normal Text><Action Keyword>txresp</Action Keyword><br/>
+<Region Marker>}</Region Marker><Normal Text> </Normal Text><Keyword>-start</Keyword><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>varnish</Keyword><Normal Text> </Normal Text><Varnish Identifier>v1</Varnish Identifier><Keyword> -vcl+backend</Keyword><Normal Text> </Normal Text><Region Marker>{</Region Marker><br/>
+<Normal Text>	</Normal Text><Keyword>import</Keyword><Normal Text> </Normal Text><Well-known VMod>std</Well-known VMod><Normal Text>;</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>	</Normal Text><Keyword>sub</Keyword><Normal Text> </Normal Text><Standard VCL Sub>vcl_deliver</Standard VCL Sub><Normal Text> </Normal Text><Region Marker>{</Region Marker><br/>
+<Normal Text>		</Normal Text><Keyword>set</Keyword><Normal Text> </Normal Text><HTTP Header>resp.http.rnd1</HTTP Header><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Known VMod Function>std.random</Known VMod Function><Normal Text>(</Normal Text><Decimal>0</Decimal><Normal Text>, </Normal Text><Decimal>1</Decimal><Normal Text>);</Normal Text><br/>
+<Normal Text>		</Normal Text><Keyword>set</Keyword><Normal Text> </Normal Text><HTTP Header>resp.http.rnd2</HTTP Header><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Known VMod Function>std.random</Known VMod Function><Normal Text>(</Normal Text><Decimal>0</Decimal><Normal Text>, </Normal Text><Decimal>10</Decimal><Normal Text>);</Normal Text><br/>
+<Normal Text>		</Normal Text><Keyword>set</Keyword><Normal Text> </Normal Text><HTTP Header>resp.http.rnd3</HTTP Header><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Known VMod Function>std.random</Known VMod Function><Normal Text>(</Normal Text><Decimal>8</Decimal><Normal Text>, </Normal Text><Decimal>10</Decimal><Normal Text>);</Normal Text><br/>
+<Normal Text>		</Normal Text><Keyword>set</Keyword><Normal Text> </Normal Text><HTTP Header>resp.http.rnd4</HTTP Header><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Known VMod Function>std.random</Known VMod Function><Normal Text>(</Normal Text><Decimal>99</Decimal><Normal Text>, </Normal Text><Decimal>100</Decimal><Normal Text>);</Normal Text><br/>
+<Normal Text>	</Normal Text><Region Marker>}</Region Marker><br/>
+<Region Marker>}</Region Marker><Normal Text> </Normal Text><Keyword>-start</Keyword><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>varnish</Keyword><Normal Text> </Normal Text><Varnish Identifier>v1</Varnish Identifier><Normal Text> </Normal Text><Keyword>-cliok </Keyword><String>"debug.srandom"</String><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>client</Keyword><Normal Text> </Normal Text><Client Identifier>c1</Client Identifier><String> </String><Region Marker>{</Region Marker><br/>
+<Normal Text>	</Normal Text><Action Keyword>txreq</Action Keyword><br/>
+<Normal Text>	</Normal Text><Action Keyword>rxresp</Action Keyword><br/>
+<Normal Text>	</Normal Text><Action Keyword>expect</Action Keyword><Normal Text> </Normal Text><HTTP Header>resp.http.rnd1</HTTP Header><Normal Text> </Normal Text><Comparison Operator>==</Comparison Operator><Normal Text> </Normal Text><Float>0.656</Float><br/>
+<Normal Text>	</Normal Text><Action Keyword>expect</Action Keyword><Normal Text> </Normal Text><HTTP Header>resp.http.rnd2</HTTP Header><Normal Text> </Normal Text><Comparison Operator>==</Comparison Operator><Normal Text> </Normal Text><Float>0.390</Float><br/>
+<Normal Text>	</Normal Text><Action Keyword>expect</Action Keyword><Normal Text> </Normal Text><HTTP Header>resp.http.rnd3</HTTP Header><Normal Text> </Normal Text><Comparison Operator>==</Comparison Operator><Normal Text> </Normal Text><Float>8.585</Float><br/>
+<Normal Text>	</Normal Text><Action Keyword>expect</Action Keyword><Normal Text> </Normal Text><HTTP Header>resp.http.rnd4</HTTP Header><Normal Text> </Normal Text><Comparison Operator>==</Comparison Operator><Normal Text> </Normal Text><Float>99.636</Float><br/>
+<Region Marker>}</Region Marker><Normal Text> </Normal Text><Keyword>-run</Keyword><br/>

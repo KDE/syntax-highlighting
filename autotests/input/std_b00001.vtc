@@ -1,0 +1,28 @@
+varnishtest "Test std.random()"
+
+server s1 {
+	rxreq
+	txresp
+} -start
+
+varnish v1 -vcl+backend {
+	import std;
+
+	sub vcl_deliver {
+		set resp.http.rnd1 = std.random(0, 1);
+		set resp.http.rnd2 = std.random(0, 10);
+		set resp.http.rnd3 = std.random(8, 10);
+		set resp.http.rnd4 = std.random(99, 100);
+	}
+} -start
+
+varnish v1 -cliok "debug.srandom"
+
+client c1 {
+	txreq
+	rxresp
+	expect resp.http.rnd1 == 0.656
+	expect resp.http.rnd2 == 0.390
+	expect resp.http.rnd3 == 8.585
+	expect resp.http.rnd4 == 99.636
+} -run

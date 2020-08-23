@@ -1,0 +1,342 @@
+##############################################################################
+#
+# NAGIOS.CFG - Sample Main Config File for Nagios @VERSION@
+#
+# Read the documentation for more information on this configuration
+# file.  I've provided some comments here, but things may not be so
+# clear without further explanation.
+#
+#
+##############################################################################
+
+
+# LOG FILE
+# This is the main log file where service and host events are logged
+# for historical purposes.  This should be the first option specified
+# in the config file!!!
+
+log_file=@localstatedir@/nagios.log
+
+
+
+# OBJECT CONFIGURATION FILE(S)
+# These are the object configuration files in which you define hosts,
+# host groups, contacts, contact groups, services, etc.
+# You can split your object definitions across several config files
+# if you wish (as shown below), or keep them all in a single config file.
+
+# You can specify individual object config files as shown below:
+cfg_file=@sysconfdir@/objects/commands.cfg
+cfg_file=@sysconfdir@/objects/contacts.cfg
+cfg_file=@sysconfdir@/objects/timeperiods.cfg
+cfg_file=@sysconfdir@/objects/templates.cfg
+
+# Definitions for monitoring the local (Linux) host
+cfg_file=@sysconfdir@/objects/localhost.cfg
+
+# Definitions for monitoring a Windows machine
+#cfg_file=@sysconfdir@/objects/windows.cfg
+
+# Definitions for monitoring a router/switch
+#cfg_file=@sysconfdir@/objects/switch.cfg
+
+# Definitions for monitoring a network printer
+#cfg_file=@sysconfdir@/objects/printer.cfg
+
+
+# You can also tell Nagios to process all config files (with a .cfg
+# extension) in a particular directory by using the cfg_dir
+# directive as shown below:
+
+#cfg_dir=@sysconfdir@/servers
+#cfg_dir=@sysconfdir@/printers
+#cfg_dir=@sysconfdir@/switches
+#cfg_dir=@sysconfdir@/routers
+
+
+
+
+# OBJECT CACHE FILE
+# This option determines where object definitions are cached when
+# Nagios starts/restarts.  The CGIs read object definitions from
+# this cache file (rather than looking at the object config files
+# directly) in order to prevent inconsistencies that can occur
+# when the config files are modified after Nagios starts.
+
+object_cache_file=@localstatedir@/objects.cache
+
+
+
+# PRE-CACHED OBJECT FILE
+# This options determines the location of the precached object file.
+# If you run Nagios with the -p command line option, it will preprocess
+# your object configuration file(s) and write the cached config to this
+# file.  You can then start Nagios with the -u option to have it read
+# object definitions from this precached file, rather than the standard
+# object configuration files (see the cfg_file and cfg_dir options above).
+# Using a precached object file can speed up the time needed to (re)start
+# the Nagios process if you've got a large and/or complex configuration.
+# Read the documentation section on optimizing Nagios to find our more
+# about how this feature works.
+
+precached_object_file=@localstatedir@/objects.precache
+
+
+
+# RESOURCE FILE
+# This is an optional resource file that contains $USERx$ macro
+# definitions. Multiple resource files can be specified by using
+# multiple resource_file definitions.  The CGIs will not attempt to
+# read the contents of resource files, so information that is
+# considered to be sensitive (usernames, passwords, etc) can be
+# defined as macros in this file and restrictive permissions (600)
+# can be placed on this file.
+
+resource_file=@sysconfdir@/resource.cfg
+
+
+
+# STATUS FILE
+# This is where the current status of all monitored services and
+# hosts is stored.  Its contents are read and processed by the CGIs.
+# The contents of the status file are deleted every time Nagios
+#  restarts.
+
+status_file=@localstatedir@/status.dat
+
+
+
+# STATUS FILE UPDATE INTERVAL
+# This option determines the frequency (in seconds) that
+# Nagios will periodically dump program, host, and
+# service status data.
+
+status_update_interval=10
+
+
+
+# NAGIOS USER
+# This determines the effective user that Nagios should run as.
+# You can either supply a username or a UID.
+
+nagios_user=@nagios_user@
+
+
+
+# NAGIOS GROUP
+# This determines the effective group that Nagios should run as.
+# You can either supply a group name or a GID.
+
+nagios_group=@nagios_grp@
+
+
+
+# EXTERNAL COMMAND OPTION
+# This option allows you to specify whether or not Nagios should check
+# for external commands (in the command file defined below).
+# By default Nagios will check for external commands.
+# If you want to be able to use the CGI command interface
+# you will have to enable this.
+# Values: 0 = disable commands, 1 = enable commands
+
+check_external_commands=1
+
+
+
+# EXTERNAL COMMAND FILE
+# This is the file that Nagios checks for external command requests.
+# It is also where the command CGI will write commands that are submitted
+# by users, so it must be writeable by the user that the web server
+# is running as (usually 'nobody').  Permissions should be set at the
+# directory level instead of on the file, as the file is deleted every
+# time its contents are processed.
+
+command_file=@localstatedir@/rw/nagios.cmd
+
+
+
+# QUERY HANDLER INTERFACE
+# This is the socket that is created for the Query Handler interface
+
+#query_socket=@localstatedir@/rw/nagios.qh
+
+
+
+# LOCK FILE
+# This is the lockfile that Nagios will use to store its PID number
+# in when it is running in daemon mode.
+
+lock_file=@subsyslockfile@
+
+
+
+# TEMP FILE
+# This is a temporary file that is used as scratch space when Nagios
+# updates the status log, cleans the comment file, etc.  This file
+# is created, used, and deleted throughout the time that Nagios is
+# running.
+
+temp_file=@localstatedir@/nagios.tmp
+
+
+
+# TEMP PATH
+# This is path where Nagios can create temp files for service and
+# host check results, etc.
+
+temp_path=@TMPDIR@
+
+
+
+# EVENT BROKER OPTIONS
+# Controls what (if any) data gets sent to the event broker.
+# Values:  0      = Broker nothing
+#         -1      = Broker everything
+#         <other> = See documentation
+
+event_broker_options=-1
+
+
+
+# EVENT BROKER MODULE(S)
+# This directive is used to specify an event broker module that should
+# by loaded by Nagios at startup.  Use multiple directives if you want
+# to load more than one module.  Arguments that should be passed to
+# the module at startup are separated from the module path by a space.
+#
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# WARNING !!! WARNING !!! WARNING !!! WARNING !!! WARNING !!! WARNING
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#
+# Do NOT overwrite modules while they are being used by Nagios or Nagios
+# will crash in a fiery display of SEGFAULT glory.  This is a bug/limitation
+# either in dlopen(), the kernel, and/or the filesystem.  And maybe Nagios...
+#
+# The correct/safe way of updating a module is by using one of these methods:
+#    1. Shutdown Nagios, replace the module file, restart Nagios
+#    2. Delete the original module file, move the new module file into place,
+#	restart Nagios
+#
+# Example:
+#
+#   broker_module=<modulepath> [moduleargs]
+
+#broker_module=/somewhere/module1.o
+#broker_module=/somewhere/module2.o arg1 arg2=3 debug=0
+
+
+
+# LOG ROTATION METHOD
+# This is the log rotation method that Nagios should use to rotate
+# the main log file. Values are as follows..
+#	n	= None - don't rotate the log
+#	h	= Hourly rotation (top of the hour)
+#	d	= Daily rotation (midnight every day)
+#	w	= Weekly rotation (midnight on Saturday evening)
+#	m	= Monthly rotation (midnight last day of month)
+
+log_rotation_method=d
+
+
+
+# LOG ARCHIVE PATH
+# This is the directory where archived (rotated) log files should be
+# placed (assuming you've chosen to do log rotation).
+
+log_archive_path=@localstatedir@/archives
+
+
+
+# LOGGING OPTIONS
+# If you want messages logged to the syslog facility, as well as the
+# Nagios log file set this option to 1.  If not, set it to 0.
+
+use_syslog=1
+
+
+
+# NOTIFICATION LOGGING OPTION
+# If you don't want notifications to be logged, set this value to 0.
+# If notifications should be logged, set the value to 1.
+
+log_notifications=1
+
+
+
+# SERVICE RETRY LOGGING OPTION
+# If you don't want service check retries to be logged, set this value
+# to 0.  If retries should be logged, set the value to 1.
+
+log_service_retries=1
+
+
+
+# HOST RETRY LOGGING OPTION
+# If you don't want host check retries to be logged, set this value to
+# 0.  If retries should be logged, set the value to 1.
+
+log_host_retries=1
+
+
+
+# EVENT HANDLER LOGGING OPTION
+# If you don't want host and service event handlers to be logged, set
+# this value to 0.  If event handlers should be logged, set the value
+# to 1.
+
+log_event_handlers=1
+
+
+
+# INITIAL STATES LOGGING OPTION
+# If you want Nagios to log all initial host and service states to
+# the main log file (the first time the service or host is checked)
+# you can enable this option by setting this value to 1.  If you
+# are not using an external application that does long term state
+# statistics reporting, you do not need to enable this option.  In
+# this case, set the value to 0.
+
+log_initial_states=0
+
+
+
+# CURRENT STATES LOGGING OPTION
+# If you don't want Nagios to log all current host and service states
+# after log has been rotated to the main log file, you can disable this
+# option by setting this value to 0. Default value is 1.
+
+log_current_states=1
+
+
+
+# EXTERNAL COMMANDS LOGGING OPTION
+# If you don't want Nagios to log external commands, set this value
+# to 0.  If external commands should be logged, set this value to 1.
+# Note: This option does not include logging of passive service
+# checks - see the option below for controlling whether or not
+# passive checks are logged.
+
+log_external_commands=1
+
+
+
+# PASSIVE CHECKS LOGGING OPTION
+# If you don't want Nagios to log passive host and service checks, set
+# this value to 0.  If passive checks should be logged, set
+# this value to 1.
+
+log_passive_checks=1
+
+
+
+# GLOBAL HOST AND SERVICE EVENT HANDLERS
+# These options allow you to specify a host and service event handler
+# command that is to be run for every host or service state change.
+# The global event handler is executed immediately prior to the event
+# handler that you have optionally specified in each host or
+# service definition. The command argument is the short name of a
+# command definition that you define in your host configuration file.
+# Read the HTML docs for more information.
+
+#global_host_event_handler=somecommand
+#global_service_event_handler=somecommand

@@ -76,3 +76,19 @@ int a()
 <%
     [](){%>();
 }
+
+#define 1
+ #define 2
+  #define 3
+   #define 4
+    #define 5
+	#define tab
+
+#if 1
+int x; // variable shall not be grey
+#endif
+#if defined (A)
+int y; // variable shall not be grey
+#elif defined (B)
+int z; // variable shall not be grey
+#endif

@@ -30,60 +30,60 @@
 #
 # Original author: Lasse Karstensen <lkarsten@varnish-software.com>
 
-sub devicedetect <beginfold id='4'>{</beginfold id='4'>
+sub devicedetect <beginfold id='1'>{</beginfold id='1'>
 	unset req.http.X-UA-Device;
 	set req.http.X-UA-Device = "pc";
 
 	# Handle that a cookie may override the detection alltogether.
-	if <beginfold id='5'>(</beginfold id='5'>req.http.Cookie ~ "(?i)X-UA-Device-force"<endfold id='5'>)</endfold id='5'> <beginfold id='6'>{</beginfold id='6'>
-		<beginfold id='2'>/*</beginfold id='2'> ;?? means zero or one ;, non-greedy to match the first. <endfold id='2'>*/</endfold id='2'>
+	if <beginfold id='2'>(</beginfold id='2'>req.http.Cookie ~ "(?i)X-UA-Device-force"<endfold id='2'>)</endfold id='2'> <beginfold id='3'>{</beginfold id='3'>
+		<beginfold id='4'>/*</beginfold id='4'> ;?? means zero or one ;, non-greedy to match the first. <endfold id='4'>*/</endfold id='4'>
 		set req.http.X-UA-Device = regsub(req.http.Cookie, "(?i).*X-UA-Device-force=([^;]+);??.*", "\1");
-		<beginfold id='2'>/*</beginfold id='2'> Clean up our mess in the cookie header <endfold id='2'>*/</endfold id='2'>
+		<beginfold id='4'>/*</beginfold id='4'> Clean up our mess in the cookie header <endfold id='4'>*/</endfold id='4'>
 		set req.http.Cookie = regsuball(req.http.Cookie, "(^|; ) *X-UA-Device-force=[^;]+;? *", "\1");
-		<beginfold id='2'>/*</beginfold id='2'> If the cookie header is now empty, or just whitespace, unset it. <endfold id='2'>*/</endfold id='2'>
-		if <beginfold id='5'>(</beginfold id='5'>req.http.Cookie ~ "^ *$"<endfold id='5'>)</endfold id='5'> <beginfold id='6'>{</beginfold id='6'> unset req.http.Cookie; <endfold id='6'>}</endfold id='6'>
-	<endfold id='6'>}</endfold id='6'> else <beginfold id='6'>{</beginfold id='6'>
-        if <beginfold id='5'>(</beginfold id='5'>req.http.User-Agent ~ "\(compatible; Googlebot-Mobile/2.1; \+http://www.google.com/bot.html\)" ||
-            <beginfold id='5'>(</beginfold id='5'>req.http.User-Agent ~ "(Android|iPhone)" && req.http.User-Agent ~ "\(compatible.?; Googlebot/2.1.?; \+http://www.google.com/bot.html"<endfold id='5'>)</endfold id='5'> ||
-			<beginfold id='5'>(</beginfold id='5'>req.http.User-Agent ~ "(iPhone|Windows Phone)" && req.http.User-Agent ~ "\(compatible; bingbot/2.0; \+http://www.bing.com/bingbot.htm"<endfold id='5'>)</endfold id='5'><endfold id='5'>)</endfold id='5'> <beginfold id='6'>{</beginfold id='6'>
-            set req.http.X-UA-Device = "mobile-bot"; <endfold id='6'>}</endfold id='6'>
-		elsif <beginfold id='5'>(</beginfold id='5'>req.http.User-Agent ~ "(?i)(ads|google|bing|msn|yandex|baidu|ro|career|seznam|)bot" ||
+		<beginfold id='4'>/*</beginfold id='4'> If the cookie header is now empty, or just whitespace, unset it. <endfold id='4'>*/</endfold id='4'>
+		if <beginfold id='2'>(</beginfold id='2'>req.http.Cookie ~ "^ *$"<endfold id='2'>)</endfold id='2'> <beginfold id='3'>{</beginfold id='3'> unset req.http.Cookie; <endfold id='3'>}</endfold id='3'>
+	<endfold id='3'>}</endfold id='3'> else <beginfold id='3'>{</beginfold id='3'>
+        if <beginfold id='2'>(</beginfold id='2'>req.http.User-Agent ~ "\(compatible; Googlebot-Mobile/2.1; \+http://www.google.com/bot.html\)" ||
+            <beginfold id='2'>(</beginfold id='2'>req.http.User-Agent ~ "(Android|iPhone)" && req.http.User-Agent ~ "\(compatible.?; Googlebot/2.1.?; \+http://www.google.com/bot.html"<endfold id='2'>)</endfold id='2'> ||
+			<beginfold id='2'>(</beginfold id='2'>req.http.User-Agent ~ "(iPhone|Windows Phone)" && req.http.User-Agent ~ "\(compatible; bingbot/2.0; \+http://www.bing.com/bingbot.htm"<endfold id='2'>)</endfold id='2'><endfold id='2'>)</endfold id='2'> <beginfold id='3'>{</beginfold id='3'>
+            set req.http.X-UA-Device = "mobile-bot"; <endfold id='3'>}</endfold id='3'>
+		elsif <beginfold id='2'>(</beginfold id='2'>req.http.User-Agent ~ "(?i)(ads|google|bing|msn|yandex|baidu|ro|career|seznam|)bot" ||
 		    req.http.User-Agent ~ "(?i)(baidu|jike|symantec)spider" ||
 		    req.http.User-Agent ~ "(?i)pingdom" ||
 		    req.http.User-Agent ~ "(?i)facebookexternalhit" ||
 		    req.http.User-Agent ~ "(?i)scanner" ||
 		    req.http.User-Agent ~ "(?i)slurp" ||
-		    req.http.User-Agent ~ "(?i)(web)crawler"<endfold id='5'>)</endfold id='5'> <beginfold id='6'>{</beginfold id='6'>
-			set req.http.X-UA-Device = "bot"; <endfold id='6'>}</endfold id='6'>
-		elsif <beginfold id='5'>(</beginfold id='5'>req.http.User-Agent ~ "(?i)ipad"<endfold id='5'>)</endfold id='5'>        <beginfold id='6'>{</beginfold id='6'> set req.http.X-UA-Device = "tablet-ipad"; <endfold id='6'>}</endfold id='6'>
-		elsif <beginfold id='5'>(</beginfold id='5'>req.http.User-Agent ~ "(?i)ip(hone|od)"<endfold id='5'>)</endfold id='5'> <beginfold id='6'>{</beginfold id='6'> set req.http.X-UA-Device = "mobile-iphone"; <endfold id='6'>}</endfold id='6'>
-		<beginfold id='2'>/*</beginfold id='2'> how do we differ between an android phone and an android tablet?
-		   http://stackoverflow.com/questions/5341637/how-do-detect-android-tablets-in-general-useragent <endfold id='2'>*/</endfold id='2'>
-		elsif <beginfold id='5'>(</beginfold id='5'>req.http.User-Agent ~ "(?i)android.*(mobile|mini)"<endfold id='5'>)</endfold id='5'> <beginfold id='6'>{</beginfold id='6'> set req.http.X-UA-Device = "mobile-android"; <endfold id='6'>}</endfold id='6'>
+		    req.http.User-Agent ~ "(?i)(web)crawler"<endfold id='2'>)</endfold id='2'> <beginfold id='3'>{</beginfold id='3'>
+			set req.http.X-UA-Device = "bot"; <endfold id='3'>}</endfold id='3'>
+		elsif <beginfold id='2'>(</beginfold id='2'>req.http.User-Agent ~ "(?i)ipad"<endfold id='2'>)</endfold id='2'>        <beginfold id='3'>{</beginfold id='3'> set req.http.X-UA-Device = "tablet-ipad"; <endfold id='3'>}</endfold id='3'>
+		elsif <beginfold id='2'>(</beginfold id='2'>req.http.User-Agent ~ "(?i)ip(hone|od)"<endfold id='2'>)</endfold id='2'> <beginfold id='3'>{</beginfold id='3'> set req.http.X-UA-Device = "mobile-iphone"; <endfold id='3'>}</endfold id='3'>
+		<beginfold id='4'>/*</beginfold id='4'> how do we differ between an android phone and an android tablet?
+		   http://stackoverflow.com/questions/5341637/how-do-detect-android-tablets-in-general-useragent <endfold id='4'>*/</endfold id='4'>
+		elsif <beginfold id='2'>(</beginfold id='2'>req.http.User-Agent ~ "(?i)android.*(mobile|mini)"<endfold id='2'>)</endfold id='2'> <beginfold id='3'>{</beginfold id='3'> set req.http.X-UA-Device = "mobile-android"; <endfold id='3'>}</endfold id='3'>
 		// android 3/honeycomb was just about tablet-only, and any phones will probably handle a bigger page layout.
-		elsif <beginfold id='5'>(</beginfold id='5'>req.http.User-Agent ~ "(?i)android 3"<endfold id='5'>)</endfold id='5'>              <beginfold id='6'>{</beginfold id='6'> set req.http.X-UA-Device = "tablet-android"; <endfold id='6'>}</endfold id='6'>
-		<beginfold id='2'>/*</beginfold id='2'> Opera Mobile <endfold id='2'>*/</endfold id='2'>
-		elsif <beginfold id='5'>(</beginfold id='5'>req.http.User-Agent ~ "Opera Mobi"<endfold id='5'>)</endfold id='5'>                  <beginfold id='6'>{</beginfold id='6'> set req.http.X-UA-Device = "mobile-smartphone"; <endfold id='6'>}</endfold id='6'>
+		elsif <beginfold id='2'>(</beginfold id='2'>req.http.User-Agent ~ "(?i)android 3"<endfold id='2'>)</endfold id='2'>              <beginfold id='3'>{</beginfold id='3'> set req.http.X-UA-Device = "tablet-android"; <endfold id='3'>}</endfold id='3'>
+		<beginfold id='4'>/*</beginfold id='4'> Opera Mobile <endfold id='4'>*/</endfold id='4'>
+		elsif <beginfold id='2'>(</beginfold id='2'>req.http.User-Agent ~ "Opera Mobi"<endfold id='2'>)</endfold id='2'>                  <beginfold id='3'>{</beginfold id='3'> set req.http.X-UA-Device = "mobile-smartphone"; <endfold id='3'>}</endfold id='3'>
 		// May very well give false positives towards android tablets. Suggestions welcome.
-		elsif <beginfold id='5'>(</beginfold id='5'>req.http.User-Agent ~ "(?i)android"<endfold id='5'>)</endfold id='5'>         <beginfold id='6'>{</beginfold id='6'> set req.http.X-UA-Device = "tablet-android"; <endfold id='6'>}</endfold id='6'>
-		elsif <beginfold id='5'>(</beginfold id='5'>req.http.User-Agent ~ "PlayBook; U; RIM Tablet"<endfold id='5'>)</endfold id='5'>         <beginfold id='6'>{</beginfold id='6'> set req.http.X-UA-Device = "tablet-rim"; <endfold id='6'>}</endfold id='6'>
-		elsif <beginfold id='5'>(</beginfold id='5'>req.http.User-Agent ~ "hp-tablet.*TouchPad"<endfold id='5'>)</endfold id='5'>         <beginfold id='6'>{</beginfold id='6'> set req.http.X-UA-Device = "tablet-hp"; <endfold id='6'>}</endfold id='6'>
-		elsif <beginfold id='5'>(</beginfold id='5'>req.http.User-Agent ~ "Kindle/3"<endfold id='5'>)</endfold id='5'>         <beginfold id='6'>{</beginfold id='6'> set req.http.X-UA-Device = "tablet-kindle"; <endfold id='6'>}</endfold id='6'>
-		elsif <beginfold id='5'>(</beginfold id='5'>req.http.User-Agent ~ "Touch.+Tablet PC" ||
-		    req.http.User-Agent ~ "Windows NT [0-9.]+; ARM;" <endfold id='5'>)</endfold id='5'> <beginfold id='6'>{</beginfold id='6'>
+		elsif <beginfold id='2'>(</beginfold id='2'>req.http.User-Agent ~ "(?i)android"<endfold id='2'>)</endfold id='2'>         <beginfold id='3'>{</beginfold id='3'> set req.http.X-UA-Device = "tablet-android"; <endfold id='3'>}</endfold id='3'>
+		elsif <beginfold id='2'>(</beginfold id='2'>req.http.User-Agent ~ "PlayBook; U; RIM Tablet"<endfold id='2'>)</endfold id='2'>         <beginfold id='3'>{</beginfold id='3'> set req.http.X-UA-Device = "tablet-rim"; <endfold id='3'>}</endfold id='3'>
+		elsif <beginfold id='2'>(</beginfold id='2'>req.http.User-Agent ~ "hp-tablet.*TouchPad"<endfold id='2'>)</endfold id='2'>         <beginfold id='3'>{</beginfold id='3'> set req.http.X-UA-Device = "tablet-hp"; <endfold id='3'>}</endfold id='3'>
+		elsif <beginfold id='2'>(</beginfold id='2'>req.http.User-Agent ~ "Kindle/3"<endfold id='2'>)</endfold id='2'>         <beginfold id='3'>{</beginfold id='3'> set req.http.X-UA-Device = "tablet-kindle"; <endfold id='3'>}</endfold id='3'>
+		elsif <beginfold id='2'>(</beginfold id='2'>req.http.User-Agent ~ "Touch.+Tablet PC" ||
+		    req.http.User-Agent ~ "Windows NT [0-9.]+; ARM;" <endfold id='2'>)</endfold id='2'> <beginfold id='3'>{</beginfold id='3'>
 		        set req.http.X-UA-Device = "tablet-microsoft";
-		<endfold id='6'>}</endfold id='6'>
-		elsif <beginfold id='5'>(</beginfold id='5'>req.http.User-Agent ~ "Mobile.+Firefox"<endfold id='5'>)</endfold id='5'>     <beginfold id='6'>{</beginfold id='6'> set req.http.X-UA-Device = "mobile-firefoxos"; <endfold id='6'>}</endfold id='6'>
-		elsif <beginfold id='5'>(</beginfold id='5'>req.http.User-Agent ~ "^HTC" ||
+		<endfold id='3'>}</endfold id='3'>
+		elsif <beginfold id='2'>(</beginfold id='2'>req.http.User-Agent ~ "Mobile.+Firefox"<endfold id='2'>)</endfold id='2'>     <beginfold id='3'>{</beginfold id='3'> set req.http.X-UA-Device = "mobile-firefoxos"; <endfold id='3'>}</endfold id='3'>
+		elsif <beginfold id='2'>(</beginfold id='2'>req.http.User-Agent ~ "^HTC" ||
 		    req.http.User-Agent ~ "Fennec" ||
 		    req.http.User-Agent ~ "IEMobile" ||
 		    req.http.User-Agent ~ "BlackBerry" ||
 		    req.http.User-Agent ~ "BB10.*Mobile" ||
 		    req.http.User-Agent ~ "GT-.*Build/GINGERBREAD" ||
-		    req.http.User-Agent ~ "SymbianOS.*AppleWebKit"<endfold id='5'>)</endfold id='5'> <beginfold id='6'>{</beginfold id='6'>
+		    req.http.User-Agent ~ "SymbianOS.*AppleWebKit"<endfold id='2'>)</endfold id='2'> <beginfold id='3'>{</beginfold id='3'>
 			set req.http.X-UA-Device = "mobile-smartphone";
-		<endfold id='6'>}</endfold id='6'>
-		elsif <beginfold id='5'>(</beginfold id='5'>req.http.User-Agent ~ "(?i)symbian" ||
+		<endfold id='3'>}</endfold id='3'>
+		elsif <beginfold id='2'>(</beginfold id='2'>req.http.User-Agent ~ "(?i)symbian" ||
 		    req.http.User-Agent ~ "(?i)^sonyericsson" ||
 		    req.http.User-Agent ~ "(?i)^nokia" ||
 		    req.http.User-Agent ~ "(?i)^samsung" ||
@@ -106,8 +106,8 @@ sub devicedetect <beginfold id='4'>{</beginfold id='4'>
 		    req.http.User-Agent ~ "(?i)eudoraweb" ||
 		    req.http.User-Agent ~ "(?i)htc" ||
 		    req.http.User-Agent ~ "(?i)240x320" ||
-		    req.http.User-Agent ~ "(?i)avantgo"<endfold id='5'>)</endfold id='5'> <beginfold id='6'>{</beginfold id='6'>
+		    req.http.User-Agent ~ "(?i)avantgo"<endfold id='2'>)</endfold id='2'> <beginfold id='3'>{</beginfold id='3'>
 			set req.http.X-UA-Device = "mobile-generic";
-		<endfold id='6'>}</endfold id='6'>
-	<endfold id='6'>}</endfold id='6'>
-<endfold id='4'>}</endfold id='4'>
+		<endfold id='3'>}</endfold id='3'>
+	<endfold id='3'>}</endfold id='3'>
+<endfold id='1'>}</endfold id='1'>

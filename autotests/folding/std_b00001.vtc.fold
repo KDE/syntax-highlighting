@@ -1,28 +1,28 @@
 varnishtest "Test std.random()"
 
-server s1 <beginfold id='3'>{</beginfold id='3'>
+server s1 <beginfold id='1'>{</beginfold id='1'>
 	rxreq
 	txresp
-<endfold id='3'>}</endfold id='3'> -start
+<endfold id='1'>}</endfold id='1'> -start
 
-varnish v1 -vcl+backend <beginfold id='4'>{</beginfold id='4'>
+varnish v1 -vcl+backend <beginfold id='2'>{</beginfold id='2'>
 	import std;
 
-	sub vcl_deliver <beginfold id='14'>{</beginfold id='14'>
+	sub vcl_deliver <beginfold id='3'>{</beginfold id='3'>
 		set resp.http.rnd1 = std.random(0, 1);
 		set resp.http.rnd2 = std.random(0, 10);
 		set resp.http.rnd3 = std.random(8, 10);
 		set resp.http.rnd4 = std.random(99, 100);
-	<endfold id='14'>}</endfold id='14'>
-<endfold id='4'>}</endfold id='4'> -start
+	<endfold id='3'>}</endfold id='3'>
+<endfold id='2'>}</endfold id='2'> -start
 
 varnish v1 -cliok "debug.srandom"
 
-client c1 <beginfold id='2'>{</beginfold id='2'>
+client c1 <beginfold id='4'>{</beginfold id='4'>
 	txreq
 	rxresp
 	expect resp.http.rnd1 == 0.656
 	expect resp.http.rnd2 == 0.390
 	expect resp.http.rnd3 == 8.585
 	expect resp.http.rnd4 == 99.636
-<endfold id='2'>}</endfold id='2'> -run
+<endfold id='4'>}</endfold id='4'> -run

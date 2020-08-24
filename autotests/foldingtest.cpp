@@ -19,6 +19,8 @@
 #include <QTextStream>
 #include <QTest>
 
+#include <unordered_map>
+
 using namespace KSyntaxHighlighting;
 
 class FoldingHighlighter : public AbstractHighlighter
@@ -60,16 +62,18 @@ public:
 
             int offset = 0;
             for (const auto &fold : qAsConst(m_folds)) {
+                // use stable ids for output, see below docs for m_stableFoldingIds
+                const auto stableId = m_stableFoldingIds[fold.region.id()];
                 m_out << currentLine.mid(offset, fold.offset - offset);
                 if (fold.region.type() == FoldingRegion::Begin)
-                    m_out << "<beginfold id='" << fold.region.id() << "'>";
+                    m_out << "<beginfold id='" << stableId << "'>";
                 else
-                    m_out << "<endfold id='" << fold.region.id() << "'>";
+                    m_out << "<endfold id='" << stableId << "'>";
                 m_out << currentLine.mid(fold.offset, fold.length);
                 if (fold.region.type() == FoldingRegion::Begin)
-                    m_out << "</beginfold id='" << fold.region.id() << "'>";
+                    m_out << "</beginfold id='" << stableId << "'>";
                 else
-                    m_out << "</endfold id='" << fold.region.id() << "'>";
+                    m_out << "</endfold id='" << stableId << "'>";
                 offset = fold.offset + fold.length;
             }
             m_out << currentLine.mid(offset) << '\n';
@@ -91,6 +95,10 @@ protected:
     {
         Q_ASSERT(region.isValid());
         m_folds.push_back({offset, length, region});
+
+        // create stable id if needed, see below m_stableFoldingIds docs for details
+        // start with 1
+        m_stableFoldingIds.emplace(region.id(), m_stableFoldingIds.size() + 1);
     }
 
 private:
@@ -101,6 +109,11 @@ private:
         FoldingRegion region;
     };
     QVector<Fold> m_folds;
+
+    // we use one repository for all tests
+    // => the folding ids might change even if just unrelated highlighings are added
+    // => construct some stable id per test based on occurrence of id
+    std::unordered_map<uint32_t, size_t> m_stableFoldingIds;
 };
 
 class FoldingTest : public QObject
@@ -109,14 +122,25 @@ class FoldingTest : public QObject
 public:
     explicit FoldingTest(QObject *parent = nullptr)
         : QObject(parent)
+        , m_repo(nullptr)
     {
     }
 
 private:
+    Repository *m_repo;
+
 private Q_SLOTS:
     void initTestCase()
     {
         QStandardPaths::setTestModeEnabled(true);
+        m_repo = new Repository;
+        initRepositorySearchPaths(*m_repo);
+    }
+
+    void cleanupTestCase()
+    {
+        delete m_repo;
+        m_repo = nullptr;
     }
 
     void testFolding_data()
@@ -152,16 +176,13 @@ private Q_SLOTS:
         QFETCH(QString, outFile);
         QFETCH(QString, refFile);
         QFETCH(QString, syntax);
+        QVERIFY(m_repo);
 
-        Repository m_repo;
-        initRepositorySearchPaths(m_repo);
-
-        auto def = m_repo.definitionForFileName(inFile);
+        auto def = m_repo->definitionForFileName(inFile);
         if (!syntax.isEmpty())
-            def = m_repo.definitionForName(syntax);
+            def = m_repo->definitionForName(syntax);
 
         FoldingHighlighter highlighter;
-
         QVERIFY(def.isValid());
         highlighter.setDefinition(def);
         highlighter.highlightFile(inFile, outFile);

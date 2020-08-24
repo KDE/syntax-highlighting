@@ -1,0 +1,47 @@
+PROGRAM testtest;
+
+
+INTERFACE
+
+extern inout int inputs_int[];
+extern out int nur_out[];
+extern in int nur_in[];
+
+CODE
+
+function jetzt_mach_schon(in int grenze, out int fak)<beginfold id='1'>{</beginfold id='1'>
+    int temp, counter;
+    counter=grenze;
+    temp=1;
+    while(counter>1)
+        temp*=(counter--);
+    fak=temp;
+<endfold id='1'>}</endfold id='1'>
+
+function mach_mal(inout int i)<beginfold id='1'>{</beginfold id='1'>
+    if(i==3) i=6;
+    else if(i==4) i=24;
+    else if(i>=5) jetzt_mach_schon(i,i);
+    // 1 und 2: gleich.
+<endfold id='1'>}</endfold id='1'>
+
+function mach_nochmal(in int k1, out int k2, in int vektor)<beginfold id='1'>{</beginfold id='1'>
+    int4 hossa;
+    hossa=k1;
+    int4 hasso;
+    hasso=-vektor;
+
+  k2=(hasso|hossa>k1)?k1:-k1; //parse error before `|'
+// k2=(hasso||hossa>k1)?k1:-k1; //only works on expressions of equal dimension
+
+<endfold id='1'>}</endfold id='1'>
+
+CONTROL
+    forall (int i in inputs_int:1D) do <beginfold id='1'>{</beginfold id='1'>
+        mach_mal(i);
+    <endfold id='1'>}</endfold id='1'>
+    forall (int j in inputs_int:1D;
+            int i in nur_out:1D;
+            int vektor in nur_in:1D) do <beginfold id='1'>{</beginfold id='1'>
+        mach_nochmal(j,i, vektor);
+    <endfold id='1'>}</endfold id='1'>

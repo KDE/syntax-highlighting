@@ -106,4 +106,26 @@ guess <span style="color:#27ae60;font-weight:bold;">&lt;-</span> <span style="co
 <span style="color:#8e44ad;">c</span>(<span style="color:#f67400;">1</span>,<span style="color:#f67400;">6</span>,<span style="color:#f67400;">4</span>,<span style="color:#f67400;">9</span>)<span style="color:#3daee9;">*</span><span style="color:#f67400;">2</span>
 something <span style="color:#27ae60;font-weight:bold;">&lt;-</span> <span style="color:#8e44ad;">c</span>(<span style="color:#f67400;">1</span>,<span style="color:#f67400;">4</span>,letters[<span style="color:#f67400;">2</span>])  <span style="color:#7a7c7d;"># indices start at one, you get (1,4,&quot;b&quot;)</span>
 <span style="color:#8e44ad;">length</span>(something)
+
+<span style="color:#a43340;font-weight:bold;">## Pipe</span>
+diamonds <span style="color:#3daee9;">%&gt;%</span>
+  <span style="color:#8e44ad;">filter</span>(price <span style="color:#3daee9;">&gt;</span> <span style="color:#f67400;">1000</span>) <span style="color:#3daee9;">%&gt;%</span>
+  <span style="color:#8e44ad;">group_by</span>(cut) <span style="color:#3daee9;">%&gt;%</span>
+  <span style="color:#8e44ad;">tally</span>() <span style="color:#3daee9;">%&gt;%</span> 
+  <span style="color:#8e44ad;">rename</span>(<span style="color:#2980b9;">tally =</span> n) <span style="color:#3daee9;">%&gt;%</span> 
+  <span style="color:#8e44ad;">arrange</span>(<span style="color:#3daee9;">-</span>tally) <span style="color:#3daee9;">%&gt;%</span> 
+  <span style="color:#8e44ad;">mutate</span>(<span style="color:#2980b9;">pct =</span> tally <span style="color:#3daee9;">/</span> <span style="color:#8e44ad;">sum</span>(tally)) <span style="color:#27ae60;font-weight:bold;">-&gt;</span> df
+
+<span style="color:#a43340;font-weight:bold;">## ggplot2 </span>
+plot <span style="color:#27ae60;font-weight:bold;">=</span> <span style="color:#8e44ad;">ggplot</span>(diamonds, <span style="color:#8e44ad;">aes</span>(<span style="color:#2980b9;">x =</span> price, <span style="color:#2980b9;">y =</span> carat)) <span style="color:#3daee9;">+</span>
+  <span style="color:#8e44ad;">geom_point</span>(<span style="color:#2980b9;">alpha =</span> <span style="color:#f67400;">0.3</span>, <span style="color:#2980b9;">colour =</span> <span style="color:#f44f4f;">'steelblue'</span>) <span style="color:#3daee9;">+</span>
+  <span style="color:#8e44ad;">labs</span>(
+    <span style="color:#2980b9;">title =</span> <span style="color:#f44f4f;">&quot;ggplot diamonds&quot;</span>,
+    <span style="color:#2980b9;">x =</span> <span style="color:#f44f4f;">&quot;Price, $&quot;</span>,
+    <span style="color:#2980b9;">y =</span> <span style="color:#f44f4f;">&quot;Carat&quot;</span>
+  ) <span style="color:#3daee9;">+</span>
+  <span style="color:#8e44ad;">facet_wrap</span>(<span style="color:#3daee9;">~</span> cut) <span style="color:#3daee9;">+</span>
+  <span style="color:#8e44ad;">theme_minimal</span>()
+
+plot <span style="color:#3daee9;">+</span> <span style="color:#8e44ad;">coord_flip</span>()
 </pre></body></html>

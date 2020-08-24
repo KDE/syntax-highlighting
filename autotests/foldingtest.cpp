@@ -141,6 +141,8 @@ private Q_SLOTS:
                                                          << syntax;
         }
 
+        // cleanup before we test
+        QDir(QStringLiteral(TESTBUILDDIR "/folding.out/")).removeRecursively();
         QDir().mkpath(QStringLiteral(TESTBUILDDIR "/folding.out/"));
     }
 

@@ -73,6 +73,9 @@ private Q_SLOTS:
                                                          << syntax;
         }
 
+
+        // cleanup before we test
+        QDir(QStringLiteral(TESTBUILDDIR "/html.output/")).removeRecursively();
         QDir().mkpath(QStringLiteral(TESTBUILDDIR "/html.output/"));
     }
 

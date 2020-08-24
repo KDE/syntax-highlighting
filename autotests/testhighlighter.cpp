@@ -133,7 +133,9 @@ private Q_SLOTS:
             QTest::newRow(fileName.toUtf8().constData()) << inFile << (QStringLiteral(TESTBUILDDIR "/output/") + fileName + QStringLiteral(".ref")) << (QStringLiteral(TESTSRCDIR "/reference/") + fileName + QStringLiteral(".ref")) << syntax;
         }
 
-        QVERIFY(QDir().mkpath(QStringLiteral(TESTBUILDDIR "/output/")));
+        // cleanup before we test
+        QDir(QStringLiteral(TESTBUILDDIR "/output/")).removeRecursively();
+        QDir().mkpath(QStringLiteral(TESTBUILDDIR "/output/"));
     }
 
     void testHighlight()

@@ -112,6 +112,7 @@ private Q_SLOTS:
 
         // we don't want multiple tests for the same highlighting
         // tests should be consolidated into one useful file per highlighting
+        // the update script for https://kate-editor.org/syntax/ will check that no duplicated output is there, too
         bool duplicates = false;
         for (const auto &entry : qAsConst(m_coveredDefinitions)) {
             if (entry.second.size() <= 1) {

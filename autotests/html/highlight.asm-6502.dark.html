@@ -4,6 +4,63 @@
 <title>highlight.asm-6502</title>
 <meta name="generator" content="KF5::SyntaxHighlighting (Asm6502)"/>
 </head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="color:#2980b9;">.MEMORYMAP</span>
+        <span style="font-weight:bold;">SLOTSIZE</span> <span style="color:#f67400;">$8000</span> <span style="color:#7a7c7d;">; The slot is $8000 bytes in size. More details on slots later.</span>
+        <span style="font-weight:bold;">DEFAULTSLOT</span> <span style="color:#f67400;">0</span> <span style="color:#7a7c7d;">; There's only 1 slot in SNES, there are more in other consoles.</span>
+        <span style="font-weight:bold;">SLOT</span> <span style="color:#f67400;">0</span> <span style="color:#f67400;">$8000</span> <span style="color:#7a7c7d;">; Defines Slot 0's starting address.</span>
+<span style="color:#2980b9;">.</span><span style="color:#2980b9;">ENDME</span>
+
+<span style="color:#2980b9;">.</span><span style="color:#2980b9;">SNESHEADER</span>
+        <span style="font-weight:bold;">ID</span>    <span style="color:#f44f4f;">&quot;SNES&quot;</span>
+        <span style="font-weight:bold;">NAME</span>  <span style="color:#f44f4f;">&quot;Test Demo Mode 7     &quot;</span>
+        <span style="color:#7a7c7d;">;     &quot;123456789012345678901&quot;</span>
+        <span style="font-weight:bold;">LOROM</span>
+        <span style="font-weight:bold;">SLOWROM</span>
+        <span style="font-weight:bold;">CARTRIDGETYPE</span> <span style="color:#f67400;">$00</span>
+        <span style="font-weight:bold;">ROMSIZE</span> <span style="color:#f67400;">$09</span> <span style="color:#7a7c7d;">;size rom 09-0d</span>
+        <span style="font-weight:bold;">VERSION</span> <span style="color:#f67400;">00</span>
+<span style="color:#2980b9;">.</span><span style="color:#2980b9;">ENDSNES</span>
+
+<span style="color:#2980b9;">.MACRO</span> Clear_RAM
+    <span style="font-weight:bold;">ldx</span> <span style="font-weight:bold;">#</span><span style="color:#f67400;">$0</span>
+        <span style="font-weight:bold;">ldy</span> <span style="font-weight:bold;">#</span><span style="color:#f67400;">0</span>
+        <span style="color:#8e44ad;">-:</span>
+                <span style="font-weight:bold;">sty</span> <span style="color:#f67400;">0</span><span style="font-weight:bold;">,x</span>
+                <span style="font-weight:bold;">inx</span>
+                <span style="font-weight:bold;">inx</span>
+                <span style="font-weight:bold;">cpx</span> <span style="font-weight:bold;">#</span><span style="color:#f67400;">$2000</span>
+        <span style="color:#fdbc4b;font-weight:bold;">bne</span> -
+<span style="color:#2980b9;">.ENDM</span>
+
+<span style="color:#2980b9;">.include</span> <span style="color:#f44f4f;">&quot;header.asm&quot;</span>
+
+<span style="color:#2980b9;">.</span><span style="color:#2980b9;">bank</span> <span style="color:#f67400;">0</span> slot <span style="color:#f67400;">0</span>
+<span style="color:#2980b9;">.org</span> <span style="color:#f67400;">0</span>
+
+<span style="color:#8e44ad;">Main:</span>
+        <span style="font-weight:bold;">sei</span>
+        <span style="font-weight:bold;">clc</span>
+        <span style="font-weight:bold;">xce</span>
+
+        <span style="font-weight:bold;">rep</span> <span style="font-weight:bold;">#</span><span style="color:#f67400;">$10</span>        <span style="color:#7a7c7d;">;16 bit xy</span>
+        <span style="font-weight:bold;">sep</span> <span style="font-weight:bold;">#</span><span style="color:#f67400;">$20</span>        <span style="color:#7a7c7d;">; 8 bit a</span>
+
+        <span style="color:#2980b9;">.dw</span> <span style="color:#f67400;">$1C02</span>,<span style="color:#f67400;">$1C02</span>,<span style="color:#f67400;">$1C02</span>,<span style="color:#f67400;">$1C02</span>
+
+        <span style="font-weight:bold;">lda</span> sincos.l + <span style="color:#f67400;">$80</span><span style="font-weight:bold;">,X</span>
+
+<span style="color:#8e44ad;">sincos2:</span>
+        <span style="color:#2980b9;">.include</span> <span style="color:#f44f4f;">&quot;DATA/dsincos.asm&quot;</span>
+
+        <span style="font-weight:bold;">lda</span> <span style="font-weight:bold;">#</span>\<span style="color:#f67400;">1</span>&amp;<span style="color:#f67400;">$FF</span>
+        <span style="font-weight:bold;">sta</span> <span style="color:#f67400;">$211B</span>
+
+        <span style="font-weight:bold;">cmp</span> <span style="font-weight:bold;">#</span><span style="color:#f67400;">$04</span>
+        <span style="color:#fdbc4b;font-weight:bold;">bne</span> +++
+                <span style="font-weight:bold;">lda</span> <span style="font-weight:bold;">#</span><span style="color:#f67400;">$04</span>
+                <span style="color:#fdbc4b;font-weight:bold;">bra</span> lab
+        <span style="color:#8e44ad;">+++:</span>
+
 <span style="font-weight:bold;">TMP</span>      EQU <span style="color:#f67400;">$6</span>
 
 <span style="color:#8e44ad;">XY:</span>

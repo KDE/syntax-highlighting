@@ -254,35 +254,30 @@ private Q_SLOTS:
 
     void testIncludedFormats()
     {
-        QStringList definitionNames;
-        for (const auto &def : m_repo.definitions()) {
-            definitionNames.push_back(def.name());
+        // ensure we have a efficient numbering of formats
+        // do this just with one example definition that includes a lot of stuff
+        // before: checked for all definitions we have, that is n^2 run-time wise
+        Repository repo;
+        initRepositorySearchPaths(repo);
+        auto def = repo.definitionForName(QLatin1String("PHP (HTML)"));
+        QVERIFY(def.isValid());
+        auto includedDefs = def.includedDefinitions();
+        includedDefs.push_front(def);
+
+        // collect all formats, shall be numbered from 1..
+        QSet<int> formatIds;
+        for (const auto &d : qAsConst(includedDefs)) {
+            const auto formats = d.formats();
+            for (const auto &format : formats) {
+                // no duplicates
+                QVERIFY(!formatIds.contains(format.id()));
+                formatIds.insert(format.id());
+            }
         }
 
-        for (const QString &name : qAsConst(definitionNames)) {
-            Repository repo;
-            initRepositorySearchPaths(repo);
-            auto def = repo.definitionForName(name);
-            QCOMPARE(m_repo.definitionForName(name).isValid(), def.isValid());
-            auto includedDefs = def.includedDefinitions();
-            includedDefs.push_front(def);
-
-            // collect all formats, shall be numbered from 1..
-            QSet<int> formatIds;
-            for (const auto &d : qAsConst(includedDefs)) {
-                const auto formats = d.formats();
-                for (const auto &format : formats) {
-                    // no duplicates
-                    QVERIFY(!formatIds.contains(format.id()));
-                    formatIds.insert(format.id());
-                }
-            }
-            QVERIFY(!def.isValid() || def.name() == QLatin1String("Broken Syntax") || !formatIds.isEmpty());
-
-            // ensure all ids are there from 1..size
-            for (int i = 1; i <= formatIds.size(); ++i) {
-                QVERIFY(formatIds.contains(i));
-            }
+        // ensure all ids are there from 1..size
+        for (int i = 1; i <= formatIds.size(); ++i) {
+            QVERIFY(formatIds.contains(i));
         }
     }
 

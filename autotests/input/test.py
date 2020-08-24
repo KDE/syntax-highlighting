@@ -1,4 +1,4 @@
-# comment with ALERT
+﻿# comment with ALERT
 
 ''' multiline
     comment
@@ -80,3 +80,14 @@ u = 1_0.e+3_22j + .2_1e2j + 11_1.j
 aaa.123
 aaa123
 .0x123
+
+# Comment\
+
+# kate: syntax Python ; scheme Normal;
+# kate: font-size 14; background-color #FAFAFA ;
+
+# kate: remove-trailing-spaces *;
+# kate: remove-trailing-spaces all;
+
+# kate: replace-tabs false;
+# kate: byte-order-mark true ;

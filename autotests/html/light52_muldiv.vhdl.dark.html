@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>light52_muldiv.vhdl</title>
+<meta name="generator" content="KF5::SyntaxHighlighting (VHDL)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="color:#7a7c7d;">--------------------------------------------------------------------------------</span>
+<span style="color:#7a7c7d;">-- light52_muldiv.vhdl -- Simple multiplier/divider module.</span>
+<span style="color:#7a7c7d;">--------------------------------------------------------------------------------</span>
+<span style="color:#7a7c7d;">-- The 8051 mul and div instructions are both unsigned and operands are 8 bit.</span>
+<span style="color:#7a7c7d;">--</span>
+<span style="color:#7a7c7d;">-- This module implements the division as a sequential state machine which takes</span>
+<span style="color:#7a7c7d;">-- 8 cycles to complete. </span>
+<span style="color:#7a7c7d;">-- The multiplier can be implemented as sequential or as combinational, in which</span>
+<span style="color:#7a7c7d;">-- case it will use a DSP block in those architectures that support it.</span>
+<span style="color:#7a7c7d;">-- No attempt has been made to make this module generic or reusable.</span>
+<span style="color:#7a7c7d;">--</span>
+<span style="color:#7a7c7d;">-- If you want a combinational multiplier but don't want to waste a DSP block </span>
+<span style="color:#7a7c7d;">-- in this module, you need to modify this file adding whatever synthesis </span>
+<span style="color:#7a7c7d;">-- pragmas your tool of choice needs.</span>
+<span style="color:#7a7c7d;">--</span>
+<span style="color:#7a7c7d;">-- Note that unlike the division state machine, the combinational product logic</span>
+<span style="color:#7a7c7d;">-- is always operating: when SEQUENTIAL_MULTIPLIER=true, prod_out equals </span>
+<span style="color:#7a7c7d;">-- data_a * data_b with a latency of 1 clock cycle, and mul_ready is hardwired</span>
+<span style="color:#7a7c7d;">-- to '1'.</span>
+<span style="color:#7a7c7d;">--</span>
+<span style="color:#7a7c7d;">-- </span><span style="color:#ca9219;background-color:#451e1a;font-weight:bold;">FIXME</span><span style="color:#7a7c7d;"> explain division algorithm.</span>
+<span style="color:#7a7c7d;">--------------------------------------------------------------------------------</span>
+<span style="color:#7a7c7d;">-- GENERICS:</span>
+<span style="color:#7a7c7d;">-- </span>
+<span style="color:#7a7c7d;">-- SEQUENTIAL_MULTIPLIER        -- Sequential vs. combinational multiplier.</span>
+<span style="color:#7a7c7d;">--  When true, a sequential implementation will be used for the multiplier, </span>
+<span style="color:#7a7c7d;">--  which will usually save a lot of logic or a dedicated multiplier.</span>
+<span style="color:#7a7c7d;">--  When false, a combinational registered multiplier will be used.</span>
+<span style="color:#7a7c7d;">--</span>
+<span style="color:#7a7c7d;">--------------------------------------------------------------------------------</span>
+<span style="color:#7a7c7d;">-- INTERFACE SIGNALS:</span>
+<span style="color:#7a7c7d;">--</span>
+<span style="color:#7a7c7d;">-- clk :            Clock, active rising edge.</span>
+<span style="color:#7a7c7d;">-- reset :          Synchronous reset. Clears only the control registers not</span>
+<span style="color:#7a7c7d;">--                  visible to the programmer -- not the output registers.</span>
+<span style="color:#7a7c7d;">-- </span>
+<span style="color:#7a7c7d;">-- data_a :         Numerator input, should be connected to the ACC register.</span>
+<span style="color:#7a7c7d;">-- data_b :         Denominator input, should be connected to the B register.</span>
+<span style="color:#7a7c7d;">-- start :          Assert for 1 cycle to start the division state machine</span>
+<span style="color:#7a7c7d;">--                  (and the product if SEQUENTIAL_MULTIPLIER=true);</span>
+<span style="color:#7a7c7d;">-- </span>
+<span style="color:#7a7c7d;">-- prod_out :       Product output, valid only when mul_ready='1'.</span>
+<span style="color:#7a7c7d;">-- quot_out :       Quotient output, valid only when div_ready='1'.</span>
+<span style="color:#7a7c7d;">-- rem_out :        Remainder output, valid only when div_ready='1'.</span>
+<span style="color:#7a7c7d;">-- div_ov_out :     Division overflow flag, valid only when div_ready='1'.</span>
+<span style="color:#7a7c7d;">-- mul_ov_out :     Product overflow flag, valid only when mul_ready='1'.</span>
+<span style="color:#7a7c7d;">-- </span>
+<span style="color:#7a7c7d;">-- mul_ready :      Asserted permanently if SEQUENTIAL_MULTIPLIER=false.</span>
+<span style="color:#7a7c7d;">-- div_ready :      Deasserted the cycle after start is asserted.</span>
+<span style="color:#7a7c7d;">--                  Asserted when the division has completed.</span>
+<span style="color:#7a7c7d;">--</span>
+<span style="color:#7a7c7d;">--------------------------------------------------------------------------------</span>
+<span style="color:#7a7c7d;">-- Copyright (C) 2012 Jose A. Ruiz</span>
+<span style="color:#7a7c7d;">--                                                              </span>
+<span style="color:#7a7c7d;">-- This source file may be used and distributed without         </span>
+<span style="color:#7a7c7d;">-- restriction provided that this copyright statement is not    </span>
+<span style="color:#7a7c7d;">-- removed from the file and that any derivative work contains  </span>
+<span style="color:#7a7c7d;">-- the original copyright notice and the associated disclaimer. </span>
+<span style="color:#7a7c7d;">--                                                              </span>
+<span style="color:#7a7c7d;">-- This source file is free software; you can redistribute it   </span>
+<span style="color:#7a7c7d;">-- and/or modify it under the terms of the GNU Lesser General   </span>
+<span style="color:#7a7c7d;">-- Public License as published by the Free Software Foundation; </span>
+<span style="color:#7a7c7d;">-- either version 2.1 of the License, or (at your option) any   </span>
+<span style="color:#7a7c7d;">-- later version.                                               </span>
+<span style="color:#7a7c7d;">--                                                              </span>
+<span style="color:#7a7c7d;">-- This source is distributed in the hope that it will be       </span>
+<span style="color:#7a7c7d;">-- useful, but WITHOUT ANY WARRANTY; without even the implied   </span>
+<span style="color:#7a7c7d;">-- warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR      </span>
+<span style="color:#7a7c7d;">-- PURPOSE.  See the GNU Lesser General Public License for more </span>
+<span style="color:#7a7c7d;">-- details.                                                     </span>
+<span style="color:#7a7c7d;">--                                                              </span>
+<span style="color:#7a7c7d;">-- You should have received a copy of the GNU Lesser General    </span>
+<span style="color:#7a7c7d;">-- Public License along with this source; if not, download it   </span>
+<span style="color:#7a7c7d;">-- from http://www.opencores.org/lgpl.shtml</span>
+<span style="color:#7a7c7d;">--------------------------------------------------------------------------------</span>
+
+<span style="font-weight:bold;">library</span> ieee;
+<span style="font-weight:bold;">use</span> ieee<span style="color:#27ae60;">.</span>std_logic_1164<span style="color:#27ae60;">.</span>all;
+<span style="font-weight:bold;">use</span> ieee<span style="color:#27ae60;">.</span>numeric_std<span style="color:#27ae60;">.</span>all;
+
+<span style="font-weight:bold;">use</span> work<span style="color:#27ae60;">.</span>light52_pkg<span style="color:#27ae60;">.</span>all;
+<span style="font-weight:bold;">use</span> work<span style="color:#27ae60;">.</span>light52_ucode_pkg<span style="color:#27ae60;">.</span>all;
+
+<span style="color:#223388;font-weight:bold;">entity</span> <span style="color:#bb6600;font-weight:bold;">light52_muldiv</span> <span style="font-weight:bold;">is</span>
+    <span style="color:#223388;font-weight:bold;">generic</span> (
+        SEQUENTIAL_MULTIPLIER <span style="color:#27ae60;">:</span> <span style="color:#2980b9;">boolean</span> <span style="color:#27ae60;">:=</span> false
+    );
+    <span style="color:#223388;font-weight:bold;">port</span>(
+        clk <span style="color:#27ae60;">:</span>                   <span style="font-weight:bold;">in</span> <span style="color:#2980b9;">std_logic</span>;
+        reset <span style="color:#27ae60;">:</span>                 <span style="font-weight:bold;">in</span> <span style="color:#2980b9;">std_logic</span>;
+        
+        data_a <span style="color:#27ae60;">:</span>                <span style="font-weight:bold;">in</span> t_byte;
+        data_b <span style="color:#27ae60;">:</span>                <span style="font-weight:bold;">in</span> t_byte;
+        start <span style="color:#27ae60;">:</span>                 <span style="font-weight:bold;">in</span> <span style="color:#2980b9;">std_logic</span>;
+        
+        prod_out <span style="color:#27ae60;">:</span>              <span style="font-weight:bold;">out</span> t_word;
+        quot_out <span style="color:#27ae60;">:</span>              <span style="font-weight:bold;">out</span> t_byte;
+        rem_out <span style="color:#27ae60;">:</span>               <span style="font-weight:bold;">out</span> t_byte;
+        div_ov_out <span style="color:#27ae60;">:</span>            <span style="font-weight:bold;">out</span> <span style="color:#2980b9;">std_logic</span>;
+        mul_ov_out <span style="color:#27ae60;">:</span>            <span style="font-weight:bold;">out</span> <span style="color:#2980b9;">std_logic</span>;
+        
+        mul_ready <span style="color:#27ae60;">:</span>             <span style="font-weight:bold;">out</span> <span style="color:#2980b9;">std_logic</span>;
+        div_ready <span style="color:#27ae60;">:</span>             <span style="font-weight:bold;">out</span> <span style="color:#2980b9;">std_logic</span>
+    );
+<span style="color:#223388;font-weight:bold;">end entity light52_muldiv;</span>
+
+<span style="color:#223388;font-weight:bold;">architecture</span> <span style="color:#bb6600;font-weight:bold;">sequential</span> <span style="font-weight:bold;">of</span> <span style="color:#8e44ad;">light52_muldiv</span> <span style="font-weight:bold;">is</span>
+
+<span style="color:#27ae60;">signal</span> bit_ctr <span style="color:#27ae60;">:</span>            <span style="color:#2980b9;">integer</span> <span style="font-weight:bold;">range</span> <span style="color:#f67400;">0</span> <span style="color:#27ae60;">to</span> <span style="color:#f67400;">8</span>;
+
+<span style="color:#27ae60;">signal</span> b_shift_reg <span style="color:#27ae60;">:</span>        t_word;
+
+<span style="color:#27ae60;">signal</span> den_ge_256 <span style="color:#27ae60;">:</span>         <span style="color:#2980b9;">std_logic</span>;
+<span style="color:#27ae60;">signal</span> num_ge_den <span style="color:#27ae60;">:</span>         <span style="color:#2980b9;">std_logic</span>;
+<span style="color:#27ae60;">signal</span> sub_num <span style="color:#27ae60;">:</span>            <span style="color:#2980b9;">std_logic</span>;
+
+<span style="color:#27ae60;">signal</span> denominator <span style="color:#27ae60;">:</span>        t_byte;
+<span style="color:#27ae60;">signal</span> rem_reg <span style="color:#27ae60;">:</span>            t_byte;
+<span style="color:#27ae60;">signal</span> quot_reg <span style="color:#27ae60;">:</span>           t_byte;
+<span style="color:#27ae60;">signal</span> prod_reg <span style="color:#27ae60;">:</span>           t_word;
+<span style="color:#27ae60;">signal</span> ready <span style="color:#27ae60;">:</span>              <span style="color:#2980b9;">std_logic</span>;
+
+<span style="color:#27ae60;">signal</span> load_regs <span style="color:#27ae60;">:</span>          <span style="color:#2980b9;">std_logic</span>;
+
+<span style="color:#223388;font-weight:bold;">begin</span>
+
+<span style="color:#7a7c7d;">-- Control logic ---------------------------------------------------------------</span>
+
+<span style="color:#bb6600;font-weight:bold;">control_counter</span><span style="color:#27ae60;">:</span> <span style="color:#0099aa;font-weight:bold;">process</span>(clk)
+<span style="color:#0099aa;font-weight:bold;">begin</span>
+    <span style="color:#223388;font-weight:bold;">if</span> clk<span style="color:#f67400;">'event</span> <span style="font-weight:bold;">and</span> clk<span style="color:#27ae60;">=</span><span style="color:#f67400;">'1'</span> <span style="color:#223388;font-weight:bold;">then</span>
+        <span style="color:#223388;font-weight:bold;">if</span> reset<span style="color:#27ae60;">=</span><span style="color:#f67400;">'1'</span> <span style="color:#223388;font-weight:bold;">then</span>
+            bit_ctr <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">8</span>;
+        <span style="color:#223388;font-weight:bold;">else</span>
+            <span style="color:#223388;font-weight:bold;">if</span> load_regs<span style="color:#27ae60;">=</span><span style="color:#f67400;">'1'</span> <span style="color:#223388;font-weight:bold;">then</span>
+                bit_ctr <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">0</span>;
+            <span style="color:#223388;font-weight:bold;">elsif</span> bit_ctr <span style="color:#27ae60;">/=</span> <span style="color:#f67400;">8</span> <span style="color:#223388;font-weight:bold;">then</span>
+                bit_ctr <span style="color:#27ae60;">&lt;=</span> bit_ctr <span style="color:#27ae60;">+</span> <span style="color:#f67400;">1</span>;
+            <span style="color:#223388;font-weight:bold;">end if;</span>
+        <span style="color:#223388;font-weight:bold;">end if;</span>
+    <span style="color:#223388;font-weight:bold;">end if;</span>
+<span style="color:#0099aa;font-weight:bold;">end process control_counter</span>;
+
+<span style="color:#7a7c7d;">-- Internal signal ready is asserted after 8 cycles.</span>
+<span style="color:#7a7c7d;">-- The sequential multiplier will use this signal too, IF it takes 8 cycles.</span>
+
+ready <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">'1'</span> <span style="font-weight:bold;">when</span> bit_ctr <span style="color:#27ae60;">&gt;=</span> <span style="color:#f67400;">8</span> else <span style="color:#f67400;">'0'</span>;
+
+
+<span style="color:#7a7c7d;">---- Divider logic -------------------------------------------------------------</span>
+
+<span style="color:#7a7c7d;">-- What we do is a simple base-2 'shift-and-subtract' algorithm that takes</span>
+<span style="color:#7a7c7d;">-- 8 cycles to complete. We can get away with this because we deal with unsigned</span>
+<span style="color:#7a7c7d;">-- numbers only.</span>
+
+<span style="color:#bb6600;font-weight:bold;">divider_registers</span><span style="color:#27ae60;">:</span> <span style="color:#0099aa;font-weight:bold;">process</span>(clk)
+<span style="color:#0099aa;font-weight:bold;">begin</span>
+    <span style="color:#223388;font-weight:bold;">if</span> clk<span style="color:#f67400;">'event</span> <span style="font-weight:bold;">and</span> clk<span style="color:#27ae60;">=</span><span style="color:#f67400;">'1'</span> <span style="color:#223388;font-weight:bold;">then</span>
+        <span style="color:#7a7c7d;">-- denominator shift register</span>
+        <span style="color:#223388;font-weight:bold;">if</span> load_regs<span style="color:#27ae60;">=</span><span style="color:#f67400;">'1'</span> <span style="color:#223388;font-weight:bold;">then</span>
+            b_shift_reg <span style="color:#27ae60;">&lt;=</span> <span style="color:#f44f4f;">&quot;0&quot;</span> <span style="color:#27ae60;">&amp;</span> data_b <span style="color:#27ae60;">&amp;</span> <span style="color:#f44f4f;">&quot;0000000&quot;</span>;
+            <span style="color:#7a7c7d;">-- Division overflow can be determined upon loading B reg data.</span>
+            <span style="color:#7a7c7d;">-- OV will be raised only on div-by-zero.</span>
+            <span style="color:#223388;font-weight:bold;">if</span> data_b<span style="color:#27ae60;">=</span>X<span style="color:#f44f4f;">&quot;00&quot;</span> <span style="color:#223388;font-weight:bold;">then</span>
+                div_ov_out <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">'1'</span>;
+            <span style="color:#223388;font-weight:bold;">else</span>
+                div_ov_out <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">'0'</span>;
+            <span style="color:#223388;font-weight:bold;">end if;</span>
+        <span style="color:#223388;font-weight:bold;">else</span>
+            b_shift_reg <span style="color:#27ae60;">&lt;=</span> <span style="color:#f44f4f;">&quot;0&quot;</span> <span style="color:#27ae60;">&amp;</span> b_shift_reg(b_shift_reg<span style="color:#f67400;">'high</span> <span style="color:#27ae60;">downto</span> <span style="color:#f67400;">1</span>);
+        <span style="color:#223388;font-weight:bold;">end if;</span>
+        
+        <span style="color:#7a7c7d;">-- numerator register</span>
+        <span style="color:#223388;font-weight:bold;">if</span> load_regs<span style="color:#27ae60;">=</span><span style="color:#f67400;">'1'</span> <span style="color:#223388;font-weight:bold;">then</span> 
+            rem_reg <span style="color:#27ae60;">&lt;=</span> data_a;
+        <span style="color:#223388;font-weight:bold;">elsif</span> bit_ctr<span style="color:#27ae60;">/=</span><span style="color:#f67400;">8</span> <span style="font-weight:bold;">and</span> sub_num<span style="color:#27ae60;">=</span><span style="color:#f67400;">'1'</span> <span style="color:#223388;font-weight:bold;">then</span> 
+            rem_reg <span style="color:#27ae60;">&lt;=</span> rem_reg <span style="color:#27ae60;">-</span> denominator;
+        <span style="color:#223388;font-weight:bold;">end if;</span>
+
+        <span style="color:#7a7c7d;">--- quotient register</span>
+        <span style="color:#223388;font-weight:bold;">if</span> load_regs<span style="color:#27ae60;">=</span><span style="color:#f67400;">'1'</span> <span style="color:#223388;font-weight:bold;">then</span>
+            quot_reg <span style="color:#27ae60;">&lt;=</span> (<span style="color:#27ae60;">others</span> <span style="color:#27ae60;">=&gt;</span> <span style="color:#f67400;">'0'</span>);
+        <span style="color:#223388;font-weight:bold;">elsif</span> bit_ctr<span style="color:#27ae60;">/=</span><span style="color:#f67400;">8</span> <span style="color:#223388;font-weight:bold;">then</span>
+            quot_reg <span style="color:#27ae60;">&lt;=</span> quot_reg(quot_reg<span style="color:#f67400;">'high-1</span> <span style="color:#27ae60;">downto</span> <span style="color:#f67400;">0</span>) <span style="color:#27ae60;">&amp;</span> sub_num;
+        <span style="color:#223388;font-weight:bold;">end if;</span>
+        
+        load_regs <span style="color:#27ae60;">&lt;=</span> start;
+    <span style="color:#223388;font-weight:bold;">end if;</span>
+<span style="color:#0099aa;font-weight:bold;">end process divider_registers</span>;
+
+denominator <span style="color:#27ae60;">&lt;=</span> b_shift_reg(<span style="color:#f67400;">7</span> <span style="color:#27ae60;">downto</span> <span style="color:#f67400;">0</span>);
+
+<span style="color:#7a7c7d;">-- The 16-bit comparison between b_shift_reg (denominator) and the zero-extended </span>
+<span style="color:#7a7c7d;">-- rem_reg (numerator) can be simplified by splitting it in 2: </span>
+<span style="color:#7a7c7d;">-- If the shifted denominator high byte is not zero, it is &gt;=256...</span>
+den_ge_256 <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">'1'</span> <span style="font-weight:bold;">when</span> b_shift_reg(<span style="color:#f67400;">15</span> <span style="color:#27ae60;">downto</span> <span style="color:#f67400;">8</span>) <span style="color:#27ae60;">/=</span> X<span style="color:#f44f4f;">&quot;00&quot;</span> else <span style="color:#f67400;">'0'</span>;
+<span style="color:#7a7c7d;">-- ...otherwise we need to compare the low bytes.</span>
+num_ge_den <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">'1'</span> <span style="font-weight:bold;">when</span> rem_reg <span style="color:#27ae60;">&gt;=</span> denominator else <span style="color:#f67400;">'0'</span>;
+sub_num <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">'1'</span> <span style="font-weight:bold;">when</span> den_ge_256<span style="color:#27ae60;">=</span><span style="color:#f67400;">'0'</span> <span style="font-weight:bold;">and</span> num_ge_den<span style="color:#27ae60;">=</span><span style="color:#f67400;">'1'</span> else <span style="color:#f67400;">'0'</span>;
+
+
+quot_out <span style="color:#27ae60;">&lt;=</span> quot_reg;
+prod_out <span style="color:#27ae60;">&lt;=</span> prod_reg;
+rem_out <span style="color:#27ae60;">&lt;=</span> rem_reg;
+
+div_ready <span style="color:#27ae60;">&lt;=</span> ready;
+
+<span style="color:#7a7c7d;">---- Multiplier logic ----------------------------------------------------------</span>
+
+<span style="color:#7a7c7d;">---- Combinational multiplier -----------------------------</span>
+<span style="color:#bb6600;font-weight:bold;">multiplier_combinational</span><span style="color:#27ae60;">:</span> <span style="color:#223388;font-weight:bold;">if</span> <span style="font-weight:bold;">not</span> SEQUENTIAL_MULTIPLIER <span style="color:#223388;font-weight:bold;">generate</span>
+
+<span style="color:#bb6600;font-weight:bold;">registered_combinational_multiplier</span><span style="color:#27ae60;">:</span><span style="color:#0099aa;font-weight:bold;">process</span>(clk)
+<span style="color:#0099aa;font-weight:bold;">begin</span>
+    <span style="color:#223388;font-weight:bold;">if</span> clk<span style="color:#f67400;">'event</span> <span style="font-weight:bold;">and</span> clk<span style="color:#27ae60;">=</span><span style="color:#f67400;">'1'</span> <span style="color:#223388;font-weight:bold;">then</span>
+        prod_reg <span style="color:#27ae60;">&lt;=</span> data_a <span style="color:#27ae60;">*</span> data_b; <span style="color:#7a7c7d;">-- t_byte is unsigned</span>
+    <span style="color:#223388;font-weight:bold;">end if;</span>
+<span style="color:#0099aa;font-weight:bold;">end process registered_combinational_multiplier</span>;
+
+<span style="color:#7a7c7d;">-- The multiplier output is valid in the cycle after the operands are loaded,</span>
+<span style="color:#7a7c7d;">-- so by the time MUL is executed it's already done.</span>
+mul_ready <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">'1'</span>;
+
+mul_ov_out <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">'1'</span> <span style="font-weight:bold;">when</span> prod_reg(<span style="color:#f67400;">15</span> <span style="color:#27ae60;">downto</span> <span style="color:#f67400;">8</span>)<span style="color:#27ae60;">/=</span>X<span style="color:#f44f4f;">&quot;00&quot;</span> else <span style="color:#f67400;">'0'</span>;
+prod_out <span style="color:#27ae60;">&lt;=</span> prod_reg;
+
+<span style="color:#223388;font-weight:bold;">end generate multiplier_combinational</span>;
+
+<span style="color:#7a7c7d;">---- Sequential multiplier --------------------------------</span>
+<span style="color:#bb6600;font-weight:bold;">multiplier_sequential</span><span style="color:#27ae60;">:</span> <span style="color:#223388;font-weight:bold;">if</span> SEQUENTIAL_MULTIPLIER <span style="color:#223388;font-weight:bold;">generate</span>
+
+<span style="font-weight:bold;">assert</span> false
+<span style="font-weight:bold;">report</span> <span style="color:#f44f4f;">&quot;Sequential multiplier implementation not done yet.&quot;</span><span style="color:#27ae60;">&amp;</span>
+       <span style="color:#f44f4f;">&quot; Use combinational implementation.&quot;</span>
+<span style="font-weight:bold;">severity</span> <span style="font-weight:bold;">failure</span>;
+
+<span style="color:#223388;font-weight:bold;">end generate multiplier_sequential</span>;
+
+<span style="color:#223388;font-weight:bold;">end sequential;</span>
+</pre></body></html>

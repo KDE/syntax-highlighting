@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>highlight.lua</title>
+<meta name="generator" content="KF5::SyntaxHighlighting (Lua)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="color:#7a7c7d;">#!/usr/bin/env lua</span>
+
+<span style="color:#7a7c7d;">-- Metatables</span>
+<span style="color:#5555ff;">t</span> = {
+    <span style="color:#7f8c8d;">__add</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">a</span>,<span style="color:#5555ff;">b</span>)<span style="color:#a1a100;">return</span> <span style="color:#5555ff;">a</span>+<span style="color:#5555ff;">b</span> <span style="font-weight:bold;">end</span>,
+    <span style="color:#7f8c8d;">__sub</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">a</span>,<span style="color:#5555ff;">b</span>)<span style="color:#a1a100;">return</span> <span style="color:#5555ff;">a</span>-<span style="color:#5555ff;">b</span> <span style="font-weight:bold;">end</span>,
+    <span style="color:#7f8c8d;">__mul</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">a</span>,<span style="color:#5555ff;">b</span>)<span style="color:#a1a100;">return</span> <span style="color:#5555ff;">a</span>*<span style="color:#5555ff;">b</span> <span style="font-weight:bold;">end</span>,
+    <span style="color:#7f8c8d;">__div</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">a</span>,<span style="color:#5555ff;">b</span>)<span style="color:#a1a100;">return</span> <span style="color:#5555ff;">a</span>/<span style="color:#5555ff;">b</span> <span style="font-weight:bold;">end</span>,
+    <span style="color:#7f8c8d;">__mod</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">a</span>,<span style="color:#5555ff;">b</span>)<span style="color:#a1a100;">return</span> <span style="color:#5555ff;">a</span>%<span style="color:#5555ff;">b</span> <span style="font-weight:bold;">end</span>,
+    <span style="color:#7f8c8d;">__pow</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">a</span>,<span style="color:#5555ff;">b</span>)<span style="color:#a1a100;">return</span> <span style="color:#5555ff;">a</span>^<span style="color:#5555ff;">b</span> <span style="font-weight:bold;">end</span>,
+    <span style="color:#7f8c8d;">__unm</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">a</span>)<span style="color:#a1a100;">return</span> -<span style="color:#5555ff;">a</span> <span style="font-weight:bold;">end</span>,
+    <span style="color:#7f8c8d;">__idiv</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">a</span>,<span style="color:#5555ff;">b</span>)<span style="color:#a1a100;">return</span> <span style="color:#5555ff;">a</span>//<span style="color:#5555ff;">b</span> <span style="font-weight:bold;">end</span>,
+    <span style="color:#7f8c8d;">__band</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">a</span>,<span style="color:#5555ff;">b</span>)<span style="color:#a1a100;">return</span> <span style="color:#5555ff;">a</span>&amp;<span style="color:#5555ff;">b</span> <span style="font-weight:bold;">end</span>,
+    <span style="color:#7f8c8d;">__bor</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">a</span>,<span style="color:#5555ff;">b</span>)<span style="color:#a1a100;">return</span> <span style="color:#5555ff;">a</span>|<span style="color:#5555ff;">b</span> <span style="font-weight:bold;">end</span>,
+    <span style="color:#7f8c8d;">__bxor</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">a</span>,<span style="color:#5555ff;">b</span>)<span style="color:#a1a100;">return</span> <span style="color:#5555ff;">a</span>~<span style="color:#5555ff;">b</span> <span style="font-weight:bold;">end</span>,
+    <span style="color:#7f8c8d;">__bnot</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">a</span>)<span style="color:#a1a100;">return</span> ~<span style="color:#5555ff;">a</span> <span style="font-weight:bold;">end</span>,
+    <span style="color:#7f8c8d;">__shl</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">a</span>,<span style="color:#5555ff;">b</span>)<span style="color:#a1a100;">return</span> <span style="color:#5555ff;">a</span>&lt;&lt;<span style="color:#5555ff;">b</span> <span style="font-weight:bold;">end</span>,
+    <span style="color:#7f8c8d;">__shr</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">a</span>,<span style="color:#5555ff;">b</span>)<span style="color:#a1a100;">return</span> <span style="color:#5555ff;">a</span>&gt;&gt;<span style="color:#5555ff;">b</span> <span style="font-weight:bold;">end</span>,
+    <span style="color:#7f8c8d;">__concat</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">a</span>,<span style="color:#5555ff;">b</span>)<span style="color:#a1a100;">return</span> <span style="color:#5555ff;">a</span>..<span style="color:#5555ff;">b</span> <span style="font-weight:bold;">end</span>,
+    <span style="color:#7f8c8d;">__len</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">a</span>)<span style="color:#a1a100;">return</span> #<span style="color:#5555ff;">a</span> <span style="font-weight:bold;">end</span>,
+    <span style="color:#7f8c8d;">__eq</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">a</span>,<span style="color:#5555ff;">b</span>)<span style="color:#a1a100;">return</span> <span style="color:#5555ff;">a</span>==<span style="color:#5555ff;">b</span> <span style="font-weight:bold;">end</span>,
+    <span style="color:#7f8c8d;">__lt</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">a</span>,<span style="color:#5555ff;">b</span>)<span style="color:#a1a100;">return</span> <span style="color:#5555ff;">a</span>&lt;<span style="color:#5555ff;">b</span> <span style="font-weight:bold;">end</span>,
+    <span style="color:#7f8c8d;">__le</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">a</span>,<span style="color:#5555ff;">b</span>)<span style="color:#a1a100;">return</span> <span style="color:#5555ff;">a</span>&lt;=<span style="color:#5555ff;">b</span> <span style="font-weight:bold;">end</span>,
+    <span style="color:#7f8c8d;">__index</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">t</span>,<span style="color:#5555ff;">k</span>)<span style="color:#a1a100;">return</span> <span style="color:#5555ff;">t</span>[<span style="color:#5555ff;">k</span>] <span style="font-weight:bold;">end</span>,
+    <span style="color:#7f8c8d;">__newindex</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">t</span>,<span style="color:#5555ff;">k</span>,<span style="color:#5555ff;">v</span>)<span style="color:#a1a100;">return</span> <span style="color:#5555ff;">t</span>[<span style="color:#5555ff;">k</span>]=<span style="color:#5555ff;">v</span> <span style="font-weight:bold;">end</span>,
+    <span style="color:#7f8c8d;">__call</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">f</span>, ...)<span style="color:#a1a100;">return</span> f(...) <span style="font-weight:bold;">end</span>,
+
+   <span style="color:#7f8c8d;">__tostring</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">a</span>)<span style="color:#a1a100;">return</span> <span style="color:#8e44ad;">tostring</span>(<span style="color:#5555ff;">a</span>) <span style="font-weight:bold;">end</span>,
+   <span style="color:#7f8c8d;">__pairs</span>=<span style="font-weight:bold;">function</span>(<span style="color:#5555ff;">t</span>)<span style="color:#a1a100;">return</span> <span style="color:#8e44ad;">pairs</span>(<span style="color:#5555ff;">a</span>) <span style="font-weight:bold;">end</span>,
+   <span style="color:#7a7c7d;">-- setmetatable</span>
+   <span style="color:#7f8c8d;">__metatable</span>=<span style="font-weight:bold;">true</span>
+   <span style="color:#7a7c7d;">-- Garbage collector</span>
+   <span style="color:#7f8c8d;">__gc</span>=<span style="font-weight:bold;">function</span>() <span style="font-weight:bold;">end</span>
+   <span style="color:#7a7c7d;">-- Weak table</span>
+   <span style="color:#7f8c8d;">__mode</span>=<span style="color:#f44f4f;">'k'</span> <span style="color:#7a7c7d;">-- or 'v'</span>
+}
+
+<span style="color:#5555ff;">a</span> <span style="font-weight:bold;">or</span> <span style="color:#5555ff;">b</span>
+<span style="color:#5555ff;">a</span> <span style="font-weight:bold;">and</span> <span style="color:#5555ff;">b</span>
+<span style="color:#5555ff;">a</span>~=<span style="color:#5555ff;">b</span>
+<span style="color:#5555ff;">a</span>&gt;=<span style="color:#5555ff;">b</span>
+<span style="font-weight:bold;">true</span> <span style="font-weight:bold;">or</span> <span style="font-weight:bold;">false</span>
+<span style="color:#5555ff;">a</span> <span style="font-weight:bold;">or</span> <span style="font-weight:bold;">nil</span>
+<span style="color:#5555ff;">a</span>::<span style="color:#5555ff;">m</span>
+<span style="color:#5555ff;">a</span>.<span style="color:#5555ff;">m</span>
+<span style="color:#5555ff;">a</span>;<span style="color:#5555ff;">a</span>
+
+
+<span style="color:#7a7c7d;">-- String</span>
+<span style="color:#f44f4f;">'</span><span style="color:#3daee9;">\a</span><span style="color:#f44f4f;">'</span>
+<span style="color:#f44f4f;">'</span><span style="color:#3daee9;">\b</span><span style="color:#f44f4f;">'</span>
+<span style="color:#f44f4f;">'</span><span style="color:#3daee9;">\f</span><span style="color:#f44f4f;">'</span>
+<span style="color:#f44f4f;">'</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">'</span>
+<span style="color:#f44f4f;">'</span><span style="color:#3daee9;">\r</span><span style="color:#f44f4f;">'</span>
+<span style="color:#f44f4f;">'</span><span style="color:#3daee9;">\t</span><span style="color:#f44f4f;">'</span>
+<span style="color:#f44f4f;">'</span><span style="color:#3daee9;">\v</span><span style="color:#f44f4f;">'</span>
+<span style="color:#f44f4f;">'</span><span style="color:#3daee9;">\\</span><span style="color:#f44f4f;">'</span>
+<span style="color:#f44f4f;">'</span><span style="color:#3daee9;">\&quot;</span><span style="color:#f44f4f;">'</span>
+<span style="color:#f44f4f;">'</span><span style="color:#3daee9;">\'</span><span style="color:#f44f4f;">'</span>
+<span style="color:#f44f4f;">'</span><span style="color:#3daee9;">\z</span><span style="color:#f44f4f;">'</span>
+<span style="color:#f44f4f;">'</span><span style="color:#3daee9;">\xff</span><span style="color:#f44f4f;">'</span>
+<span style="color:#f44f4f;">'</span><span style="color:#3daee9;">\xFF</span><span style="color:#f44f4f;">'</span>
+<span style="color:#f44f4f;">'</span><span style="color:#3daee9;">\231</span><span style="color:#f44f4f;">'</span>
+<span style="color:#f44f4f;">'</span><span style="color:#3daee9;">\23</span><span style="color:#f44f4f;">'</span>
+<span style="color:#f44f4f;">'</span><span style="color:#3daee9;">\2</span><span style="color:#f44f4f;">'</span>
+<span style="color:#f44f4f;">'</span><span style="color:#3daee9;">\u{100201}</span><span style="color:#f44f4f;">'</span> <span style="color:#7a7c7d;">-- max 6 digits</span>
+<span style="color:#f44f4f;">'</span><span style="color:#3daee9;">\2</span><span style="color:#f44f4f;">a</span><span style="color:#da4453;text-decoration:underline;">\</span><span style="color:#f44f4f;">ks'</span> <span style="color:#7a7c7d;">-- error</span>
+
+<span style="color:#f44f4f;">'multi</span><span style="color:#3daee9;">\</span>
+<span style="color:#f44f4f;">line'</span>
+<span style="color:#f44f4f;">'multi</span><span style="color:#3daee9;">\z</span>
+<span style="color:#f44f4f;">line'</span>
+<span style="color:#f44f4f;">'multi</span><span style="color:#3daee9;">\z</span><span style="color:#f44f4f;">    line</span><span style="color:#3daee9;">\</span>
+<span style="color:#f44f4f;">2'</span>
+
+<span style="color:#5555ff;">a</span> = <span style="color:#f44f4f;">'alo</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">123&quot;'</span>
+<span style="color:#5555ff;">a</span> = <span style="color:#f44f4f;">&quot;alo</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">123</span><span style="color:#3daee9;">\&quot;</span><span style="color:#f44f4f;">&quot;</span>
+<span style="color:#5555ff;">a</span> = <span style="color:#f44f4f;">'</span><span style="color:#3daee9;">\97</span><span style="color:#f44f4f;">lo</span><span style="color:#3daee9;">\10\049</span><span style="color:#f44f4f;">23&quot;'</span>
+<span style="color:#5555ff;">a</span> = <span style="color:#da4453;">[[alo</span>
+<span style="color:#da4453;">123&quot;]]</span>
+<span style="color:#5555ff;">a</span> = <span style="color:#da4453;">[==[</span>
+<span style="color:#da4453;">alo</span>
+<span style="color:#da4453;">123&quot;]==]</span>
+
+
+<span style="color:#7a7c7d;">-- Decimal</span>
+<span style="color:#f67400;">3</span>
+<span style="color:#f67400;">345</span>
+<span style="color:#f67400;">0xff</span>
+<span style="color:#f67400;">0xBEBADA</span>
+
+<span style="color:#7a7c7d;">-- Float</span>
+<span style="color:#f67400;">3.</span>
+<span style="color:#f67400;">.3</span>
+<span style="color:#f67400;">3.0</span>
+<span style="color:#f67400;">3.1416</span>
+<span style="color:#f67400;">314.16e-2</span>
+<span style="color:#f67400;">314.e+2</span>
+<span style="color:#f67400;">0.31416E1</span>
+<span style="color:#f67400;">34e1</span>
+<span style="color:#f67400;">0.e3</span>
+<span style="color:#f67400;">0x0.1E</span>
+<span style="color:#f67400;">0xA23p-4</span>
+<span style="color:#f67400;">0xA.p+4</span>
+<span style="color:#f67400;">0x.ap4</span>
+<span style="color:#f67400;">0X1.921FB54442D18P+1</span>
+<span style="color:#7a7c7d;">-- error</span>
+<span style="color:#f67400;">32</span><span style="color:#da4453;text-decoration:underline;">p</span>
+<span style="color:#f67400;">0</span><span style="color:#da4453;text-decoration:underline;">xp</span>-<span style="color:#f67400;">4</span>
+<span style="color:#f67400;">0</span><span style="color:#da4453;text-decoration:underline;">x</span>.<span style="color:#5555ff;">p</span>-<span style="color:#f67400;">4</span>
+<span style="color:#f67400;">3.</span><span style="color:#da4453;text-decoration:underline;">x</span>
+
+
+<span style="color:#7a7c7d;">-- single comment</span>
+xyz()
+<span style="color:#7a7c7d;">--[[</span>
+<span style="color:#7a7c7d;"> long comment</span>
+<span style="color:#7a7c7d;">]]</span>
+xyz()
+
+
+<span style="color:#5555ff;">a</span> = { [f(<span style="color:#f67400;">1</span>)] = <span style="color:#5555ff;">g</span>; <span style="color:#f44f4f;">&quot;x&quot;</span>, <span style="color:#f44f4f;">&quot;y&quot;</span>; <span style="color:#5555ff;">x</span> = <span style="color:#f67400;">1</span>, f(<span style="color:#5555ff;">x</span>), [<span style="color:#f67400;">30</span>] = <span style="color:#f67400;">23</span>; <span style="color:#f67400;">45</span> }
+
+<span style="color:#7a7c7d;">-- is equivalent to</span>
+
+<span style="color:#a1a100;">do</span>
+  <span style="font-weight:bold;">local</span> <span style="color:#5555ff;">t</span> = {}
+  <span style="color:#5555ff;">t</span>[f(<span style="color:#f67400;">1</span>)] = <span style="color:#5555ff;">g</span>
+  <span style="color:#5555ff;">t</span>[<span style="color:#f67400;">1</span>] = <span style="color:#f44f4f;">&quot;x&quot;</span> <span style="color:#7a7c7d;">-- 1st exp</span>
+  <span style="color:#5555ff;">t</span>[<span style="color:#f67400;">2</span>] = <span style="color:#f44f4f;">&quot;y&quot;</span> <span style="color:#7a7c7d;">-- 2nd exp</span>
+  <span style="color:#5555ff;">t</span>.<span style="color:#5555ff;">x</span> = <span style="color:#f67400;">1</span> <span style="color:#7a7c7d;">-- t[&quot;x&quot;] = 1</span>
+  <span style="color:#5555ff;">t</span>[<span style="color:#f67400;">3</span>] = f(<span style="color:#5555ff;">x</span>) <span style="color:#7a7c7d;">-- 3rd exp</span>
+  <span style="color:#5555ff;">t</span>[<span style="color:#f67400;">30</span>] = <span style="color:#f67400;">23</span>
+  <span style="color:#5555ff;">t</span>[<span style="color:#f67400;">4</span>] = <span style="color:#f67400;">45</span> <span style="color:#7a7c7d;">-- 4th exp</span>
+  <span style="color:#5555ff;">a</span> = <span style="color:#5555ff;">t</span>
+<span style="color:#a1a100;">end</span>
+
+<span style="color:#f67400;">32</span>-<span style="color:#f67400;">0x43</span>+<span style="color:#f67400;">0x2</span>-<span style="color:#f67400;">5</span>
+<span style="color:#a1a100;">return</span><span style="color:#f44f4f;">&quot;a&quot;</span>
+<span style="color:#a1a100;">return</span><span style="color:#f44f4f;">'a'</span>
+<span style="color:#a1a100;">return</span>{}
+f(<span style="color:#f67400;">3</span>)
+f<span style="color:#f44f4f;">'a'</span>
+f<span style="color:#f44f4f;">&quot;a&quot;</span>
+f{<span style="color:#5555ff;">s</span>=<span style="color:#f67400;">2</span>}
+f<span style="color:#da4453;">[[s]]</span>
+f<span style="color:#da4453;">[=[s]=]</span>
+#<span style="color:#5555ff;">a</span>
+
+<span style="font-weight:bold;">local</span> <span style="color:#27aeae;font-weight:bold;">CONSTANT</span> = <span style="color:#5555ff;">a</span>
+
+<span style="color:#5555ff;">a</span> = {}
+<span style="font-weight:bold;">local</span> <span style="color:#5555ff;">x</span> = <span style="color:#f67400;">20</span>
+<span style="color:#a1a100;">for</span> <span style="color:#5555ff;">i</span>=<span style="color:#f67400;">1</span>,<span style="color:#f67400;">10</span> <span style="color:#a1a100;">do</span>
+  <span style="font-weight:bold;">local</span> <span style="color:#5555ff;">y</span> = <span style="color:#f67400;">0</span>
+  <span style="color:#5555ff;">a</span>[<span style="color:#5555ff;">i</span>] = <span style="font-weight:bold;">function</span> () <span style="color:#5555ff;">y</span>=<span style="color:#5555ff;">y</span>+<span style="color:#f67400;">1</span>; <span style="color:#a1a100;">return</span> <span style="color:#5555ff;">x</span>+<span style="color:#5555ff;">y</span> <span style="font-weight:bold;">end</span>
+<span style="color:#a1a100;">end</span>
+
+<span style="color:#7a7c7d;">--! </span><span style="color:#3f8058;font-weight:bold;">\brief</span><span style="color:#7a7c7d;"> gfind is deprecated</span>
+<span style="color:#da4453;text-decoration:underline;">string.gfind</span>(<span style="color:#f44f4f;">'s'</span>)
+<span style="color:#8e44ad;">string.gmatch</span>(<span style="color:#f44f4f;">'f'</span>)
+
+<span style="font-weight:bold;">function</span> foo()
+  <span style="color:#a1a100;">if</span> <span style="color:#5555ff;">x</span> <span style="color:#a1a100;">then</span>
+    <span style="font-weight:bold;">function</span>() <span style="font-weight:bold;">end</span>
+    <span style="color:#5555ff;">bar</span>=<span style="font-weight:bold;">function</span>()
+      <span style="color:#a1a100;">if</span> <span style="color:#5555ff;">y</span> <span style="color:#a1a100;">then</span>
+        <span style="color:#a1a100;">if</span> <span style="color:#5555ff;">z</span> <span style="color:#a1a100;">then</span> <span style="color:#a1a100;">end</span>
+      <span style="color:#a1a100;">end</span>
+    <span style="font-weight:bold;">end</span>
+  <span style="color:#a1a100;">end</span>
+<span style="font-weight:bold;">end</span>
+
+<span style="color:#7a7c7d;">-- attributes</span>
+<span style="font-weight:bold;">local</span> <span style="color:#5555ff;">a</span><span style="color:#2980b9;">&lt;const&gt;</span> = <span style="color:#f67400;">2</span>
+<span style="font-weight:bold;">local</span> <span style="color:#5555ff;">a</span><span style="color:#2980b9;">&lt;const&gt;</span> <span style="color:#8e44ad;">print</span>(<span style="color:#5555ff;">a</span>)
+<span style="font-weight:bold;">local</span> <span style="color:#5555ff;">f</span> <span style="color:#2980b9;">&lt;close&gt;</span>, <span style="color:#5555ff;">const</span> <span style="color:#2980b9;">&lt;    const &gt;</span>
+<span style="font-weight:bold;">local</span> <span style="color:#5555ff;">a</span> <span style="color:#da4453;text-decoration:underline;">&lt;cloe&gt;</span>, <span style="color:#5555ff;">b</span><span style="color:#da4453;text-decoration:underline;">&lt; cons &gt;</span>, <span style="color:#5555ff;">c</span><span style="color:#da4453;text-decoration:underline;">&lt;const</span>, <span style="color:#5555ff;">d</span><span style="color:#2980b9;">&lt;close&gt;</span> ; <span style="color:#5555ff;">a</span>&lt;<span style="color:#5555ff;">b</span>
+<span style="font-weight:bold;">local</span> <span style="color:#5555ff;">a</span> <span style="color:#da4453;text-decoration:underline;">&lt;cloe&gt;</span> <span style="color:#7a7c7d;">-- bla, </span>
+<span style="color:#5555ff;">b</span>&lt; <span style="color:#5555ff;">cons</span> &gt;
+<span style="font-weight:bold;">local</span> <span style="color:#5555ff;">a</span> <span style="color:#2980b9;">&lt;close&gt;</span> <span style="color:#7a7c7d;">--[[</span>
+<span style="color:#7a7c7d;">b &lt;const&gt;]]</span>, <span style="color:#5555ff;">b</span> <span style="color:#2980b9;">&lt;const&gt;</span> <span style="color:#7a7c7d;">--[[ xyz ]]</span> , <span style="color:#5555ff;">c</span> <span style="color:#2980b9;">&lt;close&gt;</span>
+<span style="color:#5555ff;">b</span>&lt; <span style="color:#5555ff;">cons</span> &gt;
+</pre></body></html>

@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>or1200_dc_fsm.v</title>
+<meta name="generator" content="KF5::SyntaxHighlighting (Verilog)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="color:#7a7c7d;">//////////////////////////////////////////////////////////////////////</span>
+<span style="color:#7a7c7d;">////                                                              ////</span>
+<span style="color:#7a7c7d;">////  OR1200's DC FSM                                             ////</span>
+<span style="color:#7a7c7d;">////                                                              ////</span>
+<span style="color:#7a7c7d;">////  This file is part of the OpenRISC 1200 project              ////</span>
+<span style="color:#7a7c7d;">////  http://opencores.org/project,or1k                           ////</span>
+<span style="color:#7a7c7d;">////                                                              ////</span>
+<span style="color:#7a7c7d;">////  Description                                                 ////</span>
+<span style="color:#7a7c7d;">////  Data cache state machine                                    ////</span>
+<span style="color:#7a7c7d;">////                                                              ////</span>
+<span style="color:#7a7c7d;">////  To Do:                                                      ////</span>
+<span style="color:#7a7c7d;">////   - Test error during line read or write                     ////</span>
+<span style="color:#7a7c7d;">////                                                              ////</span>
+<span style="color:#7a7c7d;">////  Author(s):                                                  ////</span>
+<span style="color:#7a7c7d;">////      - Damjan Lampret, lampret@opencores.org                 ////</span>
+<span style="color:#7a7c7d;">////      - Julius Baxter, julius@opencores.org                   ////</span>
+<span style="color:#7a7c7d;">////                                                              ////</span>
+<span style="color:#7a7c7d;">//////////////////////////////////////////////////////////////////////</span>
+<span style="color:#7a7c7d;">////                                                              ////</span>
+<span style="color:#7a7c7d;">//// Copyright (C) 2000, 2010 Authors and OPENCORES.ORG           ////</span>
+<span style="color:#7a7c7d;">////                                                              ////</span>
+<span style="color:#7a7c7d;">//// This source file may be used and distributed without         ////</span>
+<span style="color:#7a7c7d;">//// restriction provided that this copyright statement is not    ////</span>
+<span style="color:#7a7c7d;">//// removed from the file and that any derivative work contains  ////</span>
+<span style="color:#7a7c7d;">//// the original copyright notice and the associated disclaimer. ////</span>
+<span style="color:#7a7c7d;">////                                                              ////</span>
+<span style="color:#7a7c7d;">//// This source file is free software; you can redistribute it   ////</span>
+<span style="color:#7a7c7d;">//// and/or modify it under the terms of the GNU Lesser General   ////</span>
+<span style="color:#7a7c7d;">//// Public License as published by the Free Software Foundation; ////</span>
+<span style="color:#7a7c7d;">//// either version 2.1 of the License, or (at your option) any   ////</span>
+<span style="color:#7a7c7d;">//// later version.                                               ////</span>
+<span style="color:#7a7c7d;">////                                                              ////</span>
+<span style="color:#7a7c7d;">//// This source is distributed in the hope that it will be       ////</span>
+<span style="color:#7a7c7d;">//// useful, but WITHOUT ANY WARRANTY; without even the implied   ////</span>
+<span style="color:#7a7c7d;">//// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR      ////</span>
+<span style="color:#7a7c7d;">//// PURPOSE.  See the GNU Lesser General Public License for more ////</span>
+<span style="color:#7a7c7d;">//// details.                                                     ////</span>
+<span style="color:#7a7c7d;">////                                                              ////</span>
+<span style="color:#7a7c7d;">//// You should have received a copy of the GNU Lesser General    ////</span>
+<span style="color:#7a7c7d;">//// Public License along with this source; if not, download it   ////</span>
+<span style="color:#7a7c7d;">//// from http://www.opencores.org/lgpl.shtml                     ////</span>
+<span style="color:#7a7c7d;">////                                                              ////</span>
+<span style="color:#7a7c7d;">//////////////////////////////////////////////////////////////////////</span>
+<span style="color:#7a7c7d;">//</span>
+<span style="color:#7a7c7d;">// $Log: or1200_dc_fsm.v,v $</span>
+<span style="color:#7a7c7d;">// Revision 2.0  2010/06/30 11:00:00  ORSoC</span>
+<span style="color:#7a7c7d;">// Minor update: </span>
+<span style="color:#7a7c7d;">// Bugs fixed. </span>
+<span style="color:#7a7c7d;">//</span>
+
+<span style="color:#7a7c7d;">// synopsys translate_off</span>
+<span style="color:#27ae60;">`include </span><span style="color:#f67400;">&quot;timescale.v&quot;</span>
+<span style="color:#7a7c7d;">// synopsys translate_on</span>
+<span style="color:#27ae60;">`include </span><span style="color:#f67400;">&quot;or1200_defines.v&quot;</span>
+
+<span style="color:#27ae60;">`define OR1200_DCFSM_IDLE	3'd0</span>
+<span style="color:#27ae60;">`define OR1200_DCFSM_CLOADSTORE	3'd1</span>
+<span style="color:#27ae60;">`define OR1200_DCFSM_LOOP2	3'd2</span>
+<span style="color:#27ae60;">`define OR1200_DCFSM_LOOP3	3'd3</span>
+<span style="color:#27ae60;">`define OR1200_DCFSM_LOOP4	3'd4</span>
+<span style="color:#27ae60;">`define OR1200_DCFSM_FLUSH5	3'd5</span>
+<span style="color:#27ae60;">`define OR1200_DCFSM_INV6	3'd6</span>
+<span style="color:#27ae60;">`define OR1200_DCFSM_WAITSPRCS7	3'd7</span>
+
+
+
+<span style="color:#7a7c7d;">//</span>
+<span style="color:#7a7c7d;">// Data cache FSM for cache line of 16 bytes (4x singleword)</span>
+<span style="color:#7a7c7d;">//</span>
+
+<span style="font-weight:bold;">module</span> or1200_dc_fsm
+  (
+   <span style="color:#7a7c7d;">// Clock and reset</span>
+   clk, rst,
+   
+   <span style="color:#7a7c7d;">// Internal i/f to top level DC</span>
+   dc_en, dcqmem_cycstb_i, dcqmem_ci_i, dcqmem_we_i, dcqmem_sel_i,
+   tagcomp_miss, biudata_valid, biudata_error, lsu_addr,
+   dcram_we, biu_read, biu_write, biu_do_sel, dcram_di_sel, first_hit_ack, 
+   first_miss_ack, first_miss_err, burst, tag_we, tag_valid, dc_addr, 
+   dc_no_writethrough, tag_dirty, dirty, tag, tag_v, dc_block_flush, 
+   dc_block_writeback, spr_dat_i, mtspr_dc_done, spr_cswe
+   );
+
+   <span style="color:#7a7c7d;">//</span>
+   <span style="color:#7a7c7d;">// I/O</span>
+   <span style="color:#7a7c7d;">//</span>
+   <span style="color:#2980b9;">input</span>				clk;
+   <span style="color:#2980b9;">input</span>				rst;
+   <span style="color:#2980b9;">input</span>				dc_en;
+   <span style="color:#2980b9;">input</span>				dcqmem_cycstb_i;
+   <span style="color:#2980b9;">input</span>				dcqmem_ci_i;
+   <span style="color:#2980b9;">input</span>				dcqmem_we_i;
+   <span style="color:#2980b9;">input</span> [<span style="color:#f67400;">3</span>:<span style="color:#f67400;">0</span>] 				dcqmem_sel_i;
+   <span style="color:#2980b9;">input</span>				tagcomp_miss;
+   <span style="color:#2980b9;">input</span>				biudata_valid;
+   <span style="color:#2980b9;">input</span>				biudata_error;
+   <span style="color:#2980b9;">input</span> [<span style="color:#f67400;">31</span>:<span style="color:#f67400;">0</span>] 			lsu_addr;
+   <span style="color:#2980b9;">output</span> [<span style="color:#f67400;">3</span>:<span style="color:#f67400;">0</span>] 			dcram_we;
+   <span style="color:#2980b9;">output</span>				biu_read;
+   <span style="color:#2980b9;">output</span>				biu_write;
+   <span style="color:#2980b9;">output</span> 				dcram_di_sel;
+   <span style="color:#2980b9;">output</span> 				biu_do_sel;
+   <span style="color:#2980b9;">output</span>				first_hit_ack;
+   <span style="color:#2980b9;">output</span>				first_miss_ack;
+   <span style="color:#2980b9;">output</span>				first_miss_err;
+   <span style="color:#2980b9;">output</span>				burst;
+   <span style="color:#2980b9;">output</span>				tag_we;
+   <span style="color:#2980b9;">output</span> 				tag_valid;
+   <span style="color:#2980b9;">output</span> [<span style="color:#f67400;">31</span>:<span style="color:#f67400;">0</span>] 			dc_addr;
+   <span style="color:#2980b9;">input</span> 				dc_no_writethrough;
+   <span style="color:#2980b9;">output</span> 				tag_dirty;
+   <span style="color:#2980b9;">input</span> 				dirty;
+   <span style="color:#2980b9;">input</span> [<span style="color:#27ae60;">`OR1200_DCTAG_W</span>-<span style="color:#f67400;">2</span>:<span style="color:#f67400;">0</span>] 		tag;
+   <span style="color:#2980b9;">input</span> 				tag_v;   
+   <span style="color:#2980b9;">input</span> 				dc_block_flush;
+   <span style="color:#2980b9;">input</span> 				dc_block_writeback;
+   <span style="color:#2980b9;">input</span> [<span style="color:#f67400;">31</span>:<span style="color:#f67400;">0</span>] 			spr_dat_i;
+   <span style="color:#2980b9;">output</span> 				mtspr_dc_done;
+   <span style="color:#2980b9;">input</span> 				spr_cswe;
+   
+   
+   <span style="color:#7a7c7d;">//</span>
+   <span style="color:#7a7c7d;">// Internal wires and regs</span>
+   <span style="color:#7a7c7d;">//</span>
+   <span style="color:#2980b9;">reg</span> [<span style="color:#f67400;">31</span>:<span style="color:#f67400;">0</span>] 				addr_r;
+   <span style="color:#2980b9;">reg</span> [<span style="color:#f67400;">2</span>:<span style="color:#f67400;">0</span>] 				state;
+   <span style="color:#2980b9;">reg</span> [<span style="color:#27ae60;">`OR1200_DCLS</span>-<span style="color:#f67400;">1</span>:<span style="color:#f67400;">0</span>] 		cnt;
+   <span style="color:#2980b9;">reg</span> 					hitmiss_eval;
+   <span style="color:#2980b9;">reg</span> 					store;
+   <span style="color:#2980b9;">reg</span> 					load;
+   <span style="color:#2980b9;">reg</span> 					cache_inhibit;
+   <span style="color:#2980b9;">reg</span> 					cache_miss;
+   <span style="color:#2980b9;">reg</span> 					cache_dirty_needs_writeback;
+   <span style="color:#2980b9;">reg</span>                                  did_early_load_ack;
+   <span style="color:#2980b9;">reg</span> 					cache_spr_block_flush;
+   <span style="color:#2980b9;">reg</span> 					cache_spr_block_writeback;
+   <span style="color:#2980b9;">reg</span> 					cache_wb;   
+   <span style="color:#2980b9;">wire</span> 				load_hit_ack;
+   <span style="color:#2980b9;">wire</span> 				load_miss_ack;
+   <span style="color:#2980b9;">wire</span> 				load_inhibit_ack;   
+   <span style="color:#2980b9;">wire</span> 				store_hit_ack;
+   <span style="color:#2980b9;">wire</span> 				store_hit_writethrough_ack;   
+   <span style="color:#2980b9;">wire</span> 				store_miss_writethrough_ack;   
+   <span style="color:#2980b9;">wire</span> 				store_inhibit_ack;
+   <span style="color:#2980b9;">wire</span> 				store_miss_ack;
+   <span style="color:#2980b9;">wire</span> 				dcram_we_after_line_load;
+   <span style="color:#2980b9;">wire</span> 				dcram_we_during_line_load;
+   <span style="color:#2980b9;">wire</span> 				tagram_we_end_of_loadstore_loop;
+   <span style="color:#2980b9;">wire</span> 				tagram_dirty_bit_set;   
+   <span style="color:#2980b9;">wire</span> 				writethrough;
+   <span style="color:#2980b9;">wire</span> 				cache_inhibit_with_eval;
+   <span style="color:#2980b9;">wire</span> [(<span style="color:#27ae60;">`OR1200_DCLS</span>-<span style="color:#f67400;">1</span>)-<span style="color:#f67400;">2</span>:<span style="color:#f67400;">0</span>]		next_addr_word;
+
+   <span style="color:#7a7c7d;">//</span>
+   <span style="color:#7a7c7d;">// Cache inhibit</span>
+   <span style="color:#7a7c7d;">//</span>
+   
+   <span style="color:#7a7c7d;">// Indicates whether cache is inhibited, during hitmiss_eval and after</span>
+   <span style="font-weight:bold;">assign</span> cache_inhibit_with_eval = (hitmiss_eval &amp; dcqmem_ci_i) |
+				    (!hitmiss_eval &amp; cache_inhibit);
+   
+   <span style="color:#7a7c7d;">//</span>
+   <span style="color:#7a7c7d;">// Generate of DCRAM write enables</span>
+   <span style="color:#7a7c7d;">//</span>
+
+   <span style="color:#7a7c7d;">// WE when non-writethrough, and had to wait for a line to load.</span>
+   <span style="font-weight:bold;">assign</span> dcram_we_after_line_load = (state == <span style="color:#27ae60;">`OR1200_DCFSM_LOOP3</span>) &amp;
+				    dcqmem_we_i &amp; !cache_dirty_needs_writeback &amp;
+				     !did_early_load_ack;
+
+   <span style="color:#7a7c7d;">// WE when receiving the data cache line</span>
+   <span style="font-weight:bold;">assign</span> dcram_we_during_line_load = (state == <span style="color:#27ae60;">`OR1200_DCFSM_LOOP2</span>) &amp; load &amp; 
+				      biudata_valid;   
+   
+   <span style="font-weight:bold;">assign</span> dcram_we =(<span style="color:#7a7c7d;">// Write when hit - make sure it is only when hit - could</span>
+		     <span style="color:#7a7c7d;">// maybe be doing write through and don't want to corrupt</span>
+		     <span style="color:#7a7c7d;">// cache lines corresponding to the writethrough addr_r.</span>
+		     ({<span style="color:#f67400;">4</span>{store_hit_ack | store_hit_writethrough_ack}} |
+		     <span style="color:#7a7c7d;">// Write after load of line</span>
+		     {<span style="color:#f67400;">4</span>{dcram_we_after_line_load}}) &amp; 
+		     dcqmem_sel_i		 ) |
+		    <span style="color:#7a7c7d;">// Write during load</span>
+		    {<span style="color:#f67400;">4</span>{dcram_we_during_line_load}};
+
+   <span style="color:#7a7c7d;">//</span>
+   <span style="color:#7a7c7d;">// Tag RAM signals</span>
+   <span style="color:#7a7c7d;">//</span>
+   
+   <span style="color:#7a7c7d;">// WE to tag RAM when we finish loading a line.</span>
+   <span style="font-weight:bold;">assign</span> tagram_we_end_of_loadstore_loop = ((state==<span style="color:#27ae60;">`OR1200_DCFSM_LOOP2</span>) &amp; 
+					     biudata_valid &amp; !(|cnt));
+   
+<span style="color:#27ae60;">`ifndef OR1200_DC_WRITETHROUGH</span>
+   <span style="color:#7a7c7d;">// No writethrough, so mark a line dirty whenever we write to it</span>
+   <span style="font-weight:bold;">assign</span> tagram_dirty_bit_set = store_hit_ack | store_miss_ack;
+
+   <span style="color:#7a7c7d;">// Generate done signal for MTSPR instructions that may block execution</span>
+   <span style="font-weight:bold;">assign</span> mtspr_dc_done = <span style="color:#7a7c7d;">// Either DC disabled or we're not selected, or</span>
+			  !dc_en | !spr_cswe |
+			  <span style="color:#7a7c7d;">// Requested address not valid or writeback and !dirty</span>
+			  ((state==<span style="color:#27ae60;">`OR1200_DCFSM_FLUSH5</span>) &amp; 
+			   (!tag_v | (cache_spr_block_writeback &amp; !dirty))) |
+			  <span style="color:#7a7c7d;">// Writeback or flush is finished</span>
+			  ((state==<span style="color:#27ae60;">`OR1200_DCFSM_LOOP3</span>) &amp; 
+			   (cache_spr_block_flush | cache_spr_block_writeback))|
+			  <span style="color:#7a7c7d;">// Invalidate of clean line finished</span>
+			  ((state==<span style="color:#27ae60;">`OR1200_DCFSM_INV6</span>) &amp; cache_spr_block_flush);
+   
+   
+<span style="color:#27ae60;">`else</span>
+ <span style="color:#27ae60;">`ifdef</span> OR1200_DC_NOSTACKWRITETHROUGH   
+   <span style="color:#7a7c7d;">// For dirty bit setting when having writethrough but not for stack</span>
+   <span style="font-weight:bold;">assign</span> tagram_dirty_bit_set = store_hit_ack | store_miss_ack;
+ <span style="color:#27ae60;">`else</span>
+   <span style="color:#7a7c7d;">// Lines will never be dirty if always writethrough</span>
+   <span style="font-weight:bold;">assign</span> tagram_dirty_bit_set = <span style="color:#f67400;">0</span>;
+ <span style="color:#27ae60;">`endif</span>
+   
+   <span style="font-weight:bold;">assign</span> mtspr_dc_done = <span style="color:#f67400;">1'b1</span>;
+   
+<span style="color:#27ae60;">`endif</span>
+
+   <span style="font-weight:bold;">assign</span> tag_dirty = tagram_dirty_bit_set;
+   
+   <span style="color:#7a7c7d;">// WE to tag RAM</span>
+   <span style="font-weight:bold;">assign</span> tag_we = tagram_we_end_of_loadstore_loop |		    
+                    tagram_dirty_bit_set | (state == <span style="color:#27ae60;">`OR1200_DCFSM_INV6</span>);
+   
+
+   <span style="color:#7a7c7d;">// Valid bit</span>
+   <span style="color:#7a7c7d;">// Set valid when end of line load, or marking dirty (is still valid)</span>
+   <span style="font-weight:bold;">assign</span> tag_valid = ( tagram_we_end_of_loadstore_loop &amp; 
+			(load | (store &amp; cache_spr_block_writeback)) ) |
+		      tagram_dirty_bit_set;
+
+
+   
+   <span style="color:#7a7c7d;">//</span>
+   <span style="color:#7a7c7d;">// BIU read and write</span>
+   <span style="color:#7a7c7d;">//</span>
+
+   <span style="font-weight:bold;">assign</span> biu_read = <span style="color:#7a7c7d;">// Bus read request when:</span>
+		     <span style="color:#7a7c7d;">// 1) Have a miss and not dirty or a load with inhibit</span>
+		     ((state == <span style="color:#27ae60;">`OR1200_DCFSM_CLOADSTORE</span>) &amp;
+		      (((hitmiss_eval &amp; tagcomp_miss &amp; !dirty &amp; 
+			 !(store &amp; writethrough)) | 
+			(load &amp; cache_inhibit_with_eval)) &amp; dcqmem_cycstb_i)) |
+		     <span style="color:#7a7c7d;">// 2) In the loop and loading</span>
+		     ((state == <span style="color:#27ae60;">`OR1200_DCFSM_LOOP2</span>) &amp; load);
+   
+
+   <span style="font-weight:bold;">assign</span> biu_write = <span style="color:#7a7c7d;">// Bus write request when:</span>
+		      <span style="color:#7a7c7d;">// 1) Have a miss and dirty or store with inhibit</span>
+		      ((state == <span style="color:#27ae60;">`OR1200_DCFSM_CLOADSTORE</span>) &amp; 
+		       (((hitmiss_eval &amp; tagcomp_miss &amp; dirty) | 
+			 (store &amp; writethrough)) | 
+			(store &amp; cache_inhibit_with_eval)) &amp; dcqmem_cycstb_i) |
+		      <span style="color:#7a7c7d;">// 2) In the loop and storing</span>
+		      ((state == <span style="color:#27ae60;">`OR1200_DCFSM_LOOP2</span>) &amp; store);
+   
+   <span style="color:#7a7c7d;">//</span>
+   <span style="color:#7a7c7d;">// Select for data to actual cache RAM (from LSU or BIU)</span>
+   <span style="color:#7a7c7d;">//</span>
+   <span style="color:#7a7c7d;">// Data to DCRAM - from external bus when loading (from IU when store)</span>
+   <span style="font-weight:bold;">assign</span> dcram_di_sel = load;
+   <span style="color:#7a7c7d;">// Data to external bus - always from IU except in case of bursting back</span>
+   <span style="color:#7a7c7d;">//                        the line to memory. (1 selects DCRAM)</span>
+   <span style="font-weight:bold;">assign</span> biu_do_sel = (state == <span style="color:#27ae60;">`OR1200_DCFSM_LOOP2</span>) &amp; store;
+
+   <span style="color:#7a7c7d;">// 3-bit wire for calculating next word of burst write, depending on</span>
+   <span style="color:#7a7c7d;">// line size of data cache.</span>
+   <span style="font-weight:bold;">assign</span> next_addr_word =  addr_r[<span style="color:#27ae60;">`OR1200_DCLS</span>-<span style="color:#f67400;">1</span>:<span style="color:#f67400;">2</span>] + <span style="color:#f67400;">1</span>;
+   
+   <span style="color:#7a7c7d;">// Address to cache RAM (tag address also derived from this)   </span>
+   <span style="font-weight:bold;">assign</span> dc_addr =
+		   <span style="color:#7a7c7d;">// First check if we've got a block flush or WB op</span>
+		   ((dc_block_flush &amp; !cache_spr_block_flush) | 
+		   (dc_block_writeback &amp; !cache_spr_block_writeback)) ? 
+		   <span style="color:#f67400;">spr_dat_i :</span>
+		   (state==<span style="color:#27ae60;">`OR1200_DCFSM_FLUSH5</span>) ? addr_r:
+		    <span style="color:#7a7c7d;">// If no SPR action, then always put out address from LSU</span>
+		    (state==<span style="color:#27ae60;">`OR1200_DCFSM_IDLE</span> | hitmiss_eval) ? lsu_addr :
+		    <span style="color:#7a7c7d;">// Next, if in writeback loop, when ACKed must immediately</span>
+		    <span style="color:#7a7c7d;">// output next word address (the RAM address takes a cycle</span>
+		    <span style="color:#7a7c7d;">// to increment, but it's needed immediately for burst)</span>
+		    <span style="color:#7a7c7d;">// otherwise, output our registered address.</span>
+		    (state==<span style="color:#27ae60;">`OR1200_DCFSM_LOOP2</span> &amp; biudata_valid &amp; store ) ? 
+		    {addr_r[<span style="color:#f67400;">31</span>:<span style="color:#27ae60;">`OR1200_DCLS</span>], next_addr_word, <span style="color:#f67400;">2'b00</span>} : addr_r;
+   
+<span style="color:#27ae60;">`ifdef OR1200_DC_WRITETHROUGH</span>
+ <span style="color:#27ae60;">`ifdef</span> OR1200_DC_NOSTACKWRITETHROUGH   
+   <span style="font-weight:bold;">assign</span> writethrough = !dc_no_writethrough;
+ <span style="color:#27ae60;">`else</span>
+   <span style="font-weight:bold;">assign</span> writethrough = <span style="color:#f67400;">1</span>;
+ <span style="color:#27ae60;">`endif</span>
+<span style="color:#27ae60;">`else</span>
+   <span style="font-weight:bold;">assign</span> writethrough = <span style="color:#f67400;">0</span>;
+<span style="color:#27ae60;">`endif</span>
+   
+   <span style="color:#7a7c7d;">//</span>
+   <span style="color:#7a7c7d;">// ACK generation for LSU</span>
+   <span style="color:#7a7c7d;">//</span>
+   
+   <span style="color:#7a7c7d;">// ACK for when it's a cache hit</span>
+   <span style="font-weight:bold;">assign</span> first_hit_ack = load_hit_ack | store_hit_ack | 
+			  store_hit_writethrough_ack | 
+			  store_miss_writethrough_ack |
+			  store_inhibit_ack | store_miss_ack ;
+
+   <span style="color:#7a7c7d;">// ACK for when it's a cache miss - load only, is used in MUX for data back</span>
+   <span style="color:#7a7c7d;">//                                  LSU straight off external data bus. In</span>
+   <span style="color:#7a7c7d;">//                                  this was is also used for cache inhibit</span>
+   <span style="color:#7a7c7d;">//                                  loads.</span>
+   <span style="color:#7a7c7d;">// first_hit_ack takes precedence over first_miss_ack</span>
+   <span style="font-weight:bold;">assign</span> first_miss_ack = ~first_hit_ack &amp; (load_miss_ack | load_inhibit_ack);
+   
+   <span style="color:#7a7c7d;">// ACK cache hit on load</span>
+   <span style="font-weight:bold;">assign</span> load_hit_ack = (state == <span style="color:#27ae60;">`OR1200_DCFSM_CLOADSTORE</span>) &amp; 
+			 hitmiss_eval &amp; !tagcomp_miss &amp; !dcqmem_ci_i &amp; load;
+   
+   <span style="color:#7a7c7d;">// ACK cache hit on store, no writethrough</span>
+   <span style="font-weight:bold;">assign</span> store_hit_ack = (state == <span style="color:#27ae60;">`OR1200_DCFSM_CLOADSTORE</span>) &amp; 
+			  hitmiss_eval  &amp; !tagcomp_miss &amp; !dcqmem_ci_i &amp;
+			  store &amp; !writethrough;
+   
+   <span style="color:#7a7c7d;">// ACK cache hit on store with writethrough</span>
+   <span style="font-weight:bold;">assign</span> store_hit_writethrough_ack = (state == <span style="color:#27ae60;">`OR1200_DCFSM_CLOADSTORE</span>) &amp; 
+				       !cache_miss &amp; !cache_inhibit &amp;
+				       store &amp; writethrough &amp; biudata_valid;
+   
+   <span style="color:#7a7c7d;">// ACK cache miss on store with writethrough</span>
+   <span style="font-weight:bold;">assign</span> store_miss_writethrough_ack = (state == <span style="color:#27ae60;">`OR1200_DCFSM_CLOADSTORE</span>) &amp; 
+					cache_miss &amp; !cache_inhibit &amp;
+					store &amp; writethrough &amp; biudata_valid;
+      
+   <span style="color:#7a7c7d;">// ACK store when cacheinhibit</span>
+   <span style="font-weight:bold;">assign</span> store_inhibit_ack = (state == <span style="color:#27ae60;">`OR1200_DCFSM_CLOADSTORE</span>) &amp;
+			      store &amp; cache_inhibit &amp; biudata_valid;
+   
+   
+   <span style="color:#7a7c7d;">// Get the _early_ ack on first ACK back from wishbone during load only</span>
+   <span style="color:#7a7c7d;">// Condition is that we're in the loop - that it's the first ack we get (can</span>
+   <span style="color:#7a7c7d;">// tell from value of cnt), and we're loading a line to read from it (not</span>
+   <span style="color:#7a7c7d;">// loading to write to it, in the case of a write without writethrough.)</span>
+   <span style="font-weight:bold;">assign</span> load_miss_ack =  ((state== <span style="color:#27ae60;">`OR1200_DCFSM_LOOP2</span>) &amp; load &amp;
+			    (cnt==((<span style="color:#f67400;">1</span> &lt;&lt; <span style="color:#27ae60;">`OR1200_DCLS</span>) - <span style="color:#f67400;">4</span>)) &amp; biudata_valid &amp; 
+			    !(dcqmem_we_i &amp; !writethrough));
+   
+   <span style="font-weight:bold;">assign</span> load_inhibit_ack = (state == <span style="color:#27ae60;">`OR1200_DCFSM_CLOADSTORE</span>) &amp;
+			     load &amp; cache_inhibit &amp; biudata_valid;   
+   
+   <span style="color:#7a7c7d;">// This will be case of write through disabled, and had to load a line.</span>
+   <span style="font-weight:bold;">assign</span> store_miss_ack = dcram_we_after_line_load;
+            
+   <span style="font-weight:bold;">assign</span> first_miss_err = biudata_error &amp; dcqmem_cycstb_i;
+
+   <span style="color:#7a7c7d;">// Signal burst when in the load/store loop. We will always try to burst.</span>
+   <span style="font-weight:bold;">assign</span> burst = (state == <span style="color:#27ae60;">`OR1200_DCFSM_LOOP2</span>);
+
+   <span style="color:#7a7c7d;">//</span>
+   <span style="color:#7a7c7d;">// Main DC FSM</span>
+   <span style="color:#7a7c7d;">//</span>
+   <span style="font-weight:bold;">always</span> @(<span style="font-weight:bold;">posedge</span> clk <span style="color:#2980b9;">or</span> <span style="color:#27ae60;">`OR1200_RST_EVENT</span> rst) <span style="font-weight:bold;">begin</span>
+      <span style="font-weight:bold;">if</span> (rst == <span style="color:#27ae60;">`OR1200_RST_VALUE</span>) <span style="font-weight:bold;">begin</span>
+	 state &lt;=  <span style="color:#27ae60;">`OR1200_DCFSM_IDLE</span>;
+	 addr_r &lt;=  <span style="color:#f67400;">32'd0</span>;
+	 hitmiss_eval &lt;=  <span style="color:#f67400;">1'b0</span>;
+	 store &lt;=  <span style="color:#f67400;">1'b0</span>;
+	 load &lt;=  <span style="color:#f67400;">1'b0</span>;
+	 cnt &lt;=  <span style="color:#27ae60;">`OR1200_DCLS</span><span style="color:#f67400;">'d0</span>;
+         cache_miss &lt;=  <span style="color:#f67400;">1'b0</span>;
+	 cache_dirty_needs_writeback &lt;= <span style="color:#f67400;">1'b0</span>;
+	 cache_inhibit &lt;=  <span style="color:#f67400;">1'b0</span>;
+	 did_early_load_ack &lt;= <span style="color:#f67400;">1'b0</span>;
+	 cache_spr_block_flush &lt;= <span style="color:#f67400;">1'b0</span>;
+	 cache_spr_block_writeback &lt;= <span style="color:#f67400;">1'b0</span>;
+      <span style="font-weight:bold;">end</span>
+      <span style="font-weight:bold;">else</span>
+	<span style="font-weight:bold;">case</span> (state)	<span style="color:#7a7c7d;">// synopsys parallel_case</span>
+	  
+          <span style="color:#27ae60;">`OR1200_DCFSM_IDLE</span> : <span style="font-weight:bold;">begin</span>
+	     <span style="font-weight:bold;">if</span> (dc_en &amp; (dc_block_flush | dc_block_writeback))
+	       <span style="font-weight:bold;">begin</span>
+		  cache_spr_block_flush &lt;= dc_block_flush;
+		  cache_spr_block_writeback &lt;= dc_block_writeback;
+		  hitmiss_eval &lt;= <span style="color:#f67400;">1'b1</span>;
+		  state &lt;= <span style="color:#27ae60;">`OR1200_DCFSM_FLUSH5</span>;
+		  addr_r &lt;=  spr_dat_i;
+	       <span style="font-weight:bold;">end</span>
+	     <span style="font-weight:bold;">else</span> <span style="font-weight:bold;">if</span> (dc_en &amp; dcqmem_cycstb_i)
+	       <span style="font-weight:bold;">begin</span>
+		  state &lt;= <span style="color:#27ae60;">`OR1200_DCFSM_CLOADSTORE</span>;
+		  hitmiss_eval &lt;=  <span style="color:#f67400;">1'b1</span>;
+		  store &lt;=  dcqmem_we_i;
+		  load &lt;=  !dcqmem_we_i;
+	       <span style="font-weight:bold;">end</span>
+	     
+	     
+          <span style="font-weight:bold;">end</span> <span style="color:#7a7c7d;">// case: `OR1200_DCFSM_IDLE</span>
+	  
+          <span style="color:#27ae60;">`OR1200_DCFSM_CLOADSTORE</span>: <span style="font-weight:bold;">begin</span>
+	     hitmiss_eval &lt;=  <span style="color:#f67400;">1'b0</span>;
+	     <span style="font-weight:bold;">if</span> (hitmiss_eval) <span style="font-weight:bold;">begin</span>
+                cache_inhibit &lt;=  dcqmem_ci_i; <span style="color:#7a7c7d;">// Check for cache inhibit here</span>
+                cache_miss &lt;=  tagcomp_miss;
+		cache_dirty_needs_writeback &lt;= dirty;
+		addr_r &lt;=  lsu_addr;
+             <span style="font-weight:bold;">end</span>
+
+	     <span style="color:#7a7c7d;">// Evaluate any cache line load/stores in first cycle:</span>
+			     <span style="color:#7a7c7d;">//</span>
+	     <span style="font-weight:bold;">if</span> (hitmiss_eval &amp; tagcomp_miss &amp; !(store &amp; writethrough) &amp;
+		 !dcqmem_ci_i)
+	       <span style="font-weight:bold;">begin</span>
+		  <span style="color:#7a7c7d;">// Miss - first either:</span>
+		  <span style="color:#7a7c7d;">//  1) write back dirty line </span>
+		  <span style="font-weight:bold;">if</span> (dirty) <span style="font-weight:bold;">begin</span>
+		     <span style="color:#7a7c7d;">// Address for writeback</span>
+		     addr_r &lt;=  {tag, lsu_addr[<span style="color:#27ae60;">`OR1200_DCINDXH</span>:<span style="color:#f67400;">2</span>],<span style="color:#f67400;">2'd0</span>};
+		     load &lt;= <span style="color:#f67400;">1'b0</span>;
+		     store &lt;= <span style="color:#f67400;">1'b1</span>;
+<span style="color:#27ae60;">`ifdef OR1200_VERBOSE		     </span>
+		     <span style="color:#2980b9;">$display</span>(<span style="color:#f44f4f;">&quot;%t: dcache miss and dirty&quot;</span>, <span style="color:#2980b9;">$time</span>);
+<span style="color:#27ae60;">`endif</span>
+		  <span style="font-weight:bold;">end</span>
+		  <span style="color:#7a7c7d;">//  2) load requested line</span>
+		  <span style="font-weight:bold;">else</span> <span style="font-weight:bold;">begin</span>
+		     addr_r &lt;=  lsu_addr;
+		     load &lt;= <span style="color:#f67400;">1'b1</span>;
+		     store &lt;= <span style="color:#f67400;">1'b0</span>;
+		  <span style="font-weight:bold;">end</span> <span style="color:#7a7c7d;">// else: !if(dirty)</span>
+		  state &lt;= <span style="color:#27ae60;">`OR1200_DCFSM_LOOP2</span>;		  
+		  <span style="color:#7a7c7d;">// Set the counter for the burst accesses</span>
+		  cnt &lt;=  ((<span style="color:#f67400;">1</span> &lt;&lt; <span style="color:#27ae60;">`OR1200_DCLS</span>) - <span style="color:#f67400;">4</span>);
+	       <span style="font-weight:bold;">end</span>
+             <span style="font-weight:bold;">else</span> <span style="font-weight:bold;">if</span> (<span style="color:#7a7c7d;">// Strobe goes low</span>
+		      !dcqmem_cycstb_i |
+		      <span style="color:#7a7c7d;">// Cycle finishes</span>
+		      (!hitmiss_eval &amp; (biudata_valid | biudata_error)) |
+		      <span style="color:#7a7c7d;">// Cache hit in first cycle....</span>
+		      (hitmiss_eval &amp; !tagcomp_miss &amp; !dcqmem_ci_i &amp;
+		      <span style="color:#7a7c7d;">// .. and you're not doing a writethrough store..</span>
+		      !(store &amp; writethrough))) <span style="font-weight:bold;">begin</span>
+                state &lt;=  <span style="color:#27ae60;">`OR1200_DCFSM_IDLE</span>;
+                load &lt;=  <span style="color:#f67400;">1'b0</span>;
+		store &lt;= <span style="color:#f67400;">1'b0</span>;
+		cache_inhibit &lt;= <span style="color:#f67400;">1'b0</span>;
+		cache_dirty_needs_writeback &lt;= <span style="color:#f67400;">1'b0</span>;
+             <span style="font-weight:bold;">end</span>	     
+          <span style="font-weight:bold;">end</span> <span style="color:#7a7c7d;">// case: `OR1200_DCFSM_CLOADSTORE	  </span>
+	  
+          <span style="color:#27ae60;">`OR1200_DCFSM_LOOP2</span> : <span style="font-weight:bold;">begin</span> <span style="color:#7a7c7d;">// loop/abort	     </span>
+             <span style="font-weight:bold;">if</span> (!dc_en| biudata_error) <span style="font-weight:bold;">begin</span>
+                state &lt;=  <span style="color:#27ae60;">`OR1200_DCFSM_IDLE</span>;
+                load &lt;=  <span style="color:#f67400;">1'b0</span>;
+		store &lt;= <span style="color:#f67400;">1'b0</span>;
+		cnt &lt;= <span style="color:#27ae60;">`OR1200_DCLS</span><span style="color:#f67400;">'d0</span>;
+             <span style="font-weight:bold;">end</span>
+             <span style="font-weight:bold;">if</span> (biudata_valid &amp; (|cnt)) <span style="font-weight:bold;">begin</span>
+                cnt &lt;=  cnt - <span style="color:#f67400;">4</span>;
+                addr_r[<span style="color:#27ae60;">`OR1200_DCLS</span>-<span style="color:#f67400;">1</span>:<span style="color:#f67400;">2</span>] &lt;=  addr_r[<span style="color:#27ae60;">`OR1200_DCLS</span>-<span style="color:#f67400;">1</span>:<span style="color:#f67400;">2</span>] + <span style="color:#f67400;">1</span>;
+             <span style="font-weight:bold;">end</span>
+	     <span style="font-weight:bold;">else</span> <span style="font-weight:bold;">if</span> (biudata_valid &amp; !(|cnt)) <span style="font-weight:bold;">begin</span>
+		state &lt;= <span style="color:#27ae60;">`OR1200_DCFSM_LOOP3</span>;
+		addr_r &lt;=  lsu_addr;
+		load &lt;= <span style="color:#f67400;">1'b0</span>;
+		store &lt;= <span style="color:#f67400;">1'b0</span>;
+	     <span style="font-weight:bold;">end</span>
+
+	     <span style="color:#7a7c7d;">// Track if we did an early ack during a load</span>
+	     <span style="font-weight:bold;">if</span> (load_miss_ack)
+	       did_early_load_ack &lt;= <span style="color:#f67400;">1'b1</span>;
+	     
+
+          <span style="font-weight:bold;">end</span> <span style="color:#7a7c7d;">// case: `OR1200_DCFSM_LOOP2</span>
+	  
+	  <span style="color:#27ae60;">`OR1200_DCFSM_LOOP3</span>: <span style="font-weight:bold;">begin</span> <span style="color:#7a7c7d;">// figure out next step</span>
+	     <span style="font-weight:bold;">if</span> (cache_dirty_needs_writeback) <span style="font-weight:bold;">begin</span>
+		<span style="color:#7a7c7d;">// Just did store of the dirty line so now load new one</span>
+		load &lt;= <span style="color:#f67400;">1'b1</span>;
+		<span style="color:#7a7c7d;">// Set the counter for the burst accesses</span>
+		cnt &lt;=  ((<span style="color:#f67400;">1</span> &lt;&lt; <span style="color:#27ae60;">`OR1200_DCLS</span>) - <span style="color:#f67400;">4</span>);
+		<span style="color:#7a7c7d;">// Address of line to be loaded</span>
+		addr_r &lt;=  lsu_addr;
+		cache_dirty_needs_writeback &lt;= <span style="color:#f67400;">1'b0</span>;
+		state &lt;= <span style="color:#27ae60;">`OR1200_DCFSM_LOOP2</span>;
+	     <span style="font-weight:bold;">end</span> <span style="color:#7a7c7d;">// if (cache_dirty_needs_writeback)</span>
+	     <span style="font-weight:bold;">else</span> <span style="font-weight:bold;">if</span> (cache_spr_block_flush | cache_spr_block_writeback) <span style="font-weight:bold;">begin</span>
+		<span style="color:#7a7c7d;">// Just wrote back the line to memory, we're finished.</span>
+		cache_spr_block_flush &lt;= <span style="color:#f67400;">1'b0</span>;
+		cache_spr_block_writeback &lt;= <span style="color:#f67400;">1'b0</span>;
+		state &lt;= <span style="color:#27ae60;">`OR1200_DCFSM_WAITSPRCS7</span>;
+	     <span style="font-weight:bold;">end</span>
+	     <span style="font-weight:bold;">else</span> <span style="font-weight:bold;">begin</span>
+		<span style="color:#7a7c7d;">// Just loaded a new line, finish up</span>
+		did_early_load_ack &lt;= <span style="color:#f67400;">1'b0</span>;
+		state &lt;= <span style="color:#27ae60;">`OR1200_DCFSM_LOOP4</span>;
+	     <span style="font-weight:bold;">end</span>
+	  <span style="font-weight:bold;">end</span> <span style="color:#7a7c7d;">// case: `OR1200_DCFSM_LOOP3</span>
+
+	  <span style="color:#27ae60;">`OR1200_DCFSM_LOOP4</span>: <span style="font-weight:bold;">begin</span>
+	     state &lt;=  <span style="color:#27ae60;">`OR1200_DCFSM_IDLE</span>;
+	  <span style="font-weight:bold;">end</span>
+
+	  <span style="color:#27ae60;">`OR1200_DCFSM_FLUSH5</span>: <span style="font-weight:bold;">begin</span>
+	     hitmiss_eval &lt;= <span style="color:#f67400;">1'b0</span>;
+	     <span style="font-weight:bold;">if</span> (hitmiss_eval &amp; !tag_v)
+	       <span style="font-weight:bold;">begin</span>
+		  <span style="color:#7a7c7d;">// Not even cached, just ignore</span>
+		  cache_spr_block_flush &lt;= <span style="color:#f67400;">1'b0</span>;
+		  cache_spr_block_writeback &lt;= <span style="color:#f67400;">1'b0</span>;
+		  state &lt;=  <span style="color:#27ae60;">`OR1200_DCFSM_WAITSPRCS7</span>;
+	       <span style="font-weight:bold;">end</span>
+	     <span style="font-weight:bold;">else</span> <span style="font-weight:bold;">if</span> (hitmiss_eval &amp; tag_v)
+	       <span style="font-weight:bold;">begin</span>
+		  <span style="color:#7a7c7d;">// Tag is valid - what do we do?</span>
+		  <span style="font-weight:bold;">if</span> ((cache_spr_block_flush | cache_spr_block_writeback) &amp; 
+		      dirty) <span style="font-weight:bold;">begin</span>
+		     <span style="color:#7a7c7d;">// Need to writeback</span>
+		     <span style="color:#7a7c7d;">// Address for writeback (spr_dat_i has already changed so</span>
+		     <span style="color:#7a7c7d;">// use line number from addr_r)</span>
+		     addr_r &lt;=  {tag, addr_r[<span style="color:#27ae60;">`OR1200_DCINDXH</span>:<span style="color:#f67400;">2</span>],<span style="color:#f67400;">2'd0</span>};
+		     load &lt;= <span style="color:#f67400;">1'b0</span>;
+		     store &lt;= <span style="color:#f67400;">1'b1</span>;
+<span style="color:#27ae60;">`ifdef OR1200_VERBOSE		     </span>
+		     <span style="color:#2980b9;">$display</span>(<span style="color:#f44f4f;">&quot;%t: block flush: dirty block&quot;</span>, <span style="color:#2980b9;">$time</span>);
+<span style="color:#27ae60;">`endif</span>
+		     state &lt;= <span style="color:#27ae60;">`OR1200_DCFSM_LOOP2</span>;		  
+		     <span style="color:#7a7c7d;">// Set the counter for the burst accesses</span>
+		     cnt &lt;=  ((<span style="color:#f67400;">1</span> &lt;&lt; <span style="color:#27ae60;">`OR1200_DCLS</span>) - <span style="color:#f67400;">4</span>);
+		  <span style="font-weight:bold;">end</span>
+		  <span style="font-weight:bold;">else</span> <span style="font-weight:bold;">if</span> (cache_spr_block_flush &amp; !dirty)
+		    <span style="font-weight:bold;">begin</span>
+		       <span style="color:#7a7c7d;">// Line not dirty, just need to invalidate</span>
+		       state &lt;=  <span style="color:#27ae60;">`OR1200_DCFSM_INV6</span>;
+		    <span style="font-weight:bold;">end</span> <span style="color:#7a7c7d;">// else: !if(dirty)</span>
+		  <span style="font-weight:bold;">else</span> <span style="font-weight:bold;">if</span> (cache_spr_block_writeback &amp; !dirty)
+		    <span style="font-weight:bold;">begin</span>
+		       <span style="color:#7a7c7d;">// Nothing to do - line is valid but not dirty</span>
+		       cache_spr_block_writeback &lt;= <span style="color:#f67400;">1'b0</span>;
+		       state &lt;=  <span style="color:#27ae60;">`OR1200_DCFSM_WAITSPRCS7</span>;
+		    <span style="font-weight:bold;">end</span>
+	  <span style="font-weight:bold;">end</span> <span style="color:#7a7c7d;">// if (hitmiss_eval &amp; tag_v)</span>
+	  <span style="font-weight:bold;">end</span>
+	  <span style="color:#27ae60;">`OR1200_DCFSM_INV6</span>: <span style="font-weight:bold;">begin</span>
+	     cache_spr_block_flush &lt;= <span style="color:#f67400;">1'b0</span>;
+	     <span style="color:#7a7c7d;">// Wait until SPR CS goes low before going back to idle</span>
+	     <span style="font-weight:bold;">if</span> (!spr_cswe)
+	       state &lt;=  <span style="color:#27ae60;">`OR1200_DCFSM_IDLE</span>;
+	  <span style="font-weight:bold;">end</span>
+	  <span style="color:#27ae60;">`OR1200_DCFSM_WAITSPRCS7</span>: <span style="font-weight:bold;">begin</span>
+	     <span style="color:#7a7c7d;">// Wait until SPR CS goes low before going back to idle</span>
+	     <span style="font-weight:bold;">if</span> (!spr_cswe)
+	       state &lt;=  <span style="color:#27ae60;">`OR1200_DCFSM_IDLE</span>;
+	  <span style="font-weight:bold;">end</span>
+
+	<span style="font-weight:bold;">endcase</span> <span style="color:#7a7c7d;">// case (state)</span>
+      
+   <span style="font-weight:bold;">end</span> <span style="color:#7a7c7d;">// always @ (posedge clk or `OR1200_RST_EVENT rst)</span>
+   
+
+<span style="font-weight:bold;">endmodule</span>
+</pre></body></html>

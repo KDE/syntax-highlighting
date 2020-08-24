@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>test.zsh</title>
+<meta name="generator" content="KF5::SyntaxHighlighting (Zsh)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="color:#7a7c7d;"># bug #380229</span>
+<span style="color:#27ae60;">${str:$((${#a[1]}</span>+1<span style="color:#27ae60;">))}</span>
+
+<span style="color:#7a7c7d;"># from http://zshwiki.org/home/examples/hardstatus</span>
+<span style="font-weight:bold;">function</span><span style="color:#8e44ad;"> title</span> <span style="font-weight:bold;">{</span>
+  <span style="font-weight:bold;">if [[</span> <span style="color:#27ae60;">$TERM</span> <span style="color:#27ae60;">==</span> <span style="color:#f44f4f;">&quot;screen&quot;</span><span style="font-weight:bold;"> ]]</span>; <span style="font-weight:bold;">then</span>
+    <span style="color:#7a7c7d;"># Use these two for GNU Screen:</span>
+    <span style="color:#880088;font-weight:bold;">print</span> -nR <span style="color:#f44f4f;">$'</span><span style="color:#2980b9;">\033</span><span style="color:#f44f4f;">k'</span><span style="color:#27ae60;">$1</span><span style="color:#f44f4f;">$'</span><span style="color:#2980b9;">\033</span><span style="color:#f44f4f;">'</span><span style="color:#2980b9;">\\</span>
+
+    <span style="color:#880088;font-weight:bold;">print</span> -nR <span style="color:#f44f4f;">$'</span><span style="color:#2980b9;">\033</span><span style="color:#f44f4f;">]0;'</span><span style="color:#27ae60;">$2</span><span style="color:#f44f4f;">$'</span><span style="color:#2980b9;">\a</span><span style="color:#f44f4f;">'</span>
+  <span style="font-weight:bold;">elif [[</span> <span style="color:#27ae60;">$TERM</span> <span style="color:#27ae60;">==</span> <span style="color:#f44f4f;">&quot;xterm&quot;</span> || <span style="color:#27ae60;">$TERM</span> <span style="color:#27ae60;">==</span> <span style="color:#f44f4f;">&quot;rxvt&quot;</span><span style="font-weight:bold;"> ]]</span>; <span style="font-weight:bold;">then</span>
+    <span style="color:#7a7c7d;"># Use this one instead for XTerms:</span>
+    <span style="color:#880088;font-weight:bold;">print</span> -nR <span style="color:#f44f4f;">$'</span><span style="color:#2980b9;">\033</span><span style="color:#f44f4f;">]0;'</span><span style="color:#27ae60;">$*</span><span style="color:#f44f4f;">$'</span><span style="color:#2980b9;">\a</span><span style="color:#f44f4f;">'</span>
+  <span style="font-weight:bold;">fi</span>
+<span style="font-weight:bold;">}</span>
+
+<span style="font-weight:bold;">function</span><span style="color:#8e44ad;"> precmd</span> <span style="font-weight:bold;">{</span>
+  title <span style="color:#cc00cc;font-weight:bold;">zsh</span> <span style="color:#f44f4f;">&quot;</span><span style="color:#27ae60;">$PWD</span><span style="color:#f44f4f;">&quot;</span>
+<span style="font-weight:bold;">}</span>
+
+<span style="font-weight:bold;">function</span><span style="color:#8e44ad;"> preexec</span> <span style="font-weight:bold;">{</span>
+  <span style="color:#880088;font-weight:bold;">emulate</span> -L <span style="color:#cc00cc;font-weight:bold;">zsh</span>
+  <span style="color:#880088;font-weight:bold;">local</span> -a <span style="color:#27ae60;">cmd</span>; <span style="color:#27ae60;">cmd=(</span>$<span style="color:#2980b9;">{(z)1}</span><span style="color:#27ae60;">)</span>
+  title <span style="color:#27ae60;">$cmd[1]</span>:t <span style="color:#f44f4f;">&quot;</span><span style="color:#27ae60;">$cmd[2,-1]</span><span style="color:#f44f4f;">&quot;</span>
+<span style="font-weight:bold;">}</span>
+
+caption always <span style="color:#f44f4f;">&quot;%3n %t%? (%u)%?%?: %h%?&quot;</span>
+
+<span style="color:#8e44ad;">preexec()</span> <span style="font-weight:bold;">{</span>
+  <span style="color:#880088;font-weight:bold;">emulate</span> -L <span style="color:#cc00cc;font-weight:bold;">zsh</span>
+  <span style="color:#880088;font-weight:bold;">local</span> -a <span style="color:#27ae60;">cmd</span>; <span style="color:#27ae60;">cmd=(</span>$<span style="color:#2980b9;">{(z)1}</span><span style="color:#27ae60;">)</span>             <span style="color:#7a7c7d;"># Re-parse the command line</span>
+
+  <span style="color:#7a7c7d;"># Construct a command that will output the desired job number.</span>
+  <span style="font-weight:bold;">case</span> <span style="color:#27ae60;">$cmd[1]</span><span style="font-weight:bold;"> in</span>
+      fg<span style="font-weight:bold;">)</span>
+        <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">((</span> <span style="color:#27ae60;">$#</span>cmd == 1 <span style="font-weight:bold;">))</span>; <span style="font-weight:bold;">then</span>
+          <span style="color:#7a7c7d;"># No arguments, must find the current job</span>
+          <span style="color:#27ae60;">cmd=(</span>builtin jobs -l %+<span style="color:#27ae60;">)</span>
+        <span style="font-weight:bold;">else</span>
+          <span style="color:#7a7c7d;"># Replace the command name, ignore extra args.</span>
+          <span style="color:#27ae60;">cmd=(</span>builtin jobs -l $<span style="color:#2980b9;">{(Q)cmd[2]}</span><span style="color:#27ae60;">)</span>
+        <span style="font-weight:bold;">fi;;</span>
+       %*<span style="font-weight:bold;">)</span> <span style="color:#27ae60;">cmd=(</span>builtin jobs -l $<span style="color:#2980b9;">{(Q)cmd[1]}</span><span style="color:#27ae60;">)</span><span style="font-weight:bold;">;;</span> <span style="color:#7a7c7d;"># Same as &quot;else&quot; above</span>
+       exec<span style="font-weight:bold;">)</span> <span style="color:#880088;font-weight:bold;">shift</span> cmd;<span style="font-weight:bold;">&amp;</span> <span style="color:#7a7c7d;"># If the command is 'exec', drop that, because</span>
+          <span style="color:#7a7c7d;"># we'd rather just see the command that is being</span>
+          <span style="color:#7a7c7d;"># exec'd. Note the ;&amp; to fall through.</span>
+       *)  title <span style="color:#27ae60;">$cmd[1]</span>:t <span style="color:#f44f4f;">&quot;</span><span style="color:#27ae60;">$cmd[2,-1]</span><span style="color:#f44f4f;">&quot;</span>    <span style="color:#7a7c7d;"># Not resuming a job,</span>
+          <span style="color:#880088;font-weight:bold;">return</span><span style="font-weight:bold;">;;</span>                        <span style="color:#7a7c7d;"># so we're all done</span>
+      <span style="font-weight:bold;">esac</span>
+
+  <span style="color:#880088;font-weight:bold;">local</span> -A <span style="color:#27ae60;">jt</span>; <span style="color:#27ae60;">jt=(</span>$<span style="color:#2980b9;">{(kv)jobtexts}</span><span style="color:#27ae60;">)</span>       <span style="color:#7a7c7d;"># Copy jobtexts for subshell</span>
+
+  <span style="color:#7a7c7d;"># Run the command, read its output, and look up the jobtext.</span>
+  <span style="color:#7a7c7d;"># Could parse $rest here, but $jobtexts (via $jt) is easier.</span>
+  <span style="color:#27ae60;">$cmd</span> <span style="color:#223388;font-weight:bold;">&gt;&gt;</span><span style="font-weight:bold;">(</span><span style="color:#880088;font-weight:bold;">read</span> <span style="color:#27ae60;">num</span> <span style="color:#27ae60;">rest</span>
+          <span style="color:#27ae60;">cmd=(</span>$<span style="color:#2980b9;">{(z)${(e):-\$jt$num}}</span><span style="color:#27ae60;">)</span>
+          title <span style="color:#27ae60;">$cmd[1]</span>:t <span style="color:#f44f4f;">&quot;</span><span style="color:#27ae60;">$cmd[2,-1]</span><span style="color:#f44f4f;">&quot;</span><span style="font-weight:bold;">)</span> <span style="color:#223388;font-weight:bold;">2&gt;</span>/dev/null
+<span style="font-weight:bold;">}</span>
+
+<span style="font-weight:bold;">function</span><span style="color:#8e44ad;"> precmd()</span> <span style="font-weight:bold;">{</span>
+  title <span style="color:#cc00cc;font-weight:bold;">zsh</span> <span style="color:#f44f4f;">&quot;</span><span style="color:#27ae60;">$IDENTITY</span><span style="color:#f44f4f;">:</span><span style="color:#27ae60;">$(</span><span style="color:#880088;font-weight:bold;">print</span> -P %~<span style="color:#27ae60;">)</span><span style="color:#f44f4f;">&quot;</span>
+<span style="font-weight:bold;">}</span>
+
+<span style="color:#f44f4f;">&quot;%{^[]0;screen ^En (^Et) ^G%}&quot;</span>
+
+<span style="color:#880088;font-weight:bold;">print</span> -nRP <span style="color:#f44f4f;">$'</span><span style="color:#2980b9;">\033</span><span style="color:#f44f4f;">k%(!.#\[.)'</span><span style="color:#27ae60;">$1</span><span style="color:#f44f4f;">$'%'</span>$<span style="color:#2980b9;">\(\(</span>20\-$<span style="color:#2980b9;">{#1}\)\)</span><span style="color:#f44f4f;">$'&lt; ..&lt;'</span>$<span style="color:#2980b9;">{${2:+${${${@[${#${@}}]##/*/}</span>/#/ }:-}}//<span style="color:#2980b9;">\&quot;</span>/}<span style="color:#f44f4f;">$'%(!.\].)</span><span style="color:#2980b9;">\033</span><span style="color:#f44f4f;">'</span><span style="color:#2980b9;">\\</span>
+</pre></body></html>

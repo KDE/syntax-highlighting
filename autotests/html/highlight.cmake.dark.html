@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>highlight.cmake</title>
+<meta name="generator" content="KF5::SyntaxHighlighting (CMake)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="color:#7a7c7d;"># This CMakeLists.txt doesn't do anything useful,</span>
+<span style="color:#7a7c7d;"># but it shoudl demonstrate the cmake syntax highlighting</span>
+<span style="color:#7a7c7d;">#</span>
+<span style="color:#7a7c7d;"># Alex Turbov &lt;i.zaufi@gmail.com&gt;</span>
+<span style="color:#7a7c7d;">#</span>
+
+<span style="color:#2980b9;background-color:#153042;">#[[.rst:</span>
+<span style="color:#7a7c7d;">Demo</span>
+<span style="color:#7a7c7d;">----</span>
+
+<span style="color:#7a7c7d;">This is an </span><span style="font-weight:bold;">**RST**</span><span style="color:#7a7c7d;"> documentation.</span>
+
+<span style="color:#2980b9;">::</span>
+
+<span style="color:#2980b9;">    # Sample code block</span>
+<span style="color:#2980b9;">    blah-blah</span>
+
+<span style="color:#7a7c7d;">But we are about to test CMake here ;-)</span>
+
+<span style="color:#2980b9;background-color:#153042;">#]]</span>
+
+<span style="font-weight:bold;">cmake_policy</span>(<span style="color:#27ae60;">VERSION</span> 3.11)
+
+<span style="font-weight:bold;">project</span>(
+    Demo <span style="color:#27ae60;">VERSION</span> 1.0
+    <span style="color:#27ae60;">DESCRIPTION</span> <span style="color:#f44f4f;">&quot;For unit testing purposes&quot;</span>
+    <span style="color:#7a7c7d;"># </span><span style="color:#81ca2d;background-color:#4d1f24;font-weight:bold;">NOTE</span><span style="color:#7a7c7d;"> that particular languages is a separate style</span>
+    <span style="color:#7a7c7d;"># to highlight &quot;special&quot; (well known values)</span>
+    <span style="color:#27ae60;">LANGUAGES</span> <span style="color:#27ae60;">C</span> <span style="color:#27ae60;">CXX</span>
+  )
+
+<span style="font-weight:bold;">set</span>(SOME_TRUE_OPTION <span style="color:#30a030;">TRUE</span>)      <span style="color:#7a7c7d;"># `true` value</span>
+<span style="color:#7a7c7d;"># `false` value and &quot;internal&quot; variable</span>
+<span style="font-weight:bold;">set</span>(<span style="color:#303030;">_ANOTHER_FALSE_OPTION</span> <span style="color:#e05050;">OFF</span> <span style="color:#27ae60;">CACHE</span> <span style="color:#27ae60;">INTERNAL</span> <span style="color:#f44f4f;">&quot;Internal option&quot;</span>)
+
+<span style="color:#7a7c7d;">#BEGIN Message block</span>
+<span style="font-weight:bold;">message</span>(<span style="color:#27ae60;">FATAL_ERROR</span> <span style="color:#f44f4f;">&quot;Ordinal message do </span><span style="color:#f67400;">${VARIABLE_EXPANSION}</span><span style="color:#f44f4f;">&quot;</span>)
+<span style="font-weight:bold;">message</span>(<span style="color:#27ae60;">AUTHOR_WARNING</span> <span style="color:#f44f4f;">&quot;... standard variables have a dedicated style&quot;</span>)
+<span style="font-weight:bold;">message</span>(<span style="color:#27ae60;">SEND_ERROR</span> <span style="color:#f44f4f;">&quot;e.g. </span><span style="color:#f67400;">${</span><span style="color:#c09050;">PROJECT_DESCRIPTION</span><span style="color:#f67400;">}</span><span style="color:#f44f4f;"> or </span><span style="color:#f67400;">${</span><span style="color:#c09050;">CMAKE_COMMAND</span><span style="color:#f67400;">}</span><span style="color:#f44f4f;">&quot;</span>)
+<span style="font-weight:bold;">message</span>(
+    <span style="color:#27ae60;">STATUS</span> <span style="color:#f44f4f;">[=[</span>
+<span style="color:#f44f4f;">        Raw messages do not do ${VARIABLES_EXPANSION} or \n</span>
+<span style="color:#f44f4f;">        escape symbols highlighting...</span>
+<span style="color:#f44f4f;">    ]=]</span>
+)
+<span style="color:#7a7c7d;">#END Message block</span>
+
+<span style="color:#7a7c7d;"># </span><span style="color:#e85848;background-color:#451e1a;font-weight:bold;">ATTENTION</span><span style="color:#7a7c7d;"> Every command highlight only its own named keywords...</span>
+<span style="color:#7a7c7d;"># Also, note aliased (most of the time imported) targets higlighted as well</span>
+<span style="font-weight:bold;">add_library</span>(<span style="color:#f67400;">Foo::foo</span> <span style="color:#27ae60;">IMPORTED</span> <span style="color:#27ae60;">GLOBAL</span>)
+<span style="font-weight:bold;">set</span>(KW_HL IMPORTED GLOBAL)      <span style="color:#7a7c7d;"># `IMPORTED` and `GLOBAL` are not highlighted here!</span>
+
+<span style="color:#7a7c7d;"># Properties are separate (&quot;special value&quot;) style</span>
+<span style="font-weight:bold;">set_target_properties</span>(<span style="color:#f67400;">Foo::foo</span> <span style="color:#27ae60;">PROPERTIES</span> <span style="color:#27ae60;">LOCATION</span> <span style="color:#f44f4f;">&quot;</span><span style="color:#f67400;">${FOO_LIBRARY}</span><span style="color:#f44f4f;">&quot;</span>)
+
+<span style="color:#7a7c7d;"># Generator expressions</span>
+<span style="font-weight:bold;">target_compile_definitions</span>(
+    <span style="color:#7a7c7d;"># </span><span style="color:#81ca2d;background-color:#4d1f24;font-weight:bold;">NOTE</span><span style="color:#7a7c7d;"> Ok w/ CMake &gt;= 3.11</span>
+    <span style="color:#f67400;">Foo::foo</span>
+    <span style="color:#b86050;">$&lt;$&lt;</span><span style="color:#b84040;font-weight:bold;">PLATFORM_ID</span><span style="color:#b86050;">:Windows&gt;:WINDOWS_FOO&gt;</span>
+    <span style="color:#b86050;">$&lt;$&lt;</span><span style="color:#b84040;font-weight:bold;">PLATFORM_ID</span><span style="color:#b86050;">:Linux&gt;:</span>
+<span style="color:#b86050;">        LINUX_FOO</span>
+<span style="color:#b86050;">        $&lt;$&lt;</span><span style="color:#b84040;font-weight:bold;">BOOL</span><span style="color:#b86050;">:</span><span style="color:#f67400;">${</span><span style="color:#303030;">_has_foo</span><span style="color:#f67400;">}</span><span style="color:#b86050;">&gt;:SOME_FOO_PATH=</span><span style="color:#f67400;">${</span><span style="color:#c09050;">PROJECT_BINARY_DIR</span><span style="color:#f67400;">}</span><span style="color:#b86050;">/foo&gt;</span>
+<span style="color:#b86050;">    &gt;</span>
+  )
+
+<span style="color:#2980b9;background-color:#153042;">#[=======================================================================[.rst:</span>
+<span style="color:#2980b9;">.. cmake:command:: </span><span style="color:#7a7c7d;">my_fun</span>
+
+<span style="font-style:italic;">*RST*</span><span style="color:#7a7c7d;"> documentation </span><span style="color:#2980b9;">``can``</span><span style="color:#7a7c7d;"> refer to </span><span style="font-weight:bold;">:cmake:command:</span><span style="color:#f67400;">`any_commands`</span><span style="color:#7a7c7d;"> or</span>
+<span style="font-weight:bold;">:cmake:variable:</span><span style="color:#f67400;">`variables`</span><span style="color:#7a7c7d;">...</span>
+
+<span style="color:#2980b9;">.. code-block:: cmake</span>
+<span style="color:#2980b9;">   :caption: **Synopsys**</span>
+
+<span style="color:#2980b9;">    my_fun([ANYTHING...])</span>
+
+<span style="color:#2980b9;background-color:#153042;">#]=======================================================================]</span>
+<span style="font-weight:bold;">function</span>(my_fun)
+    <span style="color:#7a7c7d;"># </span><span style="color:#ca9219;background-color:#451e1a;font-weight:bold;">TODO</span><span style="color:#7a7c7d;"> Add implementation</span>
+<span style="font-weight:bold;">endfunction</span>()
+
+<span style="color:#8e44ad;">my_fun</span>(
+    <span style="color:#7a7c7d;"># Custom functions do not highlight &quot;standard&quot; named args ...</span>
+    PUBLIC LOCATION PARENT_SCOPE
+    <span style="color:#7a7c7d;"># only some well-known values ...</span>
+    <span style="color:#e05050;">smth-NOTFOUND</span> <span style="color:#30a030;">ON</span>
+    <span style="color:#7a7c7d;"># and standard variables</span>
+    <span style="color:#c09050;">PROJECT_VERSION</span>
+    <span style="color:#7a7c7d;"># or substitutions</span>
+    <span style="color:#f67400;">$ENV{HOME}</span> OR <span style="color:#f67400;">${</span><span style="color:#303030;">_internal_var_is_grey</span><span style="color:#f67400;">}</span>
+  )
+
+<span style="color:#7a7c7d;"># I dont'recall exactly, but there was some bug with `if`...</span>
+<span style="font-weight:bold;">if</span>((A <span style="color:#27ae60;">AND</span> <span style="color:#f44f4f;">&quot;</span><span style="color:#f67400;">${B}</span><span style="color:#f44f4f;">&quot;</span>) <span style="color:#27ae60;">OR</span> C <span style="color:#27ae60;">OR</span> (var <span style="color:#27ae60;">MATCHES</span> <span style="color:#f44f4f;">&quot;regex&quot;</span>))
+    <span style="color:#7a7c7d;"># Anyway... it is Ok nowadays ;-)</span>
+
+<span style="font-weight:bold;">elseif</span>(<span style="color:#27ae60;">POLICY</span> <span style="color:#27ae60;">CMP066</span>)
+    <span style="font-weight:bold;">add_executable</span>(<span style="color:#f67400;">${</span><span style="color:#c09050;">PROJECT_NAME</span><span style="color:#f67400;">}</span> <span style="color:#f67400;">${</span><span style="color:#c09050;">PROJECT_NAME</span><span style="color:#f67400;">}</span>.cc)
+    <span style="font-weight:bold;">target_link_libraries</span>(
+        <span style="color:#f67400;">${</span><span style="color:#c09050;">PROJECT_NAME</span><span style="color:#f67400;">}</span>
+        <span style="color:#27ae60;">PRIVATE</span>
+            <span style="color:#f67400;">Qt5::Core</span>
+            <span style="color:#b86050;">$&lt;$&lt;</span><span style="color:#b84040;font-weight:bold;">BOOL</span><span style="color:#b86050;">:</span><span style="color:#f67400;">${HAS_FOO}</span><span style="color:#b86050;">&gt;:</span><span style="color:#f67400;">Foo::foo</span><span style="color:#b86050;">&gt;</span>
+      )
+
+<span style="font-weight:bold;">endif</span>()
+
+<span style="color:#7a7c7d;"># In each function call below, all 3 named parameter lines should apply the same highlighting.</span>
+<span style="font-weight:bold;">add_custom_command</span>(
+    <span style="color:#27ae60;">COMMAND</span> true
+    <span style="color:#27ae60;">COMMAND</span> (true)
+    <span style="color:#27ae60;">COMMAND</span> true
+)
+<span style="font-weight:bold;">add_custom_target</span>(TargetName
+    <span style="color:#27ae60;">WORKING_DIRECTORY</span> somedir
+    <span style="color:#27ae60;">COMMAND</span> (true)
+    <span style="color:#27ae60;">BYPRODUCTS</span> somefile
+)
+<span style="font-weight:bold;">execute_process</span>(
+    <span style="color:#27ae60;">COMMAND</span> true
+    <span style="color:#27ae60;">COMMAND</span> (true)
+    <span style="color:#27ae60;">COMMAND</span> true
+)
+<span style="font-weight:bold;">add_test</span>(
+    <span style="color:#27ae60;">NAME</span> sometest
+    <span style="color:#27ae60;">COMMAND</span> (true)
+    <span style="color:#27ae60;">WORKING_DIRECTORY</span> somedir
+)
+</pre></body></html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>mandelbrot.pony</title>
+<meta name="generator" content="KF5::SyntaxHighlighting (Pony)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="font-weight:bold;">use</span> <span style="color:#f44f4f;">&quot;cli&quot;</span>
+<span style="font-weight:bold;">use</span> <span style="color:#f44f4f;">&quot;collections&quot;</span>
+<span style="font-weight:bold;">use</span> <span style="color:#f44f4f;">&quot;files&quot;</span>
+
+<span style="font-weight:bold;">actor</span> <span style="color:#2980b9;">Worker</span>
+  <span style="font-weight:bold;">new</span> <span style="color:#8e44ad;">mandelbrot</span>(main: <span style="color:#2980b9;">Main</span>, x: <span style="color:#2980b9;">USize</span>, y: <span style="color:#2980b9;">USize</span>, width: <span style="color:#2980b9;">USize</span>,
+    iterations: <span style="color:#2980b9;">USize</span>, limit: <span style="color:#2980b9;">F32</span>, real: <span style="color:#2980b9;">Array</span>[<span style="color:#2980b9;">F32</span>] <span style="color:#2980b9;font-style:italic;">val</span>,
+    imaginary: <span style="color:#2980b9;">Array</span>[<span style="color:#2980b9;">F32</span>] <span style="color:#2980b9;font-style:italic;">val</span>)
+  =&gt;
+    <span style="font-weight:bold;">var</span> view: <span style="color:#2980b9;">Array</span>[<span style="color:#2980b9;">U8</span>] <span style="color:#2980b9;font-style:italic;">iso</span> =
+      <span style="color:#fdbc4b;font-weight:bold;">recover</span>
+        <span style="color:#2980b9;">Array</span>[<span style="color:#2980b9;">U8</span>]((y - x) * (width &gt;&gt; <span style="color:#f67400;">3</span>))
+      <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+    <span style="font-weight:bold;">let</span> group_r = <span style="color:#2980b9;">Array</span>[<span style="color:#2980b9;">F32</span>].&gt;undefined(<span style="color:#f67400;">8</span>)
+    <span style="font-weight:bold;">let</span> group_i = <span style="color:#2980b9;">Array</span>[<span style="color:#2980b9;">F32</span>].&gt;undefined(<span style="color:#f67400;">8</span>)
+
+    <span style="font-weight:bold;">var</span> row = x
+
+    <span style="color:#fdbc4b;font-weight:bold;">try</span>
+      <span style="color:#fdbc4b;font-weight:bold;">while</span> row &lt; y <span style="color:#fdbc4b;font-weight:bold;">do</span>
+        <span style="font-weight:bold;">let</span> prefetch_i = imaginary(row)?
+
+        <span style="font-weight:bold;">var</span> col: <span style="color:#2980b9;">USize</span> = <span style="color:#f67400;">0</span>
+
+        <span style="color:#fdbc4b;font-weight:bold;">while</span> col &lt; width <span style="color:#fdbc4b;font-weight:bold;">do</span>
+          <span style="font-weight:bold;">var</span> j: <span style="color:#2980b9;">USize</span> = <span style="color:#f67400;">0</span>
+
+          <span style="color:#fdbc4b;font-weight:bold;">while</span> j &lt; <span style="color:#f67400;">8</span> <span style="color:#fdbc4b;font-weight:bold;">do</span>
+            group_r.update(j, real(col + j)?)?
+            group_i.update(j, prefetch_i)?
+            j = j + <span style="color:#f67400;">1</span>
+          <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+          <span style="font-weight:bold;">var</span> bitmap: <span style="color:#2980b9;">U8</span> = <span style="color:#f67400;">0xFF</span>
+          <span style="font-weight:bold;">var</span> n = iterations
+
+          <span style="color:#fdbc4b;font-weight:bold;">repeat</span>
+            <span style="font-weight:bold;">var</span> mask: <span style="color:#2980b9;">U8</span> = <span style="color:#f67400;">0x80</span>
+            <span style="font-weight:bold;">var</span> k: <span style="color:#2980b9;">USize</span> = <span style="color:#f67400;">0</span>
+
+            <span style="color:#fdbc4b;font-weight:bold;">while</span> k &lt; <span style="color:#f67400;">8</span> <span style="color:#fdbc4b;font-weight:bold;">do</span>
+              <span style="font-weight:bold;">let</span> r = group_r(k)?
+              <span style="font-weight:bold;">let</span> i = group_i(k)?
+
+              group_r.update(k, ((r * r) - (i * i)) + real(col + k)?)?
+              group_i.update(k, (<span style="color:#f67400;">2.0</span> * r * i) + prefetch_i)?
+
+              <span style="color:#fdbc4b;font-weight:bold;">if</span> ((r * r) + (i * i)) &gt; limit <span style="color:#fdbc4b;font-weight:bold;">then</span>
+                bitmap = bitmap and not mask
+              <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+              mask = mask &gt;&gt; <span style="color:#f67400;">1</span>
+              k = k + <span style="color:#f67400;">1</span>
+            <span style="color:#fdbc4b;font-weight:bold;">end</span>
+          <span style="color:#fdbc4b;font-weight:bold;">until</span> (bitmap == <span style="color:#f67400;">0</span>) or ((n = n - <span style="color:#f67400;">1</span>) == <span style="color:#f67400;">1</span>) <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+          view.push(bitmap)
+
+          col = col + <span style="color:#f67400;">8</span>
+        <span style="color:#fdbc4b;font-weight:bold;">end</span>
+        row = row + <span style="color:#f67400;">1</span>
+      <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+      main.draw(x * (width &gt;&gt; <span style="color:#f67400;">3</span>), <span style="font-weight:bold;">consume</span> view)
+    <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+<span style="font-weight:bold;">class</span> <span style="color:#2980b9;font-style:italic;">val</span> <span style="color:#2980b9;">Config</span>
+  <span style="font-weight:bold;">let</span> iterations: <span style="color:#2980b9;">USize</span>
+  <span style="font-weight:bold;">let</span> limit: <span style="color:#2980b9;">F32</span>
+  <span style="font-weight:bold;">let</span> chunks: <span style="color:#2980b9;">USize</span>
+  <span style="font-weight:bold;">let</span> width: <span style="color:#2980b9;">USize</span>
+  <span style="font-weight:bold;">let</span> outpath: (<span style="color:#2980b9;">FilePath</span> | <span style="color:#2980b9;">None</span>)
+
+  <span style="font-weight:bold;">new</span> <span style="color:#2980b9;font-style:italic;">val</span> <span style="color:#8e44ad;">create</span>(env: <span style="color:#2980b9;">Env</span>) ? =&gt;
+    <span style="font-weight:bold;">let</span> cs = <span style="color:#2980b9;">CommandSpec</span>.leaf(<span style="color:#f44f4f;">&quot;gups_opt&quot;</span>,
+      <span style="color:#f44f4f;">&quot;&quot;&quot;</span>
+<span style="color:#f44f4f;">      The binary output can be converted to a PNG with the following command</span>
+<span style="color:#f44f4f;">      (ImageMagick Tools required):</span>
+
+<span style="color:#f44f4f;">        convert &lt;output&gt; PNG:&lt;output&gt;.png&quot;&quot;&quot;</span>,
+      [
+      <span style="color:#2980b9;">OptionSpec</span>.i64(<span style="color:#f44f4f;">&quot;iterations&quot;</span>,
+        <span style="color:#f44f4f;">&quot;Maximum amount of iterations to be done for each pixel.&quot;</span>
+        <span style="font-weight:bold;">where</span> short' = <span style="color:#3daee9;">'i'</span>, default' = <span style="color:#f67400;">50</span>)
+      <span style="color:#2980b9;">OptionSpec</span>.f64(<span style="color:#f44f4f;">&quot;limit&quot;</span>,
+        <span style="color:#f44f4f;">&quot;Square of the limit that pixels need to exceed in order to escape from the Mandelbrot set.&quot;</span>
+        <span style="font-weight:bold;">where</span> short' = <span style="color:#3daee9;">'l'</span>, default' = <span style="color:#f67400;">4.0</span>)
+      <span style="color:#2980b9;">OptionSpec</span>.i64(<span style="color:#f44f4f;">&quot;chunks&quot;</span>,
+        <span style="color:#f44f4f;">&quot;Maximum line count of chunks the image should be divided into for divide &amp; conquer processing.&quot;</span>
+        <span style="font-weight:bold;">where</span> short' = <span style="color:#3daee9;">'c'</span>, default' = <span style="color:#f67400;">16</span>)
+      <span style="color:#2980b9;">OptionSpec</span>.i64(<span style="color:#f44f4f;">&quot;width&quot;</span>,
+        <span style="color:#f44f4f;">&quot;Lateral length of the resulting mandelbrot image.&quot;</span>
+        <span style="font-weight:bold;">where</span> short' = <span style="color:#3daee9;">'w'</span>, default' = <span style="color:#f67400;">16000</span>)
+      <span style="color:#2980b9;">OptionSpec</span>.string(<span style="color:#f44f4f;">&quot;output&quot;</span>,
+        <span style="color:#f44f4f;">&quot;File to write the output to.&quot;</span>
+        <span style="font-weight:bold;">where</span> short' = <span style="color:#3daee9;">'o'</span>, default' = <span style="color:#f44f4f;">&quot;&quot;</span>)
+    ])?.&gt;add_help()?
+    <span style="font-weight:bold;">let</span> cmd =
+      <span style="color:#fdbc4b;font-weight:bold;">match</span> <span style="color:#2980b9;">CommandParser</span>(cs).parse(env.args, env.vars)
+      | <span style="font-weight:bold;">let</span> c: <span style="color:#2980b9;">Command</span> =&gt; c
+      | <span style="font-weight:bold;">let</span> ch: <span style="color:#2980b9;">CommandHelp</span> =&gt;
+        ch.print_help(env.out)
+        env.exitcode(<span style="color:#f67400;">0</span>)
+        <span style="color:#fdbc4b;font-weight:bold;">error</span>
+      | <span style="font-weight:bold;">let</span> se: <span style="color:#2980b9;">SyntaxError</span> =&gt;
+        env.out.print(se.string())
+        env.exitcode(<span style="color:#f67400;">1</span>)
+        <span style="color:#fdbc4b;font-weight:bold;">error</span>
+      <span style="color:#fdbc4b;font-weight:bold;">end</span>
+    iterations = cmd.option(<span style="color:#f44f4f;">&quot;iterations&quot;</span>).i64().usize()
+    limit = cmd.option(<span style="color:#f44f4f;">&quot;limit&quot;</span>).f64().f32()
+    chunks = cmd.option(<span style="color:#f44f4f;">&quot;chunks&quot;</span>).i64().usize()
+    width = cmd.option(<span style="color:#f44f4f;">&quot;width&quot;</span>).i64().usize()
+    outpath =
+      <span style="color:#fdbc4b;font-weight:bold;">try</span>
+        <span style="color:#2980b9;">FilePath</span>(env.root <span style="font-weight:bold;">as</span> <span style="color:#2980b9;">AmbientAuth</span>, cmd.option(<span style="color:#f44f4f;">&quot;output&quot;</span>).string())?
+      <span style="color:#fdbc4b;font-weight:bold;">else</span>
+        <span style="color:#2980b9;">None</span>
+      <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+  <span style="font-weight:bold;">new</span> <span style="color:#2980b9;font-style:italic;">val</span> <span style="color:#8e44ad;">none</span>() =&gt;
+    iterations = <span style="color:#f67400;">0</span>
+    limit = <span style="color:#f67400;">0</span>
+    chunks = <span style="color:#f67400;">0</span>
+    width = <span style="color:#f67400;">0</span>
+    outpath = <span style="color:#2980b9;">None</span>
+
+<span style="font-weight:bold;">actor</span> <span style="color:#2980b9;">Main</span>
+  <span style="font-weight:bold;">let</span> c: <span style="color:#2980b9;">Config</span>
+  <span style="font-weight:bold;">var</span> outfile: (<span style="color:#2980b9;">File</span> | <span style="color:#2980b9;">None</span>) = <span style="color:#2980b9;">None</span>
+  <span style="font-weight:bold;">var</span> actors: <span style="color:#2980b9;">USize</span> = <span style="color:#f67400;">0</span>
+  <span style="font-weight:bold;">var</span> header: <span style="color:#2980b9;">USize</span> = <span style="color:#f67400;">0</span>
+  <span style="font-weight:bold;">var</span> real: <span style="color:#2980b9;">Array</span>[<span style="color:#2980b9;">F32</span>] <span style="color:#2980b9;font-style:italic;">val</span> = <span style="color:#fdbc4b;font-weight:bold;">recover</span> <span style="color:#2980b9;">Array</span>[<span style="color:#2980b9;">F32</span>] <span style="color:#fdbc4b;font-weight:bold;">end</span>
+  <span style="font-weight:bold;">var</span> imaginary: <span style="color:#2980b9;">Array</span>[<span style="color:#2980b9;">F32</span>] <span style="color:#2980b9;font-style:italic;">val</span> = <span style="color:#fdbc4b;font-weight:bold;">recover</span> <span style="color:#2980b9;">Array</span>[<span style="color:#2980b9;">F32</span>] <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+  <span style="font-weight:bold;">new</span> <span style="color:#8e44ad;">create</span>(env: <span style="color:#2980b9;">Env</span>) =&gt;
+    <span style="color:#fdbc4b;font-weight:bold;">try</span>
+      c = <span style="color:#2980b9;">Config</span>(env)?
+      outfile =
+        <span style="color:#fdbc4b;font-weight:bold;">match</span> c.outpath
+        | <span style="font-weight:bold;">let</span> fp: <span style="color:#2980b9;">FilePath</span> =&gt; <span style="color:#2980b9;">File</span>(fp)
+        <span style="color:#fdbc4b;font-weight:bold;">else</span>
+          <span style="color:#2980b9;">None</span>
+        <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+      <span style="font-weight:bold;">let</span> length = c.width
+      <span style="font-weight:bold;">let</span> recip_width = <span style="color:#f67400;">2.0</span> / c.width.f32()
+
+      <span style="font-weight:bold;">var</span> r = <span style="color:#fdbc4b;font-weight:bold;">recover</span> <span style="color:#2980b9;">Array</span>[<span style="color:#2980b9;">F32</span>](length) <span style="color:#fdbc4b;font-weight:bold;">end</span>
+      <span style="font-weight:bold;">var</span> i = <span style="color:#fdbc4b;font-weight:bold;">recover</span> <span style="color:#2980b9;">Array</span>[<span style="color:#2980b9;">F32</span>](length) <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+      <span style="color:#fdbc4b;font-weight:bold;">for</span> j <span style="font-weight:bold;">in</span> <span style="color:#2980b9;">Range</span>(<span style="color:#f67400;">0</span>, c.width) <span style="color:#fdbc4b;font-weight:bold;">do</span>
+        r.push((recip_width * j.f32()) - <span style="color:#f67400;">1.5</span>)
+        i.push((recip_width * j.f32()) - <span style="color:#f67400;">1.0</span>)
+      <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+      real = <span style="font-weight:bold;">consume</span> r
+      imaginary = <span style="font-weight:bold;">consume</span> i
+
+      spawn_actors()
+      create_outfile()
+    <span style="color:#fdbc4b;font-weight:bold;">end</span>
+    c = <span style="color:#2980b9;">Config</span>.none()
+
+  <span style="font-weight:bold;">be</span> <span style="color:#8e44ad;">draw</span>(offset: <span style="color:#2980b9;">USize</span>, pixels: <span style="color:#2980b9;">Array</span>[<span style="color:#2980b9;">U8</span>] <span style="color:#2980b9;font-style:italic;">val</span>) =&gt;
+    <span style="color:#fdbc4b;font-weight:bold;">match</span> outfile
+    | <span style="font-weight:bold;">let</span> out: <span style="color:#2980b9;">File</span> =&gt;
+      out.seek_start(header + offset)
+      out.write(pixels)
+      <span style="color:#fdbc4b;font-weight:bold;">if</span> (actors = actors - <span style="color:#f67400;">1</span>) == <span style="color:#f67400;">1</span> <span style="color:#fdbc4b;font-weight:bold;">then</span>
+        out.dispose()
+      <span style="color:#fdbc4b;font-weight:bold;">end</span>
+    <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+  <span style="font-weight:bold;">fun</span> <span style="color:#2980b9;font-style:italic;">ref</span> <span style="color:#8e44ad;">create_outfile</span>() =&gt;
+    <span style="color:#fdbc4b;font-weight:bold;">match</span> outfile
+    | <span style="font-weight:bold;">let</span> f: <span style="color:#2980b9;">File</span> =&gt;
+      f.print(<span style="color:#f44f4f;">&quot;P4</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;"> &quot;</span> + c.width.string() + <span style="color:#f44f4f;">&quot; &quot;</span> + c.width.string() + <span style="color:#f44f4f;">&quot;</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">&quot;</span>)
+      header = f.size()
+      f.set_length((c.width * (c.width &gt;&gt; <span style="color:#f67400;">3</span>)) + header)
+    <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+  <span style="font-weight:bold;">fun</span> <span style="color:#2980b9;font-style:italic;">ref</span> <span style="color:#8e44ad;">spawn_actors</span>() =&gt;
+    actors = ((c.width + (c.chunks - <span style="color:#f67400;">1</span>)) / c.chunks)
+    <span style="font-weight:bold;">var</span> rest = c.width % c.chunks
+    <span style="color:#fdbc4b;font-weight:bold;">if</span> rest == <span style="color:#f67400;">0</span> <span style="color:#fdbc4b;font-weight:bold;">then</span> rest = c.chunks <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+    <span style="font-weight:bold;">var</span> x: <span style="color:#2980b9;">USize</span> = <span style="color:#f67400;">0</span>
+    <span style="font-weight:bold;">var</span> y: <span style="color:#2980b9;">USize</span> = <span style="color:#f67400;">0</span>
+
+    <span style="color:#fdbc4b;font-weight:bold;">for</span> i <span style="font-weight:bold;">in</span> <span style="color:#2980b9;">Range</span>(<span style="color:#f67400;">0</span>, actors - <span style="color:#f67400;">1</span>) <span style="color:#fdbc4b;font-weight:bold;">do</span>
+      x = i * c.chunks
+      y = x + c.chunks
+      <span style="color:#2980b9;">Worker</span>.mandelbrot(<span style="font-weight:bold;">this</span>, x, y, c.width, c.iterations, c.limit, real, imaginary)
+    <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+    <span style="color:#2980b9;">Worker</span>.mandelbrot(<span style="font-weight:bold;">this</span>, y, y + rest, c.width, c.iterations, c.limit, real,
+      imaginary)
+</pre></body></html>

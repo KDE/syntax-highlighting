@@ -88,9 +88,10 @@ void HtmlHighlighter::highlightData(QIODevice *dev, const QString &title)
     *d->out << "<title>" << htmlTitle << "</title>\n";
     *d->out << "<meta name=\"generator\" content=\"KF5::SyntaxHighlighting (" << definition().name() << ")\"/>\n";
     *d->out << "</head><body";
+    *d->out << " style=\"background-color:" << QColor(theme().editorColor(Theme::BackgroundColor)).name();
     if (theme().textColor(Theme::Normal))
-        *d->out << " style=\"color:" << QColor(theme().textColor(Theme::Normal)).name() << "\"";
-    *d->out << "><pre>\n";
+        *d->out << ";color:" << QColor(theme().textColor(Theme::Normal)).name();
+    *d->out << "\"><pre>\n";
 
     QTextStream in(dev);
     in.setCodec("UTF-8");

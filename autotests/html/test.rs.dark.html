@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>test.rs</title>
+<meta name="generator" content="KF5::SyntaxHighlighting (Rust)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="color:#7a7c7d;">// Comment </span><span style="color:#81ca2d;background-color:#4d1f24;font-weight:bold;">NOTE</span>
+<span style="color:#7a7c7d;">/* Comment </span><span style="color:#ca9219;background-color:#451e1a;font-weight:bold;">FIXME</span><span style="color:#7a7c7d;"> </span><span style="color:#e85848;background-color:#451e1a;font-weight:bold;">ALERT</span>
+<span style="color:#7a7c7d;">	*/</span>
+
+<span style="color:#7a7c7d;">// Identifiers</span>
+<span style="color:#27ae60;">hellóñαωΑΩµo!</span>();
+<span style="color:#27ae60;">HellóñαωΑΩµ::</span>Hello;
+<span style="color:#27ae60;">'hellóñαωΑΩµo</span>
+
+<span style="font-weight:bold;">pub</span> <span style="font-weight:bold;">use</span> <span style="font-weight:bold;">self</span><span style="color:#27ae60;">::PathParameters::</span>*;
+<span style="font-weight:bold;">pub</span> <span style="font-weight:bold;">use</span> <span style="color:#27ae60;">symbol::</span>{Ident, Symbol <span style="font-weight:bold;">as</span> Name};
+<span style="font-weight:bold;">use</span> <span style="color:#27ae60;">serialize::</span>{<span style="font-weight:bold;">self</span>, Encoder, Decoder};
+<span style="font-weight:bold;">use</span> <span style="color:#27ae60;">std::</span><span style="color:#2980b9;">u32</span>;
+
+<span style="color:#2980b9;">#[derive(</span><span style="color:#7f8c8d;">Clone</span>,<span style="color:#2980b9;"> </span><span style="color:#7f8c8d;">PartialEq</span>,<span style="color:#2980b9;"> </span><span style="color:#7f8c8d;">Eq</span>,<span style="color:#2980b9;"> </span><span style="color:#7f8c8d;">Hash</span>,<span style="color:#2980b9;"> </span><span style="color:#7f8c8d;">Copy</span><span style="color:#2980b9;">)]</span>
+
+<span style="font-weight:bold;">pub</span> <span style="font-weight:bold;">struct</span> Lifetime {
+	<span style="font-weight:bold;">pub</span> id: NodeId,
+	<span style="font-weight:bold;">pub</span> span: Span,
+	<span style="font-weight:bold;">pub</span> bounds: <span style="color:#2980b9;">Vec</span>&lt;PathSegment&gt;
+}
+
+<span style="font-weight:bold;">impl</span> <span style="color:#27ae60;">fmt::</span><span style="color:#7f8c8d;">Debug</span> <span style="font-weight:bold;">for</span> Lifetime {
+	<span style="font-weight:bold;">fn</span> fmt(&amp;<span style="font-weight:bold;">self</span>, f: &amp;<span style="font-weight:bold;">mut</span> <span style="color:#27ae60;">fmt::</span>Formatter) -&gt; <span style="color:#27ae60;">fmt::</span><span style="color:#2980b9;">Result</span> {
+		<span style="color:#27ae60;">write!</span>(f, <span style="color:#f44f4f;">&quot;lifetime({}: {})&quot;</span>, <span style="font-weight:bold;">self</span>.id, <span style="color:#27ae60;">pprust::</span>lifetime_to_string(<span style="font-weight:bold;">self</span>))
+	}
+}
+<span style="font-weight:bold;">impl</span>&lt;<span style="color:#27ae60;">'a</span>&gt; <span style="color:#7f8c8d;">PartialEq</span>&lt;&amp;<span style="color:#27ae60;">'a</span> <span style="color:#2980b9;">str</span>&gt; <span style="font-weight:bold;">for</span> <span style="color:#2980b9;">Path</span> {
+	<span style="font-weight:bold;">fn</span> eq(&amp;<span style="font-weight:bold;">self</span>, string: &amp;&amp;<span style="color:#27ae60;">'a</span> <span style="color:#2980b9;">str</span>) -&gt; <span style="color:#2980b9;">bool</span> {
+		<span style="font-weight:bold;">self</span>.segments.len() == <span style="color:#f67400;">1</span> &amp;&amp; <span style="font-weight:bold;">self</span>.segments[<span style="color:#f67400;">0</span>].identifier.name == *string
+	}
+}
+
+<span style="font-weight:bold;">enum</span> TraitBoundModifier {
+	<span style="color:#27aeae;font-weight:bold;">None</span>,
+	Maybe,
+}
+
+<span style="font-weight:bold;">union</span> tests {
+	a: <span style="color:#2980b9;">i128</span>,
+	b: <span style="color:#2980b9;">isize</span>,
+}
+
+<span style="color:#7a7c7d;">// Self vs self</span>
+<span style="font-weight:bold;">trait</span> T {
+    <span style="font-weight:bold;">type</span> Item;
+    <span style="color:#7a7c7d;">// `Self` will be whatever type that implements `T`.</span>
+    <span style="font-weight:bold;">fn</span> new() -&gt; <span style="color:#2980b9;">Self</span>;
+    <span style="color:#7a7c7d;">// `Self::Item` will be the type alias in the implementation.</span>
+    <span style="font-weight:bold;">fn</span> f(&amp;<span style="font-weight:bold;">self</span>) -&gt; <span style="color:#2980b9;">Self</span><span style="color:#27ae60;">::</span>Item;
+}
+
+<span style="color:#7a7c7d;">// Raw identifiers</span>
+<span style="font-weight:bold;">extern</span> <span style="font-weight:bold;">crate</span> foo;
+<span style="font-weight:bold;">fn</span> main() {
+    <span style="color:#27ae60;">foo::</span><span style="color:#3f8058;">r#</span>try();
+}
+
+<span style="color:#2980b9;">#[valid types]</span>
+<span style="font-weight:bold;">fn</span> types() {
+	<span style="font-weight:bold;">let</span> num = <span style="color:#f67400;">333_3_</span>;
+	<span style="font-weight:bold;">let</span> num_u8: <span style="color:#2980b9;">u8</span> = <span style="color:#f67400;">333u8</span>;
+	<span style="font-weight:bold;">let</span> num_u16: <span style="color:#2980b9;">u16</span> = <span style="color:#f67400;">333u16</span>;
+	<span style="font-weight:bold;">let</span> num_u32: <span style="color:#2980b9;">u32</span> = <span style="color:#f67400;">333u32</span>;
+	<span style="font-weight:bold;">let</span> num_u64: <span style="color:#2980b9;">u64</span> = <span style="color:#f67400;">333u64</span>;
+	<span style="font-weight:bold;">let</span> num_u128: <span style="color:#2980b9;">u128</span> = <span style="color:#f67400;">333u128</span>;
+	<span style="font-weight:bold;">let</span> num_usize: <span style="color:#2980b9;">usize</span> = <span style="color:#f67400;">333usize</span>;
+	<span style="font-weight:bold;">let</span> num_float: <span style="color:#2980b9;">f32</span> = <span style="color:#f67400;">333.45f32</span>;
+
+	<span style="font-weight:bold;">let</span> binary = <span style="color:#f67400;">0b1_010</span>;
+	<span style="font-weight:bold;">let</span> octal = <span style="color:#f67400;">0o21535</span>;
+	<span style="font-weight:bold;">let</span> hexadecimal = <span style="color:#f67400;">0x73A2_F</span>;
+
+	<span style="font-weight:bold;">let</span> char1: <span style="color:#2980b9;">char</span> = <span style="color:#3daee9;">'a'</span>;
+	<span style="font-weight:bold;">let</span> char2: <span style="color:#2980b9;">char</span> = <span style="color:#3daee9;">'</span><span style="color:#3daee9;">\n</span><span style="color:#3daee9;">'</span>;
+	<span style="font-weight:bold;">let</span> char3: <span style="color:#2980b9;">char</span> = <span style="color:#3daee9;">'</span><span style="color:#3daee9;">\u{123_AF}</span><span style="color:#3daee9;">'</span>;
+
+	<span style="font-weight:bold;">let</span> byte1: <span style="color:#2980b9;">u8</span> = <span style="color:#3daee9;">b'a'</span>;
+	<span style="font-weight:bold;">let</span> byte2: <span style="color:#2980b9;">u8</span> = <span style="color:#3daee9;">b'</span><span style="color:#3daee9;">\x13</span><span style="color:#3daee9;">'</span>;
+
+	<span style="font-weight:bold;">let</span> string: <span style="color:#2980b9;">str</span> = <span style="color:#f44f4f;">&quot;hello </span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;"> </span><span style="color:#3daee9;">\r</span><span style="color:#f44f4f;"> </span><span style="color:#3daee9;">\u{123_________fd_}</span><span style="color:#f44f4f;"> </span><span style="color:#3daee9;">\</span>
+<span style="color:#f44f4f;">						bye&quot;</span>;
+	<span style="font-weight:bold;">let</span> byte_string: <span style="color:#2980b9;">str</span> = <span style="color:#f44f4f;">b&quot;hello </span><span style="color:#3daee9;">\t</span><span style="color:#f44f4f;"> </span><span style="color:#3daee9;">\0</span><span style="color:#f44f4f;"> </span><span style="color:#3daee9;">\</span><span style="color:#da4453;text-decoration:underline;">u</span><span style="color:#f44f4f;">{123} </span><span style="color:#3daee9;">\</span><span style="color:#da4453;text-decoration:underline;">b</span><span style="color:#f44f4f;"> bye&quot;</span>;
+	<span style="font-weight:bold;">let</span> raw_string1: <span style="color:#2980b9;">str</span> = <span style="color:#f44f4f;">r&quot;hello \t \b&quot;</span>;
+	<span style="font-weight:bold;">let</span> raw_string2: <span style="color:#2980b9;">str</span> = <span style="color:#f44f4f;">r####&quot;hello \n &quot;### bye&quot;####</span>####;
+	<span style="font-weight:bold;">let</span> raw_string3: <span style="color:#2980b9;">str</span> = <span style="color:#f44f4f;">br####&quot;hello \n&quot;####</span>;
+
+    <span style="color:#7a7c7d;">// Invalid</span>
+
+	<span style="font-weight:bold;">let</span> invalid_binary= <span style="color:#da4453;text-decoration:underline;">0b1_015</span>;
+	<span style="font-weight:bold;">let</span> invalid_octal = <span style="color:#da4453;text-decoration:underline;">0o64_92</span>;
+	<span style="font-weight:bold;">let</span> invalid_hexadecimal = <span style="color:#da4453;text-decoration:underline;">0x7_3AY</span>;
+
+    <span style="font-weight:bold;">let</span> invalid_char1: <span style="color:#2980b9;">char</span> = <span style="color:#3daee9;">'</span><span style="color:#da4453;text-decoration:underline;">\y</span><span style="color:#3daee9;">'</span>;
+	<span style="font-weight:bold;">let</span> invalid_char2: <span style="color:#2980b9;">char</span> = <span style="color:#3daee9;">'</span><span style="color:#da4453;text-decoration:underline;">\324</span><span style="color:#3daee9;">'</span>;
+	<span style="font-weight:bold;">let</span> invalid_char3: <span style="color:#2980b9;">char</span> = <span style="color:#3daee9;">'</span><span style="color:#da4453;text-decoration:underline;">%%</span><span style="color:#3daee9;">'</span>;
+	<span style="font-weight:bold;">let</span> invalid_char4: <span style="color:#2980b9;">char</span> = <span style="color:#3daee9;">'</span><span style="color:#da4453;text-decoration:underline;">\n\dfd</span><span style="color:#3daee9;">'</span>;
+	<span style="font-weight:bold;">let</span> invalid_char5: <span style="color:#2980b9;">char</span> = <span style="color:#27ae60;">'aaaa</span>a<span style="color:#3daee9;">'</span>;
+	<span style="font-weight:bold;">let</span> open_char: <span style="color:#2980b9;">char</span> = <span style="color:#3daee9;">'</span>&amp;&amp;&amp;;
+
+	<span style="font-weight:bold;">let</span> invalid_byte1: <span style="color:#2980b9;">u8</span> = b<span style="color:#27ae60;">'a</span>b<span style="color:#3daee9;">'</span>;
+	<span style="font-weight:bold;">let</span> invalid_byte2: <span style="color:#2980b9;">u8</span> = b<span style="color:#3daee9;">'</span><span style="color:#da4453;text-decoration:underline;">\b</span><span style="color:#3daee9;">'</span>;
+	<span style="font-weight:bold;">let</span> invalid_byte2: <span style="color:#2980b9;">u8</span> = b<span style="color:#3daee9;">'</span><span style="color:#3daee9;">\u{123}</span><span style="color:#3daee9;">'</span>;
+
+	<span style="font-weight:bold;">let</span> invalid_string: <span style="color:#2980b9;">str</span> = <span style="color:#f44f4f;">&quot;hello </span><span style="color:#3daee9;">\</span><span style="color:#da4453;text-decoration:underline;">b</span><span style="color:#f44f4f;"> </span><span style="color:#3daee9;">\</span><span style="color:#da4453;text-decoration:underline;">u</span><span style="color:#f44f4f;">{_123} </span><span style="color:#3daee9;">\</span><span style="color:#da4453;text-decoration:underline;">u</span><span style="color:#f44f4f;">{1234567} </span><span style="color:#3daee9;">\</span><span style="color:#da4453;text-decoration:underline;"> </span><span style="color:#f44f4f;"> bye&quot;</span>;
+}
+</pre></body></html>

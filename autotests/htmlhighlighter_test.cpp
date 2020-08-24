@@ -50,6 +50,8 @@ private Q_SLOTS:
         QTest::addColumn<QString>("inFile");
         QTest::addColumn<QString>("outFile");
         QTest::addColumn<QString>("refFile");
+        QTest::addColumn<QString>("outDarkFile");
+        QTest::addColumn<QString>("refDarkFile");
         QTest::addColumn<QString>("syntax");
 
         const QDir dir(QStringLiteral(TESTSRCDIR "/input"));
@@ -63,7 +65,11 @@ private Q_SLOTS:
             if (syntaxOverride.exists() && syntaxOverride.open(QFile::ReadOnly))
                 syntax = QString::fromUtf8(syntaxOverride.readAll()).trimmed();
 
-            QTest::newRow(fileName.toUtf8().constData()) << inFile << (QStringLiteral(TESTBUILDDIR "/html.output/") + fileName + QStringLiteral(".html")) << (QStringLiteral(TESTSRCDIR "/html/") + fileName + QStringLiteral(".html"))
+            QTest::newRow(fileName.toUtf8().constData()) << inFile
+                                                         << (QStringLiteral(TESTBUILDDIR "/html.output/") + fileName + QStringLiteral(".html"))
+                                                         << (QStringLiteral(TESTSRCDIR "/html/") + fileName + QStringLiteral(".html"))
+                                                         << (QStringLiteral(TESTBUILDDIR "/html.output/") + fileName + QStringLiteral(".dark.html"))
+                                                         << (QStringLiteral(TESTSRCDIR "/html/") + fileName + QStringLiteral(".dark.html"))
                                                          << syntax;
         }
 
@@ -75,25 +81,27 @@ private Q_SLOTS:
         QFETCH(QString, inFile);
         QFETCH(QString, outFile);
         QFETCH(QString, refFile);
+        QFETCH(QString, outDarkFile);
+        QFETCH(QString, refDarkFile);
         QFETCH(QString, syntax);
         QVERIFY(m_repo);
 
-        HtmlHighlighter highlighter;
-        highlighter.setTheme(m_repo->defaultTheme());
-        QVERIFY(highlighter.theme().isValid());
-
-        auto def = m_repo->definitionForFileName(inFile);
-        if (!syntax.isEmpty())
-            def = m_repo->definitionForName(syntax);
+        // get the matching definitions
+        const auto def = syntax.isEmpty() ? m_repo->definitionForFileName(inFile) : m_repo->definitionForName(syntax);
         QVERIFY(def.isValid());
-        highlighter.setDefinition(def);
-        highlighter.setOutputFile(outFile);
-        highlighter.highlightFile(inFile);
 
-        /**
-         * compare results
-         */
-        compareFiles(refFile, outFile);
+        // we try both light and dark themes
+        for (int i = 0; i < 2; ++i) {
+            HtmlHighlighter highlighter;
+            highlighter.setTheme(m_repo->defaultTheme((i == 0) ? Repository::LightTheme : Repository::DarkTheme));
+            QVERIFY(highlighter.theme().isValid());
+            highlighter.setDefinition(def);
+            highlighter.setOutputFile((i == 0) ? outFile : outDarkFile);
+            highlighter.highlightFile(inFile);
+
+            // compare results
+            compareFiles((i == 0) ? refFile : refDarkFile, (i == 0) ? outFile : outDarkFile);
+        }
     }
 };
 

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>nagios.cfg</title>
+<meta name="generator" content="KF5::SyntaxHighlighting (Nagios)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="color:#7a7c7d;">##############################################################################</span>
+<span style="color:#7a7c7d;">#</span>
+<span style="color:#7a7c7d;"># NAGIOS.CFG - Sample Main Config File for Nagios @VERSION@</span>
+<span style="color:#7a7c7d;">#</span>
+<span style="color:#7a7c7d;"># Read the documentation for more information on this configuration</span>
+<span style="color:#7a7c7d;"># file.  I've provided some comments here, but things may not be so</span>
+<span style="color:#7a7c7d;"># clear without further explanation.</span>
+<span style="color:#7a7c7d;">#</span>
+<span style="color:#7a7c7d;">#</span>
+<span style="color:#7a7c7d;">##############################################################################</span>
+
+
+<span style="color:#7a7c7d;"># LOG FILE</span>
+<span style="color:#7a7c7d;"># This is the main log file where service and host events are logged</span>
+<span style="color:#7a7c7d;"># for historical purposes.  This should be the first option specified</span>
+<span style="color:#7a7c7d;"># in the config file!!!</span>
+
+log_file<span style="color:#27ae60;">=</span><span style="color:#f44f4f;">@localstatedir@/nagios.log</span>
+
+
+
+<span style="color:#7a7c7d;"># OBJECT CONFIGURATION FILE(S)</span>
+<span style="color:#7a7c7d;"># These are the object configuration files in which you define hosts,</span>
+<span style="color:#7a7c7d;"># host groups, contacts, contact groups, services, etc.</span>
+<span style="color:#7a7c7d;"># You can split your object definitions across several config files</span>
+<span style="color:#7a7c7d;"># if you wish (as shown below), or keep them all in a single config file.</span>
+
+<span style="color:#7a7c7d;"># You can specify individual object config files as shown below:</span>
+cfg_file<span style="color:#27ae60;">=</span><span style="color:#f44f4f;">@sysconfdir@/objects/commands.cfg</span>
+cfg_file<span style="color:#27ae60;">=</span><span style="color:#f44f4f;">@sysconfdir@/objects/contacts.cfg</span>
+cfg_file<span style="color:#27ae60;">=</span><span style="color:#f44f4f;">@sysconfdir@/objects/timeperiods.cfg</span>
+cfg_file<span style="color:#27ae60;">=</span><span style="color:#f44f4f;">@sysconfdir@/objects/templates.cfg</span>
+
+<span style="color:#7a7c7d;"># Definitions for monitoring the local (Linux) host</span>
+cfg_file<span style="color:#27ae60;">=</span><span style="color:#f44f4f;">@sysconfdir@/objects/localhost.cfg</span>
+
+<span style="color:#7a7c7d;"># Definitions for monitoring a Windows machine</span>
+<span style="color:#7a7c7d;">#cfg_file=@sysconfdir@/objects/windows.cfg</span>
+
+<span style="color:#7a7c7d;"># Definitions for monitoring a router/switch</span>
+<span style="color:#7a7c7d;">#cfg_file=@sysconfdir@/objects/switch.cfg</span>
+
+<span style="color:#7a7c7d;"># Definitions for monitoring a network printer</span>
+<span style="color:#7a7c7d;">#cfg_file=@sysconfdir@/objects/printer.cfg</span>
+
+
+<span style="color:#7a7c7d;"># You can also tell Nagios to process all config files (with a .cfg</span>
+<span style="color:#7a7c7d;"># extension) in a particular directory by using the cfg_dir</span>
+<span style="color:#7a7c7d;"># directive as shown below:</span>
+
+<span style="color:#7a7c7d;">#cfg_dir=@sysconfdir@/servers</span>
+<span style="color:#7a7c7d;">#cfg_dir=@sysconfdir@/printers</span>
+<span style="color:#7a7c7d;">#cfg_dir=@sysconfdir@/switches</span>
+<span style="color:#7a7c7d;">#cfg_dir=@sysconfdir@/routers</span>
+
+
+
+
+<span style="color:#7a7c7d;"># OBJECT CACHE FILE</span>
+<span style="color:#7a7c7d;"># This option determines where object definitions are cached when</span>
+<span style="color:#7a7c7d;"># Nagios starts/restarts.  The CGIs read object definitions from</span>
+<span style="color:#7a7c7d;"># this cache file (rather than looking at the object config files</span>
+<span style="color:#7a7c7d;"># directly) in order to prevent inconsistencies that can occur</span>
+<span style="color:#7a7c7d;"># when the config files are modified after Nagios starts.</span>
+
+object_cache_file<span style="color:#27ae60;">=</span><span style="color:#f44f4f;">@localstatedir@/objects.cache</span>
+
+
+
+<span style="color:#7a7c7d;"># PRE-CACHED OBJECT FILE</span>
+<span style="color:#7a7c7d;"># This options determines the location of the precached object file.</span>
+<span style="color:#7a7c7d;"># If you run Nagios with the -p command line option, it will preprocess</span>
+<span style="color:#7a7c7d;"># your object configuration file(s) and write the cached config to this</span>
+<span style="color:#7a7c7d;"># file.  You can then start Nagios with the -u option to have it read</span>
+<span style="color:#7a7c7d;"># object definitions from this precached file, rather than the standard</span>
+<span style="color:#7a7c7d;"># object configuration files (see the cfg_file and cfg_dir options above).</span>
+<span style="color:#7a7c7d;"># Using a precached object file can speed up the time needed to (re)start</span>
+<span style="color:#7a7c7d;"># the Nagios process if you've got a large and/or complex configuration.</span>
+<span style="color:#7a7c7d;"># Read the documentation section on optimizing Nagios to find our more</span>
+<span style="color:#7a7c7d;"># about how this feature works.</span>
+
+precached_object_file<span style="color:#27ae60;">=</span><span style="color:#f44f4f;">@localstatedir@/objects.precache</span>
+
+
+
+<span style="color:#7a7c7d;"># RESOURCE FILE</span>
+<span style="color:#7a7c7d;"># This is an optional resource file that contains $USERx$ macro</span>
+<span style="color:#7a7c7d;"># definitions. Multiple resource files can be specified by using</span>
+<span style="color:#7a7c7d;"># multiple resource_file definitions.  The CGIs will not attempt to</span>
+<span style="color:#7a7c7d;"># read the contents of resource files, so information that is</span>
+<span style="color:#7a7c7d;"># considered to be sensitive (usernames, passwords, etc) can be</span>
+<span style="color:#7a7c7d;"># defined as macros in this file and restrictive permissions (600)</span>
+<span style="color:#7a7c7d;"># can be placed on this file.</span>
+
+resource_file<span style="color:#27ae60;">=</span><span style="color:#f44f4f;">@sysconfdir@/resource.cfg</span>
+
+
+
+<span style="color:#7a7c7d;"># STATUS FILE</span>
+<span style="color:#7a7c7d;"># This is where the current status of all monitored services and</span>
+<span style="color:#7a7c7d;"># hosts is stored.  Its contents are read and processed by the CGIs.</span>
+<span style="color:#7a7c7d;"># The contents of the status file are deleted every time Nagios</span>
+<span style="color:#7a7c7d;">#  restarts.</span>
+
+status_file<span style="color:#27ae60;">=</span><span style="color:#f44f4f;">@localstatedir@/status.dat</span>
+
+
+
+<span style="color:#7a7c7d;"># STATUS FILE UPDATE INTERVAL</span>
+<span style="color:#7a7c7d;"># This option determines the frequency (in seconds) that</span>
+<span style="color:#7a7c7d;"># Nagios will periodically dump program, host, and</span>
+<span style="color:#7a7c7d;"># service status data.</span>
+
+status_update_interval<span style="color:#27ae60;">=</span><span style="color:#f67400;">10</span>
+
+
+
+<span style="color:#7a7c7d;"># NAGIOS USER</span>
+<span style="color:#7a7c7d;"># This determines the effective user that Nagios should run as.</span>
+<span style="color:#7a7c7d;"># You can either supply a username or a UID.</span>
+
+nagios_user<span style="color:#27ae60;">=</span><span style="color:#f44f4f;">@nagios_user@</span>
+
+
+
+<span style="color:#7a7c7d;"># NAGIOS GROUP</span>
+<span style="color:#7a7c7d;"># This determines the effective group that Nagios should run as.</span>
+<span style="color:#7a7c7d;"># You can either supply a group name or a GID.</span>
+
+nagios_group<span style="color:#27ae60;">=</span><span style="color:#f44f4f;">@nagios_grp@</span>
+
+
+
+<span style="color:#7a7c7d;"># EXTERNAL COMMAND OPTION</span>
+<span style="color:#7a7c7d;"># This option allows you to specify whether or not Nagios should check</span>
+<span style="color:#7a7c7d;"># for external commands (in the command file defined below).</span>
+<span style="color:#7a7c7d;"># By default Nagios will check for external commands.</span>
+<span style="color:#7a7c7d;"># If you want to be able to use the CGI command interface</span>
+<span style="color:#7a7c7d;"># you will have to enable this.</span>
+<span style="color:#7a7c7d;"># Values: 0 = disable commands, 1 = enable commands</span>
+
+check_external_commands<span style="color:#27ae60;">=</span><span style="color:#f67400;">1</span>
+
+
+
+<span style="color:#7a7c7d;"># EXTERNAL COMMAND FILE</span>
+<span style="color:#7a7c7d;"># This is the file that Nagios checks for external command requests.</span>
+<span style="color:#7a7c7d;"># It is also where the command CGI will write commands that are submitted</span>
+<span style="color:#7a7c7d;"># by users, so it must be writeable by the user that the web server</span>
+<span style="color:#7a7c7d;"># is running as (usually 'nobody').  Permissions should be set at the</span>
+<span style="color:#7a7c7d;"># directory level instead of on the file, as the file is deleted every</span>
+<span style="color:#7a7c7d;"># time its contents are processed.</span>
+
+command_file<span style="color:#27ae60;">=</span><span style="color:#f44f4f;">@localstatedir@/rw/nagios.cmd</span>
+
+
+
+<span style="color:#7a7c7d;"># QUERY HANDLER INTERFACE</span>
+<span style="color:#7a7c7d;"># This is the socket that is created for the Query Handler interface</span>
+
+<span style="color:#7a7c7d;">#query_socket=@localstatedir@/rw/nagios.qh</span>
+
+
+
+<span style="color:#7a7c7d;"># LOCK FILE</span>
+<span style="color:#7a7c7d;"># This is the lockfile that Nagios will use to store its PID number</span>
+<span style="color:#7a7c7d;"># in when it is running in daemon mode.</span>
+
+lock_file<span style="color:#27ae60;">=</span><span style="color:#f44f4f;">@subsyslockfile@</span>
+
+
+
+<span style="color:#7a7c7d;"># TEMP FILE</span>
+<span style="color:#7a7c7d;"># This is a temporary file that is used as scratch space when Nagios</span>
+<span style="color:#7a7c7d;"># updates the status log, cleans the comment file, etc.  This file</span>
+<span style="color:#7a7c7d;"># is created, used, and deleted throughout the time that Nagios is</span>
+<span style="color:#7a7c7d;"># running.</span>
+
+temp_file<span style="color:#27ae60;">=</span><span style="color:#f44f4f;">@localstatedir@/nagios.tmp</span>
+
+
+
+<span style="color:#7a7c7d;"># TEMP PATH</span>
+<span style="color:#7a7c7d;"># This is path where Nagios can create temp files for service and</span>
+<span style="color:#7a7c7d;"># host check results, etc.</span>
+
+temp_path<span style="color:#27ae60;">=</span><span style="color:#f44f4f;">@TMPDIR@</span>
+
+
+
+<span style="color:#7a7c7d;"># EVENT BROKER OPTIONS</span>
+<span style="color:#7a7c7d;"># Controls what (if any) data gets sent to the event broker.</span>
+<span style="color:#7a7c7d;"># Values:  0      = Broker nothing</span>
+<span style="color:#7a7c7d;">#         -1      = Broker everything</span>
+<span style="color:#7a7c7d;">#         &lt;other&gt; = See documentation</span>
+
+event_broker_options<span style="color:#27ae60;">=</span><span style="color:#f44f4f;">-</span><span style="color:#f67400;">1</span>
+
+
+
+<span style="color:#7a7c7d;"># EVENT BROKER MODULE(S)</span>
+<span style="color:#7a7c7d;"># This directive is used to specify an event broker module that should</span>
+<span style="color:#7a7c7d;"># by loaded by Nagios at startup.  Use multiple directives if you want</span>
+<span style="color:#7a7c7d;"># to load more than one module.  Arguments that should be passed to</span>
+<span style="color:#7a7c7d;"># the module at startup are separated from the module path by a space.</span>
+<span style="color:#7a7c7d;">#</span>
+<span style="color:#7a7c7d;">#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!</span>
+<span style="color:#7a7c7d;"># </span><span style="color:#ca9219;background-color:#451e1a;font-weight:bold;">WARNING</span><span style="color:#7a7c7d;"> !!! </span><span style="color:#ca9219;background-color:#451e1a;font-weight:bold;">WARNING</span><span style="color:#7a7c7d;"> !!! </span><span style="color:#ca9219;background-color:#451e1a;font-weight:bold;">WARNING</span><span style="color:#7a7c7d;"> !!! </span><span style="color:#ca9219;background-color:#451e1a;font-weight:bold;">WARNING</span><span style="color:#7a7c7d;"> !!! </span><span style="color:#ca9219;background-color:#451e1a;font-weight:bold;">WARNING</span><span style="color:#7a7c7d;"> !!! </span><span style="color:#ca9219;background-color:#451e1a;font-weight:bold;">WARNING</span>
+<span style="color:#7a7c7d;">#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!</span>
+<span style="color:#7a7c7d;">#</span>
+<span style="color:#7a7c7d;"># Do NOT overwrite modules while they are being used by Nagios or Nagios</span>
+<span style="color:#7a7c7d;"># will crash in a fiery display of SEGFAULT glory.  This is a bug/limitation</span>
+<span style="color:#7a7c7d;"># either in dlopen(), the kernel, and/or the filesystem.  And maybe Nagios...</span>
+<span style="color:#7a7c7d;">#</span>
+<span style="color:#7a7c7d;"># The correct/safe way of updating a module is by using one of these methods:</span>
+<span style="color:#7a7c7d;">#    1. Shutdown Nagios, replace the module file, restart Nagios</span>
+<span style="color:#7a7c7d;">#    2. Delete the original module file, move the new module file into place,</span>
+<span style="color:#7a7c7d;">#	restart Nagios</span>
+<span style="color:#7a7c7d;">#</span>
+<span style="color:#7a7c7d;"># Example:</span>
+<span style="color:#7a7c7d;">#</span>
+<span style="color:#7a7c7d;">#   broker_module=&lt;modulepath&gt; [moduleargs]</span>
+
+<span style="color:#7a7c7d;">#broker_module=/somewhere/module1.o</span>
+<span style="color:#7a7c7d;">#broker_module=/somewhere/module2.o arg1 arg2=3 debug=0</span>
+
+
+
+<span style="color:#7a7c7d;"># LOG ROTATION METHOD</span>
+<span style="color:#7a7c7d;"># This is the log rotation method that Nagios should use to rotate</span>
+<span style="color:#7a7c7d;"># the main log file. Values are as follows..</span>
+<span style="color:#7a7c7d;">#	n	= None - don't rotate the log</span>
+<span style="color:#7a7c7d;">#	h	= Hourly rotation (top of the hour)</span>
+<span style="color:#7a7c7d;">#	d	= Daily rotation (midnight every day)</span>
+<span style="color:#7a7c7d;">#	w	= Weekly rotation (midnight on Saturday evening)</span>
+<span style="color:#7a7c7d;">#	m	= Monthly rotation (midnight last day of month)</span>
+
+log_rotation_method<span style="color:#27ae60;">=</span><span style="color:#f44f4f;">d</span>
+
+
+
+<span style="color:#7a7c7d;"># LOG ARCHIVE PATH</span>
+<span style="color:#7a7c7d;"># This is the directory where archived (rotated) log files should be</span>
+<span style="color:#7a7c7d;"># placed (assuming you've chosen to do log rotation).</span>
+
+log_archive_path<span style="color:#27ae60;">=</span><span style="color:#f44f4f;">@localstatedir@/archives</span>
+
+
+
+<span style="color:#7a7c7d;"># LOGGING OPTIONS</span>
+<span style="color:#7a7c7d;"># If you want messages logged to the syslog facility, as well as the</span>
+<span style="color:#7a7c7d;"># Nagios log file set this option to 1.  If not, set it to 0.</span>
+
+use_syslog<span style="color:#27ae60;">=</span><span style="color:#f67400;">1</span>
+
+
+
+<span style="color:#7a7c7d;"># NOTIFICATION LOGGING OPTION</span>
+<span style="color:#7a7c7d;"># If you don't want notifications to be logged, set this value to 0.</span>
+<span style="color:#7a7c7d;"># If notifications should be logged, set the value to 1.</span>
+
+log_notifications<span style="color:#27ae60;">=</span><span style="color:#f67400;">1</span>
+
+
+
+<span style="color:#7a7c7d;"># SERVICE RETRY LOGGING OPTION</span>
+<span style="color:#7a7c7d;"># If you don't want service check retries to be logged, set this value</span>
+<span style="color:#7a7c7d;"># to 0.  If retries should be logged, set the value to 1.</span>
+
+log_service_retries<span style="color:#27ae60;">=</span><span style="color:#f67400;">1</span>
+
+
+
+<span style="color:#7a7c7d;"># HOST RETRY LOGGING OPTION</span>
+<span style="color:#7a7c7d;"># If you don't want host check retries to be logged, set this value to</span>
+<span style="color:#7a7c7d;"># 0.  If retries should be logged, set the value to 1.</span>
+
+log_host_retries<span style="color:#27ae60;">=</span><span style="color:#f67400;">1</span>
+
+
+
+<span style="color:#7a7c7d;"># EVENT HANDLER LOGGING OPTION</span>
+<span style="color:#7a7c7d;"># If you don't want host and service event handlers to be logged, set</span>
+<span style="color:#7a7c7d;"># this value to 0.  If event handlers should be logged, set the value</span>
+<span style="color:#7a7c7d;"># to 1.</span>
+
+log_event_handlers<span style="color:#27ae60;">=</span><span style="color:#f67400;">1</span>
+
+
+
+<span style="color:#7a7c7d;"># INITIAL STATES LOGGING OPTION</span>
+<span style="color:#7a7c7d;"># If you want Nagios to log all initial host and service states to</span>
+<span style="color:#7a7c7d;"># the main log file (the first time the service or host is checked)</span>
+<span style="color:#7a7c7d;"># you can enable this option by setting this value to 1.  If you</span>
+<span style="color:#7a7c7d;"># are not using an external application that does long term state</span>
+<span style="color:#7a7c7d;"># statistics reporting, you do not need to enable this option.  In</span>
+<span style="color:#7a7c7d;"># this case, set the value to 0.</span>
+
+log_initial_states<span style="color:#27ae60;">=</span><span style="color:#f67400;">0</span>
+
+
+
+<span style="color:#7a7c7d;"># CURRENT STATES LOGGING OPTION</span>
+<span style="color:#7a7c7d;"># If you don't want Nagios to log all current host and service states</span>
+<span style="color:#7a7c7d;"># after log has been rotated to the main log file, you can disable this</span>
+<span style="color:#7a7c7d;"># option by setting this value to 0. Default value is 1.</span>
+
+log_current_states<span style="color:#27ae60;">=</span><span style="color:#f67400;">1</span>
+
+
+
+<span style="color:#7a7c7d;"># EXTERNAL COMMANDS LOGGING OPTION</span>
+<span style="color:#7a7c7d;"># If you don't want Nagios to log external commands, set this value</span>
+<span style="color:#7a7c7d;"># to 0.  If external commands should be logged, set this value to 1.</span>
+<span style="color:#7a7c7d;"># Note: This option does not include logging of passive service</span>
+<span style="color:#7a7c7d;"># checks - see the option below for controlling whether or not</span>
+<span style="color:#7a7c7d;"># passive checks are logged.</span>
+
+log_external_commands<span style="color:#27ae60;">=</span><span style="color:#f67400;">1</span>
+
+
+
+<span style="color:#7a7c7d;"># PASSIVE CHECKS LOGGING OPTION</span>
+<span style="color:#7a7c7d;"># If you don't want Nagios to log passive host and service checks, set</span>
+<span style="color:#7a7c7d;"># this value to 0.  If passive checks should be logged, set</span>
+<span style="color:#7a7c7d;"># this value to 1.</span>
+
+log_passive_checks<span style="color:#27ae60;">=</span><span style="color:#f67400;">1</span>
+
+
+
+<span style="color:#7a7c7d;"># GLOBAL HOST AND SERVICE EVENT HANDLERS</span>
+<span style="color:#7a7c7d;"># These options allow you to specify a host and service event handler</span>
+<span style="color:#7a7c7d;"># command that is to be run for every host or service state change.</span>
+<span style="color:#7a7c7d;"># The global event handler is executed immediately prior to the event</span>
+<span style="color:#7a7c7d;"># handler that you have optionally specified in each host or</span>
+<span style="color:#7a7c7d;"># service definition. The command argument is the short name of a</span>
+<span style="color:#7a7c7d;"># command definition that you define in your host configuration file.</span>
+<span style="color:#7a7c7d;"># Read the HTML docs for more information.</span>
+
+<span style="color:#7a7c7d;">#global_host_event_handler=somecommand</span>
+<span style="color:#7a7c7d;">#global_service_event_handler=somecommand</span>
+</pre></body></html>

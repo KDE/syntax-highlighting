@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>test.smali</title>
+<meta name="generator" content="KF5::SyntaxHighlighting (Smali)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="color:#7a7c7d;">#</span>
+<span style="color:#7a7c7d;"># Copyright (C) 2006 The Android Open Source Project</span>
+<span style="color:#7a7c7d;">#</span>
+<span style="color:#7a7c7d;"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span style="color:#7a7c7d;"># you may not use this file except in compliance with the License.</span>
+<span style="color:#7a7c7d;"># You may obtain a copy of the License at</span>
+<span style="color:#7a7c7d;">#</span>
+<span style="color:#7a7c7d;">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span style="color:#7a7c7d;">#</span>
+<span style="color:#7a7c7d;"># Unless required by applicable law or agreed to in writing, software</span>
+<span style="color:#7a7c7d;"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span style="color:#7a7c7d;"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span style="color:#7a7c7d;"># See the License for the specific language governing permissions and</span>
+<span style="color:#7a7c7d;"># limitations under the License.</span>
+<span style="color:#7a7c7d;">#</span>
+<span style="color:#2980b9;">.class</span> <span style="font-weight:bold;">public</span> <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;
+<span style="color:#2980b9;">.super</span> <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/util/StateMachine</span>;
+<span style="color:#2980b9;">.source</span> <span style="color:#f44f4f;">&quot;DataConnection.java&quot;</span>
+
+
+<span style="color:#7a7c7d;"># annotations</span>
+<span style="color:#2980b9;">.annotation</span><span style="color:#2980b9;"> </span><span style="font-weight:bold;">system</span><span style="color:#2980b9;"> </span><span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">dalvik/annotation/MemberClasses</span>;
+<span style="color:#2980b9;">    value </span>=<span style="color:#2980b9;"> </span>{
+<span style="color:#2980b9;">        </span><span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$DcNetworkAgent</span>;<span style="color:#2980b9;">,</span>
+<span style="color:#2980b9;">        </span><span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$DcDisconnectionErrorCreatingConnection</span>;<span style="color:#2980b9;">,</span>
+<span style="color:#2980b9;">        </span><span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$DcDisconnectingState</span>;<span style="color:#2980b9;">,</span>
+<span style="color:#2980b9;">        </span><span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$ConnectionParams</span>;
+<span style="color:#2980b9;">    </span>}
+<span style="color:#2980b9;">.end annotation</span>
+
+
+<span style="color:#7a7c7d;"># static fields</span>
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">BASE</span>:<span style="color:#2980b9;font-style:italic;">I</span> = <span style="color:#f67400;">0x40000</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">CMD_TO_STRING_COUNT</span>:<span style="color:#2980b9;font-style:italic;">B</span> = <span style="color:#f67400;">0x18</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">DBG</span>:<span style="color:#2980b9;font-style:italic;">Z</span> = <span style="color:#f67400;">true</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">EVENT_BW_REFRESH_RESPONSE</span>:<span style="color:#2980b9;font-style:italic;">S</span> = <span style="color:#f67400;">0x4000e</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">EVENT_CONNECT</span>:<span style="color:#2980b9;font-style:italic;">I</span> = <span style="color:#f67400;">0x40000</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">EVENT_DATA_CONNECTION_DRS_OR_RAT_CHANGED</span>:<span style="color:#2980b9;font-style:italic;">I</span> = <span style="color:#f67400;">0x4000b</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">EVENT_DATA_CONNECTION_VOICE_CALL_STARTED</span>:<span style="color:#2980b9;font-style:italic;">I</span> = <span style="color:#f67400;">0x4000f</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">EVENT_DEACTIVATE_DONE</span>:<span style="color:#2980b9;font-style:italic;">I</span> = <span style="color:#f67400;">0x40003</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">EVENT_DISCONNECT</span>:<span style="color:#2980b9;font-style:italic;">F</span> = <span style="color:#f67400;">636.6886188221E12</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">EVENT_DISCONNECT_ALL</span>:<span style="color:#2980b9;font-style:italic;">D</span> = <span style="color:#f67400;">98.58E-23D</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">EVENT_KEEPALIVE_STARTED</span>:<span style="color:#2980b9;font-style:italic;">D</span> = <span style="color:#f67400;">-Infinity</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">EVENT_KEEPALIVE_START_REQUEST</span>:<span style="color:#2980b9;font-style:italic;">F</span> = <span style="color:#f67400;">NaN</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">EVENT_KEEPALIVE_STATUS</span>:<span style="color:#2980b9;font-style:italic;">I</span> = <span style="color:#f67400;">0x40012</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">EVENT_LOST_CONNECTION</span>:<span style="color:#2980b9;font-style:italic;">J</span> = <span style="color:#f67400;">0x40009EEF</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">EVENT_RIL_CONNECTED</span>:<span style="color:#2980b9;font-style:italic;">I</span> = <span style="color:#f67400;">0x40005</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">EVENT_SETUP_DATA_CONNECTION_DONE</span>:<span style="color:#2980b9;font-style:italic;">I</span> = <span style="color:#f67400;">0x40001</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">EVENT_TEAR_DOWN_NOW</span>:<span style="color:#2980b9;font-style:italic;">C</span> = <span style="color:#3daee9;">'\n'</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">NETWORK_TYPE</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>; = <span style="color:#f44f4f;">&quot;MOBILE&quot;</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">NULL_IP</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>; = <span style="color:#f44f4f;">&quot;0.0.0.0&quot;</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">TCP_BUFFER_SIZES_1XRTT</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>; = <span style="color:#f44f4f;">&quot;16384,32768,131072,4096,16384,102400&quot;</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">TCP_BUFFER_SIZES_EDGE</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>; = <span style="color:#f44f4f;">&quot;4093,26280,70800,4096,16384,70800&quot;</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">TCP_BUFFER_SIZES_UMTS</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>; = <span style="color:#f44f4f;">&quot;58254,349525,1048576,58254,349525,1048576&quot;</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">final</span> <span style="color:#27aeae;">VDBG</span>:<span style="color:#2980b9;font-style:italic;">Z</span> = <span style="color:#f67400;">false</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="font-weight:bold;">static</span> <span style="color:#27aeae;">mInstanceNumber</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/concurrent/atomic/AtomicInteger</span>;
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="font-weight:bold;">static</span> <span style="color:#27aeae;">sCmdToString</span>:<span style="color:#2980b9;font-style:italic;">[L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+
+<span style="color:#7a7c7d;"># instance fields</span>
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mAc</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/util/AsyncChannel</span>;
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mActivatingState</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$DcActivatingState</span>;
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mActiveState</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$DcActiveState</span>;
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">public</span> <span style="color:#27aeae;">mApnContexts</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/HashMap</span>;
+    <span style="color:#2980b9;">.annotation</span><span style="color:#2980b9;"> </span><span style="font-weight:bold;">system</span><span style="color:#2980b9;"> </span><span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">dalvik/annotation/Signature</span>;
+<span style="color:#2980b9;">        value </span>=<span style="color:#2980b9;"> </span>{
+<span style="color:#2980b9;">            </span><span style="color:#f44f4f;">&quot;Ljava/util/HashMap&lt;&quot;</span><span style="color:#2980b9;">,</span>
+<span style="color:#2980b9;">            </span><span style="color:#f44f4f;">&quot;Lcom/android/internal/telephony/dataconnection/ApnContext;&quot;</span><span style="color:#2980b9;">,</span>
+<span style="color:#2980b9;">            </span><span style="color:#f44f4f;">&quot;Lcom/android/internal/telephony/dataconnection/DataConnection$ConnectionParams;&quot;</span><span style="color:#2980b9;">,</span>
+<span style="color:#2980b9;">            </span><span style="color:#f44f4f;">&quot;&gt;;&quot;</span>
+<span style="color:#2980b9;">        </span>}
+<span style="color:#2980b9;">    .end annotation</span>
+<span style="color:#2980b9;">.end field</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mApnSetting</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnSetting</span>;
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">public</span> <span style="color:#27aeae;">mCid</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mConnectionParams</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$ConnectionParams</span>;
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mCreateTime</span>:<span style="color:#2980b9;font-style:italic;">J</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mDataRegState</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mDataServiceManager</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataServiceManager</span>;
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mDcController</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DcController</span>;
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mDisconnectingErrorCreatingConnection</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$DcDisconnectionErrorCreatingConnection</span>;
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mId</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mInactiveState</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$DcInactiveState</span>;
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mLastFailCause</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DcFailCause</span>;
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mLastFailTime</span>:<span style="color:#2980b9;font-style:italic;">J</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mLinkProperties</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/LinkProperties</span>;
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mNetCapsLocalLog</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/util/LocalLog</span>;
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mNetworkAgent</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$DcNetworkAgent</span>;
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mNetworkInfo</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkInfo</span>;
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">protected</span> <span style="color:#27aeae;">mPcscfAddr</span>:<span style="color:#2980b9;font-style:italic;">[L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mPhone</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/Phone</span>;
+
+<span style="color:#2980b9;">.field</span> <span style="color:#27aeae;">mReconnectIntent</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/app/PendingIntent</span>;
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mRestrictedNetworkOverride</span>:<span style="color:#2980b9;font-style:italic;">Z</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mRilRat</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mSubscriptionOverride</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+<span style="color:#2980b9;">.field</span> <span style="color:#27aeae;">mTag</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+<span style="color:#2980b9;">.field</span> <span style="font-weight:bold;">private</span> <span style="color:#27aeae;">mUserData</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/Object</span>;
+
+
+<span style="color:#7a7c7d;"># direct methods</span>
+<span style="color:#2980b9;">.method</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">constructor</span> &lt;<span style="color:#8e44ad;">clinit</span>&gt;()<span style="color:#2980b9;font-style:italic;">V</span>
+    <span style="color:#2980b9;">.registers</span> <span style="color:#f67400;">3</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">109</span>
+    <span style="font-weight:bold;">new-instance</span> <span style="color:#27aeae;">v0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/concurrent/atomic/AtomicInteger</span>;
+
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v1</span>, <span style="color:#f67400;">0x0</span>
+
+    <span style="font-weight:bold;">invoke-direct</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/concurrent/atomic/AtomicInteger</span>;-&gt;&lt;<span style="color:#8e44ad;">init</span>&gt;(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="font-weight:bold;">sput-object</span> <span style="color:#27aeae;">v0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mInstanceNumber</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/concurrent/atomic/AtomicInteger</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">227</span>
+    <span style="font-weight:bold;">const/16</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f67400;">0x18</span>
+
+    <span style="font-weight:bold;">new-array</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v0</span>, <span style="color:#2980b9;font-style:italic;">[L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">sput-object</span> <span style="color:#27aeae;">v0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">sCmdToString</span>:<span style="color:#2980b9;font-style:italic;">[L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">229</span>
+    <span style="font-weight:bold;">sget-object</span> <span style="color:#27aeae;">v0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">sCmdToString</span>:<span style="color:#2980b9;font-style:italic;">[L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v2</span>, <span style="color:#f44f4f;">&quot;EVENT_CONNECT&quot;</span>
+
+    <span style="font-weight:bold;">aput-object</span> <span style="color:#27aeae;">v2</span>, <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v1</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">255</span>
+    <span style="font-weight:bold;">sget-object</span> <span style="color:#27aeae;">v0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">sCmdToString</span>:<span style="color:#2980b9;font-style:italic;">[L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v1</span>, <span style="color:#f44f4f;">&quot;EVENT_LINK_CAPACITY_CHANGED&quot;</span>
+
+    <span style="font-weight:bold;">const/16</span> <span style="color:#27aeae;">v2</span>, <span style="color:#f67400;">0x17</span>
+
+    <span style="font-weight:bold;">aput-object</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v2</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">256</span>
+    <span style="font-weight:bold;">return-void</span>
+<span style="color:#2980b9;">.end method</span>
+
+<span style="color:#2980b9;">.method</span> <span style="font-weight:bold;">private</span> <span style="font-weight:bold;">constructor</span> &lt;<span style="color:#8e44ad;">init</span>&gt;(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/Phone</span>;<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;<span style="color:#2980b9;font-style:italic;">IL</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DcTracker</span>;<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataServiceManager</span>;<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DcTesterFailBringUpAll</span>;<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DcController</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+    <span style="color:#2980b9;">.registers</span> <span style="color:#f67400;">10</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">466</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p7</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DcController</span>;-&gt;<span style="color:#8e44ad;">getHandler</span>()<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/os/Handler</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">v0</span>
+
+    <span style="font-weight:bold;">invoke-direct</span> {<span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">p2</span>, <span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/util/StateMachine</span>;-&gt;&lt;<span style="color:#8e44ad;">init</span>&gt;(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/os/Handler</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">113</span>
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">p2</span>, <span style="color:#f67400;">0x0</span>
+
+    <span style="font-weight:bold;">iput-object</span> <span style="color:#27aeae;">p2</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mDct</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DcTracker</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">180</span>
+    <span style="font-weight:bold;">new-instance</span> <span style="color:#27aeae;">v0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/LinkProperties</span>;
+
+    <span style="font-weight:bold;">invoke-direct</span> {<span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/LinkProperties</span>;-&gt;&lt;<span style="color:#8e44ad;">init</span>&gt;()<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="font-weight:bold;">iput-object</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mLinkProperties</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/LinkProperties</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">187</span>
+    <span style="font-weight:bold;">const</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f67400;">0x7fffffff</span>
+
+    <span style="font-weight:bold;">iput</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mRilRat</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">188</span>
+    <span style="font-weight:bold;">iput</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mDataRegState</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">191</span>
+    <span style="font-weight:bold;">new-instance</span> <span style="color:#27aeae;">v0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/util/LocalLog</span>;
+
+    <span style="font-weight:bold;">const/16</span> <span style="color:#27aeae;">v1</span>, <span style="color:#f67400;">0x32</span>
+
+    <span style="font-weight:bold;">invoke-direct</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/util/LocalLog</span>;-&gt;&lt;<span style="color:#8e44ad;">init</span>&gt;(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="font-weight:bold;">iput-object</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mNetCapsLocalLog</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/util/LocalLog</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">195</span>
+    <span style="font-weight:bold;">iput-object</span> <span style="color:#27aeae;">p2</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mApnContexts</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/HashMap</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">196</span>
+    <span style="font-weight:bold;">iput-object</span> <span style="color:#27aeae;">p2</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mReconnectIntent</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/app/PendingIntent</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">909</span>
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f67400;">0x0</span>
+
+    <span style="font-weight:bold;">iput-boolean</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mRestrictedNetworkOverride</span>:<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1440</span>
+    <span style="font-weight:bold;">new-instance</span> <span style="color:#27aeae;">v1</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$DcDefaultState</span>;
+
+    <span style="font-weight:bold;">invoke-direct</span> {<span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">p2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$DcDefaultState</span>;-&gt;&lt;<span style="color:#8e44ad;">init</span>&gt;(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$1</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="font-weight:bold;">iput-object</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mDefaultState</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$DcDefaultState</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">467</span>
+    <span style="font-weight:bold;">const/16</span> <span style="color:#27aeae;">p2</span>, <span style="color:#f67400;">0x12c</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">p2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#8e44ad;">setLogRecSize</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">468</span>
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">p2</span>, <span style="color:#f67400;">0x1</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">p2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#8e44ad;">setLogOnlyTransitions</span>(<span style="color:#2980b9;font-style:italic;">Z</span>)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">469</span>
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v1</span>, <span style="color:#f44f4f;">&quot;DataConnection created&quot;</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">v1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#8e44ad;">log</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">471</span>
+    <span style="font-weight:bold;">iput-object</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mPhone</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/Phone</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">476</span>
+    <span style="font-weight:bold;">iput</span> <span style="color:#27aeae;">p3</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mId</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">477</span>
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">p1</span>, <span style="color:#f67400;">-0x1</span>
+
+    <span style="font-weight:bold;">iput</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mCid</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">478</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mPhone</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/Phone</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/Phone</span>;-&gt;<span style="color:#8e44ad;">getServiceState</span>()<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/telephony/ServiceState</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">p1</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">479</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/telephony/ServiceState</span>;-&gt;<span style="color:#8e44ad;">getRilDataRadioTechnology</span>()<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">p3</span>
+
+    <span style="font-weight:bold;">iput</span> <span style="color:#27aeae;">p3</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mRilRat</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">480</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">p3</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mPhone</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/Phone</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p3</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/Phone</span>;-&gt;<span style="color:#8e44ad;">getServiceState</span>()<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/telephony/ServiceState</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">p3</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p3</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/telephony/ServiceState</span>;-&gt;<span style="color:#8e44ad;">getDataRegState</span>()<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">p3</span>
+
+    <span style="font-weight:bold;">iput</span> <span style="color:#27aeae;">p3</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mDataRegState</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">481</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/telephony/ServiceState</span>;-&gt;<span style="color:#8e44ad;">getDataNetworkType</span>()<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">p3</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">482</span>
+    <span style="font-weight:bold;">new-instance</span> <span style="color:#27aeae;">p4</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkInfo</span>;
+
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">p5</span>, <span style="color:#f44f4f;">&quot;MOBILE&quot;</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">483</span>
+    <span style="font-weight:bold;">invoke-static</span> {<span style="color:#27aeae;">p3</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/telephony/TelephonyManager</span>;-&gt;<span style="color:#8e44ad;">getNetworkTypeName</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">p6</span>
+
+    <span style="font-weight:bold;">invoke-direct</span> {<span style="color:#27aeae;">p4</span>, <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p3</span>, <span style="color:#27aeae;">p5</span>, <span style="color:#27aeae;">p6</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkInfo</span>;-&gt;&lt;<span style="color:#8e44ad;">init</span>&gt;(<span style="color:#2980b9;font-style:italic;">IIL</span><span style="color:#7f8c8d;">java/lang/String</span>;<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="font-weight:bold;">iput-object</span> <span style="color:#27aeae;">p4</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mNetworkInfo</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkInfo</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">484</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">p3</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mNetworkInfo</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkInfo</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/telephony/ServiceState</span>;-&gt;<span style="color:#8e44ad;">getDataRoaming</span>()<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">p1</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p3</span>, <span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkInfo</span>;-&gt;<span style="color:#8e44ad;">setRoaming</span>(<span style="color:#2980b9;font-style:italic;">Z</span>)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">485</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mNetworkInfo</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkInfo</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">p2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkInfo</span>;-&gt;<span style="color:#8e44ad;">setIsAvailable</span>(<span style="color:#2980b9;font-style:italic;">Z</span>)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">487</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mDefaultState</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$DcDefaultState</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#8e44ad;">addState</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/util/State</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">493</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mInactiveState</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$DcInactiveState</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#8e44ad;">setInitialState</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/util/State</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">495</span>
+    <span style="font-weight:bold;">new-instance</span> <span style="color:#27aeae;">p1</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/HashMap</span>;
+
+    <span style="font-weight:bold;">invoke-direct</span> {<span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/HashMap</span>;-&gt;&lt;<span style="color:#8e44ad;">init</span>&gt;()<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="font-weight:bold;">iput-object</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mApnContexts</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/HashMap</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">496</span>
+    <span style="font-weight:bold;">return-void</span>
+<span style="color:#2980b9;">.end method</span>
+
+<span style="color:#2980b9;">.method</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">synthetic</span> <span style="color:#8e44ad;">access$000</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/os/Message</span>;)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+    <span style="color:#2980b9;">.registers</span> <span style="color:#f67400;">1</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">97</span>
+    <span style="font-weight:bold;">invoke-static</span> {<span style="color:#27aeae;">p0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#8e44ad;">msgToString</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/os/Message</span>;)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">p0</span>
+
+    <span style="font-weight:bold;">return-object</span> <span style="color:#27aeae;">p0</span>
+<span style="color:#2980b9;">.end method</span>
+
+<span style="color:#2980b9;">.method</span> <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">synthetic</span> <span style="color:#8e44ad;">access$902</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/Object</span>;)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/Object</span>;
+    <span style="color:#2980b9;">.registers</span> <span style="color:#f67400;">2</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">97</span>
+    <span style="font-weight:bold;">iput-object</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mUserData</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/Object</span>;
+
+    <span style="font-weight:bold;">return-object</span> <span style="color:#27aeae;">p1</span>
+<span style="color:#2980b9;">.end method</span>
+
+<span style="color:#2980b9;">.method</span> <span style="font-weight:bold;">private</span> <span style="color:#8e44ad;">checkSetMtu</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnSetting</span>;<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/LinkProperties</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+    <span style="color:#2980b9;">.registers</span> <span style="color:#f67400;">4</span>
+
+    <span style="color:#2980b9;">.local</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">getMtu</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/LinkProperties</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">438</span>
+    <span style="font-weight:bold;">if-nez</span> <span style="color:#27aeae;">p2</span>, <span style="color:#27ae60;">:cond_3</span>
+
+    <span style="font-weight:bold;">return-void</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">440</span>
+    <span style="color:#27ae60;">:cond_3</span>
+    <span style="font-weight:bold;">if-eqz</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27ae60;">:cond_74</span>
+
+    <span style="font-weight:bold;">if-nez</span> <span style="color:#27aeae;">p2</span>, <span style="color:#27ae60;">:cond_8</span>
+
+    <span style="font-weight:bold;">goto</span> <span style="color:#27ae60;">:goto_74</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">442</span>
+    <span style="color:#27ae60;">:cond_8</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/LinkProperties</span>;-&gt;<span style="color:#8e44ad;">getMtu</span>()<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">v0</span>
+
+    <span style="font-weight:bold;">if-eqz</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27ae60;">:cond_27</span>
+
+    <span style="color:#2980b9;">.restart local</span> <span style="color:#27aeae;">v0</span> <span style="color:#7a7c7d;"># getMtu:Landroid/net/LinkProperties;</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">443</span>
+    <span style="font-weight:bold;">new-instance</span> <span style="color:#27aeae;">p1</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;
+
+    <span style="font-weight:bold;">invoke-direct</span> {<span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;-&gt;&lt;<span style="color:#8e44ad;">init</span>&gt;()<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.end local</span> <span style="color:#27aeae;">v0</span> <span style="color:#7a7c7d;"># getMtu:Landroid/net/LinkProperties;</span>
+
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f44f4f;">&quot;MTU set by call response to: &quot;</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;-&gt;<span style="color:#8e44ad;">append</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/LinkProperties</span>;-&gt;<span style="color:#8e44ad;">getMtu</span>()<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="font-weight:bold;">invoke-static</span> {<span style="color:#27aeae;">v3</span>, <span style="color:#27aeae;">v4</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;-&gt;<span style="color:#8e44ad;">format</span>(<span style="color:#2980b9;font-style:italic;">[L</span><span style="color:#7f8c8d;">java/lang/String</span>;<span style="color:#2980b9;font-style:italic;">[[L</span><span style="color:#7f8c8d;">java/lang/Object</span>;)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">v3</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">v3</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#8e44ad;">log</span>(<span style="color:#2980b9;font-style:italic;">I[[D[L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="font-weight:bold;">invoke-static</span> {<span style="color:#27aeae;">v1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/os/AsyncResult</span>;-&gt;<span style="color:#8e44ad;">forMessage</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/os/Message</span>;)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/os/AsyncResult</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">444</span>
+    <span style="font-weight:bold;">return-void</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">447</span>
+    <span style="color:#27ae60;">:cond_27</span>
+    <span style="font-weight:bold;">if-eqz</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27ae60;">:cond_49</span>
+
+    <span style="font-weight:bold;">iget</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p1</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnSetting</span>;-&gt;<span style="color:#27aeae;">mtu</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="font-weight:bold;">if-eqz</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27ae60;">:cond_49</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">448</span>
+    <span style="font-weight:bold;">iget</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p1</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnSetting</span>;-&gt;<span style="color:#27aeae;">mtu</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p2</span>, <span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/LinkProperties</span>;-&gt;<span style="color:#8e44ad;">setMtu</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">449</span>
+    <span style="font-weight:bold;">new-instance</span> <span style="color:#27aeae;">p2</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;
+
+    <span style="font-weight:bold;">invoke-direct</span> {<span style="color:#27aeae;">p2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;-&gt;&lt;<span style="color:#8e44ad;">init</span>&gt;()<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f44f4f;">&quot;MTU set by APN to: &quot;</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p2</span>, <span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;-&gt;<span style="color:#8e44ad;">append</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;
+
+    <span style="font-weight:bold;">iget</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">p1</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnSetting</span>;-&gt;<span style="color:#27aeae;">mtu</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p2</span>, <span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;-&gt;<span style="color:#8e44ad;">append</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;-&gt;<span style="color:#8e44ad;">toString</span>()<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">p1</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#8e44ad;">log</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">450</span>
+    <span style="font-weight:bold;">return-void</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">453</span>
+    <span style="color:#27ae60;">:cond_49</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mPhone</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/Phone</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/Phone</span>;-&gt;<span style="color:#8e44ad;">getContext</span>()<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/content/Context</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">p1</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/content/Context</span>;-&gt;<span style="color:#8e44ad;">getResources</span>()<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/content/res/Resources</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">p1</span>
+
+    <span style="font-weight:bold;">const</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f67400;">0x10e0066</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/content/res/Resources</span>;-&gt;<span style="color:#8e44ad;">getInteger</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">p1</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">455</span>
+    <span style="font-weight:bold;">if-eqz</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27ae60;">:cond_73</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">456</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p2</span>, <span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/LinkProperties</span>;-&gt;<span style="color:#8e44ad;">setMtu</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">457</span>
+    <span style="font-weight:bold;">new-instance</span> <span style="color:#27aeae;">p2</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;
+
+    <span style="font-weight:bold;">invoke-direct</span> {<span style="color:#27aeae;">p2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;-&gt;&lt;<span style="color:#8e44ad;">init</span>&gt;()<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f44f4f;">&quot;MTU set by config resource to: &quot;</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p2</span>, <span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;-&gt;<span style="color:#8e44ad;">append</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;-&gt;<span style="color:#8e44ad;">toString</span>()<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">p1</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#8e44ad;">log</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">459</span>
+    <span style="color:#27ae60;">:cond_73</span>
+    <span style="font-weight:bold;">return-void</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">440</span>
+    <span style="color:#27ae60;">:cond_74</span>
+    <span style="color:#27ae60;">:goto_74</span>
+    <span style="font-weight:bold;">return-void</span>
+<span style="color:#2980b9;">.end method</span>
+
+<span style="color:#2980b9;">.method</span> <span style="font-weight:bold;">private</span> <span style="color:#8e44ad;">clearSettings</span>()<span style="color:#2980b9;font-style:italic;">V</span>
+    <span style="color:#2980b9;">.registers</span> <span style="color:#f67400;">3</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">723</span>
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f44f4f;">&quot;clearSettings&quot;</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#8e44ad;">log</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">725</span>
+    <span style="font-weight:bold;">const-wide/16</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f67400;">-0x1</span>
+
+    <span style="font-weight:bold;">iput-wide</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mCreateTime</span>:<span style="color:#2980b9;font-style:italic;">J</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">726</span>
+    <span style="font-weight:bold;">iput-wide</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mLastFailTime</span>:<span style="color:#2980b9;font-style:italic;">J</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">727</span>
+    <span style="font-weight:bold;">sget-object</span> <span style="color:#27aeae;">v0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DcFailCause</span>;-&gt;<span style="color:#27aeae;">NONE</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DcFailCause</span>;
+
+    <span style="font-weight:bold;">iput-object</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mLastFailCause</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DcFailCause</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">728</span>
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f67400;">-0x1</span>
+
+    <span style="font-weight:bold;">iput</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mCid</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">730</span>
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f67400;">0x5</span>
+
+    <span style="font-weight:bold;">new-array</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v0</span>, <span style="color:#2980b9;font-style:italic;">[L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">iput-object</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mPcscfAddr</span>:<span style="color:#2980b9;font-style:italic;">[L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">732</span>
+    <span style="font-weight:bold;">new-instance</span> <span style="color:#27aeae;">v0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/LinkProperties</span>;
+
+    <span style="font-weight:bold;">invoke-direct</span> {<span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/LinkProperties</span>;-&gt;&lt;<span style="color:#8e44ad;">init</span>&gt;()<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="font-weight:bold;">iput-object</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mLinkProperties</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/LinkProperties</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">733</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mApnContexts</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/HashMap</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/HashMap</span>;-&gt;<span style="color:#8e44ad;">clear</span>()<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">734</span>
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f67400;">0x0</span>
+
+    <span style="font-weight:bold;">iput-object</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mApnSetting</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnSetting</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">736</span>
+    <span style="font-weight:bold;">return-void</span>
+<span style="color:#2980b9;">.end method</span>
+
+<span style="color:#2980b9;">.method</span> <span style="font-weight:bold;">static</span> <span style="color:#8e44ad;">cmdToString</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+    <span style="color:#2980b9;">.registers</span> <span style="color:#f67400;">4</span>
+
+    <span style="color:#2980b9;">.param</span> <span style="color:#27aeae;">p0</span>,<span style="color:#27aeae;"> cmd</span>
+
+    <span style="color:#2980b9;">.prologue</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">260</span>
+    <span style="font-weight:bold;">const/high16</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f67400;">0x40000</span>
+
+    <span style="font-weight:bold;">sub-int/2addr</span> <span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">v0</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">261</span>
+    <span style="font-weight:bold;">if-ltz</span> <span style="color:#27aeae;">p0</span>, <span style="color:#27ae60;">:cond_f</span>
+
+    <span style="font-weight:bold;">sget-object</span> <span style="color:#27aeae;">v1</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">sCmdToString</span>:<span style="color:#2980b9;font-style:italic;">[L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">array-length</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">v1</span>
+
+    <span style="font-weight:bold;">if-ge</span> <span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">v1</span>, <span style="color:#27ae60;">:cond_f</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">262</span>
+    <span style="font-weight:bold;">sget-object</span> <span style="color:#27aeae;">v1</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">sCmdToString</span>:<span style="color:#2980b9;font-style:italic;">[L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">aget-object</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">p0</span>
+
+    <span style="font-weight:bold;">goto</span> <span style="color:#27ae60;">:goto_15</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">264</span>
+    <span style="color:#27ae60;">:cond_f</span>
+    <span style="font-weight:bold;">add-int</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">v0</span>
+
+    <span style="font-weight:bold;">invoke-static</span> {<span style="color:#27aeae;">v1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DcAsyncChannel</span>;-&gt;<span style="color:#8e44ad;">cmdToString</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">v1</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">266</span>
+    <span style="color:#27ae60;">:goto_15</span>
+    <span style="font-weight:bold;">if-nez</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27ae60;">:cond_2d</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">267</span>
+    <span style="font-weight:bold;">new-instance</span> <span style="color:#27aeae;">v1</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;
+
+    <span style="font-weight:bold;">invoke-direct</span> {<span style="color:#27aeae;">v1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;-&gt;&lt;<span style="color:#8e44ad;">init</span>&gt;()<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v2</span>, <span style="color:#f44f4f;">&quot;0x&quot;</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">v2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;-&gt;<span style="color:#8e44ad;">append</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;
+
+    <span style="font-weight:bold;">add-int/2addr</span> <span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">v0</span>
+
+    <span style="font-weight:bold;">invoke-static</span> {<span style="color:#27aeae;">p0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/Integer</span>;-&gt;<span style="color:#8e44ad;">toHexString</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">p0</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">p0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;-&gt;<span style="color:#8e44ad;">append</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">v1</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">269</span>
+    <span style="color:#27ae60;">:cond_2d</span>
+    <span style="font-weight:bold;">return-object</span> <span style="color:#27aeae;">v1</span>
+<span style="color:#2980b9;">.end method</span>
+
+<span style="color:#2980b9;">.method</span> <span style="font-weight:bold;">private</span> <span style="color:#8e44ad;">dumpToLog</span>()<span style="color:#2980b9;font-style:italic;">V</span>
+    <span style="color:#2980b9;">.registers</span> <span style="color:#f67400;">4</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">2489</span>
+    <span style="font-weight:bold;">new-instance</span> <span style="color:#27aeae;">v0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$1</span>;
+
+    <span style="font-weight:bold;">new-instance</span> <span style="color:#27aeae;">v1</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/io/StringWriter</span>;
+
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v2</span>, <span style="color:#f67400;">0x0</span>
+
+    <span style="font-weight:bold;">invoke-direct</span> {<span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">v2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/io/StringWriter</span>;-&gt;&lt;<span style="color:#8e44ad;">init</span>&gt;(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="font-weight:bold;">invoke-direct</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">v1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$1</span>;-&gt;&lt;<span style="color:#8e44ad;">init</span>&gt;(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/io/Writer</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v1</span>, <span style="color:#f67400;">0x0</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#8e44ad;">dump</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/io/FileDescriptor</span>;<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/io/PrintWriter</span>;<span style="color:#2980b9;font-style:italic;">[L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">2499</span>
+    <span style="font-weight:bold;">return-void</span>
+<span style="color:#2980b9;">.end method</span>
+
+<span style="color:#2980b9;">.method</span> <span style="font-weight:bold;">private</span> <span style="color:#8e44ad;">getSuggestedRetryDelay</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/telephony/data/DataCallResponse</span>;)<span style="color:#2980b9;font-style:italic;">J</span>
+    <span style="color:#2980b9;">.registers</span> <span style="color:#f67400;">4</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">2331</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/telephony/data/DataCallResponse</span>;-&gt;<span style="color:#8e44ad;">getSuggestedRetryTime</span>()<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">v0</span>
+
+    <span style="font-weight:bold;">if-gez</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27ae60;">:cond_e</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">2332</span>
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">p1</span>, <span style="color:#f44f4f;">&quot;No suggested retry delay.&quot;</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#8e44ad;">log</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">2333</span>
+    <span style="font-weight:bold;">const-wide/16</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f67400;">-0x2</span>
+
+    <span style="font-weight:bold;">return-wide</span> <span style="color:#27aeae;">v0</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">2336</span>
+    <span style="color:#27ae60;">:cond_e</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/telephony/data/DataCallResponse</span>;-&gt;<span style="color:#8e44ad;">getSuggestedRetryTime</span>()<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">v0</span>
+
+    <span style="font-weight:bold;">const</span> <span style="color:#27aeae;">v1</span>, <span style="color:#f67400;">0x7fffffff</span>
+
+    <span style="font-weight:bold;">if-ne</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v1</span>, <span style="color:#27ae60;">:cond_1f</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">2337</span>
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">p1</span>, <span style="color:#f44f4f;">&quot;Modem suggested not retrying.&quot;</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#8e44ad;">log</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">2338</span>
+    <span style="font-weight:bold;">const-wide/16</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f67400;">-0x1</span>
+
+    <span style="font-weight:bold;">return-wide</span> <span style="color:#27aeae;">v0</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">2343</span>
+    <span style="color:#27ae60;">:cond_1f</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/telephony/data/DataCallResponse</span>;-&gt;<span style="color:#8e44ad;">getSuggestedRetryTime</span>()<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">p1</span>
+
+    <span style="font-weight:bold;">int-to-long</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p1</span>
+
+    <span style="font-weight:bold;">return-wide</span> <span style="color:#27aeae;">v0</span>
+<span style="color:#2980b9;">.end method</span>
+
+<span style="color:#2980b9;">.method</span> <span style="font-weight:bold;">private</span> <span style="color:#8e44ad;">initConnection</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$ConnectionParams</span>;)<span style="color:#2980b9;font-style:italic;">Z</span>
+    <span style="color:#2980b9;">.registers</span> <span style="color:#f67400;">6</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1168</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p1</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$ConnectionParams</span>;-&gt;<span style="color:#27aeae;">mApnContext</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnContext</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1169</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mApnSetting</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnSetting</span>;
+
+    <span style="font-weight:bold;">if-nez</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27ae60;">:cond_c</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1174</span>
+    <span style="color:#27ae60;">:cond_c</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mApnSetting</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnSetting</span>;
+
+    <span style="font-weight:bold;">if-eqz</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27ae60;">:cond_5f</span>
+
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mApnSetting</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnSetting</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnContext</span>;-&gt;<span style="color:#8e44ad;">getApnType</span>()<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">v2</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">v2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnSetting</span>;-&gt;<span style="color:#8e44ad;">canHandleType</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">v1</span>
+
+    <span style="font-weight:bold;">if-nez</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27ae60;">:cond_1d</span>
+
+    <span style="font-weight:bold;">goto</span> <span style="color:#27ae60;">:goto_5f</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1181</span>
+    <span style="color:#27ae60;">:cond_1d</span>
+    <span style="font-weight:bold;">iget</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mTag</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v2</span>, <span style="color:#f67400;">0x1</span>
+
+    <span style="font-weight:bold;">add-int/2addr</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">v2</span>
+
+    <span style="font-weight:bold;">iput</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mTag</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1182</span>
+    <span style="font-weight:bold;">iput-object</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mConnectionParams</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$ConnectionParams</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1183</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mConnectionParams</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$ConnectionParams</span>;
+
+    <span style="font-weight:bold;">iget</span> <span style="color:#27aeae;">v3</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mTag</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="font-weight:bold;">iput</span> <span style="color:#27aeae;">v3</span>, <span style="color:#27aeae;">v1</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$ConnectionParams</span>;-&gt;<span style="color:#27aeae;">mTag</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1187</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mApnContexts</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/HashMap</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/HashMap</span>;-&gt;<span style="color:#8e44ad;">put</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/Object</span>;<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/Object</span>;)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/Object</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1190</span>
+    <span style="font-weight:bold;">new-instance</span> <span style="color:#27aeae;">p1</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;
+
+    <span style="font-weight:bold;">invoke-direct</span> {<span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;-&gt;&lt;<span style="color:#8e44ad;">init</span>&gt;()<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f44f4f;">&quot;initConnection:  RefCount=&quot;</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;-&gt;<span style="color:#8e44ad;">append</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;
+
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mApnContexts</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/HashMap</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1191</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/HashMap</span>;-&gt;<span style="color:#8e44ad;">size</span>()<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">v0</span>
+
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f44f4f;">&quot; mConnectionParams=&quot;</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;-&gt;<span style="color:#8e44ad;">append</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;
+
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mConnectionParams</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$ConnectionParams</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;-&gt;<span style="color:#8e44ad;">append</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/Object</span>;)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;-&gt;<span style="color:#8e44ad;">toString</span>()<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">p1</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1190</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#8e44ad;">log</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1195</span>
+    <span style="font-weight:bold;">return</span> <span style="color:#27aeae;">v2</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1176</span>
+    <span style="color:#27ae60;">:cond_5f</span>
+    <span style="color:#27ae60;">:goto_5f</span>
+    <span style="font-weight:bold;">new-instance</span> <span style="color:#27aeae;">v0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;
+
+    <span style="font-weight:bold;">invoke-direct</span> {<span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;-&gt;&lt;<span style="color:#8e44ad;">init</span>&gt;()<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v1</span>, <span style="color:#f44f4f;">&quot;initConnection: incompatible apnSetting in ConnectionParams cp=&quot;</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;-&gt;<span style="color:#8e44ad;">append</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;-&gt;<span style="color:#8e44ad;">append</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/Object</span>;)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/StringBuilder</span>;
+
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">p1</span>, <span style="color:#f44f4f;">&quot; dc=&quot;</span>
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">p1</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#8e44ad;">log</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1179</span>
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">p1</span>, <span style="color:#f67400;">0x0</span>
+
+    <span style="font-weight:bold;">return</span> <span style="color:#27aeae;">p1</span>
+<span style="color:#2980b9;">.end method</span>
+
+<span style="color:#2980b9;">.method</span> <span style="font-weight:bold;">private</span> <span style="color:#8e44ad;">isDnsOk</span>(<span style="color:#2980b9;font-style:italic;">[L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">Z</span>
+    <span style="color:#2980b9;">.registers</span> <span style="color:#f67400;">6</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">780</span>
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f44f4f;">&quot;0.0.0.0&quot;</span>
+
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v1</span>, <span style="color:#f67400;">0x0</span>
+
+    <span style="font-weight:bold;">aget-object</span> <span style="color:#27aeae;">v2</span>, <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">v1</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;-&gt;<span style="color:#8e44ad;">equals</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/Object</span>;)<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">v0</span>
+
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v2</span>, <span style="color:#f67400;">0x1</span>
+
+    <span style="font-weight:bold;">if-eqz</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27ae60;">:cond_65</span>
+
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f44f4f;">&quot;0.0.0.0&quot;</span>
+
+    <span style="font-weight:bold;">aget-object</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">v2</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;-&gt;<span style="color:#8e44ad;">equals</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/Object</span>;)<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">p1</span>
+
+    <span style="font-weight:bold;">if-eqz</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27ae60;">:cond_65</span>
+
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mPhone</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/Phone</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">781</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/Phone</span>;-&gt;<span style="color:#8e44ad;">isDnsCheckDisabled</span>()<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">p1</span>
+
+    <span style="font-weight:bold;">if-nez</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27ae60;">:cond_65</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">787</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mApnSetting</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnSetting</span>;
+
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">p1</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnSetting</span>;-&gt;<span style="color:#27aeae;">types</span>:<span style="color:#2980b9;font-style:italic;">[L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">aget-object</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">v1</span>
+
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f44f4f;">&quot;mms&quot;</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;-&gt;<span style="color:#8e44ad;">equals</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/Object</span>;)<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">p1</span>
+
+    <span style="font-weight:bold;">if-eqz</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27ae60;">:cond_36</span>
+
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mApnSetting</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnSetting</span>;
+
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">p1</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnSetting</span>;-&gt;<span style="color:#27aeae;">mmsProxy</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">788</span>
+    <span style="font-weight:bold;">invoke-static</span> {<span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#8e44ad;">isIpAddress</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">p1</span>
+
+    <span style="font-weight:bold;">if-nez</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27ae60;">:cond_65</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">789</span>
+    <span style="color:#27ae60;">:cond_36</span>
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">p1</span>, <span style="color:#f44f4f;">&quot;isDnsOk: return false apn.types[0]=%s APN_TYPE_MMS=%s isIpAddress(%s)=%s&quot;</span>
+
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f67400;">0x4</span>
+
+    <span style="font-weight:bold;">new-array</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v0</span>, <span style="color:#2980b9;font-style:italic;">[L</span><span style="color:#7f8c8d;">java/lang/Object</span>;
+
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v3</span>, <span style="color:#27aeae;">v3</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnSetting</span>;-&gt;<span style="color:#27aeae;">types</span>:<span style="color:#2980b9;font-style:italic;">[L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">aget-object</span> <span style="color:#27aeae;">v3</span>, <span style="color:#27aeae;">v3</span>, <span style="color:#27aeae;">v1</span>
+
+    <span style="font-weight:bold;">aput-object</span> <span style="color:#27aeae;">v3</span>, <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v1</span>
+
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v3</span>, <span style="color:#f44f4f;">&quot;mms&quot;</span>
+
+    <span style="font-weight:bold;">aput-object</span> <span style="color:#27aeae;">v3</span>, <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v2</span>
+
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v2</span>, <span style="color:#f67400;">0x2</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">792</span>
+    <span style="font-weight:bold;">invoke-static</span> {<span style="color:#27aeae;">v3</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#8e44ad;">isIpAddress</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">v3</span>
+
+    <span style="font-weight:bold;">invoke-static</span> {<span style="color:#27aeae;">v3</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/Boolean</span>;-&gt;<span style="color:#8e44ad;">valueOf</span>(<span style="color:#2980b9;font-style:italic;">Z</span>)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/Boolean</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">v3</span>
+
+    <span style="font-weight:bold;">aput-object</span> <span style="color:#27aeae;">v3</span>, <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v2</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">789</span>
+    <span style="font-weight:bold;">invoke-static</span> {<span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;-&gt;<span style="color:#8e44ad;">format</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;<span style="color:#2980b9;font-style:italic;">[L</span><span style="color:#7f8c8d;">java/lang/Object</span>;)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">p1</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#8e44ad;">log</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">793</span>
+    <span style="font-weight:bold;">return</span> <span style="color:#27aeae;">v1</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">796</span>
+    <span style="color:#27ae60;">:cond_65</span>
+    <span style="font-weight:bold;">return</span> <span style="color:#27aeae;">v2</span>
+<span style="color:#2980b9;">.end method</span>
+
+<span style="color:#2980b9;">.method</span> <span style="font-weight:bold;">private</span> <span style="color:#8e44ad;">setNetworkRestriction</span>()<span style="color:#2980b9;font-style:italic;">V</span>
+    <span style="color:#2980b9;">.registers</span> <span style="color:#f67400;">5</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">914</span>
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f67400;">0x0</span>
+
+    <span style="font-weight:bold;">iput-boolean</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mRestrictedNetworkOverride</span>:<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">916</span>
+    <span style="font-weight:bold;">nop</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">917</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mApnContexts</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/HashMap</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/HashMap</span>;-&gt;<span style="color:#8e44ad;">keySet</span>()<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/Set</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">v0</span>
+
+    <span style="font-weight:bold;">invoke-interface</span> {<span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/Set</span>;-&gt;<span style="color:#8e44ad;">iterator</span>()<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/Iterator</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">v0</span>
+
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v1</span>, <span style="color:#f67400;">0x1</span>
+
+    <span style="font-weight:bold;">move</span> <span style="color:#27aeae;">v2</span>, <span style="color:#27aeae;">v1</span>
+
+    <span style="color:#27ae60;">:goto_10</span>
+    <span style="font-weight:bold;">invoke-interface</span> {<span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/Iterator</span>;-&gt;<span style="color:#8e44ad;">hasNext</span>()<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">v3</span>
+
+    <span style="font-weight:bold;">if-eqz</span> <span style="color:#27aeae;">v3</span>, <span style="color:#27ae60;">:cond_22</span>
+
+    <span style="font-weight:bold;">invoke-interface</span> {<span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/Iterator</span>;-&gt;<span style="color:#8e44ad;">next</span>()<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/Object</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">v3</span>
+
+    <span style="font-weight:bold;">check-cast</span> <span style="color:#27aeae;">v3</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnContext</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">918</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v3</span>, <span style="color:#27aeae;">v1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnContext</span>;-&gt;<span style="color:#8e44ad;">hasNoRestrictedRequests</span>(<span style="color:#2980b9;font-style:italic;">Z</span>)<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">v3</span>
+
+    <span style="font-weight:bold;">and-int/2addr</span> <span style="color:#27aeae;">v2</span>, <span style="color:#27aeae;">v3</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">919</span>
+    <span style="font-weight:bold;">goto</span> <span style="color:#27ae60;">:goto_10</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">920</span>
+    <span style="color:#27ae60;">:cond_22</span>
+    <span style="font-weight:bold;">if-eqz</span> <span style="color:#27aeae;">v2</span>, <span style="color:#27ae60;">:cond_25</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">921</span>
+    <span style="font-weight:bold;">return-void</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">926</span>
+    <span style="color:#27ae60;">:cond_25</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mApnSetting</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnSetting</span>;
+
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v2</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mPhone</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/Phone</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnSetting</span>;-&gt;<span style="color:#8e44ad;">isMetered</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/Phone</span>;)<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">v0</span>
+
+    <span style="font-weight:bold;">if-nez</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27ae60;">:cond_30</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">927</span>
+    <span style="font-weight:bold;">return-void</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">931</span>
+    <span style="color:#27ae60;">:cond_30</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mDct</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">Dataconnection/DcTracker</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DcTracker</span>;-&gt;<span style="color:#8e44ad;">isDataEnabled</span>()<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">v0</span>
+
+    <span style="font-weight:bold;">xor-int/2addr</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v1</span>
+
+    <span style="font-weight:bold;">iput-boolean</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mRestrictedNetworkOverride</span>:<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">932</span>
+    <span style="font-weight:bold;">return-void</span>
+<span style="color:#2980b9;">.end method</span>
+
+<span style="color:#2980b9;">.method</span> <span style="font-weight:bold;">static</span> <span style="color:#8e44ad;">slog</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">Data/String</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+    <span style="color:#2980b9;">.registers</span> <span style="color:#f67400;">2</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">2396</span>
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f44f4f;">&quot;DC&quot;</span>
+
+    <span style="font-weight:bold;">invoke-static</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/telephony/Rlog</span>;-&gt;<span style="color:#8e44ad;">d</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">2397</span>
+    <span style="font-weight:bold;">return-void</span>
+<span style="color:#2980b9;">.end method</span>
+
+<span style="color:#2980b9;">.method</span> <span style="font-weight:bold;">private</span> <span style="color:#8e44ad;">updateTcpBufferSizes</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">V</span>
+    <span style="color:#2980b9;">.registers</span> <span style="color:#f67400;">10</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">812</span>
+    <span style="font-weight:bold;">nop</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">813</span>
+    <span style="font-weight:bold;">const/16</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f67400;">0x13</span>
+
+    <span style="font-weight:bold;">if-ne</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">v0</span>, <span style="color:#27ae60;">:cond_7</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">816</span>
+    <span style="font-weight:bold;">const/16</span> <span style="color:#27aeae;">p1</span>, <span style="color:#f67400;">0xe</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">818</span>
+    <span style="color:#27ae60;">:cond_7</span>
+    <span style="font-weight:bold;">invoke-static</span> {<span style="color:#27aeae;">p1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/telephony/ServiceState</span>;-&gt;<span style="color:#8e44ad;">rilRadioTechnologyToString</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">v1</span>
+
+    <span style="font-weight:bold;">sget-object</span> <span style="color:#27aeae;">v2</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/Locale</span>;-&gt;<span style="color:#27aeae;">ROOT</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/Locale</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">v2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;-&gt;<span style="color:#8e44ad;">toLowerCase</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/util/Locale</span>;)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">v1</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">821</span>
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v2</span>, <span style="color:#f67400;">0x7</span>
+
+    <span style="font-weight:bold;">if-eq</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">v2</span>, <span style="color:#27ae60;">:cond_1c</span>
+
+    <span style="font-weight:bold;">const/16</span> <span style="color:#27aeae;">v2</span>, <span style="color:#f67400;">0x8</span>
+
+    <span style="font-weight:bold;">if-eq</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">v2</span>, <span style="color:#27ae60;">:cond_1c</span>
+
+    <span style="font-weight:bold;">const/16</span> <span style="color:#27aeae;">v2</span>, <span style="color:#f67400;">0xc</span>
+
+    <span style="font-weight:bold;">if-ne</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">v2</span>, <span style="color:#27ae60;">:cond_1e</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">824</span>
+    <span style="color:#27ae60;">:cond_1c</span>
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v1</span>, <span style="color:#f44f4f;">&quot;evdo&quot;</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">828</span>
+    <span style="color:#27ae60;">:cond_1e</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v2</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mPhone</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/Phone</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/Phone</span>;-&gt;<span style="color:#8e44ad;">getContext</span>()<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/content/Context</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">v2</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/content/Context</span>;-&gt;<span style="color:#8e44ad;">getResources</span>()<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/content/res/Resources</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">v2</span>
+
+    <span style="font-weight:bold;">const</span> <span style="color:#27aeae;">v3</span>, <span style="color:#f67400;">0x1070039</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v2</span>, <span style="color:#27aeae;">v3</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/content/res/Resources</span>;-&gt;<span style="color:#8e44ad;">getStringArray</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">[L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">v2</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">830</span>
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v3</span>, <span style="color:#f67400;">0x0</span>
+
+    <span style="font-weight:bold;">move</span> <span style="color:#27aeae;">v4</span>, <span style="color:#27aeae;">v3</span>
+
+    <span style="color:#27ae60;">:goto_31</span>
+    <span style="font-weight:bold;">array-length</span> <span style="color:#27aeae;">v5</span>, <span style="color:#27aeae;">v2</span>
+
+    <span style="font-weight:bold;">if-ge</span> <span style="color:#27aeae;">v4</span>, <span style="color:#27aeae;">v5</span>, <span style="color:#27ae60;">:cond_4f</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">831</span>
+    <span style="font-weight:bold;">aget-object</span> <span style="color:#27aeae;">v5</span>, <span style="color:#27aeae;">v2</span>, <span style="color:#27aeae;">v4</span>
+
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v6</span>, <span style="color:#f44f4f;">&quot;:&quot;</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v5</span>, <span style="color:#27aeae;">v6</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;-&gt;<span style="color:#8e44ad;">split</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">[L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">v5</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">832</span>
+    <span style="font-weight:bold;">aget-object</span> <span style="color:#27aeae;">v6</span>, <span style="color:#27aeae;">v5</span>, <span style="color:#27aeae;">v3</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">v6</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;-&gt;<span style="color:#8e44ad;">equals</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/Object</span>;)<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">v6</span>
+
+    <span style="font-weight:bold;">if-eqz</span> <span style="color:#27aeae;">v6</span>, <span style="color:#27ae60;">:cond_4c</span>
+
+    <span style="font-weight:bold;">array-length</span> <span style="color:#27aeae;">v6</span>, <span style="color:#27aeae;">v5</span>
+
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v7</span>, <span style="color:#f67400;">0x2</span>
+
+    <span style="font-weight:bold;">if-ne</span> <span style="color:#27aeae;">v6</span>, <span style="color:#27aeae;">v7</span>, <span style="color:#27ae60;">:cond_4c</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">833</span>
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v1</span>, <span style="color:#f67400;">0x1</span>
+
+    <span style="font-weight:bold;">aget-object</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">v5</span>, <span style="color:#27aeae;">v1</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">834</span>
+    <span style="font-weight:bold;">goto</span> <span style="color:#27ae60;">:goto_50</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">830</span>
+    <span style="color:#27ae60;">:cond_4c</span>
+    <span style="font-weight:bold;">add-int/lit8</span> <span style="color:#27aeae;">v4</span>, <span style="color:#27aeae;">v4</span>, <span style="color:#f67400;">0x1</span>
+
+    <span style="font-weight:bold;">goto</span> <span style="color:#27ae60;">:goto_31</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">838</span>
+    <span style="color:#27ae60;">:cond_4f</span>
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v1</span>, <span style="color:#f67400;">0x0</span>
+
+    <span style="color:#27ae60;">:goto_50</span>
+    <span style="font-weight:bold;">if-nez</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27ae60;">:cond_79</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">842</span>
+    <span style="font-weight:bold;">if-eq</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">v0</span>, <span style="color:#27ae60;">:cond_76</span>
+
+    <span style="font-weight:bold;">packed-switch</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27ae60;">:pswitch_data_80</span>
+
+    <span style="font-weight:bold;">packed-switch</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27ae60;">:pswitch_data_8a</span>
+
+    <span style="font-weight:bold;">goto</span> <span style="color:#27ae60;">:goto_79</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">875</span>
+    <span style="color:#27ae60;">:pswitch_5b</span>
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v1</span>, <span style="color:#f44f4f;">&quot;122334,734003,2202010,32040,192239,576717&quot;</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">845</span>
+    <span style="font-weight:bold;">goto</span> <span style="color:#27ae60;">:goto_79</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">872</span>
+    <span style="color:#27ae60;">:cond_76</span>
+    <span style="color:#27ae60;">:pswitch_76</span>
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v1</span>, <span style="color:#f44f4f;">&quot;524288,1048576,2097152,262144,524288,1048576&quot;</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">873</span>
+    <span style="font-weight:bold;">nop</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">882</span>
+    <span style="color:#27ae60;">:cond_79</span>
+    <span style="color:#27ae60;">:goto_79</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mLinkProperties</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/LinkProperties</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p1</span>, <span style="color:#27aeae;">v1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/LinkProperties</span>;-&gt;<span style="color:#8e44ad;">setTcpBufferSizes</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">883</span>
+    <span style="font-weight:bold;">return-void</span>
+
+    <span style="font-weight:bold;">nop</span>
+
+    <span style="color:#27ae60;">:pswitch_data_80</span>
+    <span style="color:#2980b9;">.packed-switch </span><span style="color:#f67400;">0x1</span>
+        <span style="color:#27ae60;">:pswitch_73</span>
+        <span style="color:#27ae60;">:pswitch_70</span>
+        <span style="color:#27ae60;">:pswitch_6d</span>
+    <span style="color:#2980b9;">.end packed-switch</span>
+
+    <span style="color:#27ae60;">:pswitch_data_8a</span>
+    <span style="color:#2980b9;">.packed-switch </span><span style="color:#f67400;">0x6</span>
+        <span style="color:#27ae60;">:pswitch_6a</span>
+        <span style="color:#27ae60;">:pswitch_67</span>
+        <span style="color:#27ae60;">:pswitch_67</span>
+        <span style="color:#27ae60;">:pswitch_64</span>
+        <span style="color:#27ae60;">:pswitch_61</span>
+        <span style="color:#27ae60;">:pswitch_61</span>
+        <span style="color:#27ae60;">:pswitch_67</span>
+        <span style="color:#27ae60;">:pswitch_5e</span>
+        <span style="color:#27ae60;">:pswitch_76</span>
+        <span style="color:#27ae60;">:pswitch_5b</span>
+    <span style="color:#2980b9;">.end packed-switch</span>
+<span style="color:#2980b9;">.end method</span>
+
+
+<span style="color:#7a7c7d;"># virtual methods</span>
+<span style="color:#2980b9;">.method</span> <span style="color:#8e44ad;">dispose</span>()<span style="color:#2980b9;font-style:italic;">V</span>
+    <span style="color:#2980b9;">.registers</span> <span style="color:#f67400;">2</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">292</span>
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v0</span>, <span style="color:#f44f4f;">&quot;dispose: call quiteNow()&quot;</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p0</span>, <span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#8e44ad;">log</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">293</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">p0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#8e44ad;">quitNow</span>()<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">294</span>
+    <span style="font-weight:bold;">return-void</span>
+<span style="color:#2980b9;">.end method</span>
+
+<span style="color:#2980b9;">.method</span> <span style="font-weight:bold;">public</span> <span style="color:#8e44ad;">dump</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/io/FileDescriptor</span>;<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/io/PrintWriter</span>;<span style="color:#2980b9;font-style:italic;">[L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+    <span style="color:#2980b9;">.registers</span> <span style="color:#f67400;">7</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">2510</span>
+    <span style="font-weight:bold;">new-instance</span> <span style="color:#27aeae;">v0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/util/IndentingPrintWriter</span>;
+
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v1</span>, <span style="color:#f44f4f;">&quot; &quot;</span>
+
+    <span style="font-weight:bold;">invoke-direct</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p2</span>, <span style="color:#27aeae;">v1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/util/IndentingPrintWriter</span>;-&gt;&lt;<span style="color:#8e44ad;">init</span>&gt;(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/io/Writer</span>;<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">2543</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/util/IndentingPrintWriter</span>;-&gt;<span style="color:#8e44ad;">flush</span>()<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">2544</span>
+    <span style="font-weight:bold;">return-void</span>
+<span style="color:#2980b9;">.end method</span>
+
+<span style="color:#2980b9;">.method</span> <span style="font-weight:bold;">public</span> <span style="color:#8e44ad;">getDataConnectionId</span>()<span style="color:#2980b9;font-style:italic;">I</span>
+    <span style="color:#2980b9;">.registers</span> <span style="color:#f67400;">2</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">710</span>
+    <span style="font-weight:bold;">iget</span> <span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mId</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="font-weight:bold;">return</span> <span style="color:#27aeae;">v0</span>
+<span style="color:#2980b9;">.end method</span>
+
+<span style="color:#2980b9;">.method</span> <span style="color:#8e44ad;">getNetworkCapabilities</span>()<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;
+    <span style="color:#2980b9;">.registers</span> <span style="color:#f67400;">16</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">935</span>
+    <span style="font-weight:bold;">new-instance</span> <span style="color:#27aeae;">v0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;
+
+    <span style="font-weight:bold;">invoke-direct</span> {<span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;-&gt;&lt;<span style="color:#8e44ad;">init</span>&gt;()<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">936</span>
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v1</span>, <span style="color:#f67400;">0x0</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;-&gt;<span style="color:#8e44ad;">addTransportType</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">938</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v2</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mApnSetting</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnSetting</span>;
+
+    <span style="font-weight:bold;">const/16</span> <span style="color:#27aeae;">v3</span>, <span style="color:#f67400;">0xb</span>
+
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v4</span>, <span style="color:#f67400;">0x2</span>
+
+    <span style="font-weight:bold;">const/4</span> <span style="color:#27aeae;">v5</span>, <span style="color:#f67400;">0x1</span>
+
+    <span style="color:#27ae60;">:sswitch_b7</span>
+    <span style="font-weight:bold;">const-string</span> <span style="color:#27aeae;">v10</span>, <span style="color:#f44f4f;">&quot;*&quot;</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v8</span>, <span style="color:#27aeae;">v10</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;-&gt;<span style="color:#8e44ad;">equals</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/Object</span>;)<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">v8</span>
+
+    <span style="font-weight:bold;">if-eqz</span> <span style="color:#27aeae;">v8</span>, <span style="color:#27ae60;">:cond_c1</span>
+
+    <span style="font-weight:bold;">move</span> <span style="color:#27aeae;">v8</span>, <span style="color:#27aeae;">v1</span>
+
+    <span style="font-weight:bold;">goto</span> <span style="color:#27ae60;">:goto_c2</span>
+
+    <span style="color:#27ae60;">:cond_c1</span>
+    <span style="color:#27ae60;">:goto_c1</span>
+    <span style="font-weight:bold;">move</span> <span style="color:#27aeae;">v8</span>, <span style="color:#27aeae;">v9</span>
+
+    <span style="color:#27ae60;">:goto_c2</span>
+    <span style="font-weight:bold;">const/16</span> <span style="color:#27aeae;">v9</span>, <span style="color:#f67400;">0xc</span>
+
+    <span style="font-weight:bold;">packed-switch</span> <span style="color:#27aeae;">v8</span>, <span style="color:#27ae60;">:pswitch_data_1f6</span>
+
+    <span style="font-weight:bold;">goto</span> <span style="color:#27ae60;">:goto_107</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">964</span>
+    <span style="font-weight:bold;">goto</span> <span style="color:#27ae60;">:goto_107</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">959</span>
+    <span style="color:#27ae60;">:pswitch_ea</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v9</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;-&gt;<span style="color:#8e44ad;">addCapability</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">960</span>
+    <span style="font-weight:bold;">goto</span> <span style="color:#27ae60;">:goto_107</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">948</span>
+    <span style="color:#27ae60;">:pswitch_ee</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v9</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;-&gt;<span style="color:#8e44ad;">addCapability</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">956</span>
+    <span style="font-weight:bold;">nop</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">939</span>
+    <span style="color:#27ae60;">:goto_107</span>
+    <span style="font-weight:bold;">add-int/lit8</span> <span style="color:#27aeae;">v7</span>, <span style="color:#27aeae;">v7</span>, <span style="color:#f67400;">0x1</span>
+
+    <span style="font-weight:bold;">goto/16</span> <span style="color:#27ae60;">:goto_17</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1001</span>
+    <span style="color:#27ae60;">:cond_10b</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mConnectionParams</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$ConnectionParams</span>;
+
+    <span style="font-weight:bold;">if-eqz</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27ae60;">:cond_119</span>
+
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mConnectionParams</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$ConnectionParams</span>;
+
+    <span style="font-weight:bold;">iget-boolean</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">v1</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection$ConnectionParams</span>;-&gt;<span style="color:#27aeae;">mUnmeteredUseOnly</span>:<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="font-weight:bold;">if-eqz</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27ae60;">:cond_119</span>
+
+    <span style="font-weight:bold;">iget-boolean</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mRestrictedNetworkOverride</span>:<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="font-weight:bold;">if-eqz</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27ae60;">:cond_123</span>
+
+    <span style="color:#27ae60;">:cond_119</span>
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mApnSetting</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnSetting</span>;
+
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v2</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mPhone</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/Phone</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1003</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">v2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/ApnSetting</span>;-&gt;<span style="color:#8e44ad;">isMetered</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/Phone</span>;)<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">v1</span>
+
+    <span style="font-weight:bold;">if-nez</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27ae60;">:cond_127</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1004</span>
+    <span style="color:#27ae60;">:cond_123</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v3</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;-&gt;<span style="color:#8e44ad;">addCapability</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;
+
+    <span style="font-weight:bold;">goto</span> <span style="color:#27ae60;">:goto_12a</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1006</span>
+    <span style="color:#27ae60;">:cond_127</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v3</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;-&gt;<span style="color:#8e44ad;">removeCapability</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1009</span>
+    <span style="color:#27ae60;">:goto_12a</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;-&gt;<span style="color:#8e44ad;">maybeMarkCapabilitiesRestricted</span>()<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1011</span>
+    <span style="color:#27ae60;">:cond_12d</span>
+    <span style="font-weight:bold;">iget-boolean</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mRestrictedNetworkOverride</span>:<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="font-weight:bold;">if-eqz</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27ae60;">:cond_139</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1012</span>
+    <span style="font-weight:bold;">const/16</span> <span style="color:#27aeae;">v1</span>, <span style="color:#f67400;">0xd</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;-&gt;<span style="color:#8e44ad;">removeCapability</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1014</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v4</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;-&gt;<span style="color:#8e44ad;">removeCapability</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1017</span>
+    <span style="color:#27ae60;">:cond_139</span>
+    <span style="font-weight:bold;">nop</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1018</span>
+    <span style="font-weight:bold;">nop</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1019</span>
+    <span style="font-weight:bold;">iget</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mRilRat</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="font-weight:bold;">const/16</span> <span style="color:#27aeae;">v2</span>, <span style="color:#f67400;">0x13</span>
+
+    <span style="font-weight:bold;">const/16</span> <span style="color:#27aeae;">v6</span>, <span style="color:#f67400;">0x733</span>
+
+    <span style="font-weight:bold;">const/16</span> <span style="color:#27aeae;">v7</span>, <span style="color:#f67400;">0x99</span>
+
+    <span style="font-weight:bold;">const</span> <span style="color:#27aeae;">v8</span>, <span style="color:#f67400;">0x19000</span>
+
+    <span style="font-weight:bold;">const</span> <span style="color:#27aeae;">v9</span>, <span style="color:#f67400;">0xc800</span>
+
+    <span style="font-weight:bold;">const/16</span> <span style="color:#27aeae;">v10</span>, <span style="color:#f67400;">0x3800</span>
+
+    <span style="font-weight:bold;">const/16</span> <span style="color:#27aeae;">v11</span>, <span style="color:#f67400;">0xe</span>
+
+    <span style="font-weight:bold;">if-eq</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">v2</span>, <span style="color:#27ae60;">:cond_18a</span>
+
+    <span style="font-weight:bold;">packed-switch</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27ae60;">:pswitch_data_20e</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1038</span>
+    <span style="color:#27ae60;">:goto_152</span>
+    <span style="font-weight:bold;">move</span> <span style="color:#27aeae;">v6</span>, <span style="color:#27aeae;">v11</span>
+
+    <span style="font-weight:bold;">move</span> <span style="color:#27aeae;">v8</span>, <span style="color:#27aeae;">v6</span>
+
+    <span style="font-weight:bold;">goto</span> <span style="color:#27ae60;">:goto_18b</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1035</span>
+    <span style="color:#27ae60;">:pswitch_155</span>
+    <span style="font-weight:bold;">const/16</span> <span style="color:#27aeae;">v6</span>, <span style="color:#f67400;">0x2c00</span>
+
+    <span style="font-weight:bold;">const</span> <span style="color:#27aeae;">v8</span>, <span style="color:#f67400;">0xa800</span>
+
+    <span style="font-weight:bold;">goto</span> <span style="color:#27ae60;">:goto_18b</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1032</span>
+    <span style="color:#27ae60;">:pswitch_15b</span>
+    <span style="font-weight:bold;">nop</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1038</span>
+    <span style="color:#27ae60;">:goto_15c</span>
+    <span style="font-weight:bold;">move</span> <span style="color:#27aeae;">v6</span>, <span style="color:#27aeae;">v9</span>
+
+    <span style="font-weight:bold;">goto</span> <span style="color:#27ae60;">:goto_18b</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1033</span>
+    <span style="color:#27ae60;">:cond_18a</span>
+    <span style="font-weight:bold;">goto</span> <span style="color:#27ae60;">:goto_15c</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1038</span>
+    <span style="color:#27ae60;">:goto_18b</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v6</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;-&gt;<span style="color:#8e44ad;">setLinkUpstreamBandwidthKbps</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1039</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v8</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;-&gt;<span style="color:#8e44ad;">setLinkDownstreamBandwidthKbps</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1041</span>
+    <span style="font-weight:bold;">new-instance</span> <span style="color:#27aeae;">v1</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/StringNetworkSpecifier</span>;
+
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v2</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mPhone</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/Phone</span>;
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/Phone</span>;-&gt;<span style="color:#8e44ad;">getSubId</span>()<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">v2</span>
+
+    <span style="font-weight:bold;">invoke-static</span> {<span style="color:#27aeae;">v2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/Integer</span>;-&gt;<span style="color:#8e44ad;">toString</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">v2</span>
+
+    <span style="font-weight:bold;">invoke-direct</span> {<span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">v2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/StringNetworkSpecifier</span>;-&gt;&lt;<span style="color:#8e44ad;">init</span>&gt;(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">java/lang/String</span>;)<span style="color:#2980b9;font-style:italic;">V</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;-&gt;<span style="color:#8e44ad;">setNetworkSpecifier</span>(<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkSpecifier</span>;)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1043</span>
+    <span style="font-weight:bold;">const/16</span> <span style="color:#27aeae;">v1</span>, <span style="color:#f67400;">0x12</span>
+
+    <span style="font-weight:bold;">iget-object</span> <span style="color:#27aeae;">v2</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mPhone</span>:<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/Phone</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1044</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/Phone</span>;-&gt;<span style="color:#8e44ad;">getServiceState</span>()<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/telephony/ServiceState</span>;
+
+    <span style="font-weight:bold;">move-result-object</span> <span style="color:#27aeae;">v2</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/telephony/ServiceState</span>;-&gt;<span style="color:#8e44ad;">getDataRoaming</span>()<span style="color:#2980b9;font-style:italic;">Z</span>
+
+    <span style="font-weight:bold;">move-result</span> <span style="color:#27aeae;">v2</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1043</span>
+    <span style="font-weight:bold;">xor-int/2addr</span> <span style="color:#27aeae;">v2</span>, <span style="color:#27aeae;">v5</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">v2</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;-&gt;<span style="color:#8e44ad;">setCapability</span>(<span style="color:#2980b9;font-style:italic;">IZ</span>)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1046</span>
+    <span style="font-weight:bold;">const/16</span> <span style="color:#27aeae;">v1</span>, <span style="color:#f67400;">0x14</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;-&gt;<span style="color:#8e44ad;">addCapability</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1049</span>
+    <span style="font-weight:bold;">iget</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mSubscriptionOverride</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="font-weight:bold;">and-int/2addr</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">v5</span>
+
+    <span style="font-weight:bold;">if-eqz</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27ae60;">:cond_1c0</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1050</span>
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v3</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;-&gt;<span style="color:#8e44ad;">addCapability</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1052</span>
+    <span style="color:#27ae60;">:cond_1c0</span>
+    <span style="font-weight:bold;">iget</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">p0</span>, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#2980b9;">com/android/internal/telephony/dataconnection/DataConnection</span>;-&gt;<span style="color:#27aeae;">mSubscriptionOverride</span>:<span style="color:#2980b9;font-style:italic;">I</span>
+
+    <span style="font-weight:bold;">and-int/2addr</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27aeae;">v4</span>
+
+    <span style="font-weight:bold;">if-eqz</span> <span style="color:#27aeae;">v1</span>, <span style="color:#27ae60;">:cond_1ca</span>
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1053</span>
+    <span style="font-weight:bold;">const/16</span> <span style="color:#27aeae;">v1</span>, <span style="color:#f67400;">0x14</span>
+
+    <span style="font-weight:bold;">invoke-virtual</span> {<span style="color:#27aeae;">v0</span>, <span style="color:#27aeae;">v1</span>}, <span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;-&gt;<span style="color:#8e44ad;">removeCapability</span>(<span style="color:#2980b9;font-style:italic;">I</span>)<span style="color:#2980b9;font-style:italic;">L</span><span style="color:#7f8c8d;">android/net/NetworkCapabilities</span>;
+
+    <span style="color:#2980b9;">.line</span> <span style="color:#f67400;">1056</span>
+    <span style="color:#27ae60;">:cond_1ca</span>
+    <span style="font-weight:bold;">return-object</span> <span style="color:#27aeae;">v0</span>
+
+    <span style="font-weight:bold;">nop</span>
+
+    <span style="color:#27ae60;">:sswitch_data_1cc</span>
+    <span style="color:#2980b9;">.sparse-switch</span>
+        <span style="color:#f67400;">0x2a</span> -&gt; <span style="color:#27ae60;">:sswitch_b7</span>
+        <span style="color:#f67400;">0xd18</span> -&gt; <span style="color:#27ae60;">:sswitch_ac</span>
+        <span style="color:#f67400;">0x17ff4</span> -&gt; <span style="color:#27ae60;">:sswitch_a2</span>
+        <span style="color:#f67400;">0x185fd</span> -&gt; <span style="color:#27ae60;">:sswitch_98</span>
+        <span style="color:#f67400;">0x197cf</span> -&gt; <span style="color:#27ae60;">:sswitch_8e</span>
+        <span style="color:#f67400;">0x1a6d3</span> -&gt; <span style="color:#27ae60;">:sswitch_84</span>
+        <span style="color:#f67400;">0x300cf6</span> -&gt; <span style="color:#27ae60;">:sswitch_7a</span>
+        <span style="color:#f67400;">0x360bde</span> -&gt; <span style="color:#27ae60;">:sswitch_70</span>
+        <span style="color:#f67400;">0x5c13d641</span> -&gt; <span style="color:#27ae60;">:sswitch_66</span>
+        <span style="color:#f67400;">0x6118c591</span> -&gt; <span style="color:#27ae60;">:sswitch_5a</span>
+    <span style="color:#2980b9;">.end sparse-switch</span>
+
+    <span style="color:#27ae60;">:pswitch_data_1f6</span>
+    <span style="color:#2980b9;">.packed-switch </span><span style="color:#f67400;">0x0</span>
+        <span style="color:#27ae60;">:pswitch_ee</span>
+        <span style="color:#27ae60;">:pswitch_ea</span>
+        <span style="color:#27ae60;">:pswitch_e6</span>
+        <span style="color:#27ae60;">:pswitch_d2</span>
+        <span style="color:#27ae60;">:pswitch_ce</span>
+        <span style="color:#27ae60;">:pswitch_c8</span>
+    <span style="color:#2980b9;">.end packed-switch</span>
+
+    <span style="color:#27ae60;">:pswitch_data_20e</span>
+    <span style="color:#2980b9;">.packed-switch </span><span style="color:#f67400;">0x1</span>
+        <span style="color:#27ae60;">:pswitch_185</span>
+        <span style="color:#27ae60;">:pswitch_180</span>
+        <span style="color:#27ae60;">:pswitch_17b</span>
+        <span style="color:#27ae60;">:pswitch_17a</span>
+        <span style="color:#27ae60;">:pswitch_164</span>
+        <span style="color:#27ae60;">:pswitch_161</span>
+        <span style="color:#27ae60;">:pswitch_15e</span>
+        <span style="color:#27ae60;">:pswitch_15b</span>
+        <span style="color:#27ae60;">:pswitch_155</span>
+    <span style="color:#2980b9;">.end packed-switch</span>
+<span style="color:#2980b9;">.end method</span>
+</pre></body></html>

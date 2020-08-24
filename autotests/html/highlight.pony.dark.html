@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>highlight.pony</title>
+<meta name="generator" content="KF5::SyntaxHighlighting (Pony)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="color:#7a7c7d;">// Test file for Pony syntax highlighting, released under MIT License</span>
+
+<span style="font-weight:bold;">primitive</span> <span style="color:#2980b9;">Red</span>   <span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">apply</span>(): <span style="color:#2980b9;">U32</span> =&gt; <span style="color:#f67400;">0xFFFF0000</span>
+
+<span style="font-weight:bold;">primitive</span> <span style="color:#2980b9;">Colours</span>
+  <span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">black</span>(): <span style="color:#2980b9;">U32</span> =&gt; <span style="color:#f67400;">0xFF000000</span>
+  <span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">red</span>(): <span style="color:#2980b9;">U32</span> =&gt; <span style="color:#f67400;">0xFFFF0000</span>
+
+<span style="font-weight:bold;">primitive</span> <span style="color:#2980b9;">Black</span>
+<span style="font-weight:bold;">primitive</span> <span style="color:#2980b9;">Blue</span>
+
+<span style="font-weight:bold;">type</span> <span style="color:#2980b9;">Colour</span> <span style="font-weight:bold;">is</span> (<span style="color:#2980b9;">Black</span> | <span style="color:#2980b9;">Blue</span> )
+
+<span style="font-weight:bold;">primitive</span> <span style="color:#2980b9;">ColourList</span>
+  <span style="font-weight:bold;">fun</span> <span style="color:#2980b9;font-style:italic;">tag</span> <span style="color:#8e44ad;">apply</span>(): <span style="color:#2980b9;">Array</span>[<span style="color:#2980b9;">Colour</span>] =&gt;
+    [<span style="color:#2980b9;">Black</span>; <span style="color:#2980b9;">Blue</span>]
+
+<span style="color:#fdbc4b;font-weight:bold;">for</span> colour <span style="font-weight:bold;">in</span> <span style="color:#2980b9;">ColourList</span>().values() <span style="color:#fdbc4b;font-weight:bold;">do</span>
+<span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+<span style="font-weight:bold;">type</span> <span style="color:#2980b9;">EGLEvent</span> <span style="font-weight:bold;">is</span> (<span style="color:#2980b9;">U8</span>, <span style="color:#2980b9;">F32</span>, <span style="color:#2980b9;">F32</span>)
+(<span style="font-weight:bold;">var</span> code, <span style="font-weight:bold;">var</span> x, <span style="font-weight:bold;">var</span> y) = <span style="color:#8e44ad;">@getEvent</span>[<span style="color:#2980b9;">EGLEvent</span>]()
+
+<span style="font-weight:bold;">primitive</span> <span style="color:#2980b9;">_XDisplayHandle</span>
+<span style="font-weight:bold;">primitive</span> <span style="color:#2980b9;">_EGLDisplayHandle</span>
+
+<span style="font-weight:bold;">let</span> x_dpy = <span style="color:#8e44ad;">@XOpenDisplay</span>[<span style="color:#2980b9;">Pointer</span>[<span style="color:#2980b9;">_XDisplayHandle</span>]](<span style="color:#2980b9;">U32</span>(<span style="color:#f67400;">0</span>))
+<span style="color:#fdbc4b;font-weight:bold;">if</span> x_dpy.is_null() <span style="color:#fdbc4b;font-weight:bold;">then</span>
+  env.out.print(<span style="color:#f44f4f;">&quot;XOpenDisplay failed&quot;</span>)
+<span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+<span style="font-weight:bold;">let</span> e_dpy = <span style="color:#8e44ad;">@eglGetDisplay</span>[<span style="color:#2980b9;">Pointer</span>[<span style="color:#2980b9;">_EGLDisplayHandle</span>]](x_dpy)
+<span style="color:#fdbc4b;font-weight:bold;">if</span> e_dpy.is_null() <span style="color:#fdbc4b;font-weight:bold;">then</span>
+  env.out.print(<span style="color:#f44f4f;">&quot;eglGetDisplay failed&quot;</span>)
+<span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+<span style="font-weight:bold;">primitive</span> <span style="color:#2980b9;">_EGLConfigHandle</span>
+<span style="font-weight:bold;">let</span> a = <span style="color:#2980b9;">Array</span>[<span style="color:#2980b9;">U16</span>](<span style="color:#f67400;">8</span>)
+a.push(<span style="color:#f67400;">0x3040</span>)
+a.push(<span style="color:#f67400;">0b01011</span>)
+<span style="font-weight:bold;">let</span> config = <span style="color:#2980b9;">Pointer</span>[<span style="color:#2980b9;">_EGLConfigHandle</span>]
+<span style="color:#fdbc4b;font-weight:bold;">if</span> <span style="color:#8e44ad;">@eglChooseConfig</span>[<span style="color:#2980b9;">U32</span>](e_dpy, a, config, <span style="color:#2980b9;">U32</span>(<span style="color:#f67400;">1</span>), <span style="color:#2980b9;">Pointer</span>[<span style="color:#2980b9;">U32</span>]) == <span style="color:#f67400;">0</span> <span style="color:#fdbc4b;font-weight:bold;">then</span>
+    env.out.print(<span style="color:#f44f4f;">&quot;eglChooseConfig failed&quot;</span>)
+<span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+
+<span style="font-weight:bold;">actor</span> <span style="color:#2980b9;">Main</span>
+  <span style="font-weight:bold;">new</span> <span style="color:#8e44ad;">create</span>(env: <span style="color:#2980b9;">Env</span>) =&gt;
+    <span style="color:#7a7c7d;">// The no of arguments</span>
+    env.out.print(env.args.size().string())
+    <span style="color:#fdbc4b;font-weight:bold;">for</span> value <span style="font-weight:bold;">in</span> env.args.values() <span style="color:#fdbc4b;font-weight:bold;">do</span>
+      env.out.print(value)
+    <span style="color:#fdbc4b;font-weight:bold;">end</span>
+    <span style="color:#7a7c7d;">// Access the arguments the first one will always be the the appication name</span>
+    <span style="color:#fdbc4b;font-weight:bold;">try</span> env.out.print(env.args(<span style="color:#f67400;">0</span>)?) <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+<span style="font-weight:bold;">actor</span> <span style="color:#2980b9;">Main</span>
+  <span style="font-weight:bold;">new</span> <span style="color:#8e44ad;">create</span>(env: <span style="color:#2980b9;">Env</span>) =&gt;
+    <span style="font-weight:bold;">var</span> options = <span style="color:#2980b9;">Options</span>(env)
+
+    options
+      .add(<span style="color:#f44f4f;">&quot;output&quot;</span>, <span style="color:#f44f4f;">&quot;o&quot;</span>, <span style="color:#2980b9;">StringArgument</span>)
+
+    env.out.print(options.has_argument())
+
+    <span style="color:#fdbc4b;font-weight:bold;">for</span> option <span style="font-weight:bold;">in</span> options <span style="color:#fdbc4b;font-weight:bold;">do</span>
+      <span style="color:#fdbc4b;font-weight:bold;">match</span> option
+      | (<span style="color:#f44f4f;">&quot;output&quot;</span>, <span style="font-weight:bold;">var</span> arg: <span style="color:#2980b9;">String</span>) =&gt; _outputFileName = arg.string()
+      | <span style="font-weight:bold;">let</span> err: <span style="color:#2980b9;">ParseError</span> =&gt;
+          err.report(env.out)
+          env.out.print(
+            <span style="color:#f44f4f;">&quot;&quot;&quot;</span>
+<span style="color:#f44f4f;">            pony-embed [OPTIONS]</span>
+<span style="color:#f44f4f;">              --output     name   string output filename.</span>
+<span style="color:#f44f4f;">            &quot;&quot;&quot;</span>
+          )
+      <span style="color:#fdbc4b;font-weight:bold;">end</span>
+    <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+<span style="font-weight:bold;">use</span> <span style="color:#f44f4f;">&quot;ponytest&quot;</span>
+
+<span style="font-weight:bold;">actor</span> <span style="color:#2980b9;">Main</span> <span style="font-weight:bold;">is</span> <span style="color:#2980b9;">TestList</span>
+  <span style="font-weight:bold;">new</span> <span style="color:#8e44ad;">create</span>(env: <span style="color:#2980b9;">Env</span>) =&gt; <span style="color:#2980b9;">PonyTest</span>(env, <span style="font-weight:bold;">this</span>)
+  <span style="font-weight:bold;">new</span> <span style="color:#8e44ad;">make</span>() =&gt; <span style="color:#2980b9;">None</span>
+
+  <span style="font-weight:bold;">fun</span> <span style="color:#2980b9;font-style:italic;">tag</span> <span style="color:#8e44ad;">tests</span>(test: <span style="color:#2980b9;">PonyTest</span>) =&gt;
+    test(<span style="color:#2980b9;">_TestAddition</span>)
+
+<span style="font-weight:bold;">class</span> <span style="color:#2980b9;font-style:italic;">iso</span> <span style="color:#2980b9;">_TestAddition</span> <span style="font-weight:bold;">is</span> <span style="color:#2980b9;">UnitTest</span>
+  <span style="color:#f44f4f;">&quot;&quot;&quot;</span>
+<span style="color:#f44f4f;">  Adding 2 numbers</span>
+<span style="color:#f44f4f;">  &quot;&quot;&quot;</span>
+  <span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">name</span>(): <span style="color:#2980b9;">String</span> =&gt; <span style="color:#f44f4f;">&quot;u32/add&quot;</span>
+
+  <span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">apply</span>(h: <span style="color:#2980b9;">TestHelper</span>): <span style="color:#2980b9;">TestResult</span> =&gt;
+    h.expect_eq[<span style="color:#2980b9;">U32</span>](<span style="color:#f67400;">2</span> + <span style="color:#f67400;">2</span>, <span style="color:#f67400;">4</span>)
+
+<span style="font-weight:bold;">fun</span> <span style="color:#2980b9;font-style:italic;">tag</span> <span style="color:#8e44ad;">log</span>(msg: <span style="color:#2980b9;">String</span>, verbose: <span style="color:#2980b9;">Bool</span> = <span style="font-weight:bold;">false</span>)
+<span style="font-weight:bold;">be</span> <span style="color:#8e44ad;">fail</span>() =&gt;
+<span style="font-weight:bold;">be</span> <span style="color:#8e44ad;">assert_failed</span>(msg: <span style="color:#2980b9;">String</span>) =&gt;
+<span style="font-weight:bold;">fun</span> <span style="color:#2980b9;font-style:italic;">tag</span> <span style="color:#8e44ad;">assert_true</span>(actual: <span style="color:#2980b9;">Bool</span>, msg: <span style="color:#2980b9;">String</span> = <span style="color:#f44f4f;">&quot;&quot;</span>) ?
+<span style="font-weight:bold;">fun</span> <span style="color:#2980b9;font-style:italic;">tag</span> <span style="color:#8e44ad;">expect_true</span>(actual: <span style="color:#2980b9;">Bool</span>, msg: <span style="color:#2980b9;">String</span> = <span style="color:#f44f4f;">&quot;&quot;</span>): <span style="color:#2980b9;">Bool</span>
+<span style="font-weight:bold;">fun</span> <span style="color:#2980b9;font-style:italic;">tag</span> <span style="color:#8e44ad;">expect_eq</span>[<span style="color:#2980b9;">A</span>: (<span style="color:#2980b9;">Equatable</span>[<span style="color:#2980b9;">A</span>] <span style="color:#2980b9;">#read</span> &amp; <span style="color:#2980b9;">Stringable</span>)]
+  (expect: <span style="color:#2980b9;">A</span>, actual: <span style="color:#2980b9;">A</span>, msg: <span style="color:#2980b9;">String</span> = <span style="color:#f44f4f;">&quot;&quot;</span>): <span style="color:#2980b9;">Bool</span>
+<span style="font-weight:bold;">fun</span> <span style="color:#2980b9;font-style:italic;">tag</span> <span style="color:#8e44ad;">expect_eq</span>[<span style="color:#2980b9;">A</span>: (<span style="color:#2980b9;">Equatable</span>[<span style="color:#2980b9;">A</span>] <span style="color:#da4453;text-decoration:underline;">#unknown</span> &amp; <span style="color:#2980b9;">Stringable</span>)]
+  (expect: <span style="color:#2980b9;">A</span>, actual: <span style="color:#2980b9;">A</span>, msg: <span style="color:#2980b9;">String</span> = <span style="color:#f44f4f;">&quot;&quot;</span>): <span style="color:#2980b9;">Bool</span>
+
+<span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">add</span>(other: <span style="color:#2980b9;">A</span>): <span style="color:#2980b9;">A</span>
+<span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">sub</span>(other: <span style="color:#2980b9;">A</span>): <span style="color:#2980b9;">A</span>
+<span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">mul</span>(other: <span style="color:#2980b9;">A</span>): <span style="color:#2980b9;">A</span>
+<span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">div</span>(other: <span style="color:#2980b9;">A</span>): <span style="color:#2980b9;">A</span>
+<span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">mod</span>(other: <span style="color:#2980b9;">A</span>): <span style="color:#2980b9;">A</span>
+<span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">eq</span>(other: <span style="color:#2980b9;">A</span>): <span style="color:#2980b9;">Bool</span>
+<span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">ne</span>(other: <span style="color:#2980b9;">A</span>): <span style="color:#2980b9;">Bool</span>
+<span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">lt</span>(other: <span style="color:#2980b9;">A</span>): <span style="color:#2980b9;">Bool</span>
+<span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">le</span>(other: <span style="color:#2980b9;">A</span>): <span style="color:#2980b9;">Bool</span>
+<span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">ge</span>(other: <span style="color:#2980b9;">A</span>): <span style="color:#2980b9;">Bool</span>
+<span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">gt</span>(other: <span style="color:#2980b9;">A</span>): <span style="color:#2980b9;">Bool</span>
+<span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">shl</span>(other: <span style="color:#2980b9;">A</span>): <span style="color:#2980b9;">A</span>
+<span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">shr</span>(other: <span style="color:#2980b9;">A</span>): <span style="color:#2980b9;">A</span>
+<span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">op_and</span>(other:<span style="color:#2980b9;">A</span>): <span style="color:#2980b9;">A</span>
+<span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">op_or</span>(other: <span style="color:#2980b9;">A</span>): <span style="color:#2980b9;">A</span>
+<span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">op_xor</span>(othr: <span style="color:#2980b9;">A</span>): <span style="color:#2980b9;">A</span>
+
+<span style="font-weight:bold;">class</span> <span style="color:#2980b9;">Test</span>
+  <span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">alpha</span>() =&gt;
+    <span style="color:#f44f4f;">&quot;&quot;&quot;</span>
+<span style="color:#f44f4f;">    &quot;&quot;&quot;</span>
+
+<span style="font-weight:bold;">let</span> dice: <span style="color:#2980b9;">Array</span>[<span style="color:#2980b9;">U32</span>] = [<span style="color:#f67400;">1</span>; <span style="color:#f67400;">2</span>; <span style="color:#f67400;">3</span>
+  <span style="color:#f67400;">4</span>
+  <span style="color:#f67400;">5</span>
+  <span style="color:#f67400;">6</span>
+]
+
+<span style="font-weight:bold;">actor</span> <span style="color:#2980b9;">Main</span>
+  <span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">foo</span>(n:<span style="color:#2980b9;">U32</span>): {<span style="color:#2980b9;font-style:italic;">ref</span>(<span style="color:#2980b9;">U32</span>): <span style="color:#2980b9;">U32</span>} =&gt;
+    <span style="font-weight:bold;">var</span> s: <span style="color:#2980b9;">Array</span>[<span style="color:#2980b9;">U32</span>] = <span style="color:#2980b9;">Array</span>[<span style="color:#2980b9;">U32</span>].init(n, <span style="color:#f67400;">1</span>)
+    {<span style="color:#2980b9;font-style:italic;">ref</span>(i:<span style="color:#2980b9;">U32</span>)(s): <span style="color:#2980b9;">U32</span> =&gt;
+      <span style="color:#fdbc4b;font-weight:bold;">try</span>
+        s(<span style="color:#f67400;">0</span>) = s(<span style="color:#f67400;">0</span>) + i
+        s(<span style="color:#f67400;">0</span>)
+      <span style="color:#fdbc4b;font-weight:bold;">else</span>
+        <span style="color:#f67400;">0</span>
+      <span style="color:#fdbc4b;font-weight:bold;">end</span>
+    }
+
+  <span style="font-weight:bold;">new</span> <span style="color:#8e44ad;">create</span>(env:<span style="color:#2980b9;">Env</span>) =&gt;
+    <span style="font-weight:bold;">var</span> f = foo(<span style="color:#f67400;">5</span>)
+    env.out.print(f(<span style="color:#f67400;">10</span>).string())
+    env.out.print(f(<span style="color:#f67400;">20</span>).string())
+
+<span style="color:#7a7c7d;">/* nested /* commentary */ */</span>
+<span style="color:#7a7c7d;">// single comment</span>
+
+<span style="font-weight:bold;">class</span> <span style="color:#2980b9;">A</span>
+<span style="font-weight:bold;">class</span> <span style="color:#2980b9;">_A</span>
+x'
+x''
+x'.string()
+<span style="color:#3daee9;">'\uaaaa'</span>
+<span style="color:#3daee9;">'\Ubbbbbb'</span>
+<span style="color:#3daee9;">'\xcc'</span>
+<span style="color:#3daee9;">'\''</span>
+<span style="color:#3daee9;">'\n'</span>
+<span style="color:#f44f4f;">&quot;</span><span style="color:#3daee9;">\uaaaa</span><span style="color:#f44f4f;">a&quot;</span>
+<span style="color:#f44f4f;">&quot;</span><span style="color:#3daee9;">\Ubbbbbb</span><span style="color:#f44f4f;">b&quot;</span>
+<span style="color:#f44f4f;">&quot;</span><span style="color:#3daee9;">\xcc</span><span style="color:#f44f4f;">c&quot;</span>
+<span style="color:#f44f4f;">&quot;</span><span style="color:#3daee9;">\&quot;</span><span style="color:#f44f4f;">&quot;</span>
+<span style="color:#f44f4f;">&quot;</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">&quot;</span>
+<span style="color:#f67400;">34.4</span>
+<span style="color:#f67400;">34.4e43</span>
+<span style="color:#f67400;">43e4</span>
+<span style="color:#f67400;">0x3040</span>
+<span style="color:#f67400;">0xaF</span>
+<span style="color:#f67400;">0b01</span>
+<span style="color:#f67400;">3_43_4</span>
+<span style="color:#f67400;">0x0_4</span>
+
+<span style="font-weight:bold;">fun</span> <span style="color:#8e44ad;">create</span>(): <span style="color:#2980b9;">U32</span> =&gt; <span style="color:#f67400;">0</span>
+<span style="font-weight:bold;">fun</span> <span style="color:#2980b9;font-style:italic;">iso</span> <span style="color:#8e44ad;">create</span>(): <span style="color:#2980b9;">U32</span> =&gt; <span style="color:#f67400;">0</span>
+<span style="font-weight:bold;">fun</span> <span style="color:#2980b9;">\\ abc \\</span>  <span style="color:#2980b9;font-style:italic;">iso</span> <span style="color:#8e44ad;">create</span>(): <span style="color:#2980b9;">U32</span> =&gt; <span style="color:#f67400;">0</span>
+<span style="font-weight:bold;">class</span> <span style="color:#2980b9;">\\ packet, blah \\</span> <span style="color:#2980b9;font-style:italic;">iso</span> <span style="color:#2980b9;">Xyz</span>
+<span style="color:#fdbc4b;font-weight:bold;">if</span> <span style="color:#2980b9;">\\ likely \\</span> a <span style="color:#fdbc4b;font-weight:bold;">then</span>
+<span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+a.endnormal
+
+print();print()
+
+<span style="color:#7a7c7d;">/* syntactically false: */</span>
+
+<span style="font-weight:bold;">class</span> <span style="color:#da4453;text-decoration:underline;">_aA</span>
+<span style="font-weight:bold;">class</span> <span style="color:#da4453;text-decoration:underline;">_a</span>
+<span style="font-weight:bold;">class</span> <span style="color:#da4453;text-decoration:underline;">a</span>
+<span style="color:#da4453;text-decoration:underline;">0b2332</span>
+<span style="color:#da4453;text-decoration:underline;">0b</span>
+<span style="color:#da4453;text-decoration:underline;">0x</span>
+<span style="color:#da4453;text-decoration:underline;">0xgf</span>
+<span style="color:#da4453;text-decoration:underline;">0f00</span>
+<span style="color:#da4453;text-decoration:underline;">3.</span>
+<span style="color:#da4453;text-decoration:underline;">.3</span>
+<span style="color:#da4453;text-decoration:underline;">3.</span>e3
+<span style="color:#da4453;text-decoration:underline;">3_</span>
+<span style="color:#da4453;text-decoration:underline;">3__43_4</span>
+<span style="color:#da4453;text-decoration:underline;">''</span>
+<span style="color:#da4453;text-decoration:underline;">'</span>\u'
+<span style="color:#da4453;text-decoration:underline;">'</span>\ua'
+<span style="color:#da4453;text-decoration:underline;">'</span>\uaaa'
+<span style="color:#da4453;text-decoration:underline;">'</span>\uaaaaa'
+<span style="color:#da4453;text-decoration:underline;">'</span>\uyyyy'
+<span style="color:#f44f4f;">&quot;</span><span style="color:#da4453;text-decoration:underline;">\u</span><span style="color:#f44f4f;">&quot;</span>
+<span style="color:#f44f4f;">&quot;</span><span style="color:#da4453;text-decoration:underline;">\u</span><span style="color:#f44f4f;">a&quot;</span>
+<span style="color:#f44f4f;">&quot;</span><span style="color:#da4453;text-decoration:underline;">\u</span><span style="color:#f44f4f;">aaa&quot;</span>
+<span style="color:#f44f4f;">&quot;</span><span style="color:#da4453;text-decoration:underline;">\u</span><span style="color:#f44f4f;">yyyy&quot;</span>
+a<span style="color:#da4453;text-decoration:underline;">'</span>a
+
+<span style="font-weight:bold;">class</span> <span style="color:#da4453;text-decoration:underline;">badType</span>
+print()<span style="color:#da4453;text-decoration:underline;">;</span>
+</pre></body></html>

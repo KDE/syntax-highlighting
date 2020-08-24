@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>highlight.asm-nasm</title>
+<meta name="generator" content="KF5::SyntaxHighlighting (Intel x86 (NASM))"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="color:#7a7c7d;">; Example file for nasm.xml kate syntax file</span>
+<span style="color:#7a7c7d;">; compile with `nasm example.asm -f elf -o example.o`</span>
+<span style="color:#7a7c7d;">; and link with 'gcc example.o -o example`</span>
+<span style="color:#7a7c7d;">; Public domain</span>
+<span style="color:#7a7c7d;">; </span><span style="color:#3f8058;">kate:</span><span style="color:#7a7c7d;"> </span><span style="color:#7f8c8d;">hl</span><span style="color:#f44f4f;"> Intel x86 (NASM)</span><span style="color:#7f8c8d;">;</span>
+
+<span style="font-weight:bold;">section</span> <span style="color:#8e44ad;">.data</span>
+
+hello <span style="color:#2980b9;">dd</span> <span style="color:#f44f4f;">'Hello World'</span>, <span style="color:#f67400;">0x</span><span style="color:#f67400;">0A</span>, <span style="color:#f67400;">0</span><span style="color:#f67400;">h</span>
+printf_param <span style="color:#2980b9;">dd</span> <span style="color:#f44f4f;">'%s'</span>, <span style="color:#f67400;">0</span><span style="color:#f67400;">q</span>
+
+<span style="font-weight:bold;">section</span> <span style="color:#8e44ad;">.text</span>
+
+<span style="font-weight:bold;">extern</span> printf
+
+<span style="font-weight:bold;">global</span> main
+<span style="color:#8e44ad;">main:</span>
+	<span style="font-weight:bold;">push</span> <span style="font-weight:bold;">ebp</span>
+	<span style="font-weight:bold;">mov</span> <span style="font-weight:bold;">ebp</span>, <span style="font-weight:bold;">esp</span>
+	
+	<span style="font-weight:bold;">push</span> hello
+	<span style="font-weight:bold;">push</span> printf_param
+	<span style="color:#fdbc4b;font-weight:bold;">call</span> printf
+	
+	<span style="font-weight:bold;">mov</span> <span style="font-weight:bold;">eax</span>, <span style="color:#f67400;">0</span><span style="color:#f67400;">b</span>
+	<span style="font-weight:bold;">leave</span>
+	<span style="color:#fdbc4b;font-weight:bold;">ret</span>
+
+
+NULL              <span style="color:#2980b9;">EQU</span> <span style="color:#f67400;">0</span>                         <span style="color:#7a7c7d;">; Constants</span>
+STD_OUTPUT_HANDLE <span style="color:#2980b9;">EQU</span> -<span style="color:#f67400;">11</span>
+
+<span style="font-weight:bold;">extern</span> GetStdHandle                             <span style="color:#7a7c7d;">; Import external symbols</span>
+
+<span style="font-weight:bold;">global</span> Start                                    <span style="color:#7a7c7d;">; Export symbols. The entry point</span>
+
+<span style="font-weight:bold;">section</span> <span style="color:#8e44ad;">.data</span>                                   <span style="color:#7a7c7d;">; Initialized data segment</span>
+ Message        <span style="color:#2980b9;">db</span> <span style="color:#f44f4f;">&quot;Console Message 64&quot;</span>, <span style="color:#f67400;">0D</span><span style="color:#f67400;">h</span>, <span style="color:#f67400;">0A</span><span style="color:#f67400;">h</span>
+ MessageLength  <span style="color:#2980b9;">EQU</span> $-Message                   <span style="color:#7a7c7d;">; Address of this line ($) - address of Message</span>
+
+<span style="font-weight:bold;">section</span> <span style="color:#8e44ad;">.bss</span>                                    <span style="color:#7a7c7d;">; Uninitialized data segment</span>
+<span style="font-weight:bold;">alignb</span> <span style="color:#f67400;">8</span>
+ Written        <span style="color:#2980b9;">resq</span> <span style="color:#f67400;">1</span>
+
+<span style="font-weight:bold;">section</span> <span style="color:#8e44ad;">.text</span>                                   <span style="color:#7a7c7d;">; Code segment</span>
+<span style="color:#8e44ad;">Start:</span>
+ <span style="font-weight:bold;">sub</span>   <span style="font-weight:bold;">RSP</span>, <span style="color:#f67400;">8</span>                                   <span style="color:#7a7c7d;">; Align the stack to a multiple of 16 bytes</span>
+
+ <span style="font-weight:bold;">mov</span>   <span style="font-weight:bold;">ECX</span>, STD_OUTPUT_HANDLE
+ <span style="color:#fdbc4b;font-weight:bold;">call</span>  GetStdHandle
+ <span style="font-weight:bold;">mov</span>   <span style="color:#2980b9;">qword</span> [<span style="font-weight:bold;">REL</span> StandardHandle], <span style="font-weight:bold;">RAX</span>
+
+ <span style="font-weight:bold;">sub</span>   <span style="font-weight:bold;">RSP</span>, <span style="color:#f67400;">32</span> + <span style="color:#f67400;">8</span> + <span style="color:#f67400;">8</span>                          <span style="color:#7a7c7d;">; Shadow space + 5th parameter + align stack</span>
+                                                <span style="color:#7a7c7d;">; to a multiple of 16 bytes</span>
+ <span style="font-weight:bold;">mov</span>   <span style="font-weight:bold;">RCX</span>, <span style="color:#2980b9;">qword</span> [<span style="font-weight:bold;">REL</span> StandardHandle]          <span style="color:#7a7c7d;">; 1st parameter</span>
+ <span style="font-weight:bold;">lea</span>   <span style="font-weight:bold;">RDX</span>, [<span style="font-weight:bold;">REL</span> Message]                       <span style="color:#7a7c7d;">; 2nd parameter</span>
+ <span style="font-weight:bold;">mov</span>   <span style="font-weight:bold;">R8</span>, MessageLength                        <span style="color:#7a7c7d;">; 3rd parameter</span>
+ <span style="font-weight:bold;">mov</span>   <span style="color:#2980b9;">qword</span> [<span style="font-weight:bold;">RSP</span> + <span style="color:#f67400;">4</span> * <span style="color:#f67400;">8</span>], NULL                <span style="color:#7a7c7d;">; 5th parameter</span>
+                                                <span style="color:#7a7c7d;">; Message Box, 64 bit. V1.02</span>
+<span style="color:#8e44ad;">.DisplayMessageBox:</span>
+ <span style="font-weight:bold;">xor</span>   <span style="font-weight:bold;">ECX</span>, <span style="font-weight:bold;">ECX</span>                                 <span style="color:#7a7c7d;">; 1st parameter</span>
+ <span style="font-weight:bold;">lea</span>   <span style="font-weight:bold;">RDX</span>, [<span style="font-weight:bold;">REL</span> MessageBoxText]                <span style="color:#7a7c7d;">; 2nd parameter</span>
+ <span style="font-weight:bold;">lea</span>   <span style="font-weight:bold;">R8</span>, [<span style="font-weight:bold;">REL</span> MessageBoxCaption]              <span style="color:#7a7c7d;">; 3rd parameter</span>
+ <span style="font-weight:bold;">mov</span>   <span style="font-weight:bold;">R9D</span>, MB_YESNO | MB_DEFBUTTON2            <span style="color:#7a7c7d;">; 4th parameter. 2 constants ORed together</span>
+ <span style="color:#fdbc4b;font-weight:bold;">call</span>  MessageBoxA
+
+ <span style="font-weight:bold;">cmp</span>   <span style="font-weight:bold;">RAX</span>, IDNO                                <span style="color:#7a7c7d;">; Check the return value for &quot;No&quot;</span>
+ <span style="color:#fdbc4b;font-weight:bold;">je</span>    <span style="color:#8e44ad;">.DisplayMessageBox</span>
+
+<span style="font-weight:bold;">extern</span> _GetStdHandle@4                          <span style="color:#7a7c7d;">; Import external symbols</span>
+<span style="color:#8e44ad;">Start:</span>
+ <span style="color:#fdbc4b;font-weight:bold;">call</span>  _WriteFile@20
+
+<span style="font-weight:bold;">section</span> <span style="color:#8e44ad;">.data</span>                                   <span style="color:#7a7c7d;">; Initialized data segment</span>
+ Static1Colour    <span style="color:#2980b9;">dd</span> <span style="color:#f67400;">0F0F0F0</span><span style="color:#f67400;">h</span>,
+ Edit2            <span style="color:#2980b9;">resq</span> <span style="color:#f67400;">1</span>
+
+<span style="color:#27ae60;">%define</span> Screen.Width       <span style="font-weight:bold;">RBP</span> - <span style="color:#f67400;">160</span>            <span style="color:#7a7c7d;">; 4 bytes</span>
+<span style="color:#27ae60;">%define</span> ClientArea         <span style="font-weight:bold;">RBP</span> - <span style="color:#f67400;">152</span>            <span style="color:#7a7c7d;">; RECT structure. 16 bytes</span>
+
+ <span style="font-weight:bold;">mov</span>   <span style="color:#2980b9;">dword</span> [wc.cbSize], <span style="color:#f67400;">80</span>                    <span style="color:#7a7c7d;">; [RBP - 136]</span>
+ <span style="font-weight:bold;">mov</span>   <span style="color:#2980b9;">dword</span> [wc.style], CS_HREDRAW | CS_VREDRAW | CS_BYTEALIGNWINDOW  <span style="color:#7a7c7d;">; [RBP - 132]</span>
+ <span style="font-weight:bold;">mov</span>   <span style="color:#2980b9;">qword</span> [wc.lpfnWndProc], <span style="font-weight:bold;">RAX</span>              <span style="color:#7a7c7d;">; [RBP - 128]</span>
+ <span style="font-weight:bold;">mov</span>   <span style="color:#2980b9;">qword</span> [wc.hIcon], <span style="font-weight:bold;">RAX</span>                    <span style="color:#7a7c7d;">; [RBP - 104]</span>
+ <span style="font-weight:bold;">mov</span>   <span style="color:#2980b9;">dword</span> [<span style="font-weight:bold;">RSP</span> + <span style="color:#f67400;">4</span> * <span style="color:#f67400;">8</span>], <span style="font-weight:bold;">EAX</span>                 <span style="color:#7a7c7d;">; X position, now centred</span>
+
+ <span style="font-weight:bold;">cmp</span>   <span style="color:#2980b9;">qword</span> [uMsg], WM_CLOSE                   <span style="color:#7a7c7d;">; [RBP + 24]</span>
+ <span style="color:#fdbc4b;font-weight:bold;">je</span>    WMCLOSE
+ <span style="color:#fdbc4b;font-weight:bold;">call</span>  DestroyWindow                            <span style="color:#7a7c7d;">; Send a WM_DESTROY message</span>
+ <span style="color:#fdbc4b;font-weight:bold;">jmp</span>   Return.WM_Processed
+ <span style="font-weight:bold;">mov</span>   <span style="font-weight:bold;">EDX</span>, <span style="color:#f67400;">0604060</span><span style="color:#f67400;">h</span>
+ <span style="color:#fdbc4b;font-weight:bold;">call</span>  SetBkColor
+ <span style="font-weight:bold;">mov</span>   <span style="font-weight:bold;">EDX</span>, <span style="color:#f67400;">0005000</span><span style="color:#f67400;">h</span>
+
+<span style="color:#2980b9;">db</span> <span style="color:#f67400;">0x</span><span style="color:#f67400;">55</span> <span style="color:#7a7c7d;">; just the byte 0x55</span>
+<span style="color:#2980b9;">db</span> <span style="color:#f67400;">0x</span><span style="color:#f67400;">55</span>,<span style="color:#f67400;">0x</span><span style="color:#f67400;">56</span>,<span style="color:#f67400;">0x</span><span style="color:#f67400;">57</span> <span style="color:#7a7c7d;">; three bytes in succession</span>
+<span style="color:#2980b9;">db</span> <span style="color:#f44f4f;">'a'</span>,<span style="color:#f67400;">0x</span><span style="color:#f67400;">55</span> <span style="color:#7a7c7d;">; character constants are OK</span>
+<span style="color:#2980b9;">db</span> <span style="color:#f44f4f;">'hello'</span>,<span style="color:#f67400;">13</span>,<span style="color:#f67400;">10</span>,<span style="color:#f44f4f;">'$'</span> <span style="color:#7a7c7d;">; so are string constants</span>
+<span style="color:#2980b9;">dw</span> <span style="color:#f67400;">0x</span><span style="color:#f67400;">1234</span> <span style="color:#7a7c7d;">; 0x34 0x12</span>
+<span style="color:#2980b9;">dw</span> <span style="color:#f44f4f;">'a'</span> <span style="color:#7a7c7d;">; 0x61 0x00 (it's just a number)</span>
+<span style="color:#2980b9;">dw</span> <span style="color:#f44f4f;">'ab'</span> <span style="color:#7a7c7d;">; 0x61 0x62 (character constant)</span>
+<span style="color:#2980b9;">dw</span> <span style="color:#f44f4f;">'abc'</span> <span style="color:#7a7c7d;">; 0x61 0x62 0x63 0x00 (string)</span>
+<span style="color:#2980b9;">dd</span> <span style="color:#f67400;">0x</span><span style="color:#f67400;">12345678</span> <span style="color:#7a7c7d;">; 0x78 0x56 0x34 0x12</span>
+<span style="color:#2980b9;">dd</span> <span style="color:#f67400;">1.234567e20</span> <span style="color:#7a7c7d;">; floating-point constant</span>
+<span style="color:#2980b9;">dq</span> <span style="color:#f67400;">0x</span><span style="color:#f67400;">123456789abcdef0</span> <span style="color:#7a7c7d;">; eight byte constant</span>
+<span style="color:#2980b9;">dq</span> <span style="color:#f67400;">1.234567e20</span> <span style="color:#7a7c7d;">; double-precision float</span>
+<span style="color:#2980b9;">dt</span> <span style="color:#f67400;">1.234567e20</span> <span style="color:#7a7c7d;">; extended-precision float</span>
+
+<span style="color:#2980b9;">db</span> <span style="color:#f67400;">33</span>
+<span style="color:#2980b9;">db</span> (<span style="color:#f67400;">44</span>)               <span style="color:#7a7c7d;">; Integer expression</span>
+<span style="color:#7a7c7d;">; db (44,55)            ; Invalid - error</span>
+<span style="color:#2980b9;">db</span> %(<span style="color:#f67400;">44</span>,<span style="color:#f67400;">55</span>)
+<span style="color:#2980b9;">db</span> %(<span style="color:#f44f4f;">'XX'</span>,<span style="color:#f44f4f;">'YY'</span>)
+<span style="color:#2980b9;">db</span> (<span style="color:#f44f4f;">'AA'</span>)             <span style="color:#7a7c7d;">; Integer expression - outputs single byte</span>
+<span style="color:#2980b9;">db</span> %(<span style="color:#f44f4f;">'BB'</span>)            <span style="color:#7a7c7d;">; List, containing a string</span>
+<span style="color:#2980b9;">db</span> ?
+<span style="color:#2980b9;">db</span> <span style="color:#f67400;">6</span> dup (<span style="color:#f67400;">33</span>)
+<span style="color:#2980b9;">db</span> <span style="color:#f67400;">6</span> dup (<span style="color:#f67400;">33</span>, <span style="color:#f67400;">34</span>)
+<span style="color:#2980b9;">db</span> <span style="color:#f67400;">6</span> dup (<span style="color:#f67400;">33</span>, <span style="color:#f67400;">34</span>), <span style="color:#f67400;">35</span>
+<span style="color:#2980b9;">db</span> <span style="color:#f67400;">7</span> dup (<span style="color:#f67400;">99</span>)
+<span style="color:#2980b9;">db</span> <span style="color:#f67400;">7</span> dup <span style="color:#2980b9;">dword</span> (?, <span style="color:#2980b9;">word</span> ?, ?)
+<span style="color:#2980b9;">dw</span> <span style="color:#2980b9;">byte</span> (?,<span style="color:#f67400;">44</span>)
+<span style="color:#2980b9;">dw</span> <span style="color:#f67400;">3</span> dup (<span style="color:#f67400;">0x</span><span style="color:#f67400;">cc</span>, <span style="color:#f67400;">4</span> dup <span style="color:#2980b9;">byte</span> (<span style="color:#f44f4f;">'PQR'</span>), ?), <span style="color:#f67400;">0x</span><span style="color:#f67400;">abcd</span>
+<span style="color:#2980b9;">dd</span> <span style="color:#f67400;">16</span> dup (<span style="color:#f67400;">0x</span><span style="color:#f67400;">aaaa</span>, ?, <span style="color:#f67400;">0x</span><span style="color:#f67400;">bbbbbb</span>)
+<span style="color:#2980b9;">dd</span> <span style="color:#f67400;">64</span> dup (?)
+<span style="color:#2980b9;">db</span> <span style="color:#f44f4f;">`</span><span style="color:#3daee9;">\u263a</span><span style="color:#f44f4f;">`</span>            <span style="color:#7a7c7d;">; UTF-8 smiley face</span>
+<span style="color:#2980b9;">db</span> <span style="color:#f44f4f;">`</span><span style="color:#3daee9;">\xe2\x98\xba</span><span style="color:#f44f4f;">`</span>      <span style="color:#7a7c7d;">; UTF-8 smiley face</span>
+<span style="color:#2980b9;">db</span> <span style="color:#f67400;">0E2</span><span style="color:#f67400;">h</span>, <span style="color:#f67400;">098</span><span style="color:#f67400;">h</span>, <span style="color:#f67400;">0BA</span><span style="color:#f67400;">h</span>    <span style="color:#7a7c7d;">; UTF-8 smiley face</span>
+<span style="color:#8e44ad;">buffer:</span>         <span style="color:#2980b9;">resb</span>    <span style="color:#f67400;">64</span>              <span style="color:#7a7c7d;">; reserve 64 bytes </span>
+<span style="color:#8e44ad;">wordvar:</span>        <span style="color:#2980b9;">resw</span>    <span style="color:#f67400;">1</span>               <span style="color:#7a7c7d;">; reserve a word </span>
+<span style="color:#8e44ad;">buffer:</span>         <span style="color:#2980b9;">db</span>      <span style="color:#f67400;">64</span> dup (?)      <span style="color:#7a7c7d;">; reserve 64 bytes </span>
+<span style="color:#8e44ad;">wordvar:</span>        <span style="color:#2980b9;">dw</span>      ?               <span style="color:#7a7c7d;">; reserve a word </span>
+
+<span style="color:#2980b9;">incbin</span>  <span style="color:#f44f4f;">&quot;file.dat&quot;</span>             <span style="color:#7a7c7d;">; include the whole file</span>
+<span style="color:#2980b9;">incbin</span>  <span style="color:#f44f4f;">&quot;file.dat&quot;</span>,<span style="color:#f67400;">1024</span>        <span style="color:#7a7c7d;">; skip the first 1024 bytes</span>
+<span style="color:#2980b9;">incbin</span>  <span style="color:#f44f4f;">&quot;file.dat&quot;</span>,<span style="color:#f67400;">1024</span>,<span style="color:#f67400;">512</span>    <span style="color:#7a7c7d;">; skip the first 1024, and</span>
+                               <span style="color:#7a7c7d;">; actually include at most 512</span>
+
+message         <span style="color:#2980b9;">db</span>      <span style="color:#f44f4f;">'hello, world'</span> 
+msglen          <span style="color:#2980b9;">equ</span>     $-message
+
+<span style="color:#8e44ad;">buffer:</span> <span style="color:#2980b9;">db</span>      <span style="color:#f44f4f;">'hello, world'</span> 
+        <span style="color:#2980b9;">times</span> <span style="color:#f67400;">64</span>-$+buffer <span style="color:#2980b9;">db</span> <span style="color:#f44f4f;">' '</span>
+
+     <span style="font-weight:bold;">bndstx</span> [<span style="font-weight:bold;">rbx</span>*<span style="color:#f67400;">1</span>+<span style="font-weight:bold;">rax</span>+<span style="color:#f67400;">0x</span><span style="color:#f67400;">3</span>], bnd0    <span style="color:#7a7c7d;">; GAS - '*1' indecates an index reg</span>
+     <span style="font-weight:bold;">VDIVPS</span> <span style="font-weight:bold;">zmm4</span>, <span style="font-weight:bold;">zmm5</span>, <span style="color:#2980b9;">dword</span> [<span style="font-weight:bold;">rbx</span>]{<span style="color:#f67400;">1to16</span>}   <span style="color:#7a7c7d;">; single-precision float </span>
+     <span style="font-weight:bold;">VDIVPS</span> <span style="font-weight:bold;">zmm4</span>, <span style="font-weight:bold;">zmm5</span>, <span style="color:#2980b9;">zword</span> [<span style="font-weight:bold;">rbx</span>]          <span style="color:#7a7c7d;">; packed 512 bit memory</span>
+
+<span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">ax</span>,<span style="color:#f67400;">200</span>          <span style="color:#7a7c7d;">; decimal</span>
+<span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">ax</span>,<span style="color:#f67400;">0200</span>         <span style="color:#7a7c7d;">; still decimal</span>
+<span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">ax</span>,<span style="color:#f67400;">0200</span><span style="color:#f67400;">d</span>        <span style="color:#7a7c7d;">; explicitly decimal</span>
+<span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">ax</span>,<span style="color:#f67400;">0d</span><span style="color:#f67400;">200</span>        <span style="color:#7a7c7d;">; also decimal</span>
+<span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">ax</span>,<span style="color:#f67400;">0c8</span><span style="color:#f67400;">h</span>         <span style="color:#7a7c7d;">; hex</span>
+<span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">ax</span>,$<span style="color:#f67400;">0c8</span>         <span style="color:#7a7c7d;">; hex again: the 0 is required</span>
+<span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">ax</span>,<span style="color:#f67400;">0x</span><span style="color:#f67400;">c8</span>         <span style="color:#7a7c7d;">; hex yet again</span>
+<span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">ax</span>,<span style="color:#f67400;">0h</span><span style="color:#f67400;">c8</span>         <span style="color:#7a7c7d;">; still hex</span>
+<span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">ax</span>,<span style="color:#f67400;">310</span><span style="color:#f67400;">q</span>         <span style="color:#7a7c7d;">; octal</span>
+<span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">ax</span>,<span style="color:#f67400;">310</span><span style="color:#f67400;">o</span>         <span style="color:#7a7c7d;">; octal again</span>
+<span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">ax</span>,<span style="color:#f67400;">0o</span><span style="color:#f67400;">310</span>        <span style="color:#7a7c7d;">; octal yet again</span>
+<span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">ax</span>,<span style="color:#f67400;">0q</span><span style="color:#f67400;">310</span>        <span style="color:#7a7c7d;">; octal yet again</span>
+<span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">ax</span>,<span style="color:#f67400;">11001000</span><span style="color:#f67400;">b</span>    <span style="color:#7a7c7d;">; binary</span>
+<span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">ax</span>,<span style="color:#f67400;">1100_1000</span><span style="color:#f67400;">b</span>   <span style="color:#7a7c7d;">; same binary constant</span>
+<span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">ax</span>,<span style="color:#f67400;">1100_1000</span><span style="color:#f67400;">y</span>   <span style="color:#7a7c7d;">; same binary constant once more</span>
+<span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">ax</span>,<span style="color:#f67400;">0b</span><span style="color:#f67400;">1100_1000</span>  <span style="color:#7a7c7d;">; same binary constant yet again</span>
+<span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">ax</span>,<span style="color:#f67400;">0y</span><span style="color:#f67400;">1100_1000</span>  <span style="color:#7a7c7d;">; same binary constant yet again</span>
+
+<span style="color:#27ae60;">%define</span> u(x) <span style="font-weight:bold;">__?utf16?__</span>(x) 
+<span style="color:#27ae60;">%define</span> w(x) <span style="font-weight:bold;">__?utf32?__</span>(x) 
+
+<span style="color:#2980b9;">dw</span> u(<span style="color:#f44f4f;">'C:\WINDOWS'</span>), <span style="color:#f67400;">0</span>       <span style="color:#7a7c7d;">; Pathname in UTF-16</span>
+<span style="color:#2980b9;">dd</span> w(<span style="color:#f44f4f;">`A + B = </span><span style="color:#3daee9;">\u206a</span><span style="color:#f44f4f;">`</span>), <span style="color:#f67400;">0</span>   <span style="color:#7a7c7d;">; String in UTF-32</span>
+
+<span style="color:#2980b9;">db</span>    -<span style="color:#f67400;">0.2</span>                    <span style="color:#7a7c7d;">; &quot;Quarter precision&quot;</span>
+<span style="color:#2980b9;">dw</span>    -<span style="color:#f67400;">0.5</span>                    <span style="color:#7a7c7d;">; IEEE 754r/SSE5 half precision</span>
+<span style="color:#2980b9;">dd</span>    <span style="color:#f67400;">1.2</span>                     <span style="color:#7a7c7d;">; an easy one</span>
+<span style="color:#2980b9;">dd</span>    <span style="color:#f67400;">1.222_222_222</span>           <span style="color:#7a7c7d;">; underscores are permitted</span>
+<span style="color:#2980b9;">dd</span>    <span style="color:#f67400;">0x1p+2</span>                  <span style="color:#7a7c7d;">; 1.0x2^2 = 4.0</span>
+<span style="color:#2980b9;">dq</span>    <span style="color:#f67400;">0x1p+32</span>                 <span style="color:#7a7c7d;">; 1.0x2^32 = 4 294 967 296.0</span>
+<span style="color:#2980b9;">dq</span>    <span style="color:#f67400;">1.e10</span>                   <span style="color:#7a7c7d;">; 10 000 000 000.0</span>
+<span style="color:#2980b9;">dq</span>    <span style="color:#f67400;">1.e+10</span>                  <span style="color:#7a7c7d;">; synonymous with 1.e10</span>
+<span style="color:#2980b9;">dq</span>    <span style="color:#f67400;">1.e-10</span>                  <span style="color:#7a7c7d;">; 0.000 000 000 1</span>
+<span style="color:#2980b9;">dt</span>    <span style="color:#f67400;">3.141592653589793238462</span> <span style="color:#7a7c7d;">; pi</span>
+<span style="color:#2980b9;">do</span>    <span style="color:#f67400;">1.e+4000</span>                <span style="color:#7a7c7d;">; IEEE 754r quad precision</span>
+
+<span style="font-weight:bold;">mov</span>    <span style="font-weight:bold;">rax</span>,<span style="font-weight:bold;">__?float64?__</span>(<span style="color:#f67400;">3.141592653589793238462</span>)
+<span style="font-weight:bold;">mov</span>    <span style="font-weight:bold;">rax</span>,<span style="color:#f67400;">0x</span><span style="color:#f67400;">400921fb54442d18</span>
+
+<span style="color:#27ae60;">%define</span> Inf <span style="font-weight:bold;">__?Infinity?__</span> 
+<span style="color:#27ae60;">%define</span> NaN <span style="font-weight:bold;">__?QNaN?__</span> 
+
+<span style="color:#2980b9;">dq</span>    +<span style="color:#f67400;">1.5</span>, -Inf, NaN         <span style="color:#7a7c7d;">; Double-precision constants</span>
+<span style="color:#2980b9;">dt</span> <span style="color:#f67400;">12_345_678_901_245_678</span><span style="color:#f67400;">p</span>
+<span style="color:#2980b9;">dt</span> -<span style="color:#f67400;">12_345_678_901_245_678</span><span style="color:#f67400;">p</span>
+<span style="color:#2980b9;">dt</span> +<span style="color:#f67400;">0p33</span>
+<span style="color:#2980b9;">dt</span> <span style="color:#f67400;">33</span><span style="color:#f67400;">p</span>
+
+<span style="color:#2980b9;">dq</span> b * (a // b) + (a <span style="color:#8e44ad;">%%</span> b)
+
+<span style="color:#fdbc4b;font-weight:bold;">call</span>    (<span style="font-weight:bold;">seg</span> procedure):procedure
+<span style="color:#fdbc4b;font-weight:bold;">call</span>    weird_seg:(procedure <span style="font-weight:bold;">wrt</span> weird_seg)
+
+<span style="font-weight:bold;">push</span> <span style="color:#2980b9;">dword</span> <span style="color:#f67400;">33</span>
+<span style="font-weight:bold;">push</span> <span style="font-weight:bold;">strict</span> <span style="color:#2980b9;">dword</span> <span style="color:#f67400;">33</span>
+
+<span style="color:#2980b9;">times</span> (label-$) <span style="color:#2980b9;">db</span> <span style="color:#f67400;">0</span>
+
+<span style="color:#8e44ad;">label:</span>  <span style="color:#2980b9;">db</span>      <span style="color:#f44f4f;">'Where am I?'</span>
+        <span style="color:#2980b9;">times</span> (label-$+1) <span style="color:#2980b9;">db</span> <span style="color:#f67400;">0</span> 
+<span style="color:#8e44ad;">label:</span>  <span style="color:#2980b9;">db</span>      <span style="color:#f44f4f;">'NOW where am I?'</span>
+
+label1  <span style="color:#7a7c7d;">; some code </span>
+
+.<span style="font-weight:bold;">loop</span> 
+        <span style="color:#7a7c7d;">; some more code </span>
+
+        <span style="color:#fdbc4b;font-weight:bold;">jne</span>     <span style="color:#8e44ad;">.loop</span> 
+        <span style="color:#fdbc4b;font-weight:bold;">ret</span> 
+
+<span style="color:#8e44ad;">label1:</span>                         <span style="color:#7a7c7d;">; a non-local label </span>
+<span style="color:#8e44ad;">.local:</span>                         <span style="color:#7a7c7d;">; this is really label1.local </span>
+<span style="color:#8e44ad;">..@foo:</span>                         <span style="color:#7a7c7d;">; this is a special symbol </span>
+<span style="color:#8e44ad;">label2:</span>                         <span style="color:#7a7c7d;">; another non-local label </span>
+<span style="color:#8e44ad;">.local:</span>                         <span style="color:#7a7c7d;">; this is really label2.local </span>
+
+        <span style="color:#fdbc4b;font-weight:bold;">jmp</span>     <span style="color:#8e44ad;">..@foo</span>          <span style="color:#7a7c7d;">; this will jump three lines up</span>
+
+
+<span style="color:#27ae60;">%define</span> THIS_VERY_LONG_MACRO_NAME_IS_DEFINED_TO \ 
+        THIS_VALUE
+
+<span style="color:#27ae60;">%define</span> ctrl    <span style="color:#f67400;">0x</span><span style="color:#f67400;">1F</span> &amp; 
+<span style="color:#27ae60;">%define</span> param(a,b) ((a)+(a)*(b)) 
+
+        <span style="font-weight:bold;">mov</span>     <span style="color:#2980b9;">byte</span> [param(<span style="color:#f67400;">2</span>,<span style="font-weight:bold;">ebx</span>)], ctrl <span style="color:#f44f4f;">'D'</span>
+        <span style="font-weight:bold;">mov</span>     <span style="color:#2980b9;">byte</span> [(<span style="color:#f67400;">2</span>)+(<span style="color:#f67400;">2</span>)*(<span style="font-weight:bold;">ebx</span>)], <span style="color:#f67400;">0x</span><span style="color:#f67400;">1F</span> &amp; <span style="color:#f44f4f;">'D'</span>
+
+<span style="color:#27ae60;">%define</span> a(x)    <span style="color:#f67400;">1</span>+b(x) 
+<span style="color:#27ae60;">%define</span> b(x)    <span style="color:#f67400;">2</span>*x 
+
+        <span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">ax</span>,a(<span style="color:#f67400;">8</span>)
+
+   <span style="color:#27ae60;">%define</span> foo (a,b)               <span style="color:#7a7c7d;">; no arguments, (a,b) is the expansion </span>
+   <span style="color:#27ae60;">%define</span> bar(a,b)                <span style="color:#7a7c7d;">; two arguments, empty expansion</span>
+
+   <span style="color:#27ae60;">%define</span> ereg(foo,) e %+ foo 
+     <span style="font-weight:bold;">mov</span> <span style="font-weight:bold;">eax</span>,ereg(<span style="font-weight:bold;">dx</span>,<span style="font-weight:bold;">cx</span>)
+
+    <span style="color:#27ae60;">%define</span> xyzzy(=expr,&amp;val) expr, str 
+    <span style="color:#27ae60;">%define</span> plugh(x) xyzzy(x,x) 
+    <span style="color:#2980b9;">db</span> plugh(<span style="color:#f67400;">3</span>+<span style="color:#f67400;">5</span>), <span style="color:#f44f4f;">`</span><span style="color:#3daee9;">\0</span><span style="color:#f44f4f;">`</span> <span style="color:#7a7c7d;">; Expands to: db 8, &quot;3+5&quot;, `\0`</span>
+
+     <span style="font-weight:bold;">mov</span> <span style="font-weight:bold;">ax</span>,Foo%[<span style="font-weight:bold;">__?BITS?__</span>] <span style="color:#7a7c7d;">; The Foo value</span>
+<span style="color:#27ae60;">%xdefine</span> Bar         Quux    <span style="color:#7a7c7d;">; Expands due to %xdefine </span>
+<span style="color:#27ae60;">%define</span>  Bar         %[Quux] <span style="color:#7a7c7d;">; Expands due to %[...]</span>
+
+
+
+<span style="color:#27ae60;">%define</span> BDASTART <span style="color:#f67400;">400</span><span style="color:#f67400;">h</span>                <span style="color:#7a7c7d;">; Start of BIOS data area</span>
+
+<span style="font-weight:bold;">struc</span>   tBIOSDA                      <span style="color:#7a7c7d;">; its structure </span>
+        .COM1addr       <span style="color:#2980b9;">RESW</span>    <span style="color:#f67400;">1</span> 
+        .COM2addr       <span style="color:#2980b9;">RESW</span>    <span style="color:#f67400;">1</span> 
+        <span style="color:#7a7c7d;">; ..and so on </span>
+<span style="font-weight:bold;">endstruc</span>
+
+        <span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">ax</span>,BDASTART + tBIOSDA.COM1addr 
+        <span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">bx</span>,BDASTART + tBIOSDA.COM2addr
+<span style="color:#7a7c7d;">; Macro to access BIOS variables by their names (from tBDA):</span>
+
+<span style="color:#27ae60;">%idefine</span> Foo mov %?,%?? 
+
+<span style="color:#27ae60;">%idefine</span> keyword $%?
+
+<span style="color:#27ae60;">%idefine</span> <span style="font-weight:bold;">pause</span> $%?                  <span style="color:#7a7c7d;">; Hide the PAUSE instruction</span>
+<span style="color:#27ae60;">%define</span> foo bar 
+<span style="color:#27ae60;">%undef</span>  foo 
+
+        <span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">eax</span>, foo
+<span style="color:#27ae60;">%assign</span> i i+<span style="color:#f67400;">1</span>
+<span style="color:#27ae60;">%defstr</span> <span style="font-weight:bold;">test</span> TEST
+<span style="color:#27ae60;">%define</span> <span style="font-weight:bold;">test</span> <span style="color:#f44f4f;">'TEST'</span>
+<span style="color:#27ae60;">%defstr</span> PATH %!PATH          <span style="color:#7a7c7d;">; The operating system PATH variable</span>
+
+<span style="color:#27ae60;">%deftok</span> <span style="font-weight:bold;">test</span> <span style="color:#f44f4f;">'TEST'</span>
+
+<span style="color:#27ae60;">%define</span> <span style="font-weight:bold;">test</span> TEST
+
+<span style="color:#27ae60;">%define</span> greedy(a,b,c+) a + <span style="color:#f67400;">66</span> %, b * <span style="color:#f67400;">3</span> %, c 
+
+       <span style="color:#2980b9;">db</span> greedy(<span style="color:#f67400;">1</span>,<span style="color:#f67400;">2</span>)          <span style="color:#7a7c7d;">; db 1 + 66, 2 * 3 </span>
+       <span style="color:#2980b9;">db</span> greedy(<span style="color:#f67400;">1</span>,<span style="color:#f67400;">2</span>,<span style="color:#f67400;">3</span>)        <span style="color:#7a7c7d;">; db 1 + 66, 2 * 3, 3 </span>
+       <span style="color:#2980b9;">db</span> greedy(<span style="color:#f67400;">1</span>,<span style="color:#f67400;">2</span>,<span style="color:#f67400;">3</span>,<span style="color:#f67400;">4</span>)      <span style="color:#7a7c7d;">; db 1 + 66, 2 * 3, 3, 4 </span>
+       <span style="color:#2980b9;">db</span> greedy(<span style="color:#f67400;">1</span>,<span style="color:#f67400;">2</span>,<span style="color:#f67400;">3</span>,<span style="color:#f67400;">4</span>,<span style="color:#f67400;">5</span>)    <span style="color:#7a7c7d;">; db 1 + 66, 2 * 3, 3, 4, 5</span>
+
+<span style="color:#27ae60;">%macro</span>  silly <span style="color:#f67400;">2</span> 
+    <span style="color:#27ae60;">%</span><span style="color:#f67400;">2</span>: <span style="color:#2980b9;">db</span>      %<span style="color:#f67400;">1</span> 
+<span style="color:#27ae60;">%endmacro</span> 
+
+        silly <span style="color:#f44f4f;">'a'</span>, letter_a             <span style="color:#7a7c7d;">; letter_a:  db 'a' </span>
+        silly <span style="color:#f44f4f;">'ab'</span>, string_ab           <span style="color:#7a7c7d;">; string_ab: db 'ab' </span>
+        silly {<span style="color:#f67400;">13</span>,<span style="color:#f67400;">10</span>}, crlf             <span style="color:#7a7c7d;">; crlf:      db 13,10</span>
+<span style="color:#27ae60;">%pragma</span> preproc sane_empty_expansion
+
+<span style="color:#27ae60;">%macro</span> mpar <span style="color:#f67400;">1</span>-*
+     <span style="color:#2980b9;">db</span> %{<span style="color:#f67400;">3</span>:<span style="color:#f67400;">5</span>} 
+     <span style="color:#2980b9;">db</span> %{-<span style="color:#f67400;">1</span>:-<span style="color:#f67400;">3</span>} 
+<span style="color:#27ae60;">%endmacro</span>
+
+mpar <span style="color:#f67400;">1</span>,<span style="color:#f67400;">2</span>,<span style="color:#f67400;">3</span>,<span style="color:#f67400;">4</span>,<span style="color:#f67400;">5</span>,<span style="color:#f67400;">6</span>
+
+<span style="color:#27ae60;">%macro</span>  die <span style="color:#f67400;">0</span>-<span style="color:#f67400;">1</span> <span style="color:#f44f4f;">&quot;Painful program death has occurred.&quot;</span> 
+
+        writefile <span style="color:#f67400;">2</span>,%<span style="color:#f67400;">1</span> 
+        <span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">ax</span>,<span style="color:#f67400;">0x</span><span style="color:#f67400;">4c01</span> 
+        <span style="font-weight:bold;">int</span>     <span style="color:#f67400;">0x</span><span style="color:#f67400;">21</span> 
+
+<span style="color:#27ae60;">%endmacro</span>
+
+<span style="color:#27ae60;">%macro</span>  multipush <span style="color:#f67400;">1</span>-* 
+
+  <span style="color:#27ae60;">%rep</span>  %0 
+        <span style="font-weight:bold;">push</span>    %<span style="color:#f67400;">1</span> 
+  <span style="color:#27ae60;">%rotate</span> 1 
+  <span style="color:#27ae60;">%endrep</span> 
+
+        j%-<span style="color:#f67400;">1</span>    <span style="color:#8e44ad;">%%skip</span> 
+        <span style="color:#fdbc4b;font-weight:bold;">ret</span> 
+  <span style="color:#8e44ad;">%%skip:</span> 
+
+<span style="color:#27ae60;">%endmacro</span>
+
+
+<span style="color:#27ae60;">%macro</span> foo <span style="color:#f67400;">1</span><span style="font-weight:bold;">.nolist</span>
+
+<span style="color:#27ae60;">%endmacro</span>
+
+<span style="color:#27ae60;">%macro</span>  pushparam <span style="color:#f67400;">1</span> 
+
+  <span style="color:#27ae60;">%ifidni</span> %1,ip 
+        <span style="color:#fdbc4b;font-weight:bold;">call</span>    <span style="color:#8e44ad;">%%label</span> 
+  <span style="color:#8e44ad;">%%label:</span> 
+  <span style="color:#27ae60;">%else</span> 
+        <span style="font-weight:bold;">push</span>    %<span style="color:#f67400;">1</span> 
+  <span style="color:#27ae60;">%endif</span> 
+
+<span style="color:#27ae60;">%endmacro</span>
+
+<span style="color:#27ae60;">%assign</span> i <span style="color:#f67400;">0</span> 
+<span style="color:#27ae60;">%rep</span>    64 
+        <span style="font-weight:bold;">inc</span>     <span style="color:#2980b9;">word</span> [table+<span style="color:#f67400;">2</span>*i] 
+<span style="color:#27ae60;">%assign</span> i i+<span style="color:#f67400;">1</span> 
+<span style="color:#27ae60;">%endrep</span>
+
+
+<span style="color:#8e44ad;">fibonacci:</span> 
+<span style="color:#27ae60;">%assign</span> i <span style="color:#f67400;">0</span> 
+<span style="color:#27ae60;">%assign</span> j <span style="color:#f67400;">1</span> 
+<span style="color:#27ae60;">%rep</span> 100 
+<span style="color:#27ae60;">%if</span> j &gt; <span style="color:#f67400;">65535</span> 
+    <span style="color:#27ae60;">%exitrep</span> 
+<span style="color:#27ae60;">%endif</span> 
+        <span style="color:#2980b9;">dw</span> j 
+<span style="color:#27ae60;">%assign</span> k j+i 
+<span style="color:#27ae60;">%assign</span> i j 
+<span style="color:#27ae60;">%assign</span> j k 
+<span style="color:#27ae60;">%endrep</span> 
+
+fib_number <span style="color:#2980b9;">equ</span> ($-fibonacci)/<span style="color:#f67400;">2</span>
+
+
+<span style="color:#27ae60;">%include</span> &quot;macros.mac<span style="color:#f44f4f;">&quot;</span>
+
+
+<span style="color:#27ae60;">%ifndef</span> MACROS_MAC 
+    <span style="color:#27ae60;">%define</span> MACROS_MAC 
+    <span style="color:#7a7c7d;">; now define some macros </span>
+<span style="color:#27ae60;">%endif</span>
+
+<span style="color:#27ae60;">%pathsearch</span> MyFoo <span style="color:#f44f4f;">&quot;foo.bin&quot;</span>
+
+<span style="color:#27ae60;">%imacro</span> <span style="color:#2980b9;">incbin</span> <span style="color:#f67400;">1</span>-<span style="color:#f67400;">2</span>+ <span style="color:#f67400;">0</span> 
+<span style="color:#27ae60;">%pathsearch</span> dep %<span style="color:#f67400;">1</span> 
+<span style="color:#27ae60;">%depend</span> dep 
+        <span style="color:#2980b9;">incbin</span> dep,%<span style="color:#f67400;">2</span> 
+<span style="color:#27ae60;">%endmacro</span>
+<span style="color:#27ae60;">%use</span> altreg 
+<span style="color:#27ae60;">%use</span> 'altreg<span style="color:#f44f4f;">'</span>
+
+<span style="color:#27ae60;">%push</span>    foobar
+
+<span style="color:#27ae60;">%macro</span> repeat <span style="color:#f67400;">0</span> 
+
+    <span style="color:#27ae60;">%push</span>   repeat 
+    <span style="color:#27ae60;">%</span>$begin: 
+
+<span style="color:#27ae60;">%endmacro</span>
+
+<span style="color:#27ae60;">%macro</span> until <span style="color:#f67400;">1</span>
+
+        j%-<span style="color:#f67400;">1</span>    %$begin
+    <span style="color:#27ae60;">%pop</span> 
+
+<span style="color:#27ae60;">%endmacro</span>
+
+<span style="color:#27ae60;">%define</span> %$localmac <span style="color:#f67400;">3</span>
+
+<span style="color:#27ae60;">%macro</span> else <span style="color:#f67400;">0</span> 
+
+  <span style="color:#27ae60;">%ifctx</span> if 
+        <span style="color:#27ae60;">%repl</span>   else 
+        <span style="color:#fdbc4b;font-weight:bold;">jmp</span>     %$ifend 
+        <span style="color:#27ae60;">%</span>$ifnot: 
+  <span style="color:#27ae60;">%else</span> 
+        <span style="color:#27ae60;">%error</span>  &quot;expected <span style="color:#f44f4f;">`if' before `</span>else<span style="color:#f44f4f;">'&quot; </span>
+  <span style="color:#27ae60;">%endif</span> 
+
+<span style="color:#27ae60;">%endmacro</span> 
+
+<span style="color:#27ae60;">%macro</span> endif <span style="color:#f67400;">0</span> 
+
+  <span style="color:#27ae60;">%ifctx</span> if 
+        <span style="color:#27ae60;">%</span>$ifnot: 
+        <span style="color:#27ae60;">%pop</span> 
+  <span style="color:#27ae60;">%elifctx</span>      else 
+        <span style="color:#27ae60;">%</span>$ifend: 
+        <span style="color:#27ae60;">%pop</span> 
+  <span style="color:#27ae60;">%else</span> 
+        <span style="color:#27ae60;">%error</span>  &quot;expected <span style="color:#f44f4f;">`if' or `</span>else<span style="color:#f44f4f;">' before `endif'&quot; </span>
+  <span style="color:#27ae60;">%endif</span> 
+
+<span style="color:#27ae60;">%endmacro</span>
+
+<span style="color:#8e44ad;">some_function:</span> 
+    <span style="color:#27ae60;">%push</span> mycontext             <span style="color:#7a7c7d;">; save the current context </span>
+    <span style="color:#27ae60;">%stacksize</span> small            <span style="color:#7a7c7d;">; tell NASM to use bp </span>
+    <span style="color:#27ae60;">%assign</span> %$localsize <span style="color:#f67400;">0</span>       <span style="color:#7a7c7d;">; see text for explanation </span>
+    <span style="color:#27ae60;">%local</span> old_ax:<span style="color:#2980b9;">word</span>, old_dx:<span style="color:#2980b9;">word</span> 
+
+        <span style="font-weight:bold;">enter</span>   %$localsize,<span style="color:#f67400;">0</span>   <span style="color:#7a7c7d;">; see text for explanation </span>
+        <span style="font-weight:bold;">mov</span>     [old_ax],<span style="font-weight:bold;">ax</span>     <span style="color:#7a7c7d;">; swap ax &amp; bx </span>
+        <span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">cx</span>,[old_dx] 
+        <span style="font-weight:bold;">leave</span>                   <span style="color:#7a7c7d;">; restore old bp </span>
+        <span style="color:#fdbc4b;font-weight:bold;">ret</span>                     <span style="color:#7a7c7d;">; </span>
+
+    <span style="color:#27ae60;">%pop</span>                        <span style="color:#7a7c7d;">; restore original context</span>
+
+
+<span style="color:#27ae60;">%ifdef</span> F1 
+    <span style="color:#7a7c7d;">; do some setup </span>
+<span style="color:#27ae60;">%elifdef</span> F2 
+    <span style="color:#7a7c7d;">; do some different setup </span>
+<span style="color:#27ae60;">%else</span> 
+    <span style="color:#27ae60;">%error</span> &quot;Neither F1 nor F2 was defined.<span style="color:#f44f4f;">&quot; </span>
+<span style="color:#27ae60;">%endif</span>
+<span style="color:#27ae60;">%ifdef</span> F1 
+    <span style="color:#7a7c7d;">; do some setup </span>
+<span style="color:#27ae60;">%elifdef</span> F2 
+    <span style="color:#7a7c7d;">; do some different setup </span>
+<span style="color:#27ae60;">%else</span> 
+    <span style="color:#27ae60;">%warning</span> &quot;Neither F1 nor F2 was defined, assuming F1.<span style="color:#f44f4f;">&quot; </span>
+    <span style="color:#27ae60;">%define</span> F1 
+<span style="color:#27ae60;">%endif</span>%if foo &gt; <span style="color:#f67400;">64</span> 
+    <span style="color:#27ae60;">%assign</span> foo_over foo-<span style="color:#f67400;">64</span> 
+    <span style="color:#27ae60;">%error</span> foo is foo_over bytes too large 
+<span style="color:#27ae60;">%endif</span>
+
+        <span style="color:#2980b9;">db</span>      <span style="font-weight:bold;">__?NASM_VER?__</span>
+
+<span style="font-weight:bold;">struc</span>   mytype 
+  <span style="color:#8e44ad;">mt_long:</span>      <span style="color:#2980b9;">resd</span>    <span style="color:#f67400;">1</span> 
+  <span style="color:#8e44ad;">.str:</span>         <span style="color:#2980b9;">resb</span>    <span style="color:#f67400;">32</span> 
+<span style="font-weight:bold;">endstruc</span>
+
+<span style="color:#27ae60;">%use</span> altreg 
+
+
+<span style="color:#27ae60;">%macro</span>  writefile <span style="color:#f67400;">2</span>+ 
+
+        [<span style="font-weight:bold;">section</span> <span style="color:#8e44ad;">.data</span>] 
+
+  <span style="color:#8e44ad;">%%str:</span>        <span style="color:#2980b9;">db</span>      %<span style="color:#f67400;">2</span> 
+  <span style="color:#8e44ad;">%%endstr:</span> 
+
+        <span style="font-weight:bold;">__?SECT?__</span> 
+
+        <span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">dx</span>,<span style="color:#8e44ad;">%%str</span> 
+        <span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">cx</span>,<span style="color:#8e44ad;">%%endstr</span>-<span style="color:#8e44ad;">%%str</span> 
+        <span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">bx</span>,%<span style="color:#f67400;">1</span> 
+        <span style="font-weight:bold;">mov</span>     <span style="font-weight:bold;">ah</span>,<span style="color:#f67400;">0x</span><span style="color:#f67400;">40</span> 
+        <span style="font-weight:bold;">int</span>     <span style="color:#f67400;">0x</span><span style="color:#f67400;">21</span> 
+
+<span style="color:#27ae60;">%endmacro</span>
+
+ <span style="font-weight:bold;">DEFAULT</span> <span style="font-weight:bold;">BND</span> 
+     <span style="color:#fdbc4b;font-weight:bold;">call</span> foo            <span style="color:#7a7c7d;">; BND will be prefixed </span>
+     <span style="font-weight:bold;">nobnd</span> call foo      <span style="color:#7a7c7d;">; BND will NOT be prefixed</span>
+
+<span style="font-weight:bold;">global</span> _main 
+<span style="color:#8e44ad;">_main:</span> 
+<span style="font-weight:bold;">global</span>  hashlookup:function, hashtable:data
+
+<span style="font-weight:bold;">common</span>  intvar  <span style="color:#f67400;">4</span>
+<span style="font-weight:bold;">static</span> foo 
+<span style="color:#8e44ad;">foo:</span> 
+         <span style="color:#7a7c7d;">; codes</span>
+
+<span style="color:#27ae60;">%pragma</span> macho lprefix L_
+<span style="color:#7a7c7d;">; The most common conventions </span>
+<span style="color:#27ae60;">%pragma</span> output gprefix _ 
+<span style="color:#27ae60;">%pragma</span> output lprefix L_ 
+<span style="color:#7a7c7d;">; ELF uses a different convention </span>
+<span style="color:#27ae60;">%pragma</span> elf    gprefix                       <span style="color:#7a7c7d;">; empty </span>
+<span style="color:#27ae60;">%pragma</span> elf    lprefix <span style="color:#8e44ad;">.L</span>
+
+<span style="font-weight:bold;">section</span> <span style="color:#8e44ad;">.pdata</span>  rdata <span style="font-weight:bold;">align</span>=<span style="color:#f67400;">4</span> 
+        <span style="color:#2980b9;">dd</span>      main <span style="font-weight:bold;">wrt</span> <span style="color:#8e44ad;">..imagebase</span> 
+        <span style="color:#2980b9;">dd</span>      main_end <span style="font-weight:bold;">wrt</span> <span style="color:#8e44ad;">..imagebase</span> 
+        <span style="color:#2980b9;">dd</span>      xmain <span style="font-weight:bold;">wrt</span> <span style="color:#8e44ad;">..imagebase</span> 
+<span style="font-weight:bold;">section</span> <span style="color:#8e44ad;">.xdata</span>  rdata <span style="font-weight:bold;">align</span>=<span style="color:#f67400;">8</span> 
+<span style="color:#8e44ad;">xmain:</span>  <span style="color:#2980b9;">db</span>      <span style="color:#f67400;">9</span>,<span style="color:#f67400;">0</span>,<span style="color:#f67400;">0</span>,<span style="color:#f67400;">0</span> 
+        <span style="color:#2980b9;">dd</span>      handler <span style="font-weight:bold;">wrt</span> <span style="color:#8e44ad;">..imagebase</span> 
+<span style="font-weight:bold;">section</span> <span style="color:#8e44ad;">.drectve</span> info 
+        <span style="color:#2980b9;">db</span>      <span style="color:#f44f4f;">'/defaultlib:user32.lib /defaultlib:msvcrt.lib '</span>
+</pre></body></html>

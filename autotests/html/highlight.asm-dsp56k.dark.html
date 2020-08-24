@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>highlight.asm-dsp56k</title>
+<meta name="generator" content="KF5::SyntaxHighlighting (Motorola DSP56k)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="color:#7a7c7d;">* initialization</span>
+<span style="color:#8e44ad;">n</span>       <span style="color:#fdbc4b;font-weight:bold;">equ</span>   <span style="color:#f67400;">20</span>
+<span style="color:#8e44ad;">start</span>   <span style="color:#fdbc4b;font-weight:bold;">equ</span>   <span style="color:#f67400;">$40</span>
+<span style="color:#8e44ad;">wddr</span>    <span style="color:#fdbc4b;font-weight:bold;">equ</span>   <span style="color:#f67400;">$0</span>
+<span style="color:#8e44ad;">cddr</span>    <span style="color:#fdbc4b;font-weight:bold;">equ</span>   <span style="color:#f67400;">$0</span>
+<span style="color:#8e44ad;">input</span>   <span style="color:#fdbc4b;font-weight:bold;">equ</span>   <span style="color:#f67400;">$ffe0</span>
+<span style="color:#8e44ad;">output</span>  <span style="color:#fdbc4b;font-weight:bold;">equ</span>   <span style="color:#f67400;">$ffe1</span>
+<span style="color:#7a7c7d;">;</span>
+        <span style="color:#fdbc4b;font-weight:bold;">org</span>   <span style="color:#27ae60;font-weight:bold;">p:</span>start
+        <span style="font-weight:bold;">move</span>  <span style="color:#27aeae;font-weight:bold;">#</span><span style="color:#8e44ad;">wddr</span>,<span style="color:#2980b9;">r0</span>  <span style="color:#7a7c7d;">;r0 ¬ samples</span>
+        <span style="font-weight:bold;">move</span>  <span style="color:#27aeae;font-weight:bold;">#</span><span style="color:#8e44ad;">cddr</span>,<span style="color:#2980b9;">r4</span>  <span style="color:#7a7c7d;">;r1 ¬ coefﬁcients</span>
+        <span style="font-weight:bold;">move</span>  <span style="color:#27aeae;font-weight:bold;">#</span><span style="color:#8e44ad;">n</span>-<span style="color:#27aeae;font-weight:bold;">1</span>,<span style="color:#2980b9;">m0</span>   <span style="color:#7a7c7d;">;set modulo arithmetic</span>
+        <span style="font-weight:bold;">move</span>  <span style="color:#2980b9;">m0</span>,<span style="color:#2980b9;">m4</span>     <span style="color:#7a7c7d;">;for the 2 circular buffers</span>
+<span style="color:#7a7c7d;">;</span>
+        <span style="font-weight:bold;">opt</span>   cc
+<span style="color:#7a7c7d;">;       filter loop :8+(n-1) cycles</span>
+
+        <span style="font-weight:bold;">movep</span> <span style="color:#27ae60;font-weight:bold;">y:</span>input,<span style="color:#27ae60;font-weight:bold;">x:</span> (<span style="color:#2980b9;">r0</span>)              <span style="color:#7a7c7d;">;input sample in memory</span>
+        <span style="font-weight:bold;">clr</span>   <span style="color:#2980b9;">a</span>                <span style="color:#27ae60;font-weight:bold;">x:</span>(<span style="color:#2980b9;">r0</span>)+,<span style="color:#2980b9;">x0</span>  <span style="color:#27ae60;font-weight:bold;">y:</span> (<span style="color:#2980b9;">r4</span>)+,<span style="color:#2980b9;">y0</span>
+        <span style="font-weight:bold;">rep</span>   <span style="color:#27aeae;font-weight:bold;">#</span><span style="color:#8e44ad;">n</span>-<span style="color:#27aeae;font-weight:bold;">1</span>
+        <span style="font-weight:bold;">mac</span>   <span style="color:#2980b9;">x0</span>,<span style="color:#2980b9;">y0</span>,<span style="color:#2980b9;">a</span>          <span style="color:#27ae60;font-weight:bold;">x:</span>(<span style="color:#2980b9;">r0</span>)+,<span style="color:#2980b9;">x0</span>  <span style="color:#27ae60;font-weight:bold;">y:</span>(<span style="color:#2980b9;">r4</span>)+,<span style="color:#2980b9;">y0</span>
+        <span style="font-weight:bold;">macr</span>  <span style="color:#2980b9;">x0</span>,<span style="color:#2980b9;">x0</span>,<span style="color:#2980b9;">a</span>          (<span style="color:#2980b9;">r0</span>)-
+
+        <span style="font-weight:bold;">movep</span> <span style="color:#2980b9;">a</span>,<span style="color:#27ae60;font-weight:bold;">y:</span>output                   <span style="color:#7a7c7d;">;output ﬁltered sample</span>
+
+<span style="color:#8e44ad;">fftr2a</span> <span style="color:#fdbc4b;font-weight:bold;">macro</span> points,data,coef
+<span style="color:#8e44ad;">fftr2a</span>: <span style="font-weight:bold;">ident</span> <span style="color:#f67400;">1</span>,<span style="color:#f67400;">1</span>
+
+        <span style="font-weight:bold;">move</span> <span style="color:#27aeae;font-weight:bold;">#</span><span style="color:#8e44ad;">points</span>/<span style="color:#27aeae;font-weight:bold;">2</span>,<span style="color:#2980b9;">n0</span>  <span style="color:#7a7c7d;">;initialize butterﬂies per group</span>
+        <span style="font-weight:bold;">move</span> <span style="color:#27aeae;font-weight:bold;">#1</span>,<span style="color:#2980b9;">n2</span>         <span style="color:#7a7c7d;">;initialize groups per pass</span>
+        <span style="font-weight:bold;">move</span> <span style="color:#27aeae;font-weight:bold;">#</span><span style="color:#8e44ad;">points</span>/<span style="color:#27aeae;font-weight:bold;">4</span>,<span style="color:#2980b9;">n6</span>  <span style="color:#7a7c7d;">;initialize C pointer offset</span>
+        <span style="font-weight:bold;">move</span> <span style="color:#27aeae;font-weight:bold;">#</span>-<span style="color:#27aeae;font-weight:bold;">1</span>,<span style="color:#2980b9;">m0</span>        <span style="color:#7a7c7d;">;initialize A and B address modiﬁers</span>
+        <span style="font-weight:bold;">move</span> <span style="color:#2980b9;">m0</span>,<span style="color:#2980b9;">m1</span>         <span style="color:#7a7c7d;">;for linear addressing</span>
+        <span style="font-weight:bold;">move</span> <span style="color:#2980b9;">m0</span>,<span style="color:#2980b9;">m4</span>
+        <span style="font-weight:bold;">move</span> <span style="color:#2980b9;">m0</span>,<span style="color:#2980b9;">m5</span>
+        <span style="font-weight:bold;">move</span> <span style="color:#27aeae;font-weight:bold;">#0</span>,<span style="color:#2980b9;">m6</span>         <span style="color:#7a7c7d;">;initialize C address modiﬁer for</span>
+                           <span style="color:#7a7c7d;">;reverse carry (bit-reversed) addressing</span>
+
+        <span style="font-weight:bold;">do</span>   <span style="color:#27aeae;font-weight:bold;">#</span><span style="color:#8e44ad;font-weight:bold;">@cvi</span> (<span style="color:#8e44ad;font-weight:bold;">@log</span>(points)/<span style="color:#8e44ad;font-weight:bold;">@log</span>(<span style="color:#f67400;">2</span>)+<span style="color:#f67400;">0.5</span>),_end_pass
+        <span style="font-weight:bold;">move</span> <span style="color:#27aeae;font-weight:bold;">#</span><span style="color:#8e44ad;">data</span>,<span style="color:#2980b9;">r0</span>       <span style="color:#7a7c7d;">;initialize A input pointer</span>
+        <span style="font-weight:bold;">move</span> <span style="color:#2980b9;">r0</span>,<span style="color:#2980b9;">r4</span>          <span style="color:#7a7c7d;">;initialize A output pointer</span>
+
+<span style="color:#8e44ad;">_end_bfy</span>
+        <span style="font-weight:bold;">move</span> <span style="color:#2980b9;">a</span>,<span style="color:#27ae60;font-weight:bold;">x:</span>(<span style="color:#2980b9;">r5</span>)+<span style="color:#2980b9;">n5</span> <span style="color:#27ae60;font-weight:bold;">y:</span>(<span style="color:#2980b9;">r1</span>)+<span style="color:#2980b9;">n1</span>,<span style="color:#2980b9;">y1</span>
+
+<span style="color:#8e44ad;">end_cell</span>
+        <span style="font-weight:bold;">rnd</span> <span style="color:#2980b9;">a</span>
+        <span style="font-weight:bold;">movep</span> <span style="color:#27aeae;font-weight:bold;">#0</span>,<span style="color:#27ae60;font-weight:bold;">x:</span><span style="color:#f67400;">$fffe</span>
+        <span style="color:#fdbc4b;font-weight:bold;">dc</span> <span style="color:#8e44ad;font-weight:bold;">@sin</span>(<span style="color:#8e44ad;font-weight:bold;">@cvf</span>(count)*freq)
+        <span style="font-weight:bold;">move</span> <span style="color:#27aeae;font-weight:bold;">#</span><span style="color:#8e44ad;">twiddle</span>,<span style="color:#2980b9;">r2</span>
+
+        <span style="font-weight:bold;">MOVE</span> <span style="color:#27ae60;font-weight:bold;">L:</span><span style="color:#27aeae;font-weight:bold;">&lt;$1</span>,<span style="color:#2980b9;">A</span>
+        <span style="font-weight:bold;">SUB</span> <span style="color:#2980b9;">X</span>,<span style="color:#2980b9;">A</span> <span style="color:#27ae60;font-weight:bold;">L:</span><span style="color:#27aeae;font-weight:bold;">&lt;$3</span>,<span style="color:#2980b9;">B</span>
+
+ <span style="font-weight:bold;">bad_label</span>
+ <span style="color:#8e44ad;">good_label</span>:
+</pre></body></html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>highlight.asm-avr</title>
+<meta name="generator" content="KF5::SyntaxHighlighting (AVR Assembler)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="color:#7a7c7d;">;********************************************************************</span>
+<span style="color:#7a7c7d;">;* LED flasher: LED will flash with a X on/off ratio at PD6</span>
+<span style="color:#7a7c7d;">;*</span>
+<span style="color:#7a7c7d;">;* </span><span style="color:#81ca2d;background-color:#4d1f24;font-weight:bold;">NOTE</span><span style="color:#7a7c7d;">: delay depends in the value of X, 1 is fast, 255 is slow</span>
+<span style="color:#7a7c7d;">;*</span>
+<span style="color:#7a7c7d;">;* No copyright ©1998 RES® * FREEWARE *</span>
+<span style="color:#7a7c7d;">;*</span>
+<span style="color:#7a7c7d;">;* </span><span style="color:#81ca2d;background-color:#4d1f24;font-weight:bold;">NOTE</span><span style="color:#7a7c7d;">: Connect a low current LED with a 1k resistor in serie from </span>
+<span style="color:#7a7c7d;">;*	 Vdd to pin 11 of the MCU. (Or a normal LED with a 330ohm)</span>
+<span style="color:#7a7c7d;">;*									   </span>
+<span style="color:#7a7c7d;">;* RES® can be reached by email: digitalaudio@mail.com		   </span>
+<span style="color:#7a7c7d;">;* or visit the website: http://home.wanadoo.nl/electro1/avr</span>
+<span style="color:#7a7c7d;">;*</span>
+<span style="color:#7a7c7d;">;* Version           :1.0 					   </span>
+<span style="color:#7a7c7d;">;* Date		     :12/26/98</span>
+<span style="color:#7a7c7d;">;* Author	     :Rob's ElectroSoft®</span>
+<span style="color:#7a7c7d;">;* Target MCU        :AT90S1200-12PI@4MHz					   </span>
+<span style="color:#7a7c7d;">;********************************************************************</span>
+
+<span style="font-weight:bold;">.include</span> <span style="color:#f44f4f;">&quot;1200def.inc&quot;</span>
+
+	<span style="color:#fdbc4b;font-weight:bold;">rjmp</span>	RESET		<span style="color:#7a7c7d;">;reset handle</span>
+
+
+<span style="color:#7a7c7d;">;* Long delay </span>
+
+<span style="color:#7a7c7d;">;* Register variables</span>
+
+	<span style="font-weight:bold;">.def</span>  T1      = r1
+	<span style="font-weight:bold;">.def</span>  T2      = r2
+	<span style="font-weight:bold;">.def</span>  temp    = r19
+
+<span style="color:#7a7c7d;">;* Code</span>
+	    
+<span style="color:#8e44ad;">longDelay:</span>      
+	<span style="font-weight:bold;">clr</span>   T1		<span style="color:#7a7c7d;">;T1 used as delay 2nd count</span>
+	<span style="font-weight:bold;">clr</span>   T2		<span style="color:#7a7c7d;">;T2 used as delay 3d count</span>
+<span style="color:#8e44ad;">delay_1:</span>    
+	<span style="font-weight:bold;">dec</span>   T2
+	<span style="color:#fdbc4b;font-weight:bold;">brne</span>  delay_1            
+	<span style="font-weight:bold;">dec</span>   T1
+	<span style="color:#fdbc4b;font-weight:bold;">brne</span>  delay_1           
+	<span style="font-weight:bold;">dec</span>   temp		<span style="color:#7a7c7d;">;temp must be preset as </span>
+	<span style="color:#fdbc4b;font-weight:bold;">brne</span>  delay_1		<span style="color:#7a7c7d;">; delay master count</span>
+	<span style="color:#fdbc4b;font-weight:bold;">ret</span>                     
+
+
+<span style="color:#7a7c7d;">;* Resets the data direction register D</span>
+
+<span style="color:#7a7c7d;">;* Defines</span>
+
+	<span style="font-weight:bold;">.equ</span>  led   = <span style="color:#f67400;">6</span>		<span style="color:#7a7c7d;">;LED at PD6</span>
+
+<span style="color:#7a7c7d;">;* Code</span>
+
+<span style="color:#8e44ad;">RESET:</span>
+	<span style="font-weight:bold;">sbi</span>   DDRD, led		<span style="color:#7a7c7d;">;connect LED to PORTD pin 6</span>
+	    
+
+<span style="color:#7a7c7d;">;* Main program</span>
+
+<span style="color:#7a7c7d;">;* This part will let the LED go on and off by X</span>
+
+<span style="color:#7a7c7d;">;* Register variables</span>
+
+	<span style="font-weight:bold;">.equ</span>  X   =  <span style="color:#f67400;">10</span> 	<span style="color:#7a7c7d;">;enter delaytime X</span>
+
+<span style="color:#8e44ad;">flash:</span> 
+	<span style="font-weight:bold;">sbi</span>   PORTD, led	<span style="color:#7a7c7d;">;LED on</span>
+	<span style="font-weight:bold;">ldi</span>   temp, X		<span style="color:#7a7c7d;">;X sec delay           </span>
+	<span style="color:#fdbc4b;font-weight:bold;">rcall</span> longDelay             
+	<span style="font-weight:bold;">cbi</span>   PORTD, led	<span style="color:#7a7c7d;">;LED off            </span>
+	<span style="font-weight:bold;">ldi</span>   temp, X		<span style="color:#7a7c7d;">;X sec delay</span>
+	<span style="color:#fdbc4b;font-weight:bold;">rcall</span> longDelay
+	<span style="color:#fdbc4b;font-weight:bold;">rjmp</span>  flash		<span style="color:#7a7c7d;">;another run</span>
+
+<span style="color:#7a7c7d;">/* other </span>
+<span style="color:#7a7c7d;">tests */</span>
+
+<span style="font-weight:bold;">.org</span> LARGEBOOTSTART
+<span style="color:#7a7c7d;">; the following sets up RAMPZ:Z to point to a FLASH data object, typically</span>
+<span style="color:#7a7c7d;">; for use with ELPM.</span>
+<span style="font-weight:bold;">ldi</span> ZL, <span style="color:#8e44ad;">low</span> (cmdtable * <span style="color:#f67400;">2</span>)
+<span style="font-weight:bold;">ldi</span> ZH, <span style="color:#8e44ad;">high</span> (cmdtable * <span style="color:#f67400;">2</span>)
+<span style="font-weight:bold;">.if</span> ((cmdtable * <span style="color:#f67400;">2</span>) &gt; <span style="color:#f67400;">65535</span>)
+<span style="font-weight:bold;">ldi</span> r16, <span style="color:#f67400;">1</span>
+<span style="font-weight:bold;">sts</span> RAMPZ, r16
+<span style="font-weight:bold;">.endif</span>
+<span style="color:#7a7c7d;">; more code follows here</span>
+<span style="color:#8e44ad;">cmdtable:</span> <span style="font-weight:bold;">.db</span> <span style="color:#f44f4f;">&quot;foo&quot;</span>, <span style="color:#f67400;">0x0</span>
+<span style="font-weight:bold;">.db</span> <span style="color:#f44f4f;">&quot;Hello</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">&quot;</span> <span style="color:#7a7c7d;">// is equivalent to:</span>
+<span style="font-weight:bold;">.db</span> <span style="color:#3daee9;">'H'</span>, <span style="color:#3daee9;">'e'</span>, <span style="color:#3daee9;">'l'</span>, <span style="color:#3daee9;">'l'</span>, <span style="color:#3daee9;">'o'</span>, <span style="color:#3daee9;">'\\'</span>, <span style="color:#3daee9;">'n'</span>
+<span style="font-weight:bold;">.db</span> <span style="color:#3daee9;">'\0'</span>, <span style="color:#3daee9;">'\177'</span>, <span style="color:#3daee9;">'\xff'</span>
+<span style="font-weight:bold;">.db</span> <span style="color:#f44f4f;">&quot;</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">x</span><span style="color:#3daee9;">\r</span><span style="color:#f44f4f;">x</span><span style="color:#3daee9;">\a</span><span style="color:#f44f4f;">x</span><span style="color:#3daee9;">\b</span><span style="color:#f44f4f;">x</span><span style="color:#3daee9;">\f</span><span style="color:#f44f4f;">x</span><span style="color:#3daee9;">\t</span><span style="color:#f44f4f;">x</span><span style="color:#3daee9;">\v</span><span style="color:#f44f4f;">x</span><span style="color:#3daee9;">\\</span><span style="color:#f44f4f;">x</span><span style="color:#3daee9;">\000</span><span style="color:#f44f4f;">0</span><span style="color:#3daee9;">\xff</span><span style="color:#f44f4f;">f</span><span style="color:#3daee9;">\0\1</span><span style="color:#f44f4f;">&quot;</span>
+<span style="color:#f67400;">0b10_111_</span>2 <span style="color:#f67400;">0xaf3_4</span> <span style="color:#f67400;">0_12</span> <span style="color:#f67400;">32_32</span> <span style="color:#f67400;">$32_3</span>
+
+<span style="font-weight:bold;">.macro</span> m
+<span style="font-weight:bold;">ldi</span> <span style="color:#27aeae;">@0</span>, <span style="color:#27aeae;">@1</span>
+<span style="font-weight:bold;">.endm</span> m r16,\ <span style="color:#f67400;">0</span>
+
+<span style="color:#27ae60;">#define</span> <span style="color:#27ae60;">TEST</span> \
+<span style="font-weight:bold;">.IF</span> <span style="color:#27ae60;">val</span> \
+<span style="font-weight:bold;">.DW</span> <span style="color:#27ae60;">__TIME__</span> \
+<span style="font-weight:bold;">.ELSE</span> \
+<span style="font-weight:bold;">.DW</span> <span style="color:#f67400;">1</span> \
+<span style="font-weight:bold;">.ENDIF</span>
+
+<span style="color:#27ae60;">#</span><span style="color:#da4453;text-decoration:underline;">defi</span> <span style="color:#27ae60;">TEST</span>
+</pre></body></html>

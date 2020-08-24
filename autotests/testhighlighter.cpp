@@ -19,6 +19,8 @@
 #include <QTextStream>
 #include <QTest>
 
+#include <map>
+
 using namespace KSyntaxHighlighting;
 
 class TestHighlighter : public AbstractHighlighter
@@ -78,7 +80,7 @@ public:
 
 private:
     Repository *m_repo;
-    QSet<QString> m_coveredDefinitions;
+    std::map<QString, QStringList> m_coveredDefinitions;
 
 private Q_SLOTS:
     void initTestCase()
@@ -97,16 +99,35 @@ private Q_SLOTS:
 
         int count = 0;
         for (const auto &def : m_repo->definitions()) {
-            if (def.isHidden() || !def.isValid())
+            if (!def.isValid())
                 continue;
             ++count;
-            if (m_coveredDefinitions.contains(def.name()))
+            if (m_coveredDefinitions.find(def.name()) != m_coveredDefinitions.end())
                 coveredList.write(def.name().toUtf8() + '\n');
             else
                 uncoveredList.write(def.name().toUtf8() + '\n');
         }
 
         qDebug() << "Syntax definitions with test coverage:" << ((float)m_coveredDefinitions.size() * 100.0f / (float)count) << "%";
+
+        // we don't want multiple tests for the same highlighting
+        // tests should be consolidated into one useful file per highlighting
+        bool duplicates = false;
+        for (const auto &entry : qAsConst(m_coveredDefinitions)) {
+            if (entry.second.size() <= 1) {
+                continue;
+            }
+
+            // abort and tell about duplicated test cases!
+            qWarning() << "Multiple unit tests for the language " << entry.first;
+            for (const auto &testCase : entry.second) {
+                qWarning() << "  - " << testCase;
+            }
+            duplicates = true;
+        }
+        if (duplicates) {
+            QFAIL("Multiple unit tests for the same language found, see for details the output above!");
+        }
 
         delete m_repo;
         m_repo = nullptr;
@@ -156,7 +177,7 @@ private Q_SLOTS:
 
         QVERIFY(def.isValid());
         qDebug() << "Using syntax" << def.name();
-        m_coveredDefinitions.insert(def.name());
+        m_coveredDefinitions[def.name()].push_back(inFile);
         highlighter.setDefinition(def);
         highlighter.highlightFile(inFile, outFile);
 

@@ -170,3 +170,16 @@ Also, you can report a bug [here](https://bugs.kde.org/enter_bug.cgi?product=fra
 However, some users often report bugs related to syntax highlighting in
 [kate/syntax](https://bugs.kde.org/buglist.cgi?component=syntax&product=kate&resolution=---)
 and [kile/editor](https://bugs.kde.org/buglist.cgi?component=editor&product=kile&resolution=---).
+
+## Updating the kate-editor.org/syntax website
+
+To update the kate-editor.org/syntax website including the update site & all linked examples/files,
+please run after successful build & test the following make target:
+
+make update_kate_editor_org
+
+This will clone the kate-editor.org git from invent.kde.org into kate-editor-org inside the build directory and update the needed things.
+
+You can afterwards step into kate-editor-org and commit & push the change after review.
+
+The kate-editor.org webserver will update itself periodically from the repository on invent.kde.org.

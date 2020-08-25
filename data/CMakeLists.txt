@@ -69,3 +69,7 @@ set_property(TARGET SyntaxHighlightingData PROPERTY POSITION_INDEPENDENT_CODE 1)
 if(NOT ${CMAKE_VERSION} VERSION_LESS "3.13.0")
     target_link_libraries(SyntaxHighlightingData PRIVATE Qt5::Core)
 endif()
+
+# add target to update kate-editor.org syntax page + update site
+add_custom_target(update_kate_editor_org
+    COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/generators/update-kate-editor-org.pl" "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")

@@ -1,5 +1,9 @@
 #!/usr/bin/perl -w
 
+# update script for kate-editor.org/syntax
+# SPDX-FileCopyrightText: 2020 Christoph Cullmann <cullmann@kde.org>
+# SPDX-License-Identifier: MIT
+
 # needed things
 use FindBin;
 use Cwd;

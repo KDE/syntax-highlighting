@@ -87,7 +87,7 @@ private Q_SLOTS:
         QTest::addColumn<QString>("fileName");
         QTest::addColumn<QStringList>("expectedNames");
 
-        QTest::newRow("Matlab") << QStringLiteral("/bla/foo.m") << (QStringList() << QStringLiteral("Magma") << QStringLiteral("Matlab") << QStringLiteral("Objective-C") << QStringLiteral("Octave"));
+        QTest::newRow("Matlab") << QStringLiteral("/bla/foo.m") << (QStringList() << QStringLiteral("Objective-C") << QStringLiteral("Magma") << QStringLiteral("Matlab") << QStringLiteral("Octave"));
     }
 
     void testDefinitionsForFileName()

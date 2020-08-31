@@ -137,7 +137,7 @@ Theme Repository::defaultTheme(Repository::DefaultTheme t)
 {
     if (t == DarkTheme)
         return theme(QLatin1String("Breeze Dark"));
-    return theme(QLatin1String("Default"));
+    return theme(QLatin1String("Breeze Light"));
 }
 
 void RepositoryPrivate::load(Repository *repo)

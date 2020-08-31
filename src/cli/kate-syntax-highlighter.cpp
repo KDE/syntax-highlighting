@@ -28,6 +28,8 @@ int main(int argc, char **argv)
     QCoreApplication::setOrganizationName(QStringLiteral("KDE"));
     QCoreApplication::setApplicationVersion(QStringLiteral(SyntaxHighlighting_VERSION_STRING));
 
+    Repository repo;
+
     QCommandLineParser parser;
     parser.setApplicationDescription(app.translate("SyntaxHighlightingCLI", "Command line syntax highlighter using Kate syntax definitions."));
     parser.addHelpOption();
@@ -52,7 +54,7 @@ int main(int argc, char **argv)
     parser.addOption(syntaxName);
 
     QCommandLineOption themeName(
-        QStringList() << QStringLiteral("t") << QStringLiteral("theme"), app.translate("SyntaxHighlightingCLI", "Color theme to use for highlighting."), app.translate("SyntaxHighlightingCLI", "theme"), QStringLiteral("Default"));
+        QStringList() << QStringLiteral("t") << QStringLiteral("theme"), app.translate("SyntaxHighlightingCLI", "Color theme to use for highlighting."), app.translate("SyntaxHighlightingCLI", "theme"), repo.defaultTheme(Repository::LightTheme).name());
     parser.addOption(themeName);
 
     QCommandLineOption titleOption(QStringList() << QStringLiteral("T") << QStringLiteral("title"),
@@ -65,7 +67,6 @@ int main(int argc, char **argv)
 
     parser.process(app);
 
-    Repository repo;
     if (parser.isSet(listDefs)) {
         for (const auto &def : repo.definitions()) {
             std::cout << qPrintable(def.name()) << std::endl;

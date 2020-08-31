@@ -65,7 +65,7 @@ private Q_SLOTS:
     void testFormat_data()
     {
         QTest::addColumn<QString>("themeName");
-        QTest::newRow("default") << "Default";
+        QTest::newRow("default") << "Breeze Light";
         QTest::newRow("dark") << "Breeze Dark";
         QTest::newRow("print") << "Printing";
     }
@@ -118,9 +118,9 @@ private Q_SLOTS:
         QVERIFY(f.id() > 0);
     }
 
-    void testDefaultTheme()
+    void testBreezeLightTheme()
     {
-        Theme t = m_repo.theme(QLatin1String("Default"));
+        Theme t = m_repo.theme(QLatin1String("Breeze Light"));
         QVERIFY(t.isValid());
 
         // Themes compiled in as resource are never writable

@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>highlight_tads3.t</title>
+<meta name="generator" content="KF5::SyntaxHighlighting (TADS 3)"/>
+</head><body style="background-color:#ffffff;color:#1f1c1b"><pre>
+<span style="color:#898887;">// TADS3 Example File</span>
+<span style="color:#898887;">// Source: https://www.tads.org/t3doc/doc/t3QuickStart.htm</span>
+
+<span style="color:#006e28;">#charset </span><span style="color:#bf0303;">&quot;us-ascii&quot;</span>
+<span style="color:#006e28;">#include </span><span style="color:#bf0303;">&lt;adv3.h&gt;</span>
+<span style="color:#006e28;">#include </span><span style="color:#bf0303;">&lt;en_us.h&gt;</span>
+
+versionInfo: GameID
+    IFID = <span style="color:#bf0303;">'558c20af-6559-477a-9f98-b7b4274cd304</span><span style="color:#bf0303;">'</span>
+    name = <span style="color:#bf0303;">'The Best Burglar</span><span style="color:#bf0303;">'</span>
+    byline = <span style="color:#bf0303;">'by Eric Eve</span><span style="color:#bf0303;">'</span>
+    htmlByline = <span style="color:#bf0303;">'by </span><span style="color:#006e28;font-style:italic;">&lt;a href=&quot;mailto:eric.eve@hmc.ox.ac.uk&quot;&gt;</span>
+<span style="color:#bf0303;">                  Eric Eve</span><span style="color:#006e28;font-style:italic;">&lt;/a&gt;</span><span style="color:#bf0303;">'</span>
+    version = <span style="color:#bf0303;">'3</span><span style="color:#bf0303;">'</span>
+    authorEmail = <span style="color:#bf0303;">'Eric Eve </span><span style="color:#006e28;font-style:italic;">&lt;eric.eve@hmc.ox.ac.uk&gt;</span><span style="color:#bf0303;">'</span>
+    desc = <span style="color:#bf0303;">'You are the world</span><span style="color:#3daee9;font-weight:bold;">\'</span><span style="color:#bf0303;">s best burglar faced with the greatest challenge</span>
+<span style="color:#bf0303;">        of your felonious career.</span><span style="color:#bf0303;">'</span>
+    htmlDesc = <span style="color:#bf0303;">'You are the world</span><span style="color:#3daee9;font-weight:bold;">\'</span><span style="color:#bf0303;">s best burglar faced with the greatest</span>
+<span style="color:#bf0303;">        challenge of your felonious career.</span><span style="color:#bf0303;">'</span>
+;
+
+gameMain: GameMainDef
+    <span style="color:#898887;">/* the initial player character is 'me' */</span>
+    initialPlayerChar = me
+
+    showIntro()
+    {
+        <span style="color:#bf0303;">&quot;</span><span style="color:#006e28;font-style:italic;">&lt;b&gt;</span><span style="color:#bf0303;">The Best Burglar</span><span style="color:#006e28;font-style:italic;">&lt;/b&gt;</span><span style="color:#3daee9;font-weight:bold;">\n</span><span style="color:#bf0303;">Well, you've got this far. Now it's just a</span>
+<span style="color:#bf0303;">        quick nip inside the house and out again carrying the Orb of Ultimate</span>
+<span style="color:#bf0303;">        Satisfaction, an object that no burglar has ever managed to steal</span>
+<span style="color:#bf0303;">        before. If you can pull it off you're sure to win the Burglar of the</span>
+<span style="color:#bf0303;">        Year Award, putting you at the pinnacle of your profession.</span><span style="color:#3daee9;font-weight:bold;">\b</span><span style="color:#bf0303;">&quot;</span>;
+    }
+
+    showGoodbye()
+    {
+        <span style="color:#bf0303;">&quot;Thanks for playing! &quot;</span>;
+    }
+;
+
+startRoom: OutdoorRoom <span style="color:#bf0303;">'Driveway</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;The large red-brick Tudor house stands immediately to the north of this end</span>
+<span style="color:#bf0303;">    of the driveway, while the drive back to the road where you left your</span>
+<span style="color:#bf0303;">    getaway vehicle runs off though a belt of trees to the southwest.&quot;</span>
+
+    roomFirstDesc = <span style="color:#bf0303;">&quot;Here you are in the drive of Number 305 Erehwon Avenue,</span>
+<span style="color:#bf0303;">        with the great house you've come to burgle standing just before you to</span>
+<span style="color:#bf0303;">        the north. The drive back to the road where you left your getaway</span>
+<span style="color:#bf0303;">        vehicle runs off though a belt of trees to the southwest.&quot;</span>
+
+    north = frontDoor
+    <span style="font-weight:bold;">in</span> asExit(north)
+    southwest = drive
+;
+
++ me: Actor
+    pcDesc = <span style="color:#bf0303;">&quot;You're Alexis Lightfinger, burglar extraordinaire, the most</span>
+<span style="color:#bf0303;">        professional thief in the known universe; but you're on a job now, so</span>
+<span style="color:#bf0303;">        you don't have time for the narcissistic indulgence of admiring your own</span>
+<span style="color:#bf0303;">        appearance. You're far too professional not to have come fully prepared,</span>
+<span style="color:#bf0303;">        so there's no practical need to look yourself over again. &quot;</span>
+;
+
+++ Container <span style="color:#bf0303;">'large white swag bag*bags</span><span style="color:#bf0303;">'</span> <span style="color:#bf0303;">'swag bag</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;It's a large white bag with </span><span style="color:#006e28;font-style:italic;">&lt;q&gt;</span><span style="color:#bf0303;">SWAG</span><span style="color:#006e28;font-style:italic;">&lt;/q&gt;</span><span style="color:#bf0303;"> printed on it in very large</span>
+<span style="color:#bf0303;">    letters. Everyone knows that no real burglar would ever carry such a thing,</span>
+<span style="color:#bf0303;">    so by carrying it you know no one will take you for a real burglar. Cunning,</span>
+<span style="color:#bf0303;">    eh? &quot;</span>
+;
+
++ frontDoor: LockableWithKey, Door <span style="color:#bf0303;">'solid oak front door*doors</span><span style="color:#bf0303;">'</span> <span style="color:#bf0303;">'front door</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;The lintel above the front door is carved with the date 1589, presumably</span>
+<span style="color:#bf0303;">    the date the house was built. The door itself is made of solid oak. &quot;</span>
+    keyList = [brassKey]
+
+    makeOpen(stat)
+    {
+        <span style="font-weight:bold;">inherited</span>(stat);
+        <span style="font-weight:bold;">if</span>(stat)
+            achievement.awardPointsOnce();
+    }
+
+    achievement: Achievement { +<span style="color:#b08000;">10</span> <span style="color:#bf0303;">&quot;opening the front door&quot;</span> }
+
+;
+
++ flowerPot: ComplexContainer <span style="color:#bf0303;">'terracotta small flower flowerpot/pot*pots</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">'flower pot</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;It's a perfectly ordinary small terracota pot, though it looks like no</span>
+<span style="color:#bf0303;">    one's got round to putting a plant in it yet. &quot;</span>
+    subContainer: ComplexComponent, Container { bulkCapacity = <span style="color:#b08000;">3</span>}
+    subUnderside: ComplexComponent, Underside { }
+
+    initSpecialDesc = <span style="color:#bf0303;">&quot;A small flower pot rests on the ground not far from the</span>
+<span style="color:#bf0303;">        front door. &quot;</span>
+
+    bulk = <span style="color:#b08000;">3</span>
+    bulkCapacity = <span style="color:#b08000;">3</span>
+;
+
+++ brassKey: Hidden, Key <span style="color:#bf0303;">'small brass key*keys</span><span style="color:#bf0303;">'</span> <span style="color:#bf0303;">'small brass key</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;It's an ordinary enough small brass key. &quot;</span>
+    subLocation = &amp;subUnderside
+;
+
++ Enterable -&gt; frontDoor <span style="color:#bf0303;">'large red red-brick tudor house/mansion/front</span>
+<span style="color:#bf0303;">    *houses*buildings</span><span style="color:#bf0303;">'</span> <span style="color:#bf0303;">'house</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;It's a large red-brick Tudor house with mullioned windows, climbing</span>
+<span style="color:#bf0303;">    creepers and the date 1589 carved over the door. &quot;</span>
+;
+
+++ Component <span style="color:#bf0303;">'(door) carved lintel</span><span style="color:#bf0303;">'</span> <span style="color:#bf0303;">'lintel</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;Its most noteworthy feature is the date 1589 carved into it. &quot;</span>
+;
+
++ Decoration <span style="color:#bf0303;">'mullioned windows</span><span style="color:#bf0303;">'</span> <span style="color:#bf0303;">'windows</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;They're architecturally attractive, no doubt, but not especially helpful to</span>
+<span style="color:#bf0303;">    burglars. &quot;</span>
+
+    notImportantMsg = <span style="color:#bf0303;">'It</span><span style="color:#3daee9;font-weight:bold;">\'</span><span style="color:#bf0303;">s a matter of professional pride with you never to</span>
+<span style="color:#bf0303;">        mess with windows. </span><span style="color:#bf0303;">'</span>
+    isPlural = <span style="font-weight:bold;">true</span>
+;
+
++ Decoration <span style="color:#bf0303;">'green climbing ivy/creepers/creeper</span><span style="color:#bf0303;">'</span> <span style="color:#bf0303;">'creepers</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;The front of the house is festooned with green creepers -- ivy, perhaps,</span>
+<span style="color:#bf0303;">    but botany was never your strong point since in the main plants aren't</span>
+<span style="color:#bf0303;">    worth burgling. &quot;</span>
+
+    notImportantMsg = <span style="color:#bf0303;">'The creepers can</span><span style="color:#3daee9;font-weight:bold;">\'</span><span style="color:#bf0303;">t help you burgle the house -- they</span><span style="color:#3daee9;font-weight:bold;">\'</span><span style="color:#bf0303;">re</span>
+<span style="color:#bf0303;">        certainly not strong enough to climb and they</span><span style="color:#3daee9;font-weight:bold;">\'</span><span style="color:#bf0303;">re certainly not worth</span>
+<span style="color:#bf0303;">        stealing -- so you may as well leave them alone. </span><span style="color:#bf0303;">'</span>
+    isPlural = <span style="font-weight:bold;">true</span>
+;
+
++ drive: PathPassage <span style="color:#bf0303;">'drive/path/avenue</span><span style="color:#bf0303;">'</span> <span style="color:#bf0303;">'drive</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;The drive leading back to the road runs off through a belt of trees to the</span>
+<span style="color:#bf0303;">    southwest. &quot;</span>
+
+    dobjFor(TravelVia)
+    {
+        action()
+        {
+            <span style="color:#bf0303;">&quot;You retrace your steps back to the road, where your trusty unmarked</span>
+<span style="color:#bf0303;">            burglarmobile is still parked, ready for your quick getaway. &quot;</span>;
+
+            <span style="font-weight:bold;">if</span>(orb.isIn(me))
+            {
+                <span style="color:#bf0303;">&quot;Congratulations! You have got away with the Orb of Ultimate</span>
+<span style="color:#bf0303;">                Satisfaction, a feat never before performed. As you slip the orb</span>
+<span style="color:#bf0303;">                onto the back seat of your car and climb into the driver's seat</span>
+<span style="color:#bf0303;">                you tell yourself that you're now absolutely certain to win</span>
+<span style="color:#bf0303;">                the Burglar of the Year Award!</span><span style="color:#3daee9;font-weight:bold;">\b</span><span style="color:#bf0303;">&quot;</span>;
+
+                achievement.awardPointsOnce();
+
+                finishGameMsg(ftVictory, [finishOptionUndo,
+                    finishOptionFullScore]);
+            }
+            <span style="font-weight:bold;">else</span>
+            {
+                <span style="color:#bf0303;">&quot;It's a shame you didn't manage to steal the orb, though.</span>
+<span style="color:#bf0303;">                Without it you'll never win the Burglar of the Year Award</span>
+<span style="color:#bf0303;">                now.</span><span style="color:#3daee9;font-weight:bold;">\b</span><span style="color:#bf0303;">&quot;</span>;
+
+                finishGameMsg(ftFailure, [finishOptionUndo]);
+            }
+        }
+    }
+
+    okayRubMsg = <span style="color:#bf0303;">'What -- all of it? That may take a while! </span><span style="color:#bf0303;">'</span>
+    achievement: Achievement { +<span style="color:#b08000;">10</span> <span style="color:#bf0303;">&quot;getting away with the orb&quot;</span> }
+;
+
++ Decoration <span style="color:#bf0303;">'belt/trees</span><span style="color:#bf0303;">'</span> <span style="color:#bf0303;">'trees</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;The trees are in full leaf, which is good, because they hide what you're</span>
+<span style="color:#bf0303;">    doing from the road. &quot;</span>
+
+    notImportantMsg = <span style="color:#bf0303;">'The trees are doing a good job of hiding you from the</span>
+<span style="color:#bf0303;">        road, so you may as well leave them alone. It</span><span style="color:#3daee9;font-weight:bold;">\'</span><span style="color:#bf0303;">s not as if they</span><span style="color:#3daee9;font-weight:bold;">\'</span><span style="color:#bf0303;">re</span>
+<span style="color:#bf0303;">        something you could steal, after all. </span><span style="color:#bf0303;">'</span>
+;
+
+hallway: Room <span style="color:#bf0303;">'Hallway</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;This hall is or grand proportions but pretty bare. The front door lies to</span>
+<span style="color:#bf0303;">    the south and other exits lead east, north and west. &quot;</span>
+
+    south = hallDoor
+    out asExit(south)
+    west = study
+    north: FakeConnector { <span style="color:#bf0303;">&quot;You're pretty sure that only leads to the kitchen,</span>
+<span style="color:#bf0303;">        and you haven't come here to cook a meal. &quot;</span> }
+
+    east: DeadEndConnector { <span style="color:#bf0303;">'the living room</span><span style="color:#bf0303;">'</span> <span style="color:#bf0303;">&quot;You </span><span style="color:#0057ae;font-style:italic;">&lt;&lt;one of&gt;&gt;</span><span style="color:#bf0303;">walk through the</span>
+<span style="color:#bf0303;">        doorway and find yourself in</span><span style="color:#0057ae;font-style:italic;">&lt;&lt;or&gt;&gt;</span><span style="color:#bf0303;">return to</span><span style="color:#0057ae;font-style:italic;">&lt;&lt;stopping&gt;&gt;</span><span style="color:#bf0303;"> the living room</span>
+<span style="color:#bf0303;">        where you take </span><span style="color:#0057ae;font-style:italic;">&lt;&lt;one of&gt;&gt;</span><span style="color:#bf0303;"> a </span><span style="color:#0057ae;font-style:italic;">&lt;&lt;or&gt;&gt;</span><span style="color:#bf0303;">another</span><span style="color:#0057ae;font-style:italic;">&lt;&lt;stopping&gt;&gt;</span><span style="color:#bf0303;"> quick look around,</span>
+<span style="color:#bf0303;">        but </span><span style="color:#0057ae;font-style:italic;">&lt;&lt;one of&gt;&gt;&lt;&lt;or&gt;&gt;</span><span style="color:#bf0303;"> once again</span><span style="color:#0057ae;font-style:italic;">&lt;&lt;stopping&gt;&gt;</span><span style="color:#bf0303;"> failing to find anything of</span>
+<span style="color:#bf0303;">        interest you quickly return to the hall. &quot;</span>}
+;
+
++ hallDoor: Lockable, Door -&gt; frontDoor <span style="color:#bf0303;">'front door*doors</span><span style="color:#bf0303;">'</span> <span style="color:#bf0303;">'front door</span><span style="color:#bf0303;">'</span>
+;
+
++ table:Surface <span style="color:#bf0303;">'small wooden mahogany side table/legs*tables</span><span style="color:#bf0303;">'</span> <span style="color:#bf0303;">'small table</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;It's a small mahogany table standing on four thin legs. &quot;</span>
+    initSpecialDesc = <span style="color:#bf0303;">&quot;A small table rests by the east wall. &quot;</span>
+    bulk = <span style="color:#b08000;">5</span>
+
+    dobjFor(Take)
+    {
+        check()
+        {
+            <span style="font-weight:bold;">if</span>(contents.length &gt; <span style="color:#b08000;">0</span>)
+                failCheck(<span style="color:#bf0303;">'It</span><span style="color:#3daee9;font-weight:bold;">\'</span><span style="color:#bf0303;">s probably not a very good idea to try picking</span>
+<span style="color:#bf0303;">                    up the table while </span><span style="color:#006e28;font-style:italic;">&lt;&lt;contents[1].nameIs&gt;</span><span style="color:#bf0303;">&gt; still on it. </span><span style="color:#bf0303;">'</span>);
+        }
+    }
+;
+
+++ vase: Container <span style="color:#bf0303;">'cheap china floral vase/pattern</span><span style="color:#bf0303;">'</span> <span style="color:#bf0303;">'vase</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;It's only a cheap thing, made of china but painted in a tasteless floral</span>
+<span style="color:#bf0303;">    pattern using far too many primary colours. &quot;</span>
+
+    bulk = <span style="color:#b08000;">3</span>
+    bulkCapacity = <span style="color:#b08000;">3</span>
+;
+
++++ silverKey: Hidden, Key <span style="color:#bf0303;">'small silver key*keys</span><span style="color:#bf0303;">'</span> <span style="color:#bf0303;">'small silver key</span><span style="color:#bf0303;">'</span>
+;
+
+study: Room <span style="color:#bf0303;">'Study</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;This study is much as you would expect: somewhat spartan. A desk stands in</span>
+<span style="color:#bf0303;">    the middle of the room with a chair placed just behind it. A </span><span style="color:#0057ae;font-style:italic;">&lt;&lt;if</span>
+<span style="color:#0057ae;font-style:italic;">      picture.moved&gt;&gt;</span><span style="color:#bf0303;">safe is built into </span><span style="color:#0057ae;font-style:italic;">&lt;&lt;else&gt;&gt;</span><span style="color:#bf0303;"> rather bland painting hangs on</span>
+<span style="color:#bf0303;">    </span><span style="color:#0057ae;font-style:italic;">&lt;&lt;end&gt;&gt;</span><span style="color:#bf0303;"> the west wall. The way out is to the east. &quot;</span>
+    east = hallway
+    out asExit(east)
+;
+
++ desk: Heavy, Platform <span style="color:#bf0303;">'plain wooden desk</span><span style="color:#bf0303;">'</span> <span style="color:#bf0303;">'desk</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;It's a plain wooden desk with a single drawer. &quot;</span>
+    dobjFor(Open) remapTo(Open, drawer)
+    dobjFor(Close) remapTo(Close, drawer)
+    dobjFor(LookIn) remapTo(LookIn, drawer)
+    dobjFor(UnlockWith) remapTo(UnlockWith, drawer, IndirectObject)
+    dobjFor(LockWith) remapTo(LockWith, drawer, IndirectObject)
+    dobjFor(Lock) remapTo(Lock, drawer)
+    dobjFor(Unlock) remapTo(Unlock, drawer)
+;
+
+++ drawer: KeyedContainer, Component <span style="color:#bf0303;">'(desk) drawer*drawers</span><span style="color:#bf0303;">'</span> <span style="color:#bf0303;">'drawer</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;It's an ordinary desk drawer with a small silver lock. &quot;</span>
+    keyList = [silverKey]
+;
+
++++ notebook: Readable <span style="color:#bf0303;">'small bright red notebook/book/cover/pages</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">'small red notebook</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;It's a small notebook with a bright red cover. &quot;</span>
+
+    readDesc = <span style="color:#bf0303;">&quot;You open the notebook and flick through its pages. The only</span>
+<span style="color:#bf0303;">        thing you find of any interest is a page with </span><span style="color:#006e28;font-style:italic;">&lt;q&gt;</span><span style="color:#bf0303;">SAFE DATE</span><span style="color:#006e28;font-style:italic;">&lt;/q&gt;</span><span style="color:#bf0303;"> scrawled</span>
+<span style="color:#bf0303;">        across it. After satisfying yourself that the notebook contains nothing</span>
+<span style="color:#bf0303;">        else of any potential relevance you snap it shut again. </span><span style="color:#006e28;font-style:italic;">&lt;.reveal</span>
+<span style="color:#006e28;font-style:italic;">        safe-date&gt;</span><span style="color:#bf0303;">&quot;</span>
+
+    dobjFor(Open) asDobjFor(Read)
+    dobjFor(LookIn) asDobjFor(Read)
+
+    dobjFor(Read)
+    {
+        action()
+        {
+            <span style="font-weight:bold;">inherited</span>;
+            achievement.awardPointsOnce();
+        }
+    }
+
+    cannotCloseMsg = <span style="color:#bf0303;">'It</span><span style="color:#3daee9;font-weight:bold;">\'</span><span style="color:#bf0303;">s already closed. </span><span style="color:#bf0303;">'</span>
+    achievement: Achievement { +<span style="color:#b08000;">5</span> <span style="color:#bf0303;">&quot;reading the notebook&quot;</span> }
+;
+
++ CustomImmovable, Chair <span style="color:#bf0303;">'red office swivel chair</span><span style="color:#bf0303;">'</span> <span style="color:#bf0303;">'chair</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;It's a typical office swivel chair, covered in red fabric. &quot;</span>
+
+    cannotTakeMsg = <span style="color:#bf0303;">'You see no reason to burden yourself with such a useless</span>
+<span style="color:#bf0303;">        object; that would be quite unprofessional. </span><span style="color:#bf0303;">'</span>
+
+;
+
++ picture: RoomPartItem, Thing <span style="color:#bf0303;">'rather bland picture/painting/landscape</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">'picture</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;It's a landscape, pleasantly executed enough, but of no great distinction</span>
+<span style="color:#bf0303;">    and definitely not worth the bother of stealing. &quot;</span>
+
+    initNominalRoomPartLocation = defaultWestWall
+    initSpecialDesc = <span style="color:#bf0303;">&quot;A rather bland painting hangs on the west wall. &quot;</span>
+    isListed = (moved)
+
+    bulk = <span style="color:#b08000;">8</span>
+
+    dobjFor(LookBehind)
+    {
+        action()
+        {
+            <span style="font-weight:bold;">if</span>(moved)
+                <span style="font-weight:bold;">inherited</span>;
+            <span style="font-weight:bold;">else</span>
+            {
+                safe.discover();
+                <span style="color:#bf0303;">&quot;Behind the picture is a safe built into the wall. &quot;</span>;
+            }
+        }
+    }
+
+    moveInto(newDest)
+    {
+        <span style="font-weight:bold;">if</span>(!safe.discovered)
+        {
+            <span style="color:#bf0303;">&quot;Removing the painting from the wall reveals a safe behind. &quot;</span>;
+            safe.discover();
+        }
+        <span style="font-weight:bold;">inherited</span>(newDest);
+    }
+;
+
++ safe: RoomPartItem, Hidden, CustomFixture, ComplexContainer
+    <span style="color:#bf0303;">'sturdy steel safe</span><span style="color:#bf0303;">'</span> <span style="color:#bf0303;">'safe</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;It's a sturdy steel safe with a single dial on its door. &quot;</span>
+
+    subContainer: ComplexComponent, IndirectLockable, OpenableContainer
+    {
+        bulkCapacity = <span style="color:#b08000;">5</span>
+        makeOpen(stat)
+        {
+            <span style="font-weight:bold;">inherited</span>(stat);
+            <span style="font-weight:bold;">if</span>(stat)
+                achievement.awardPointsOnce();
+        }
+
+        achievement: Achievement { +<span style="color:#b08000;">10</span> <span style="color:#bf0303;">&quot;opening the safe&quot;</span> }
+    }
+
+    specialDesc = <span style="color:#bf0303;">&quot;A safe is built into the west wall. &quot;</span>
+    specialNominalRoomPartLocation = defaultWestWall
+    cannotTakeMsg = <span style="color:#bf0303;">'It</span><span style="color:#bf0303;">'</span>s firmly built into the wall; you can<span style="color:#bf0303;">'t budge it. </span><span style="color:#bf0303;">'</span>
+
+    discover()
+    {
+        <span style="font-weight:bold;">if</span>(!discovered)
+        {
+            <span style="font-weight:bold;">foreach</span>(<span style="font-weight:bold;">local</span> cur <span style="font-weight:bold;">in</span> allContents)
+                cur.discover();
+
+            achievement.awardPointsOnce();
+        }
+        <span style="font-weight:bold;">inherited</span>();
+    }
+
+    achievement: Achievement { +<span style="color:#b08000;">5</span> <span style="color:#bf0303;">&quot;finding the safe&quot;</span> }
+;
+
+++ safeDoor:  Hidden, ContainerDoor <span style="color:#bf0303;">'(safe) door</span><span style="color:#bf0303;">'</span> <span style="color:#bf0303;">'safe door</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;It has a circular dial attached to its centre. &quot;</span>
+;
+
++++ safeDial: Hidden, Component,  NumberedDial <span style="color:#bf0303;">'circular dial*dials</span><span style="color:#bf0303;">'</span> <span style="color:#bf0303;">'dial</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;The dial can be turned to any number between </span><span style="color:#0057ae;font-style:italic;">&lt;&lt;minSetting&gt;&gt;</span><span style="color:#bf0303;"> and</span>
+<span style="color:#bf0303;">    </span><span style="color:#0057ae;font-style:italic;">&lt;&lt;maxSetting&gt;&gt;</span><span style="color:#bf0303;">. It's currently at </span><span style="color:#0057ae;font-style:italic;">&lt;&lt;curSetting&gt;&gt;</span><span style="color:#bf0303;">. &quot;</span>
+
+    minSetting = <span style="color:#b08000;">0</span>
+    maxSetting = <span style="color:#b08000;">99</span>
+    curSetting = <span style="color:#bf0303;">'35</span><span style="color:#bf0303;">'</span>
+
+    num1 = <span style="color:#b08000;">0</span>
+    num2 = <span style="color:#b08000;">0</span>
+    correctCombination = <span style="color:#b08000;">1589</span>
+
+    makeSetting(val)
+    {
+        <span style="font-weight:bold;">inherited</span>(val);
+        num2 = num1;
+        num1 = toInteger(val);
+        <span style="font-weight:bold;">if</span>(<span style="color:#b08000;">100</span> * num2 + num1 == correctCombination)
+        {
+            <span style="color:#bf0303;">&quot;You hear a slight </span><span style="color:#006e28;font-style:italic;">&lt;i&gt;</span><span style="color:#bf0303;">click</span><span style="color:#006e28;font-style:italic;">&lt;/i&gt;</span><span style="color:#bf0303;"> come from the safe door. &quot;</span>;
+            safe.makeLocked(<span style="font-weight:bold;">nil</span>);
+        }
+        <span style="font-weight:bold;">else</span> <span style="font-weight:bold;">if</span>(!safe.isOpen)
+            safe.makeLocked(<span style="font-weight:bold;">true</span>);
+    }
+;
+
+++ orb: Thing <span style="color:#bf0303;">'ultimate battered dull metal orb/sphere/ball/satisfaction</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">'Orb of Ultimate Satisfaction</span><span style="color:#bf0303;">'</span>
+    <span style="color:#bf0303;">&quot;It doesn't look much be honest, just a battered sphere made of some dull</span>
+<span style="color:#bf0303;">    metal, but you've been told it's the most valuable and desirable object</span>
+<span style="color:#bf0303;">    in the known universe! &quot;</span>
+
+    aName = (theName)
+
+    subLocation = &amp;subContainer
+
+    okayRubMsg = <span style="color:#bf0303;">'As {you/he} rub{s} {the dobj/him} a shimmering djiin suddenly</span>
+<span style="color:#bf0303;">        appears in the air before you!</span><span style="color:#3daee9;font-weight:bold;">\b</span>
+<span style="color:#bf0303;">        </span><span style="color:#006e28;font-style:italic;">&lt;q&gt;</span><span style="color:#bf0303;">Hello, you have reached the automated holographic answering service</span>
+<span style="color:#bf0303;">        of Jeannie the Genie,</span><span style="color:#006e28;font-style:italic;">&lt;/q&gt;</span><span style="color:#bf0303;"> she announces. </span><span style="color:#006e28;font-style:italic;">&lt;q&gt;</span><span style="color:#bf0303;">I</span><span style="color:#3daee9;font-weight:bold;">\'</span><span style="color:#bf0303;">m sorry I</span><span style="color:#3daee9;font-weight:bold;">\'</span><span style="color:#bf0303;">m not</span>
+<span style="color:#bf0303;">        available to respond to your rub in person right now, but my hours of</span>
+<span style="color:#bf0303;">        activity have been heavily curtailed by the European Working Time</span>
+<span style="color:#bf0303;">        Directive. Before making a wish, please make sure that you have</span>
+<span style="color:#bf0303;">        conducted a full risk assessment in line with the latest Health and</span>
+<span style="color:#bf0303;">        Safety Guidelines. Also, please note that before any wish can be granted</span>
+<span style="color:#bf0303;">        you must sign a Form P45/PDQ/LOL indemnifying this wish-granting agency</span>
+<span style="color:#bf0303;">        against any consequential loss or damage arising from the fulfilment of</span>
+<span style="color:#bf0303;">        your desires. Thank you for rubbing. Have a nice day!</span><span style="color:#006e28;font-style:italic;">&lt;/q&gt;</span><span style="color:#3daee9;font-weight:bold;">\b</span>
+<span style="color:#bf0303;">        Her message complete, the holographic djiin fades away into</span>
+<span style="color:#bf0303;">        non-existence. </span><span style="color:#bf0303;">'</span>
+
+    moveInto(dest)
+    {
+        <span style="font-weight:bold;">inherited</span>(dest);
+        <span style="font-weight:bold;">if</span>(dest.isOrIsIn(me))
+            achievement.awardPointsOnce();
+    }
+
+    achievement: Achievement { +<span style="color:#b08000;">10</span> <span style="color:#bf0303;">&quot;taking the orb&quot;</span> }
+;
+
+<span style="color:#898887;">//------------------------------------------------------------------------------</span>
+
+<span style="color:#898887;">/* DEFINE A NEW VERB */</span>
+
+DefineTAction(Rub)
+;
+
+VerbRule(Rub)
+    <span style="color:#bf0303;">'rub</span><span style="color:#bf0303;">'</span> dobjList
+    : RubAction
+    verbPhrase = <span style="color:#bf0303;">'rub/rubbing (what)</span><span style="color:#bf0303;">'</span>
+;
+
+<span style="color:#898887;">/* When creating a new verb, you'll want to modify the Thing class so as to provide</span>
+<span style="color:#898887;">   default handling for the command. The defaults specified here will be used except</span>
+<span style="color:#898887;">   on objects for which you define explicit handling of the command. */</span>
+
+<span style="font-weight:bold;">modify</span> Thing
+    dobjFor(Rub)
+    {
+        preCond = [touchObj]
+        action() { mainReport(okayRubMsg); }
+    }
+
+    okayRubMsg = <span style="color:#bf0303;">'{You/he} rub{s} {the dobj/him} but not much happens as a</span>
+<span style="color:#bf0303;">        result. </span><span style="color:#bf0303;">'</span>
+
+    shouldNotBreakMsg = <span style="color:#bf0303;">'Only amateurs go round breaking things unnecessarily. </span><span style="color:#bf0303;">'</span>
+;
+
+<span style="color:#898887;">//------------------------------------------------------------------------------</span>
+
+<span style="color:#898887;">/* HINTS */</span>
+
+TopHintMenu;
+
++ Goal -&gt; (frontDoor.achievement)
+    <span style="color:#bf0303;">'How do I get into the house?</span><span style="color:#bf0303;">'</span>
+    [
+        <span style="color:#bf0303;">'Well, the windows don</span><span style="color:#3daee9;font-weight:bold;">\'</span><span style="color:#bf0303;">t seem a good way in. </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'So perhaps you</span><span style="color:#3daee9;font-weight:bold;">\'</span><span style="color:#bf0303;">d better try the front door. </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'Could someone have left a key around somewhere? </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'Is there anything lying around where someone could have hidden a key? </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'What about that flowerpot? </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'Try looking under the flowerpot. </span><span style="color:#bf0303;">'</span>
+    ]
+
+    goalState = OpenGoal
+;
+
+<span style="color:#898887;">/* The closeWhenSeen property of the following Goal object is an example of how to</span>
+<span style="color:#898887;">   make your hint menu respond dynamically to the player's current situation. */</span>
+
++ Goal <span style="color:#bf0303;">'Where can I find the orb? </span><span style="color:#bf0303;">'</span>
+    [
+        <span style="color:#bf0303;">'Something like that is bound to be kept safe. </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'So it</span><span style="color:#3daee9;font-weight:bold;">\'</span><span style="color:#bf0303;">s probably inside the house. </span><span style="color:#bf0303;">'</span>
+    ]
+
+    goalState = OpenGoal
+    closeWhenSeen = hallway
+;
+
++ Goal <span style="color:#bf0303;">'Where can I find the orb?</span><span style="color:#bf0303;">'</span>
+    [
+        <span style="color:#bf0303;">'It</span><span style="color:#3daee9;font-weight:bold;">\'</span><span style="color:#bf0303;">s sure to be kept somewhere safe. </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'You</span><span style="color:#3daee9;font-weight:bold;">\'</span><span style="color:#bf0303;">d better hunt around. </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'Somewhere in the study seems the most likely place. </span><span style="color:#bf0303;">'</span>,
+        deskHint,
+        <span style="color:#bf0303;">'But it should be safely locked in a safe </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'Where might someone hide a safe in this study? </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'What could be behind that picture on the wall? </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'Try looking behind the picture (or simply taking the picture). </span><span style="color:#bf0303;">'</span>
+    ]
+
+    openWhenSeen = hallway
+    closeWhenSeen = orb
+;
+
+++ deskHint: Hint <span style="color:#bf0303;">'Have you tried looking in the desk drawer? </span><span style="color:#bf0303;">'</span>
+    [deskGoal]
+;
+
++ deskGoal: Goal <span style="color:#bf0303;">'How do I get the desk drawer open?</span><span style="color:#bf0303;">'</span>
+    [
+        <span style="color:#bf0303;">'Have you examined the drawer? </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'What might you need to unlock it? </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'Where might you find such a thing? </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'What have you seen that a small key might be hidden in? </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'How carefully have you searched the hall? </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'What is (or was) on the hall table? </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'What might that vase be for? </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'Try looking in the vase. </span><span style="color:#bf0303;">'</span>
+    ]
+    closeWhenSeen = notebook
+;
+
++ Goal <span style="color:#bf0303;">'How do I get the safe open?</span><span style="color:#bf0303;">'</span>
+    [
+        <span style="color:#bf0303;">'How carefully have you examined the safe? </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'Where might someone leave a clue to the combination? </span><span style="color:#bf0303;">'</span>,
+        deskHint,
+        <span style="color:#bf0303;">'Make sure you read the notebook. </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'Once you</span><span style="color:#3daee9;font-weight:bold;">\'</span><span style="color:#bf0303;">ve found the combination you need to use the dial. </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'If the combination is a number larger than 99 you</span><span style="color:#3daee9;font-weight:bold;">\'</span><span style="color:#bf0303;">ll need to enter it</span>
+<span style="color:#bf0303;">        in stages. </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'For example, if the combination were 1234 you</span><span style="color:#3daee9;font-weight:bold;">\'</span><span style="color:#bf0303;">d first need to turn the</span>
+<span style="color:#bf0303;">        dial to 12 and then turn it to 34. </span><span style="color:#bf0303;">'</span>
+    ]
+
+    openWhenSeen = safe
+    closeWhenAchieved = (safe.subContainer.achievement)
+;
+
++ Goal <span style="color:#bf0303;">'What does the clue in the notebook mean?</span><span style="color:#bf0303;">'</span>
+    [
+        <span style="color:#bf0303;">'Well, </span><span style="color:#006e28;font-style:italic;">&lt;q&gt;</span><span style="color:#bf0303;">SAFE</span><span style="color:#006e28;font-style:italic;">&lt;/q&gt;</span><span style="color:#bf0303;"> might refer to something you want to open. </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'Have you seen a date round here? </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'When was this house built? </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'Where might you find the year in which this house was built? </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'How carefully have you looked at the front of the house? </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'Did you examine the door? </span><span style="color:#bf0303;">'</span>
+    ]
+
+    openWhenRevealed = <span style="color:#bf0303;">'safe-date</span><span style="color:#bf0303;">'</span>
+    closeWhenAchieved = (safe.subContainer.achievement)
+;
+
+
++ Goal <span style="color:#bf0303;">'What do I do with the orb now I</span><span style="color:#3daee9;font-weight:bold;">\'</span><span style="color:#bf0303;">ve got it?</span><span style="color:#bf0303;">'</span>
+    [
+        <span style="color:#bf0303;">'Well, you could try rubbing it. </span><span style="color:#bf0303;">'</span>,
+        <span style="color:#bf0303;">'But the main thing to do now is to escape with it. </span><span style="color:#bf0303;">'</span>
+    ]
+    openWhenSeen = orb
+;
+</pre></body></html>

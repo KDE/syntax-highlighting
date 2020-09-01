@@ -18,15 +18,22 @@
 
 using namespace KSyntaxHighlighting;
 
+// QChar::isDigit() match any digit in unicode (romain numeral, etc)
+static bool isDigit(QChar c)
+{
+    return (c <= QLatin1Char('9') && QLatin1Char('0') <= c);
+}
+
 static bool isOctalChar(QChar c)
 {
-    return c.isNumber() && c != QLatin1Char('9') && c != QLatin1Char('8');
+    return (c <= QLatin1Char('7') && QLatin1Char('0') <= c);
 }
 
 static bool isHexChar(QChar c)
 {
-    return c.isNumber() || c == QLatin1Char('a') || c == QLatin1Char('A') || c == QLatin1Char('b') || c == QLatin1Char('B') || c == QLatin1Char('c') || c == QLatin1Char('C') || c == QLatin1Char('d') || c == QLatin1Char('D') ||
-        c == QLatin1Char('e') || c == QLatin1Char('E') || c == QLatin1Char('f') || c == QLatin1Char('F');
+    return isDigit(c)
+        || (c <= QLatin1Char('f') && QLatin1Char('a') <= c)
+        || (c <= QLatin1Char('F') && QLatin1Char('A') <= c);
 }
 
 static int matchEscapedChar(const QString &text, int offset)
@@ -281,14 +288,14 @@ MatchResult Float::doMatch(const QString &text, int offset, const QStringList &)
         return offset;
 
     auto newOffset = offset;
-    while (newOffset < text.size() && text.at(newOffset).isDigit())
+    while (newOffset < text.size() && isDigit(text.at(newOffset)))
         ++newOffset;
 
     if (newOffset >= text.size() || text.at(newOffset) != QLatin1Char('.'))
         return offset;
     ++newOffset;
 
-    while (newOffset < text.size() && text.at(newOffset).isDigit())
+    while (newOffset < text.size() && isDigit(text.at(newOffset)))
         ++newOffset;
 
     if (newOffset == offset + 1) // we only found a decimal point
@@ -302,7 +309,7 @@ MatchResult Float::doMatch(const QString &text, int offset, const QStringList &)
     if (expOffset < text.size() && (text.at(expOffset) == QLatin1Char('+') || text.at(expOffset) == QLatin1Char('-')))
         ++expOffset;
     bool foundExpDigit = false;
-    while (expOffset < text.size() && text.at(expOffset).isDigit()) {
+    while (expOffset < text.size() && isDigit(text.at(expOffset))) {
         ++expOffset;
         foundExpDigit = true;
     }
@@ -430,7 +437,7 @@ MatchResult Int::doMatch(const QString &text, int offset, const QStringList &) c
     if (offset > 0 && !isWordDelimiter(text.at(offset - 1)))
         return offset;
 
-    while (offset < text.size() && text.at(offset).isDigit())
+    while (offset < text.size() && isDigit(text.at(offset)))
         ++offset;
     return offset;
 }

@@ -24,3 +24,14 @@ message(meson.source_root())
 message(unknown.source_root())
 message('str'.join(l))
 
+message('
+\a
+\x2
+\x12
+\x12
+\x123
+\1
+\12
+\123
+\1234
+')

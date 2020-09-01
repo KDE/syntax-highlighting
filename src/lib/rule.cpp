@@ -42,30 +42,31 @@ static int matchEscapedChar(const QString &text, int offset)
         return offset;
 
     const auto c = text.at(offset + 1);
-    static const auto controlChars = QStringLiteral("abefnrtv\"'?\\");
-    if (controlChars.contains(c))
+    switch (c.unicode()) {
+    // control chars
+    case 'a': case 'b': case 'e': case 'f':
+    case 'n': case 'r': case 't': case 'v':
+    case '"': case '\'': case '?': case '\\':
         return offset + 2;
 
     // hex encoded character
-    if (c == QLatin1Char('x')) {
-        auto newOffset = offset + 2;
-        for (int i = 0; i < 2 && newOffset + i < text.size(); ++i, ++newOffset) {
-            if (!isHexChar(text.at(newOffset)))
-                break;
+    case 'x':
+        if (offset + 2 < text.size() && isHexChar(text.at(offset + 2))) {
+            if (offset + 3 < text.size() && isHexChar(text.at(offset + 3)))
+                return offset + 4;
+            return offset + 3;
         }
-        if (newOffset == offset + 2)
-            return offset;
-        return newOffset;
-    }
+        return offset;
 
     // octal encoding, simple \0 is OK, too, unlike simple \x above
-    if (isOctalChar(c)) {
-        auto newOffset = offset + 2;
-        for (int i = 0; i < 2 && newOffset + i < text.size(); ++i, ++newOffset) {
-            if (!isOctalChar(text.at(newOffset)))
-                break;
+    case '0': case '1': case '2': case '3':
+    case '4': case '5': case '6': case '7':
+        if (offset + 2 < text.size() && isOctalChar(text.at(offset + 2))) {
+            if (offset + 3 < text.size() && isOctalChar(text.at(offset + 3)))
+                return offset + 4;
+            return offset + 3;
         }
-        return newOffset;
+        return offset + 2;
     }
 
     return offset;

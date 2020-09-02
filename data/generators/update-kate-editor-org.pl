@@ -182,7 +182,7 @@ foreach my $htmlFile (<data/html/*.dark.html>, <data/html/.*.dark.html>) {
     my $name;
     open my $F, "<$htmlFile";
     while (<$F>) {
-        if (($name) = /name="generator" content="KF5::SyntaxHighlighting \((.*)\)"/) {
+        if (($name) = /name="generator" content="KF5::SyntaxHighlighting - Definition \((.*)\) - Theme/) {
             last;
         }
     }
@@ -242,9 +242,9 @@ system("git add $syntax_md") == 0 || die "Failed to add $syntax_md to git!\n";
 # switch back to build directory, we do all our work there
 chdir($buildDir) || die "Failed to switch to build directory '$buildDir'!\n";
 
-
 # purge old data in kate-editor.org clone
 my $staticThemePath = "kate-editor-org/static/themes";
+remove_tree($staticThemePath);
 if (-d $staticThemePath) {
     die "Failed to delete '$staticThemePath'!\n";
 }

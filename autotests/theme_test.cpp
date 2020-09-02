@@ -9,6 +9,7 @@
 #include <abstracthighlighter.h>
 #include <definition.h>
 #include <format.h>
+#include <htmlhighlighter.h>
 #include <repository.h>
 #include <state.h>
 #include <theme.h>
@@ -52,6 +53,13 @@ private Q_SLOTS:
 
     void testThemes()
     {
+        // cleanup before we test
+        QDir(QStringLiteral(TESTBUILDDIR "/theme.html.output/")).removeRecursively();
+        QDir().mkpath(QStringLiteral(TESTBUILDDIR "/theme.html.output/"));
+
+        // we have one fixed theme showcase
+        const QString inFile(QStringLiteral(TESTSRCDIR "/input/themes/showcase.cpp"));
+
         QVERIFY(!m_repo.themes().isEmpty());
         for (const auto &theme : m_repo.themes()) {
             QVERIFY(theme.isValid());
@@ -59,6 +67,18 @@ private Q_SLOTS:
             QVERIFY(!theme.filePath().isEmpty());
             QVERIFY(QFileInfo::exists(theme.filePath()));
             QVERIFY(m_repo.theme(theme.name()).isValid());
+
+            // render some example HTML for the theme, we use that e.g. to show-case the themes on our website
+            // ignore the Test Theme
+            if (!theme.name().startsWith(QLatin1String("Test"))) {
+                const QString outFile(QStringLiteral(TESTBUILDDIR "/theme.html.output/") + QFileInfo(theme.filePath()).baseName() + QStringLiteral(".html"));
+                HtmlHighlighter highlighter;
+                highlighter.setTheme(theme);
+                QVERIFY(highlighter.theme().isValid());
+                highlighter.setDefinition(m_repo.definitionForFileName(inFile));
+                highlighter.setOutputFile(outFile);
+                highlighter.highlightFile(inFile);
+            }
         }
     }
 

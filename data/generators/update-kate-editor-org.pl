@@ -39,6 +39,11 @@ if (-d "kate-editor-org") {
     system("git", "clone", "git\@invent.kde.org:websites/kate-editor-org.git") == 0 || die "Failed to clone kate-editor-org.git!\n";
 }
 
+#
+# update of syntax definitions
+# beside the pure update site generation, we will create some web site with examples for all highlightings
+#
+
 # try to get current frameworks version
 my $currentVersion;
 open (my $list, "<$sourceDir/CMakeLists.txt");
@@ -228,3 +233,32 @@ close($syntax_page);
 
 # add to git
 system("git add $syntax_md") == 0 || die "Failed to add $syntax_md to git!\n";
+
+#
+# update of themes web site
+# this will generate an overview of all shipped themes with an example
+#
+
+# switch back to build directory, we do all our work there
+chdir($buildDir) || die "Failed to switch to build directory '$buildDir'!\n";
+
+
+# purge old data in kate-editor.org clone
+my $staticThemePath = "kate-editor-org/static/themes";
+if (-d $staticThemePath) {
+    die "Failed to delete '$staticThemePath'!\n";
+}
+make_path($staticThemePath);
+if (! -d $staticThemePath) {
+    die "Failed to create '$staticThemePath'!\n";
+}
+
+# copy over all html renderings as examples
+print "Updating theme example HTML files...\n";
+system("cp", "-rf", "autotests/theme.html.output", "$staticThemePath/html") == 0 || die "Failed to copy autotests/theme.html.output references!\n";
+
+# switch over to git again
+chdir($staticThemePath) || die "Failed to switch to '$staticThemePath' directory!\n";
+
+# add html files
+system("git", "add", "html") == 0 || die "Failed to add theme HTML files to git!\n";

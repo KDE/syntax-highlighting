@@ -253,34 +253,15 @@ private Q_SLOTS:
         }
 
         // editor area colors
-        const QStringList requiredEditorColors = {QLatin1String("background-color"),
-                                                  QLatin1String("bracket-matching"),
-                                                  QLatin1String("code-folding"),
-                                                  QLatin1String("current-line"),
-                                                  QLatin1String("current-line-number"),
-                                                  QLatin1String("icon-border"),
-                                                  QLatin1String("indentation-line"),
-                                                  QLatin1String("line-numbers"),
-                                                  QLatin1String("mark-bookmark"),
-                                                  QLatin1String("mark-breakpoint-active"),
-                                                  QLatin1String("mark-breakpoint-disabled"),
-                                                  QLatin1String("mark-breakpoint-reached"),
-                                                  QLatin1String("mark-error"),
-                                                  QLatin1String("mark-execution"),
-                                                  QLatin1String("mark-warning"),
-                                                  QLatin1String("modified-lines"),
-                                                  QLatin1String("replace-highlight"),
-                                                  QLatin1String("saved-lines"),
-                                                  QLatin1String("search-highlight"),
-                                                  QLatin1String("selection"),
-                                                  QLatin1String("separator"),
-                                                  QLatin1String("spell-checking"),
-                                                  QLatin1String("tab-marker"),
-                                                  QLatin1String("template-background"),
-                                                  QLatin1String("template-focused-placeholder"),
-                                                  QLatin1String("template-placeholder"),
-                                                  QLatin1String("template-read-only-placeholder"),
-                                                  QLatin1String("word-wrap-marker")};
+        static const auto colorIdx = Theme::staticMetaObject.indexOfEnumerator("EditorColorRole");
+        Q_ASSERT(colorIdx >= 0);
+        const auto metaEnumColor = Theme::staticMetaObject.enumerator(colorIdx);
+        QStringList requiredEditorColors;
+        for (int i = 0; i < metaEnumColor.keyCount(); ++i) {
+            Q_ASSERT(i == metaEnumColor.value(i));
+            requiredEditorColors.append(QLatin1String(metaEnumColor.key(i)));
+        }
+        std::sort(requiredEditorColors.begin(), requiredEditorColors.end());
 
         // verify all editor colors are defined - not more, not less
         QVERIFY(obj.contains(QLatin1String("editor-colors")));

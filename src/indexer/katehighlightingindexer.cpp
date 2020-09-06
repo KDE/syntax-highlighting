@@ -18,6 +18,10 @@
 #include <QXmlSchemaValidator>
 #endif
 
+#include "../lib/xml_p.h"
+
+using KSyntaxHighlighting::Xml::attrToBool;
+
 namespace
 {
 QStringList readListing(const QString &fileName)
@@ -121,7 +125,7 @@ bool checkRegularExpression(const QString &hlFilename, QXmlStreamReader &xml)
         }
 
         // dynamic == true and no place holder?
-        if (xml.name() == QLatin1String("RegExpr") && xml.attributes().value(QStringLiteral("dynamic")) == QStringLiteral("true")) {
+        if (xml.name() == QLatin1String("RegExpr") && attrToBool(xml.attributes().value(QStringLiteral("dynamic")))) {
             static const QRegularExpression placeHolder(QStringLiteral("%\\d+"));
             if (!string.contains(placeHolder)) {
                 qWarning() << hlFilename << "line" << xml.lineNumber() << "broken regex:" << string << "problem: dynamic=true but no %\\d+ placeholder";
@@ -180,7 +184,7 @@ bool checkLookAhead(const QString &hlFilename, QXmlStreamReader &xml)
 {
     if (xml.attributes().hasAttribute(QStringLiteral("lookAhead"))) {
         auto lookAhead = xml.attributes().value(QStringLiteral("lookAhead"));
-        if (lookAhead == QStringLiteral("true")) {
+        if (attrToBool(lookAhead)) {
             auto context = xml.attributes().value(QStringLiteral("context"));
             if (context == QStringLiteral("#stay")) {
                 qWarning() << hlFilename << "line" << xml.lineNumber() << "Infinite loop: lookAhead with context #stay";
@@ -351,9 +355,18 @@ public:
                 language.existingContextNames.insert(name);
             }
 
-            if (xml.attributes().value(QLatin1String("fallthroughContext")).toString() == QLatin1String("#stay")) {
-                qWarning() << hlFilename << "possible infinite loop due to fallthroughContext=\"#stay\" in context " << name;
-                m_success = false;
+            auto fallthroughContext = xml.attributes().value(QLatin1String("fallthroughContext"));
+            if (!fallthroughContext.isEmpty()) {
+                if (fallthroughContext == QLatin1String("#stay")) {
+                    qWarning() << hlFilename << "possible infinite loop due to fallthroughContext=\"#stay\" in context " << name;
+                    m_success = false;
+                }
+
+                auto fallthrough = xml.attributes().value(QLatin1String("fallthrough"));
+                if (fallthrough.isEmpty() && language.version < Version{5, 62}) {
+                    qWarning() << hlFilename << "fallthroughContext attribute without fallthrough attribute is only valid with kateversion >= 5.62 in context " << name;
+                    m_success = false;
+                }
             }
 
             processContext(hlName, xml.attributes().value(QLatin1String("lineEndContext")).toString());
@@ -675,8 +688,7 @@ int main(int argc, char *argv[])
         hl[QStringLiteral("priority")] = xml.attributes().value(QLatin1String("priority")).toInt();
 
         // add boolean one
-        const QString hidden = xml.attributes().value(QLatin1String("hidden")).toString();
-        hl[QStringLiteral("hidden")] = (hidden == QLatin1String("true") || hidden == QLatin1String("1"));
+        hl[QStringLiteral("hidden")] = attrToBool(xml.attributes().value(QLatin1String("hidden")));
 
         // remember hl
         hls[QFileInfo(hlFile).fileName()] = hl;

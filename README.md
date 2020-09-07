@@ -5,12 +5,13 @@ Syntax highlighting engine for Kate syntax definitions
 ## Table of contents
 
 1. [Introduction](#introduction)
-2. [Syntax Definition Files](#syntax-definition-files)
-3. [Out of scope](#out-of-scope)
+2. [Out of scope](#out-of-scope)
+3. [Syntax Definition Files](#syntax-definition-files)
 4. [Build it](#build-it)
 5. [How to contribute](#how-to-contribute)
 6. [Adding unit tests for a syntax definition](#adding-unit-tests-for-a-syntax-definition)
 7. [Report bug or help to fix them](#report-bug-or-help-to-fix-them)
+8. [Updating the kate-editor.org/syntax website](#updating-the-kate-editororgsyntax-website)
 
 ## Introduction
 
@@ -18,6 +19,19 @@ This is a stand-alone implementation of the Kate syntax highlighting engine.
 It's meant as a building block for text editors as well as for simple highlighted
 text rendering (e.g. as HTML), supporting both integration with a custom editor
 as well as a ready-to-use QSyntaxHighlighter sub-class.
+
+## Out of scope
+
+To not turn this into yet another text editor, the following things are considered
+out of scope:
+
+* code folding, beyond providing folding range information
+* auto completion
+* spell checking
+* user interface for configuration
+* management of text buffers or documents
+
+If you need any of this, check out [KTextEditor](https://api.kde.org/frameworks/ktexteditor/html/).
 
 ## Syntax Definition Files
 
@@ -56,19 +70,6 @@ For more details, see ["The Highlight Definition XML Format" (Working with Synta
 
 Also, in **data/schema/** there is a script to validate the syntax definiton XML
 files. Use the command `validatehl.sh mySyntax.xml`.
-
-## Out of scope
-
-To not turn this into yet another text editor, the following things are considered
-out of scope:
-
-* code folding, beyond providing folding range information
-* auto completion
-* spell checking
-* user interface for configuration
-* management of text buffers or documents
-
-If you need any of this, check out [KTextEditor](https://api.kde.org/frameworks/ktexteditor/html/).
 
 ## Build it
 
@@ -119,10 +120,11 @@ All the necessary information to send contributions is [here](https://community.
 * The KSyntaxHighlighting framework is under [MIT license](https://directory.fsf.org/wiki/License:Expat).
   Ideally, use MIT license for your contributions, including new XML files.
 
-* Do not use hard colors, as they may not look good or be illegible in some color
+* Do not use hard-coded colors, as they may not look good or be illegible in some color
   themes. Prefer to use the default color styles.
 
   For more information, see:
+
     * [Available Default Styles (Working with Syntax Highlighting, KDE Documentation)](https://docs.kde.org/?application=katepart&branch=trunk5&path=highlight.html#kate-highlight-default-styles)
     * [Kate Part (KF5): New Default Styles for better Color Schemes (Kate Editor Website)](https://kate-editor.org/2014/03/07/kate-part-kf5-new-default-styles-for-better-color-schemes/)
 
@@ -173,13 +175,17 @@ and [kile/editor](https://bugs.kde.org/buglist.cgi?component=editor&product=kile
 
 ## Updating the kate-editor.org/syntax website
 
-To update the kate-editor.org/syntax website including the update site & all linked examples/files,
-please run after successful build & test the following make target:
+To update the [kate-editor.org/syntax](https://kate-editor.org/syntax/) website
+including the update site & all linked examples/files,
+please run after successful **build** & **test** the following make target:
 
+```bash
 make update_kate_editor_org
+```
 
-This will clone the kate-editor.org git from invent.kde.org into kate-editor-org inside the build directory and update the needed things.
+This will clone the [kate-editor.org git](https://invent.kde.org/websites/kate-editor-org)
+from *invent.kde.org* into **kate-editor-org** inside the build directory and update the needed things.
 
-You can afterwards step into kate-editor-org and commit & push the change after review.
+You can afterwards step into **kate-editor-org** and commit & push the change after review.
 
-The kate-editor.org webserver will update itself periodically from the repository on invent.kde.org.
+The [kate-editor.org](https://kate-editor.org) webserver will update itself periodically from the repository on *invent.kde.org*.

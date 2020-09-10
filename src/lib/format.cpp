@@ -97,7 +97,8 @@ Theme::TextStyle Format::textStyle() const
 
 bool Format::isDefaultTextStyle(const Theme &theme) const
 {
-    return (!hasTextColor(theme)) && (!hasBackgroundColor(theme)) && (selectedTextColor(theme) == theme.selectedTextColor(Theme::Normal)) && (selectedBackgroundColor(theme) == theme.selectedBackgroundColor(Theme::Normal)) &&
+    // use QColor::fromRgba for background QRgb => QColor conversion to avoid unset colors == black!
+    return (!hasTextColor(theme)) && (!hasBackgroundColor(theme)) && (selectedTextColor(theme) == theme.selectedTextColor(Theme::Normal)) && (selectedBackgroundColor(theme) == QColor::fromRgba(theme.selectedBackgroundColor(Theme::Normal))) &&
         (isBold(theme) == theme.isBold(Theme::Normal)) && (isItalic(theme) == theme.isItalic(Theme::Normal)) && (isUnderline(theme) == theme.isUnderline(Theme::Normal)) && (isStrikeThrough(theme) == theme.isStrikeThrough(Theme::Normal));
 }
 
@@ -126,7 +127,9 @@ QColor Format::selectedTextColor(const Theme &theme) const
 bool Format::hasBackgroundColor(const Theme &theme) const
 {
     const auto overrideStyle = d->styleOverride(theme);
-    return backgroundColor(theme) != theme.backgroundColor(Theme::Normal) && (d->style.backgroundColor || theme.backgroundColor(d->defaultStyle) || overrideStyle.backgroundColor);
+
+    // use QColor::fromRgba for background QRgb => QColor conversion to avoid unset colors == black!
+    return backgroundColor(theme) != QColor::fromRgba(theme.backgroundColor(Theme::Normal)) && (d->style.backgroundColor || theme.backgroundColor(d->defaultStyle) || overrideStyle.backgroundColor);
 }
 
 QColor Format::backgroundColor(const Theme &theme) const
@@ -134,7 +137,9 @@ QColor Format::backgroundColor(const Theme &theme) const
     const auto overrideStyle = d->styleOverride(theme);
     if (overrideStyle.backgroundColor)
         return overrideStyle.backgroundColor;
-    return d->style.backgroundColor ? d->style.backgroundColor : theme.backgroundColor(d->defaultStyle);
+
+    // use QColor::fromRgba for background QRgb => QColor conversion to avoid unset colors == black!
+    return d->style.backgroundColor ? d->style.backgroundColor : QColor::fromRgba(theme.backgroundColor(d->defaultStyle));
 }
 
 QColor Format::selectedBackgroundColor(const Theme &theme) const
@@ -142,7 +147,9 @@ QColor Format::selectedBackgroundColor(const Theme &theme) const
     const auto overrideStyle = d->styleOverride(theme);
     if (overrideStyle.selectedBackgroundColor)
         return overrideStyle.selectedBackgroundColor;
-    return d->style.selectedBackgroundColor ? d->style.selectedBackgroundColor : theme.selectedBackgroundColor(d->defaultStyle);
+
+    // use QColor::fromRgba for background QRgb => QColor conversion to avoid unset colors == black!
+    return d->style.selectedBackgroundColor ? d->style.selectedBackgroundColor : QColor::fromRgba(theme.selectedBackgroundColor(d->defaultStyle));
 }
 
 bool Format::isBold(const Theme &theme) const

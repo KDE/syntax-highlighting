@@ -30,6 +30,8 @@ target2: bla.cpp $@
 # String Substitution
 VAR := $(ANOTHER_VAR:%=%+1)
 
+# Variable Assignment
+RELAXED ::= mello
 rempl := x
 foo := a b c
 bar := foo

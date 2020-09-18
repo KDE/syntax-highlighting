@@ -53,13 +53,6 @@ private Q_SLOTS:
 
     void testThemes()
     {
-        // cleanup before we test
-        QDir(QStringLiteral(TESTBUILDDIR "/theme.html.output/")).removeRecursively();
-        QDir().mkpath(QStringLiteral(TESTBUILDDIR "/theme.html.output/"));
-
-        // we have one fixed theme showcase
-        const QString inFile(QStringLiteral(TESTSRCDIR "/input/themes/showcase.cpp"));
-
         QVERIFY(!m_repo.themes().isEmpty());
         for (const auto &theme : m_repo.themes()) {
             QVERIFY(theme.isValid());
@@ -67,18 +60,6 @@ private Q_SLOTS:
             QVERIFY(!theme.filePath().isEmpty());
             QVERIFY(QFileInfo::exists(theme.filePath()));
             QVERIFY(m_repo.theme(theme.name()).isValid());
-
-            // render some example HTML for the theme, we use that e.g. to show-case the themes on our website
-            // ignore the Test Theme
-            if (!theme.name().startsWith(QLatin1String("Test"))) {
-                const QString outFile(QStringLiteral(TESTBUILDDIR "/theme.html.output/") + QFileInfo(theme.filePath()).baseName() + QStringLiteral(".html"));
-                HtmlHighlighter highlighter;
-                highlighter.setTheme(theme);
-                QVERIFY(highlighter.theme().isValid());
-                highlighter.setDefinition(m_repo.definitionForFileName(inFile));
-                highlighter.setOutputFile(outFile);
-                highlighter.highlightFile(inFile);
-            }
         }
     }
 
@@ -194,6 +175,10 @@ private Q_SLOTS:
 
     void testThemeIntegrity_data()
     {
+        // cleanup before we test
+        QDir(QStringLiteral(TESTBUILDDIR "/theme.html.output/")).removeRecursively();
+        QDir().mkpath(QStringLiteral(TESTBUILDDIR "/theme.html.output/"));
+
         QTest::addColumn<QString>("themeFileName");
 
         QDirIterator it(QStringLiteral(":/org.kde.syntax-highlighting/themes"), QStringList() << QLatin1String("*.theme"), QDir::Files);
@@ -223,7 +208,8 @@ private Q_SLOTS:
         QVERIFY(obj.contains(QLatin1String("metadata")));
         const QJsonObject metadata = obj.value(QLatin1String("metadata")).toObject();
         QVERIFY(metadata.contains(QLatin1String("name")));
-        QVERIFY(!metadata.value(QLatin1String("name")).toString().isEmpty());
+        const auto themeName = metadata.value(QLatin1String("name")).toString();
+        QVERIFY(!themeName.isEmpty());
         QVERIFY(metadata.contains(QLatin1String("revision")));
         QVERIFY(metadata.value(QLatin1String("revision")).toInt() > 0);
 
@@ -274,6 +260,23 @@ private Q_SLOTS:
         for (const auto &key : requiredEditorColors) {
             QVERIFY(QColor::isValidColor(editorColors.value(key).toString()));
         }
+
+        // the theme must be available in our repository, too
+        const auto theme = m_repo.theme(themeName);
+        QVERIFY(theme.isValid());
+        QVERIFY(theme.name() == themeName);
+
+        // we have one fixed theme showcase
+        const QString inFile(QStringLiteral(TESTSRCDIR "/input/themes/showcase.cpp"));
+
+        // render some example HTML for the theme, we use that e.g. to show-case the themes on our website
+        const QString outFile(QStringLiteral(TESTBUILDDIR "/theme.html.output/") + QFileInfo(theme.filePath()).baseName() + QStringLiteral(".html"));
+        HtmlHighlighter highlighter;
+        highlighter.setTheme(theme);
+        QVERIFY(highlighter.theme().isValid());
+        highlighter.setDefinition(m_repo.definitionForFileName(inFile));
+        highlighter.setOutputFile(outFile);
+        highlighter.highlightFile(inFile);
     }
 };
 }

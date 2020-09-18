@@ -298,7 +298,7 @@ print $themes_page
 foreach my $name (sort keys %themeToHTML) {
     my $file = $themeToHTML{$name};
     print $themes_page "<h3>$name</h3>\n";
-    print $themes_page "<iframe height=400 width=600 src=\"/themes/$file\" title=\"$name HTML Examples\"></iframe>\n";
+    print $themes_page "<iframe height=500 width=700 src=\"/themes/$file\" title=\"$name HTML Examples\"></iframe>\n";
 }
 close($themes_page);
 

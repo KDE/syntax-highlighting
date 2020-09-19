@@ -21,6 +21,7 @@
 #include <QJsonObject>
 #include <QJsonParseError>
 #include <QObject>
+#include <QRegularExpression>
 #include <QStandardPaths>
 #include <QTest>
 
@@ -221,7 +222,8 @@ private Q_SLOTS:
         const auto copyrights = metadata.value(QLatin1String("copyright")).toArray();
         QVERIFY(!copyrights.empty());
         for (const auto &copyright : copyrights) {
-            QVERIFY(copyright.toString().startsWith(QLatin1String("SPDX-FileCopyrightText: ")));
+            static const QRegularExpression copyrightRegex(QLatin1String("SPDX-FileCopyrightText: \\d{4} "));
+            QVERIFY(copyright.toString().indexOf(copyrightRegex) == 0);
         }
 
         // ensure the theme is MIT licensed with a proper SPDX identifier

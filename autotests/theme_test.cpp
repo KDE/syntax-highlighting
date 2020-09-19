@@ -17,6 +17,7 @@
 #include <QDebug>
 #include <QDirIterator>
 #include <QFileInfo>
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonParseError>
 #include <QObject>
@@ -212,6 +213,21 @@ private Q_SLOTS:
         QVERIFY(!themeName.isEmpty());
         QVERIFY(metadata.contains(QLatin1String("revision")));
         QVERIFY(metadata.value(QLatin1String("revision")).toInt() > 0);
+
+        // verify licensing part of the metadata
+
+        // ensure we have some copyright text attributes like "SPDX-FileCopyrightText: 2020 Christoph Cullmann <cullmann@kde.org>"
+        QVERIFY(metadata.contains(QLatin1String("copyright")));
+        const auto copyrights = metadata.value(QLatin1String("copyright")).toArray();
+        QVERIFY(!copyrights.empty());
+        for (const auto &copyright : copyrights) {
+            QVERIFY(copyright.toString().startsWith(QLatin1String("SPDX-FileCopyrightText: ")));
+        }
+
+        // ensure the theme is MIT licensed with a proper SPDX identifier
+        // we always compile all themes into the library as resources, we want to have a "pure" MIT licensed library!
+        QVERIFY(metadata.contains(QLatin1String("license")));
+        QVERIFY(metadata.value(QLatin1String("license")).toString() == QLatin1String("SPDX-License-Identifier: MIT"));
 
         // verify completeness of text styles
         static const auto idx = Theme::staticMetaObject.indexOfEnumerator("TextStyle");

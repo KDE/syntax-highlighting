@@ -9,6 +9,7 @@
 #include <definition.h>
 #include <definitiondownloader.h>
 #include <htmlhighlighter.h>
+#include <ansihighlighter.h>
 #include <repository.h>
 #include <theme.h>
 
@@ -19,6 +20,25 @@
 #include <iostream>
 
 using namespace KSyntaxHighlighting;
+
+template<class Highlighter, class ...Ts>
+static void applyHighlighter(Highlighter &highlighter, QCommandLineParser &parser, bool fromFileName, const QString &inFileName, const QCommandLineOption &stdinOption, const QCommandLineOption &outputName, const Ts &...highlightParams)
+{
+    if (parser.isSet(outputName))
+        highlighter.setOutputFile(parser.value(outputName));
+    else
+        highlighter.setOutputFile(stdout);
+
+    if (fromFileName) {
+        highlighter.highlightFile(inFileName, highlightParams...);
+    } else if (parser.isSet(stdinOption)) {
+        QFile inFile;
+        inFile.open(stdin, QIODevice::ReadOnly);
+        highlighter.highlightData(&inFile, highlightParams...);
+    } else {
+        parser.showHelp(1);
+    }
+}
 
 int main(int argc, char **argv)
 {
@@ -56,6 +76,17 @@ int main(int argc, char **argv)
     QCommandLineOption themeName(
         QStringList() << QStringLiteral("t") << QStringLiteral("theme"), app.translate("SyntaxHighlightingCLI", "Color theme to use for highlighting."), app.translate("SyntaxHighlightingCLI", "theme"), repo.defaultTheme(Repository::LightTheme).name());
     parser.addOption(themeName);
+
+    QCommandLineOption outputFormatOption(QStringList() << QStringLiteral("f") << QStringLiteral("output-format"),
+                                          app.translate("SyntaxHighlightingCLI", "Use the specified format instead of html. Must be html, ansi or ansi256Colors."),
+                                          app.translate("SyntaxHighlightingCLI", "format"),
+                                          QStringLiteral("html"));
+    parser.addOption(outputFormatOption);
+
+    QCommandLineOption traceOption(QStringList() << QStringLiteral("format-trace"),
+                                   app.translate("SyntaxHighlightingCLI", "Add information to debug a syntax file with --output-format=ansi or ansi256Colors. Possible values are comma-separated with following values: format, region or context."),
+                                   app.translate("SyntaxHighlightingCLI", "types"));
+    parser.addOption(traceOption);
 
     QCommandLineOption titleOption(QStringList() << QStringLiteral("T") << QStringLiteral("title"),
                                    app.translate("SyntaxHighlightingCLI", "Set HTML page's title\n(default: the filename or \"Kate Syntax Highlighter\" if reading from stdin)."),
@@ -97,41 +128,71 @@ int main(int argc, char **argv)
 
     Definition def;
     if (parser.isSet(syntaxName)) {
-        def = repo.definitionForName(parser.value(syntaxName));
-        if (!def.isValid())
+        const QString syntax = parser.value(syntaxName);
+        def = repo.definitionForName(syntax);
+        if (!def.isValid()) {
             /* see if it's a mimetype instead */
-            def = repo.definitionForMimeType(parser.value(syntaxName));
+            def = repo.definitionForMimeType(syntax);
+            if (!def.isValid()) {
+                /* see if it's a extension instead */
+                def = repo.definitionForFileName(QLatin1String("f.")+syntax);
+                if (!def.isValid())
+                    /* see if it's a filename instead */
+                    def = repo.definitionForFileName(syntax);
+            }
+        }
     } else if (fromFileName) {
         def = repo.definitionForFileName(inFileName);
     } else {
         parser.showHelp(1);
     }
 
-    QString title;
-    if (parser.isSet(titleOption))
-        title = parser.value(titleOption);
-
     if (!def.isValid()) {
         std::cerr << "Unknown syntax." << std::endl;
         return 1;
     }
 
-    HtmlHighlighter highlighter;
-    highlighter.setDefinition(def);
-    if (parser.isSet(outputName))
-        highlighter.setOutputFile(parser.value(outputName));
-    else
-        highlighter.setOutputFile(stdout);
-    highlighter.setTheme(repo.theme(parser.value(themeName)));
+    QString outputFormat = parser.value(outputFormatOption);
+    if (0 == outputFormat.compare(QLatin1String("html"), Qt::CaseInsensitive)) {
+        QString title;
+        if (parser.isSet(titleOption))
+            title = parser.value(titleOption);
 
-    if (fromFileName) {
-        highlighter.highlightFile(inFileName, title);
-    } else if (parser.isSet(stdinOption)) {
-        QFile inFile;
-        inFile.open(stdin, QIODevice::ReadOnly);
-        highlighter.highlightData(&inFile, title);
+        HtmlHighlighter highlighter;
+        highlighter.setDefinition(def);
+        highlighter.setTheme(repo.theme(parser.value(themeName)));
+        applyHighlighter(highlighter, parser, fromFileName, inFileName, stdinOption, outputName, title);
     } else {
-        parser.showHelp(1);
+        auto AnsiFormat = AnsiHighlighter::AnsiFormat::TrueColor;
+
+        if (0 == outputFormat.compare(QLatin1String("ansi256Colors"), Qt::CaseInsensitive)) {
+            AnsiFormat = AnsiHighlighter::AnsiFormat::XTerm256Color;
+        } else if (0 != outputFormat.compare(QLatin1String("ansi"), Qt::CaseInsensitive)) {
+            std::cerr << "Unknown output format." << std::endl;
+            return 2;
+        }
+
+        AnsiHighlighter highlighter;
+
+        if (parser.isSet(traceOption)) {
+            const auto options = parser.value(traceOption).split(QLatin1Char(','), Qt::SkipEmptyParts);
+            for (auto const& option : options) {
+                if (option == QLatin1String("format")) {
+                    highlighter.enableFormatNameTrace();
+                } else {
+                    if (option == QLatin1String("region") || option == QLatin1String("context")) {
+                        std::cerr << "'region' and 'context' aren't yet supported." << std::endl;
+                    } else {
+                        std::cerr << "Unknown trace format." << std::endl;
+                    }
+                    return 2;
+                }
+            }
+        }
+
+        highlighter.setDefinition(def);
+        highlighter.setTheme(repo.theme(parser.value(themeName)));
+        applyHighlighter(highlighter, parser, fromFileName, inFileName, stdinOption, outputName, AnsiFormat);
     }
 
     return 0;

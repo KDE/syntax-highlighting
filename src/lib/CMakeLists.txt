@@ -8,6 +8,7 @@ set(syntax_highlighting_srcs
     foldingregion.cpp
     format.cpp
     htmlhighlighter.cpp
+    ansihighlighter.cpp
     keywordlist.cpp
     rule.cpp
     definition.cpp

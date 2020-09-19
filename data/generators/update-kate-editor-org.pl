@@ -260,9 +260,6 @@ system("cp", "-rf", "autotests/theme.html.output", "$staticThemePath/html") == 0
 # switch over to git again
 chdir($staticThemePath) || die "Failed to switch to '$staticThemePath' directory!\n";
 
-# add html files
-system("git", "add", "html") == 0 || die "Failed to add theme HTML files to git!\n";
-
 # collect all themes with their test case
 print "Parsing theme kate-editor-org/static/themes/html/*.html files...\n";
 my %themeToHTML;
@@ -300,12 +297,15 @@ foreach my $name (sort keys %themeToHTML) {
     # write snippet to disk
     my $snippetName = $themeToHTML{$name};
     $snippetName =~ s/\.html/-snippet.html/;
-    open my $F, ">$snippetName";
-    print $F $fullFile;
-    close $F;
+    open my $OF, ">$snippetName";
+    print $OF $fullFile;
+    close $OF;
     $themeToHTMLSnippet{lc($name)}{"name"} = $name;
     $themeToHTMLSnippet{lc($name)}{"file"} = $snippetName;
 }
+
+# add html files
+system("git", "add", "html") == 0 || die "Failed to add theme HTML files to git!\n";
 
 # we create some overview page, too, as markdown to brag about the amount of stuff we know .P
 # we output sorted by lower case names as otherwise ayu and co. end up at the end...

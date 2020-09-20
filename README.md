@@ -112,13 +112,24 @@ repository of the KSyntaxHighlighting framework is [here](https://invent.kde.org
 
 All the necessary information to send contributions is [here](https://community.kde.org/Infrastructure/GitLab).
 
+### Licensing
+
+Contributions to KSyntaxHighlighting shall be licensed under [MIT](LICENSES/MIT.txt).
+
+All files shall contain a proper "SPDX-License-Identifier: MIT" identifier inside a header like:
+
+```cpp
+/*
+    SPDX-FileCopyrightText: 2020 Christoph Cullmann <cullmann@kde.org>
+
+    SPDX-License-Identifier: MIT
+*/
+```
+
 ### What you should know before working with syntax definition files and sending a patch
 
 * If you are modifying an existing syntax definition XML file, you must increase
   the version number of the language.
-
-* The KSyntaxHighlighting framework is under [MIT license](https://directory.fsf.org/wiki/License:Expat).
-  Ideally, use MIT license for your contributions, including new XML files.
 
 * Do not use hard-coded colors, as they may not look good or be illegible in some color
   themes. Prefer to use the default color styles.

@@ -104,8 +104,7 @@ bool Format::isDefaultTextStyle(const Theme &theme) const
 
 bool Format::hasTextColor(const Theme &theme) const
 {
-    const auto overrideStyle = d->styleOverride(theme);
-    return textColor(theme) != theme.textColor(Theme::Normal) && (d->style.textColor || theme.textColor(d->defaultStyle) || overrideStyle.textColor);
+    return textColor(theme) != theme.textColor(Theme::Normal) && (d->style.textColor || theme.textColor(d->defaultStyle) || d->styleOverride(theme).textColor);
 }
 
 QColor Format::textColor(const Theme &theme) const
@@ -126,10 +125,8 @@ QColor Format::selectedTextColor(const Theme &theme) const
 
 bool Format::hasBackgroundColor(const Theme &theme) const
 {
-    const auto overrideStyle = d->styleOverride(theme);
-
     // use QColor::fromRgba for background QRgb => QColor conversion to avoid unset colors == black!
-    return backgroundColor(theme) != QColor::fromRgba(theme.backgroundColor(Theme::Normal)) && (d->style.backgroundColor || theme.backgroundColor(d->defaultStyle) || overrideStyle.backgroundColor);
+    return backgroundColor(theme) != QColor::fromRgba(theme.backgroundColor(Theme::Normal)) && (d->style.backgroundColor || theme.backgroundColor(d->defaultStyle) || d->styleOverride(theme).backgroundColor);
 }
 
 QColor Format::backgroundColor(const Theme &theme) const

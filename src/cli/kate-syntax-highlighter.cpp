@@ -84,9 +84,13 @@ int main(int argc, char **argv)
     parser.addOption(outputFormatOption);
 
     QCommandLineOption traceOption(QStringList() << QStringLiteral("format-trace"),
-                                   app.translate("SyntaxHighlightingCLI", "Add information to debug a syntax file with --output-format=ansi or ansi256Colors. Possible values are comma-separated with following values: format, region or context."),
-                                   app.translate("SyntaxHighlightingCLI", "types"));
+                                   app.translate("SyntaxHighlightingCLI", "Add information to debug a syntax file with --output-format=ansi or ansi256Colors. Possible values are format, region or context."),
+                                   app.translate("SyntaxHighlightingCLI", "type"));
     parser.addOption(traceOption);
+
+    QCommandLineOption noAnsiEditorBg(QStringList() << QStringLiteral("b") << QStringLiteral("no-ansi-background"),
+                                      app.translate("SyntaxHighlightingCLI", "Disable ANSI background for the default color."));
+    parser.addOption(noAnsiEditorBg);
 
     QCommandLineOption titleOption(QStringList() << QStringLiteral("T") << QStringLiteral("title"),
                                    app.translate("SyntaxHighlightingCLI", "Set HTML page's title\n(default: the filename or \"Kate Syntax Highlighter\" if reading from stdin)."),
@@ -192,7 +196,7 @@ int main(int argc, char **argv)
 
         highlighter.setDefinition(def);
         highlighter.setTheme(repo.theme(parser.value(themeName)));
-        applyHighlighter(highlighter, parser, fromFileName, inFileName, stdinOption, outputName, AnsiFormat);
+        applyHighlighter(highlighter, parser, fromFileName, inFileName, stdinOption, outputName, AnsiFormat, !parser.isSet(noAnsiEditorBg));
     }
 
     return 0;

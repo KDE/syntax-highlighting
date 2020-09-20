@@ -31,8 +31,8 @@ public:
     AnsiHighlighter();
     ~AnsiHighlighter() override;
 
-    void highlightFile(const QString &fileName, AnsiFormat format = AnsiFormat::TrueColor);
-    void highlightData(QIODevice *device, AnsiFormat format = AnsiFormat::TrueColor);
+    void highlightFile(const QString &fileName, AnsiFormat format = AnsiFormat::TrueColor, bool useEditorBackground = true);
+    void highlightData(QIODevice *device, AnsiFormat format = AnsiFormat::TrueColor, bool useEditorBackground = true);
 
     void setOutputFile(const QString &fileName);
     void setOutputFile(FILE *fileHandle);

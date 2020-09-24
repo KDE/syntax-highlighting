@@ -17,9 +17,11 @@
 #include <QDebug>
 #include <QDirIterator>
 #include <QFileInfo>
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonParseError>
 #include <QObject>
+#include <QRegularExpression>
 #include <QStandardPaths>
 #include <QTest>
 
@@ -144,7 +146,7 @@ private Q_SLOTS:
         QCOMPARE(t.editorColor(Theme::WordWrapMarker), QColor("#ededed").rgb());
         QCOMPARE(t.editorColor(Theme::ModifiedLines), QColor("#fdbc4b").rgb());
         QCOMPARE(t.editorColor(Theme::SavedLines), QColor("#2ecc71").rgb());
-        QCOMPARE(t.editorColor(Theme::Separator), QColor("#898887").rgb());
+        QCOMPARE(t.editorColor(Theme::Separator), QColor("#a0a0a0").rgb());
         QCOMPARE(t.editorColor(Theme::MarkBookmark), QColor("#0000ff").rgb());
         QCOMPARE(t.editorColor(Theme::MarkBreakpointActive), QColor("#ff0000").rgb());
         QCOMPARE(t.editorColor(Theme::MarkBreakpointReached), QColor("#ffff00").rgb());
@@ -212,6 +214,22 @@ private Q_SLOTS:
         QVERIFY(!themeName.isEmpty());
         QVERIFY(metadata.contains(QLatin1String("revision")));
         QVERIFY(metadata.value(QLatin1String("revision")).toInt() > 0);
+
+        // verify licensing part of the metadata
+
+        // ensure we have some copyright text attributes like "SPDX-FileCopyrightText: 2020 Christoph Cullmann <cullmann@kde.org>"
+        QVERIFY(metadata.contains(QLatin1String("copyright")));
+        const auto copyrights = metadata.value(QLatin1String("copyright")).toArray();
+        QVERIFY(!copyrights.empty());
+        for (const auto &copyright : copyrights) {
+            static const QRegularExpression copyrightRegex(QLatin1String("SPDX-FileCopyrightText: \\d{4} "));
+            QVERIFY(copyright.toString().indexOf(copyrightRegex) == 0);
+        }
+
+        // ensure the theme is MIT licensed with a proper SPDX identifier
+        // we always compile all themes into the library as resources, we want to have a "pure" MIT licensed library!
+        QVERIFY(metadata.contains(QLatin1String("license")));
+        QVERIFY(metadata.value(QLatin1String("license")).toString() == QLatin1String("SPDX-License-Identifier: MIT"));
 
         // verify completeness of text styles
         static const auto idx = Theme::staticMetaObject.indexOfEnumerator("TextStyle");

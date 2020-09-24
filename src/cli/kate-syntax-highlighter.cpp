@@ -84,7 +84,7 @@ int main(int argc, char **argv)
     parser.addOption(outputFormatOption);
 
     QCommandLineOption traceOption(QStringList() << QStringLiteral("format-trace"),
-                                   app.translate("SyntaxHighlightingCLI", "Add information to debug a syntax file with --output-format=ansi or ansi256Colors. Possible values are format, region or context."),
+                                   app.translate("SyntaxHighlightingCLI", "Add information to debug a syntax file with --output-format=ansi or ansi256Colors. Possible values are format, region, context and lineseparator."),
                                    app.translate("SyntaxHighlightingCLI", "type"));
     parser.addOption(traceOption);
 
@@ -168,7 +168,6 @@ int main(int argc, char **argv)
         applyHighlighter(highlighter, parser, fromFileName, inFileName, stdinOption, outputName, title);
     } else {
         auto AnsiFormat = AnsiHighlighter::AnsiFormat::TrueColor;
-
         if (0 == outputFormat.compare(QLatin1String("ansi256Colors"), Qt::CaseInsensitive)) {
             AnsiFormat = AnsiHighlighter::AnsiFormat::XTerm256Color;
         } else if (0 != outputFormat.compare(QLatin1String("ansi"), Qt::CaseInsensitive)) {
@@ -176,27 +175,29 @@ int main(int argc, char **argv)
             return 2;
         }
 
-        AnsiHighlighter highlighter;
-
+        auto debugOptions = AnsiHighlighter::DebugOptions();
         if (parser.isSet(traceOption)) {
-            const auto options = parser.value(traceOption).split(QLatin1Char(','), Qt::SkipEmptyParts);
+            const auto options = parser.values(traceOption);
             for (auto const& option : options) {
                 if (option == QLatin1String("format")) {
-                    highlighter.enableFormatNameTrace();
+                    debugOptions |= AnsiHighlighter::DebugOption::FormatName;
+                } else if (option == QLatin1String("region")) {
+                    debugOptions |= AnsiHighlighter::DebugOption::RegionName;
+                } else if (option == QLatin1String("context")) {
+                    debugOptions |= AnsiHighlighter::DebugOption::ContextName;
+                } else if (option == QLatin1String("lineseparator")) {
+                    debugOptions |= AnsiHighlighter::DebugOption::LineSeparator;
                 } else {
-                    if (option == QLatin1String("region") || option == QLatin1String("context")) {
-                        std::cerr << "'region' and 'context' aren't yet supported." << std::endl;
-                    } else {
-                        std::cerr << "Unknown trace format." << std::endl;
-                    }
+                    std::cerr << "Unknown trace format." << std::endl;
                     return 2;
                 }
             }
         }
 
+        AnsiHighlighter highlighter;
         highlighter.setDefinition(def);
         highlighter.setTheme(repo.theme(parser.value(themeName)));
-        applyHighlighter(highlighter, parser, fromFileName, inFileName, stdinOption, outputName, AnsiFormat, !parser.isSet(noAnsiEditorBg));
+        applyHighlighter(highlighter, parser, fromFileName, inFileName, stdinOption, outputName, AnsiFormat, !parser.isSet(noAnsiEditorBg), debugOptions);
     }
 
     return 0;

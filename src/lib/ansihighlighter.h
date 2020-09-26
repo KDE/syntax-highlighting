@@ -35,7 +35,6 @@ public:
         FormatName    = 1 << 0,
         RegionName    = 1 << 1,
         ContextName   = 1 << 2,
-        LineSeparator = 1 << 3,
     };
     Q_DECLARE_FLAGS(DebugOptions, DebugOption)
 

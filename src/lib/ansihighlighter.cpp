@@ -545,9 +545,15 @@ namespace
             m_size += str.size();
         }
 
-        void append(QLatin1String str, QRgb rgb, bool is256Colors)
+        void appendForeground(QRgb rgb, bool is256Colors)
         {
-            append(str);
+            append(QLatin1String("38;"));
+            append(rgb, is256Colors);
+        }
+
+        void appendBackground(QRgb rgb, bool is256Colors)
+        {
+            append(QLatin1String("48;"));
             append(rgb, is256Colors);
         }
 
@@ -624,9 +630,10 @@ namespace
             m_size = 0;
         }
 
-        // TODO replaced by latin1String
-        char const* data() const { return m_data; }
-        int size() const { return m_size; }
+        QLatin1String latin1() const
+        {
+            return QLatin1String(m_data, m_size);
+        }
 
     private:
         char m_data[128];
@@ -652,35 +659,33 @@ namespace
 
     struct GraphLine
     {
+        // TODO rename + private
         QString s1;
         QString s2;
         int len1 = 0;
         int len2 = 0;
         int endNameLen = 0;
 
-        void pushName(int offset, QString const& style, QLatin1String nameStyle, QString const& name, QLatin1String infoStyle)
+        template<class String>
+        void pushName(int offset, String const& s, int charCounter)
         {
             assert(offset >= len2);
             int n = offset - len2;
-            len2 += name.size() + n;
+            len2 += charCounter + n;
             expandLine(s2, n);
-            s2 += style;
-            s2 += nameStyle;
-            s2 += name;
-            s2 += infoStyle;
+            s2 += s;
             endNameLen = len2;
         }
 
-        void pushGraph(int offset, QString const& style, QLatin1String graphSymbol, QLatin1String infoStyle)
+        template<class String>
+        void pushGraph(int offset, String const& s, int charCounter)
         {
             assert(offset >= len1);
-            int n1 = offset - len1;
-            len1 += n1 + 1;
-            expandLine(s1, n1);
+            int n = offset - len1;
+            len1 += charCounter + n;
+            expandLine(s1, n);
             int ps1 = s1.size();
-            s1 += style;
-            s1 += graphSymbol;
-            s1 += infoStyle;
+            s1 += s;
             if (offset >= len2) {
                 int n2 = offset - len2;
                 len2 += n2 + 1;
@@ -714,6 +719,11 @@ namespace
         return *p;
     }
 
+    // disable bold, italic and underline on |
+    const QLatin1String graphSymbol("\x1b[21;23;24m|");
+    // reverse video
+    const QLatin1String nameStyle("\x1b[7m");
+
     class DebugSyntaxHighlighter : public KSyntaxHighlighting::AbstractHighlighter
     {
     public:
@@ -727,24 +737,42 @@ namespace
             m_contextCapture.setDefinition(def);
         }
 
-        void highlightData(QTextStream &in, QTextStream &out, QLatin1String backgroundDefaultColor, const std::vector<QPair<QString, QString>> &ansiStyles, DebugOptions debugOptions)
+        void highlightData(QTextStream &in, QTextStream &out, QLatin1String infoStyle, QLatin1String backgroundDefaultColor, const std::vector<QPair<QString, QString>> &ansiStyles, DebugOptions debugOptions)
         {
+            m_regionStyles.resize(ansiStyles.size());
+            for (std::size_t i = 0; i < m_regionStyles.size(); ++i)
+                m_regionStyles[i] = &ansiStyles[i].first;
+            std::sort(m_regionStyles.begin(), m_regionStyles.end(), [](const QString *a, const QString *b) {
+                return *a < *b;
+            });
+            m_regionStyles.erase(std::unique(m_regionStyles.begin(), m_regionStyles.end(), [](const QString *a, const QString *b) {
+                return *a == *b;
+            }), m_regionStyles.end());
+
             // TODO remove Name suffix
             m_enableFormatNameTrace = debugOptions.testFlag(DebugOption::FormatName);
             m_enableRegionTrace = debugOptions.testFlag(DebugOption::RegionName);
             const bool enableNameTrace = debugOptions & (DebugOption::FormatName | DebugOption::ContextName);
 
+            const bool hasSeparator = enableNameTrace && m_enableRegionTrace;
             const bool useEditorBackground = !backgroundDefaultColor.isEmpty();
-            const QString resetBgColor = QLatin1String("\x1b[") + (useEditorBackground ? backgroundDefaultColor : QLatin1String("0m"));
+            const QString resetBgColor = (useEditorBackground ? backgroundDefaultColor : QStringLiteral("\x1b[0m"));
 
+            bool firstLine = true;
             State state;
             while (!in.atEnd()) {
                 const QString currentLine = in.readLine();
                 auto oldState = state;
                 state = highlightLine(currentLine, state);
 
+                if (hasSeparator) {
+                    if (!firstLine)
+                        out << QStringLiteral("\x1b[0m────────────────────────────────────────────────────\x1b[K\n");
+                    firstLine = false;
+                }
+
                 if (!m_regions.empty()) {
-                    printRegions(out, ansiStyles, currentLine.size());
+                    printRegions(out, infoStyle, currentLine.size());
                     out << resetBgColor;
                 }
 
@@ -763,7 +791,7 @@ namespace
                         addContextNames(oldState, currentLine);
                     }
 
-                    printFormats(out, ansiStyles);
+                    printFormats(out, infoStyle, ansiStyles);
                     out << resetBgColor;
                 }
                 m_highlightedFragments.clear();
@@ -853,28 +881,20 @@ namespace
             return QString(contextName % QLatin1Char('[') % context->name() % QLatin1Char(']'));
         }
 
-        void printFormats(QTextStream &out, const std::vector<QPair<QString, QString>> &ansiStyles)
+        void printFormats(QTextStream &out, QLatin1String regionStyle, const std::vector<QPair<QString, QString>> &ansiStyles)
         {
-            // disable bold, italic and underline on |
-            const QLatin1String graphSymbol("\x1b[21;23;24m|");
-            // TODO depend on background color
-            // reset then gray background
-            const QLatin1String infoStyle("\x1b[0;48;5;235m");
-            // reverse video
-            const QLatin1String nameStyle("\x1b[7m");
-
             m_formatGraph.clear();
             for (auto const& fragment : m_highlightedFragments) {
                 GraphLine& line = lineAtOffset(m_formatGraph, fragment.offset);
                 auto const& style = ansiStyles[fragment.formatId].first;
-                line.pushName(fragment.offset, style, nameStyle, fragment.name, infoStyle);
+                line.pushName(fragment.offset, style % nameStyle % fragment.name % regionStyle, fragment.name.size());
 
                 for (GraphLine* pline = m_formatGraph.data(); pline <= &line; ++pline) {
-                    pline->pushGraph(fragment.offset, style, graphSymbol, infoStyle);
+                    pline->pushGraph(fragment.offset, style % graphSymbol % regionStyle, 1);
                 }
             }
 
-            out << infoStyle;
+            out << regionStyle;
             auto first = m_formatGraph.begin();
             auto last = m_formatGraph.end();
             --last;
@@ -884,18 +904,8 @@ namespace
             out << first->s1 << "\x1b[K\n" << first->s2 << "\x1b[K\x1b[0m\n";
         }
 
-        void printRegions(QTextStream &out, const std::vector<QPair<QString, QString>> &/*ansiStyles*/, int lineLength)
+        void printRegions(QTextStream &out, QLatin1String regionStyle, int lineLength)
         {
-            // TODO same as FormatNameTrace::compute()
-            // disable bold, italic and underline on |
-            const QLatin1String graphSymbol("\x1b[21;23;24m|");
-            const QLatin1String graphSymbol2("\x1b[23;24;1m|");
-            // TODO depend on background color
-            // reset then gray background
-            const QLatin1String infoStyle("\x1b[0;48;5;235m");
-            // reverse video
-            const QLatin1String nameStyle("\x1b[7m");
-
             m_regionGraph.clear();
             QString regionName;
             QString tmp;
@@ -905,21 +915,27 @@ namespace
                 "------------------------------"
                 "------------------------------");
 
-            // TODO color with ansiStyle + id % size()
-
             bool hasContinuation = false;
 
-            for (Region& info : m_regions) {
-                int offset = info.offset;
+            for (Region& region : m_regions) {
+                auto pushGraphs = [&](int offset, const GraphLine *endline, const QString &style){
+                    for (GraphLine* pline = m_regionGraph.data(); pline <= endline; ++pline) {
+                        if (pline->len1 <= offset) {
+                            pline->pushGraph(offset, style % graphSymbol % regionStyle, 1);
+                        }
+                    }
+                };
 
-                switch (info.state) {
+                int offset = region.offset;
+
+                switch (region.state) {
                     case Region::State::Open:
                         regionName = QLatin1Char('(');
-                        regionName += QString::number(info.regionId);
-                        if (info.bindIndex == -1) {
-                            expandString(regionName, lineLength - info.offset - regionName.size(), continuationLine);
+                        regionName += QString::number(region.regionId);
+                        if (region.bindIndex == -1) {
+                            expandString(regionName, lineLength - region.offset - regionName.size(), continuationLine);
                         } else {
-                            expandString(regionName, m_regions[info.bindIndex].offset - info.offset - 2, continuationLine);
+                            expandString(regionName, m_regions[region.bindIndex].offset - region.offset - 2, continuationLine);
                             regionName += QLatin1Char(')');
                         }
                         break;
@@ -929,66 +945,65 @@ namespace
                         continue;
 
                     case Region::State::Close:
-                        regionName = QLatin1Char((info.bindIndex == -1) ? '>' : ')');
-                        regionName += QString::number(info.regionId);
-                        if (info.bindIndex == -1)
+                        regionName = QLatin1Char((region.bindIndex == -1) ? '>' : ')');
+                        regionName += QString::number(region.regionId);
+                        if (region.bindIndex == -1)
                             break;
 
-                        if (m_regions[info.bindIndex].state == Region::State::Continuation) {
+                        if (m_regions[region.bindIndex].state == Region::State::Continuation) {
                             tmp.clear();
-                            expandString(tmp, info.offset, continuationLine);
+                            expandString(tmp, region.offset, continuationLine);
                             regionName.prepend(tmp);
                             offset = 0;
                             break;
                         }
 
-                        GraphLine& line = m_regionGraph[m_regions[info.bindIndex].offset];
-                        for (GraphLine* pline = m_regionGraph.data(); pline <= &line; ++pline) {
-                            pline->pushGraph(info.offset, QString(), graphSymbol, infoStyle);
-                        }
+                        const auto &bindRegion = m_regions[region.bindIndex];
+                        const GraphLine &line = m_regionGraph[bindRegion.offset];
+                        const auto &style = *m_regionStyles[bindRegion.depth % m_regionStyles.size()];
+                        pushGraphs(region.offset, &line, style);
                         continue;
                 }
 
-                GraphLine& line = lineAtOffset(m_regionGraph, offset);
-                line.pushName(offset, QString(), nameStyle, regionName, infoStyle);
+                GraphLine &line = lineAtOffset(m_regionGraph, offset);
+                const auto &style = *m_regionStyles[region.depth % m_regionStyles.size()];
+                line.pushName(offset, style % nameStyle % regionName % regionStyle, regionName.size());
+                pushGraphs(region.offset, &line, style);
 
-                for (GraphLine* pline = m_regionGraph.data(); pline <= &line; ++pline) {
-                    pline->pushGraph(info.offset, QString(), graphSymbol, infoStyle);
-                }
-
-                if (info.state == Region::State::Open && info.bindIndex != -1) {
-                    info.offset = &line - m_regionGraph.data();
+                if (region.state == Region::State::Open && region.bindIndex != -1) {
+                    region.offset = &line - m_regionGraph.data();
                 }
             }
 
-            out << infoStyle;
+            out << regionStyle;
 
             if (hasContinuation) {
                 regionName.clear();
                 expandString(regionName, lineLength, continuationLine);
-
-                for (const Region &info : m_regions) {
-                    if (info.state == Region::State::Continuation && info.bindIndex == -1) {
-                        out << nameStyle << regionName << infoStyle << "\x1b[K\n";
+                for (const auto &region : m_regions) {
+                    if (region.state == Region::State::Continuation && region.bindIndex == -1) {
+                        const auto &style = *m_regionStyles[region.depth % m_regionStyles.size()];
+                        out << style << nameStyle << regionName << regionStyle << "\x1b[K\n";
                     }
                 }
             }
 
-            auto first = m_regionGraph.rbegin();
-            auto last = m_regionGraph.rend();
-            --last;
-            for (; first != last; ++first) {
-                out << first->s2 << "\x1b[K\n" << first->s1 << "\x1b[K\n";
+            if (!m_regionGraph.empty()) {
+                auto first = m_regionGraph.rbegin();
+                auto last = m_regionGraph.rend();
+                --last;
+                for (; first != last; ++first) {
+                    out << first->s2 << "\x1b[K\n" << first->s1 << "\x1b[K\n";
+                }
+                out << first->s2 << "\x1b[K\n" << first->s1 << "\x1b[K\x1b[0m\n";
             }
-            out << first->s2 << "\x1b[K\n" << first->s1 << "\x1b[K\x1b[0m\n";
 
-            auto isClose = [](Region const& info){
-                return info.bindIndex != -1 || info.state == Region::State::Close;
-            };
-            m_regions.erase(std::remove_if(m_regions.begin(), m_regions.end(), isClose), m_regions.end());
-            for (auto& info : m_regions) {
-                info.offset = 0;
-                info.state = Region::State::Continuation;
+            m_regions.erase(std::remove_if(m_regions.begin(), m_regions.end(), [](Region const& region){
+                return region.bindIndex != -1 || region.state == Region::State::Close;
+            }), m_regions.end());
+            for (auto& region : m_regions) {
+                region.offset = 0;
+                region.state = Region::State::Continuation;
             }
         }
 
@@ -1045,6 +1060,7 @@ namespace
         int m_regionDepth = 0;
         std::vector<Region> m_regions;
         std::vector<GraphLine> m_regionGraph;
+        std::vector<const QString*> m_regionStyles;
     };
 } // anonymous namespace
 
@@ -1114,7 +1130,8 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
     auto definitions = definition.includedDefinitions();
     definitions.append(definition);
 
-    AnsiBuffer defaultColorBuffer;
+    AnsiBuffer foregroundColorBuffer;
+    AnsiBuffer backgroundColorBuffer;
     QLatin1String foregroundDefaultColor;
     QLatin1String backgroundDefaultColor;
 
@@ -1123,17 +1140,11 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
     if (useEditorBackground) {
         const QRgb foregroundColor = theme.textColor(Theme::Normal);
         const QRgb backgroundColor = theme.editorColor(Theme::BackgroundColor);
-
-        const auto p = defaultColorBuffer.data();
-        defaultColorBuffer.append(QLatin1String("\x1b[0;"));
-        const auto startFgColorOffset = p + defaultColorBuffer.size();
-        defaultColorBuffer.append(QLatin1String("38;"), foregroundColor, is256Colors);
-        const auto startbgColorOffset = p + defaultColorBuffer.size();
-        defaultColorBuffer.append(QLatin1String("48;"), backgroundColor, is256Colors);
-        const auto stopBgColorOffset = p + defaultColorBuffer.size();
-
-        foregroundDefaultColor = QLatin1String(startFgColorOffset, startbgColorOffset);
-        backgroundDefaultColor = QLatin1String(startbgColorOffset, stopBgColorOffset);
+        foregroundColorBuffer.appendForeground(foregroundColor, is256Colors);
+        backgroundColorBuffer.append(QLatin1String("\x1b["));
+        backgroundColorBuffer.appendBackground(backgroundColor, is256Colors);
+        foregroundDefaultColor = foregroundColorBuffer.latin1();
+        backgroundDefaultColor = backgroundColorBuffer.latin1().mid(2);
     }
 
     // initialize ansiStyles
@@ -1158,18 +1169,18 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
             const bool hasStrikeThrough = format.isStrikeThrough(theme);
 
             if (hasFg)
-                buf.append(QLatin1String("38;"), format.textColor(theme).rgb(), is256Colors);
+                buf.appendForeground(format.textColor(theme).rgb(), is256Colors);
             else
                 buf.append(foregroundDefaultColor);
-            if (hasBg) buf.append(QLatin1String("48;"), format.backgroundColor(theme).rgb(), is256Colors);
+            if (hasBg) buf.appendBackground(format.backgroundColor(theme).rgb(), is256Colors);
             if (hasBold) buf.append(QLatin1String("1;"));
             if (hasItalic) buf.append(QLatin1String("3;"));
             if (hasUnderline) buf.append(QLatin1String("4;"));
             if (hasStrikeThrough) buf.append(QLatin1String("9;"));
 
-            if (buf.size() > 2) {
+            if (buf.latin1().size() > 2) {
                 buf.setFinalStyle();
-                d->ansiStyles[id].first = QLatin1String(buf.data(), buf.size());
+                d->ansiStyles[id].first = buf.latin1();
 
                 if (useEditorBackground) {
                     buf.clear();
@@ -1178,7 +1189,7 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
                         buf.append(hasEffect ? QLatin1String("\x1b[0;") : QLatin1String("\x1b["));
                         buf.append(backgroundDefaultColor);
                         buf.setFinalStyle();
-                        d->ansiStyles[id].second = QLatin1String(buf.data(), buf.size());
+                        d->ansiStyles[id].second = buf.latin1();
                     } else if (hasEffect) {
                         buf.append(QLatin1String("\x1b["));
                         if (hasBold) buf.append(QLatin1String("21;"));
@@ -1186,7 +1197,7 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
                         if (hasUnderline) buf.append(QLatin1String("24;"));
                         if (hasStrikeThrough) buf.append(QLatin1String("29;"));
                         buf.setFinalStyle();
-                        d->ansiStyles[id].second = QLatin1String(buf.data(), buf.size());
+                        d->ansiStyles[id].second = buf.latin1();
                     }
                 } else {
                     d->ansiStyles[id].second = QStringLiteral("\x1b[0m");
@@ -1196,8 +1207,9 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
     }
 
     if (useEditorBackground) {
-        defaultColorBuffer.setFinalStyle();
-        d->out << QLatin1String("\x1b[") << backgroundDefaultColor;
+        backgroundColorBuffer.setFinalStyle();
+        backgroundDefaultColor = backgroundColorBuffer.latin1();
+        d->out << backgroundDefaultColor;
     }
 
     QTextStream in(dev);
@@ -1215,10 +1227,13 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
                 d->out << QLatin1Char('\n');
         }
     } else {
+        AnsiBuffer buffer;
+        buffer.append(QLatin1String("\x1b[0;"));
+        buffer.appendBackground(theme.editorColor(useEditorBackground ? Theme::TemplateBackground : Theme::BackgroundColor), is256Colors);
+        buffer.setFinalStyle();
         DebugSyntaxHighlighter debugHighlighter;
-        debugHighlighter.setTheme(theme);
         debugHighlighter.setDefinition(definition);
-        debugHighlighter.highlightData(in, d->out, backgroundDefaultColor, d->ansiStyles, debugOptions);
+        debugHighlighter.highlightData(in, d->out, buffer.latin1(), backgroundDefaultColor, d->ansiStyles, debugOptions);
     }
 
     if (useEditorBackground) {

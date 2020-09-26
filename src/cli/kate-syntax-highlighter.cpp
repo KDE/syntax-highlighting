@@ -185,8 +185,6 @@ int main(int argc, char **argv)
                     debugOptions |= AnsiHighlighter::DebugOption::RegionName;
                 } else if (option == QLatin1String("context")) {
                     debugOptions |= AnsiHighlighter::DebugOption::ContextName;
-                } else if (option == QLatin1String("lineseparator")) {
-                    debugOptions |= AnsiHighlighter::DebugOption::LineSeparator;
                 } else {
                     std::cerr << "Unknown trace format." << std::endl;
                     return 2;

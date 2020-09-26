@@ -175,18 +175,18 @@ int main(int argc, char **argv)
             return 2;
         }
 
-        auto debugOptions = AnsiHighlighter::DebugOptions();
+        auto debugOptions = AnsiHighlighter::TraceOptions();
         if (parser.isSet(traceOption)) {
             const auto options = parser.values(traceOption);
             for (auto const& option : options) {
-                if (option == QLatin1String("format")) {
-                    debugOptions |= AnsiHighlighter::DebugOption::FormatName;
-                } else if (option == QLatin1String("region")) {
-                    debugOptions |= AnsiHighlighter::DebugOption::RegionName;
-                } else if (option == QLatin1String("context")) {
-                    debugOptions |= AnsiHighlighter::DebugOption::ContextName;
+                if (option == QStringLiteral("format")) {
+                    debugOptions |= AnsiHighlighter::TraceOption::Format;
+                } else if (option == QStringLiteral("region")) {
+                    debugOptions |= AnsiHighlighter::TraceOption::Region;
+                } else if (option == QStringLiteral("context")) {
+                    debugOptions |= AnsiHighlighter::TraceOption::Context;
                 } else {
-                    std::cerr << "Unknown trace format." << std::endl;
+                    std::cerr << "Unknown trace name." << std::endl;
                     return 2;
                 }
             }

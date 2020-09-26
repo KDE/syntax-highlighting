@@ -596,6 +596,7 @@ namespace
                 double dist = 1e24;
                 int idx = 0;
                 const auto lab = rgbToLab(rgb);
+                // find the nearest xterm color
                 for (CieLab const& xtermLab : xterm240Labs) {
                     auto dist2 = calculate_CIEDE2000(lab, xtermLab);
                     if (dist2 < dist) {
@@ -606,6 +607,7 @@ namespace
 
                 append('5');
                 append(';');
+                // add 16 to convert 240 colors mode to 256 colors mode
                 appendUInt8(idx + 16);
             } else {
                 append('2');
@@ -619,6 +621,7 @@ namespace
             append(';');
         }
 
+        // Replace last character with 'm'. Last character must be ';'
         void setFinalStyle()
         {
             assert(m_data[m_size-1] == ';');
@@ -647,7 +650,7 @@ namespace
 #endif
     };
 
-    void expandString(QString &s, int n, const QString &fill)
+    void fillString(QString &s, int n, const QString &fill)
     {
         if (n > 0) {
             for (; n > fill.size(); n -= fill.size()) {
@@ -659,46 +662,45 @@ namespace
 
     struct GraphLine
     {
-        // TODO rename + private
-        QString s1;
-        QString s2;
-        int len1 = 0;
-        int len2 = 0;
-        int endNameLen = 0;
+        QString graphLine;
+        QString labelLine;
+        int graphLineLength = 0;
+        int labelLineLength = 0;
+        int nextLabelOffset = 0;
 
         template<class String>
-        void pushName(int offset, String const& s, int charCounter)
+        void pushLabel(int offset, String const& s, int charCounter)
         {
             assert(offset >= len2);
-            int n = offset - len2;
-            len2 += charCounter + n;
-            expandLine(s2, n);
-            s2 += s;
-            endNameLen = len2;
+            const int n = offset - labelLineLength;
+            labelLineLength += charCounter + n;
+            fillLine(labelLine, n);
+            labelLine += s;
+            nextLabelOffset = labelLineLength;
         }
 
         template<class String>
         void pushGraph(int offset, String const& s, int charCounter)
         {
             assert(offset >= len1);
-            int n = offset - len1;
-            len1 += charCounter + n;
-            expandLine(s1, n);
-            int ps1 = s1.size();
-            s1 += s;
-            if (offset >= len2) {
-                int n2 = offset - len2;
-                len2 += n2 + 1;
-                expandLine(s2, n2);
-                s2 += s1.rightRef(s1.size() - ps1);
+            const int n = offset - graphLineLength;
+            graphLineLength += charCounter + n;
+            fillLine(graphLine, n);
+            const int ps1 = graphLine.size();
+            graphLine += s;
+            if (offset >= labelLineLength) {
+                const int n2 = offset - labelLineLength;
+                labelLineLength += n2 + 1;
+                fillLine(labelLine, n2);
+                labelLine += graphLine.rightRef(graphLine.size() - ps1);
             }
         }
 
     private:
-        static void expandLine(QString& s, int n)
+        static void fillLine(QString& s, int n)
         {
             assert(n >= 0);
-            expandString(s, n, QStringLiteral(
+            fillString(s, n, QStringLiteral(
                 "                              "
                 "                              "
                 "                              "
@@ -706,11 +708,14 @@ namespace
         }
     };
 
+    /**
+     * Returns the first free line at a given position or create a new one
+     */
     GraphLine& lineAtOffset(std::vector<GraphLine> &graphLines, int offset)
     {
         const auto last = graphLines.end();
         auto p = std::find_if(graphLines.begin(), last, [=](GraphLine const& line) {
-            return line.endNameLen < offset;
+            return line.nextLabelOffset < offset;
         });
         if (p == last) {
             graphLines.emplace_back();
@@ -724,11 +729,14 @@ namespace
     // reverse video
     const QLatin1String nameStyle("\x1b[7m");
 
+    /**
+     * ANSI Highlighter dedicated to traces
+     */
     class DebugSyntaxHighlighter : public KSyntaxHighlighting::AbstractHighlighter
     {
     public:
-        using DebugOption = KSyntaxHighlighting::AnsiHighlighter::DebugOption;
-        using DebugOptions = KSyntaxHighlighting::AnsiHighlighter::DebugOptions;
+        using TraceOption = KSyntaxHighlighting::AnsiHighlighter::TraceOption;
+        using TraceOptions = KSyntaxHighlighting::AnsiHighlighter::TraceOptions;
 
         void setDefinition(const KSyntaxHighlighting::Definition & def) override
         {
@@ -737,26 +745,17 @@ namespace
             m_contextCapture.setDefinition(def);
         }
 
-        void highlightData(QTextStream &in, QTextStream &out, QLatin1String infoStyle, QLatin1String backgroundDefaultColor, const std::vector<QPair<QString, QString>> &ansiStyles, DebugOptions debugOptions)
+        void highlightData(QTextStream &in, QTextStream &out, QLatin1String infoStyle, QLatin1String editorBackground, const std::vector<QPair<QString, QString>> &ansiStyles, TraceOptions traceOptions)
         {
-            m_regionStyles.resize(ansiStyles.size());
-            for (std::size_t i = 0; i < m_regionStyles.size(); ++i)
-                m_regionStyles[i] = &ansiStyles[i].first;
-            std::sort(m_regionStyles.begin(), m_regionStyles.end(), [](const QString *a, const QString *b) {
-                return *a < *b;
-            });
-            m_regionStyles.erase(std::unique(m_regionStyles.begin(), m_regionStyles.end(), [](const QString *a, const QString *b) {
-                return *a == *b;
-            }), m_regionStyles.end());
+            initRegionStyles(ansiStyles);
 
-            // TODO remove Name suffix
-            m_enableFormatNameTrace = debugOptions.testFlag(DebugOption::FormatName);
-            m_enableRegionTrace = debugOptions.testFlag(DebugOption::RegionName);
-            const bool enableNameTrace = debugOptions & (DebugOption::FormatName | DebugOption::ContextName);
+            m_hasFormatTrace = traceOptions.testFlag(TraceOption::Format);
+            m_hasRegionTrace = traceOptions.testFlag(TraceOption::Region);
+            const bool hasContextTrace = traceOptions.testFlag(TraceOption::Context);
+            const bool hasFormatOrContextTrace = m_hasFormatTrace || hasContextTrace;
 
-            const bool hasSeparator = enableNameTrace && m_enableRegionTrace;
-            const bool useEditorBackground = !backgroundDefaultColor.isEmpty();
-            const QString resetBgColor = (useEditorBackground ? backgroundDefaultColor : QStringLiteral("\x1b[0m"));
+            const bool hasSeparator = hasFormatOrContextTrace && m_hasRegionTrace;
+            const QString resetBgColor = (editorBackground.isEmpty() ? QStringLiteral("\x1b[0m") : editorBackground);
 
             bool firstLine = true;
             State state;
@@ -781,31 +780,28 @@ namespace
                     out << ansiStyle.first << currentLine.midRef(fragment.offset, fragment.length) << ansiStyle.second;
                 }
 
-                if (useEditorBackground)
-                    out << QStringLiteral("\x1b[K\n");
-                else
-                    out << QLatin1Char('\n');
+                out << QStringLiteral("\x1b[K\n");
 
-                if (enableNameTrace && !m_highlightedFragments.empty()) {
-                    if (debugOptions.testFlag(DebugOption::ContextName)) {
-                        addContextNames(oldState, currentLine);
-                    }
+                if (hasFormatOrContextTrace && !m_highlightedFragments.empty()) {
+                    if (hasContextTrace)
+                        appendContextNames(oldState, currentLine);
 
                     printFormats(out, infoStyle, ansiStyles);
                     out << resetBgColor;
                 }
+
                 m_highlightedFragments.clear();
             }
         }
 
         void applyFormat(int offset, int length, const KSyntaxHighlighting::Format &format) override
         {
-            m_highlightedFragments.push_back({m_enableFormatNameTrace ? format.name() : QString(), offset, length, format.id()});
+            m_highlightedFragments.push_back({m_hasFormatTrace ? format.name() : QString(), offset, length, format.id()});
         }
 
         void applyFolding(int offset, int /*length*/, FoldingRegion region) override
         {
-            if (!m_enableRegionTrace) return;
+            if (!m_hasRegionTrace) return;
 
             const auto id = region.id();
 
@@ -813,7 +809,7 @@ namespace
                 m_regions.push_back(Region{m_regionDepth, offset, -1, id, Region::State::Open});
                 ++m_regionDepth;
             } else {
-                // search open region
+                // find open region
                 auto it = m_regions.rbegin();
                 auto eit = m_regions.rend();
                 for (int depth = 0; it != eit; ++it) {
@@ -840,7 +836,23 @@ namespace
         using KSyntaxHighlighting::AbstractHighlighter::highlightLine;
 
     private:
-        void addContextNames(State &state, const QString &currentLine)
+        /**
+         * Initializes with colors of \p ansiStyle without duplicate.
+         */
+        void initRegionStyles(const std::vector<QPair<QString, QString>> &ansiStyles)
+        {
+            m_regionStyles.resize(ansiStyles.size());
+            for (std::size_t i = 0; i < m_regionStyles.size(); ++i)
+                m_regionStyles[i] = ansiStyles[i].first;
+
+            std::sort(m_regionStyles.begin(), m_regionStyles.end());
+            m_regionStyles.erase(std::unique(m_regionStyles.begin(), m_regionStyles.end()), m_regionStyles.end());
+        }
+
+        /**
+         * Append the context name in front of the format name.
+         */
+        void appendContextNames(State &state, const QString &currentLine)
         {
             auto newState = state;
             for (auto &fragment : m_highlightedFragments) {
@@ -883,33 +895,31 @@ namespace
 
         void printFormats(QTextStream &out, QLatin1String regionStyle, const std::vector<QPair<QString, QString>> &ansiStyles)
         {
+            // init graph
             m_formatGraph.clear();
             for (auto const& fragment : m_highlightedFragments) {
                 GraphLine& line = lineAtOffset(m_formatGraph, fragment.offset);
                 auto const& style = ansiStyles[fragment.formatId].first;
-                line.pushName(fragment.offset, style % nameStyle % fragment.name % regionStyle, fragment.name.size());
+                line.pushLabel(fragment.offset, style % nameStyle % fragment.name % regionStyle, fragment.name.size());
 
                 for (GraphLine* pline = m_formatGraph.data(); pline <= &line; ++pline) {
                     pline->pushGraph(fragment.offset, style % graphSymbol % regionStyle, 1);
                 }
             }
 
+            // display graph
             out << regionStyle;
             auto first = m_formatGraph.begin();
             auto last = m_formatGraph.end();
             --last;
             for (; first != last; ++first) {
-                out << first->s1 << "\x1b[K\n" << first->s2 << "\x1b[K\n";
+                out << first->graphLine << "\x1b[K\n" << first->labelLine << "\x1b[K\n";
             }
-            out << first->s1 << "\x1b[K\n" << first->s2 << "\x1b[K\x1b[0m\n";
+            out << first->graphLine << "\x1b[K\n" << first->labelLine << "\x1b[K\x1b[0m\n";
         }
 
         void printRegions(QTextStream &out, QLatin1String regionStyle, int lineLength)
         {
-            m_regionGraph.clear();
-            QString regionName;
-            QString tmp;
-
             const QString continuationLine = QStringLiteral(
                 "------------------------------"
                 "------------------------------"
@@ -917,59 +927,74 @@ namespace
 
             bool hasContinuation = false;
 
+            m_regionGraph.clear();
+            QString label;
+            QString numStr;
+
+            // init graph
             for (Region& region : m_regions) {
-                auto pushGraphs = [&](int offset, const GraphLine *endline, const QString &style){
+                if (region.state == Region::State::Continuation) {
+                    hasContinuation = true;
+                    continue;
+                }
+
+                auto pushGraphs = [&](int offset, const GraphLine *endline, const QStringView &style){
                     for (GraphLine* pline = m_regionGraph.data(); pline <= endline; ++pline) {
-                        if (pline->len1 <= offset) {
+                        // a label can hide a graph
+                        if (pline->graphLineLength <= offset) {
                             pline->pushGraph(offset, style % graphSymbol % regionStyle, 1);
                         }
                     }
                 };
 
-                int offset = region.offset;
+                QChar openChar;
+                QChar closeChar;
+                int lpad = 0;
+                int rpad = 0;
 
-                switch (region.state) {
-                    case Region::State::Open:
-                        regionName = QLatin1Char('(');
-                        regionName += QString::number(region.regionId);
-                        if (region.bindIndex == -1) {
-                            expandString(regionName, lineLength - region.offset - regionName.size(), continuationLine);
-                        } else {
-                            expandString(regionName, m_regions[region.bindIndex].offset - region.offset - 2, continuationLine);
-                            regionName += QLatin1Char(')');
-                        }
-                        break;
+                int offsetLabel = region.offset;
 
-                    case Region::State::Continuation:
-                        hasContinuation = true;
-                        continue;
+                numStr.setNum(region.regionId);
 
-                    case Region::State::Close:
-                        regionName = QLatin1Char((region.bindIndex == -1) ? '>' : ')');
-                        regionName += QString::number(region.regionId);
-                        if (region.bindIndex == -1)
-                            break;
-
-                        if (m_regions[region.bindIndex].state == Region::State::Continuation) {
-                            tmp.clear();
-                            expandString(tmp, region.offset, continuationLine);
-                            regionName.prepend(tmp);
-                            offset = 0;
-                            break;
-                        }
-
-                        const auto &bindRegion = m_regions[region.bindIndex];
-                        const GraphLine &line = m_regionGraph[bindRegion.offset];
-                        const auto &style = *m_regionStyles[bindRegion.depth % m_regionStyles.size()];
-                        pushGraphs(region.offset, &line, style);
-                        continue;
+                if (region.state == Region::State::Open) {
+                    openChar = QLatin1Char('(');
+                    if (region.bindIndex == -1) {
+                        rpad = lineLength - region.offset - numStr.size();
+                    } else {
+                        rpad = m_regions[region.bindIndex].offset - region.offset - 2;
+                        closeChar = QLatin1Char(')');
+                    }
+                    // close without open
+                } else if (region.bindIndex == -1) {
+                    closeChar = QLatin1Char('>');
+                    // label already present, we only display the graph
+                } else if (m_regions[region.bindIndex].state == Region::State::Open) {
+                    const auto &openRegion = m_regions[region.bindIndex];
+                    // here offset is a graph index
+                    const GraphLine &line = m_regionGraph[openRegion.offset];
+                    const auto &style = m_regionStyles[openRegion.depth % m_regionStyles.size()];
+                    pushGraphs(region.offset, &line, style);
+                    continue;
+                } else {
+                    closeChar = QLatin1Char(')');
+                    lpad = region.offset - numStr.size();
+                    offsetLabel = 0;
                 }
 
-                GraphLine &line = lineAtOffset(m_regionGraph, offset);
-                const auto &style = *m_regionStyles[region.depth % m_regionStyles.size()];
-                line.pushName(offset, style % nameStyle % regionName % regionStyle, regionName.size());
+                const QStringView openS(&openChar, openChar.unicode() ? 1 : 0);
+                const QStringView closeS(&closeChar, closeChar.unicode() ? 1 : 0);
+
+                label.clear();
+                fillString(label, lpad, continuationLine);
+                label += numStr;
+                fillString(label, rpad, continuationLine);
+
+                GraphLine &line = lineAtOffset(m_regionGraph, offsetLabel);
+                const auto &style = m_regionStyles[region.depth % m_regionStyles.size()];
+                line.pushLabel(offsetLabel, style % nameStyle % openS % label % closeS % regionStyle, label.size() + openS.size() + closeS.size());
                 pushGraphs(region.offset, &line, style);
 
+                // transforms offset into graph index when region is on 1 line
                 if (region.state == Region::State::Open && region.bindIndex != -1) {
                     region.offset = &line - m_regionGraph.data();
                 }
@@ -977,30 +1002,34 @@ namespace
 
             out << regionStyle;
 
+            // display regions which are neither closed nor open
             if (hasContinuation) {
-                regionName.clear();
-                expandString(regionName, lineLength, continuationLine);
+                label.clear();
+                fillString(label, lineLength ? lineLength : 5, continuationLine);
                 for (const auto &region : m_regions) {
                     if (region.state == Region::State::Continuation && region.bindIndex == -1) {
-                        const auto &style = *m_regionStyles[region.depth % m_regionStyles.size()];
-                        out << style << nameStyle << regionName << regionStyle << "\x1b[K\n";
+                        const auto &style = m_regionStyles[region.depth % m_regionStyles.size()];
+                        out << style << nameStyle << label << regionStyle << "\x1b[K\n";
                     }
                 }
             }
 
+            // display graph
             if (!m_regionGraph.empty()) {
                 auto first = m_regionGraph.rbegin();
                 auto last = m_regionGraph.rend();
                 --last;
                 for (; first != last; ++first) {
-                    out << first->s2 << "\x1b[K\n" << first->s1 << "\x1b[K\n";
+                    out << first->labelLine << "\x1b[K\n" << first->graphLine << "\x1b[K\n";
                 }
-                out << first->s2 << "\x1b[K\n" << first->s1 << "\x1b[K\x1b[0m\n";
+                out << first->labelLine << "\x1b[K\n" << first->graphLine << "\x1b[K\x1b[0m\n";
             }
 
+            // keep regions that are not closed
             m_regions.erase(std::remove_if(m_regions.begin(), m_regions.end(), [](Region const& region){
                 return region.bindIndex != -1 || region.state == Region::State::Close;
             }), m_regions.end());
+            // all remaining regions become Continuation
             for (auto& region : m_regions) {
                 region.offset = 0;
                 region.state = Region::State::Continuation;
@@ -1049,8 +1078,8 @@ namespace
             State state;
         };
 
-        bool m_enableFormatNameTrace;
-        bool m_enableRegionTrace;
+        bool m_hasFormatTrace;
+        bool m_hasRegionTrace;
 
         std::vector<HighlightFragment> m_highlightedFragments;
         std::vector<GraphLine> m_formatGraph;
@@ -1060,7 +1089,7 @@ namespace
         int m_regionDepth = 0;
         std::vector<Region> m_regions;
         std::vector<GraphLine> m_regionGraph;
-        std::vector<const QString*> m_regionStyles;
+        std::vector<QStringView> m_regionStyles;
     };
 } // anonymous namespace
 
@@ -1079,9 +1108,7 @@ AnsiHighlighter::AnsiHighlighter()
 {
 }
 
-AnsiHighlighter::~AnsiHighlighter()
-{
-}
+AnsiHighlighter::~AnsiHighlighter() = default;
 
 void AnsiHighlighter::setOutputFile(const QString &fileName)
 {
@@ -1104,7 +1131,7 @@ void AnsiHighlighter::setOutputFile(FILE *fileHandle)
     d->out.setCodec("UTF-8");
 }
 
-void AnsiHighlighter::highlightFile(const QString &fileName, AnsiFormat format, bool useEditorBackground, DebugOptions debugOptions)
+void AnsiHighlighter::highlightFile(const QString &fileName, AnsiFormat format, bool useEditorBackground, TraceOptions traceOptions)
 {
     QFileInfo fi(fileName);
     QFile f(fileName);
@@ -1113,10 +1140,10 @@ void AnsiHighlighter::highlightFile(const QString &fileName, AnsiFormat format, 
         return;
     }
 
-    highlightData(&f, format, useEditorBackground, debugOptions);
+    highlightData(&f, format, useEditorBackground, traceOptions);
 }
 
-void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useEditorBackground, DebugOptions debugOptions)
+void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useEditorBackground, TraceOptions traceOptions)
 {
     if (!d->out.device()) {
         qCWarning(Log) << "No output stream defined!";
@@ -1157,9 +1184,9 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
                 d->ansiStyles.resize(std::max(std::size_t(id*2), std::size_t(32)));
             }
 
-            AnsiBuffer buf;
+            AnsiBuffer buffer;
 
-            buf.append(QLatin1String("\x1b["));
+            buffer.append(QLatin1String("\x1b["));
 
             const bool hasFg = format.hasTextColor(theme);
             const bool hasBg = format.hasBackgroundColor(theme);
@@ -1169,35 +1196,36 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
             const bool hasStrikeThrough = format.isStrikeThrough(theme);
 
             if (hasFg)
-                buf.appendForeground(format.textColor(theme).rgb(), is256Colors);
+                buffer.appendForeground(format.textColor(theme).rgb(), is256Colors);
             else
-                buf.append(foregroundDefaultColor);
-            if (hasBg) buf.appendBackground(format.backgroundColor(theme).rgb(), is256Colors);
-            if (hasBold) buf.append(QLatin1String("1;"));
-            if (hasItalic) buf.append(QLatin1String("3;"));
-            if (hasUnderline) buf.append(QLatin1String("4;"));
-            if (hasStrikeThrough) buf.append(QLatin1String("9;"));
+                buffer.append(foregroundDefaultColor);
+            if (hasBg) buffer.appendBackground(format.backgroundColor(theme).rgb(), is256Colors);
+            if (hasBold) buffer.append(QLatin1String("1;"));
+            if (hasItalic) buffer.append(QLatin1String("3;"));
+            if (hasUnderline) buffer.append(QLatin1String("4;"));
+            if (hasStrikeThrough) buffer.append(QLatin1String("9;"));
 
-            if (buf.latin1().size() > 2) {
-                buf.setFinalStyle();
-                d->ansiStyles[id].first = buf.latin1();
+            // if there is ANSI style
+            if (buffer.latin1().size() > 2) {
+                buffer.setFinalStyle();
+                d->ansiStyles[id].first = buffer.latin1();
 
                 if (useEditorBackground) {
-                    buf.clear();
+                    buffer.clear();
                     const bool hasEffect = hasBold || hasItalic || hasUnderline || hasStrikeThrough;
                     if (hasBg) {
-                        buf.append(hasEffect ? QLatin1String("\x1b[0;") : QLatin1String("\x1b["));
-                        buf.append(backgroundDefaultColor);
-                        buf.setFinalStyle();
-                        d->ansiStyles[id].second = buf.latin1();
+                        buffer.append(hasEffect ? QLatin1String("\x1b[0;") : QLatin1String("\x1b["));
+                        buffer.append(backgroundDefaultColor);
+                        buffer.setFinalStyle();
+                        d->ansiStyles[id].second = buffer.latin1();
                     } else if (hasEffect) {
-                        buf.append(QLatin1String("\x1b["));
-                        if (hasBold) buf.append(QLatin1String("21;"));
-                        if (hasItalic) buf.append(QLatin1String("23;"));
-                        if (hasUnderline) buf.append(QLatin1String("24;"));
-                        if (hasStrikeThrough) buf.append(QLatin1String("29;"));
-                        buf.setFinalStyle();
-                        d->ansiStyles[id].second = buf.latin1();
+                        buffer.append(QLatin1String("\x1b["));
+                        if (hasBold) buffer.append(QLatin1String("21;"));
+                        if (hasItalic) buffer.append(QLatin1String("23;"));
+                        if (hasUnderline) buffer.append(QLatin1String("24;"));
+                        if (hasStrikeThrough) buffer.append(QLatin1String("29;"));
+                        buffer.setFinalStyle();
+                        d->ansiStyles[id].second = buffer.latin1();
                     }
                 } else {
                     d->ansiStyles[id].second = QStringLiteral("\x1b[0m");
@@ -1215,7 +1243,7 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
     QTextStream in(dev);
     in.setCodec("UTF-8");
 
-    if (!debugOptions) {
+    if (!traceOptions) {
         State state;
         while (!in.atEnd()) {
             d->currentLine = in.readLine();
@@ -1233,7 +1261,7 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
         buffer.setFinalStyle();
         DebugSyntaxHighlighter debugHighlighter;
         debugHighlighter.setDefinition(definition);
-        debugHighlighter.highlightData(in, d->out, buffer.latin1(), backgroundDefaultColor, d->ansiStyles, debugOptions);
+        debugHighlighter.highlightData(in, d->out, buffer.latin1(), backgroundDefaultColor, d->ansiStyles, traceOptions);
     }
 
     if (useEditorBackground) {

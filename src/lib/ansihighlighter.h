@@ -29,20 +29,20 @@ public:
         XTerm256Color,
     };
 
-    enum class DebugOption
+    enum class TraceOption
     {
         NoOptions,
-        FormatName    = 1 << 0,
-        RegionName    = 1 << 1,
-        ContextName   = 1 << 2,
+        Format  = 1 << 0,
+        Region  = 1 << 1,
+        Context = 1 << 2,
     };
-    Q_DECLARE_FLAGS(DebugOptions, DebugOption)
+    Q_DECLARE_FLAGS(TraceOptions, TraceOption)
 
     AnsiHighlighter();
     ~AnsiHighlighter() override;
 
-    void highlightFile(const QString &fileName, AnsiFormat format = AnsiFormat::TrueColor, bool useEditorBackground = true, DebugOptions debugOptions = DebugOptions());
-    void highlightData(QIODevice *device, AnsiFormat format = AnsiFormat::TrueColor, bool useEditorBackground = true, DebugOptions debugOptions = DebugOptions());
+    void highlightFile(const QString &fileName, AnsiFormat format = AnsiFormat::TrueColor, bool useEditorBackground = true, TraceOptions traceOptions = TraceOptions());
+    void highlightData(QIODevice *device, AnsiFormat format = AnsiFormat::TrueColor, bool useEditorBackground = true, TraceOptions traceOptions = TraceOptions());
 
     void setOutputFile(const QString &fileName);
     void setOutputFile(FILE *fileHandle);
@@ -55,6 +55,6 @@ private:
 };
 }
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(KSyntaxHighlighting::AnsiHighlighter::DebugOptions)
+Q_DECLARE_OPERATORS_FOR_FLAGS(KSyntaxHighlighting::AnsiHighlighter::TraceOptions)
 
 #endif // KSYNTAXHIGHLIGHTING_ANSIHIGHLIGHTER_H

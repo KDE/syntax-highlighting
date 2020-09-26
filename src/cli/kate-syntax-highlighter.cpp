@@ -83,8 +83,8 @@ int main(int argc, char **argv)
                                           QStringLiteral("html"));
     parser.addOption(outputFormatOption);
 
-    QCommandLineOption traceOption(QStringList() << QStringLiteral("format-trace"),
-                                   app.translate("SyntaxHighlightingCLI", "Add information to debug a syntax file with --output-format=ansi or ansi256Colors. Possible values are format, region, context and lineseparator."),
+    QCommandLineOption traceOption(QStringList() << QStringLiteral("syntax-trace"),
+                                   app.translate("SyntaxHighlightingCLI", "Add information to debug a syntax file. Only works with --output-format=ansi or ansi256Colors. Possible values are format, region and context."),
                                    app.translate("SyntaxHighlightingCLI", "type"));
     parser.addOption(traceOption);
 

@@ -533,14 +533,14 @@ namespace
     {
         void append(char c)
         {
-            assert(remaining() >= 1);
+            Q_ASSERT(remaining() >= 1);
             m_data[m_size] = c;
             ++m_size;
         }
 
         void append(QLatin1String str)
         {
-            assert(remaining() >= str.size());
+            Q_ASSERT(remaining() >= str.size());
             memcpy(m_data + m_size, str.data(), str.size());
             m_size += str.size();
         }
@@ -560,7 +560,7 @@ namespace
         void append(QRgb rgb, bool is256Colors)
         {
             auto appendUInt8 = [&](int x){
-                assert(x <= 255 && x >= 0);
+                Q_ASSERT(x <= 255 && x >= 0);
                 if (x > 99) {
                     if (x >= 200) {
                         append('2');
@@ -624,7 +624,7 @@ namespace
         // Replace last character with 'm'. Last character must be ';'
         void setFinalStyle()
         {
-            assert(m_data[m_size-1] == ';');
+            Q_ASSERT(m_data[m_size-1] == ';');
             m_data[m_size-1] = 'm';
         }
 
@@ -642,12 +642,10 @@ namespace
         char m_data[128];
         int m_size = 0;
 
-#ifndef NDEBUG
         int remaining() const noexcept
         {
             return 128 - m_size;
         }
-#endif
     };
 
     void fillString(QString &s, int n, const QString &fill)
@@ -671,7 +669,7 @@ namespace
         template<class String>
         void pushLabel(int offset, String const& s, int charCounter)
         {
-            assert(offset >= len2);
+            Q_ASSERT(offset >= labelLineLength);
             const int n = offset - labelLineLength;
             labelLineLength += charCounter + n;
             fillLine(labelLine, n);
@@ -682,7 +680,7 @@ namespace
         template<class String>
         void pushGraph(int offset, String const& s, int charCounter)
         {
-            assert(offset >= len1);
+            Q_ASSERT(offset >= graphLineLength);
             const int n = offset - graphLineLength;
             graphLineLength += charCounter + n;
             fillLine(graphLine, n);
@@ -699,7 +697,7 @@ namespace
     private:
         static void fillLine(QString& s, int n)
         {
-            assert(n >= 0);
+            Q_ASSERT(n >= 0);
             fillString(s, n, QStringLiteral(
                 "                              "
                 "                              "

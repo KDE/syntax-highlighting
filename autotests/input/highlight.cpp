@@ -549,3 +549,10 @@ int y; // variable shall not be grey
 #elif defined (B)
 int z; // variable shall not be grey
 #endif
+
+/*!
+ * formula @f$a+b@f$ inside a block comment
+ */
+
+//! formula @f$a+b@f$ inside a inline comment
+// formula @f$a+b@f$ inside a normal comment

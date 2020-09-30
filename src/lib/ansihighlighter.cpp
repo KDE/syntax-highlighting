@@ -17,8 +17,8 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QTextStream>
-#include <QVarLengthArray>
 #include <QColor>
+#include <QMap>
 
 #include <vector>
 #include <cmath>
@@ -531,6 +531,8 @@ namespace
 
     struct AnsiBuffer
     {
+        using ColorCache = QMap<QRgb, int>;
+
         void append(char c)
         {
             Q_ASSERT(remaining() >= 1);
@@ -545,19 +547,19 @@ namespace
             m_size += str.size();
         }
 
-        void appendForeground(QRgb rgb, bool is256Colors)
+        void appendForeground(QRgb rgb, bool is256Colors, ColorCache& colorCache)
         {
             append(QLatin1String("38;"));
-            append(rgb, is256Colors);
+            append(rgb, is256Colors, colorCache);
         }
 
-        void appendBackground(QRgb rgb, bool is256Colors)
+        void appendBackground(QRgb rgb, bool is256Colors, ColorCache& colorCache)
         {
             append(QLatin1String("48;"));
-            append(rgb, is256Colors);
+            append(rgb, is256Colors, colorCache);
         }
 
-        void append(QRgb rgb, bool is256Colors)
+        void append(QRgb rgb, bool is256Colors, ColorCache& colorCache)
         {
             auto appendUInt8 = [&](int x){
                 Q_ASSERT(x <= 255 && x >= 0);
@@ -595,20 +597,28 @@ namespace
             if (is256Colors) {
                 double dist = 1e24;
                 int idx = 0;
-                const auto lab = rgbToLab(rgb);
-                // find the nearest xterm color
-                for (CieLab const& xtermLab : xterm240Labs) {
-                    auto dist2 = calculate_CIEDE2000(lab, xtermLab);
-                    if (dist2 < dist) {
-                        dist = dist2;
-                        idx = &xtermLab - xterm240Labs;
+                auto it = colorCache.find(rgb);
+                if (it == colorCache.end()) {
+                    const auto lab = rgbToLab(rgb);
+                    // find the nearest xterm color
+                    for (CieLab const& xtermLab : xterm240Labs) {
+                        auto dist2 = calculate_CIEDE2000(lab, xtermLab);
+                        if (dist2 < dist) {
+                            dist = dist2;
+                            idx = &xtermLab - xterm240Labs;
+                        }
                     }
+                    // add 16 to convert 240 colors mode to 256 colors mode
+                    idx += 16;
+                    colorCache.insert(rgb, idx);
+                }
+                else {
+                    idx = it.value();
                 }
 
                 append('5');
                 append(';');
-                // add 16 to convert 240 colors mode to 256 colors mode
-                appendUInt8(idx + 16);
+                appendUInt8(idx);
             } else {
                 append('2');
                 append(';');
@@ -1155,6 +1165,8 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
     auto definitions = definition.includedDefinitions();
     definitions.append(definition);
 
+    AnsiBuffer::ColorCache colorCache;
+
     AnsiBuffer foregroundColorBuffer;
     AnsiBuffer backgroundColorBuffer;
     QLatin1String foregroundDefaultColor;
@@ -1165,9 +1177,9 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
     if (useEditorBackground) {
         const QRgb foregroundColor = theme.textColor(Theme::Normal);
         const QRgb backgroundColor = theme.editorColor(Theme::BackgroundColor);
-        foregroundColorBuffer.appendForeground(foregroundColor, is256Colors);
+        foregroundColorBuffer.appendForeground(foregroundColor, is256Colors, colorCache);
         backgroundColorBuffer.append(QLatin1String("\x1b["));
-        backgroundColorBuffer.appendBackground(backgroundColor, is256Colors);
+        backgroundColorBuffer.appendBackground(backgroundColor, is256Colors, colorCache);
         foregroundDefaultColor = foregroundColorBuffer.latin1();
         backgroundDefaultColor = backgroundColorBuffer.latin1().mid(2);
     }
@@ -1194,10 +1206,10 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
             const bool hasStrikeThrough = format.isStrikeThrough(theme);
 
             if (hasFg)
-                buffer.appendForeground(format.textColor(theme).rgb(), is256Colors);
+                buffer.appendForeground(format.textColor(theme).rgb(), is256Colors, colorCache);
             else
                 buffer.append(foregroundDefaultColor);
-            if (hasBg) buffer.appendBackground(format.backgroundColor(theme).rgb(), is256Colors);
+            if (hasBg) buffer.appendBackground(format.backgroundColor(theme).rgb(), is256Colors, colorCache);
             if (hasBold) buffer.append(QLatin1String("1;"));
             if (hasItalic) buffer.append(QLatin1String("3;"));
             if (hasUnderline) buffer.append(QLatin1String("4;"));
@@ -1255,7 +1267,7 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
     } else {
         AnsiBuffer buffer;
         buffer.append(QLatin1String("\x1b[0;"));
-        buffer.appendBackground(theme.editorColor(useEditorBackground ? Theme::TemplateBackground : Theme::BackgroundColor), is256Colors);
+        buffer.appendBackground(theme.editorColor(useEditorBackground ? Theme::TemplateBackground : Theme::BackgroundColor), is256Colors, colorCache);
         buffer.setFinalStyle();
         DebugSyntaxHighlighter debugHighlighter;
         debugHighlighter.setDefinition(definition);

@@ -9,16 +9,24 @@
 ]>
 
 <!--
-  This file is part of the KDE's KSyntaxHighlighting framework.
+  SubRip Text (.SRT) Subtitles Syntax Highlighting Definition
+  ===========================================================================
 
-  SubRip Text (.SRT) Subtitles Syntax highlighting Definition.
+   This file is part of the KDE's KSyntaxHighlighting framework.
+
+   SPDX-FileCopyrightText: 2019-2020 Nibaldo González S. <nibgonz@gmail.com>
+
+   SPDX-License-Identifier: MIT
+
+  ===========================================================================
+
   Mor information: http://ale5000.altervista.org/subtitles.htm
 
-  Last update: September 24, 2019 (v1)
+  Last update: September 30, 2020 (v2)
 -->
 
 <language name="SubRip Subtitles"
-          version="1"
+          version="2"
           kateversion="5.53"
           section="Other"
           extensions="*.srt"
@@ -33,25 +41,23 @@
 
 		<context name="Normal" attribute="Normal Text" lineEndContext="#stay">
 			<RegExpr context="FindTime" attribute="Sequence Number" String="\d+(?=\s*$)" firstNonSpace="true" />
-			<RegExpr context="TimeStart" String="&time;\s+\-\-&gt;\s+&time;&coordinates;" firstNonSpace="true" lookAhead="true" />
-			<Int context="FindError" attribute="Normal Text" firstNonSpace="true" />
+			<RegExpr context="Time" String="(&time;\s+)(\-\-&gt;)(\s+&time;)(&coordinates;)" firstNonSpace="true" lookAhead="true" />
+			<Int context="TimeError" attribute="Error" firstNonSpace="true" />
 		</context>
-
 		<context name="FindTime" attribute="Normal Text" lineEndContext="#stay" lineEmptyContext="#pop">
-			<RegExpr context="#pop!TimeStart" String="&time;\s+\-\-&gt;\s+&time;&coordinates;" firstNonSpace="true" lookAhead="true" />
-			<Int context="#pop!FindError" attribute="Normal Text" firstNonSpace="true" />
+			<RegExpr context="#pop!Time" String="(&time;\s+)(\-\-&gt;)(\s+&time;)(&coordinates;)" firstNonSpace="true" lookAhead="true" />
+			<Int context="#pop!TimeError" attribute="Error" firstNonSpace="true" />
 		</context>
-		<context name="TimeStart" attribute="Appearance Time" lineEndContext="#pop">
-			<StringDetect context="#pop!TimeEnd" attribute="Time Arrow" String="--&gt;" />
-		</context>
-		<context name="TimeEnd" attribute="Disappearance Time" lineEndContext="#pop!SubtitleContent">
-			<RegExpr context="#pop!SubtitleContent" attribute="Coordinates" String="&coordinates;" />
+		<context name="Time" attribute="Normal Text" lineEndContext="#pop!SubtitleContent">
+			<StringDetect context="#stay" attribute="Appearance Time" String="%1" dynamic="true" />
+			<StringDetect context="#stay" attribute="Time Arrow" String="%2" dynamic="true" />
+			<StringDetect context="#stay" attribute="Disappearance Time" String="%3" dynamic="true" />
+			<StringDetect context="#pop!SubtitleContent" attribute="Coordinates" String="%4" dynamic="true" />
 		</context>
 
-		<context name="FindError" attribute="Normal Text" lineEndContext="Error" />
-		<context name="Error" attribute="Normal Text" lineEndContext="#stay" lineEmptyContext="#pop#pop">
-			<RegExpr context="#stay" attribute="Error" String="\S" />
-		</context>
+		<!-- Mark all subtitle text as error -->
+		<context name="TimeError" attribute="Error" lineEndContext="Error" lineEmptyContext="#pop" />
+		<context name="Error" attribute="Error (Subtitle)" lineEndContext="#stay" lineEmptyContext="#pop#pop" />
 
 		<context name="SubtitleContent" attribute="Subtitle" lineEndContext="#stay" lineEmptyContext="#pop">
 			<StringDetect context="BoldThan" attribute="Format Tag: Bold" String="&lt;b&gt;" />
@@ -232,35 +238,36 @@
 	</contexts>
 
 	<itemDatas>
-		<itemData name="Normal Text" defStyleNum="dsNormal" spellChecking="false" />
+		<itemData name="Normal Text"        defStyleNum="dsNormal" spellChecking="false" />
 
-		<itemData name="Sequence Number"    defStyleNum="dsOthers" bold="true" spellChecking="false" />
-		<itemData name="Appearance Time"    defStyleNum="dsComment" italic="false" spellChecking="false" />
-		<itemData name="Disappearance Time" defStyleNum="dsComment" italic="false" spellChecking="false" />
-		<itemData name="Time Arrow"         defStyleNum="dsComment" bold="true" italic="false" spellChecking="false" />
-		<itemData name="Coordinates"        defStyleNum="dsAnnotation" italic="false" spellChecking="false" />
+		<itemData name="Sequence Number"    defStyleNum="dsOthers"     bold="1" spellChecking="false" />
+		<itemData name="Appearance Time"    defStyleNum="dsComment"    bold="0" italic="0" spellChecking="false" />
+		<itemData name="Disappearance Time" defStyleNum="dsComment"    bold="0" italic="0" spellChecking="false" />
+		<itemData name="Time Arrow"         defStyleNum="dsComment"    bold="1" italic="0" spellChecking="false" />
+		<itemData name="Coordinates"        defStyleNum="dsAnnotation" bold="0" italic="0" underline="0" spellChecking="false" />
 		<itemData name="Subtitle"           defStyleNum="dsNormal" />
 
-		<itemData name="Tag"                defStyleNum="dsVariable" spellChecking="false" />
-		<itemData name="Line Alignment Tag" defStyleNum="dsVariable" bold="true" spellChecking="false" />
-		<itemData name="Format Tag"         defStyleNum="dsVariable" spellChecking="false" />
-		<itemData name="Format Tag: Bold"   defStyleNum="dsVariable" bold="true" spellChecking="false" />
-		<itemData name="Format Tag: Italic" defStyleNum="dsVariable" italic="true" spellChecking="false" />
-		<itemData name="Format Tag: Underline" defStyleNum="dsVariable" underline="true" spellChecking="false" />
-		<itemData name="Format Tag: Strikethrough" defStyleNum="dsVariable" strikeOut="true" spellChecking="false" />
-		<itemData name="Format Tag: Bold-Italic" defStyleNum="dsVariable" bold="true" italic="true" spellChecking="false" />
-		<itemData name="Format Tag: Bold-Underline" defStyleNum="dsVariable" bold="true" underline="true" spellChecking="false" />
-		<itemData name="Format Tag: Italic-Underline" defStyleNum="dsVariable" italic="true" underline="true" spellChecking="false" />
-		<itemData name="Bold"               defStyleNum="dsNormal" bold="true" />
-		<itemData name="Italic"             defStyleNum="dsNormal" italic="true" />
-		<itemData name="Underline"          defStyleNum="dsNormal" underline="true" />
-		<itemData name="Strikethrough"      defStyleNum="dsNormal" strikeOut="true" />
-		<itemData name="Bold-Italic"        defStyleNum="dsNormal" bold="true" italic="true" />
-		<itemData name="Bold-Underline"     defStyleNum="dsNormal" bold="true" underline="true" />
-		<itemData name="Italic-Underline"   defStyleNum="dsNormal" italic="true" underline="true" />
+		<itemData name="Tag"                          defStyleNum="dsVariable" bold="0" italic="0" underline="0" spellChecking="false" />
+		<itemData name="Line Alignment Tag"           defStyleNum="dsVariable" bold="1" italic="0" underline="0" spellChecking="false" />
+		<itemData name="Format Tag"                   defStyleNum="dsVariable" bold="0" italic="0" underline="0" strikeOut="0" spellChecking="false" />
+		<itemData name="Format Tag: Bold"             defStyleNum="dsVariable" bold="1" italic="0" underline="0" strikeOut="0" spellChecking="false" />
+		<itemData name="Format Tag: Italic"           defStyleNum="dsVariable" bold="0" italic="1" underline="0" strikeOut="0" spellChecking="false" />
+		<itemData name="Format Tag: Underline"        defStyleNum="dsVariable" bold="0" italic="0" underline="1" strikeOut="0" spellChecking="false" />
+		<itemData name="Format Tag: Strikethrough"    defStyleNum="dsVariable" bold="0" italic="0" underline="0" strikeOut="1" spellChecking="false" />
+		<itemData name="Format Tag: Bold-Italic"      defStyleNum="dsVariable" bold="1" italic="1" underline="0" strikeOut="0" spellChecking="false" />
+		<itemData name="Format Tag: Bold-Underline"   defStyleNum="dsVariable" bold="1" italic="0" underline="1" strikeOut="0" spellChecking="false" />
+		<itemData name="Format Tag: Italic-Underline" defStyleNum="dsVariable" bold="0" italic="1" underline="1" strikeOut="0" spellChecking="false" />
+		<itemData name="Bold"               defStyleNum="dsNormal" bold="1" />
+		<itemData name="Italic"             defStyleNum="dsNormal" italic="1" />
+		<itemData name="Underline"          defStyleNum="dsNormal" underline="1" />
+		<itemData name="Strikethrough"      defStyleNum="dsNormal" strikeOut="1" />
+		<itemData name="Bold-Italic"        defStyleNum="dsNormal" bold="1" italic="1" />
+		<itemData name="Bold-Underline"     defStyleNum="dsNormal" bold="1" underline="1" />
+		<itemData name="Italic-Underline"   defStyleNum="dsNormal" italic="1" underline="1" />
 
 		<itemData name="Escape"             defStyleNum="dsSpecialChar" spellChecking="false" />
 		<itemData name="Error"              defStyleNum="dsError" />
+		<itemData name="Error (Subtitle)"   defStyleNum="dsError" bold="0" italic="0" underline="0" />
 	</itemDatas>
 
 </highlighting>

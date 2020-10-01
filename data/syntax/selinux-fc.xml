@@ -10,28 +10,16 @@
 ]>
 
 <!--
-  SELinux File Contexts Syntax Highlighting Definition for Kate
-  ==========================================================================================
+   SELinux File Contexts Syntax Highlighting Definition
+  ===========================================================================
+
    This file is part of the KDE's KSyntaxHighlighting framework.
 
-   Copyright (c) 2018-2019 Nibaldo González S. (nibgonz@gmail.com)
+   SPDX-FileCopyrightText: 2018-2020 Nibaldo González S. <nibgonz@gmail.com>
 
-   Permission is hereby granted, free of charge, to any person obtaining a copy of this
-   software and associated documentation files (the "Software"), to deal in the Software
-   without restriction, including without limitation the rights to use, copy, modify, merge,
-   publish, distribute, sublicense, and/or sell copies of the Software, and to permit
-   persons to whom the Software is furnished to do so, subject to the following conditions:
+   SPDX-License-Identifier: MIT
 
-   The above copyright notice and this permission notice shall be included
-   in all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-   INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-   PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-   COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
-   AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-  ==========================================================================================
+  ===========================================================================
 
   SELinux policy files with definitions of file contexts:
     - Labeling Policy Files: *.fc
@@ -42,6 +30,7 @@
     - Policy Build Files: initial_sid_contexts, genfs_contexts, fs_use
 
   Change log:
+   * Version 7 [30-Sep-2020]: Use include-keywods and other minor changes.
    * Version 5 [03-Oct-2019]: Replace unnecessary WordDetect rules.
    * Version 4 [02-Apr-2019]: Remove one indentation.
    * Version 3 [09-Sep-2018]:
@@ -54,8 +43,8 @@
 -->
 
 <language name="SELinux File Contexts"
-          version="6"
-          kateversion="5.0"
+          version="7"
+          kateversion="5.53"
           section="Other"
           extensions="*.fc;file_contexts;file_contexts_*;file_contexts.local;file_contexts.homedirs;file_contexts.template;homedir_template;property_contexts;service_contexts;hwservice_contexts;initial_sid_contexts;genfs_contexts;fs_use"
           priority="3"
@@ -64,6 +53,13 @@
           license="MIT">
 
 <highlighting>
+
+	<list name="statements_fc">
+		<include>statements_fc##SELinux Policy</include>
+	</list>
+	<list name="refpolicy_keywords">
+		<include>refpolicy_keywords##SELinux Policy</include>
+	</list>
 
 	<contexts>
 
@@ -90,7 +86,7 @@
 
 			<!-- Functions -->
 			<DetectChar context="_parentheses_content" attribute="Normal Text" char="(" beginRegion="ParenthesesBlock"/>
-			<IncludeRules context="_refpolicy_keywords_fc##SELinux Policy"/>
+			<keyword context="#stay" attribute="Refpolicy Keywords" String="refpolicy_keywords"/>
 			<IncludeRules context="_m4_builtin_keywords##SELinux Policy"/>
 			<RegExpr context="#stay" attribute="Function" String="\b[a-zA-Z][\w\-]*(?=\()"/>
 
@@ -111,7 +107,7 @@
 			<AnyChar context="#stay" attribute="Symbol" String=",;~[]"/>
 
 			<!-- Highlight only the statements that contain definition of file contexts -->
-			<IncludeRules context="_statements_file_contexts##SELinux Policy"/>
+			<keyword context="#stay" attribute="Statements" String="statements_fc"/>
 			<RegExpr context="#stay" String="[a-zA-Z](?:\.?[\w\-]+)*"/>
 			<HlCHex context="#pop" attribute="Number"/>
 			<Int context="#pop" attribute="Number"/>
@@ -276,15 +272,17 @@
 		<itemData name="Variable"    defStyleNum="dsVariable" spellChecking="false"/>
 		<itemData name="File Type"   defStyleNum="dsKeyword"  spellChecking="false"/>
 
-		<itemData name="User"             defStyleNum="dsPreprocessor"   spellChecking="false"/>
-		<itemData name="Role"             defStyleNum="dsInformation"    spellChecking="false"/>
-		<itemData name="Type Enforcement" defStyleNum="dsAttribute"      spellChecking="false"/>
-		<itemData name="MLS/MCS Level"    defStyleNum="dsVerbatimString" spellChecking="false"/>
+		<itemData name="User"             defStyleNum="dsPreprocessor"   bold="0" italic="0" underline="0" spellChecking="false"/>
+		<itemData name="Role"             defStyleNum="dsInformation"    bold="0" italic="0" underline="0" spellChecking="false"/>
+		<itemData name="Type Enforcement" defStyleNum="dsAttribute"      bold="0" italic="0" underline="0" spellChecking="false"/>
+		<itemData name="MLS/MCS Level"    defStyleNum="dsVerbatimString" bold="0" italic="0" underline="0" spellChecking="false"/>
 
 		<itemData name="Other Keywords"   defStyleNum="dsNormal"   italic="1" spellChecking="false"/>
+		<itemData name="Statements"       defStyleNum="dsKeyword"  spellChecking="false"/>
+		<itemData name="Refpolicy Keywords" defStyleNum="dsNormal" bold="1" spellChecking="false"/>
 		<itemData name="Function"         defStyleNum="dsNormal"   bold="1" spellChecking="false"/>
 		<itemData name="Symbol"           defStyleNum="dsOperator" spellChecking="false"/>
-		<itemData name="Number"           defStyleNum="dsComment"  italic="0" underline="0" spellChecking="false"/>
+		<itemData name="Number"           defStyleNum="dsComment"  bold="0" italic="0" underline="0" spellChecking="false"/>
 		<itemData name="Text Quoted Open" defStyleNum="dsString"   underline="1" spellChecking="false"/>
 	</itemDatas>
 

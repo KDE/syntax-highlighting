@@ -10,37 +10,26 @@
 ]>
 
 <!--
-  SELinux CIL (Common Interface Language) Policy Syntax Highlighting Definition for Kate
-  ==========================================================================================
+   SELinux CIL (Common Interface Language) Policy Syntax Highlighting Definition
+  ===============================================================================
+
    This file is part of the KDE's KSyntaxHighlighting framework.
 
-   Copyright (c) 2018-2020 Nibaldo González S. (nibgonz@gmail.com)
+   SPDX-FileCopyrightText: 2018-2020 Nibaldo González S. <nibgonz@gmail.com>
 
-   Permission is hereby granted, free of charge, to any person obtaining a copy of this
-   software and associated documentation files (the "Software"), to deal in the Software
-   without restriction, including without limitation the rights to use, copy, modify, merge,
-   publish, distribute, sublicense, and/or sell copies of the Software, and to permit
-   persons to whom the Software is furnished to do so, subject to the following conditions:
+   SPDX-License-Identifier: MIT
 
-   The above copyright notice and this permission notice shall be included
-   in all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-   INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-   PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-   COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
-   AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-  ==========================================================================================
+  ===============================================================================
 
   Based on the Scheme syntax highlighting file (scheme.xml),
-  created by Dominik Haumann (dhaumann@kde.org) & licensed under MIT.
+  created by Dominik Haumann (dhaumann@kde.org).
 
   Last update: secilc 3.0
   More details about CIL:
     https://github.com/SELinuxProject/selinux/tree/master/secilc/docs
 
   Change log:
+   * Version 7 [30-Sep-2020]: Use include-keywods and other minor changes.
    * Version 6 [25-Aug-2020]: Update colors in brackets.
    * Version 5 [10-Dec-2019]: Add "glblub" keyword (defaultrange).
    * Version 4 [03-Oct-2019]: Replace unnecessary WordDetect rules.
@@ -56,8 +45,8 @@
 -->
 
 <language name="SELinux CIL Policy"
-          version="6"
-          kateversion="5.0"
+          version="7"
+          kateversion="5.53"
           section="Sources"
           extensions="*.cil"
           priority="9"
@@ -317,6 +306,12 @@
 		<item>h1</item>
 		<item>h2</item>
 	</list>
+	<list name="policy_capabilities">
+		<include>policy_capabilities##SELinux Policy</include>
+	</list>
+	<list name="filesystem">
+		<include>filesystem##SELinux Policy</include>
+	</list>
 
 	<contexts>
 
@@ -410,7 +405,7 @@
 		</context>
 		<context name="_policycap_statement" attribute="Normal Text" lineEndContext="#stay">
 			<IncludeRules context="_default_end"/>
-			<IncludeRules context="_policy_capabilities##SELinux Policy"/>
+			<keyword context="#stay" attribute="Policy Capability" String="policy_capabilities"/>
 			<IncludeRules context="_common"/>
 			<IncludeRules context="_identifiers"/>
 		</context>
@@ -466,7 +461,7 @@
 			<StringDetect context="#stay" attribute="Other Keywords" String="&lt;src_cil&gt;"/>
 			<StringDetect context="#stay" attribute="Other Keywords" String="&lt;src_hll&gt;"/>
 			<keyword context="#stay" attribute="Other Keywords" String="other_keywords"/>
-			<IncludeRules context="_filesystem##SELinux Policy"/>
+			<keyword context="#stay" attribute="Filesystem" String="filesystem"/>
 
 			<IncludeRules context="_identifiers"/>
 		</context>
@@ -642,18 +637,20 @@
 		<itemData name="Text Quoted" defStyleNum="dsString" spellChecking="false"/>
 		<itemData name="Path"        defStyleNum="dsNormal" spellChecking="false"/>
 
-		<itemData name="Statements"                defStyleNum="dsKeyword"      bold="1" spellChecking="false"/>
-		<itemData name="Type Statements"           defStyleNum="dsFunction"     bold="1" spellChecking="false"/>
-		<itemData name="Policy Config. Statements" defStyleNum="dsPreprocessor" bold="1" spellChecking="false"/>
-		<itemData name="Access Keys"               defStyleNum="dsWarning"      bold="1" spellChecking="false"/>
-		<itemData name="Expression Keys"           defStyleNum="dsVariable"     bold="1" spellChecking="false"/>
-		<itemData name="Type Name Statements"      defStyleNum="dsDataType"     bold="1" spellChecking="false"/>
+		<itemData name="Statements"                defStyleNum="dsKeyword"      bold="1" italic="0" underline="0" spellChecking="false"/>
+		<itemData name="Type Statements"           defStyleNum="dsFunction"     bold="1" italic="0" underline="0" spellChecking="false"/>
+		<itemData name="Policy Config. Statements" defStyleNum="dsPreprocessor" bold="1" italic="0" underline="0" spellChecking="false"/>
+		<itemData name="Access Keys"               defStyleNum="dsWarning"      bold="1" italic="0" underline="0" spellChecking="false"/>
+		<itemData name="Expression Keys"           defStyleNum="dsVariable"     bold="1" italic="0" underline="0" spellChecking="false"/>
+		<itemData name="Type Name Statements"      defStyleNum="dsDataType"     bold="1" italic="0" underline="0" spellChecking="false"/>
 		<itemData name="Booleans"                  defStyleNum="dsExtension"    bold="1" spellChecking="false"/>
 
 		<itemData name="Types"                defStyleNum="dsDataType"      bold="0" spellChecking="false"/>
 		<itemData name="Special Keys"         defStyleNum="dsOthers"        spellChecking="false"/>
-		<itemData name="File Contexts"        defStyleNum="dsSpecialString" spellChecking="false"/>
-		<itemData name="File Contexts (Type Enforcement)" defStyleNum="dsInformation" spellChecking="false"/>
+		<itemData name="File Contexts"        defStyleNum="dsSpecialString" bold="0" italic="0" underline="0" spellChecking="false"/>
+		<itemData name="File Contexts (Type Enforcement)" defStyleNum="dsInformation" bold="0" italic="0" underline="0" spellChecking="false"/>
+		<itemData name="Policy Capability"    defStyleNum="dsPreprocessor"  bold="0" italic="0" underline="0" spellChecking="false"/>
+		<itemData name="Filesystem"           defStyleNum="dsNormal"        italic="1" spellChecking="false"/>
 		<itemData name="Other Keywords"       defStyleNum="dsNormal"        italic="1" spellChecking="false"/>
 
 		<itemData name="Number"      defStyleNum="dsDecVal" spellChecking="false"/>
@@ -668,7 +665,7 @@
 		<itemData name="Brackets Level 6" defStyleNum="dsNormal" color="#a56de2" bold="1" spellChecking="false"/>
 
 		<itemData name="Special Char"                     defStyleNum="dsSpecialChar"   spellChecking="false"/>
-		<itemData name="Special Char of Brackets (Paths)" defStyleNum="dsAnnotation"    spellChecking="false"/>
+		<itemData name="Special Char of Brackets (Paths)" defStyleNum="dsAnnotation"    bold="0" italic="0" underline="0" spellChecking="false"/>
 		<itemData name="RegExp Brackets (Paths)"          defStyleNum="dsSpecialString" spellChecking="false"/>
 		<itemData name="Open RegExp Brackets (Paths)"     defStyleNum="dsSpecialString" underline="1" spellChecking="false"/>
 		<itemData name="Text Quoted Open"                 defStyleNum="dsString"        underline="1" spellChecking="false"/>

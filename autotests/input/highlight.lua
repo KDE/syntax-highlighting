@@ -181,3 +181,8 @@ b< cons >
 local a <close> --[[
 b <const>]], b <const> --[[ xyz ]] , c <close>
 b< cons >
+
+--- \code
+--! a = 3
+--! \endcode
+a = 3

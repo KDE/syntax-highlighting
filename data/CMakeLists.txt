@@ -1,9 +1,16 @@
-# generate PHP definitions
-macro(generate_php_syntax_definition targetFile srcFile)
-    execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax)
-    execute_process(COMMAND ${PERL_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/generators/generate-php.pl
+# create a directory for generated definitions
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax)
+
+macro(generate_syntax_definition generator targetFile srcFile)
+    execute_process(COMMAND ${PERL_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/generators/${generator}
         INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/syntax/${srcFile}
         OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/${targetFile})
+    set(gen_defs ${gen_defs} ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/${targetFile})
+endmacro()
+
+# generate PHP definitions
+macro(generate_php_syntax_definition targetFile srcFile)
+    generate_syntax_definition(generate-php.pl ${targetFile} ${srcFile})
 endmacro()
 
 generate_php_syntax_definition(javascript-php.xml javascript.xml)
@@ -13,17 +20,12 @@ generate_php_syntax_definition(javascript-react-php.xml javascript-react.xml)
 generate_php_syntax_definition(typescript-php.xml typescript.xml)
 generate_php_syntax_definition(mustache-php.xml mustache.xml)
 
+# generate DoxygenLua definition
+generate_syntax_definition(generate-doxygenlua.pl doxygenlua.xml doxygen.xml)
+
 # find all definitions
 file(GLOB src_defs "${CMAKE_CURRENT_SOURCE_DIR}/syntax/*.xml")
-set(defs
-    ${src_defs}
-    ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/html-php.xml
-    ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/css-php.xml
-    ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/javascript-php.xml
-    ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/javascript-react-php.xml
-    ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/typescript-php.xml
-    ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/mustache-php.xml
-)
+set(defs ${src_defs} ${gen_defs})
 
 # theme data resource
 qt5_add_resources(themes_QRC ${CMAKE_CURRENT_SOURCE_DIR}/themes/theme-data.qrc)

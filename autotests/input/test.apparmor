@@ -1,8 +1,13 @@
-# Sample AppArmor Profile.
-# License: Public Domain
+# kate: syntax AppArmor Security Profile; replace-tabs off;
 
-# NOTE: This profile is not fully functional, since
-# it is designed to test the syntax highlighting.
+#
+#   Sample AppArmor Profile.
+#   License: Public Domain
+#
+#   NOTE: This profile is not fully functional, since
+#   it is designed to test the syntax highlighting
+#   for the KDE's KSyntaxHighlighting framework.
+#
 
 include <tunables/global>
 
@@ -17,8 +22,14 @@ ${BOOL} = true
 # Alias
 alias /usr/ -> /mnt/usr/,
 
+# ABI feature
+abi <abi/3.0>,
+abi <"includes/abi/4.19">,
+abi "simple_tests/includes/abi/4.19",
+abi simple_tests/includes/abi/4.19,
+
 # Profile for /usr/bin/foo
-profile foo /usr/bin/foo flags=(attach_disconnected enforce) {
+profile foo /usr/bin/foo flags=(attach_disconnected enforce) xattrs=(myvalue=foo user.bar=* user.foo="bar" ) {
 	#include <abstractions/ubuntu-helpers>
 	#include<abstractions/wayland>
 	#include"/etc/apparmor.d/abstractions/ubuntu-konsole"
@@ -58,6 +69,7 @@ profile foo /usr/bin/foo flags=(attach_disconnected enforce) {
 	/usr/bin/khelpcenter Cx  -> sanitized_helper,
 	/usr/bin/helloworld  cxr ->
 		hello_world,
+	/bin/** px -> profile,
 
 	# Dbus rules
 	dbus (send)  #No-Comment
@@ -109,7 +121,7 @@ profile foo /usr/bin/foo flags=(attach_disconnected enforce) {
 		# Mount rules
 		mount options=(rw bind remount nodev noexec) vfstype=ecryptfs /home/*/.helloworld/ -> /home/*/helloworld/,
 		mount options in (rw, bind) / -> /run/hellowordd/*.mnt,
-		mount option=read-only fstype=btrfs /dev/sd[a-z][1-9]* -> /media/*/*,
+		mount options=read-only fstype=btrfs /dev/sd[a-z][1-9]* -> /media/*/*,
 		umount /home/*/helloworld/,
 
 		# Pivot Root rules

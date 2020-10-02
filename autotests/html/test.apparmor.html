@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-<title>usr.bin.apparmor-profile-test</title>
+<title>test.apparmor</title>
 <meta name="generator" content="KF5::SyntaxHighlighting - Definition (AppArmor Security Profile) - Theme (Breeze Light)"/>
 </head><body style="background-color:#ffffff;color:#1f1c1b"><pre>
-<span style="color:#898887;"># Sample AppArmor Profile.</span>
-<span style="color:#898887;"># License: Public Domain</span>
+<span style="color:#898887;"># </span><span style="color:#ca60ca;">kate:</span><span style="color:#898887;"> </span><span style="color:#0095ff;">syntax</span><span style="color:#bf0303;"> AppArmor Security Profile</span><span style="color:#0095ff;">;</span><span style="color:#898887;"> </span><span style="color:#0095ff;">replace-tabs</span><span style="color:#898887;"> </span><span style="color:#006e28;">off</span><span style="color:#0095ff;">;</span>
 
-<span style="color:#898887;"># </span><span style="color:#81ca2d;background-color:#f7e6e6;font-weight:bold;">NOTE</span><span style="color:#898887;">: This profile is not fully functional, since</span>
-<span style="color:#898887;"># it is designed to test the syntax highlighting.</span>
+<span style="color:#898887;">#</span>
+<span style="color:#898887;">#   Sample AppArmor Profile.</span>
+<span style="color:#898887;">#   License: Public Domain</span>
+<span style="color:#898887;">#</span>
+<span style="color:#898887;">#   </span><span style="color:#81ca2d;background-color:#f7e6e6;font-weight:bold;">NOTE</span><span style="color:#898887;">: This profile is not fully functional, since</span>
+<span style="color:#898887;">#   it is designed to test the syntax highlighting</span>
+<span style="color:#898887;">#   for the KDE's KSyntaxHighlighting framework.</span>
+<span style="color:#898887;">#</span>
 
 <span style="color:#006e28;">include </span><span style="color:#ff5500;">&lt;tunables/global&gt;</span>
 
@@ -23,8 +28,14 @@ deny owner <span style="color:#bf0303;text-decoration:underline;">#</span>No-com
 <span style="color:#898887;"># Alias</span>
 <span style="color:#0057ae;font-weight:bold;">alias</span> /usr/ <span style="color:#bf0303;font-weight:bold;">-&gt;</span> /mnt/usr/,
 
+<span style="color:#898887;"># ABI feature</span>
+<span style="color:#0057ae;font-weight:bold;">abi</span> <span style="color:#ff5500;">&lt;abi/3.0&gt;</span>,
+<span style="color:#0057ae;font-weight:bold;">abi</span> <span style="color:#ff5500;">&lt;&quot;includes/abi/4.19&quot;&gt;</span>,
+<span style="color:#0057ae;font-weight:bold;">abi</span> <span style="color:#ff5500;">&quot;simple_tests/includes/abi/4.19&quot;</span>,
+<span style="color:#0057ae;font-weight:bold;">abi</span> <span style="color:#ff5500;">simple_tests/includes/abi/4.19</span>,
+
 <span style="color:#898887;"># Profile for /usr/bin/foo</span>
-<span style="color:#644a9b;font-weight:bold;">profile</span> <span style="color:#644a9b;">foo</span> /usr/bin/foo <span style="color:#006e28;">flags</span>=(<span style="color:#bf0303;">attach_disconnected</span> <span style="color:#bf0303;">enforce</span>) {
+<span style="color:#644a9b;font-weight:bold;">profile</span> <span style="color:#644a9b;">foo</span> /usr/bin/foo <span style="color:#006e28;">flags</span>=(<span style="color:#bf0303;">attach_disconnected</span> <span style="color:#bf0303;">enforce</span>) <span style="color:#006e28;">xattrs</span>=(<span style="color:#0057ae;">myvalue</span>=foo <span style="color:#0057ae;">user.bar</span>=<span style="color:#3daee9;">*</span> <span style="color:#0057ae;">user.foo</span>=<span style="color:#bf0303;">&quot;bar&quot;</span> ) {
 	<span style="color:#006e28;">#include </span><span style="color:#ff5500;">&lt;abstractions/ubuntu-helpers&gt;</span>
 	<span style="color:#006e28;">#include</span><span style="color:#ff5500;">&lt;abstractions/wayland&gt;</span>
 	<span style="color:#006e28;">#include</span><span style="color:#ff5500;">&quot;/etc/apparmor.d/abstractions/ubuntu-konsole&quot;</span>
@@ -64,6 +75,7 @@ deny owner <span style="color:#bf0303;text-decoration:underline;">#</span>No-com
 	/usr/bin/khelpcenter<span style="font-weight:bold;"> Cx</span>  <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#644a9b;font-style:italic;">sanitized_helper</span>,
 	/usr/bin/helloworld <span style="font-weight:bold;"> cxr</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span>
 		<span style="color:#644a9b;font-style:italic;">hello_world</span>,
+	/bin/<span style="color:#3daee9;">**</span><span style="font-weight:bold;"> px</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> <span style="color:#644a9b;font-style:italic;">profile</span>,
 
 	<span style="color:#898887;"># Dbus rules</span>
 	<span style="color:#0057ae;font-weight:bold;">dbus</span> (<span style="font-weight:bold;">send</span>)  <span style="color:#bf0303;text-decoration:underline;">#</span>No-Comment
@@ -115,7 +127,7 @@ deny owner <span style="color:#bf0303;text-decoration:underline;">#</span>No-com
 		<span style="color:#898887;"># Mount rules</span>
 		<span style="color:#0057ae;font-weight:bold;">mount</span> <span style="color:#006e28;">options</span>=(<span style="font-weight:bold;">rw</span> <span style="font-weight:bold;">bind</span> <span style="font-weight:bold;">remount</span> <span style="font-weight:bold;">nodev</span> <span style="font-weight:bold;">noexec</span>) <span style="color:#006e28;">vfstype</span>=<span style="color:#bf0303;">ecryptfs</span> /home/<span style="color:#3daee9;">*</span>/.helloworld/ <span style="color:#bf0303;font-weight:bold;">-&gt;</span> /home/<span style="color:#3daee9;">*</span>/helloworld/,
 		<span style="color:#0057ae;font-weight:bold;">mount</span> <span style="color:#006e28;">options</span> <span style="color:#bf0303;font-weight:bold;">in</span> (<span style="font-weight:bold;">rw</span>, <span style="font-weight:bold;">bind</span>) / <span style="color:#bf0303;font-weight:bold;">-&gt;</span> /run/hellowordd/<span style="color:#3daee9;">*</span>.mnt,
-		<span style="color:#0057ae;font-weight:bold;">mount</span> <span style="color:#006e28;">option</span>=<span style="font-weight:bold;">read-only</span> <span style="color:#006e28;">fstype</span>=<span style="color:#bf0303;">btrfs</span> /dev/sd<span style="color:#bf0303;">[a-z][1-9]</span><span style="color:#3daee9;">*</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> /media/<span style="color:#3daee9;">*</span>/<span style="color:#3daee9;">*</span>,
+		<span style="color:#0057ae;font-weight:bold;">mount</span> <span style="color:#006e28;">options</span>=<span style="font-weight:bold;">read-only</span> <span style="color:#006e28;">fstype</span>=<span style="color:#bf0303;">btrfs</span> /dev/sd<span style="color:#bf0303;">[a-z][1-9]</span><span style="color:#3daee9;">*</span> <span style="color:#bf0303;font-weight:bold;">-&gt;</span> /media/<span style="color:#3daee9;">*</span>/<span style="color:#3daee9;">*</span>,
 		<span style="color:#0057ae;font-weight:bold;">umount</span> /home/<span style="color:#3daee9;">*</span>/helloworld/,
 
 		<span style="color:#898887;"># Pivot Root rules</span>

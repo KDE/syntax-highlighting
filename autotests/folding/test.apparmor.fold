@@ -1,8 +1,13 @@
-# Sample AppArmor Profile.
-# License: Public Domain
+# kate: syntax AppArmor Security Profile; replace-tabs off;
 
-# NOTE: This profile is not fully functional, since
-# it is designed to test the syntax highlighting.
+#
+#   Sample AppArmor Profile.
+#   License: Public Domain
+#
+#   NOTE: This profile is not fully functional, since
+#   it is designed to test the syntax highlighting
+#   for the KDE's KSyntaxHighlighting framework.
+#
 
 include <tunables/global>
 
@@ -17,8 +22,14 @@ ${BOOL} = true
 # Alias
 <beginfold id='1'>alias</beginfold id='1'> /usr/ -> /mnt/usr/<endfold id='1'>,</endfold id='1'>
 
+# ABI feature
+<beginfold id='1'>abi</beginfold id='1'> <abi/3.0><endfold id='1'>,</endfold id='1'>
+<beginfold id='1'>abi</beginfold id='1'> <"includes/abi/4.19"><endfold id='1'>,</endfold id='1'>
+<beginfold id='1'>abi</beginfold id='1'> "simple_tests/includes/abi/4.19"<endfold id='1'>,</endfold id='1'>
+<beginfold id='1'>abi</beginfold id='1'> simple_tests/includes/abi/4.19<endfold id='1'>,</endfold id='1'>
+
 # Profile for /usr/bin/foo
-profile foo /usr/bin/foo flags=(attach_disconnected enforce) <beginfold id='2'>{</beginfold id='2'>
+profile foo /usr/bin/foo flags=(attach_disconnected enforce) xattrs=(myvalue=foo user.bar=* user.foo="bar" ) <beginfold id='2'>{</beginfold id='2'>
 	#include <abstractions/ubuntu-helpers>
 	#include<abstractions/wayland>
 	#include"/etc/apparmor.d/abstractions/ubuntu-konsole"
@@ -58,6 +69,7 @@ profile foo /usr/bin/foo flags=(attach_disconnected enforce) <beginfold id='2'>{
 	/usr/bin/khelpcenter Cx  -> sanitized_helper<endfold id='1'>,</endfold id='1'>
 	/usr/bin/helloworld  cxr ->
 		hello_world<endfold id='1'>,</endfold id='1'>
+	/bin/** px -> profile<endfold id='1'>,</endfold id='1'>
 
 	# Dbus rules
 	<beginfold id='1'>dbus</beginfold id='1'> (send)  #No-Comment
@@ -109,7 +121,7 @@ profile foo /usr/bin/foo flags=(attach_disconnected enforce) <beginfold id='2'>{
 		# Mount rules
 		<beginfold id='1'>mount</beginfold id='1'> options=(rw bind remount nodev noexec) vfstype=ecryptfs /home/*/.helloworld/ -> /home/*/helloworld/<endfold id='1'>,</endfold id='1'>
 		<beginfold id='1'>mount</beginfold id='1'> options in (rw, bind) / -> /run/hellowordd/*.mnt<endfold id='1'>,</endfold id='1'>
-		<beginfold id='1'>mount</beginfold id='1'> option=read-only fstype=btrfs /dev/sd[a-z][1-9]* -> /media/*/*<endfold id='1'>,</endfold id='1'>
+		<beginfold id='1'>mount</beginfold id='1'> options=read-only fstype=btrfs /dev/sd[a-z][1-9]* -> /media/*/*<endfold id='1'>,</endfold id='1'>
 		<beginfold id='1'>umount</beginfold id='1'> /home/*/helloworld/<endfold id='1'>,</endfold id='1'>
 
 		# Pivot Root rules

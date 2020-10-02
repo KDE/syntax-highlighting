@@ -24,12 +24,13 @@
   ===========================================================================
 
   Last update:
-    Syntax highlighting based on AppArmor 2.13.3
+    Syntax highlighting based on AppArmor 3.0.0
     For more details about the syntax of AppArmor profiles, visit:
       https://gitlab.com/apparmor/apparmor/wikis/Documentation
-      https://manpages.ubuntu.com/manpages/disco/en/man5/apparmor.d.5.html
+      https://manpages.ubuntu.com/manpages/focal/en/man5/apparmor.d.5.html
 
   Change log:
+   * Version 12 [02-Oct-2020]: (AppArmor 3.0) Add ABI rules and new profile flags.
    * Version 11 [30-Sep-2020]: Update itemData's and rule_mount_fstypes list.
    * Version 10 [25-Oct-2019]: Use non-capturing groups in RegExpr.
    * Version 9 [20-Jun-2019]: (AppArmor 2.13.3):
@@ -62,7 +63,7 @@
 -->
 
 <language name="AppArmor Security Profile"
-          version="11"
+          version="12"
           kateversion="5.0"
           section="Markup"
           extensions="usr.bin.*;usr.sbin.*;bin.*;sbin.*;usr.lib.*;usr.lib64.*;usr.lib32.*;usr.libx32.*;usr.libexec.*;usr.local.bin.*;usr.local.sbin.*;usr.local.lib*;opt.*;etc.cron.*;snap.*;snap-update-ns.*;snap-confine.*"
@@ -86,9 +87,12 @@
 		<item>audit</item>
 		<item>complain</item>
 		<item>enforce</item>
+		<item>kill</item>
+		<item>unconfined</item>
 		<item>mediate_deleted</item>
 		<item>attach_disconnected</item>
 		<item>chroot_relative</item>
+		<!-- Others -->
 		<item>chroot_attach</item>
 		<item>chroot_no_attach</item>
 		<item>delegate_deleted</item>
@@ -97,15 +101,15 @@
 	</list>
 
 	<!-- Rule Qualifiers -->
-	<list name="access_types">
+	<list name="rule_access_qualifiers">
 		<item>allow</item>
 		<item>deny</item>
 	</list>
-	<list name="file_qualifiers">
+	<list name="file_rule_qualifiers">
 		<item>owner</item>
 		<item>other</item>
 	</list>
-	<list name="qualifiers">
+	<list name="rule_qualifiers">
 		<item>audit</item>
 		<!-- noaudit/quiet, defined, not -->
 	</list>
@@ -748,6 +752,7 @@
 		<item>remount</item>
 		<item>umount</item>
 	</list>
+	<list name="rule_name_abi"><item>abi</item></list>
 	<list name="rule_name_alias"><item>alias</item></list>
 	<list name="rule_name_file"><item>file</item></list>
 	<list name="rule_name_capability"><item>capability</item></list>
@@ -761,9 +766,6 @@
 	<list name="rule_name_changeprofile"><item>change_profile</item></list>
 	<list name="rule_name_rlimit"><item>rlimit</item></list>
 	<list name="rule_name_set"><item>set</item></list>
-
-	<!-- AppArmor 2.12.0: Keywords not currently supported:
-	     if, else, not, defined, other, rewrite, quiet, kill, nokill -->
 
 	<contexts>
 
@@ -819,11 +821,12 @@
 			<DetectChar context="_r_square_brackets" attribute="Globbing Brackets" char="["/>
 
 			<!-- Rule Qualifiers -->
-			<keyword context="#stay" attribute="Access Qualifier" String="access_types"/>
-			<keyword context="#stay" attribute="Qualifier" String="qualifiers"/>
-			<keyword context="#stay" attribute="File Qualifier" String="file_qualifiers"/>
+			<keyword context="#stay" attribute="Rule Access Qualifier" String="rule_access_qualifiers"/>
+			<keyword context="#stay" attribute="Rule Qualifier" String="rule_qualifiers"/>
+			<keyword context="#stay" attribute="File Rule Qualifier" String="file_rule_qualifiers"/>
 
 			<!-- Rules -->
+			<keyword context="_rule_abi" attribute="Rule" String="rule_name_abi" beginRegion="Rule"/>
 			<keyword context="_rule_file" attribute="Rule" String="rule_name_file" beginRegion="Rule"/>
 			<keyword context="_rule_mount" attribute="Rule" String="rule_name_mount" beginRegion="Rule"/>
 			<keyword context="_rule_capability" attribute="Rule" String="rule_name_capability" beginRegion="Rule"/>
@@ -872,7 +875,8 @@
 
 		<!-- Profile Header:
 		     Highlight the name of the profile.
-		     The profile name label is optional. This is written after the hat character (^) or a profile keyword. -->
+		     The profile name label is written after the hat character (^) or a profile keyword.
+		     AppArmor 3.0 deprecates the use of pathnames as the profiles name. -->
 		<context name="_profile_name" attribute="Profile Name" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop">
 			<DetectSpaces context="#stay" attribute="Normal Text"/>
 			<!-- Not highlighting paths and paths quoted.
@@ -926,6 +930,39 @@
 		<context name="_include_preplib_thanquot" attribute="Prep. Lib" lineEndContext="#pop">
 			<DetectChar context="_include_preplib_quot" attribute="Prep. Lib" char="&quot;"/>
 			<IncludeRules context="_include_preplib_than"/>
+		</context>
+
+		<!-- ABI Rule -->
+		<context name="_rule_abi" attribute="Error" lineEndContext="#stay">
+			<DetectSpaces attribute="Normal Text"/>
+			<RegExpr context="#pop!_abi_path_thanquot" attribute="Prep. Lib" String="&lt;\s*(?=&quot;)"/> <!-- <"path"> -->
+			<DetectChar context="#pop!_abi_path_than" attribute="Prep. Lib" char="&lt;" lookAhead="true"/> <!-- <magic/path> -->
+			<DetectChar context="#pop!_abi_path_quot" attribute="Prep. Lib" char="&quot;"/> <!-- "/abs/path" -->
+			<IncludeRules context="_end_rule"/>
+			<DetectChar context="_comment" attribute="Comment" char="#"/>
+			<!-- /abs/path -->
+			<RegExpr context="#pop!_rule_abi_after_path" attribute="Prep. Lib" String="(?:[^\s/&quot;&lt;]*/\S*|[^\s/&quot;&lt;]+)(?=&endPath;)" minimal="true"/>
+			<RegExpr context="#pop!_rule_abi_after_path" attribute="Prep. Lib" String="(?:[^\s/&quot;&lt;]*/\S*|[^\s/&quot;&lt;]+)(?:\\.|[^\s&quot;])+(?=\s|$)"/>
+		</context>
+		<context name="_abi_path_quot" attribute="Prep. Lib" lineEndContext="#stay">
+			<DetectChar context="#pop!_rule_abi_after_path" attribute="Prep. Lib" char="&quot;"/>
+		</context>
+		<context name="_abi_path_than" attribute="Prep. Lib" lineEndContext="#pop!_rule_abi_after_path">
+			<DetectChar context="#pop!_rule_abi_after_path" attribute="Prep. Lib" char="&gt;"/>
+			<RegExpr context="#pop!_rule_abi_after_path" attribute="Open Prep. Lib" String="[^&gt;\s](?=\s*$)"/>
+		</context>
+		<context name="_abi_path_thanquot" attribute="Prep. Lib" lineEndContext="#pop!_rule_abi_after_path">
+			<DetectChar context="_abi_path_thanquot_quot" attribute="Prep. Lib" char="&quot;"/>
+			<IncludeRules context="_abi_path_than"/>
+		</context>
+		<context name="_abi_path_thanquot_quot" attribute="Prep. Lib" lineEndContext="#stay">
+			<DetectChar context="#pop" attribute="Prep. Lib" char="&quot;"/>
+		</context>
+
+		<context name="_rule_abi_after_path" attribute="Error" lineEndContext="#stay">
+			<DetectSpaces attribute="Normal Text"/>
+			<IncludeRules context="_end_rule"/>
+			<DetectChar context="_comment" attribute="Comment" char="#"/>
 		</context>
 
 		<!-- @{VARIABLE} -->
@@ -1332,12 +1369,13 @@
 		</context>
 		<!-- Rule/Profile on new line, in rule not closed -->
 		<context name="_end_rule_irnc" attribute="Normal Text" lineEndContext="#stay">
-			<keyword String="profile_head" context="#pop!_profile_name" attribute="Profile Head Error" firstNonSpace="true" endRegion="Rule"/>
-			<keyword String="access_types"          context="#pop" attribute="Access Qualifier Error"  firstNonSpace="true" endRegion="Rule"/>
-			<keyword String="qualifiers"            context="#pop" attribute="Qualifier Error"         firstNonSpace="true" endRegion="Rule"/>
-			<keyword String="file_qualifiers"       context="#pop" attribute="File Qualifier Error"    firstNonSpace="true" endRegion="Rule"/>
-			<RegExpr String="set(?=\s+rlimit\b)"    context="#pop" attribute="Rule Error"              firstNonSpace="true" endRegion="Rule"/>
+			<keyword String="profile_head" context="#pop!_profile_name" attribute="Profile Head Error"      firstNonSpace="true" endRegion="Rule"/>
+			<keyword String="rule_access_qualifiers" context="#pop" attribute="Rule Access Qualifier Error" firstNonSpace="true" endRegion="Rule"/>
+			<keyword String="rule_qualifiers"        context="#pop" attribute="Rule Qualifier Error"        firstNonSpace="true" endRegion="Rule"/>
+			<keyword String="file_rule_qualifiers"   context="#pop" attribute="File Rule Qualifier Error"   firstNonSpace="true" endRegion="Rule"/>
+			<RegExpr String="set(?=\s+rlimit\b)"     context="#pop" attribute="Rule Error"                  firstNonSpace="true" endRegion="Rule"/>
 
+			<keyword String="rule_name_abi"           context="#pop!_rule_abi"           attribute="Rule Error" firstNonSpace="true" endRegion="Rule" beginRegion="Rule"/>
 			<keyword String="rule_name_file"          context="#pop!_rule_file"          attribute="Rule Error" firstNonSpace="true" endRegion="Rule" beginRegion="Rule"/>
 			<keyword String="rule_name_capability"    context="#pop!_rule_capability"    attribute="Rule Error" firstNonSpace="true" endRegion="Rule" beginRegion="Rule"/>
 			<keyword String="rule_name_network"       context="#pop!_rule_network"       attribute="Rule Error" firstNonSpace="true" endRegion="Rule" beginRegion="Rule"/>
@@ -1356,11 +1394,12 @@
 		</context>
 		<!-- For blocks of parentheses within rules (the same keywords as "_end_rule_irnc"!) -->
 		<context name="_end_rule_irnc_parentheses_rule" attribute="Normal Text" lineEndContext="#stay">
-			<keyword String="profile_head"            context="#pop" attribute="Profile Head Error"     lookAhead="true" firstNonSpace="true"/>
-			<keyword String="access_types"            context="#pop" attribute="Access Qualifier Error" lookAhead="true" firstNonSpace="true"/>
-			<keyword String="qualifiers"              context="#pop" attribute="Qualifier Error"        lookAhead="true" firstNonSpace="true"/>
-			<keyword String="file_qualifiers"         context="#pop" attribute="File Qualifier Error"   lookAhead="true" firstNonSpace="true"/>
+			<keyword String="profile_head"            context="#pop" attribute="Profile Head Error"          lookAhead="true" firstNonSpace="true"/>
+			<keyword String="rule_access_qualifiers"  context="#pop" attribute="Rule Access Qualifier Error" lookAhead="true" firstNonSpace="true"/>
+			<keyword String="rule_qualifiers"         context="#pop" attribute="Rule Qualifier Error"        lookAhead="true" firstNonSpace="true"/>
+			<keyword String="file_rule_qualifiers"    context="#pop" attribute="File Rule Qualifier Error"   lookAhead="true" firstNonSpace="true"/>
 			<RegExpr String="set(?=\s+rlimit\b)"      context="#pop" attribute="Rule Error" lookAhead="true" firstNonSpace="true"/>
+			<keyword String="rule_name_abi"           context="#pop" attribute="Rule Error" lookAhead="true" firstNonSpace="true"/>
 			<keyword String="rule_name_file"          context="#pop" attribute="Rule Error" lookAhead="true" firstNonSpace="true"/>
 			<keyword String="rule_name_capability"    context="#pop" attribute="Rule Error" lookAhead="true" firstNonSpace="true"/>
 			<keyword String="rule_name_network"       context="#pop" attribute="Rule Error" lookAhead="true" firstNonSpace="true"/>
@@ -1540,9 +1579,9 @@
 
 		<itemData name="Profile Head"     defStyleNum="dsFunction"  bold="1" underline="0" spellChecking="false"/>
 		<itemData name="Profile Name"     defStyleNum="dsFunction"  bold="0" underline="0" spellChecking="false"/>
-		<itemData name="Qualifier"        defStyleNum="dsKeyword"   bold="1" underline="0" spellChecking="false"/>
-		<itemData name="Access Qualifier" defStyleNum="dsWarning"   bold="1" underline="0" italic="0" spellChecking="false"/>
-		<itemData name="File Qualifier"   defStyleNum="dsVariable"  bold="1" underline="0" italic="0" spellChecking="false"/>
+		<itemData name="Rule Qualifier"   defStyleNum="dsKeyword"   bold="1" underline="0" spellChecking="false"/>
+		<itemData name="Rule Access Qualifier" defStyleNum="dsWarning"  bold="1" underline="0" italic="0" spellChecking="false"/>
+		<itemData name="File Rule Qualifier"   defStyleNum="dsVariable" bold="1" underline="0" italic="0" spellChecking="false"/>
 		<itemData name="Rule"             defStyleNum="dsVariable"  bold="1" underline="0" italic="0" spellChecking="false"/>
 		<itemData name="Data"             defStyleNum="dsVariable"  bold="0" underline="0" italic="0" spellChecking="false"/>
 		<itemData name="Other Data"       defStyleNum="dsNormal"    italic="1" spellChecking="false"/>
@@ -1569,13 +1608,13 @@
 		<itemData name="Globbing Char in Tran. Prof." defStyleNum="dsSpecialChar" bold="0" italic="1" underline="0" spellChecking="false"/>
 		<itemData name="Hat Operator in Tran. Prof."  defStyleNum="dsAnnotation"  bold="1" italic="1" underline="0" spellChecking="false"/>
 
-		<itemData name="Rule Error"             defStyleNum="dsVariable" bold="1" underline="1" italic="0" spellChecking="false"/>
-		<itemData name="Qualifier Error"        defStyleNum="dsKeyword"  bold="1" underline="1" spellChecking="false"/>
-		<itemData name="Access Qualifier Error" defStyleNum="dsWarning"  bold="1" underline="1" italic="0" spellChecking="false"/>
-		<itemData name="File Qualifier Error"   defStyleNum="dsVariable" bold="1" underline="1" italic="0" spellChecking="false"/>
-		<itemData name="Profile Head Error"     defStyleNum="dsFunction" bold="1" underline="1" spellChecking="false"/>
-		<itemData name="Profile Name Error"     defStyleNum="dsFunction" bold="0" underline="1" spellChecking="false"/>
-		<itemData name="Error"                  defStyleNum="dsError"    spellChecking="false"/>
+		<itemData name="Rule Error"                  defStyleNum="dsVariable" bold="1" underline="1" italic="0" spellChecking="false"/>
+		<itemData name="Rule Qualifier Error"        defStyleNum="dsKeyword"  bold="1" underline="1" spellChecking="false"/>
+		<itemData name="Rule Access Qualifier Error" defStyleNum="dsWarning"  bold="1" underline="1" italic="0" spellChecking="false"/>
+		<itemData name="File Rule Qualifier Error"   defStyleNum="dsVariable" bold="1" underline="1" italic="0" spellChecking="false"/>
+		<itemData name="Profile Head Error"          defStyleNum="dsFunction" bold="1" underline="1" spellChecking="false"/>
+		<itemData name="Profile Name Error"          defStyleNum="dsFunction" bold="0" underline="1" spellChecking="false"/>
+		<itemData name="Error"                       defStyleNum="dsError"    spellChecking="false"/>
 	</itemDatas>
 
 </highlighting>

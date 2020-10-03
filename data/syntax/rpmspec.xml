@@ -8,7 +8,7 @@
   <!ENTITY os_conditionals_names "(ifos|ifnos)">
   <!ENTITY lookahead_whitespace_eol "(?=($| |\t))">
 ]>
-<language name="RPM Spec" version="7" kateversion="2.4" section="Other" extensions="*.spec" mimetype="text/x-rpm-spec" license="Public Domain">
+<language name="RPM Spec" version="7" kateversion="5.62" section="Other" extensions="*.spec" mimetype="text/x-rpm-spec" license="Public Domain">
 
 <!-- The entities "arch" and "os" are based on /usr/lib/rpm/rpmrc (in the version coming with openSUSE 11.4). -->
 
@@ -229,11 +229,10 @@
 
       <!-- "tag_line_integer" is a context for integer values. Non-integer context is marked as
       error. -->
-      <context attribute="Error" lineEndContext="#pop" name="tag_line_integer">
+      <context attribute="Error" lineEndContext="#pop" name="tag_line_integer" fallthroughContext="every_non_whitespace_is_error">
         <Int attribute="Integer" context="every_non_whitespace_is_error" />
         <!-- Handle % -->
         <AnyChar context="tag_line_integer_without_syntax_check" String="%$" lookAhead="true" />
-        <RegExpr context="every_non_whitespace_is_error" String="." lookAhead="true" />
       </context>
 
       <!-- "tag_line_os" is a context for values that define the operation system. Unknown values
@@ -283,13 +282,12 @@
       <!-- "tag_line_switch" is a context that accepts "0", "1", "yes" and "no" as value.
       Everything else is an error. See http://www.rpm.org/max-rpm-snapshot/s1-rpm-depend-auto-depend.html
       and http://www.rpm.org/max-rpm/s1-rpm-inside-tags.html#S3-RPM-INSIDE-AUTOREQPROV-TAG -->
-      <context attribute="Error" lineEndContext="#pop" name="tag_line_switch">
+      <context attribute="Error" lineEndContext="#pop" name="tag_line_switch" fallthroughContext="every_non_whitespace_is_error">
         <AnyChar attribute="Enumeration" context="every_non_whitespace_is_error" String="01" />
         <Detect2Chars attribute="Enumeration" context="every_non_whitespace_is_error" char="n" char1="o"/>
         <StringDetect attribute="Enumeration" context="every_non_whitespace_is_error" String="yes" />
         <!-- Handle % -->
         <AnyChar context="tag_line_value" String="%$" lookAhead="true" />
-        <RegExpr context="every_non_whitespace_is_error" String="." lookAhead="true" />
       </context>
 
       <!-- A context that doesn't test for format errors in the changelog date anymore. Necessary

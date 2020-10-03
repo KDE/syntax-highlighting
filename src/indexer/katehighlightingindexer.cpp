@@ -101,11 +101,13 @@ bool checkExtensions(const QString &extensions)
 //! - isValid()
 //! - character ranges such as [A-Z] are valid and not accidentally e.g. [A-z].
 //! - dynamic=true but no place holder used?
+//! - is not . with lookAhead="1"
 bool checkRegularExpression(const QString &hlFilename, QXmlStreamReader &xml)
 {
-    if (xml.name() == QLatin1String("RegExpr") || xml.name() == QLatin1String("emptyLine")) {
+    bool isRegExpr = (xml.name() == QLatin1String("RegExpr"));
+    if (isRegExpr || xml.name() == QLatin1String("emptyLine")) {
         // get right attribute
-        const QString string(xml.attributes().value((xml.name() == QLatin1String("RegExpr")) ? QLatin1String("String") : QLatin1String("regexpr")).toString());
+        const QString string(xml.attributes().value(isRegExpr ? QLatin1String("String") : QLatin1String("regexpr")).toString());
 
         // validate regexp
         const QRegularExpression regexp(string);
@@ -125,10 +127,27 @@ bool checkRegularExpression(const QString &hlFilename, QXmlStreamReader &xml)
         }
 
         // dynamic == true and no place holder?
-        if (xml.name() == QLatin1String("RegExpr") && attrToBool(xml.attributes().value(QStringLiteral("dynamic")))) {
+        if (isRegExpr && attrToBool(xml.attributes().value(QStringLiteral("dynamic")))) {
             static const QRegularExpression placeHolder(QStringLiteral("%\\d+"));
             if (!string.contains(placeHolder)) {
                 qWarning() << hlFilename << "line" << xml.lineNumber() << "broken regex:" << string << "problem: dynamic=true but no %\\d+ placeholder";
+                return false;
+            }
+        }
+
+        // . + lookAhead should be fallthroughContext="..."
+        if (isRegExpr && attrToBool(xml.attributes().value(QStringLiteral("lookAhead"))) && string == QStringLiteral(".")) {
+            bool hasSpecialAttribute = false;
+            for (const auto &attr : xml.attributes()) {
+                const auto name = attr.name();
+                if (name == QStringLiteral("beginRegion") || name == QStringLiteral("endRegion") || name == QStringLiteral("firstNonSpace") || name == QStringLiteral("column")) {
+                    hasSpecialAttribute = true;
+                    break;
+                }
+            }
+
+            if (!hasSpecialAttribute) {
+                qWarning() << hlFilename << "line" << xml.lineNumber() << "regex should be replaced by fallthroughContext";
                 return false;
             }
         }

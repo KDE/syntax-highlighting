@@ -102,6 +102,7 @@ bool checkExtensions(const QString &extensions)
 //! - character ranges such as [A-Z] are valid and not accidentally e.g. [A-z].
 //! - dynamic=true but no place holder used?
 //! - is not . with lookAhead="1"
+//! - is not equivalent to DetectSpaces
 bool checkRegularExpression(const QString &hlFilename, QXmlStreamReader &xml)
 {
     bool isRegExpr = (xml.name() == QLatin1String("RegExpr"));
@@ -150,6 +151,13 @@ bool checkRegularExpression(const QString &hlFilename, QXmlStreamReader &xml)
                 qWarning() << hlFilename << "line" << xml.lineNumber() << "regex should be replaced by fallthroughContext";
                 return false;
             }
+        }
+
+        // is DetectSpaces
+        static const QRegularExpression isDetectSpaces(QStringLiteral(R"(^\^?(\\s|\[ \\t\]|\[\\t \])[*+]$)"));
+        if (isRegExpr && string.contains(isDetectSpaces)) {
+            qWarning() << hlFilename << "line" << xml.lineNumber() << "regex should be replaced by DetectSpaces";
+            return false;
         }
     }
 

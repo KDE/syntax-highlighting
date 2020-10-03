@@ -941,11 +941,18 @@
 			<IncludeRules context="_end_rule"/>
 			<DetectChar context="_comment" attribute="Comment" char="#"/>
 			<!-- /abs/path -->
-			<RegExpr context="#pop!_rule_abi_after_path" attribute="Prep. Lib" String="(?:[^\s/&quot;&lt;]*/\S*|[^\s/&quot;&lt;]+)(?=&endPath;)" minimal="true"/>
-			<RegExpr context="#pop!_rule_abi_after_path" attribute="Prep. Lib" String="(?:[^\s/&quot;&lt;]*/\S*|[^\s/&quot;&lt;]+)(?:\\.|[^\s&quot;])+(?=\s|$)"/>
+			<RegExpr context="#stay" attribute="Error" String="[^\s&quot;&lt;]+(?=[&quot;&lt;])"/>
+			<RegExpr context="#pop!_abi_path_text" attribute="Prep. Lib" String="[^\s&quot;&lt;]+" lookAhead="true"/>
+		</context>
+
+		<context name="_abi_path_text" attribute="Prep. Lib" lineEndContext="#pop!_rule_abi_after_path">
+			<RegExpr context="#pop!_rule_abi_after_path" String="&endPath;" lookAhead="true"/>
+			<DetectSpaces context="#pop!_rule_abi_after_path" lookAhead="true"/>
+			<AnyChar context="#stay" attribute="Error" String="&quot;&lt;&gt;"/>
 		</context>
 		<context name="_abi_path_quot" attribute="Prep. Lib" lineEndContext="#stay">
 			<DetectChar context="#pop!_rule_abi_after_path" attribute="Prep. Lib" char="&quot;"/>
+			<IncludeRules context="_escape"/>
 		</context>
 		<context name="_abi_path_than" attribute="Prep. Lib" lineEndContext="#pop!_rule_abi_after_path">
 			<DetectChar context="#pop!_rule_abi_after_path" attribute="Prep. Lib" char="&gt;"/>
@@ -957,6 +964,7 @@
 		</context>
 		<context name="_abi_path_thanquot_quot" attribute="Prep. Lib" lineEndContext="#stay">
 			<DetectChar context="#pop" attribute="Prep. Lib" char="&quot;"/>
+			<IncludeRules context="_escape"/>
 		</context>
 
 		<context name="_rule_abi_after_path" attribute="Error" lineEndContext="#stay">

@@ -171,6 +171,23 @@ bool checkRegularExpression(const QString &hlFilename, QXmlStreamReader &xml)
     return true;
 }
 
+//! Check that StringDetect contains more that 2 characters
+//! Fix with following command:
+//! \code
+//!   sed -E '/StringDetect/{/dynamic="(1|true)|insensitive="(1|true)/!{s/StringDetect(.*)String="(.|&lt;|&gt;|&quot;|&amp;)(.|&lt;|&gt;|&quot;|&amp;)"/Detect2Chars\1char="\2" char1="\3"/;t;s/StringDetect(.*)String="(.|&lt;|&gt;|&quot;|&amp;)"/DetectChar\1char="\2"/}}' -i file.xml...
+//! \endcode
+bool checkStringDetect(const QString &hlFilename, QXmlStreamReader &xml)
+{
+    if (xml.name() == QLatin1String("StringDetect")) {
+        const auto string = xml.attributes().value(QLatin1String("String"));
+        if (string.size() <= 2 && !attrToBool(xml.attributes().value(QLatin1String("dynamic"))) && !attrToBool(xml.attributes().value(QLatin1String("insensitive")))) {
+            qWarning() << hlFilename << "line" << xml.lineNumber() << "StringDetect should be replaced by" << (string.size() == 2 ? "Detect2Chars" : "DetectChar");
+            return false;
+        }
+    }
+    return true;
+}
+
 //! Check that keyword list items do not have trailing or leading spaces,
 //! e.g.: <item> keyword </item>
 bool checkItemsTrimmed(const QString &hlFilename, QXmlStreamReader &xml)
@@ -755,6 +772,12 @@ int main(int argc, char *argv[])
 
             // scan for bad regex
             if (!checkRegularExpression(hlFilename, xml)) {
+                anyError = 7;
+                continue;
+            }
+
+            // scan for StringDetect which should be Detect2Chars/DetectChar
+            if (!checkStringDetect(hlFilename, xml)) {
                 anyError = 7;
                 continue;
             }

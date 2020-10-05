@@ -460,3 +460,11 @@ exec "$test"
 # see fish issue 4230
 kill -STOP %self
 
+endcmd # is a command
+
+for inc in a # inc is a variable
+end
+
+switch d;case "*" ; case d;echo; end
+
+if ; else if ; else if ; if ; else ; end;else ; end

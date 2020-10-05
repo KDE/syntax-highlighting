@@ -3,28 +3,27 @@
 [
         <!ENTITY white             "	 ">                            <!-- first is tab -->
         <!ENTITY eocommand         "&white;&lt;&gt;^">                 <!-- end of command separator -->
-        <!ENTITY allchars          "[&white;!&quot;#$&#37;&amp;'()*+,-./0-9:;&lt;=&gt;?@A-Z[\]\\^_`a-z{}|~]"> <!--&percent; doesn't work -> &#37; -->
         <!ENTITY separator         "&white;|&amp;;&lt;&gt;()'&quot;">  <!-- token separator as char list -->
         <!ENTITY commandsep        "|&amp;;">                          <!-- command separator as char list -->
         <!ENTITY special           "{}*/.?\\$&amp;">                   <!-- not allowed in function names -->
         <!ENTITY portable_filename "A-Za-z0-9\._-">
         <!ENTITY funcname_first    "a-zA-Z+:=!.@_`">
         <!ENTITY funcname_last     "a-zA-Z0-9+,-:=!.@#&#37;^_`~">
-        <!ENTITY funcname          "[&funcname_first;]([&funcname_last;]|\\ )*">
+        <!ENTITY funcname          "[&funcname_first;](?:[&funcname_last;]|\\ )*">
         <!ENTITY varname           "[A-Za-z0-9_]+">
         <!ENTITY alnumdash         "[A-Za-z0-9-]">                     <!-- option chars, dashes for GNU long opts -->
         <!ENTITY testoptsfile      "[bcdefgGkLOprsStuwx]">             <!-- test operators for file testing -->
         <!ENTITY testoptsother     "[nzao]">                           <!-- other test operators -->
         <!ENTITY braceelement      "[!#&#37;+\-\./0-9:=@A-Z^_`a-z~]">
         <!ENTITY escapechars       "[abefnrtv $\\*?~&#37;#(){}[\]&lt;&gt;\^&amp;;&quot;&apos;]">   <!-- escape chars -->
-        <!ENTITY white_or_eol      "([&white;]|$)">
+        <!ENTITY white_or_eol      "(?:[&white;]|$)">
         <!ENTITY homedir           "~[&portable_filename;]*">
-        <!ENTITY pathdetect        "((\.\.|\.|&homedir;)&white_or_eol;|([^$\\{}&separator;/\*\?]|\\&escapechars;)*(/|\*|\*\*|\?))">
-        <!ENTITY pathpart          "(([^&separator;/]|\\&escapechars;)*)?(/|(?=&quot;)|(?='))">
+        <!ENTITY pathdetect        "(?:(?:\.\.?|&homedir;)&white_or_eol;|(?:[^$\\{}&separator;/\*\?]|\\&escapechars;)*(:?[/?]|\*\*?))">
+        <!ENTITY pathpart          "(?:[^&separator;/]|\\&escapechars;)*(?:/|(?=[&quot;']))">
 ]>
 
 
-<language name="Fish" version="2" kateversion="5.0" section="Scripts" extensions="*.fish;fishd.*" mimetype="application/x-fish" casesensitive="1" author="Arnd Diestelhorst (adiestelhorst@m-xchg.de)" license="LGPL">
+<language name="Fish" version="3" kateversion="5.72" section="Scripts" extensions="*.fish;fishd.*" mimetype="application/x-fish" casesensitive="1" author="Arnd Diestelhorst (adiestelhorst@m-xchg.de)" license="LGPL">
 
 
   <highlighting>
@@ -455,7 +454,7 @@
 
 
     <contexts>
-      <context name="Start" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="Root">
+      <context name="Start" attribute="Normal Text" lineEndContext="#stay" fallthroughContext="Root">
         <DetectChar attribute="Error" context="DropRestOfLine" char=")"/>
       </context>
 
@@ -501,7 +500,7 @@
         <IncludeRules context="Comment" />
       </context>
 
-      <context name="BlockComment" attribute="Comment" fallthrough="true" fallthroughContext="#pop#pop#pop" lineEndContext="#stay">
+      <context name="BlockComment" attribute="Comment" fallthroughContext="#pop#pop#pop" lineEndContext="#stay">
         <DetectChar attribute="Comment" context="#pop" char="#" firstNonSpace="true"/>
       </context>
 
@@ -544,7 +543,8 @@
         <WordDetect attribute="Builtin" String="read" context="read_vared" />
         <WordDetect attribute="Builtin" String="vared" context="read_vared" />
         <WordDetect attribute="Builtin" String="test" context="ArgumentsTest" />
-        <RegExpr    attribute="Builtin" String="\[\s" context="ArgumentsTestBrack" />
+        <Detect2Chars attribute="Builtin" char="[" char1="	" context="ArgumentsTestBrack" />
+        <Detect2Chars attribute="Builtin" char="[" char1=" " context="ArgumentsTestBrack" />
         <WordDetect attribute="Control Flow" String="begin" context="begin" beginRegion="begin" />
         <WordDetect attribute="Control Flow" String="for" context="for" beginRegion="for" />
         <WordDetect attribute="Control Flow" String="function" context="function" beginRegion="function" />
@@ -603,7 +603,7 @@
 
       <context name="ArgumentsTestBrack" attribute="Normal Text" lineEndContext="#pop">
         <LineContinue attribute="Escape" />
-		<Detect2Chars attribute="Builtin" char=" " char1="]" context="#pop!ArgumentsNonePre" />
+        <Detect2Chars attribute="Builtin" char=" " char1="]" context="#pop!ArgumentsNonePre" />
         <AnyChar attribute="Error" context="#pop!DropRestOfLine" String="#&commandsep;&amp;"/>
         <IncludeRules context="ArgumentsTest" />
       </context>
@@ -616,8 +616,7 @@
 
       <context name="ArgumentsTest_common" attribute="Normal Text" lineEndContext="#pop">
         <RegExpr attribute="Operator" context="DirectPath" String="-&testoptsfile; " />
-        <RegExpr attribute="Operator" String="-&testoptsother; " />
-        <RegExpr attribute="Operator" String="(!|=|!=| -eq | -ne | -gt | -ge | -lt | -le )"/>
+        <RegExpr attribute="Operator" String="-&testoptsother; |!=?|=| -eq | -ne | -gt | -ge | -lt | -le "/>
         <AnyChar context="#pop" String="&commandsep;" lookAhead="true"/>
         <IncludeRules context="FindArgumentsCommon" />
       </context>
@@ -630,14 +629,14 @@
 
       <context name="beginbody" attribute="Normal Text" lineEndContext="#stay">
         <LineContinue attribute="Escape" />
-        <StringDetect attribute="Control Flow" String="end" context="#pop#pop" endRegion="begin" />
+        <WordDetect attribute="Control Flow" String="end" context="#pop#pop" endRegion="begin" />
         <IncludeRules context="Root" />
       </context>
 
       <context name="for" attribute="Normal Text" lineEndContext="#stay">
         <LineContinue attribute="Escape" />
         <DetectSpaces attribute="Normal Text" />
-        <Detect2Chars attribute="Control Flow" char="i" char1="n" context="forargs" />
+        <WordDetect attribute="Control Flow" String="in" context="forargs" />
         <RegExpr attribute="Variable" String="&varname;" />
         <IncludeRules context="FindVarExpansion" />
         <RegExpr attribute="Error" String="."/>
@@ -651,7 +650,7 @@
 
       <context name="forbody" attribute="Normal Text" lineEndContext="#stay">
         <LineContinue attribute="Escape" />
-        <StringDetect attribute="Control Flow" String="end" context="#pop#pop#pop" endRegion="for" />
+        <WordDetect attribute="Control Flow" String="end" context="#pop#pop#pop" endRegion="for" />
         <IncludeRules context="Root" />
       </context>
 
@@ -671,7 +670,7 @@
 
       <context name="funcopts" attribute="Normal Text" lineEndContext="#pop!funcbody">
         <DetectChar attribute="Comment" context="#pop!func_comment" char="#"/>
-        <RegExpr attribute="Option" String="(-d[&white;]*|--description=)(?=('|&quot;))" context="funcdesc" beginRegion="doc"/>
+        <RegExpr attribute="Option" String="(?:-d[&white;]*|--description=)(?=[&quot;'])" context="funcdesc" beginRegion="doc"/>
         <RegExpr attribute="Option" String="-&alnumdash;*" />
         <DetectChar attribute="Separator" context="#pop!funcbody" char=";" />
         <IncludeRules context="FindArgumentsCommon" />
@@ -702,23 +701,21 @@
 
       <context name="funcbody" attribute="Normal Text" lineEndContext="#stay">
         <LineContinue attribute="Escape" />
-        <StringDetect attribute="Control Flow" String="end" context="#pop#pop" endRegion="function" />
+        <WordDetect attribute="Control Flow" String="end" context="#pop#pop" endRegion="function" />
         <IncludeRules context="Root" />
       </context>
 
       <context name="if" attribute="Normal Text" lineEndContext="#stay">
-        <LineContinue attribute="Escape" />
-        <RegExpr attribute="Control Flow" String="\s*(else\s*if|else)" />
-        <StringDetect attribute="Control Flow" String="end" context="#pop" endRegion="if"/>
+        <LineContinue attribute="Escape"/>
+        <WordDetect attribute="Control Flow" String="else" context="else" endRegion="if" beginRegion="if"/>
+        <WordDetect attribute="Control Flow" String="end" context="#pop" endRegion="if"/>
         <IncludeRules context="Root" />
       </context>
 
-      <context name="else" attribute="Normal Text" lineEndContext="#stay">
-        <LineContinue attribute="Escape" />
-        <RegExpr String="\s*(else|end|else\s*if)" context="#pop" lookAhead="true"/>
-        <RegExpr attribute="Control Flow" String="\s*(else\s*if|else)" context="else" />
-        <StringDetect attribute="Control Flow" String="end" context="#pop#pop" endRegion="if"/>
-        <IncludeRules context="Root" />
+      <context name="else" attribute="Normal Text" lineEndContext="#stay" fallthroughContext="#pop">
+        <DetectSpaces attribute="Normal Text" context="#stay"/>
+        <LineContinue attribute="Escape" context="#stay"/>
+        <WordDetect attribute="Control Flow" String="if" context="#pop"/>
       </context>
 
       <context name="switch" attribute="Normal Text" lineEndContext="switchbody">
@@ -729,8 +726,8 @@
 
       <context name="switchbody" attribute="Normal Text" lineEndContext="#stay">
         <LineContinue attribute="Escape" />
-        <RegExpr attribute="Control Flow" String="\s*case" context="case" beginRegion="case" />
-        <StringDetect attribute="Control Flow" String="end" context="#pop#pop" endRegion="switch"/>
+        <WordDetect attribute="Control Flow" String="case" context="case" beginRegion="case" />
+        <WordDetect attribute="Control Flow" String="end" context="#pop#pop" endRegion="switch"/>
         <IncludeRules context="Root" />
       </context>
 
@@ -742,14 +739,14 @@
 
       <context name="casebody" attribute="Normal Text" lineEndContext="#stay">
         <LineContinue attribute="Escape" />
-        <!-- next: don't consume anything, otherwise the end of folding hides the next case -->
-        <RegExpr String="^\s*(case|end)" context="#pop#pop" endRegion="case" lookAhead="true"/>
+        <WordDetect attribute="Control Flow" String="case" context="#pop" endRegion="case" beginRegion="case" />
+        <WordDetect attribute="Control Flow" String="end" context="#pop#pop" endRegion="case" lookAhead="1"/>
         <IncludeRules context="Root" />
       </context>
 
       <context name="while" attribute="Normal Text" lineEndContext="#stay">
         <LineContinue attribute="Escape" />
-        <StringDetect attribute="Control Flow" String="end" context="#pop" endRegion="while"/>
+        <WordDetect attribute="Control Flow" String="end" context="#pop" endRegion="while"/>
         <IncludeRules context="Root" />
       </context>
 
@@ -766,7 +763,7 @@
         <LineContinue attribute="Escape" />
         <DetectSpaces attribute="Normal Text" />
         <RegExpr attribute="Option" String="-&alnumdash;*" />
-        <RegExpr attribute="Redirection" context="Redirect" String="[0-9]*(&gt;{1,2}|&lt;|\^{1,2})" />
+        <RegExpr attribute="Redirection" context="Redirect" String="[0-9]*(?:&gt;{1,2}|&lt;|\^{1,2})" />
         <DetectChar attribute="Operator" char="="/>
         <DetectChar attribute="Index" context="Subscript" char="["/>
         <IncludeRules context="FindStrings" />
@@ -783,14 +780,14 @@
         <LineContinue attribute="Escape" />
         <DetectSpaces attribute="Normal Text" context="#pop!ArgumentsNone" />
         <AnyChar context="#pop" String="&commandsep;" lookAhead="true"/> <!--consumed on the "Find"-Level-->
-        <RegExpr attribute="Error" String="[^&commandsep;]"/>
+        <RegExpr attribute="Error" String="."/>
       </context>
 
       <context name="ArgumentsNone" attribute="Normal Text" lineEndContext="#pop">
         <LineContinue attribute="Escape" />
         <DetectSpaces attribute="Normal Text" />
         <DetectChar attribute="Comment" context="Comment" char="#"/>
-        <RegExpr attribute="Redirection" context="Redirect" String="[0-9]*(&gt;{1,2}|&lt;|\^{1,2})" />
+        <RegExpr attribute="Redirection" context="Redirect" String="[0-9]*(?:&gt;{1,2}|&lt;|\^{1,2})" />
         <AnyChar context="#pop" String="&commandsep;" lookAhead="true"/> <!--consumed on the "Find"-Level-->
         <DetectChar context="#pop" char=")" lookAhead="true"/>
         <RegExpr attribute="Error" String="[^&commandsep;#]*"/>
@@ -803,11 +800,11 @@
         <RegExpr attribute="Error" String="." context="#pop"/>
       </context>
 
-      <context name="Redirect" attribute="Redirection" fallthrough="true" fallthroughContext="#pop!DirectPath" lineEndContext="#stay">
+      <context name="Redirect" attribute="Redirection" fallthroughContext="#pop!DirectPath" lineEndContext="#stay">
         <LineContinue attribute="Escape" />
         <DetectChar attribute="Redirection" context="#pop!DirectPath" char="?"/>
         <DetectChar attribute="Redirection" context="#pop#pop" char="|"/>
-        <RegExpr    attribute="Redirection" context="#pop!TokEnd" String="(&amp;[0-9]+|&amp;-)" />
+        <RegExpr    attribute="Redirection" context="#pop!TokEnd" String="&amp;(?:[0-9]+|-)" />
       </context>
 
       <context name="Subscript" attribute="Index" lineEndContext="#pop">
@@ -852,7 +849,7 @@
       </context>
 
       <!-- Subscript consumes anything till ], marks as Variable -->
-      <context name="CheckSubscript" attribute="Index" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+      <context name="CheckSubscript" attribute="Index" lineEndContext="#pop" fallthroughContext="#pop">
         <LineContinue attribute="Escape" />
         <DetectChar attribute="Index" context="Subscript" char="["/>
       </context>
@@ -862,7 +859,7 @@
         <DetectChar attribute="Keychar" context="CommandSubstitution" char="(" />
       </context>
 
-      <context name="CommandSubstitution" attribute="Normal Text" fallthrough="true" fallthroughContext="Root" lineEndContext="#stay">
+      <context name="CommandSubstitution" attribute="Normal Text" fallthroughContext="Root" lineEndContext="#stay">
         <LineContinue attribute="Escape" />
         <DetectChar attribute="Keychar" context="#pop" char=")" />
       </context>
@@ -911,15 +908,14 @@
       </context>
 
       <!-- DirectPath is used at places where the next part is definitely a path -->
-      <context name="DirectPath" attribute="Path" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!PathHead" >
+      <context name="DirectPath" attribute="Path" lineEndContext="#pop" fallthroughContext="#pop!PathHead" >
         <LineContinue attribute="Escape" />
         <DetectSpaces attribute="Normal Text" />
         <AnyChar attribute="Error" context="#pop" String="#&commandsep;&lt;&gt;^" />
       </context>
 
-      <context name="PathHead" attribute="Path" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!Path" >
+      <context name="PathHead" attribute="Path" lineEndContext="#pop" fallthroughContext="#pop!Path" >
         <LineContinue attribute="Escape" />
-        <RegExpr attribute="HomeDir" context="#pop" String="&homedir;&white_or_eol;" />
         <RegExpr attribute="HomeDir" context="#pop!Path" String="&homedir;" />
       </context>
 
@@ -955,8 +951,7 @@
 
       <!-- FindEscapes contains various rules to mark different shell input -->
       <context name="FindEscapes" attribute="Normal Text" lineEndContext="#stay">
-        <RegExpr attribute="Escape" String="\\&escapechars;" />
-        <RegExpr attribute="Escape" String="\\([0-7]{1,3}|[xX][A-Fa-f0-9]{1,2}|u[A-Fa-f0-9]{1,4}|U[A-Fa-f0-9]{1,8}|c.)" />
+        <RegExpr attribute="Escape" String="\\(?:&escapechars;|[0-7]{1,3}|[xX][A-Fa-f0-9]{1,2}|u[A-Fa-f0-9]{1,4}|U[A-Fa-f0-9]{1,8}|c.)" />
       </context>
 
     </contexts>

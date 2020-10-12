@@ -815,6 +815,15 @@ namespace
 
             if (region.type() == FoldingRegion::Begin) {
                 m_regions.push_back(Region{m_regionDepth, offset, -1, id, Region::State::Open});
+                // swap with previous region if this is a closing region with same offset in order to superimpose labels
+                if (m_regions.size() >= 2) {
+                    auto &previousRegion = m_regions[m_regions.size()-2];
+                    if (previousRegion.state == Region::State::Close && previousRegion.offset == offset) {
+                        std::swap(previousRegion, m_regions.back());
+                        if (previousRegion.bindIndex != -1)
+                            m_regions[previousRegion.bindIndex].bindIndex = m_regions.size() - 1;
+                    }
+                }
                 ++m_regionDepth;
             } else {
                 // find open region

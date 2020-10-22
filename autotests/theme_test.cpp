@@ -146,7 +146,7 @@ private Q_SLOTS:
         QCOMPARE(t.editorColor(Theme::WordWrapMarker), QColor("#ededed").rgb());
         QCOMPARE(t.editorColor(Theme::ModifiedLines), QColor("#fdbc4b").rgb());
         QCOMPARE(t.editorColor(Theme::SavedLines), QColor("#2ecc71").rgb());
-        QCOMPARE(t.editorColor(Theme::Separator), QColor("#a0a0a0").rgb());
+        QCOMPARE(t.editorColor(Theme::Separator), QColor("#d5d5d5").rgb());
         QCOMPARE(t.editorColor(Theme::MarkBookmark), QColor("#0000ff").rgb());
         QCOMPARE(t.editorColor(Theme::MarkBreakpointActive), QColor("#ff0000").rgb());
         QCOMPARE(t.editorColor(Theme::MarkBreakpointReached), QColor("#ffff00").rgb());

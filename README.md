@@ -6,12 +6,15 @@ Syntax highlighting engine for Kate syntax definitions
 
 1. [Introduction](#introduction)
 2. [Out of scope](#out-of-scope)
-3. [Syntax Definition Files](#syntax-definition-files)
-4. [Build it](#build-it)
-5. [How to contribute](#how-to-contribute)
-6. [Adding unit tests for a syntax definition](#adding-unit-tests-for-a-syntax-definition)
+3. [Syntax definition files](#syntax-definition-files)
+4. [Color theme files](#color-theme-files)
+5. [Build it](#build-it)
+6. [How to contribute](#how-to-contribute)
+   * [Licensing](#licensing)
+   * [Tips for contributing to syntax definition files](#tips-for-contributing-to-syntax-definition-files)
+   * [Adding unit tests for a syntax definition](#adding-unit-tests-for-a-syntax-definition)
 7. [Report bug or help to fix them](#report-bug-or-help-to-fix-them)
-8. [Updating the kate-editor.org/syntax website](#updating-the-kate-editororgsyntax-website)
+8. [Updating the syntax & themes pages of the kate-editor.org website](#updating-the-kate-editororgsyntax-website)
 
 ## Introduction
 
@@ -33,7 +36,7 @@ out of scope:
 
 If you need any of this, check out [KTextEditor](https://api.kde.org/frameworks/ktexteditor/html/).
 
-## Syntax Definition Files
+## Syntax definition files
 
 This library uses Kate syntax definition files for the actual highlighting,
 the file format is documented [here](https://docs.kde.org/?application=katepart&branch=trunk5&path=highlight.html).
@@ -71,6 +74,29 @@ For more details, see ["The Highlight Definition XML Format" (Working with Synta
 Also, in **data/schema/** there is a script to validate the syntax definiton XML
 files. Use the command `validatehl.sh mySyntax.xml`.
 
+## Color theme files
+
+This library includes the color themes, the theme files use the **JSON**
+format and are located in **data/themes/** with the **.theme** extension.
+
+Additional ones are also picked up from the file system if present,
+in the **org.kde.syntax-highlighting/themes/** folder of your user directory,
+allowing you to easily add custom color theme files.
+The location of **org.kde.syntax-highlighting/themes/** is the same
+as shown in the table of the [previous section](#syntax-definition-files),
+replacing the **syntax** folder with **themes**.
+
+The [KTextEditor](https://api.kde.org/frameworks/ktexteditor/html/) library provides
+a user interface for editing and creating KSyntaxHighlighting color themes, including
+a tool for exporting and importing the JSON theme files.
+The script **data/generators/kateschema_to_theme_converter.py** converts the old Kate
+schemas files to KSyntaxHighlighting themes.
+
+For more information, see:
+
+* [Kate - Color Themes with Frameworks 5.75 (Kate Editor Website)](https://kate-editor.org/post/2020/2020-09-13-kate-color-themes-5.75/)
+* [Submit a KSyntaxHighlighting Color Theme (Kate Editor Website)](https://kate-editor.org/post/2020/2020-09-18-submit-a-ksyntaxhighlighting-color-theme/)
+
 ## Build it
 
 1. Create and change into a build directory. Usually, a folder called **build**
@@ -85,6 +111,16 @@ files. Use the command `validatehl.sh mySyntax.xml`.
 
    ```bash
    cmake <source-directory>
+   make
+   ```
+
+   For example:
+
+   ```bash
+   git clone git@invent.kde.org:frameworks/syntax-highlighting.git
+   mkdir ./syntax-highlighting/build
+   cd ./syntax-highlighting/build
+   cmake ../
    make
    ```
 
@@ -126,7 +162,7 @@ All files shall contain a proper "SPDX-License-Identifier: MIT" identifier insid
 */
 ```
 
-### What you should know before working with syntax definition files and sending a patch
+### Tips for contributing to syntax definition files
 
 * If you are modifying an existing syntax definition XML file, you must increase
   the version number of the language.
@@ -145,9 +181,9 @@ All files shall contain a proper "SPDX-License-Identifier: MIT" identifier insid
 
   Then, it is necessary to generate and update the files in **autotests/folding/**,
   **autotests/html/** and **autotests/reference/**, which must be included in the
-  patches. The instructions are in the [next section](#adding-unit-tests-for-a-syntax-definition).
+  patches. Instructions are [below](#adding-unit-tests-for-a-syntax-definition).
 
-## Adding unit tests for a syntax definition
+### Adding unit tests for a syntax definition
 
 1. Add an input file into the **autotests/input/** folder, lets call it
    **test.&lt;language-extension&gt;**.
@@ -184,9 +220,10 @@ However, some users often report bugs related to syntax highlighting in
 [kate/syntax](https://bugs.kde.org/buglist.cgi?component=syntax&product=kate&resolution=---)
 and [kile/editor](https://bugs.kde.org/buglist.cgi?component=editor&product=kile&resolution=---).
 
-## Updating the kate-editor.org/syntax website
+## Updating the syntax & themes pages of the kate-editor.org website
 
-To update the [kate-editor.org/syntax](https://kate-editor.org/syntax/) website
+To update the [kate-editor.org/syntax](https://kate-editor.org/syntax/) and
+[kate-editor.org/themes](https://kate-editor.org/themes/) websites
 including the update site & all linked examples/files,
 please run after successful **build** & **test** the following make target:
 

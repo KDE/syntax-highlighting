@@ -27,7 +27,6 @@
 #include <QFile>
 #include <QHash>
 #include <QStringList>
-#include <QVector>
 #include <QXmlStreamReader>
 
 #include <algorithm>

@@ -1,0 +1,2475 @@
+# WARNING : This file is NOT a valid systemd service.
+# It was created to demonstrate/test KDE syntax highlighting.
+# It includes invalid sections, option names and option values.
+
+; NOTE: Alerts in comments are supported.
+
+
+[Automount]
+Where = /the/mount/directory
+DirectoryMode = 0755
+TimeoutIdleSec = 5min 5s
+
+
+[Install]
+Alias = some.service some.invalid some_%b.service
+WantedBy = some.service some.socket some.invalid
+RequiredBy = some.service some.socket some.invalid
+Also = some.service some.socket some.invalid
+DefaultInstance = id
+
+
+[Mount]
+What = /dev/disk/by-uuid/444c-0d9d-411e-a973-015b31acaa
+Where = /the/mount/directory
+Type = btrfs
+Options = subvol=some_name,compress=lzo,noatime,noauto,nodev,nosuid
+SloppyOptions = on
+LazyUnmount = true
+ReadWriteOnly = true
+ForceUnmount = yes
+DirectoryMode = 0700
+TimeoutSec = 5 m 20 s
+
+
+[Path]
+PathExists = /some/absolute/path
+PathExistsGlob = /some/glob*
+PathChanged = /some/absolute/path
+PathModified = /some/absolute/path
+DirectoryNotEmpty = /some/absolute/path
+Unit = some@instance.service
+MakeDirectory = yes
+DirectoryMode = 0700
+
+
+[Service]
+## from systemd.service
+Type = exec
+RemainAfterExit = false
+GuessMainPID = no
+PIDFile = some/path
+BusName = some.name
+ExecStart = /usr/bin/Xorg ${DISPLAY} ${XDG_VTNR} \
+  -logfile %t/X.%i.log \
+  -nolisten tcp \
+  -quiet
+ExecStartPre = @/bin/start/pre some args
+ExecStartPost = -cmd arg, @cmd2 name -o \x0A
+ExecCondition = /bin/exec/condition
+ExecReload = /bin/exec/reload
+ExecStop = /bin/kill -SIGABRT $MAINPID
+ExecStopPost = -:!!/bin/stop/post
+RestartSec = 15
+TimeoutStartSec = 5s 100ms
+TimeoutStopSec = infinity
+TimeoutAbortSec = 15
+TimeoutSec = 10
+TimeoutStartFailureMode = abort
+TimeoutStopFailureMode = kill
+RuntimeMaxSec = 1min 20 seconds
+WatchdogSec = 90
+Restart = on-watchdog
+SuccessExitStatus = PROTOCOL RUNTIME_DIRECTORY \
+  SECCOMP 15 23 SIGUSR1 SIGXCPU
+RestartPreventExitStatus = 15 23 SIGUSR1 \
+  SIGXCPU
+RestartForceExitStatus = SIGQUIT SIGSTOP 99
+RootDirectoryStartOnly = false
+NonBlocking = false
+NotifyAccess = exec
+Sockets = some.socket \
+  some-other.socket
+FileDescriptorStoreMax = 5
+USBFunctionDescriptors = /some/absolute/path
+USBFunctionStrings = /some/absolute/path
+OOMPolicy = stop
+
+## from systemd.exec Paths
+WorkingDirectory = ~
+RootDirectory = /some/path
+RootImage = /some/path
+RootHash = /some/path
+RootHash = 0xABCDEF
+RootHashSignature =
+RootVerity = /some/path
+MountAPIVFS = true
+BindPaths = /source/path,/destination/path,rbind \
+  /source/path2,/destination/path2,norbind \
+  /source/path3
+BindReadOnlyPaths = /source/path,/destination/path,rbind \
+  /source/path2,/destination/path2,norbind \
+  /source/path3
+## from systemd.exec Credentials
+User = 1000
+Group = group-name
+DynamicUser = true
+SupplementaryGroups = group1 group-two 100 \
+  one-more-group
+PAMName =
+## from systemd.exec Capabilities
+CapabilityBoundingSet = ~ CAP_SYS_ADMIN CAP_DAC_OVERRIDE   CAP_SYS_PTRACE \
+  CAP_NET_ADMIN  CAP_SYS_BOOT
+AmbientCapabilities = CAP_SYS_ADMIN \
+  CAP_DAC_OVERRIDE
+## from systemd.exec Security
+NoNewPrivileges = true
+SecureBits = keep-caps keep-caps-locked \
+  no-setuid-fixup \
+  no-setuid-fixup-locked
+## from systemd.exec Mandatory Access Control
+SELinuxContext =
+AppArmorProfile = - someprofile
+SmackProcessLabel = -label
+## from systemd.exec Process Properties
+LimitCPU = 15s:20s
+LimitFSIZE = 12G:24G
+LimitDATA = infinity
+LimitSTACK = 512K
+LimitCORE = 128K
+LimitRSS = 2G
+LimitNOFILE = 123:234
+LimitAS = 3G
+LimitNPROC = 4711
+LimitMEMLOCK = 12G
+LimitLOCKS = 321
+LimitSIGPENDING = 46
+LimitMSGQUEUE = 512K
+LimitNICE = +12 : +15
+LimitRTPRIO = 20 : 40
+LimitRTTIME = 12us : 15
+UMask = 0022
+CoredumpFilter = default private-dax shared-dax
+KeyringMode = private
+OOMScoreAdjust = 123
+TimerSlackNSec = 321
+Personality = x86-64
+IgnoreSIGPIPE = false
+## from systemd.exec Scheduling
+Nice = +12
+CPUSchedulingPolicy = fifo
+CPUSchedulingPriority = 34
+CPUSchedulingResetOnFork = false
+CPUAffinity = 0 1, 2 , \
+  3, 4-8
+NUMAPolicy = interleave
+NUMAMask = 1,2,3-8
+IOSchedulingClass = idle
+IOSchedulingPriority = 5
+## from systemd.exec Sandboxing
+ProtectSystem = strict
+ProtectHome = read-only
+RuntimeDirectory = some/dir
+StateDirectory = some/dir
+CacheDirectory = some/dir
+LogsDirectory = some/dir
+ConfigurationDirectory = some/dir
+RuntimeDirectoryMode = 0755
+StateDirectoryMode = 0755
+CacheDirectoryMode = 0755
+LogsDirectoryMode = 0755
+ConfigurationDirectoryMode = 0755
+RuntimeDirectoryPreserve = restart
+TimeoutCleanSec = 20
+ReadWritePaths = some/dir
+ReadOnlyPaths = some/dir
+InaccessiblePaths = some/dir
+TemporaryFileSystem = /var:ro
+PrivateTmp = yes
+PrivateDevices = on
+PrivateNetwork = no
+NetworkNamespacePath = /some/path
+PrivateUsers = off
+ProtectHostname = false
+ProtectClock = no
+ProtectKernelTunables = yes
+ProtectKernelModules = true
+ProtectKernelLogs = yes
+ProtectControlGroups = y
+RestrictAddressFamilies = ~ AF_INET AF_VSOCK
+RestrictNamespaces = cgroup net \
+  ipc
+LockPersonality = yes
+MemoryDenyWriteExecute = true
+RestrictRealtime = true
+RestrictSUIDSGID = true
+RemoveIPC = no
+PrivateMounts = false
+MountFlags = shared
+## from systemd.exec System Call Filtering
+SystemCallFilter = @debug @aio
+SystemCallErrorNumber = ETIMEDOUT
+SystemCallArchitectures = mips64-n32 \
+  native sparc
+## from systemd.exec System Call Environment
+Environment = DISPLAY=:%i
+Environment = XAUTHORITY=%t/Xauthority.%i \
+  "var=value with spaces"
+Environment = XDG_VTNR=vt%i
+EnvironmentFile = - /some/path
+PassEnvironment = SOME VARIABLES TO PASS
+UnsetEnvironment = SOME VARIABLES TO BE UNSET
+## from systemd.exec Logging and Standard Input/Output
+StandardInput = file:/some/absolute/path
+StandardOutput = journal+console
+StandardError = inherit
+StandardInputText = SWNrIHNpdHplIGRhIHVuJyBlc3NlIEtsb3B
+StandardInputData = yBkZW5rIG5hbnUhCkpldHogaXNzZSB1ZmYsIGVy
+LogLevelMax = info
+LogExtraFields = FIELD=VALUE OTHER_FIELD=VALUE2
+LogRateLimitIntervalSec = 1s 500ms
+LogRateLimitBurst = 50
+LogNamespace = some_name
+SyslogIdentifier = some_identifier
+SyslogFacility = daemon
+SyslogLevel = debug
+SyslogLevelPrefix = true
+TTYPath = /dev/console
+TTYReset = yes
+TTYVHangup = on
+TTYVTDisallocate = true
+## from systemd.exec System V Compatibility
+UtmpIdentifier = utid
+UtmpMode = init
+
+## from systemd.kill
+KillMode = process
+KillSignal = SIGABRT
+RestartKillSignal = SIGHUP
+SendSIGHUP = yes
+SendSIGKILL = no
+FinalKillSignal = SIGABRT
+WatchdogSignal = SIGQUIT
+
+## from systemd.resource-control
+CPUAccounting = yes
+CPUWeight = 1234
+StartupCPUWeight = 321
+CPUQuota = 123.4%
+CPUQuotaPeriodSec = 1s 23ms 45us
+AllowedCPUs = 0-8, 12
+AllowedMemoryNodes = 5-8, 12
+MemoryAccounting = yes
+MemoryMin = 10G
+MemoryLow = 20%
+MemoryHigh = 40 %
+MemoryMax = 60%
+MemorySwapMax = 10G
+TasksAccounting = on
+TasksMax = 50%
+IOAccounting = on
+IOWeight = 1000
+StartupIOWeight = 500
+IODeviceWeight = /dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 1000
+IOReadBandwidthMax = /dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 10M
+IOWriteBandwidthMax = /dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 5M
+IOReadIOPSMax = /dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 1K
+IOWriteIOPSMax = /dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 2K
+IODeviceLatencyTargetSec = /dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 5s 20ms 100us
+IPAccounting = on
+IPAddressAllow = 127.0.0.0/8 ::1/128
+DevicePolicy = strict
+Slice = some.slice
+Delegate = bpf-firewall
+DisableControllers = cpu io
+
+
+[Slice]
+CPUAccounting = yes
+CPUWeight = 1234
+StartupCPUWeight = 321
+CPUQuota = 123.4%
+CPUQuotaPeriodSec = 1s 23ms 45us
+MemoryAccounting = no
+
+
+[Socket]
+ListenStream = 0.0.0.0:4000
+ListenDatagram = /path/to/socket
+ListenFIFO = /some/path
+ListenSequentialPacket = @namespace
+ListenSpecial = /some/path
+ListenNetlink = kobject-uevent
+ListenMessageQueue = /queue
+ListenUSBFunction = /some/path
+SocketProtocol = sctp
+BindIPv6Only = both
+Backlog = 123
+BindToDevice = name
+SocketGroup = users
+SocketUser = someuser
+SocketMode = 0644
+DirectoryMode = 0744
+Accept = no
+Writable = yes
+MaxConnections = 34
+MaxConnectionsPerSource = 10
+KeepAlive = yes
+KeepAliveTimeSec = 15s 30ms
+KeepAliveIntervalSec = 10s 123us
+KeepAliveProbes = 12
+NoDelay = false
+Priority = 5
+DeferAcceptSec = 1s 100ms
+ReceiveBuffer = 10K
+SendBuffer = 15K
+IPTOS = low-delay
+IPTTL = 12
+Mark = 12
+ReusePort = no
+SmackLabel = value
+SmackLabelIPIn = value
+SmackLabelIPOut = value
+SELinuxContextFromNet = true
+PipeSize = 1M
+MessageQueueMaxMessages = 12
+MessageQueueMessageSize = 1234
+FreeBind = yes
+Transparent = no
+Broadcast = true
+PassCredentials = yes
+PassSecurity = true
+PassPacketInfo = true
+TCPCongestion = westwood
+ExecStartPre = +/usr/bin/start/pre
+ExecStartPost = @/usr/bin/start/post arg
+ExecStopPre = /usr/bin/stop/pre
+ExecStopPost = /usr/bin/stop/post
+TimeoutSec = 1m 30sec
+Service = some.service
+RemoveOnStop = yes
+Symlinks = /some/path /some/other/path
+FileDescriptorName = some_name
+TriggerLimitIntervalSec = 1s 500ms
+TriggerLimitBurst = 50
+
+
+[Swap]
+What = /dev/disk/by-uuid/5db77-fde6-424e-a1bb-e88e8996c
+Priority = 123
+Options = some,device,options
+TimeoutSec = 1m 20s
+# see [Service] for options from systemd.exec and systemd.kill
+
+
+[Timer]
+OnActiveSec = 90
+OnBootSec = 5min 15s 100ms
+OnStartupSec = 2 minutes
+OnUnitActiveSec = 1 min
+OnUnitInactiveSec = 1m 30s
+OnCalendar = daily
+AccuracySec = 1min 10sec
+RandomizedDelaySec = 30s
+OnClockChange = false
+OnTimezoneChange = true
+Unit = some_timed.service
+Persistent = true
+WakeSystem = no
+RemainAfterElapse = true
+
+
+[Unit]
+Description = Testing systemd unit
+Documentation = https://docs.kde.org/stable5/en/applications/katepart/highlight.html \
+  man:/systemd.unit
+Requires = some.service
+Requisite = some-service-name.service
+Wants = some.service
+BindsTo = some.service
+BindsTo = %i.mount
+PartOf = some.service
+Conflicts = some.service
+Before = some.service
+After = some.service some@instance.service
+OnFailure = some.service
+PropagatesReloadTo = some.service
+ReloadPropagatedFrom = some.service
+JoinsNamespaceOf = some.service
+RequiresMountsFor = /tmp /var/log %h
+OnFailureJobMode = fail
+IgnoreOnIsolate = true
+StopWhenUnneeded = false
+RefuseManualStart = false
+RefuseManualStop = true
+AllowIsolate = true
+DefaultDependencies = no
+CollectMode = inactive
+FailureAction = reboot
+SuccessAction = none
+FailureActionExitStatus = 15
+SuccessActionExitStatus = 255
+JobTimeoutSec = 10
+JobRunningTimeoutSec = infinity
+JobTimeoutAction = none
+JobTimeoutRebootArgument = some argument
+StartLimitIntervalSec = 0
+StartLimitBurst = 10
+StartLimitAction = none
+RebootArgument = some argument
+ConditionArchitecture = x86
+ConditionVirtualization = |vmware
+ConditionHost = !shodan*
+ConditionKernelCommandLine = !kernel_option
+ConditionKernelVersion = | >= 4.*
+ConditionEnvironment = SOME_ENVIRONMENT_VARIABLE=some_value
+ConditionSecurity = | ! selinux
+ConditionCapability = !CAP_NET_ADMIN
+ConditionACPower = true
+ConditionNeedsUpdate = !/var
+ConditionFirstBoot = |false
+ConditionPathExists = !/some/absolute/path
+ConditionPathExistsGlob = |!/m?t/s[ao]me/path*
+ConditionPathIsDirectory = !/some/path
+ConditionPathIsSymbolicLink = !/some/path
+ConditionPathIsMountPoint = /some/path
+ConditionPathIsReadWrite = !/some/path
+ConditionPathIsEncrypted = !/some/absolute/path
+ConditionDirectoryNotEmpty = !/some/path
+ConditionFileNotEmpty = !/some/path
+ConditionFileIsExecutable = !/some/path
+ConditionUser = |@system
+ConditionGroup = |groupname
+ConditionControlGroupController = memory
+ConditionMemory = | >= 1500000
+ConditionCPUs = | < 8
+AssertArchitecture = x86
+AssertVirtualization = |vmware
+AssertHost = !shodan*
+AssertKernelCommandLine = !kernel_option
+AssertKernelVersion = !>=5.3
+AssertEnvironment = SOME_ENVIRONMENT_VARIABLE=some_value
+AssertSecurity = | ! selinux
+AssertCapability = !CAP_NET_ADMIN
+AssertACPower = true
+AssertNeedsUpdate = !/var
+AssertFirstBoot = |false
+AssertPathExists = !/some/absolute/path
+AssertPathExistsGlob = |!/mnt/*
+AssertPathIsDirectory = !/some/path
+AssertPathIsSymbolicLink = !/some/path
+AssertPathIsMountPoint = !/some/path
+AssertPathIsReadWrite = !/some/path
+AssertPathIsEncrypted = !/some/path
+AssertDirectoryNotEmpty = !/some/path
+AssertFileNotEmpty = !/some/path
+AssertFileIsExecutable = !/some/path
+AssertUser = |@system
+AssertGroup = |groupname
+AssertControlGroupController = memory
+
+
+###### invalid sections
+[Device]
+[Invalid]
+[Target]
+
+
+
+############
+# Extensions
+############
+
+
+###### option
+[Unit]
+Description = testing extensions
+  X-this = some value
+X-multiple-lines = some.service \
+ other service
+
+
+###### section
+[X-Unit]
+name = value
+
+## Comments in an extension section are just the same as elsewhere.
+
+Some text in an extension section.
+The extension section ends with the next section header.
+
+
+
+########
+# Format
+########
+
+###### for options accepting multiple values, lines may be continued
+#      using a trailing backlash
+[Unit]
+Before = before-me.socket \
+  before-me.service
+
+###### additional spaces are OK
+     [Unit]
+  RequiresMountsFor   =    /tmp /var/log
+
+
+
+########################################################
+# Testing valid and invalid values for defined contexts.
+########################################################
+
+
+###### invalid options
+[Unit]
+# missing assignment operator
+Description is invalid as it lacks the assignment operator
+# invalid option name
+InvalidOption = some text
+# WantedBy belongs to the [Install] section
+WantedBy = some.service some.socket
+
+
+###### AC architecture
+[Unit]
+# see "architecture" for all possible values
+AssertArchitecture = alpha
+AssertArchitecture = | alpha
+AssertArchitecture = |! alpha
+AssertArchitecture = ! alpha
+# other options
+ConditionArchitecture = |! alpha
+## invalid values
+AssertArchitecture = !| alpha
+AssertArchitecture = || alpha
+AssertArchitecture = !! alpha
+
+
+###### AC boolean
+[Unit]
+# see "boolean" for all possible values
+AssertACPower = true
+AssertACPower = | true
+AssertACPower = | ! true
+AssertACPower = ! true
+# other options
+AssertFirstBoot = | ! true
+ConditionACPower = | ! true
+ConditionFirstBoot = | ! true
+## invalid values
+AssertACPower = ! | true
+AssertACPower = | | true
+AssertACPower = !! true
+
+
+###### AC capability
+[Unit]
+# see "capability" for all possible values
+AssertCapability = CAP_CHOWN
+AssertCapability = | CAP_CHOWN
+AssertCapability = |! CAP_CHOWN
+AssertCapability = ! CAP_CHOWN
+# other options
+ConditionCapability = |! CAP_CHOWN
+## invalid values
+AssertCapability = !| CAP_CHOWN
+AssertCapability = || CAP_CHOWN
+AssertCapability = !! CAP_CHOWN
+
+
+###### AC cardinal
+[Unit]
+ConditionMemory = < 123456789
+ConditionMemory = <= 123456789
+ConditionMemory = = 123456789
+ConditionMemory = != 123456789
+ConditionMemory = >=123456789
+ConditionMemory = > 123456789
+ConditionMemory = |< 123456789
+ConditionMemory = |<= 123456789
+ConditionMemory = |= 123456789
+ConditionMemory = | != 123456789
+ConditionMemory = | >=123456789
+ConditionMemory = | > 123456789
+## other options
+ConditionCPUs = > 4
+## invalid values
+ConditionMemory = == 123456789
+ConditionMemory = >> 123456789
+ConditionMemory = = 123456789.987
+ConditionMemory = || = 123456789.987
+
+
+###### AC controller cg (assert/condition for control group controller)
+[Unit]
+AssertControlGroupController = blkio
+AssertControlGroupController = | blkio
+AssertControlGroupController = |! blkio
+AssertControlGroupController = ! blkio
+# other options
+ConditionControlGroupController = |! blkio
+## invalid values
+AssertControlGroupController = !| blkio
+AssertControlGroupController = || blkio
+AssertControlGroupController = !! blkio
+
+
+###### AC group
+AssertGroup = | name
+AssertGroup = |! name
+AssertGroup = ! name
+# other options
+ConditionGroup = |! name
+## invalid values
+AssertGroup = !| name
+AssertGroup = || name
+AssertGroup = !! name
+
+
+###### AC security
+[Unit]
+# see "security" for all possible values
+AssertSecurity = audit
+AssertSecurity = | audit
+AssertSecurity = |! audit
+AssertSecurity = ! audit
+# other options
+ConditionSecurity = |! audit
+## invalid values
+AssertSecurity = !| audit
+AssertSecurity = || audit
+AssertSecurity = !! audit
+
+
+###### AC text
+[Unit]
+AssertKernelCommandLine = option=value
+AssertKernelCommandLine = | arg
+AssertKernelCommandLine = |! arg
+AssertKernelCommandLine = ! arg
+# other options
+AssertDirectoryNotEmpty = |! /some/path
+AssertFileIsExecutable = |! /some/path
+AssertFileNotEmpty = |! /some/path
+AssertKernelVersion = |! arg
+AssertNeedsUpdate = |! /etc
+AssertPathExists = |! /some/path
+AssertPathIsDirectory = |! /some/path
+AssertPathIsEncrypted = |! /some/path
+AssertPathIsMountPoint = |! /some/path
+AssertPathIsReadWrite = |! /some/path
+AssertPathIsSymbolicLink = |! /some/path
+ConditionDirectoryNotEmpty = |! /some/path
+ConditionEnvironment = |! name=value
+ConditionFileIsExecutable = |! /some/path
+ConditionFileNotEmpty = |! /some/path
+ConditionKernelCommandLine = |! arg
+ConditionKernelVersion = |! arg
+ConditionNeedsUpdate = |! /var
+ConditionPathExists = |! /some/path
+ConditionPathIsDirectory = |! /some/path
+ConditionPathIsEncrypted = |! /some/path
+ConditionPathIsMountPoint = |! /some/path
+ConditionPathIsReadWrite = |! /some/path
+ConditionPathIsSymbolicLink = |! /some/path
+## invalid values
+AssertKernelCommandLine = !| arg
+AssertKernelCommandLine = || arg
+AssertKernelCommandLine = !! arg
+
+
+###### AC text *
+[Unit]
+AssertHost = hostname
+AssertHost = hostname*
+AssertHost = | hostname*
+AssertHost = |!hostname*
+AssertHost = !hostname*
+# other options
+ConditionHost = |!hostname*
+## invalid values
+AssertHost = !| hostname*
+AssertHost = || hostname*
+AssertHost = !! hostname*
+
+
+###### AC text glob
+[Unit]
+AssertPathExistsGlob = |!/s[ao]me/path*
+## invalid values
+ConditionPathExistsGlob = !! /s?me/path*
+
+
+###### AC user
+AssertUser = | @system
+AssertUser = | name
+AssertUser = |! @system
+AssertUser = ! name
+# other options
+ConditionUser = |! @system
+## invalid values
+AssertUser = !| name
+AssertUser = || name
+AssertUser = !! name
+
+
+###### AC virtualization
+# accepts boolean too
+AssertVirtualization = |true
+# see "virtualization" for all possible values
+AssertVirtualization = container
+AssertVirtualization = | container
+AssertVirtualization = |! container
+ConditionVirtualization = |! container
+AssertVirtualization = ! container
+## invalid values
+AssertVirtualization = ! | true
+AssertVirtualization = | | true
+AssertVirtualization = !! true
+# multiple values
+AssertVirtualization = true false
+
+
+###### - text
+[Service]
+AppArmorProfile = - some-profile
+AppArmorProfile =-profile
+
+
+###### -+/path list
+[Service]
+ReadWritePaths = -/some/path
+ReadWritePaths = -+/some/path
+ReadWritePaths = +/some/path
+ReadWritePaths =+/some/path-+/ -/some/other/path \
+  -+/one/more/path
+## invalid values
+ReadWritePaths = - /some/path
+ReadWritePaths = + /some/path
+ReadWritePaths = +-/some/path
+
+
+###### ~ address family list
+[Service]
+RestrictAddressFamilies = AF_ALG
+RestrictAddressFamilies = AF_APPLETALK
+RestrictAddressFamilies = AF_ASH
+RestrictAddressFamilies = AF_ATMPVC
+RestrictAddressFamilies = AF_ATMSVC
+RestrictAddressFamilies = AF_AX25
+RestrictAddressFamilies = AF_BLUETOOTH
+RestrictAddressFamilies = AF_BRIDGE
+RestrictAddressFamilies = AF_CAIF
+RestrictAddressFamilies = AF_CAN
+RestrictAddressFamilies = AF_DECnet
+RestrictAddressFamilies = AF_ECONET
+RestrictAddressFamilies = AF_FILE
+RestrictAddressFamilies = AF_IB
+RestrictAddressFamilies = AF_IEEE802154
+RestrictAddressFamilies = AF_INET
+RestrictAddressFamilies = AF_INET6
+RestrictAddressFamilies = AF_IPX
+RestrictAddressFamilies = AF_IRDA
+RestrictAddressFamilies = AF_ISDN
+RestrictAddressFamilies = AF_IUCV
+RestrictAddressFamilies = AF_KCM
+RestrictAddressFamilies = AF_KEY
+RestrictAddressFamilies = AF_LLC
+RestrictAddressFamilies = AF_LOCAL
+RestrictAddressFamilies = AF_MAX
+RestrictAddressFamilies = AF_MPLS
+RestrictAddressFamilies = AF_NETBEUI
+RestrictAddressFamilies = AF_NETLINK
+RestrictAddressFamilies = AF_NETROM
+RestrictAddressFamilies = AF_NFC
+RestrictAddressFamilies = AF_PACKET
+RestrictAddressFamilies = AF_PHONET
+RestrictAddressFamilies = AF_PPPOX
+RestrictAddressFamilies = AF_QIPCRTR
+RestrictAddressFamilies = AF_RDS
+RestrictAddressFamilies = AF_ROSE
+RestrictAddressFamilies = AF_ROUTE
+RestrictAddressFamilies = AF_RXRPC
+RestrictAddressFamilies = AF_SECURITY
+RestrictAddressFamilies = AF_SMC
+RestrictAddressFamilies = AF_SNA
+RestrictAddressFamilies = AF_TIPC
+RestrictAddressFamilies = AF_UNIX
+RestrictAddressFamilies = AF_UNSPEC
+RestrictAddressFamilies = AF_VSOCK
+RestrictAddressFamilies = AF_WANPIPE
+RestrictAddressFamilies = AF_X25
+RestrictAddressFamilies = AF_XDP
+RestrictAddressFamilies = ~ AF_XDP AF_LOCAL \
+  AF_SECURITY
+## invalid values
+RestrictAddressFamilies = AF_INVALID
+
+
+###### ~ capability list
+# all the values of capability, but multple values for a single option entry are valid
+[Service]
+AmbientCapabilities = ~ CAP_NET_ADMIN CAP_NET_RAW \
+  CAP_WAKE_ALARM
+CapabilityBoundingSet=~CAP_NET_ADMIN CAP_NET_RAW \
+  CAP_WAKE_ALARM
+
+
+###### ~ namespace list
+[Service]
+RestrictNamespaces = cgroup
+RestrictNamespaces = ipc
+RestrictNamespaces = mnt
+RestrictNamespaces = net
+RestrictNamespaces = pid
+RestrictNamespaces = user
+RestrictNamespaces = uts
+RestrictNamespaces = cgroup uts
+RestrictNamespaces = ~ cgroup pid \
+  uts
+# includes boolean
+RestrictNamespaces = true
+RestrictNamespaces = false
+## invalid values
+RestrictNamespaces = invalid
+RestrictNamespaces = ~ true
+# if boolean, no multiple values
+RestrictNamespaces = true cgroup
+
+
+###### ~ system call filter list
+[Service]
+SystemCallFilter = @aio
+SystemCallFilter = @basic-io
+SystemCallFilter = @chown
+SystemCallFilter = @clock
+SystemCallFilter = @cpu-emulation
+SystemCallFilter = @debug
+SystemCallFilter = @default
+SystemCallFilter = @file-system
+SystemCallFilter = @io-event
+SystemCallFilter = @ipc
+SystemCallFilter = @keyring
+SystemCallFilter = @memlock
+SystemCallFilter = @module
+SystemCallFilter = @mount
+SystemCallFilter = @network-io
+SystemCallFilter = @obsolete
+SystemCallFilter = @privileged
+SystemCallFilter = @process
+SystemCallFilter = @raw-io
+SystemCallFilter = @reboot
+SystemCallFilter = @resources
+SystemCallFilter = @setuid
+SystemCallFilter = @signal
+SystemCallFilter = @swap
+SystemCallFilter = @sync
+SystemCallFilter = @system-service
+SystemCallFilter = @timer
+SystemCallFilter = @obsolete @timer \
+  @swap
+SystemCallFilter = ~ @reboot @swap
+## invalid values
+SystemCallFilter = invalid
+SystemCallFilter = @invalid @ sync
+
+
+###### action
+[Unit]
+FailureAction = exit
+FailureAction = exit-force
+FailureAction = none
+FailureAction = poweroff
+FailureAction = poweroff-force
+FailureAction = poweroff-immediate
+FailureAction = reboot
+FailureAction = reboot-force
+FailureAction = reboot-immediate
+## invalid values
+FailureAction = invalid
+FailureAction = invalid exit
+# multiple values
+FailureAction = none exit
+FailureActionExitStatus = 123
+
+
+###### architecture
+[Unit]
+ConditionArchitecture = alpha
+ConditionArchitecture = arc
+ConditionArchitecture = arc-be
+ConditionArchitecture = arm
+ConditionArchitecture = arm-be
+ConditionArchitecture = arm64
+ConditionArchitecture = arm64-be
+ConditionArchitecture = cris
+ConditionArchitecture = ia64
+ConditionArchitecture = m68k
+ConditionArchitecture = mips
+ConditionArchitecture = mips-le
+ConditionArchitecture = mips64
+ConditionArchitecture = mips64-le
+ConditionArchitecture = parisc
+ConditionArchitecture = parisc64
+ConditionArchitecture = ppc
+ConditionArchitecture = ppc-le
+ConditionArchitecture = ppc64
+ConditionArchitecture = ppc64-le
+ConditionArchitecture = s390
+ConditionArchitecture = s390x
+ConditionArchitecture = sh
+ConditionArchitecture = sh64
+ConditionArchitecture = sparc
+ConditionArchitecture = sparc64
+ConditionArchitecture = tilegx
+ConditionArchitecture = x86
+ConditionArchitecture = x86-64
+# special value "native"
+ConditionArchitecture = native
+## invalid values
+ConditionArchitecture = invalid
+ConditionArchitecture = invalid x86
+# multiple values
+ConditionArchitecture = sparc x86
+
+
+###### boolean
+[Unit]
+StopWhenUnneeded = 1
+StopWhenUnneeded = 0
+StopWhenUnneeded = true
+StopWhenUnneeded = t
+StopWhenUnneeded = false
+StopWhenUnneeded = f
+StopWhenUnneeded = yes
+StopWhenUnneeded = y
+StopWhenUnneeded = no
+StopWhenUnneeded = n
+StopWhenUnneeded = on
+StopWhenUnneeded = off
+## invalid values
+StopWhenUnneeded = invalid
+# multiple values
+StopWhenUnneeded = false true
+
+
+###### calendar
+[Timer]
+OnCalendar = daily
+OnCalendar = hourly
+OnCalendar = minutely
+OnCalendar = monthly
+OnCalendar = quarterly
+OnCalendar = semiannually
+OnCalendar = weekly
+OnCalendar = yearly
+OnCalendar = daily UTC
+OnCalendar = daily utc
+OnCalendar = monday *-12-* 17:00
+OnCalendar = Mon *-12-* 17:00
+## invalid values
+OnCalendar = Mo *-12-* 17:00
+
+
+###### capability
+[Unit]
+ConditionCapability = CAP_AUDIT_CONTROL
+ConditionCapability = CAP_AUDIT_READ
+ConditionCapability = CAP_AUDIT_WRITE
+ConditionCapability = CAP_BLOCK_SUSPEND
+ConditionCapability = CAP_CHOWN
+ConditionCapability = CAP_DAC_OVERRIDE
+ConditionCapability = CAP_DAC_READ_SEARCH
+ConditionCapability = CAP_FOWNER
+ConditionCapability = CAP_FSETID
+ConditionCapability = CAP_IPC_LOCK
+ConditionCapability = CAP_IPC_OWNER
+ConditionCapability = CAP_KILL
+ConditionCapability = CAP_LEASE
+ConditionCapability = CAP_LINUX_IMMUTABLE
+ConditionCapability = CAP_MAC_ADMIN
+ConditionCapability = CAP_MAC_OVERRIDE
+ConditionCapability = CAP_MKNOD
+ConditionCapability = CAP_NET_ADMIN
+ConditionCapability = CAP_NET_BIND_SERVICE
+ConditionCapability = CAP_NET_BROADCAST
+ConditionCapability = CAP_NET_RAW
+ConditionCapability = CAP_SETGID
+ConditionCapability = CAP_SETFCAP
+ConditionCapability = CAP_SETPCAP
+ConditionCapability = CAP_SETUID
+ConditionCapability = CAP_SYS_ADMIN
+ConditionCapability = CAP_SYS_BOOT
+ConditionCapability = CAP_SYS_CHROOT
+ConditionCapability = CAP_SYS_MODULE
+ConditionCapability = CAP_SYS_NICE
+ConditionCapability = CAP_SYS_PACCT
+ConditionCapability = CAP_SYS_PTRACE
+ConditionCapability = CAP_SYS_RAWIO
+ConditionCapability = CAP_SYS_RESOURCE
+ConditionCapability = CAP_SYS_TIME
+ConditionCapability = CAP_SYS_TTY_CONFIG
+ConditionCapability = CAP_SYSLOG
+ConditionCapability = CAP_WAKE_ALARM
+## invalid values
+ConditionCapability = invalid
+# multiple values
+ConditionCapability = CAP_NET_ADMIN CAP_NET_RAW
+
+
+###### cardinal
+[Unit]
+StartLimitBurst = 15
+## invalid values
+StartLimitBurst = -10
+StartLimitBurst = 12.34
+StartLimitBurst = 10%
+StartLimitBurst = infinity
+# multiple values
+StartLimitBurst = 10 20
+
+
+###### cardinal % infinity
+[Service]
+TasksMax = 15
+TasksMax = 10%
+TasksMax = infinity
+## invalid values
+TasksMax = -10
+TasksMax = 12.34
+# multiple values
+TasksMax = 10 20
+TasksMax = infinity 20
+
+
+###### cardinal %KGMT infinity
+[Service]
+MemoryMin = 123
+MemoryMin = 12K
+MemoryMin = 12M
+MemoryMin = 12G
+MemoryMin = 12T
+MemoryMin = 12 G
+MemoryMin = infinity
+MemoryMin = 20%
+## invalid values
+MemoryMin = invalid
+# invalid bytes suffix
+MemoryMin = 12g
+MemoryMin = 12H
+MemoryMin = 12 E
+MemoryMin = 12P
+
+
+###### cardinal KGMT infinity
+[Service]
+MemorySwapMax = 123
+MemorySwapMax = 12K
+MemorySwapMax = 12M
+MemorySwapMax = 12G
+MemorySwapMax = 12T
+MemorySwapMax = 12 G
+MemorySwapMax = infinity
+## invalid values
+MemorySwapMax = invalid
+MemorySwapMax = 20%
+# invalid bytes suffix
+MemorySwapMax = 12g
+MemorySwapMax = 12H
+MemorySwapMax = 12 E
+MemorySwapMax = 12P
+
+
+###### collect mode
+[Unit]
+CollectMode = inactive
+CollectMode = inactive-or-failed
+## invalid values
+CollectMode = invalid
+CollectMode = invalid inactive
+# multiple values
+CollectMode = inactive-or-failed inactive
+
+
+###### condition needs update
+[Unit]
+ConditionNeedsUpdate = !/etc
+ConditionNeedsUpdate = !/var
+## invalid values
+ConditionNeedsUpdate = /home
+# multiple values
+ConditionNeedsUpdate = /etc /var
+
+
+###### condition user
+[Unit]
+ConditionUser = @system
+ConditionUser = name1
+ConditionUser = 1050
+## invalid values
+ConditionUser = name1.invalid
+ConditionUser = -1050
+# multiple values
+ConditionUser = name1 name2
+
+
+###### controller cg (control group controller)
+[Unit]
+AssertControlGroupController = blkio
+AssertControlGroupController = cpu
+AssertControlGroupController = cpuacct
+AssertControlGroupController = devices
+AssertControlGroupController = io
+AssertControlGroupController = memory
+## invalid values
+AssertControlGroupController = invalid
+AssertControlGroupController = bpf-firewall
+# multiple values
+AssertControlGroupController = cpu memory
+
+
+###### controller list
+[Service]
+# single controller
+DisableControllers = blkio
+DisableControllers = bpf-devices
+DisableControllers = bpf-firewall
+DisableControllers = cpu
+DisableControllers = cpuacct
+DisableControllers = cpuset
+DisableControllers = devices
+DisableControllers = io
+DisableControllers = memory
+DisableControllers = pids
+# multiple controllers
+DisableControllers = cpu io \
+  memory
+## invalid values
+DisableControllers = dev invalid
+
+
+###### cpu affinity
+[Service]
+# either "numa" or any of the values for "cpu index list"
+CPUAffinity = numa
+CPUAffinity = 0 1, 2 , \
+  3, 4-8 , 10 - 12
+## invalid values
+CPUAffinity = numa-x
+# no multiple "numa"
+CPUAffinity = numa numa
+# no CPU index list and "numa"
+CPUAffinity = numa 0 1 2
+CPUAffinity = 0 1 2 numa
+
+
+###### cpu index list
+[Service]
+NUMAMask = 0 1 2
+NUMAMask = 0,1, 2
+# using ranges
+NUMAMask = 0-2
+NUMAMask = 0 - 2
+NUMAMask = 0 1, 2 , \
+  3, 4-8 ,
+## invalid values
+NUMAMask = 0 invalid 2, 3;4
+NUMAMask = 0-a1
+NUMAMask = numa
+
+
+###### cpu scheduling policy
+[Service]
+CPUSchedulingPolicy = batch
+CPUSchedulingPolicy = fifo
+CPUSchedulingPolicy = idle
+CPUSchedulingPolicy = other
+CPUSchedulingPolicy = rr
+## invalid values
+CPUSchedulingPolicy = invalid
+# multiple values
+CPUSchedulingPolicy = batch fifo
+
+
+###### cpu scheduling priority
+[Service]
+CPUSchedulingPriority = 12
+CPUSchedulingPriority = 99
+## invalid values
+CPUSchedulingPriority = invalid
+CPUSchedulingPriority = -12
+CPUSchedulingPriority = 0.12
+# out of range
+CPUSchedulingPriority = 0
+CPUSchedulingPriority = 100
+# multiple values
+CPUSchedulingPriority = 12 34
+
+
+###### delegate
+[Service]
+# single boolean
+Delegate = true
+# single controller
+Delegate = blkio
+Delegate = bpf-devices
+Delegate = bpf-firewall
+Delegate = cpu
+Delegate = cpuacct
+Delegate = cpuset
+Delegate = devices
+Delegate = io
+Delegate = memory
+Delegate = pids
+# multiple controllers
+Delegate = cpu io \
+  memory
+## invalid values
+Delegate = invalid
+# multiple boolean values
+Delegate = on off
+
+
+###### device cardinal KMGT
+[Service]
+IOReadIOPSMax = /dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 123
+IOReadIOPSMax = /dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 12K
+IOReadIOPSMax = /dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 12M
+IOReadIOPSMax = /dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 12G
+IOReadIOPSMax = /dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 12T
+IOReadIOPSMax = /dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 12 G
+IOReadIOPSMax = /dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 \
+  10M
+## invalid values
+IOReadIOPSMax = /dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 20%
+# invalid multiplier suffix
+IOReadIOPSMax = /dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 12g
+IOReadIOPSMax = /dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 12E
+# no device
+IOReadIOPSMax = 10
+IOReadIOPSMax = 10M
+
+
+###### device policy
+[Service]
+DevicePolicy = auto
+DevicePolicy = closed
+DevicePolicy = strict
+## invalid values
+DevicePolicy = invalid
+# multiple values
+DevicePolicy = auto closed
+
+
+###### device time span
+[Service]
+IODeviceLatencyTargetSec = /dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 123
+IODeviceLatencyTargetSec = /dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 5s 20ms \
+  100us
+## invalid values
+# no device
+IODeviceLatencyTargetSec = 123
+IODeviceLatencyTargetSec = 5s 20ms 100us
+
+
+###### exec
+[Service]
+# specifier and environment variable
+ExecStart = /some/cmd %u arg $var1 inside${var2}word ${var3} $var4
+ExecStart = cmd1 %h arg1_1 $var1, cmd2 %u arg2_1 $var2_1\
+  $var2_2
+# escapes (not exactly the same as detected by HlCStringChar)
+ExecStart = cmd \, \' \" \\ \a \b \f \n \r \s \t \v \x0A \012
+# prefix
+ExecStart = @/some/cmd arg "@!+-:"
+ExecStart = -/some/cmd-1 -option arg
+ExecStart = :/some/cmd arg
+ExecStart = +/some/cmd arg
+ExecStart = !/some/cmd arg
+ExecStart = !!/some/cmd arg
+ExecStart = @:-!!/some/cmd arg
+ExecStart = @!!-:/some/cmd arg
+ExecStart = @:-+/some/cmd arg
+## invalid values
+# invalid prefix
+ExecStart = @ /some/cmd arg
+ExecStart = @ -/some/cmd arg
+ExecStart = +!/some/cmd arg
+ExecStart = !!!/some/cmd arg
+ExecStart = @+@/some/cmd arg
+ExecStart = @!!+/some/cmd arg
+
+
+###### exit status
+[Service]
+SuccessExitStatus = 75
+SuccessExitStatus = ADDRESS_FAMILIES
+SuccessExitStatus = APPARMOR
+SuccessExitStatus = CACHE_DIRECTORY
+SuccessExitStatus = CANTCREAT
+SuccessExitStatus = CAPABILITIES
+SuccessExitStatus = CGROUP
+SuccessExitStatus = CHDIR
+SuccessExitStatus = CHOWN
+SuccessExitStatus = CHROOT
+SuccessExitStatus = CONFIG
+SuccessExitStatus = CONFIGURATION_DIRECTORY
+SuccessExitStatus = CONFIRM
+SuccessExitStatus = CPUAFFINITY
+SuccessExitStatus = DATAERR
+SuccessExitStatus = EXCEPTION
+SuccessExitStatus = EXEC
+SuccessExitStatus = FAILURE
+SuccessExitStatus = FDS
+SuccessExitStatus = GROUP
+SuccessExitStatus = INVALIDARGUMENT
+SuccessExitStatus = IOERR
+SuccessExitStatus = IOPRIO
+SuccessExitStatus = KEYRING
+SuccessExitStatus = LIMITS
+SuccessExitStatus = LOGS_DIRECTORY
+SuccessExitStatus = MEMORY
+SuccessExitStatus = NAMESPACE
+SuccessExitStatus = NETWORK
+SuccessExitStatus = NICE
+SuccessExitStatus = NOHOST
+SuccessExitStatus = NOINPUT
+SuccessExitStatus = NOPERM
+SuccessExitStatus = NOPERMISSION
+SuccessExitStatus = NOTCONFIGURED
+SuccessExitStatus = NOTIMPLEMENTED
+SuccessExitStatus = NOTINSTALLED
+SuccessExitStatus = NOTRUNNING
+SuccessExitStatus = NOUSER
+SuccessExitStatus = NO_NEW_PRIVILEGES
+SuccessExitStatus = NUMA_POLICY
+SuccessExitStatus = OOM_ADJUST
+SuccessExitStatus = OSERR
+SuccessExitStatus = OSFILE
+SuccessExitStatus = PAM
+SuccessExitStatus = PERSONALITY
+SuccessExitStatus = PROTOCOL
+SuccessExitStatus = RUNTIME_DIRECTORY
+SuccessExitStatus = SECCOMP
+SuccessExitStatus = SECUREBITS
+SuccessExitStatus = SELINUX_CONTEXT
+SuccessExitStatus = SETSCHEDULER
+SuccessExitStatus = SETSID
+SuccessExitStatus = SIGNAL_MASK
+SuccessExitStatus = SMACK_PROCESS_LABEL
+SuccessExitStatus = SOFTWARE
+SuccessExitStatus = STATE_DIRECTORY
+SuccessExitStatus = STDERR
+SuccessExitStatus = STDIN
+SuccessExitStatus = STDOUT
+SuccessExitStatus = SUCCESS
+SuccessExitStatus = TEMPFAIL
+SuccessExitStatus = TIMERSLACK
+SuccessExitStatus = UNAVAILABLE
+SuccessExitStatus = USAGE
+SuccessExitStatus = USER
+# using signals (see values for context "signal" for a complete list of values)
+SuccessExitStatus = SIGABRT
+SuccessExitStatus = ADDRESS_FAMILIES 75 \
+  23 SIGHUP
+## invalid values
+SuccessExitStatus = invalid
+SuccessExitStatus = -23
+
+
+###### failure mode
+[Service]
+TimeoutStartFailureMode = abort
+TimeoutStartFailureMode = kill
+TimeoutStartFailureMode = terminate
+## invalid values
+TimeoutStartFailureMode = invalid
+# multiple values
+TimeoutStartFailureMode = abort kill
+
+
+###### fs type
+# A selection of file system types to be used as `Type` in mount units.
+[Mount]
+Type = binfmt_misc
+Type = btrfs
+Type = configfs
+Type = debugfs
+Type = devtmpfs
+Type = efivarfs
+Type = exfat
+Type = ext2
+Type = ext3
+Type = ext4
+Type = f2fs
+Type = fuse
+Type = fusectl
+Type = gfs2
+Type = hugetlbfs
+Type = iso9660
+Type = jfs
+Type = mqueue
+Type = msdos
+Type = nfs
+Type = nilfs2
+Type = ntfs
+Type = ocfs2
+Type = overlay
+Type = proc
+Type = reiserfs
+Type = tmpfs
+Type = tracefs
+Type = udf
+Type = vfat
+Type = virtiofs
+Type = xfs
+## invalid values
+Type = invalid
+Type = invalid ext4
+# multiple values
+Type = btrfs ext4
+
+
+###### file mode
+[Automount]
+DirectoryMode = 755
+## invalid values
+DirectoryMode = invalid
+# need octal digits
+DirectoryMode = 0758
+DirectoryMode = 075A
+# need 3 to 4 octal digits
+DirectoryMode = 07
+# multiple values
+DirectoryMode = 0755 0755
+
+
+###### group and user
+[Service]
+User = 1000
+Group = 100
+User = some-name
+Group = some_name
+User = _some-name-1
+User = name1
+# using specifiers
+User = %i
+User = name-%i
+User = some-%i-name
+User = %U-name
+User = some-%i-name-%U
+## invalid values
+# no negative integers
+User = -1000
+# no float
+User = 100.0
+# no name with leading digit
+User = 1name
+# no name with leading hyphen
+User = -name
+# multiple values
+User = 1000 1001
+
+
+###### group list
+[Service]
+SupplementaryGroups = some-name %U some%iname \
+  %Uname 1001 name%U
+
+
+###### io scheduling class
+[Service]
+IOSchedulingClass = 0
+IOSchedulingClass = 1
+IOSchedulingClass = 2
+IOSchedulingClass = 3
+IOSchedulingClass = best-effort
+IOSchedulingClass = idle
+IOSchedulingClass = none
+IOSchedulingClass = realtime
+## invalid values
+IOSchedulingClass = invalid
+IOSchedulingClass = 4
+IOSchedulingClass = 123
+IOSchedulingClass = -1
+# multiple values
+IOSchedulingClass = 1 idle
+IOSchedulingClass = idle none
+
+
+###### ip address list
+[Service]
+IPAddressAllow = any
+IPAddressAllow = localhost
+IPAddressAllow = link-local
+IPAddressDeny = multicast
+IPAddressAllow = localhost \
+  multicast
+IPAddressAllow = 127.0.0.0/8 ::1/128 169.254.0.0/16 fe80::/64
+## invalid values
+IPAddressAllow = invalid
+
+
+###### ip bind
+[Socket]
+BindIPv6Only = both
+BindIPv6Only = default
+BindIPv6Only = ipv6-only
+## invalid values
+BindIPv6Only = invalid
+# multiple values
+BindIPv6Only = both default
+
+
+###### io scheduling priority
+[Service]
+IOSchedulingPriority = 0
+IOSchedulingPriority = 1
+IOSchedulingPriority = 2
+IOSchedulingPriority = 3
+IOSchedulingPriority = 4
+IOSchedulingPriority = 5
+IOSchedulingPriority = 6
+IOSchedulingPriority = 7
+## invalid values
+IOSchedulingPriority = 8
+IOSchedulingPriority = 123
+IOSchedulingPriority = -1
+# multiple values
+IOSchedulingPriority = 0 3
+
+
+###### ip tos (terms-of-service)
+[Socket]
+IPTOS = 15
+IPTOS = low-cost
+IPTOS = low-delay
+IPTOS = reliability
+IPTOS = throughput
+## invalid values
+IPTOS = invalid
+# multiple values
+IPTOS = 15 20
+IPTOS = low-delay 15
+
+
+###### keyring mode
+[Service]
+KeyringMode = inherit
+KeyringMode = private
+KeyringMode = shared
+## invalid values
+KeyringMode = invalid
+# multiple values
+KeyringMode = shared private
+
+
+###### kill mode
+[Service]
+KillMode = control-group
+KillMode = mixed
+KillMode = none
+KillMode = process
+## invalid values
+KillMode = invalid
+# multiple values
+KillMode = mixed process
+
+
+###### limit bytes
+[Service]
+LimitFSIZE = 123
+LimitFSIZE = 12K
+LimitFSIZE = 12M
+LimitFSIZE = 12G
+LimitFSIZE = 12T
+LimitFSIZE = 12P
+LimitFSIZE = 12E
+LimitFSIZE = 12 G
+LimitFSIZE = 12G:24G
+LimitFSIZE = 12 G:24 G
+LimitFSIZE = 12 G: 24 G
+LimitFSIZE = 12 G :24 G
+LimitFSIZE = 12 G : 24 G
+LimitFSIZE = infinity
+## invalid values
+LimitFSIZE = invalid
+# invalid bytes suffix
+LimitFSIZE = 12g
+LimitFSIZE = 12H
+
+
+###### limit nice level
+[Service]
+LimitNICE = -1
+LimitNICE = -12
+LimitNICE = -20
+LimitNICE = +1
+LimitNICE = +12
+LimitNICE = +19
+LimitNICE = 0
+LimitNICE = 9
+LimitNICE = 12
+LimitNICE = 23
+LimitNICE = 34
+LimitNICE = 40
+LimitNICE = -10:+10
+LimitNICE = 20:30
+LimitNICE = infinity
+## invalid values
+LimitNICE = invalid
+LimitNICE = 0.2
+LimitNICE = 20 : infinity
+LimitNICE = infinity : 20
+# out of range
+LimitNICE = -21
+LimitNICE = -123
+LimitNICE = +20
+LimitNICE = +123
+LimitNICE = 41
+LimitNICE = 123
+
+
+###### limit number
+[Service]
+LimitNOFILE = 123
+LimitNOFILE = 123:321
+LimitNOFILE = infinity
+## invalid values
+LimitNOFILE = invalid
+# negative values
+LimitNOFILE = -123
+
+
+###### limit time span
+[Service]
+LimitCPU = 15s 10us : 20s 5ms
+LimitCPU = infinity
+## invalid values
+# only a single infinity
+LimitCPU = infinity : infinity
+LimitCPU = infinity : 10s 15ms
+LimitCPU = 10s 15ms : infinity
+
+
+###### log facility
+[Service]
+SyslogFacility = auth
+SyslogFacility = authpriv
+SyslogFacility = cron
+SyslogFacility = daemon
+SyslogFacility = ftp
+SyslogFacility = kern
+SyslogFacility = local0
+SyslogFacility = local1
+SyslogFacility = local2
+SyslogFacility = local3
+SyslogFacility = local4
+SyslogFacility = local5
+SyslogFacility = local6
+SyslogFacility = local7
+SyslogFacility = lpr
+SyslogFacility = mail
+SyslogFacility = news
+SyslogFacility = syslog
+SyslogFacility = user
+SyslogFacility = uucp
+## invalid values
+SyslogFacility = invalid
+# multiple values
+SyslogFacility = cron daemon
+
+
+###### log level
+[Service]
+LogLevelMax = alert
+LogLevelMax = crit
+LogLevelMax = debug
+LogLevelMax = emerg
+LogLevelMax = err
+LogLevelMax = info
+LogLevelMax = notice
+LogLevelMax = warning
+## invalid values
+LogLevelMax = invalid
+# multiple values
+LogLevelMax = info notice
+
+
+###### memory mapping
+[Service]
+CoredumpFilter = all
+CoredumpFilter = default
+CoredumpFilter = private-anonymous
+CoredumpFilter = shared-anonymous
+CoredumpFilter = private-file-backed
+CoredumpFilter = shared-file-backed
+CoredumpFilter = elf-headers
+CoredumpFilter = private-huge
+CoredumpFilter = shared-huge
+CoredumpFilter = private-dax
+CoredumpFilter = shared-dax
+# multiple values
+CoredumpFilter = private-file-backed shared-dax
+## invalid values
+CoredumpFilter = invalid
+CoredumpFilter = private-file-backed invalid elf-headers
+CoredumpFilter = invalid shared-dax
+# only spaces as separator
+CoredumpFilter = private-file-backed, shared-dax
+
+
+###### mount flag
+[Service]
+MountFlags = private
+MountFlags = shared
+MountFlags = slave
+## invalid values
+MountFlags = invalid
+# multiple values
+MountFlags = shared slave
+
+
+###### nice level
+[Service]
+Nice = -1
+Nice = -12
+Nice = -20
+Nice = +1
+Nice = +12
+Nice = +19
+Nice = 0
+Nice = 12
+Nice = 19
+## invalid values
+Nice = invalid
+Nice = 0.2
+# out of range
+Nice = -21
+Nice = -123
+Nice = +20
+Nice = +123
+Nice = 20
+Nice = 30
+Nice = 123
+# multiple values
+Nice = 12 34
+
+
+###### notify access
+[Service]
+NotifyAccess = all
+NotifyAccess = exec
+NotifyAccess = main
+NotifyAccess = none
+## invalid values
+NotifyAccess = invalid
+# multiple values
+NotifyAccess = exec none
+
+
+###### numa policy
+[Service]
+NUMAPolicy = bind
+NUMAPolicy = default
+NUMAPolicy = interleave
+NUMAPolicy = local
+NUMAPolicy = preferred
+## invalid values
+NUMAPolicy = invalid
+# multiple values
+NUMAPolicy = interleave local
+
+
+###### on failure job mode
+[Unit]
+OnFailureJobMode = fail
+OnFailureJobMode = flush
+OnFailureJobMode = ignore-dependencies
+OnFailureJobMode = ignore-requirements
+OnFailureJobMode = isolate
+OnFailureJobMode = replace
+OnFailureJobMode = replace-irreversibly
+## invalid values
+OnFailureJobMode = invalid
+OnFailureJobMode = invalid fail
+# multiple values
+OnFailureJobMode = replace fail
+
+
+###### oom score adjust (out-of-memory killer score adjustment)
+[Service]
+OOMScoreAdjust = -1000
+OOMScoreAdjust = -123
+OOMScoreAdjust = 0
+OOMScoreAdjust = 321
+OOMScoreAdjust = +321
+OOMScoreAdjust = +1000
+OOMScoreAdjust = 1000
+## invalid values
+OOMScoreAdjust = invalid
+OOMScoreAdjust = 1.2
+# out of range
+OOMScoreAdjust = -1001
+OOMScoreAdjust = +1001
+OOMScoreAdjust = 1001
+
+
+###### out-of-memory killer policy
+[Service]
+OOMPolicy = continue
+OOMPolicy = kill
+OOMPolicy = stop
+## invalid values
+OOMPolicy = invalid
+# multiple values
+OOMPolicy = kill stop
+
+
+###### percent
+[Slice]
+CPUQuota = 0.1%
+CPUQuota = 12 %
+CPUQuota = 123.4%
+## invalid values
+CPUQuota = 10
+CPUQuota = invalid
+# multiple values
+CPUQuota = 10% 20%
+
+
+###### personality
+[Service]
+Personality = ppc
+Personality = ppc-le
+Personality = ppc64
+Personality = ppc64-le
+Personality = s390
+Personality = s390x
+Personality = x86
+Personality = x86-64
+## invalid values
+Personality = invalid
+# multiple values
+Personality = x86-64 s390x
+
+
+###### protect home
+[Service]
+ProtectHome = read-only
+ProtectHome = tmpfs
+ProtectHome = true
+ProtectHome = false
+ProtectHome = yes
+## invalid values
+ProtectHome = invalid
+# multiple values
+ProtectHome = tmpfs true
+
+
+###### protect system
+[Service]
+ProtectSystem = full
+ProtectSystem = strict
+ProtectSystem = true
+ProtectSystem = false
+ProtectSystem = yes
+ProtectSystem = no
+## invalid values
+ProtectSystem = invalid
+# multiple values
+ProtectSystem = full true
+
+
+###### restart
+[Service]
+Restart = always
+Restart = no
+Restart = on-abnormal
+Restart = on-abort
+Restart = on-failure
+Restart = on-success
+Restart = on-watchdog
+## invalid values
+Restart = invalid
+# multiple values
+Restart = no on-abort
+
+
+###### runtime directory preserve
+[Service]
+RuntimeDirectoryPreserve = restart
+RuntimeDirectoryPreserve = true
+RuntimeDirectoryPreserve = false
+RuntimeDirectoryPreserve = yes
+RuntimeDirectoryPreserve = no
+## invalid values
+RuntimeDirectoryPreserve = invalid
+# multiple values
+RuntimeDirectoryPreserve = restart no
+
+
+###### secure bits list
+[Service]
+SecureBits = keep-caps
+SecureBits = keep-caps-locked
+SecureBits = no-setuid-fixup
+SecureBits = no-setuid-fixup-locked
+SecureBits = noroot
+SecureBits = noroot-locked
+SecureBits = keep-caps noroot-locked \
+  no-setuid-fixup
+## invalid values
+SecureBits = invalid
+
+
+###### security
+[Unit]
+ConditionSecurity = apparmor
+ConditionSecurity = audit
+ConditionSecurity = ima
+ConditionSecurity = selinux
+ConditionSecurity = smack
+ConditionSecurity = tomoyo
+ConditionSecurity = uefi-secureboot
+## invalid values
+ConditionSecurity = invalid
+# multiple values
+ConditionSecurity = invalid selinux
+ConditionSecurity = apparmor selinux
+
+
+###### service type
+[Service]
+Type = dbus
+Type = exec
+Type = forking
+Type = idle
+Type = notify
+Type = oneshot
+Type = simple
+## invalid values
+Type = invalid
+# multiple values
+Type = exec forking
+
+
+###### signal
+[Service]
+KillSignal = SIGABRT
+KillSignal = SIGALRM
+KillSignal = SIGBUS
+KillSignal = SIGCHLD
+KillSignal = SIGCLD
+KillSignal = SIGCONT
+KillSignal = SIGEMT
+KillSignal = SIGFPE
+KillSignal = SIGHUP
+KillSignal = SIGILL
+KillSignal = SIGINFO
+KillSignal = SIGINT
+KillSignal = SIGIO
+KillSignal = SIGIOT
+KillSignal = SIGKILL
+KillSignal = SIGLOST
+KillSignal = SIGNAL
+KillSignal = SIGPENDING
+KillSignal = SIGPIPE
+KillSignal = SIGPOLL
+KillSignal = SIGPROF
+KillSignal = SIGPWR
+KillSignal = SIGQUEUE_MAX
+KillSignal = SIGQUIT
+KillSignal = SIGRTMAX
+KillSignal = SIGRTMIN
+KillSignal = SIGSEGV
+KillSignal = SIGSTKFLT
+KillSignal = SIGSTOP
+KillSignal = SIGSYS
+KillSignal = SIGTERM
+KillSignal = SIGTRAP
+KillSignal = SIGTSTP
+KillSignal = SIGTTIN
+KillSignal = SIGTTOU
+KillSignal = SIGUNUSED
+KillSignal = SIGURG
+KillSignal = SIGUSR1
+KillSignal = SIGUSR2
+KillSignal = SIGVTALRM
+KillSignal = SIGWINCH
+KillSignal = SIGXCPU
+KillSignal = SIGXFSZ
+KillSignal = SIG_MAX
+## invalid values
+KillSignal = SIG_INVALID
+
+
+###### socket protocol
+[Socket]
+SocketProtocol = sctp
+SocketProtocol = udplite
+## invalid values
+SocketProtocol = invalid
+# multiple values
+SocketProtocol = sctp udplite
+
+
+###### standard input
+[Service]
+StandardInput = data
+StandardInput = fd
+StandardInput = fd:some_name
+StandardInput = file:/some/absolute/path
+StandardInput = null
+StandardInput = socket
+StandardInput = tty
+StandardInput = tty-fail
+StandardInput = tty-force
+## invalid values
+StandardInput = invalid
+# multiple values
+StandardInput = null tty
+StandardInput = file:/some/absolute/path socket
+# no absolute path immediately after `file:`
+StandardInput = file:
+StandardInput = file:some//path
+StandardInput = file: /some/absolute/path
+
+
+###### standard output
+[Service]
+# NOTE: Option StandardError accepts the same values.
+StandardOutput = append:/some/absolute/path
+StandardOutput = fd
+StandardOutput = fd:some_name
+StandardOutput = file:/some/absolute/path
+StandardOutput = inherit
+StandardOutput = journal
+StandardOutput = journal+console
+StandardOutput = kmsg
+StandardOutput = kmsg+console
+StandardOutput = null
+StandardOutput = socket
+StandardOutput = tty
+## invalid values
+StandardOutput = invalid
+StandardOutput = syslog
+# no absolute path immediately after append:, file:
+StandardOutput = append:
+StandardOutput = append:some/relative/path
+StandardOutput = append: /some/relative/path
+StandardOutput = file:
+StandardOutput = file:some/relative/path
+StandardOutput = file: /some/relative/path
+# multiple values
+StandardOutput = null tty
+StandardOutput = file:/some/absolute/path socket
+
+
+###### system call architecture
+[Service]
+SystemCallArchitectures = mips64-le-n32
+SystemCallArchitectures = mips64-n32
+SystemCallArchitectures = native
+SystemCallArchitectures = x32
+# all values from "architecture" are also valid
+SystemCallArchitectures = alpha \
+  mips sparc
+## invalid values
+SystemCallArchitectures = invalid
+
+
+###### system call errno
+[Service]
+# from man errno(3)
+SystemCallErrorNumber = EACCES
+SystemCallErrorNumber = EADDRINUSE
+SystemCallErrorNumber = EADDRNOTAVAIL
+SystemCallErrorNumber = EAFNOSUPPORT
+SystemCallErrorNumber = EAGAIN
+SystemCallErrorNumber = EALREADY
+SystemCallErrorNumber = EBADE
+SystemCallErrorNumber = EBADF
+SystemCallErrorNumber = EBADFD
+SystemCallErrorNumber = EBADMSG
+SystemCallErrorNumber = EBADR
+SystemCallErrorNumber = EBADRQC
+SystemCallErrorNumber = EBADSLT
+SystemCallErrorNumber = EBUSY
+SystemCallErrorNumber = ECANCELED
+SystemCallErrorNumber = ECHILD
+SystemCallErrorNumber = ECHRNG
+SystemCallErrorNumber = ECOMM
+SystemCallErrorNumber = ECONNABORTED
+SystemCallErrorNumber = ECONNREFUSED
+SystemCallErrorNumber = ECONNRESET
+SystemCallErrorNumber = EDEADLK
+SystemCallErrorNumber = EDEADLOCK
+SystemCallErrorNumber = EDESTADDRREQ
+SystemCallErrorNumber = EDOM
+SystemCallErrorNumber = EDQUOT
+SystemCallErrorNumber = EEXIST
+SystemCallErrorNumber = EFAULT
+SystemCallErrorNumber = EFBIG
+SystemCallErrorNumber = EHOSTDOWN
+SystemCallErrorNumber = EHOSTUNREACH
+SystemCallErrorNumber = EHWPOISON
+SystemCallErrorNumber = EIDRM
+SystemCallErrorNumber = EILSEQ
+SystemCallErrorNumber = EINPROGRESS
+SystemCallErrorNumber = EINTR
+SystemCallErrorNumber = EINVAL
+SystemCallErrorNumber = EIO
+SystemCallErrorNumber = EISCONN
+SystemCallErrorNumber = EISDIR
+SystemCallErrorNumber = EISNAM
+SystemCallErrorNumber = EKEYEXPIRED
+SystemCallErrorNumber = EKEYREJECTED
+SystemCallErrorNumber = EKEYREVOKED
+SystemCallErrorNumber = EL2HLT
+SystemCallErrorNumber = EL2NSYNC
+SystemCallErrorNumber = EL3HLT
+SystemCallErrorNumber = EL3RST
+SystemCallErrorNumber = ELIBACC
+SystemCallErrorNumber = ELIBBAD
+SystemCallErrorNumber = ELIBEXEC
+SystemCallErrorNumber = ELIBMAX
+SystemCallErrorNumber = ELIBSCN
+SystemCallErrorNumber = ELNRANGE
+SystemCallErrorNumber = ELOOP
+SystemCallErrorNumber = EMEDIUMTYPE
+SystemCallErrorNumber = EMFILE
+SystemCallErrorNumber = EMLINK
+SystemCallErrorNumber = EMSGSIZE
+SystemCallErrorNumber = EMULTIHOP
+SystemCallErrorNumber = ENAMETOOLONG
+SystemCallErrorNumber = ENETDOWN
+SystemCallErrorNumber = ENETRESET
+SystemCallErrorNumber = ENETUNREACH
+SystemCallErrorNumber = ENFILE
+SystemCallErrorNumber = ENOANO
+SystemCallErrorNumber = ENOBUFS
+SystemCallErrorNumber = ENODATA
+SystemCallErrorNumber = ENODEV
+SystemCallErrorNumber = ENOENT
+SystemCallErrorNumber = ENOEXEC
+SystemCallErrorNumber = ENOKEY
+SystemCallErrorNumber = ENOLCK
+SystemCallErrorNumber = ENOLINK
+SystemCallErrorNumber = ENOMEDIUM
+SystemCallErrorNumber = ENOMEM
+SystemCallErrorNumber = ENOMSG
+SystemCallErrorNumber = ENONET
+SystemCallErrorNumber = ENOPKG
+SystemCallErrorNumber = ENOPROTOOPT
+SystemCallErrorNumber = ENOSPC
+SystemCallErrorNumber = ENOSR
+SystemCallErrorNumber = ENOSTR
+SystemCallErrorNumber = ENOSYS
+SystemCallErrorNumber = ENOTBLK
+SystemCallErrorNumber = ENOTCONN
+SystemCallErrorNumber = ENOTDIR
+SystemCallErrorNumber = ENOTEMPTY
+SystemCallErrorNumber = ENOTRECOVERABLE
+SystemCallErrorNumber = ENOTSOCK
+SystemCallErrorNumber = ENOTSUP
+SystemCallErrorNumber = ENOTTY
+SystemCallErrorNumber = ENOTUNIQ
+SystemCallErrorNumber = ENXIO
+SystemCallErrorNumber = EOPNOTSUPP
+SystemCallErrorNumber = EOVERFLOW
+SystemCallErrorNumber = EOWNERDEAD
+SystemCallErrorNumber = EPERM
+SystemCallErrorNumber = EPFNOSUPPORT
+SystemCallErrorNumber = EPIPE
+SystemCallErrorNumber = EPROTO
+SystemCallErrorNumber = EPROTONOSUPPORT
+SystemCallErrorNumber = EPROTOTYPE
+SystemCallErrorNumber = ERANGE
+SystemCallErrorNumber = EREMCHG
+SystemCallErrorNumber = EREMOTE
+SystemCallErrorNumber = EREMOTEIO
+SystemCallErrorNumber = ERESTART
+SystemCallErrorNumber = ERFKILL
+SystemCallErrorNumber = EROFS
+SystemCallErrorNumber = ESHUTDOWN
+SystemCallErrorNumber = ESOCKTNOSUPPORT
+SystemCallErrorNumber = ESPIPE
+SystemCallErrorNumber = ESRCH
+SystemCallErrorNumber = ESTALE
+SystemCallErrorNumber = ESTRPIPE
+SystemCallErrorNumber = ETIME
+SystemCallErrorNumber = ETIMEDOUT
+SystemCallErrorNumber = ETOOMANYREFS
+SystemCallErrorNumber = ETXTBSY
+SystemCallErrorNumber = EUCLEAN
+SystemCallErrorNumber = EUNATCH
+SystemCallErrorNumber = EUSERS
+SystemCallErrorNumber = EWOULDBLOCK
+SystemCallErrorNumber = EXDEV
+SystemCallErrorNumber = EXFULL
+SystemCallErrorNumber = 1
+SystemCallErrorNumber = 12
+SystemCallErrorNumber = 123
+SystemCallErrorNumber = 1234
+SystemCallErrorNumber = 2
+SystemCallErrorNumber = 23
+SystemCallErrorNumber = 234
+SystemCallErrorNumber = 2345
+SystemCallErrorNumber = 3
+SystemCallErrorNumber = 34
+SystemCallErrorNumber = 345
+SystemCallErrorNumber = 3456
+SystemCallErrorNumber = 3999
+SystemCallErrorNumber = 4000
+SystemCallErrorNumber = 4009
+SystemCallErrorNumber = 4019
+SystemCallErrorNumber = 4089
+SystemCallErrorNumber = 4095
+## invalid values
+SystemCallErrorNumber = invalid
+SystemCallErrorNumber = -12
+SystemCallErrorNumber = 0.12
+# out of range
+SystemCallErrorNumber = 0
+SystemCallErrorNumber = 4096
+SystemCallErrorNumber = 5000
+# multiple values
+SystemCallErrorNumber = ESPIPE EUCLEAN
+SystemCallErrorNumber = 123 EUCLEAN
+
+
+###### time span
+[Timer]
+# without unit
+OnBootSec = 15
+# micro second
+OnBootSec = 123 usec
+OnBootSec = 123us
+OnBootSec = 123 µs
+# milli second
+OnBootSec = 123 msec
+OnBootSec = 123ms
+# second
+OnBootSec = 74 s
+OnBootSec = 2sec
+OnBootSec = 12 second
+OnBootSec = 1 seconds
+OnBootSec = 342 m
+OnBootSec = 2min
+OnBootSec = 7 minute
+OnBootSec = 1 minutes
+OnBootSec = 2 h
+OnBootSec = 48   hr
+OnBootSec = 2hour
+OnBootSec = 2hours
+OnBootSec = 2 d
+OnBootSec = 1 day
+OnBootSec = 7  days
+OnBootSec = 2 w
+OnBootSec = 123 week
+OnBootSec = 0 weeks
+OnBootSec = 12 M
+OnBootSec = 7 month
+OnBootSec = 1 months
+OnBootSec = 1y
+OnBootSec = 123year
+OnBootSec = 12 years
+OnBootSec = 55s500ms
+OnBootSec = 300ms20s 5day
+OnBootSec = 123 5 days 1m 12 1sec 123 \
+  23 msec 13 1us
+# multiple hours
+OnBootSec = 7hr 2hr \
+  1d 2w
+## invalid values
+# mi is invalid
+OnBootSec = 1mi
+# hs is invalid
+OnBootSec = 2hs
+# ds is invalid
+OnBootSec = 7 ds 1y
+# unit without amount
+OnBootSec = 12 min sec
+OnBootSec = min 1 sec
+# invalid unit
+OnBootSec = 12foo 1 bar
+
+
+###### timeout
+# all values from time span are valid
+[Unit]
+JobTimeoutSec = 0
+JobTimeoutSec = 12345
+JobTimeoutSec = 123 5 days 1m 12 1sec 123\
+  23 msec 13 1us
+JobTimeoutSec = infinity
+## invalid values
+JobTimeoutSec = invalid
+JobTimeoutSec = inf
+JobTimeoutSec = -10
+JobTimeoutSec = 0.235
+
+
+###### unit
+[Path]
+#### names
+Unit = dev-disk-by\x2duuid-5af23b\x2dfde6\x2d424e\x2da1bb\x2de88bc.swap
+Unit = some.name.service
+Unit = some.service.service \
+  some.other.service.service
+Unit = some@.service
+Unit = some@instance.service
+Unit = some@%i.service
+## invalid names
+# \x2x is an invalid escape as 2x is no hex number
+Unit = dev-disk-by\x2xuuid-5af23b\x2dfde6\x2d424e\x2da1bb\x2de88bc.swap
+#### extensions
+Unit = some.automount
+Unit = some.device
+Unit = some.mount
+Unit = some.service
+Unit = some.socket
+Unit = some.slice
+Unit = some.swap
+Unit = some.target
+## invalid extension
+Unit = some.invalid
+# incomplete unit, missing extension
+Unit = some.
+# multiple values
+Unit = some.service some-other.service
+
+
+###### unit list
+[Unit]
+#### names
+After = some.service.service \
+  some.other.service.service \
+  some@instance.service \
+  some@%i.service
+## invalid values
+# incomplete unit, missing extension
+After = some. \
+  some.service \
+  some-other.service
+
+
+###### unit list socket
+[Service]
+Sockets = some.socket some@instance.socket
+## invalid values
+Sockets = some.service
+Sockets = some.service some.socket
+
+
+###### unit service
+[Socket]
+Service = some.service
+Service = some@instance.service
+## invalid values
+Service = some.invalid
+# other unit types
+Service = some.socket
+Service = some.target
+# multiple values
+Service = some.service other.service
+
+
+###### unit slice
+[Service]
+Slice = some.slice
+Slice = some@instance.slice
+## invalid values
+# other unit types
+Slice = some.service
+Slice = some.target
+# multiple values
+Slice = some.slice other.slice
+
+
+###### utmp mode
+[Service]
+UtmpMode = init
+UtmpMode = login
+UtmpMode = user
+## invalid values
+UtmpMode = invalid
+# multiple values
+UtmpMode = login user
+
+
+###### variable assignments
+[Service]
+Environment = DISPLAY=:%i
+Environment = XAUTHORITY=%t/Xauthority.%i var1=15 \
+  "var2=value with spaces" EMPTY=
+Environment = XDG_VTNR=vt%i
+LogExtraFields = NAME=VALUE
+
+
+###### virtualization
+[Unit]
+ConditionVirtualization = acrn
+ConditionVirtualization = bhyve
+ConditionVirtualization = bochs
+ConditionVirtualization = docker
+ConditionVirtualization = kvm
+ConditionVirtualization = lxc
+ConditionVirtualization = lxc-libvirt
+ConditionVirtualization = microsoft
+ConditionVirtualization = openvz
+ConditionVirtualization = oracle
+ConditionVirtualization = parallels
+ConditionVirtualization = qemu
+ConditionVirtualization = qnx
+ConditionVirtualization = rkt
+ConditionVirtualization = systemd-nspawn
+ConditionVirtualization = uml
+ConditionVirtualization = vmware
+ConditionVirtualization = wsl
+ConditionVirtualization = xen
+ConditionVirtualization = zvm
+# using boolean
+ConditionVirtualization = true
+# using generic type
+ConditionVirtualization = container
+ConditionVirtualization = vm
+# private users
+ConditionVirtualization = private-users
+# negated
+ConditionVirtualization = !vmware
+## invalid values
+ConditionVirtualization = invalid
+ConditionVirtualization = invalid vmware
+# multiple values
+ConditionVirtualization = xen vmware
+
+
+###### weight
+[Slice]
+# integer 1..10000
+CPUWeight = 1
+CPUWeight = 12
+CPUWeight = 123
+CPUWeight = 1234
+CPUWeight = 1234
+CPUWeight = 10000
+## invalid values
+CPUWeight = -1
+CPUWeight = 0
+CPUWeight = 10001
+CPUWeight = 12345
+CPUWeight = 12.3
+CPUWeight = invalid
+# multiple values
+CPUWeight = 1 10000
+
+
+###### working directory
+[Service]
+WorkingDirectory = ~
+WorkingDirectory = - ~
+WorkingDirectory = %h
+WorkingDirectory = /some/absolute/path
+WorkingDirectory = -/some/absolute-path
+WorkingDirectory = - /some/absolute/path
+## invalid values
+# using `-` without a path
+WorkingDirectory = -
+# multiple paths
+WorkingDirectory = ~ /some/absolute/path
+WorkingDirectory = /some/absolute/path ~
+WorkingDirectory = /some/absolute/path /some/other/path
+WorkingDirectory = - - /some/absolute/path

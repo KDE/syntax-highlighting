@@ -141,6 +141,10 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ksyntaxhighlighting_version.h"
 
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)
 
+# add target to update kate-editor.org syntax page + update site
+add_custom_target(update_kate_editor_org
+    COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/utils/update-kate-editor-org.pl" "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
+
 # add clang-format target for all our real source files
 file(GLOB ALL_CLANG_FORMAT_TEST_FILES autotests/*.cpp autotests/*.h)
 file(GLOB_RECURSE ALL_CLANG_FORMAT_SOURCE_FILES examples/*.cpp examples/*.h src/*.cpp src/*.h)

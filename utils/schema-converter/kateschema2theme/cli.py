@@ -14,6 +14,7 @@ from __future__ import annotations
 import configparser
 import enum
 import functools
+import itertools
 import json
 import pathlib
 import re
@@ -196,9 +197,7 @@ _SECTION_MATCH: Final[Pattern] = re.compile(r'\[(?P<header>[^]]+?)( - Schema .*)
     '--help'
   , '-h'
   )
-@click.version_option(
-    prog_name='Kate colors/schema to theme converter'
-  )
+@click.version_option()
 @click.option(
     '--skip-included'
   , '-d'
@@ -208,18 +207,21 @@ _SECTION_MATCH: Final[Pattern] = re.compile(r'\[(?P<header>[^]]+?)( - Schema .*)
   )
 @click.option(
     '-s'
-  , '--syntax-dir'
+  , '--syntax-dirs'
+  , multiple=True
+  , metavar='DIRECTORY...'
   , type=click.Path(exists=True, file_okay=False, dir_okay=True)
   , help='Specify the directory to search for syntax files. '
-         'If given, extra validation going to happen.'
+         'If given, extra validation going to happen. Multiple '
+         'options allowed.'
   )
 @click.argument(
     'input-file'
   , type=click.File('r')
   , default='-'
   )
-def kateschema2theme(skip_included: bool, syntax_dir: click.Path, input_file: TextIO) -> int:
-    ''' The console script entry point function.'''
+def kateschema2theme(skip_included: bool, syntax_dirs: List[click.Path], input_file: TextIO) -> int:
+    ''' Kate colors/schema to theme converter. '''
     config = configparser.ConfigParser(
         delimiters=['=']
       , interpolation=None
@@ -257,8 +259,8 @@ def kateschema2theme(skip_included: bool, syntax_dir: click.Path, input_file: Te
       )
 
     if bool(custom_styles):
-        known_syntaxes: SyntaxesDict = get_syntaxes_available(syntax_dir) \
-            if bool(syntax_dir) else {}
+        known_syntaxes: SyntaxesDict = get_syntaxes_available(syntax_dirs) \
+            if bool(syntax_dirs) else {}
         if bool(known_syntaxes):
             custom_styles = verify_converted_styles(custom_styles, known_syntaxes)
 
@@ -374,7 +376,7 @@ def first_true(pred, iterable: Iterable[T], default=None) -> T:
     return next(filter(pred, iterable), default)
 
 
-def get_syntaxes_available(base: click.Path) -> SyntaxesDict:
+def get_syntaxes_available(dirs: List[click.Path]) -> SyntaxesDict:
     '''Collect syntaxs available in the given path.
 
         Returns a dict of syntax names to a list of syntax items in it.
@@ -383,7 +385,12 @@ def get_syntaxes_available(base: click.Path) -> SyntaxesDict:
         load_syntax_data
       , filter(
             lambda p: p.suffix == '.xml'
-          , pathlib.Path(str(base)).iterdir()
+          , itertools.chain(
+                *map(
+                    lambda p: pathlib.Path(str(p)).iterdir()
+                  , dirs
+                  )
+              )
           )
       , {}
       )
@@ -397,18 +404,17 @@ def load_syntax_data(state: SyntaxesDict, syntax_file: pathlib.Path) -> Syntaxes
     syntax_name = root.get('name')
     assert syntax_name is not None
 
-    if syntax_name not in state:
-        state[syntax_name] = functools.reduce(
-            collect_syntax_item_data
-          , root.iterfind('highlighting/itemDatas/itemData')
-          , set()
-          )
-    else:
+    if syntax_name in state:
         ewarn(
-            f'Ignore redefinition of `{syntax_name}` found '
-            f'in `{click.format_filename(str(syntax_file), shorten=True)}`'
+            f'Use `{syntax_name}` found '
+            f'in `{click.format_filename(str(syntax_file))}`'
           )
 
+    state[syntax_name] = functools.reduce(
+        collect_syntax_item_data
+      , root.iterfind('highlighting/itemDatas/itemData')
+      , set()
+      )
     return state
 
 

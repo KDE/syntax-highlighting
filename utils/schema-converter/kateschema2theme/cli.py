@@ -4,6 +4,13 @@
 # SPDX-License-Identifier: MIT
 #
 
+'''
+CLI utility to convert old `kate`s schema/hlcolors files to the
+new JSON theme format.
+'''
+
+from __future__ import annotations
+
 import configparser
 import enum
 import functools
@@ -11,16 +18,82 @@ import json
 import pathlib
 import re
 import textwrap
-import sys
 
 from xml.etree import ElementTree
-from typing import List
+from typing import \
+    Dict \
+  , Final \
+  , Iterable \
+  , Generator \
+  , List \
+  , Literal \
+  , Pattern \
+  , Set \
+  , TextIO \
+  , Tuple \
+  , TypedDict \
+  , TypeVar
 
 import click
-import columnize
+import columnize                                            # type: ignore
+
+# BEGIN Type declarations
+T = TypeVar('T')                                            # pylint: disable=invalid-name
+PropName = Literal[
+    'background-color'
+  , 'bold'
+  , 'italic'
+  , 'selected-text-color'
+  , 'seleted-background-color'
+  , 'strike-through'
+  , 'text-color'
+  , 'text-color'
+  , 'underline'
+  ]
+StylePropsDict = TypedDict(
+    'StylePropsDict'
+  , {
+        'background-color': str
+      , 'bold': bool
+      , 'italic': bool
+      , 'selected-text-color': str
+      , 'seleted-background-color': str
+      , 'strike-through': bool
+      , 'text-color': str
+      , 'underline': bool
+    }
+  , total=False
+  )
+CustomStyleDict = Dict[str, StylePropsDict]
+CustomStylesDict = Dict[str, CustomStyleDict]
+EditorColorsDict = Dict[str, str]
+TextStylesDict = Dict[str, StylePropsDict]
+MetadataDict = TypedDict(
+    'MetadataDict'
+  , {
+        'name': str
+      , 'revision': int
+    }
+  )
+ThemeDict = TypedDict(
+    'ThemeDict'
+  , {
+        'custom-styles': CustomStylesDict
+      , 'editor-colors': EditorColorsDict
+      , 'metadata': MetadataDict
+      , 'text-styles': TextStylesDict
+    }
+  , total=False
+  )
+SyntaxesDict = Dict[str, Set[str]]
+# END Type declarations
 
 
-class QColorItemOffset(enum.IntEnum):
+class QtColorItemOffset(enum.IntEnum):
+    '''
+    Enumeration class with offsets in the CSV record
+    of the old style definition.
+    '''
     _UNKNOWN = 0
     TEXT = enum.auto()
     SELECTED_TEXT = enum.auto()
@@ -37,11 +110,11 @@ class QColorItemOffset(enum.IntEnum):
     STANDARD_COLOR_EXPECTED_SIZE = 10
 
 
-_EXPECTED_OLD_COLOR_LEN = 8
-_OLD_COLOR_LEADING_STRIP_SIZE = 2
-_HIGHLIGHTING_PFX = 'Highlighting '
-_COLUMIZED_LIST_INDENT_PFX = '   '
-_EDITOR_COLORS = {
+_EXPECTED_OLD_COLOR_LEN: Final[int] = 8
+_OLD_COLOR_LEADING_STRIP_SIZE: Final[int] = 2
+_HIGHLIGHTING_PFX: Final[str] = 'Highlighting '
+_COLUMIZED_LIST_INDENT_PFX: Final[str] = '   '
+_EDITOR_COLORS: Final[Dict[str, str]] = {
     "Color Background": "BackgroundColor"
   , "Color Code Folding": "CodeFolding"
   , "Color Current Line Number": "CurrentLineNumber"
@@ -71,7 +144,7 @@ _EDITOR_COLORS = {
   , "Color Template Not Editable Placeholder": "TemplateReadOnlyPlaceholder"
   , "Color Word Wrap Marker": "WordWrapMarker"
   }
-_TEXT_STYLES = {
+_TEXT_STYLES: Final[Dict[str, str]] = {
     "Alert": "Alert"
   , "Annotation": "Annotation"
   , "Attribute": "Attribute"
@@ -104,18 +177,18 @@ _TEXT_STYLES = {
   , "Verbatim String": "VerbatimString"
   , "Warning": "Warning"
   }
-_OFFSET2NAME = {
-    QColorItemOffset.TEXT: 'text-color'
-  , QColorItemOffset.SELECTED_TEXT: 'selected-text-color'
-  , QColorItemOffset.BOLD: 'bold'
-  , QColorItemOffset.ITALIC: 'italic'
-  , QColorItemOffset.STRIKE_THROUGH: 'strike-through'
-  , QColorItemOffset.UNDERLINE: 'underline'
-  , QColorItemOffset.BACKGROUND: 'background-color'
-  , QColorItemOffset.SELECTED_BACKGROUND: 'seleted-background-color'
+_OFFSET2NAME: Final[Dict[QtColorItemOffset, PropName]] = {
+    QtColorItemOffset.TEXT: 'text-color'
+  , QtColorItemOffset.SELECTED_TEXT: 'selected-text-color'
+  , QtColorItemOffset.BOLD: 'bold'
+  , QtColorItemOffset.ITALIC: 'italic'
+  , QtColorItemOffset.STRIKE_THROUGH: 'strike-through'
+  , QtColorItemOffset.UNDERLINE: 'underline'
+  , QtColorItemOffset.BACKGROUND: 'background-color'
+  , QtColorItemOffset.SELECTED_BACKGROUND: 'seleted-background-color'
   }
-_META_SECTIONS = ['KateSchema', 'KateHLColors']
-_SECTION_MATCH = re.compile(r'\[(?P<header>[^]]+?)( - Schema .*)?\]')
+_META_SECTIONS: Final[List[str]] = ['KateSchema', 'KateHLColors']
+_SECTION_MATCH: Final[Pattern] = re.compile(r'\[(?P<header>[^]]+?)( - Schema .*)?\]')
 
 
 @click.command()
@@ -136,6 +209,7 @@ _SECTION_MATCH = re.compile(r'\[(?P<header>[^]]+?)( - Schema .*)?\]')
 @click.option(
     '-s'
   , '--syntax-dir'
+  , type=click.Path(exists=True, file_okay=False, dir_okay=True)
   , help='Specify the directory to search for syntax files. '
          'If given, extra validation going to happen.'
   )
@@ -144,10 +218,14 @@ _SECTION_MATCH = re.compile(r'\[(?P<header>[^]]+?)( - Schema .*)?\]')
   , type=click.File('r')
   , default='-'
   )
-def kateschema2theme(skip_included, syntax_dir, input_file):
-    config = configparser.ConfigParser(delimiters=['='])
-    config.optionxform = str
-    config.SECTCRE = _SECTION_MATCH
+def kateschema2theme(skip_included: bool, syntax_dir: click.Path, input_file: TextIO) -> int:
+    ''' The console script entry point function.'''
+    config = configparser.ConfigParser(
+        delimiters=['=']
+      , interpolation=None
+      )
+    setattr(config, 'optionxform', str)
+    setattr(config, 'SECTCRE', _SECTION_MATCH)
 
     try:
         config.read_file(input_file)
@@ -155,8 +233,8 @@ def kateschema2theme(skip_included, syntax_dir, input_file):
         eerror(f'{ex!s}')
         return 1
 
-    result = {}
-    sections = config.sections()
+    result: ThemeDict = {}
+    sections: List[str] = config.sections()
 
     if 'Editor Colors' in sections:
         result['editor-colors'] = functools.reduce(
@@ -172,14 +250,15 @@ def kateschema2theme(skip_included, syntax_dir, input_file):
           , {}
           )
 
-    custom_styles = functools.reduce(
+    custom_styles: CustomStylesDict = functools.reduce(
         collect_custom_colors
       , hl_colors(config, skip_included)
       , {}
       )
 
     if bool(custom_styles):
-        known_syntaxes = get_syntaxes_available(syntax_dir) if bool(syntax_dir) else {}
+        known_syntaxes: SyntaxesDict = get_syntaxes_available(syntax_dir) \
+            if bool(syntax_dir) else {}
         if bool(known_syntaxes):
             custom_styles = verify_converted_styles(custom_styles, known_syntaxes)
 
@@ -193,42 +272,52 @@ def kateschema2theme(skip_included, syntax_dir, input_file):
           }
 
     print(json.dumps(result, sort_keys=True, indent=4))
+    return 0
 
 
-def convert_editor_color(state, color_line):
+def convert_editor_color(state: Dict[str, str], color_line: Tuple[str, str]) -> Dict[str, str]:
+    '''Convert standard editor color names from old to new using the mapping table.'''
     name, color_settings = color_line
     assert name in _EDITOR_COLORS
     state[_EDITOR_COLORS[name]] = decode_rgb_set(color_settings)
     return state
 
 
-def decode_rgb_set(color_settings):
+def decode_rgb_set(color_settings: str) -> str:
+    '''Transform the RGB record given as CSV string to web-hex format.'''
     return rgb2hex(*map(int, color_settings.split(',')))
 
 
-def rgb2hex(r, g, b) -> str:
-    return f'#{r:02x}{g:02x}{b:02x}'
+def rgb2hex(red: int, green: int, blue: int) -> str:
+    '''Convert R,G,B integers to web-hex string'''
+    return f'#{red:02x}{green:02x}{blue:02x}'
 
 
 def collect_standard_colors(state, item):
+    '''Convert standard text styles from old to new names using the mapping table.'''
     name, value = item
     state[_TEXT_STYLES[name]] = parse_qcolor_value(value)
     return state
 
 
-def collect_custom_colors(state, item):
-    syntax, color_name, value = item
+def collect_custom_colors(state: CustomStylesDict, item: Tuple[str, str, str]) -> CustomStylesDict:
+    '''A functor to convert one old style setting to the new format
+        and update the given `state` (a dict).
+    '''
+    syntax, syntax_item, value = item
 
     props = parse_qcolor_value(value)
     if bool(props):
-        syntax_node = state.get(syntax, {})
-        syntax_node[color_name] = props
+        syntax_node: CustomStyleDict = state.get(syntax, {})
+        syntax_node[syntax_item] = props
         state[syntax] = syntax_node
 
     return state
 
 
-def hl_colors(config, skip_included):
+def hl_colors(config: configparser.ConfigParser, skip_included: bool) \
+  -> Generator[Tuple[str, str, str], None, None]:
+    '''A generator function to iterate over custom styles in the old format.'''
     for section in config.sections():
         if not section.startswith(_HIGHLIGHTING_PFX):
             continue
@@ -237,25 +326,37 @@ def hl_colors(config, skip_included):
             syntax, *parts = name.split(':')
             if not bool(parts):
                 ewarn(f'Unexpected color name: `{name}` in section `{section}`')
+
             elif not skip_included or section[len(_HIGHLIGHTING_PFX):] == syntax:
                 yield syntax, ':'.join(parts), value
 
 
-def parse_qcolor_value(value: str):
+def parse_qcolor_value(value: str) -> StylePropsDict:
+    '''Convert old color settings (QColor stored as a CSV config item)
+        into a dict of new styles.
+    '''
     components = value.split(',')
-    if len(components) == QColorItemOffset.CUSTOM_COLOR_EXPECTED_SIZE:
+    if len(components) == QtColorItemOffset.CUSTOM_COLOR_EXPECTED_SIZE:
         components.pop()
-    assert len(components) == QColorItemOffset.STANDARD_COLOR_EXPECTED_SIZE
+    assert len(components) == QtColorItemOffset.STANDARD_COLOR_EXPECTED_SIZE
     return transform_qcolor_to_dict(components)
 
 
-def transform_qcolor_to_dict(components: List[str]):
-    return functools.reduce(convert_color_property, enumerate(components), {})
+def transform_qcolor_to_dict(components: List[str]) -> StylePropsDict:
+    '''Convert old color settings given as a list of items
+        into a dict of new styles.
+    '''
+    init: StylePropsDict = {}
+    return functools.reduce(convert_color_property, enumerate(components), init)
 
 
-def convert_color_property(state, prop):
-    offset, value = prop
-    assert offset < QColorItemOffset.CUSTOM_COLOR_EXPECTED_SIZE
+def convert_color_property(state: StylePropsDict, prop: Tuple[int, str]) -> StylePropsDict:
+    '''A reducer functor to convert one item of the former color record (CSV)
+        into a new property name and a value.
+    '''
+    offset = QtColorItemOffset(prop[0])
+    value = prop[1]
+    assert offset < QtColorItemOffset.CUSTOM_COLOR_EXPECTED_SIZE
 
     if bool(value) and offset in _OFFSET2NAME:
         custom_prop_name = _OFFSET2NAME[offset]
@@ -263,34 +364,40 @@ def convert_color_property(state, prop):
             if len(value) == _EXPECTED_OLD_COLOR_LEN:
                 state[custom_prop_name] = '#' + value[_OLD_COLOR_LEADING_STRIP_SIZE:]
         else:
-            state[custom_prop_name] = True if value == '1' else False
+            state[custom_prop_name] = bool(value == '1')
 
     return state
 
 
-def first_true(pred, iterable, default=None):
-    return next(filter(pred, _META_SECTIONS), default)
+def first_true(pred, iterable: Iterable[T], default=None) -> T:
+    '''A helper function to return first item for which predicate is true.'''
+    return next(filter(pred, iterable), default)
 
 
-def get_syntaxes_available(base: str):
+def get_syntaxes_available(base: click.Path) -> SyntaxesDict:
+    '''Collect syntaxs available in the given path.
+
+        Returns a dict of syntax names to a list of syntax items in it.
+    '''
     return functools.reduce(
         load_syntax_data
       , filter(
             lambda p: p.suffix == '.xml'
-          , pathlib.Path(base).iterdir()
+          , pathlib.Path(str(base)).iterdir()
           )
       , {}
       )
 
 
-def load_syntax_data(state, syntax_file: pathlib.Path):
+def load_syntax_data(state: SyntaxesDict, syntax_file: pathlib.Path) -> SyntaxesDict:
+    '''A reducer functor to obtain syntax items.'''
     tree = ElementTree.parse(syntax_file)
     root = tree.getroot()
 
     syntax_name = root.get('name')
     assert syntax_name is not None
 
-    if not syntax_name in state:
+    if syntax_name not in state:
         state[syntax_name] = functools.reduce(
             collect_syntax_item_data
           , root.iterfind('highlighting/itemDatas/itemData')
@@ -299,13 +406,19 @@ def load_syntax_data(state, syntax_file: pathlib.Path):
     else:
         ewarn(
             f'Ignore redefinition of `{syntax_name}` found '
-            f'in `{click.format_filename(syntax_file, shorten=True)}`'
+            f'in `{click.format_filename(str(syntax_file), shorten=True)}`'
           )
 
     return state
 
 
-def verify_converted_styles(custom_styles, known_syntaxes):
+def verify_converted_styles(custom_styles: CustomStylesDict, known_syntaxes: SyntaxesDict) \
+  -> CustomStylesDict:
+    '''Validate the given `custom_styles` according to actual syntax items
+        described in the known syntax files.
+
+        Returns a dict of syntaxes without unused syntax items.
+    '''
     for syntax, styles in custom_styles.items():
         if syntax not in known_syntaxes:
             ewarn(f'The `{syntax}` is not known. Ignoring validation.')
@@ -335,13 +448,15 @@ def verify_converted_styles(custom_styles, known_syntaxes):
     return custom_styles
 
 
-def remove_unused_syntax_item(state, item):
+def remove_unused_syntax_item(state: CustomStyleDict, item: str) -> CustomStyleDict:
+    '''Remove the given `item` from the `state`.'''
     assert item in state
     del state[item]
     return state
 
 
-def format_columns(iterable):
+def format_columns(iterable: Iterable[str]) -> str:
+    '''A helper functor to output the list in columns.'''
     term_width = click.get_terminal_size()[0] - len(_COLUMIZED_LIST_INDENT_PFX)
     return textwrap.indent(
         columnize.columnize(iterable, displaywidth=term_width, colsep=' │ ')
@@ -349,14 +464,20 @@ def format_columns(iterable):
       )
 
 
-def collect_syntax_item_data(items, node):
-    items.add(node.get('name'))
+def collect_syntax_item_data(items: Set[str], node: ElementTree.Element) -> Set[str]:
+    '''A reducer functor to append a syntax item name to the given set.'''
+    name = node.get('name')
+    assert name is not None
+    items.add(name)
+
     return items
 
 
-def eerror(msg):
+def eerror(msg: str):
+    '''A helper function to display an error message.'''
     click.echo(' ' + click.style('*', fg='red', bold=True) + f' {msg}', err=True)
 
 
-def ewarn(msg):
+def ewarn(msg: str):
+    '''A helper function to display a warning message.'''
     click.echo(' ' + click.style('*', fg='yellow') + f' {msg}', err=True)

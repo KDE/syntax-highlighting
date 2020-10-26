@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # SPDX-FileCopyrightText: 2020 Alex Turbov <i.zaufi@gmail.com>
+# SPDX-FileContributor: Juraj Oravec <jurajoravec@mailo.com>
 # SPDX-License-Identifier: MIT
 #
 

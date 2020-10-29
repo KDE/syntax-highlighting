@@ -3,7 +3,7 @@
 #
 # Generate Kate syntax file for CMake
 #
-# SPDX-FileCopyrightText: 2017-2019 Alex Turbov <i.zaufi@gmail.com>
+# SPDX-FileCopyrightText: 2017-2020 Alex Turbov <i.zaufi@gmail.com>
 #
 # To install prerequisites:
 #
@@ -177,6 +177,12 @@ def cli(input_yaml, template):
     env = jinja2.Environment(
         keep_trailing_newline=True
       )
+    env.block_start_string = '<!--['
+    env.block_end_string = ']-->'
+    env.variable_start_string = '<!--{'
+    env.variable_end_string = '}-->'
+    env.comment_start_string = '<!--#'
+    env.comment_end_string = '#-->'
 
     # Register convenience filters
     env.tests['nulary'] = cmd_is_nulary

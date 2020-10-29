@@ -16,7 +16,7 @@
 
 <language
     name="CMake"
-    version="25"
+    version="26"
     kateversion="5.0"
     section="Other"
     extensions="CMakeLists.txt;*.cmake;*.cmake.in"
@@ -28,66 +28,66 @@
   <highlighting>
 
     <list name="commands">
-    {%- for command in commands %}
-        <item>{{command.name}}</item>
-    {%- endfor %}
+    <!--[- for command in commands ]-->
+        <item><!--{command.name}--></item>
+    <!--[- endfor ]-->
     </list>
-    {% for command in commands -%}
-      {%- if command.named_args and command.named_args.kw %}
-    <list name="{{command.name}}_nargs">
-        {%- for arg in command.named_args.kw %}
-      <item>{{arg}}</item>
-        {%- endfor %}
+    <!--[ for command in commands -]-->
+      <!--[- if command.named_args and command.named_args.kw ]-->
+    <list name="<!--{command.name}-->_nargs">
+        <!--[- for arg in command.named_args.kw ]-->
+      <item><!--{arg}--></item>
+        <!--[- endfor ]-->
     </list>
-      {%- endif %}
-      {%- if command.special_args and command.special_args.kw %}
-    <list name="{{command.name}}_sargs">
-        {%- for arg in command.special_args.kw %}
-      <item>{{arg}}</item>
-        {%- endfor %}
+      <!--[- endif ]-->
+      <!--[- if command.special_args and command.special_args.kw ]-->
+    <list name="<!--{command.name}-->_sargs">
+        <!--[- for arg in command.special_args.kw ]-->
+      <item><!--{arg}--></item>
+        <!--[- endfor ]-->
     </list>
-      {%- endif %}
-    {%- endfor %}
+      <!--[- endif ]-->
+    <!--[- endfor ]-->
 
     <list name="variables">
-    {%- for var in variables.kw %}
-      <item>{{var}}</item>
-    {%- endfor %}
+    <!--[- for var in variables.kw ]-->
+      <item><!--{var}--></item>
+    <!--[- endfor ]-->
     </list>
 
     <list name="deprecated-or-internal-variables">
-    {%- for var in deprecated_or_internal_variables.kw %}
-      <item>{{var}}</item>
-    {%- endfor %}
+    <!--[- for var in deprecated_or_internal_variables.kw ]-->
+      <item><!--{var}--></item>
+    <!--[- endfor ]-->
     </list>
 
     <list name="environment-variables">
-    {%- for var in environment_variables.kw %}
-      <item>{{var}}</item>
-    {%- endfor %}
+    <!--[- for var in environment_variables.kw ]-->
+      <item><!--{var}--></item>
+    <!--[- endfor ]-->
     </list>
 
-    {%- for kind in properties.kinds %}
-    <list name="{{ kind|replace('_', '-') }}">
-      {%- for prop in properties[kind].kw %}
-      <item>{{prop}}</item>
-      {%- endfor %}
+    <!--[- for kind in properties.kinds ]-->
+    <list name="<!--{ kind|replace('_', '-') }-->">
+      <!--[- for prop in properties[kind].kw ]-->
+      <item><!--{prop}--></item>
+      <!--[- endfor ]-->
     </list>
-    {%- endfor %}
+    <!--[- endfor ]-->
 
     <list name="generator-expressions">
-      {%- for expr in generator_expressions %}
-      <item>{{ expr }}</item>
-      {%- endfor %}
+      <!--[- for expr in generator_expressions ]-->
+      <item><!--{ expr }--></item>
+      <!--[- endfor ]-->
     </list>
 
     <contexts>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="Normal Text">
         <DetectSpaces/>
-        {% for command in commands -%}
-        <WordDetect String="{{command.name}}" insensitive="true" attribute="Command" context="{{command.name}}_ctx"{% if command.start_region %} beginRegion="{{command.start_region}}"{% endif -%} {%- if command.end_region %} endRegion="{{command.end_region}}"{% endif %} />
-        {% endfor -%}
+        <!--[ for command in commands -]-->
+        <WordDetect String="<!--{command.name}-->" insensitive="true" attribute="Command" context="<!--{command.name}-->_ctx"<!--[ if command.start_region ]--> beginRegion="<!--{command.start_region}-->"<!--[ endif -]--> <!--[- if command.end_region ]--> endRegion="<!--{command.end_region}-->"<!--[ endif ]--> />
+        <!--[ endfor -]-->
         <DetectChar attribute="Comment" context="Match Comments and Docs" char="#" lookAhead="true" />
         <DetectIdentifier attribute="User Function/Macro" context="User Function" />
         <RegExpr attribute="@Variable Substitution" context="@VarSubst" String="@&id_re;@" lookAhead="true" />
@@ -95,71 +95,66 @@
         <keyword attribute="Command" context="#stay" String="commands" />
       </context>
 
-      {% for command in commands -%}
-      {#
-      <!--
-        {{ command|pprint }}
-      -->
-      -#}
-      <context attribute="Normal Text" lineEndContext="#stay" name="{{command.name}}_ctx">
-        <DetectChar attribute="Normal Text" context="{{command.name}}_ctx_op" char="(" />
+      <!--[ for command in commands -]-->
+      <context attribute="Normal Text" lineEndContext="#stay" name="<!--{command.name}-->_ctx">
+        <DetectChar attribute="Normal Text" context="<!--{command.name}-->_ctx_op" char="(" />
       </context>
-      <context attribute="Normal Text" lineEndContext="#stay" name="{{command.name}}_ctx_op">
-        {%- if command.nested_parentheses %}
-        <DetectChar attribute="Normal Text" context="{{command.name}}_ctx_op_nested" char="(" />
-        {%- endif %}
+      <context attribute="Normal Text" lineEndContext="#stay" name="<!--{command.name}-->_ctx_op">
+        <!--[- if command.nested_parentheses ]-->
+        <DetectChar attribute="Normal Text" context="<!--{command.name}-->_ctx_op_nested" char="(" />
+        <!--[- endif ]-->
         <IncludeRules context="EndCmdPop2" />
-        {%- if command.named_args and command.named_args.kw %}
-        <keyword attribute="Named Args" context="#stay" String="{{command.name}}_nargs" />
-        {%- endif %}
-        {%- if command.special_args and command.special_args.kw %}
-        <keyword attribute="Special Args" context="#stay" String="{{command.name}}_sargs" />
-        {%- endif %}
-        {%- if command.property_args and command.property_args.kw %}
-          {%- for kind in command.property_args.kw %}
-        <keyword attribute="Property" context="#stay" String="{{kind}}" />
-            {%- if properties[kind|replace('-', '_')].re %}
-        <IncludeRules context="Detect More {{kind}}" />
-            {%- endif %}
-          {%- endfor %}
-        {%- endif %}
-        {%- if command is not nulary %}
+        <!--[- if command.named_args and command.named_args.kw ]-->
+        <keyword attribute="Named Args" context="#stay" String="<!--{command.name}-->_nargs" />
+        <!--[- endif ]-->
+        <!--[- if command.special_args and command.special_args.kw ]-->
+        <keyword attribute="Special Args" context="#stay" String="<!--{command.name}-->_sargs" />
+        <!--[- endif ]-->
+        <!--[- if command.property_args and command.property_args.kw ]-->
+          <!--[- for kind in command.property_args.kw ]-->
+        <keyword attribute="Property" context="#stay" String="<!--{kind}-->" />
+            <!--[- if properties[kind|replace('-', '_')].re ]-->
+        <IncludeRules context="Detect More <!--{kind}-->" />
+            <!--[- endif ]-->
+          <!--[- endfor ]-->
+        <!--[- endif ]-->
+        <!--[- if command is not nulary ]-->
         <IncludeRules context="User Function Args" />
-          {%- if command.name == 'cmake_policy' %}
+          <!--[- if command.name == 'cmake_policy' ]-->
         <!-- NOTE Handle CMP<NNN> as a special arg of `cmake_policy` command -->
         <RegExpr attribute="Special Args" context="#stay" String="\bCMP[0-9]+\b" />
-          {%- endif %}
-        {%- endif %}
+          <!--[- endif ]-->
+        <!--[- endif ]-->
       </context>
-        {%- if command.nested_parentheses %}
-      <context attribute="Normal Text" lineEndContext="#stay" name="{{command.name}}_ctx_op_nested">
+        <!--[- if command.nested_parentheses ]-->
+      <context attribute="Normal Text" lineEndContext="#stay" name="<!--{command.name}-->_ctx_op_nested">
         <IncludeRules context="EndCmdPop" />
-        {%- if command.named_args and command.named_args.kw %}
-        <keyword attribute="Named Args" context="#stay" String="{{command.name}}_nargs" />
-        {%- endif %}
-        {%- if command.special_args and command.special_args.kw %}
-        <keyword attribute="Special Args" context="#stay" String="{{command.name}}_sargs" />
-        {%- endif %}
-        {%- if command.property_args and command.property_args.kw %}
-          {%- for kind in command.property_args.kw %}
-        <keyword attribute="Property" context="#stay" String="{{kind}}" />
-              {%- if properties[kind|replace('-', '_')].re %}
-        <IncludeRules context="Detect More {{kind}}" />
-            {%- endif %}
-          {%- endfor %}
-        {%- endif %}
+        <!--[- if command.named_args and command.named_args.kw ]-->
+        <keyword attribute="Named Args" context="#stay" String="<!--{command.name}-->_nargs" />
+        <!--[- endif ]-->
+        <!--[- if command.special_args and command.special_args.kw ]-->
+        <keyword attribute="Special Args" context="#stay" String="<!--{command.name}-->_sargs" />
+        <!--[- endif ]-->
+        <!--[- if command.property_args and command.property_args.kw ]-->
+          <!--[- for kind in command.property_args.kw ]-->
+        <keyword attribute="Property" context="#stay" String="<!--{kind}-->" />
+              <!--[- if properties[kind|replace('-', '_')].re ]-->
+        <IncludeRules context="Detect More <!--{kind}-->" />
+            <!--[- endif ]-->
+          <!--[- endfor ]-->
+        <!--[- endif ]-->
         <IncludeRules context="User Function Args" />
       </context>
-        {%- endif %}
-      {% endfor -%}
+        <!--[- endif ]-->
+      <!--[ endfor -]-->
 
-      {% for kind in properties.kinds if properties[kind].re -%}
-      <context attribute="Normal Text" lineEndContext="#stay" name="Detect More {{ kind|replace('_', '-') }}">
-        {%- for prop in properties[kind].re %}
-        <RegExpr attribute="Property" context="#stay" String="{{prop}}" />
-        {%- endfor %}
-      </context>{{ '\n' }}
-      {% endfor -%}
+      <!--[ for kind in properties.kinds if properties[kind].re -]-->
+      <context attribute="Normal Text" lineEndContext="#stay" name="Detect More <!--{ kind|replace('_', '-') }-->">
+        <!--[- for prop in properties[kind].re ]-->
+        <RegExpr attribute="Property" context="#stay" String="<!--{prop}-->" />
+        <!--[- endfor ]-->
+      </context><!--{ '\n' }-->
+      <!--[ endfor -]-->
 
       <context attribute="Normal Text" lineEndContext="#stay" name="EndCmdPop">
         <DetectChar attribute="Normal Text" context="#pop" char=")" />
@@ -187,12 +182,12 @@
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="Detect More Builtin Variables">
-        {%- for var in deprecated_or_internal_variables.re %}
-        <RegExpr attribute="CMake Internal Variable" context="#stay" String="{{var}}" />
-        {%- endfor %}
-        {%- for var in variables.re %}
-        <RegExpr attribute="Builtin Variable" context="#stay" String="{{var}}" />
-        {%- endfor %}
+        <!--[- for var in deprecated_or_internal_variables.re ]-->
+        <RegExpr attribute="CMake Internal Variable" context="#stay" String="<!--{var}-->" />
+        <!--[- endfor ]-->
+        <!--[- for var in variables.re ]-->
+        <RegExpr attribute="Builtin Variable" context="#stay" String="<!--{var}-->" />
+        <!--[- endfor ]-->
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="Detect Variable Substitutions">
@@ -204,9 +199,9 @@
 
       <context attribute="Environment Variable Substitution" lineEndContext="#pop" name="EnvVarSubst">
         <keyword attribute="Standard Environment Variable" context="#stay" String="environment-variables" insensitive="false" />
-        {%- for var in environment_variables.re %}
-        <RegExpr attribute="Standard Environment Variable" context="#stay" String="{{var}}" />
-        {%- endfor %}
+        <!--[- for var in environment_variables.re ]-->
+        <RegExpr attribute="Standard Environment Variable" context="#stay" String="<!--{var}-->" />
+        <!--[- endfor ]-->
         <DetectIdentifier />
         <IncludeRules context="Detect Variable Substitutions" />
         <DetectChar attribute="Environment Variable Substitution" context="#pop" char="}" />

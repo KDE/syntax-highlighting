@@ -278,8 +278,7 @@
       <context attribute="Comment" lineEndContext="#pop" name="Comment">
         <LineContinue attribute="Comment" context="#pop" />
         <DetectSpaces />
-        <IncludeRules context="##Alerts" />
-        <IncludeRules context="##Modelines" />
+        <IncludeRules context="##Comments" />
       </context>
 
       <context attribute="Comment" lineEndContext="#stay" name="RST Documentation" dynamic="true">
@@ -291,8 +290,7 @@
         <LineContinue attribute="Comment" context="#stay" />
         <DetectSpaces />
         <StringDetect attribute="Comment" context="#pop" String="]%1]" dynamic="true" endRegion="BracketedComment" />
-        <IncludeRules context="##Alerts" />
-        <IncludeRules context="##Modelines" />
+        <IncludeRules context="##Comments" />
       </context>
 
       <context attribute="Strings" lineEndContext="#stay" name="String">

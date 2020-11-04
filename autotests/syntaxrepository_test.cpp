@@ -277,9 +277,12 @@ private Q_SLOTS:
         }
 
         // ensure all ids are there from 1..size
-        for (int i = 1; i <= formatIds.size(); ++i) {
-//  QVERIFY(formatIds.contains(i));
-        }
+        // this is no longer feasible, as we e.g. skip the "Comments"
+        // syntax definition in includedDefinitions as it is not contributing
+        // any context/rule
+        //for (int i = 1; i <= formatIds.size(); ++i) {
+        //    QVERIFY(formatIds.contains(i));
+        //}
     }
 
     void testReload()

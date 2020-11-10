@@ -65,7 +65,7 @@ Usually it is:
     </tr>
     <tr>
         <td>On Windows®</td>
-        <td>%USERPROFILE%\AppData\Local\org.kde.syntax-highlighting\syntax\ </td>
+        <td>&#37;USERPROFILE&#37;&#92;AppData&#92;Local&#92;org.kde.syntax-highlighting&#92;syntax&#92;</td>
     </tr>
 </table>
 
@@ -86,11 +86,12 @@ The location of **org.kde.syntax-highlighting/themes/** is the same
 as shown in the table of the [previous section](#syntax-definition-files),
 replacing the **syntax** folder with **themes**.
 
-The [KTextEditor](https://api.kde.org/frameworks/ktexteditor/html/) library provides
+The [KTextEditor](https://api.kde.org/frameworks/ktexteditor/html/) library
+(used by Kate, Kile and KDevelop, for example) provides
 a user interface for editing and creating KSyntaxHighlighting color themes, including
 a tool for exporting and importing the JSON theme files.
-The script **data/generators/kateschema_to_theme_converter.py** converts the old Kate
-schemas files to KSyntaxHighlighting themes.
+The tool **utils/schema-converter/** and the script **utils/kateschema_to_theme_converter.py**
+convert the old Kate schemas to KSyntaxHighlighting themes.
 
 For more information, see:
 
@@ -175,7 +176,7 @@ All files shall contain a proper "SPDX-License-Identifier: MIT" identifier insid
     * [Available Default Styles (Working with Syntax Highlighting, KDE Documentation)](https://docs.kde.org/?application=katepart&branch=trunk5&path=highlight.html#kate-highlight-default-styles)
     * [Kate Part (KF5): New Default Styles for better Color Schemes (Kate Editor Website)](https://kate-editor.org/2014/03/07/kate-part-kf5-new-default-styles-for-better-color-schemes/)
 
-* Important: add test files, these are found in **autotests/input/**.
+* Add test files, these are found in **autotests/input/**.
   If you are going to add a new syntax XML file, create a new test file; if you
   are going to modify a XML file, adds examples to existing test files.
 

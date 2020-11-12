@@ -17,6 +17,7 @@
 #include <QObject>
 #include <QStandardPaths>
 #include <QTest>
+#include <QPalette>
 
 #include <algorithm>
 
@@ -535,6 +536,16 @@ private Q_SLOTS:
         QVERIFY(lists.contains(unexistedName) == false);
         QVERIFY(def.setKeywordList(unexistedName, QStringList()) == false);
     }
+
+    void testAutomaticThemeSelection()
+    {
+        QPalette palette;
+        palette.setColor(QPalette::Base, QColor(27, 30, 32));
+        palette.setColor(QPalette::Highlight, QColor(61, 174, 253));
+        auto theme = m_repo.themeForPalette(palette);
+        QCOMPARE(theme.name(), QStringLiteral("Breeze Dark"));
+    }
+
 };
 }
 

@@ -18,6 +18,7 @@
 #include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>
+#include <QPalette>
 
 #ifndef NO_STANDARD_PATHS
 #include <QStandardPaths>
@@ -140,7 +141,8 @@ Theme Repository::defaultTheme(Repository::DefaultTheme t)
     return theme(QLatin1String("Breeze Light"));
 }
 
-Theme Repository::themeForPalette(const QPalette &palette) {
+Theme Repository::themeForPalette(const QPalette &palette)
+{
     const auto base = palette.color(QPalette::Base);
     const auto themes = d->m_themes;
 

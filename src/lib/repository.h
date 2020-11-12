@@ -11,11 +11,11 @@
 
 #include <memory>
 #include <qglobal.h>
-#include <qpalette.h>
 
 QT_BEGIN_NAMESPACE
 class QString;
 template<typename T> class QVector;
+class QPalette;
 QT_END_NAMESPACE
 
 /**
@@ -215,6 +215,7 @@ public:
 
     /**
      * Returns the best matching theme for the given palette
+     * @since 5.77
      **/
     Theme themeForPalette(const QPalette &palette);
 

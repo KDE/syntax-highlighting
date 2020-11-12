@@ -216,7 +216,7 @@ public:
     /**
      * Returns the best matching theme for the given palette
      **/
-    Theme bestThemeForApplicationPalette(const QPalette &palette);
+    Theme themeForPalette(const QPalette &palette);
 
     /**
      * Reloads the repository.

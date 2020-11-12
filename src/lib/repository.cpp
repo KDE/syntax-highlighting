@@ -140,7 +140,7 @@ Theme Repository::defaultTheme(Repository::DefaultTheme t)
     return theme(QLatin1String("Breeze Light"));
 }
 
-Theme Repository::bestThemeForApplicationPalette(const QPalette &palette) {
+Theme Repository::themeForPalette(const QPalette &palette) {
     const auto base = palette.color(QPalette::Base);
     const auto themes = d->m_themes;
 

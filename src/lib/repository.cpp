@@ -140,6 +140,34 @@ Theme Repository::defaultTheme(Repository::DefaultTheme t)
     return theme(QLatin1String("Breeze Light"));
 }
 
+Theme Repository::bestThemeForApplicationPalette(const QPalette &palette) {
+    const auto base = palette.color(QPalette::Base);
+    const auto themes = d->m_themes;
+
+    // find themes with matching background colors
+    QVector<KSyntaxHighlighting::Theme> matchingThemes;
+    for (const auto &theme : themes) {
+        const auto background = theme.editorColor(KSyntaxHighlighting::Theme::EditorColorRole::BackgroundColor);
+        if (background == base.rgb()) {
+            matchingThemes.append(theme);
+        }
+    }
+    if (!matchingThemes.empty()) {
+        // if there's multiple, search for one with a matching highlight color
+        const auto highlight = palette.color(QPalette::Highlight);
+        for (const auto &theme : qAsConst(matchingThemes)) {
+            auto selection = theme.editorColor(KSyntaxHighlighting::Theme::EditorColorRole::TextSelection);
+            if (selection == highlight.rgb()) {
+                return theme;
+            }
+        }
+        return matchingThemes.first();
+    }
+
+    // fallback to just use the default light or dark theme
+    return defaultTheme((base.lightness() < 128) ? KSyntaxHighlighting::Repository::DarkTheme : KSyntaxHighlighting::Repository::LightTheme);
+}
+
 void RepositoryPrivate::load(Repository *repo)
 {
     // always add invalid default "None" highlighting

@@ -11,6 +11,7 @@
 
 #include <memory>
 #include <qglobal.h>
+#include <qpalette.h>
 
 QT_BEGIN_NAMESPACE
 class QString;
@@ -211,6 +212,11 @@ public:
      * The returned Theme is guaranteed to be a valid theme.
      */
     Theme defaultTheme(DefaultTheme t = LightTheme);
+
+    /**
+     * Returns the best matching theme for the given palette
+     **/
+    Theme bestThemeForApplicationPalette(const QPalette &palette);
 
     /**
      * Reloads the repository.

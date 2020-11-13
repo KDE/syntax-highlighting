@@ -66,4 +66,9 @@ DOOH
 
 # bug 382527
 throw new ParserException("Test {$this->some_var[$index]}\nin {$this->file} is missing.\nThis is bad.");
+
+$arr = array();
+foreach($arr as $i => $v):
+	echo($i);
+endforeach
 ?>

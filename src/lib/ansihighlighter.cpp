@@ -759,8 +759,9 @@ namespace
 
             m_hasFormatTrace = traceOptions.testFlag(TraceOption::Format);
             m_hasRegionTrace = traceOptions.testFlag(TraceOption::Region);
-            const bool hasContextTrace = traceOptions.testFlag(TraceOption::Context);
-            const bool hasFormatOrContextTrace = m_hasFormatTrace || hasContextTrace;
+            m_hasStackSizeTrace = traceOptions.testFlag(TraceOption::StackSize);
+            m_hasContextTrace = traceOptions.testFlag(TraceOption::Context);
+            const bool hasFormatOrContextTrace = m_hasFormatTrace || m_hasContextTrace || m_hasStackSizeTrace;
 
             const bool hasSeparator = hasFormatOrContextTrace && m_hasRegionTrace;
             const QString resetBgColor = (editorBackground.isEmpty() ? QStringLiteral("\x1b[0m") : editorBackground);
@@ -791,7 +792,7 @@ namespace
                 out << QStringLiteral("\x1b[K\n");
 
                 if (hasFormatOrContextTrace && !m_highlightedFragments.empty()) {
-                    if (hasContextTrace)
+                    if (m_hasContextTrace || m_hasStackSizeTrace)
                         appendContextNames(oldState, currentLine);
 
                     printFormats(out, infoStyle, ansiStyles);
@@ -897,17 +898,27 @@ namespace
          */
         QString extractContextName(StateData *stateData) const
         {
-            // first state is empty
-            if (stateData->isEmpty()) {
-                return QStringLiteral("[???]");
+            QString label;
+
+            if (m_hasStackSizeTrace) {
+                label += QLatin1Char('(') % QString::number(stateData->size()) % QLatin1Char(')');
             }
 
-            const auto context = stateData->topContext();
-            const auto defData = DefinitionData::get(context->definition());
-            const auto contextName = (defData != m_defData)
-                ? QString(QLatin1Char('<') % defData->name % QLatin1Char('>'))
-                : QString();
-            return QString(contextName % QLatin1Char('[') % context->name() % QLatin1Char(']'));
+            if (m_hasContextTrace) {
+                // first state is empty
+                if (stateData->isEmpty()) {
+                    return label + QStringLiteral("[???]");
+                }
+
+                const auto context = stateData->topContext();
+                const auto defData = DefinitionData::get(context->definition());
+                const auto contextName = (defData != m_defData)
+                    ? QString(QLatin1Char('<') % defData->name % QLatin1Char('>'))
+                    : QString();
+                return QString(label % contextName % QLatin1Char('[') % context->name() % QLatin1Char(']'));
+            }
+
+            return label;
         }
 
         void printFormats(QTextStream &out, QLatin1String regionStyle, const std::vector<QPair<QString, QString>> &ansiStyles)
@@ -1097,6 +1108,8 @@ namespace
 
         bool m_hasFormatTrace;
         bool m_hasRegionTrace;
+        bool m_hasStackSizeTrace;
+        bool m_hasContextTrace;
 
         std::vector<HighlightFragment> m_highlightedFragments;
         std::vector<GraphLine> m_formatGraph;

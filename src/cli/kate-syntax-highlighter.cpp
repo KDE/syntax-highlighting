@@ -84,7 +84,7 @@ int main(int argc, char **argv)
     parser.addOption(outputFormatOption);
 
     QCommandLineOption traceOption(QStringList() << QStringLiteral("syntax-trace"),
-                                   app.translate("SyntaxHighlightingCLI", "Add information to debug a syntax file. Only works with --output-format=ansi or ansi256Colors. Possible values are format, region and context."),
+                                   app.translate("SyntaxHighlightingCLI", "Add information to debug a syntax file. Only works with --output-format=ansi or ansi256Colors. Possible values are format, region, context and stackSize."),
                                    app.translate("SyntaxHighlightingCLI", "type"));
     parser.addOption(traceOption);
 
@@ -185,6 +185,8 @@ int main(int argc, char **argv)
                     debugOptions |= AnsiHighlighter::TraceOption::Region;
                 } else if (option == QStringLiteral("context")) {
                     debugOptions |= AnsiHighlighter::TraceOption::Context;
+                } else if (option == QStringLiteral("stackSize")) {
+                    debugOptions |= AnsiHighlighter::TraceOption::StackSize;
                 } else {
                     std::cerr << "Unknown trace name." << std::endl;
                     return 2;

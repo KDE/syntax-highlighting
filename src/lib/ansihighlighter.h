@@ -32,9 +32,10 @@ public:
     enum class TraceOption
     {
         NoOptions,
-        Format  = 1 << 0,
-        Region  = 1 << 1,
-        Context = 1 << 2,
+        Format    = 1 << 0,
+        Region    = 1 << 1,
+        Context   = 1 << 2,
+        StackSize = 1 << 3,
     };
     Q_DECLARE_FLAGS(TraceOptions, TraceOption)
 

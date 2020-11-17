@@ -23,7 +23,7 @@ echo $"string meant to be translated"
 #this too
 echo this is#nt a comment
 dcop kate EditInterface#1 #this is
-grep -e "^default/linux/amd64/" |\ #this is a comment
+grep -e "^default/linux/amd64/" |\ #this is not a comment but #this is
 mkdir this\ isnt\ #a\ comment
 mkdir this\ isnt\\\;#a\ comment
 mkdir this\\ #is a comment
@@ -91,7 +91,7 @@ error() {
 
 
 # do - done make code blocks
-while [ $p -lt $q ] 
+while [ $p -lt $q ]
 do
 	chown 0644 $file.$p
 done
@@ -152,7 +152,7 @@ local p=3  x  y='\'
 read x y z <<< $hallo
 unset B
 declare -a VAR1 VAR2 && exit
-declare less a && b 
+declare less a && b
 
 # options are recoqnized:
 zip -f=file.zip
@@ -201,7 +201,7 @@ elif [ -d $file ]; then
 fi
 
 
-case 1 in 
+case 1 in
 2) echo xxx;
 ;;
 1) echo yyy;
@@ -230,3 +230,204 @@ rm /data{aaa`aaa}aa`aaa}a
 
 ${array[0]: -7 : +  22  }  ${array[1]: num  }
 ${parameter##word} ${parameter%%word} ${parameter^^pattern} ${parameter,,pattern} ${parameter@operator}
+
+# TODO `
+
+# commands
+abc
+cp
+:
+.
+:#nokeyword
+path/cmd
+ec\
+ho
+2
+{ab}c
+{a,b}c
+'a'c
+$ab
+${ab}c
+\ a
+!a
+{ab}[
+{a,b}[
+'a'[
+\ [
+!a[
+a{}d
+a{bc}d
+a{b,c}d
+a'b'c
+a$bc
+a${bc}d
+a\ b
+a!b
+a{}[
+a{bc}[
+a{b,c}[
+a'b'[
+a\ [
+a!b[
+
+# commands + params
+shortopt -ol -f/fd/fd -hfd/fds - -ol'a'b -f'a'/fd/fd -h'a'fd/fds
+longopt --long-a --long-b=value --file=* --file=file* --file=dir/file
+longopt --long-a'a'b --long'a'-b=value --fi'a'le=*
+noopt 3 3d -f -- -f --xx dir/file
+opt param#nocomment ab'a'cd [[ param ]] } { ~a .a #comments
+path path/file dir/ / // 3/f a@/ 'a'/b d/'a'b a\ d/f f/f\
+ile
+path ~ ~/ ~a/ . .. ./a ../a
+path /path/* /path/f* /path/f@ /path/f@(|)
+glob ? * ?f *f f* f? **/ ~/* ~* /path/f* 'a'* 'a'f/?
+extglob @ @(*) @(f*|f??(f)) f!(+(?(@(*(f)f)f)f)f)f @'a'@(|) a@(?)
+subs f! f!! f!s 'a'!s \( $v {a,b} {a} {a}/d {a\,} {a,} {a,\},b} ds/{a,b}sa/s
+2 - f -f
+!a -f
+'a' -f
+$a -f
+
+# redirections (prefix)
+<<<s cat
+<<<'s' cat
+<<<'s's cat
+<<<s's's cat
+<<<s${s}s cat
+<<< s${s}s cat
+>&2 cat
+<f cat
+2>3 cat
+2>&3 cat
+2>& 3 cat
+2>f cat
+&>f cat
+
+# redirections
+cat f>2
+cat d/f>2
+cat d/f >2
+cat d/f >& 2
+cat >2 d/f
+cat > 2
+cat <(echo) <(echo a) <(echo a/f) <(echo ) <(echo a ) <(echo a/f )
+cat 2>&1 &>f &>>f 2<&1- 2<>f 2<<heredoc
+bla bla
+heredoc
+<<-'h' cat
+bla
+h
+<<"'" cat
+bla
+'
+
+# branches
+cat a|cat
+cat a&cat
+cat a||cat
+cat a&&cat
+cat a;cat
+cat a | cat
+cat a & cat
+cat a || cat
+cat a && cat
+cat a ; cat
+cat a'a';cat
+
+# substitutions
+echo '' 'a' '\' "" "a" "\\" "$a" "a""a"'a''a' a'b'c a"b"c a$'\n'c
+echo a!bc a{a}b a{b,c}d a{b,{d,e}}d a\ b
+echo a$bc a$b/c a${b}c a$((b-3))c a$(b)c a$(a b c)c
+echo ${a[*]} ${a[@]} ${a[${b}]} ${a:-x$z} ${a/g} ${a//f/f} ${a//f*/f*}
+echo ${a^^l*} ${a,} ${!a} ${#a[1]} ${a:1:$b} $((++i,i--))
+
+[ a ]
+[ -f f'f'f ]
+[ -f f]'f'f] ]
+[ -t 13 ]
+[ -t 13] ]
+[ -t 13] ]
+[ -v abc ]
+[ -z abc ]
+[ abc -ef abc ]
+[ abc -ef abc ]
+[ abc-ef -ef abc-ef ]
+[ abc == abc ]
+[ abc < abc ]
+[ abc -eq abc ]
+[[ abc -eq abc ]]
+[ 1+2 -eq 1+2 ]
+[[ 1+2 -eq 1+2 ]]
+[ a = b c ]
+[[ a = b c ]]
+[[ x =~ a(b c|$)' '{1,}[a[.digit.]] ]]
+[[ x =~ [ ] ]]
+[[ x =~ ([ ]) ]]
+[[ x =~ [ ]]
+[[ x =~ ([) ]]
+[[ a<b ]]
+[[ a <b ]]
+[[ a< b ]]
+[[ a < b ]]
+
+((3+1+a+$c*(x) & 0x43422fd+03-085/23#D9a@_^8))
+{ echo
+    echo
+}
+{ echo ; }
+(echo ; echo)
+(echo
+    echo)
+(echo a)
+[ a -eq 2 ] || [ a -eq 2] ] && [[ a -eq 2 ]] || [[ a != b ]];
+[ a -eq 2 ]||[ a -eq 2] ]&&[[ a -eq 2 ]]||[[ a != b ]];
+test a -eq b
+
+# functions
+a() { echo x; }
+a  () { echo x; }
+function f { echo x; }
+
+# variables
+a=(a b c)
+a='a'
+a+=b
+a[1]='a'
+a[$i]='x'
+a[$((
+    2+4
+))]='x'
+a=([a]=2 `echo` -s > 'ds')
+a=a cat
+a=`ls` cat
+
+# errors
+a a(s) a
+
+# control structure
+for name in a b c {d,e} ; do echo ; done
+for name; do echo ; done
+for name do echo ; done
+for ((i=0;i<5;++i)) ; do echo $i ; done
+select name in a ; do echo ; done
+select name; do echo ; done
+if : ; then echo ; elif [[ : ]] ; then echo ; else echo ; fi
+while : || : ; do echo ; done
+until : ; : ; do echo ; done
+case a in a) esac
+case a in a) echo ; esac
+case pwd in (patt1) echo ; echo ;; (patt*) echo ;;& patt?|patt) echo ;&
+patt) echo ;; esac
+
+for name in a
+ b c ;
+do
+echo
+done
+
+case a in
+  a\( | b*c? ) echo
+  (b$c) # no pattern
+  ;;
+  (b$c)
+esac

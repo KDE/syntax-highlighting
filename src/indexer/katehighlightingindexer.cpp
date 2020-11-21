@@ -91,8 +91,14 @@ public:
         while (def.hasNext()) {
             def.next();
             auto &definition = def.value();
-
             auto &contexts = def.value().contexts;
+
+            if (contexts.isEmpty()) {
+                qWarning() << definition.filename << "has no context";
+                m_success = false;
+                continue;
+            }
+
             QMutableMapIterator<QString, Context> contextIt(contexts);
             while (contextIt.hasNext()) {
                 contextIt.next();
@@ -104,12 +110,16 @@ public:
                     resolveContextName(definition, rule.context, rule.line);
                 }
             }
+
+            definition.firstContext = &*definition.contexts.find(definition.firstContextName);
         }
     }
 
     bool check() const
     {
         bool success = m_success;
+
+        const auto usedContexts = extractUsedContexts();
 
         QMapIterator<QString, Definition> def(m_definitions);
         while (def.hasNext()) {
@@ -122,7 +132,7 @@ public:
             QSet<const Keywords*> referencedKeywords;
             QSet<ItemDatas::Style> usedAttributeNames;
             checkKeywordsList(definition, referencedKeywords);
-            checkContexts(definition, referencedKeywords, usedAttributeNames);
+            checkContexts(definition, referencedKeywords, usedAttributeNames, usedContexts);
 
             // search for non-existing or unreferenced keyword lists.
             for (const auto &keywords : definition.keywordsList) {
@@ -165,7 +175,7 @@ private:
         int popCount = 0;
         bool stay = false;
 
-        const Context *contextPtr = nullptr;
+        const Context *context = nullptr;
     };
 
     struct Parser
@@ -175,6 +185,8 @@ private:
         QXmlStreamAttribute &attr;
         bool success;
 
+        //! Read a string type attribute, \c sucess = \c false when \p str is not empty
+        //! \return \c true when attr.name() == attrName, otherwise false
         bool extractString(QString& str, const QString &attrName)
         {
             if (attr.name() != attrName)
@@ -191,6 +203,8 @@ private:
             return true;
         }
 
+        //! Read a bool type attribute, \c sucess = \c false when \p xmlBool is not \c XmlBool::Unspecified.
+        //! \return \c true when attr.name() == attrName, otherwise false
         bool extractXmlBool(XmlBool& xmlBool, const QString &attrName, bool alwaysTrue = true)
         {
             if (attr.name() != attrName)
@@ -210,6 +224,8 @@ private:
             return true;
         }
 
+        //! Read a positive integer type attribute, \c sucess = \c false when \p positive is already greater than or equal to 0
+        //! \return \c true when attr.name() == attrName, otherwise false
         bool extractPositive(int& positive, const QString &attrName)
         {
             if (attr.name() != attrName)
@@ -228,6 +244,8 @@ private:
             return true;
         }
 
+        //! Read a color, \c sucess = \c false when \p color is already greater than or equal to 0
+        //! \return \c true when attr.name() == attrName, otherwise false
         bool extractColor(qint64& color, const QString &attrName)
         {
             if (attr.name() != attrName)
@@ -244,7 +262,8 @@ private:
             return true;
         }
 
-        //! Checks that attr.value() really only have one char
+        //! Read a QChar, \c sucess = \c false when \p c is not \c '\0' or does not have one char
+        //! \return \c true when attr.name() == attrName, otherwise false
         bool extractChar(QChar& c, const QString &attrName)
         {
             if (attr.name() != attrName)
@@ -263,6 +282,7 @@ private:
             return true;
         }
 
+        //! \return parsing status when \p isExtracted is \c true, otherwise \c false
         bool checkIfExtracted(bool isExtracted)
         {
             if (isExtracted)
@@ -699,6 +719,7 @@ private:
         QMap<QString, Context> contexts;
         ItemDatas itemDatas;
         QString firstContextName;
+        const Context *firstContext = nullptr;
         QString filename;
         WordDelimiters wordDelimiters;
         XmlBool casesensitive {};
@@ -757,7 +778,43 @@ private:
         return true;
     }
 
-    bool checkContexts(const Definition &definition, QSet<const Keywords*> &referencedKeywords, QSet<ItemDatas::Style> &usedAttributeNames) const
+    QSet<const Context*> extractUsedContexts() const
+    {
+        QSet<const Context*> usedContexts;
+
+        QMapIterator<QString, Definition> def(m_definitions);
+        while (def.hasNext()) {
+            def.next();
+            const auto &definition = def.value();
+
+            if (definition.firstContext) {
+                usedContexts.insert(definition.firstContext);
+                QVector<const Context*> contexts{definition.firstContext};
+
+                for (int i = 0; i < contexts.size(); ++i) {
+                    auto appendContext = [&](const Context *context){
+                        if (context && !usedContexts.contains(context)) {
+                            contexts.append(context);
+                            usedContexts.insert(context);
+                        }
+                    };
+
+                    const auto *context = contexts[i];
+                    appendContext(context->lineEndContext.context);
+                    appendContext(context->lineEmptyContext.context);
+                    appendContext(context->fallthroughContext.context);
+
+                    for (auto &rule : context->rules) {
+                        appendContext(rule.context.context);
+                    }
+                }
+            }
+        }
+
+        return usedContexts;
+    }
+
+    bool checkContexts(const Definition &definition, QSet<const Keywords*> &referencedKeywords, QSet<ItemDatas::Style> &usedAttributeNames, const QSet<const Context*> &usedContexts) const
     {
         bool success = true;
 
@@ -766,6 +823,14 @@ private:
             contextIt.next();
 
             const auto &context = contextIt.value();
+            const auto &filename = definition.filename;
+
+            if (!usedContexts.contains(&context)) {
+                qWarning() << filename << "line" << context.line << "Unused context:" << context.name;
+                success = false;
+                continue;
+            }
+
             if (!context.attribute.isEmpty())
                 usedAttributeNames.insert({context.attribute, context.line});
 
@@ -774,10 +839,10 @@ private:
             for (const auto& rule : context.rules) {
                 if (!rule.attribute.isEmpty())
                     usedAttributeNames.insert({rule.attribute, rule.line});
-                success = checkLookAhead(definition.filename, rule) && success;
-                success = checkStringDetect(definition.filename, rule) && success;
+                success = checkLookAhead(filename, rule) && success;
+                success = checkStringDetect(filename, rule) && success;
                 success = checkKeyword(definition, rule, referencedKeywords) && success;
-                success = checkRegExpr(definition.filename, rule) && success;
+                success = checkRegExpr(filename, rule) && success;
                 success = checkWordDetect(definition, rule) && success;
             }
         }
@@ -1000,7 +1065,7 @@ private:
         return success;
     }
 
-    /// search for non-existing keyword include.
+    //! search for non-existing keyword include.
     bool checkKeywordInclude(const Definition &definition, const Keywords::Items::Item &include, QSet<const Keywords*> &referencedKeywords) const
     {
         bool containsKeywordName = true;
@@ -1029,7 +1094,7 @@ private:
         return containsKeywordName;
     }
 
-    //! Initialize the referenced context (ContextName::contextPtr)
+    //! Initialize the referenced context (ContextName::context)
     //! Some input / output examples are:
     //! - "#stay"         -> ""
     //! - "#pop"          -> ""
@@ -1072,7 +1137,7 @@ private:
                 if (idx == -1) {
                     auto it = definition.contexts.find(name.toString());
                     if (it != definition.contexts.end())
-                        context.contextPtr = &*it;
+                        context.context = &*it;
                 } else {
                     auto defName = name.mid(idx + 2);
                     auto listName = name.left(idx);
@@ -1081,7 +1146,7 @@ private:
                         definition.referencedDefinitions.insert(&*it);
                         auto ctxIt = it->contexts.find(listName.isEmpty() ? it->firstContextName : listName.toString());
                         if (ctxIt != it->contexts.end()) {
-                            context.contextPtr = &*ctxIt;
+                            context.context = &*ctxIt;
                         }
                     } else {
                         qWarning() << definition.filename << "line" << line << "unknown definition in" << context.name;
@@ -1089,7 +1154,7 @@ private:
                     }
                 }
 
-                if (!context.contextPtr) {
+                if (!context.context) {
                     qWarning() << definition.filename << "line" << line << "unknown context in" << context.name;
                     m_success = false;
                 }

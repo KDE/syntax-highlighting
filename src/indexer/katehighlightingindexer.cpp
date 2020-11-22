@@ -1177,13 +1177,13 @@ private:
     {
         bool success = true;
 
-        bool includeSupport = !(definition.kateVersion < Version{5, 53});
+        bool includeNotSupport = (definition.kateVersion < Version{5, 53});
         QMapIterator<QString, Keywords> keywordsIt(definition.keywordsList);
         while (keywordsIt.hasNext()) {
             keywordsIt.next();
 
             for (const auto& include : keywordsIt.value().items.includes) {
-                if (includeSupport) {
+                if (includeNotSupport) {
                     qWarning() << definition.filename << "line" << include.line << "<include> is only available since version \"5.53\". Please, increase kateversion.";
                     success = false;
                 }

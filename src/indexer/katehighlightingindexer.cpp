@@ -915,23 +915,10 @@ private:
                 success = checkStringDetect(filename, rule) && success;
                 success = checkKeyword(definition, rule, referencedKeywords) && success;
                 success = checkRegExpr(filename, rule) && success;
-                success = checkWordDetect(definition, rule) && success;
             }
         }
 
         return success;
-    }
-
-    bool checkWordDetect(const Definition &definition, const Context::Rule &rule) const
-    {
-        if (rule.type == Context::Rule::Type::WordDetect && !rule.string.isEmpty()) {
-            bool isDelimiter = definition.wordDelimiters.contains(rule.string[0]);
-            if (isDelimiter || definition.wordDelimiters.contains(rule.string[rule.string.size()-1])) {
-                qWarning() << definition.filename << "line" << rule.line << "WordDetect with delimiter:" << rule.string[(isDelimiter ? 0 : rule.string.size()-1)];
-                return false;
-            }
-        }
-        return true;
     }
 
     //! Check that a regular expression in a RegExpr rule:
@@ -1173,7 +1160,7 @@ private:
             for (const auto& keyword : keywordsIt.value().items.keywords) {
                 for (QChar c : keyword.content) {
                     if (definition.wordDelimiters.contains(c)) {
-                        qWarning() << definition.filename << "line" << keyword.line << "keyword with delimiter:" << c;
+                        qWarning() << definition.filename << "line" << keyword.line << "keyword with delimiter:" << c << "in" << keyword.content;
                         success = false;
                     }
                 }

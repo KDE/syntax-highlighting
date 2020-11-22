@@ -1,5 +1,6 @@
 /*
     SPDX-FileCopyrightText: 2014 Christoph Cullmann <cullmann@kde.org>
+    SPDX-FileCopyrightText: 2020 Jonathan Poelen <jonathan.poelen@gmail.com>
 
     SPDX-License-Identifier: MIT
 */
@@ -91,7 +92,7 @@ public:
         while (def.hasNext()) {
             def.next();
             auto &definition = def.value();
-            auto &contexts = def.value().contexts;
+            auto &contexts = definition.contexts;
 
             if (contexts.isEmpty()) {
                 qWarning() << definition.filename << "has no context";
@@ -106,13 +107,15 @@ public:
                 resolveContextName(definition, context.lineEndContext, context.line);
                 resolveContextName(definition, context.lineEmptyContext, context.line);
                 resolveContextName(definition, context.fallthroughContext, context.line);
-                for (auto &rule : contextIt.value().rules) {
+                for (auto &rule : context.rules) {
                     resolveContextName(definition, rule.context, rule.line);
                 }
             }
 
             definition.firstContext = &*definition.contexts.find(definition.firstContextName);
         }
+
+        resolveIncludeRules();
     }
 
     bool check() const
@@ -137,21 +140,21 @@ public:
             // search for non-existing or unreferenced keyword lists.
             for (const auto &keywords : definition.keywordsList) {
                 if (!referencedKeywords.contains(&keywords)) {
-                    qWarning() << filename << "line" << keywords.line << "Unused keyword lists:" << keywords.name;
+                    qWarning() << filename << "line" << keywords.line << "unused keyword:" << keywords.name;
                 }
             }
 
             // search for non-existing itemDatas.
             const auto invalidNames = usedAttributeNames - definition.itemDatas.styleNames;
             for (const auto &styleName : invalidNames) {
-                qWarning() << filename << "line" << styleName.line << "Reference of non-existing itemData attributes:" << styleName.name;
+                qWarning() << filename << "line" << styleName.line << "reference of non-existing itemData attributes:" << styleName.name;
                 success = false;
             }
 
             // search for unused itemDatas.
             const auto unusedNames = definition.itemDatas.styleNames - usedAttributeNames;
             for (const auto &styleName : unusedNames) {
-                qWarning() << filename << "line" << styleName.line << "Unused itemData:" << styleName.name;
+                qWarning() << filename << "line" << styleName.line << "unused itemData:" << styleName.name;
                 success = false;
             }
         }
@@ -196,7 +199,7 @@ private:
 
             str = attr.value().toString();
             if (str.isEmpty()) {
-                qWarning() << filename << "line" << xml.lineNumber() << attrName << "is empty";
+                qWarning() << filename << "line" << xml.lineNumber() << attrName << "attribute is empty";
                 success = false;
             }
 
@@ -288,7 +291,7 @@ private:
             if (isExtracted)
                 return success;
 
-            qWarning() << filename << "line" << xml.lineNumber() << "unknown attribute" << attr.name();
+            qWarning() << filename << "line" << xml.lineNumber() << "unknown attribute:" << attr.name();
             return false;
         }
 
@@ -296,7 +299,7 @@ private:
         void checkDuplicateAttr(bool isDuplicated)
         {
             if (!isDuplicated) {
-                qWarning() << filename << "line" << xml.lineNumber() << "duplicate attribute" << attr.name();
+                qWarning() << filename << "line" << xml.lineNumber() << "duplicate attribute:" << attr.name();
                 success = false;
             }
         }
@@ -428,6 +431,9 @@ private:
             // AnyChar, DetectChar, StringDetect, RegExpr, WordDetect, keyword
             QString string;
 
+            // included by IncludeRules
+            QVector<const Rule*> includedRules;
+
             bool parseElement(const QString &filename, QXmlStreamReader &xml)
             {
                 line = xml.lineNumber();
@@ -458,7 +464,7 @@ private:
                     if (xml.name() == pair.first) {
                         type = pair.second;
                         bool success = parseAttributes(filename, xml);
-                        success = checlMandoryAttributes(filename, xml) && success;
+                        success = checkMandoryAttributes(filename, xml) && success;
                         return success;
                     }
                 }
@@ -520,7 +526,7 @@ private:
                 return success;
             }
 
-            bool checlMandoryAttributes(const QString &filename, QXmlStreamReader &xml)
+            bool checkMandoryAttributes(const QString &filename, QXmlStreamReader &xml)
             {
                 QString missingAttr;
 
@@ -745,7 +751,7 @@ private:
         if (m_currentDefinition->firstContextName.isEmpty())
             m_currentDefinition->firstContextName = context.name;
         if (m_currentDefinition->contexts.contains(context.name)) {
-            qWarning() << m_currentDefinition->filename << "line" << xml.lineNumber() << "Duplicate context:" << context.name;
+            qWarning() << m_currentDefinition->filename << "line" << xml.lineNumber() << "duplicate context:" << context.name;
             m_success = false;
         }
         m_currentContext = &*m_currentDefinition->contexts.insert(context.name, context);
@@ -756,7 +762,7 @@ private:
         Keywords keywords;
         m_success = keywords.parseElement(m_currentDefinition->filename, xml) && m_success;
         if (m_currentDefinition->keywordsList.contains(keywords.name)) {
-            qWarning() << m_currentDefinition->filename << "line" << xml.lineNumber() << "Duplicate list:" << keywords.name;
+            qWarning() << m_currentDefinition->filename << "line" << xml.lineNumber() << "duplicate list:" << keywords.name;
             m_success = false;
         }
         m_currentKeywords = &*m_currentDefinition->keywordsList.insert(keywords.name, keywords);
@@ -778,9 +784,74 @@ private:
         return true;
     }
 
+    void resolveIncludeRules()
+    {
+        QSet<const Context*> usedContexts;
+        QVector<const Context*> contexts;
+
+        QMutableMapIterator<QString, Definition> def(m_definitions);
+        while (def.hasNext()) {
+            def.next();
+            auto &definition = def.value();
+            QMutableMapIterator<QString, Context> contextIt(definition.contexts);
+            while (contextIt.hasNext()) {
+                contextIt.next();
+                for (auto &rule : contextIt.value().rules) {
+                    if (rule.type != Context::Rule::Type::IncludeRules) {
+                        continue;
+                    }
+
+                    if (rule.context.stay) {
+                        qWarning() << definition.filename << "line" << rule.line << "IncludeRules refers to himself";
+                        m_success = false;
+                        continue;
+                    }
+                    if (rule.context.popCount) {
+                        qWarning() << definition.filename << "line" << rule.line << "IncludeRules with #pop prefix";
+                        m_success = false;
+                    }
+
+                    if (!rule.context.context) {
+                        m_success = false;
+                        continue;
+                    }
+
+                    usedContexts.clear();
+                    usedContexts.insert(rule.context.context);
+                    contexts.clear();
+                    contexts.append(rule.context.context);
+
+                    for (int i = 0; i < contexts.size(); ++i) {
+                        for (const auto &includedRule : contexts[i]->rules) {
+                            if (includedRule.type != Context::Rule::Type::IncludeRules) {
+                                rule.includedRules.append(&includedRule);
+                            }
+                            else if (&rule == &includedRule) {
+                                qWarning() << definition.filename << "line" << rule.line << "IncludeRules refers to himself by recursivity";
+                                m_success = false;
+                            }
+                            else if (includedRule.includedRules.isEmpty()) {
+                                const auto &context = includedRule.context.context;
+                                if (context && !usedContexts.contains(context)) {
+                                    contexts.append(context);
+                                    usedContexts.insert(context);
+                                }
+                            }
+                            else {
+                                rule.includedRules.append(includedRule.includedRules);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    //! Recursively extracts the contexts used from the first context of the definitions
     QSet<const Context*> extractUsedContexts() const
     {
         QSet<const Context*> usedContexts;
+        QVector<const Context*> contexts;
 
         QMapIterator<QString, Definition> def(m_definitions);
         while (def.hasNext()) {
@@ -789,7 +860,8 @@ private:
 
             if (definition.firstContext) {
                 usedContexts.insert(definition.firstContext);
-                QVector<const Context*> contexts{definition.firstContext};
+                contexts.clear();
+                contexts.append(definition.firstContext);
 
                 for (int i = 0; i < contexts.size(); ++i) {
                     auto appendContext = [&](const Context *context){
@@ -826,7 +898,7 @@ private:
             const auto &filename = definition.filename;
 
             if (!usedContexts.contains(&context)) {
-                qWarning() << filename << "line" << context.line << "Unused context:" << context.name;
+                qWarning() << filename << "line" << context.line << "unused context:" << context.name;
                 success = false;
                 continue;
             }
@@ -870,50 +942,97 @@ private:
     //! - is not equivalent to DetectSpaces or StringDetect
     bool checkRegExpr(const QString &filename, const Context::Rule &rule) const
     {
-        bool success = true;
-
         if (rule.type == Context::Rule::Type::RegExpr) {
-            success = checkRegularExpression(filename, rule.string, rule.line);
+            if (!checkRegularExpression(filename, rule.string, rule.line)) {
+                return false;
+            }
+
+            // remove "(?:" and ")" to simplify the following checks
+            static const QRegularExpression sanitize(QStringLiteral(R"(\(\?:|\))"));
+            auto reg = rule.string;
+            reg.replace(sanitize, QString());
 
             // dynamic == true and no place holder?
             if (rule.dynamic == XmlBool::True) {
                 static const QRegularExpression placeHolder(QStringLiteral("%\\d+"));
                 if (!rule.string.contains(placeHolder)) {
                     qWarning() << filename << "line" << rule.line << "broken regex:" << rule.string << "problem: dynamic=true but no %\\d+ placeholder";
-                    success = false;
+                    return false;
                 }
             }
 
             // . + lookAhead should be fallthroughContext="..."
-            if (rule.lookhAhead == XmlBool::True && rule.string == QStringLiteral(".")) {
-                if (rule.beginRegion.isEmpty()
-                 && rule.endRegion.isEmpty()
-                 && rule.column == -1
-                 && rule.firstNonSpace != XmlBool::True
-                ) {
-                    qWarning() << filename << "line" << rule.line << "regex should be replaced by fallthroughContext";
-                    success = false;
-                }
+            static const QRegularExpression isDot(QStringLiteral(
+                R"(^\.[*+]?\$?$)"));
+            if (rule.lookhAhead == XmlBool::True
+                && reg.contains(isDot)
+                && rule.beginRegion.isEmpty()
+                && rule.endRegion.isEmpty()
+                && rule.column == -1
+                && rule.firstNonSpace != XmlBool::True
+            ) {
+                qWarning() << filename << "line" << rule.line << "regex should be replaced by fallthroughContext:" << rule.string;
+                return false;
             }
 
             // is DetectSpaces
             static const QRegularExpression isDetectSpaces(QStringLiteral(
                 R"(^\^?(\\s|\[ \\t\]|\[\\t \])[*+]$)"));
-            if (rule.string.contains(isDetectSpaces)) {
-                qWarning() << filename << "line" << rule.line << "regex should be replaced by DetectSpaces";
+            if (reg.contains(isDetectSpaces)) {
+                qWarning() << filename << "line" << rule.line << "regex should be replaced by DetectSpaces:" << rule.string;
                 return false;
             }
 
             // is StringDetect
             static const QRegularExpression isStringDetect(QStringLiteral(
-                R"(^(?:\\[^BDPSWbdpswu]|\\u[0-9a-fA-F]{4}|[^*+?.|^$[\]{}()\\]++)*$)"));
-            if (rule.string.contains(isStringDetect)) {
-                qWarning() << filename << "line" << rule.line << "regex should be replaced by StringDetect / Detect2Chars / DetectChar";
+                R"(^\^?(?:\\[^0BDPSWbdpswoux]|\\x[0-9a-fA-F]{2}|\\x\{[0-9a-fA-F]+\}|\\0\d\d|\\o\{[0-7]+\}|\\u[0-9a-fA-F]{4}|\[[^\\]{2}\]|\[(?:\\[*+?.|^$[\]{}()\\]|.)\]|\(\?:|[^*+?.|^$[{(\\]+?)*$)"));
+            // check [eE][tT][cC]
+            static const QRegularExpression isInsensitive(QStringLiteral(
+                R"(^\^?(?:\\.|\[(.)\1\]|[^[\\]+?)*$)"));
+            if (reg.contains(isStringDetect) && reg.toUpper().contains(isInsensitive)) {
+                qWarning() << filename << "line" << rule.line << "regex should be replaced by StringDetect / Detect2Chars / DetectChar:" << rule.string;
                 return false;
+            }
+
+            // column="0" or firstNonSpace="1"
+            if (rule.column == -1 && rule.firstNonSpace != XmlBool::True
+             && reg.startsWith(QLatin1Char('^')) && !reg.contains(QLatin1Char('|'))
+            ) {
+                qWarning() << filename << "line" << rule.line << "column=\"0\" or firstNonSpace=\"1\" missing with RegExpr:" << rule.string;
+                return false;
+            }
+
+            // capture does not refer to any dynamic rules
+            static const QRegularExpression hasCapture(QStringLiteral(
+                R"(^\^?(?:\\.|\[(?:\\.|\[(?:[^]\\]++|\\.)*\]|[^[\]\\]++)\]|\((?=[?])|[^[\\(]+?)*$)"));
+            if (rule.context.context && !reg.contains(hasCapture)) {
+                bool isDynamic = false;
+                for (const auto &nextRule : rule.context.context->rules) {
+                    if (nextRule.dynamic == XmlBool::True) {
+                        isDynamic = true;
+                        break;
+                    }
+                    else {
+                        for (const auto &includedRule : nextRule.includedRules) {
+                            if (includedRule->dynamic == XmlBool::True) {
+                                isDynamic = true;
+                                break;
+                            }
+                        }
+                        if (isDynamic) {
+                            break;
+                        }
+                    }
+                }
+
+                if (!isDynamic) {
+                    qWarning() << filename << "line" << rule.line << "regex with a capture, but does not refer to any dynamic rules. Please, replace '(...)' with '(?:...)':" << rule.string;
+                    return false;
+                }
             }
         }
 
-        return success;
+        return true;
     }
 
     bool parseEmptyLine(const QString &filename, QXmlStreamReader &xml)
@@ -998,7 +1117,7 @@ private:
                 referencedKeywords.insert(&*it);
             }
             else {
-                qWarning() << definition.filename << "line" << rule.line << "Reference of non-existing keyword list:" << rule.string;
+                qWarning() << definition.filename << "line" << rule.line << "reference of non-existing keyword list:" << rule.string;
                 return false;
             }
         }
@@ -1010,7 +1129,7 @@ private:
     bool checkLookAhead(const QString &filename, const Context::Rule &rule) const
     {
         if (rule.lookhAhead == XmlBool::True && rule.context.stay) {
-            qWarning() << filename << "line" << rule.line << "Infinite loop: lookAhead with context #stay";
+            qWarning() << filename << "line" << rule.line << "infinite loop: lookAhead with context #stay";
         }
         return true;
     }
@@ -1051,7 +1170,6 @@ private:
             }
 
             // Check that keyword list items do not have deliminator character
-            // e.g.: space in <item> keyword </item>
             for (const auto& keyword : keywordsIt.value().items.keywords) {
                 for (QChar c : keyword.content) {
                     if (definition.wordDelimiters.contains(c)) {
@@ -1234,7 +1352,7 @@ bool checkExtensions(const QString &extensions)
                 continue;
             }
 
-            qWarning() << "invalid character" << c << " seen in extensions wildcard";
+            qWarning() << "invalid character" << c << "seen in extensions wildcard";
             return false;
         }
     }

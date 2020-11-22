@@ -86,6 +86,7 @@ public:
         }
     }
 
+    //! Resolve the référence to contexts (context attribute and include tag)
     void resolveContexts()
     {
         QMutableMapIterator<QString, Definition> def(m_definitions);
@@ -734,6 +735,7 @@ private:
         QString languageName;
         QSet<const Definition*> referencedDefinitions;
 
+        // Parse <keywords ...>
         bool parseKeywords(QXmlStreamReader &xml)
         {
             for (QChar c : xml.attributes().value(QStringLiteral("additionalDeliminator")))
@@ -744,6 +746,7 @@ private:
         }
     };
 
+    // Parse <context>
     void processContextElement(QXmlStreamReader &xml)
     {
         Context context;
@@ -757,6 +760,7 @@ private:
         m_currentContext = &*m_currentDefinition->contexts.insert(context.name, context);
     }
 
+    // Parse <list name="...">
     void processListElement(QXmlStreamReader &xml)
     {
         Keywords keywords;
@@ -784,6 +788,7 @@ private:
         return true;
     }
 
+    // Initialize the referenced rules (Rule::includedRules)
     void resolveIncludeRules()
     {
         QSet<const Context*> usedContexts;
@@ -847,7 +852,8 @@ private:
         }
     }
 
-    //! Recursively extracts the contexts used from the first context of the definitions
+    //! Recursively extracts the contexts used from the first context of the definitions.
+    //! This method detects groups of contexts which are only used among themselves.
     QSet<const Context*> extractUsedContexts() const
     {
         QSet<const Context*> usedContexts;
@@ -886,6 +892,7 @@ private:
         return usedContexts;
     }
 
+    //! Check contexts and rules
     bool checkContexts(const Definition &definition, QSet<const Keywords*> &referencedKeywords, QSet<ItemDatas::Style> &usedAttributeNames, const QSet<const Context*> &usedContexts) const
     {
         bool success = true;
@@ -1056,6 +1063,7 @@ private:
         return true;
     }
 
+    // Parse and check <emptyLine>
     bool parseEmptyLine(const QString &filename, QXmlStreamReader &xml)
     {
         bool success = true;
@@ -1173,6 +1181,7 @@ private:
         return true;
     }
 
+    //! Check \<include> and delimiter in a keyword list
     bool checkKeywordsList(const Definition &definition, QSet<const Keywords*> &referencedKeywords) const
     {
         bool success = true;
@@ -1204,7 +1213,7 @@ private:
         return success;
     }
 
-    //! search for non-existing keyword include.
+    //! Search for non-existing keyword include.
     bool checkKeywordInclude(const Definition &definition, const Keywords::Items::Item &include, QSet<const Keywords*> &referencedKeywords) const
     {
         bool containsKeywordName = true;

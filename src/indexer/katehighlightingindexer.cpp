@@ -699,7 +699,7 @@ private:
                    || parser.extractXmlBool(spellChecking, QStringLiteral("spellChecking"), false)
                    || parser.extractColor(color, QStringLiteral("color"))
                    || parser.extractColor(selColor, QStringLiteral("selColor"))
-                   || parser.extractColor(BackgroundColor, QStringLiteral("BackgroundColor"))
+                   || parser.extractColor(BackgroundColor, QStringLiteral("backgroundColor"))
                    || parser.extractColor(selBackgroundColor, QStringLiteral("selBackgroundColor"))
                 ;
 
@@ -926,18 +926,15 @@ private:
     //! - character ranges such as [A-Z] are valid and not accidentally e.g. [A-z].
     //! - dynamic=true but no place holder used?
     //! - is not . with lookAhead="1"
-    //! - is not equivalent to DetectSpaces or StringDetect
+    //! - is not ^... without column ou firstNonSpace attribute
+    //! - is not equivalent to DetectSpaces, DetectChar, Detect2Chars, StringDetect
+    //! - has no unused captures
     bool checkRegExpr(const QString &filename, const Context::Rule &rule) const
     {
         if (rule.type == Context::Rule::Type::RegExpr) {
             if (!checkRegularExpression(filename, rule.string, rule.line)) {
                 return false;
             }
-
-            // remove "(?:" and ")" to simplify the following checks
-            static const QRegularExpression sanitize(QStringLiteral(R"(\(\?:|\))"));
-            auto reg = rule.string;
-            reg.replace(sanitize, QString());
 
             // dynamic == true and no place holder?
             if (rule.dynamic == XmlBool::True) {
@@ -948,9 +945,47 @@ private:
                 }
             }
 
+            // is DetectSpaces
+            // \s, [\s], [\t ], [ \t] possibly in (...) or (?:...) followed by *, +
+            static const QRegularExpression isDetectSpaces(QStringLiteral(
+                R"(^\^?(?:\((?:\?:)?)?\^?(?:\\s|\[(?:\\s| (?:\t|\\t)|(?:\t|\\t) )\])\)?(?:[*+][*+?]?|[*+])?\)?\$?\)?$)"));
+            if (rule.string.contains(isDetectSpaces)) {
+                qWarning() << filename << "line" << rule.line << "RegExpr should be replaced by DetectSpaces / DetectChar:" << rule.string;
+                return false;
+            }
+
+            auto reg = rule.string;
+
+            // replace \c, \xhhh, \x{hhh...}, \0dd, \o{ddd}, \uhhhh, with _
+            static const QRegularExpression sanitize1(QStringLiteral(
+                R"(\\(?:[^0BDPSWbdpswoux]|x[0-9a-fA-F]{2}|x\{[0-9a-fA-F]+\}|0\d\d|o\{[0-7]+\}|u[0-9a-fA-F]{4}))"));
+            reg.replace(sanitize1, QStringLiteral("_"));
+
+            // replace [:...:] with ___
+            static const QRegularExpression sanitize2(QStringLiteral(
+                R"(\[:\w+:\])"));
+            reg.replace(sanitize2, QStringLiteral("___"));
+
+            // replace [ccc...], [special] with .
+            static const QRegularExpression sanitize3(QStringLiteral(
+                R"(\[(?:\^\]?[^]]*|\]?[^]\\]*?\\.[^]]*|\][^]]{2,}|[^]]{3,})\]|(\[\]?[^]]*\]))"));
+            reg.replace(sanitize3, QStringLiteral("\\1"));
+
+            // replace [c] with _
+            static const QRegularExpression sanitize4(QStringLiteral(
+                R"(\[.\])"));
+            reg.replace(sanitize4, QStringLiteral("_"));
+
+            // remove "(?:" and ")"
+            static const QRegularExpression sanitize5(QStringLiteral(
+                R"(\(\?:|\))"));
+            reg.replace(sanitize5, QString());
+
             // . + lookAhead should be fallthroughContext="..."
+            // ., (. followed by *, + or nothing
+            // ) is removed by previous sanitizer
             static const QRegularExpression isDot(QStringLiteral(
-                R"(^\.[*+]?\$?$)"));
+                R"(^\(?\.(?:[*+][*+?]?|[*+])?\$?$)"));
             if (rule.lookhAhead == XmlBool::True
                 && reg.contains(isDot)
                 && rule.beginRegion.isEmpty()
@@ -958,26 +993,21 @@ private:
                 && rule.column == -1
                 && rule.firstNonSpace != XmlBool::True
             ) {
-                qWarning() << filename << "line" << rule.line << "regex should be replaced by fallthroughContext:" << rule.string;
+                qWarning() << filename << "line" << rule.line << "RegExpr should be replaced by fallthroughContext:" << rule.string;
                 return false;
             }
 
-            // is DetectSpaces
-            static const QRegularExpression isDetectSpaces(QStringLiteral(
-                R"(^\^?(\\s|\[ \\t\]|\[\\t \])[*+]$)"));
-            if (reg.contains(isDetectSpaces)) {
-                qWarning() << filename << "line" << rule.line << "regex should be replaced by DetectSpaces:" << rule.string;
-                return false;
-            }
+            const int len = reg.size();
+            // replace [cC] with _
+            static const QRegularExpression toInsensitive(QStringLiteral(
+                R"(\[(?:([^]])\1)\])"));
+            reg.replace(toInsensitive, QString());
 
             // is StringDetect
-            static const QRegularExpression isStringDetect(QStringLiteral(
-                R"(^\^?(?:\\[^0BDPSWbdpswoux]|\\x[0-9a-fA-F]{2}|\\x\{[0-9a-fA-F]+\}|\\0\d\d|\\o\{[0-7]+\}|\\u[0-9a-fA-F]{4}|\[[^\\]{2}\]|\[(?:\\[*+?.|^$[\]{}()\\]|.)\]|\(\?:|[^*+?.|^$[{(\\]+?)*$)"));
-            // check [eE][tT][cC]
-            static const QRegularExpression isInsensitive(QStringLiteral(
-                R"(^\^?(?:\\.|\[(.)\1\]|[^[\\]+?)*$)"));
-            if (reg.contains(isStringDetect) && reg.toUpper().contains(isInsensitive)) {
-                qWarning() << filename << "line" << rule.line << "regex should be replaced by StringDetect / Detect2Chars / DetectChar:" << rule.string;
+            if (reg.contains(QStringLiteral("|\\?*+$^[{(."))) {
+                qWarning() << filename << "line" << rule.line << "RegExpr should be replaced by StringDetect / Detect2Chars / DetectChar:" << rule.string;
+                if (len != reg.size())
+                    qWarning() << filename << "line" << rule.line << "insensitive=\"1\" missing:" << rule.string;
                 return false;
             }
 
@@ -989,10 +1019,14 @@ private:
                 return false;
             }
 
+            // remove [...]
+            static const QRegularExpression sanitizeAny(QStringLiteral(
+                R"(\[\]?[^]]*\])"));
+            reg.replace(sanitizeAny, QString());
             // capture does not refer to any dynamic rules
             static const QRegularExpression hasCapture(QStringLiteral(
-                R"(^\^?(?:\\.|\[(?:\\.|\[(?:[^]\\]++|\\.)*\]|[^[\]\\]++)\]|\((?=[?])|[^[\\(]+?)*$)"));
-            if (rule.context.context && !reg.contains(hasCapture)) {
+                R"(\([^?])"));
+            if (rule.context.context && reg.contains(hasCapture)) {
                 bool isDynamic = false;
                 for (const auto &nextRule : rule.context.context->rules) {
                     if (nextRule.dynamic == XmlBool::True) {
@@ -1013,7 +1047,7 @@ private:
                 }
 
                 if (!isDynamic) {
-                    qWarning() << filename << "line" << rule.line << "regex with a capture, but does not refer to any dynamic rules. Please, replace '(...)' with '(?:...)':" << rule.string;
+                    qWarning() << filename << "line" << rule.line << "RegExpr with a capture, but does not refer to any dynamic rules. Please, replace '(...)' with '(?:...)':" << rule.string;
                     return false;
                 }
             }

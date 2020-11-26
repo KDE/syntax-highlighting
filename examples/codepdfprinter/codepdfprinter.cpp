@@ -54,7 +54,7 @@ void CodePdfPrinter::printPdfFile(const QString &fileName)
 {
     QPrinter printer(QPrinter::PrinterResolution);
     printer.setOutputFormat(QPrinter::PdfFormat);
-    printer.setPaperSize(QPrinter::A4);
+    printer.setPageSize(QPageSize(QPageSize::A4));
     printer.setOutputFileName(fileName);
 
     m_document.print(&printer);

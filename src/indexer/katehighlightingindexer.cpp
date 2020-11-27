@@ -86,7 +86,7 @@ public:
         }
     }
 
-    //! Resolve the référence to contexts (context attribute and include tag)
+    //! Resolve context attribute and include tag
     void resolveContexts()
     {
         QMutableMapIterator<QString, Definition> def(m_definitions);
@@ -105,11 +105,11 @@ public:
             while (contextIt.hasNext()) {
                 contextIt.next();
                 auto& context = contextIt.value();
-                resolveContextName(definition, context.lineEndContext, context.line);
-                resolveContextName(definition, context.lineEmptyContext, context.line);
-                resolveContextName(definition, context.fallthroughContext, context.line);
+                resolveContextName(definition, context, context.lineEndContext, context.line);
+                resolveContextName(definition, context, context.lineEmptyContext, context.line);
+                resolveContextName(definition, context, context.fallthroughContext, context.line);
                 for (auto &rule : context.rules) {
-                    resolveContextName(definition, rule.context, rule.line);
+                    resolveContextName(definition, context, rule.context, rule.line);
                 }
             }
 
@@ -135,8 +135,8 @@ public:
 
             QSet<const Keywords*> referencedKeywords;
             QSet<ItemDatas::Style> usedAttributeNames;
-            checkKeywordsList(definition, referencedKeywords);
-            checkContexts(definition, referencedKeywords, usedAttributeNames, usedContexts);
+            success = checkKeywordsList(definition, referencedKeywords) && success;
+            success = checkContexts(definition, referencedKeywords, usedAttributeNames, usedContexts) && success;
 
             // search for non-existing or unreferenced keyword lists.
             for (const auto &keywords : definition.keywordsList) {
@@ -209,7 +209,7 @@ private:
 
         //! Read a bool type attribute, \c sucess = \c false when \p xmlBool is not \c XmlBool::Unspecified.
         //! \return \c true when attr.name() == attrName, otherwise false
-        bool extractXmlBool(XmlBool& xmlBool, const QString &attrName, bool alwaysTrue = true)
+        bool extractXmlBool(XmlBool& xmlBool, const QString &attrName)
         {
             if (attr.name() != attrName)
                 return false;
@@ -219,11 +219,6 @@ private:
             xmlBool = attr.value().isNull() ? XmlBool::Unspecified
                 : attrToBool(attr.value()) ? XmlBool::True
                 : XmlBool::False;
-
-            if (alwaysTrue && xmlBool == XmlBool::False) {
-                qWarning() << filename << "line" << xml.lineNumber() << attrName << "must be 1 or true:" << attr.value();
-                success = false;
-            }
 
             return true;
         }
@@ -495,7 +490,7 @@ private:
                        || type == Type::StringDetect
                        || type == Type::WordDetect
                        || type == Type::keyword
-                       ) && parser.extractXmlBool(insensitive, QStringLiteral("insensitive"), type != Type::keyword))
+                       ) && parser.extractXmlBool(insensitive, QStringLiteral("insensitive")))
                      || ((type == Type::DetectChar
                        || type == Type::RegExpr
                        || type == Type::StringDetect
@@ -693,11 +688,11 @@ private:
                 const bool isExtracted
                     = parser.extractString(name, QStringLiteral("name"))
                    || parser.extractString(defStyleNum, QStringLiteral("defStyleNum"))
-                   || parser.extractXmlBool(bold, QStringLiteral("bold"), false)
-                   || parser.extractXmlBool(italic, QStringLiteral("italic"), false)
-                   || parser.extractXmlBool(underline, QStringLiteral("underline"), false)
-                   || parser.extractXmlBool(strikeOut, QStringLiteral("strikeOut"), false)
-                   || parser.extractXmlBool(spellChecking, QStringLiteral("spellChecking"), false)
+                   || parser.extractXmlBool(bold, QStringLiteral("bold"))
+                   || parser.extractXmlBool(italic, QStringLiteral("italic"))
+                   || parser.extractXmlBool(underline, QStringLiteral("underline"))
+                   || parser.extractXmlBool(strikeOut, QStringLiteral("strikeOut"))
+                   || parser.extractXmlBool(spellChecking, QStringLiteral("spellChecking"))
                    || parser.extractColor(color, QStringLiteral("color"))
                    || parser.extractColor(selColor, QStringLiteral("selColor"))
                    || parser.extractColor(BackgroundColor, QStringLiteral("backgroundColor"))
@@ -910,6 +905,11 @@ private:
                 continue;
             }
 
+            if (context.name.startsWith(QStringLiteral("#pop"))) {
+                qWarning() << filename << "line" << context.line << "the context name must not start with '#pop':" << context.name;
+                success = false;
+            }
+
             if (!context.attribute.isEmpty())
                 usedAttributeNames.insert({context.attribute, context.line});
 
@@ -939,7 +939,8 @@ private:
     bool checkRegExpr(const QString &filename, const Context::Rule &rule) const
     {
         if (rule.type == Context::Rule::Type::RegExpr) {
-            if (!checkRegularExpression(filename, rule.string, rule.line)) {
+            const QRegularExpression regexp(rule.string);
+            if (!checkRegularExpression(filename, regexp, rule.line)) {
                 return false;
             }
 
@@ -952,16 +953,20 @@ private:
                 }
             }
 
+            auto reg = rule.string;
+            reg.replace(QStringLiteral("{1}"), QString());
+
             // is DetectSpaces
-            // \s, [\s], [\t ], [ \t] possibly in (...) or (?:...) followed by *, +
+            // optional ^ then \s, [\s], [\t ], [ \t] possibly in (...) or (?:...) followed by *, +
             static const QRegularExpression isDetectSpaces(QStringLiteral(
-                R"(^\^?(?:\((?:\?:)?)?\^?(?:\\s|\[(?:\\s| (?:\t|\\t)|(?:\t|\\t) )\])\)?(?:[*+][*+?]?|[*+])?\)?\$?\)?$)"));
+                R"(^\^?(?:\((?:\?:)?)?\^?(?:\\s|\[(?:\\s| (?:\t|\\t)|(?:\t|\\t) )\])\)?(?:[*+][*+?]?|[*+])?\)?\)?$)"));
             if (rule.string.contains(isDetectSpaces)) {
-                qWarning() << filename << "line" << rule.line << "RegExpr should be replaced by DetectSpaces / DetectChar:" << rule.string;
+                char const* extraMsg = rule.string.contains(QLatin1Char('^'))
+                    ? "+ column=\"0\" or firstNonSpace=\"1\""
+                    : "";
+                qWarning() << filename << "line" << rule.line << "RegExpr should be replaced by DetectSpaces / DetectChar" << extraMsg << ":" << rule.string;
                 return false;
             }
-
-            auto reg = rule.string;
 
             // replace \c, \xhhh, \x{hhh...}, \0dd, \o{ddd}, \uhhhh, with _
             static const QRegularExpression sanitize1(QStringLiteral(
@@ -973,32 +978,30 @@ private:
                 R"(\[:\w+:\])"));
             reg.replace(sanitize2, QStringLiteral("___"));
 
-            // replace [ccc...], [special] with .
+            // replace [ccc...], [special] with ...
             static const QRegularExpression sanitize3(QStringLiteral(
                 R"(\[(?:\^\]?[^]]*|\]?[^]\\]*?\\.[^]]*|\][^]]{2,}|[^]]{3,})\]|(\[\]?[^]]*\]))"));
-            reg.replace(sanitize3, QStringLiteral("\\1"));
+            reg.replace(sanitize3, QStringLiteral("...\\1"));
 
             // replace [c] with _
             static const QRegularExpression sanitize4(QStringLiteral(
                 R"(\[.\])"));
             reg.replace(sanitize4, QStringLiteral("_"));
 
-            // remove "(?:" and ")"
-            static const QRegularExpression sanitize5(QStringLiteral(
-                R"(\(\?:|\))"));
-            reg.replace(sanitize5, QString());
-
             // . + lookAhead should be fallthroughContext="..."
-            // ., (. followed by *, + or nothing
-            // ) is removed by previous sanitizer
+            // ., (.) followed by *, + or nothing
             static const QRegularExpression isDot(QStringLiteral(
                 R"(^\(?\.(?:[*+][*+?]?|[*+])?\$?$)"));
+            // remove "(?:" and ")"
+            static const QRegularExpression removeParentheses(QStringLiteral(
+                R"(\(\?:|\))"));
             if (rule.lookhAhead == XmlBool::True
-                && reg.contains(isDot)
-                && rule.beginRegion.isEmpty()
-                && rule.endRegion.isEmpty()
-                && rule.column == -1
-                && rule.firstNonSpace != XmlBool::True
+                // remove parentheses on a double from the string
+             && QString(reg).replace(removeParentheses, QString()).contains(isDot)
+             && rule.beginRegion.isEmpty()
+             && rule.endRegion.isEmpty()
+             && rule.column == -1
+             && rule.firstNonSpace != XmlBool::True
             ) {
                 qWarning() << filename << "line" << rule.line << "RegExpr should be replaced by fallthroughContext:" << rule.string;
                 return false;
@@ -1008,51 +1011,101 @@ private:
             // replace [cC] with _
             static const QRegularExpression toInsensitive(QStringLiteral(
                 R"(\[(?:([^]])\1)\])"));
+            reg = reg.toUpper();
             reg.replace(toInsensitive, QString());
 
             // is StringDetect
-            if (reg.contains(QStringLiteral("|\\?*+$^[{(."))) {
-                qWarning() << filename << "line" << rule.line << "RegExpr should be replaced by StringDetect / Detect2Chars / DetectChar:" << rule.string;
+            // ignore (?:, ) and {n}
+            static const QRegularExpression isStringDetect(QStringLiteral(
+                R"(^\^?(?:[^|\\?*+$^[{(.]|{(?!\d+,\d*}|,\d+})|\(\?:)+$)"));
+            if (reg.contains(isStringDetect)) {
+                char const* extraMsg = rule.string.contains(QLatin1Char('^'))
+                    ? "+ column=\"0\" or firstNonSpace=\"1\""
+                    : "";
+                qWarning() << filename << "line" << rule.line << "RegExpr should be replaced by StringDetect / Detect2Chars / DetectChar" << extraMsg << ":" << rule.string;
                 if (len != reg.size())
                     qWarning() << filename << "line" << rule.line << "insensitive=\"1\" missing:" << rule.string;
                 return false;
             }
 
             // column="0" or firstNonSpace="1"
-            if (rule.column == -1 && rule.firstNonSpace != XmlBool::True
-             && reg.startsWith(QLatin1Char('^')) && !reg.contains(QLatin1Char('|'))
-            ) {
-                qWarning() << filename << "line" << rule.line << "column=\"0\" or firstNonSpace=\"1\" missing with RegExpr:" << rule.string;
-                return false;
+            if (rule.column == -1 && rule.firstNonSpace != XmlBool::True) {
+                // ^ without |
+                // (^sas*) -> ok
+                // (^sa|s*) -> ko
+                auto first = qAsConst(reg).begin();
+                auto last = qAsConst(reg).end();
+                int depth = 0;
+                for (; first != last; ++last) {
+                    if (QLatin1Char('(') == *first) {
+                        ++depth;
+                        if (*first == QLatin1Char('?') || first[1] == QLatin1Char(':')) {
+                            first += 2;
+                        }
+                    }
+                    else if (QLatin1Char('^') == *first) {
+                        int bol = depth;
+                        bool isSubBol = depth;
+                        bool replace = true;
+
+                        while (++first != last) {
+                            if (QLatin1Char('(') == *first) {
+                                ++depth;
+                            }
+                            else if (QLatin1Char(')') == *first) {
+                                --depth;
+                                if (depth == bol && isSubBol) {
+                                    if (depth) {
+                                        --bol;
+                                        isSubBol = bol;
+                                    }
+
+                                    // (^a)? === (^a|) -> ko
+                                    if (first + 1 != last && QStringLiteral("*?").contains(first[1])) {
+                                        replace = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            else if (QLatin1Char('|') == *first) {
+                                // ignore '|' within subgroup
+                                if (depth <= bol) {
+                                    replace = false;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (replace) {
+                            qWarning() << filename << "line" << rule.line << "column=\"0\" or firstNonSpace=\"1\" missing with RegExpr:" << rule.string;
+                            return false;
+                        }
+                    }
+                    break;
+                }
             }
 
-            // remove [...]
-            static const QRegularExpression sanitizeAny(QStringLiteral(
-                R"(\[\]?[^]]*\])"));
-            reg.replace(sanitizeAny, QString());
-            // capture does not refer to any dynamic rules
-            static const QRegularExpression hasCapture(QStringLiteral(
-                R"(\([^?])"));
-            if (rule.context.context && reg.contains(hasCapture)) {
+            if (regexp.captureCount()) {
                 bool isDynamic = false;
-                for (const auto &nextRule : rule.context.context->rules) {
-                    if (nextRule.dynamic == XmlBool::True) {
-                        isDynamic = true;
-                        break;
-                    }
-                    else {
-                        for (const auto &includedRule : nextRule.includedRules) {
-                            if (includedRule->dynamic == XmlBool::True) {
-                                isDynamic = true;
+                if (rule.context.context) {
+                    for (const auto &nextRule : rule.context.context->rules) {
+                        if (nextRule.dynamic == XmlBool::True) {
+                            isDynamic = true;
+                            break;
+                        }
+                        else {
+                            for (const auto &includedRule : nextRule.includedRules) {
+                                if (includedRule->dynamic == XmlBool::True) {
+                                    isDynamic = true;
+                                    break;
+                                }
+                            }
+                            if (isDynamic) {
                                 break;
                             }
                         }
-                        if (isDynamic) {
-                            break;
-                        }
                     }
                 }
-
                 if (!isDynamic) {
                     qWarning() << filename << "line" << rule.line << "RegExpr with a capture, but does not refer to any dynamic rules. Please, replace '(...)' with '(?:...)':" << rule.string;
                     return false;
@@ -1068,26 +1121,26 @@ private:
     {
         bool success = true;
 
-        QString regexpr;
+        QString pattern;
         XmlBool casesensitive {};
 
         for (auto& attr : xml.attributes()) {
             Parser parser{filename, xml, attr, success};
 
             const bool isExtracted
-                = parser.extractString(regexpr, QStringLiteral("regexpr"))
+                = parser.extractString(pattern, QStringLiteral("regexpr"))
                || parser.extractXmlBool(casesensitive, QStringLiteral("casesensitive"))
             ;
 
             success = parser.checkIfExtracted(isExtracted);
         }
 
-        if (regexpr.isEmpty()) {
+        if (pattern.isEmpty()) {
             qWarning() << filename << "line" << xml.lineNumber() << "missing attribute: regexpr";
             success = false;
         }
         else {
-            success = checkRegularExpression(filename, regexpr, xml.lineNumber());
+            success = checkRegularExpression(filename, QRegularExpression(pattern), xml.lineNumber());
         }
 
         return success;
@@ -1096,19 +1149,19 @@ private:
     //! Check that a regular expression:
     //! - isValid()
     //! - character ranges such as [A-Z] are valid and not accidentally e.g. [A-z].
-    bool checkRegularExpression(const QString &filename, const QString& string, int line) const
+    bool checkRegularExpression(const QString &filename, const QRegularExpression &regexp, int line) const
     {
+        const auto pattern = regexp.pattern();
         // validate regexp
-        const QRegularExpression regexp(string);
         if (!regexp.isValid()) {
-            qWarning() << filename << "line" << line << "broken regex:" << string << "problem:" << regexp.errorString() << "at offset" << regexp.patternErrorOffset();
+            qWarning() << filename << "line" << line << "broken regex:" << pattern << "problem:" << regexp.errorString() << "at offset" << regexp.patternErrorOffset();
             return false;
         }
 
         // catch possible case typos: [A-z] or [a-Z]
-        const int azOffset = std::max(string.indexOf(QStringLiteral("A-z")), string.indexOf(QStringLiteral("a-Z")));
+        const int azOffset = std::max(pattern.indexOf(QStringLiteral("A-z")), pattern.indexOf(QStringLiteral("a-Z")));
         if (azOffset >= 0) {
-            qWarning() << filename << "line" << line << "broken regex:" << string << "problem: [a-Z] or [A-z] at offset" << azOffset;
+            qWarning() << filename << "line" << line << "broken regex:" << pattern << "problem: [a-Z] or [A-z] at offset" << azOffset;
             return false;
         }
 
@@ -1127,7 +1180,12 @@ private:
                 success = false;
             }
 
-            if (context.fallthrough != XmlBool::True && definition.kateVersion < Version{5, 62}) {
+            const bool mandatoryFallthroughAttribute = definition.kateVersion < Version{5, 62};
+            if (context.fallthrough == XmlBool::True && !mandatoryFallthroughAttribute) {
+                qWarning() << definition.filename << "line" << context.line << "fallthroughContext attribute is unnecessary with kateversion >= 5.62" << context.name;
+                success = false;
+            }
+            else if (context.fallthrough != XmlBool::True && mandatoryFallthroughAttribute) {
                 qWarning() << definition.filename << "line" << context.line << "fallthroughContext attribute without fallthrough attribute is only valid with kateversion >= 5.62 in context" << context.name;
                 success = false;
             }
@@ -1170,13 +1228,27 @@ private:
     //! \endcode
     bool checkStringDetect(const QString &filename, const Context::Rule &rule) const
     {
-        if (rule.type == Context::Rule::Type::StringDetect
-         && rule.string.size() <= 2
-         && rule.dynamic != XmlBool::True
-         && rule.insensitive != XmlBool::True
-        ) {
-            qWarning() << filename << "line" << rule.line << "StringDetect should be replaced by" << (rule.string.size() == 2 ? "Detect2Chars" : "DetectChar");
-            return false;
+        if (rule.type == Context::Rule::Type::StringDetect) {
+            // dynamic == true and no place holder?
+            if (rule.dynamic == XmlBool::True) {
+                static const QRegularExpression placeHolder(QStringLiteral("%\\d+"));
+                if (!rule.string.contains(placeHolder)) {
+                    qWarning() << filename << "line" << rule.line << "broken regex:" << rule.string << "problem: dynamic=true but no %\\d+ placeholder";
+                    return false;
+                }
+            }
+            else {
+                if (rule.string.size() <= 1) {
+                    const auto replacement = rule.insensitive == XmlBool::True ? QStringLiteral("AnyChar" ) : QStringLiteral("DetectChar");
+                    qWarning() << filename << "line" << rule.line << "StringDetect should be replaced by" << replacement;
+                    return false;
+                }
+
+                if (rule.string.size() <= 2 && rule.insensitive != XmlBool::True) {
+                    qWarning() << filename << "line" << rule.line << "StringDetect should be replaced by Detect2Chars";
+                    return false;
+                }
+            }
         }
         return true;
     }
@@ -1250,15 +1322,16 @@ private:
     //! - "#pop!Comment"  -> "Comment"
     //! - "##ISO C++"     -> ""
     //! - "Comment##ISO C++"-> "Comment" in ISO C++
-    void resolveContextName(Definition &definition, ContextName &context, int line)
+    void resolveContextName(Definition &definition, const Context& context, ContextName &contextName, int line)
     {
-        QStringView name = context.name;
+        QStringView name = contextName.name;
         if (name.isEmpty()) {
-            context.stay = true;
+            contextName.stay = true;
         }
         else if (name.startsWith(QStringLiteral("#stay"))) {
             name = name.mid(5);
-            context.stay = true;
+            contextName.stay = true;
+            contextName.context = &context;
             if (!name.isEmpty()) {
                 qWarning() << definition.filename << "line" << line << "invalid context in" << context.name;
                 m_success = false;
@@ -1267,15 +1340,15 @@ private:
         else {
             while (name.startsWith(QStringLiteral("#pop"))) {
                 name = name.mid(4);
-                ++context.popCount;
+                ++contextName.popCount;
             }
 
-            if (context.popCount && !name.isEmpty()) {
+            if (contextName.popCount && !name.isEmpty()) {
                 if (name.startsWith(QLatin1Char('!')) && name.size() > 1) {
                     name = name.mid(1);
                 }
                 else {
-                    qWarning() << definition.filename << "line" << line << "invalid context in" << context.name;
+                    qWarning() << definition.filename << "line" << line << "'!' missing between '#pop' and context name" << context.name;
                     m_success = false;
                 }
             }
@@ -1285,7 +1358,7 @@ private:
                 if (idx == -1) {
                     auto it = definition.contexts.find(name.toString());
                     if (it != definition.contexts.end())
-                        context.context = &*it;
+                        contextName.context = &*it;
                 } else {
                     auto defName = name.mid(idx + 2);
                     auto listName = name.left(idx);
@@ -1294,7 +1367,7 @@ private:
                         definition.referencedDefinitions.insert(&*it);
                         auto ctxIt = it->contexts.find(listName.isEmpty() ? it->firstContextName : listName.toString());
                         if (ctxIt != it->contexts.end()) {
-                            context.context = &*ctxIt;
+                            contextName.context = &*ctxIt;
                         }
                     } else {
                         qWarning() << definition.filename << "line" << line << "unknown definition in" << context.name;
@@ -1302,7 +1375,7 @@ private:
                     }
                 }
 
-                if (!context.context) {
+                if (!contextName.context) {
                     qWarning() << definition.filename << "line" << line << "unknown context in" << context.name;
                     m_success = false;
                 }

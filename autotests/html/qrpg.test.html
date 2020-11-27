@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>qrpg.test</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (ILERPG) - Theme (Breeze Light)"/>
+</head><body style="background-color:#ffffff;color:#1f1c1b"><pre>
+     <span style="color:#898887;"> * &quot;F&quot; (file) specs define files and other i/o devices</span>
+     <span style="font-weight:bold;">F</span> ARMstF1   IF   E       K     Disk    Rename(ARMST:RARMST)
+
+     <span style="color:#898887;"> * &quot;D&quot; (data) specs are used to define variables</span>
+     <span style="font-weight:bold;">D</span> pCusNo          S              <span style="color:#b08000;">6</span>p
+     <span style="font-weight:bold;">D</span> pName           S             <span style="color:#b08000;">30</span>a
+     <span style="font-weight:bold;">D</span> pAddr1          S             <span style="color:#b08000;">30</span>a
+
+     <span style="color:#898887;"> * The &quot;chain&quot; command is used for random access of a keyed file</span>
+     <span style="font-weight:bold;">C</span><span style="color:#cc0000;">     </span>pCusNo        <span style="font-weight:bold;">chain</span>     ARMstF1
+
+     <span style="color:#898887;"> * If a record is found, move fields from the file into parameters</span>
+     <span style="font-weight:bold;">C</span><span style="color:#cc0000;">     </span>              <span style="font-weight:bold;">if</span>        <span style="font-weight:bold;">%found</span>
+     <span style="font-weight:bold;">C</span><span style="color:#cc0000;">     </span>              <span style="font-weight:bold;">eval</span>      pName  = ARNm01
+     <span style="font-weight:bold;">C</span><span style="color:#cc0000;">     </span>              <span style="font-weight:bold;">eval</span>      pAddr1 = ARAd01
+     <span style="font-weight:bold;">C</span><span style="color:#cc0000;">     </span>              <span style="font-weight:bold;">eval</span>      pAddr2 = ARAd02
+     <span style="font-weight:bold;">C</span><span style="color:#cc0000;">     </span>              <span style="font-weight:bold;">eval</span>      pCity  = ARCy01
+     <span style="font-weight:bold;">C</span><span style="color:#cc0000;">     </span>              <span style="font-weight:bold;">endif</span>
+
+     <span style="color:#898887;"> * RPG makes use of switches.  One switch &quot;LR&quot; originally stood for &quot;last record&quot;</span>
+     <span style="color:#898887;"> * LR flags the program and its dataspace as removable from memory</span>
+
+     <span style="font-weight:bold;">C</span><span style="color:#cc0000;">     </span>              <span style="font-weight:bold;">eval</span>      <span style="color:#cc0000;">*InLR</span> = <span style="color:#cc2222;">*On</span>
+
+     <span style="color:#898887;"> * &quot;F&quot; (file) specs define files and other i/o devices</span>
+     <span style="font-weight:bold;">F</span>ARMstF1   IF   E        K     Disk    Rename(ARMST:RARMST)
+
+     <span style="color:#898887;"> * &quot;D&quot; (data) specs are used to define variables and parameters</span>
+     <span style="color:#898887;"> * The &quot;prototype&quot; for the program is in a separate file</span>
+     <span style="color:#898887;"> * allowing other programs to call it</span>
+     <span style="color:#006e28;"> /copy</span> cust_pr
+     <span style="color:#898887;"> * The &quot;procedure interface&quot; describes the *ENTRY parameters</span>
+     <span style="font-weight:bold;">D</span> getCustInf      PI
+     <span style="font-weight:bold;">D</span>  pCusNo                        <span style="color:#b08000;">6</span>p <span style="color:#b08000;">0</span>   <span style="font-weight:bold;">const</span>
+     <span style="font-weight:bold;">D</span>  pName                        <span style="color:#b08000;">30</span>a
+     <span style="font-weight:bold;">D</span>  pAddr1                       <span style="color:#b08000;">30</span>a
+     <span style="font-weight:bold;">D</span>  pAddr2                       <span style="color:#b08000;">30</span>a
+     <span style="font-weight:bold;">D</span>  pCity                        <span style="color:#b08000;">25</span>a
+     <span style="font-weight:bold;">D</span>  pState                        <span style="color:#b08000;">2</span>a
+     <span style="font-weight:bold;">D</span>  pZip                         <span style="color:#b08000;">10</span>a
+     <span style="color:#006e28;"> /free</span>
+        <span style="color:#898887;">// The &quot;chain&quot; command is used for random access of a keyed file</span>
+        <span style="font-weight:bold;">chain</span> pCusNo ARMstF1;
+
+        <span style="color:#898887;">// If a record is found, move fields from the file into parameters</span>
+        <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">%found</span>;
+           pName  = ARNm01;
+           pAddr1 = ARAd01;
+           pAddr2 = ARAd02;
+           pCity  = ARCy01;
+           pState = ARSt01;
+           pZip   = ARZp15;
+        <span style="font-weight:bold;">endif</span>;
+
+      <span style="color:#898887;">// RPG makes use of switches.  One switch &quot;LR&quot; originally stood for &quot;last record&quot;</span>
+      <span style="color:#898887;">// LR actually flags the program and its dataspace as removable from memory.</span>
+        <span style="color:#cc0000;">*InLR</span> = <span style="color:#cc2222;">*On</span>;
+     <span style="color:#006e28;"> /end-free</span>
+
+     <span style="font-weight:bold;">H</span> main(GetCustInf)
+     <span style="font-weight:bold;">D</span> ARMSTF1       E DS
+     <span style="font-weight:bold;">P</span> GetCustInf      B
+     <span style="font-weight:bold;">D</span> GetCustInf      PI                  <span style="font-weight:bold;">extpgm</span>(<span style="color:#dd0022;">'CUS001'</span>)
+     <span style="font-weight:bold;">D</span>  inCusNo                            <span style="font-weight:bold;">like</span>(arCNum) <span style="font-weight:bold;">const</span>
+     <span style="font-weight:bold;">D</span>  outName                            <span style="font-weight:bold;">like</span>(arName)
+     <span style="font-weight:bold;">D</span>  outAddr1                           <span style="font-weight:bold;">like</span>(arAdd1)
+     <span style="font-weight:bold;">D</span>  outAddr2                           <span style="font-weight:bold;">like</span>(arAdd2)
+     <span style="font-weight:bold;">D</span>  outCity                            <span style="font-weight:bold;">like</span>(arCity)
+     <span style="font-weight:bold;">D</span>  outState                           <span style="font-weight:bold;">like</span>(arStte)
+     <span style="font-weight:bold;">D</span>  outZip                             <span style="font-weight:bold;">like</span>(arZip)
+     <span style="color:#006e28;"> /free</span>
+       exec sql <span style="font-weight:bold;">select</span> arName, arAdd1, arAdd2, arCity, arStte, arZip
+                into  :outName, :outAddr1, :outAddr2, :outCity, :outState,
+                      :outZip
+                from   ARMSTF1
+                where  arCNum = :inCusNo
+                fetch first <span style="color:#b08000;">1</span> row only
+                with CS
+                use currently committed;
+     <span style="color:#006e28;"> /end-free</span>
+     <span style="font-weight:bold;">P</span> GetCustInf      E
+</pre></body></html>

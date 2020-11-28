@@ -81,6 +81,13 @@ static QString replaceCaptures(const QString &pattern, const QStringList &captur
     return result;
 }
 
+Rule::~Rule()
+{
+    if (!m_additionalDeliminator.isEmpty() || !m_weakDeliminator.isEmpty()) {
+        delete m_wordDelimiters;
+    }
+}
+
 Definition Rule::definition() const
 {
     return m_def.definition();
@@ -130,6 +137,11 @@ void Rule::resolveContext()
 
     // cache for DefinitionData::wordDelimiters, is accessed VERY often
     m_wordDelimiters = &DefinitionData::get(def)->wordDelimiters;
+    if (!m_additionalDeliminator.isEmpty() || !m_weakDeliminator.isEmpty()) {
+        m_wordDelimiters = new WordDelimiters(*m_wordDelimiters);
+        m_wordDelimiters->append(m_additionalDeliminator);
+        m_wordDelimiters->remove(m_weakDeliminator);
+    }
 }
 
 void Rule::resolveAttributeFormat(Context *lookupContext)
@@ -149,6 +161,12 @@ bool Rule::doLoad(QXmlStreamReader &reader)
 {
     Q_UNUSED(reader);
     return true;
+}
+
+void Rule::loadAdditionalWordDelimiters(QXmlStreamReader &reader)
+{
+    m_additionalDeliminator = reader.attributes().value(QLatin1String("additionalDeliminator")).toString();
+    m_weakDeliminator = reader.attributes().value(QLatin1String("weakDeliminator")).toString();
 }
 
 Rule::Ptr Rule::create(const QStringRef &name)
@@ -283,6 +301,12 @@ MatchResult DetectSpaces::doMatch(const QString &text, int offset, const QString
     return offset;
 }
 
+bool Float::doLoad(QXmlStreamReader &reader)
+{
+    loadAdditionalWordDelimiters(reader);
+    return true;
+}
+
 MatchResult Float::doMatch(const QString &text, int offset, const QStringList &) const
 {
     if (offset > 0 && !isWordDelimiter(text.at(offset - 1)))
@@ -344,6 +368,12 @@ MatchResult HlCChar::doMatch(const QString &text, int offset, const QStringList 
     return offset;
 }
 
+bool HlCHex::doLoad(QXmlStreamReader &reader)
+{
+    loadAdditionalWordDelimiters(reader);
+    return true;
+}
+
 MatchResult HlCHex::doMatch(const QString &text, int offset, const QStringList &) const
 {
     if (offset > 0 && !isWordDelimiter(text.at(offset - 1)))
@@ -365,6 +395,12 @@ MatchResult HlCHex::doMatch(const QString &text, int offset, const QStringList &
     // TODO Kate matches U/L suffix, QtC does not?
 
     return offset;
+}
+
+bool HlCOct::doLoad(QXmlStreamReader &reader)
+{
+    loadAdditionalWordDelimiters(reader);
+    return true;
 }
 
 MatchResult HlCOct::doMatch(const QString &text, int offset, const QStringList &) const
@@ -433,6 +469,12 @@ MatchResult IncludeRules::doMatch(const QString &text, int offset, const QString
     return offset;
 }
 
+bool Int::doLoad(QXmlStreamReader &reader)
+{
+    loadAdditionalWordDelimiters(reader);
+    return true;
+}
+
 MatchResult Int::doMatch(const QString &text, int offset, const QStringList &) const
 {
     if (offset > 0 && !isWordDelimiter(text.at(offset - 1)))
@@ -465,6 +507,8 @@ bool KeywordListRule::doLoad(QXmlStreamReader &reader)
     } else {
         m_hasCaseSensitivityOverride = false;
     }
+
+    loadAdditionalWordDelimiters(reader);
 
     return !m_keywordList->isEmpty();
 }
@@ -647,6 +691,7 @@ bool WordDetect::doLoad(QXmlStreamReader &reader)
 {
     m_word = reader.attributes().value(QLatin1String("String")).toString();
     m_caseSensitivity = Xml::attrToBool(reader.attributes().value(QLatin1String("insensitive"))) ? Qt::CaseInsensitive : Qt::CaseSensitive;
+    loadAdditionalWordDelimiters(reader);
     return !m_word.isEmpty();
 }
 

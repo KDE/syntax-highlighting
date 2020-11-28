@@ -635,18 +635,15 @@ void DefinitionData::loadGeneral(QXmlStreamReader &reader)
                     caseSensitive = Xml::attrToBool(reader.attributes().value(QLatin1String("casesensitive"))) ? Qt::CaseSensitive : Qt::CaseInsensitive;
 
                 // adapt wordDelimiters
-                for (QChar c : reader.attributes().value(QLatin1String("additionalDeliminator")))
-                    wordDelimiters.append(c);
-                for (QChar c : reader.attributes().value(QLatin1String("weakDeliminator")))
-                    wordDelimiters.remove(c);
+                wordDelimiters.append(reader.attributes().value(QLatin1String("additionalDeliminator")));
+                wordDelimiters.remove(reader.attributes().value(QLatin1String("weakDeliminator")));
 
                 // adapt WordWrapDelimiters
                 QStringRef wordWrapDeliminatorAttr = reader.attributes().value(QLatin1String("wordWrapDeliminator"));
                 if (wordWrapDeliminatorAttr.isEmpty())
                     wordWrapDelimiters = wordDelimiters;
                 else {
-                    for (QChar c : wordWrapDeliminatorAttr)
-                        wordWrapDelimiters.append(c);
+                    wordWrapDelimiters.append(wordWrapDeliminatorAttr);
                 }
             } else if (reader.name() == QLatin1String("folding")) {
                 if (reader.attributes().hasAttribute(QLatin1String("indentationsensitive")))

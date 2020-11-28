@@ -33,7 +33,7 @@ class Rule
 {
 public:
     Rule() = default;
-    virtual ~Rule() = default;
+    virtual ~Rule();
 
     typedef std::shared_ptr<Rule> Ptr;
 
@@ -94,6 +94,8 @@ protected:
 
     bool isWordDelimiter(QChar c) const;
 
+    void loadAdditionalWordDelimiters(QXmlStreamReader &reader);
+
 private:
     Q_DISABLE_COPY(Rule)
 
@@ -109,6 +111,9 @@ private:
 
     // cache for DefinitionData::wordDelimiters, is accessed VERY often
     WordDelimiters* m_wordDelimiters = nullptr;
+
+    QString m_additionalDeliminator;
+    QString m_weakDeliminator;
 
 protected:
     bool m_dynamic = false;
@@ -161,6 +166,7 @@ protected:
 class Float : public Rule
 {
 protected:
+    bool doLoad(QXmlStreamReader &reader) override;
     MatchResult doMatch(const QString &text, int offset, const QStringList &) const override;
 };
 
@@ -184,6 +190,7 @@ private:
 class Int : public Rule
 {
 protected:
+    bool doLoad(QXmlStreamReader &reader) override;
     MatchResult doMatch(const QString &text, int offset, const QStringList &captures) const override;
 };
 
@@ -196,12 +203,14 @@ protected:
 class HlCHex : public Rule
 {
 protected:
+    bool doLoad(QXmlStreamReader &reader) override;
     MatchResult doMatch(const QString &text, int offset, const QStringList &) const override;
 };
 
 class HlCOct : public Rule
 {
 protected:
+    bool doLoad(QXmlStreamReader &reader) override;
     MatchResult doMatch(const QString &text, int offset, const QStringList &) const override;
 };
 

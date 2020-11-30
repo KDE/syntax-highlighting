@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE language SYSTEM "language.dtd">
+<!DOCTYPE language SYSTEM "language.dtd" [
+  <!ENTITY tab "&#9;">
+]>
 <language name="Varnish Test Case language" version="11" kateversion="5.62" section="Configuration" extensions="*.vtc" author="Xavier Guerrin (xavier@tuxfamily.org)" license="WTFPL" priority="9">
   <highlighting>
     <list name="VSLGrouping">
@@ -88,7 +90,7 @@
       <context name="global_directives_restricted" attribute="Normal Text" lineEndContext="#stay">
         <StringDetect firstNonSpace="true" attribute="Keyword" context="varnishtest_declaration" String="varnishtest" />
         <StringDetect firstNonSpace="true" attribute="Keyword" context="feature_instruction"     String="feature" />
-        <RegExpr attribute="Keyword" context="#stay"     String="^\s*random\s*$" />
+        <RegExpr attribute="Keyword" context="#stay"     String="^\s*random\s*$" column="0" />
       </context>
 
       <!-- directives that can be encountered at global scope, either directly or within a loop  -->
@@ -141,7 +143,7 @@
         <RegExpr attribute="String" context="unquoted-string" String="[^ ]" />
       </context>
       <context name="unquoted-string" attribute="String" lineEndContext="#pop#pop">
-        <RegExpr attribute="Normal Text" context="#pop#pop" String="\s" />
+        <AnyChar attribute="Normal Text" context="#pop#pop" String="&tab; " />
       </context>
 
       <!-- This context exits as soon as it parsed a string, be it defined between braces, quotes or spaces -->
@@ -252,7 +254,7 @@
         <DetectChar   attribute="String" context="http_expectation_operator" char="&quot;" />
       </context>
       <context name="http_expectation_arg1_unquoted-string" attribute="String" lineEndContext="#pop#pop">
-        <RegExpr attribute="Normal Text" context="http_expectation_operator" String="\s" />
+        <AnyChar attribute="Normal Text" context="http_expectation_operator" String="&tab; " />
       </context>
 
       <!-- Contexts to parse second argument of all expectations as a string -->
@@ -265,7 +267,7 @@
         <DetectChar   attribute="String" context="common_expectation_end" char="&quot;" />
       </context>
       <context name="common_expectation_arg2_unquoted-string" attribute="String" lineEndContext="#pop#pop">
-        <RegExpr attribute="Normal Text" context="common_expectation_end" String="\s" />
+        <AnyChar attribute="Normal Text" context="common_expectation_end" String="&tab; " />
       </context>
 
       <!--

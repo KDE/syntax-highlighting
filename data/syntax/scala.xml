@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
-<language name="Scala" version="9" kateversion="2.3" section="Sources"
+<language name="Scala" version="9" kateversion="5.53" section="Sources"
           extensions="*.scala;*.sbt" mimetype="text/x-scala" license="LGPL"
           author="Stephane Micheloud (stephane.micheloud@epfl.ch)">
 <!--
@@ -3414,7 +3414,7 @@ adapted from "java.xml" by Alfredo Luiz Foltran Fialho (alfoltran@ig.com.br)
         <RegExpr attribute="Decimal" context="#stay" String="//\s*BEGIN.*$" beginRegion="Region1"/>
         <RegExpr attribute="Decimal" context="#stay" String="//\s*END.*$" endRegion="Region1"/>
         <DetectChar attribute="String" context="String" char="&quot;"/>
-        <RegExpr attribute="Function" context="Printf" String="\.(format|printf)\b" />
+        <RegExpr attribute="Function" context="Printf" String="\.(?:format|printf)\b" />
         <Detect2Chars attribute="Comment" context="Commentar 1" char="/" char1="/"/>
         <Detect2Chars attribute="Comment" context="Commentar 2" char="/" char1="*" beginRegion="Comment"/>
         <DetectChar attribute="Symbol" context="#stay" char="{" beginRegion="Brace1"/>
@@ -3424,22 +3424,15 @@ adapted from "java.xml" by Alfredo Luiz Foltran Fialho (alfoltran@ig.com.br)
         <RegExpr attribute="Keyword" context="StaticImports" String="\b(import\s+static)\b" />
         <RegExpr attribute="Keyword" context="Imports" String="\b(package|import)\b" />
 -->
-        <RegExpr attribute="Function" context="#stay" String="\b[_\w][_\w\d]*(?=[\s]*(/\*\s*\d+\s*\*/\s*)?[(])" />
+        <RegExpr attribute="Function" context="#stay" String="\b[_\w][_\w\d]*(?=[\s]*(?:/\*\s*\d+\s*\*/\s*)?[(])" />
         <DetectChar attribute="Symbol" context="Member" char="." />
         <AnyChar attribute="Symbol" context="#stay" String=":!%&amp;()+,-/*&lt;=&gt;?[]|~^&#59;"/>
       </context>
       <context name="Float Suffixes" attribute="Float" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
-          <AnyChar String="fF" attribute="Float" context="#pop"/>
+          <AnyChar String="fdFD" attribute="Float" context="#pop"/>
       </context>
       <context name="Int Suffixes" attribute="Decimal" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
-          <StringDetect attribute="Decimal" context="#pop" String="ULL" insensitive="true"/>
-          <StringDetect attribute="Decimal" context="#pop" String="LUL" insensitive="true"/>
-          <StringDetect attribute="Decimal" context="#pop" String="LLU" insensitive="true"/>
-          <StringDetect attribute="Decimal" context="#pop" String="UL" insensitive="true"/>
-          <StringDetect attribute="Decimal" context="#pop" String="LU" insensitive="true"/>
-          <StringDetect attribute="Decimal" context="#pop" String="LL" insensitive="true"/>
-          <StringDetect attribute="Decimal" context="#pop" String="U" insensitive="true"/>
-          <StringDetect attribute="Decimal" context="#pop" String="L" insensitive="true"/>
+          <AnyChar attribute="Decimal" context="#pop" String="Ll"/>
       </context>
       <context attribute="String" lineEndContext="#pop" name="String">
         <LineContinue attribute="String" context="#stay"/>
@@ -3454,9 +3447,9 @@ adapted from "java.xml" by Alfredo Luiz Foltran Fialho (alfoltran@ig.com.br)
         <LineContinue attribute="String" context="#stay"/>
         <HlCStringChar attribute="String Char" context="#stay"/>
         <DetectChar attribute="String" context="#pop" char="&quot;"/>
-        <RegExpr attribute="String Char" context="#stay" String="%(\d+\$)?(-|#|\+|\ |0|,|\()*\d*(\.\d+)?[a-hosxA-CEGHSX]" />
-        <RegExpr attribute="String Char" context="#stay" String="%(\d+\$)?(-|#|\+|\ |0|,|\()*\d*(t|T)(a|A|b|B|c|C|d|D|e|F|h|H|I|j|k|l|L|m|M|N|p|P|Q|r|R|s|S|T|y|Y|z|Z)" />
-        <RegExpr attribute="String Char" context="#stay" String="%(%|n)" />
+        <RegExpr attribute="String Char" context="#stay" String="%(?:\d+\$)?[-#+ 0,(]*\d*(?:\.\d+)?[a-hosxA-CEGHSX]" />
+        <RegExpr attribute="String Char" context="#stay" String="%(?:\d+\$)?[-#+ 0,(]*\d*[tT][aAbBcCdDeFhHIjklLmMNpPQrRsSTyYzZ]" />
+        <RegExpr attribute="String Char" context="#stay" String="%[%n]" />
       </context>
       <context attribute="Normal Text" lineEndContext="#pop" name="Member" fallthrough="true" fallthroughContext="#pop">
         <RegExpr attribute="Function" context="#pop" String="\b[_a-zA-Z]\w*(?=[\s]*)" />

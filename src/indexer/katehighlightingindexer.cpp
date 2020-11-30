@@ -125,13 +125,19 @@ public:
 
         const auto usedContexts = extractUsedContexts();
 
+        QMap<const Definition*, const Definition*> maxVersionByDefinitions;
+
         QMapIterator<QString, Definition> def(m_definitions);
         while (def.hasNext()) {
             def.next();
             const auto &definition = def.value();
             const auto &filename = definition.filename;
 
-            checkKateVersion(definition);
+            auto *maxDef = maxKateVersionDefinition(definition, maxVersionByDefinitions);
+            if (maxDef != &definition) {
+                qWarning() << definition.filename << "depends on a language" << maxDef->languageName << "in version" << maxDef->kateVersionStr << ". Please, increase kateversion.";
+                success = false;
+            }
 
             QSet<const Keywords*> referencedKeywords;
             QSet<ItemDatas::Style> usedAttributeNames;
@@ -767,20 +773,22 @@ private:
         m_currentKeywords = &*m_currentDefinition->keywordsList.insert(keywords.name, keywords);
     }
 
-    bool checkKateVersion(const Definition &definition) const
+    const Definition *maxKateVersionDefinition(const Definition &definition, QMap<const Definition*, const Definition*> &maxVersionByDefinitions) const
     {
-        auto* maxDef = &definition;
-        for (const auto &referencedDef : definition.referencedDefinitions) {
-            if (maxDef->kateVersion < referencedDef->kateVersion) {
-                maxDef = referencedDef;
+        auto it = maxVersionByDefinitions.find(&definition);
+        if (it != maxVersionByDefinitions.end()) {
+            return it.value();
+        }
+        else {
+            auto it = maxVersionByDefinitions.insert(&definition, &definition);
+            for (const auto &referencedDef : definition.referencedDefinitions) {
+                auto *maxDef = maxKateVersionDefinition(*referencedDef, maxVersionByDefinitions);
+                if (it.value()->kateVersion < maxDef->kateVersion) {
+                    it.value() = maxDef;
+                }
             }
+            return it.value();
         }
-
-        if (maxDef != &definition) {
-            qWarning() << definition.filename << "depends on a language" << maxDef->languageName << "in version" << maxDef->kateVersionStr << ". Please, increase kateversion.";
-            return false;
-        }
-        return true;
     }
 
     // Initialize the referenced rules (Rule::includedRules)
@@ -964,7 +972,7 @@ private:
                 char const* extraMsg = rule.string.contains(QLatin1Char('^'))
                     ? "+ column=\"0\" or firstNonSpace=\"1\""
                     : "";
-                qWarning() << filename << "line" << rule.line << "RegExpr should be replaced by DetectSpaces / DetectChar" << extraMsg << ":" << rule.string;
+                qWarning() << filename << "line" << rule.line << "RegExpr should be replaced by DetectSpaces / DetectChar / AnyChar" << extraMsg << ":" << rule.string;
                 return false;
             }
 
@@ -1085,32 +1093,88 @@ private:
                 }
             }
 
+            // detection of unnecessary capture
+#if 0
             if (regexp.captureCount()) {
-                bool isDynamic = false;
-                if (rule.context.context) {
+                int max = std::min(regexp.captureCount(), 9);
+                int min = max;
+
+                static const QString num1[] {
+                    QStringLiteral("\\1"),
+                    QStringLiteral("\\2"),
+                    QStringLiteral("\\3"),
+                    QStringLiteral("\\4"),
+                    QStringLiteral("\\5"),
+                    QStringLiteral("\\6"),
+                    QStringLiteral("\\7"),
+                    QStringLiteral("\\8"),
+                    QStringLiteral("\\9"),
+                };
+                static const QString num2[] {
+                    QStringLiteral("\\g1"),
+                    QStringLiteral("\\g2"),
+                    QStringLiteral("\\g3"),
+                    QStringLiteral("\\g4"),
+                    QStringLiteral("\\g5"),
+                    QStringLiteral("\\g6"),
+                    QStringLiteral("\\g7"),
+                    QStringLiteral("\\g8"),
+                    QStringLiteral("\\g9"),
+                };
+                // minimal back capture
+                while (min
+                    && !rule.string.contains(num1[min-1])
+                    && !rule.string.contains(num2[min-1])
+                ) {
+                    --min;
+                }
+
+                // minimal dynamic reference
+                if (min != max && rule.context.context && !rule.context.stay) {
+                    auto maximumCapture = [max](const QString &s){
+                        static const QString cap[] {
+                            QStringLiteral("%1"),
+                            QStringLiteral("%2"),
+                            QStringLiteral("%3"),
+                            QStringLiteral("%4"),
+                            QStringLiteral("%5"),
+                            QStringLiteral("%6"),
+                            QStringLiteral("%7"),
+                            QStringLiteral("%8"),
+                            QStringLiteral("%9"),
+                        };
+                        int min = max;
+                        while (min && !s.contains(cap[min-1])) {
+                            --min;
+                        }
+                        return min;
+                    };
+
                     for (const auto &nextRule : rule.context.context->rules) {
                         if (nextRule.dynamic == XmlBool::True) {
-                            isDynamic = true;
-                            break;
+                            min = std::max(min, maximumCapture(nextRule.string));
                         }
                         else {
                             for (const auto &includedRule : nextRule.includedRules) {
                                 if (includedRule->dynamic == XmlBool::True) {
-                                    isDynamic = true;
-                                    break;
+                                    min = std::max(min, maximumCapture(includedRule->string));
                                 }
-                            }
-                            if (isDynamic) {
-                                break;
                             }
                         }
                     }
                 }
-                if (!isDynamic) {
-                    qWarning() << filename << "line" << rule.line << "RegExpr with a capture, but does not refer to any dynamic rules. Please, replace '(...)' with '(?:...)':" << rule.string;
+
+                if (min != max) {
+                    if (min == 0) {
+                        qWarning() << filename << "line" << rule.line << "RegExpr with a capture, but does not refer to any dynamic rules. Please, replace '(...)' with '(?:...)':" << rule.string;
+                    }
+                    else {
+                        qWarning() << filename << "line" << rule.line << "RegExpr with" << max << " capture but only" << min << "are used. Please, replace '(...)' with '(?:...)':" << rule.string;
+                    }
                     return false;
                 }
             }
+#endif
         }
 
         return true;
@@ -1182,11 +1246,11 @@ private:
 
             const bool mandatoryFallthroughAttribute = definition.kateVersion < Version{5, 62};
             if (context.fallthrough == XmlBool::True && !mandatoryFallthroughAttribute) {
-                qWarning() << definition.filename << "line" << context.line << "fallthroughContext attribute is unnecessary with kateversion >= 5.62" << context.name;
+                qWarning() << definition.filename << "line" << context.line << "fallthrough attribute is unnecessary with kateversion >= 5.62 in context" << context.name;
                 success = false;
             }
             else if (context.fallthrough != XmlBool::True && mandatoryFallthroughAttribute) {
-                qWarning() << definition.filename << "line" << context.line << "fallthroughContext attribute without fallthrough attribute is only valid with kateversion >= 5.62 in context" << context.name;
+                qWarning() << definition.filename << "line" << context.line << "fallthroughContext attribute without fallthrough=\"1\" attribute is only valid with kateversion >= 5.62 in context" << context.name;
                 success = false;
             }
         }
@@ -1272,6 +1336,7 @@ private:
             }
 
             // Check that keyword list items do not have deliminator character
+#if 0
             for (const auto& keyword : keywordsIt.value().items.keywords) {
                 for (QChar c : keyword.content) {
                     if (definition.wordDelimiters.contains(c)) {
@@ -1280,6 +1345,7 @@ private:
                     }
                 }
             }
+#endif
         }
 
         return success;

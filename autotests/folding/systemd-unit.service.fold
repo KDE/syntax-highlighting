@@ -89,17 +89,20 @@ OOMPolicy = stop
 WorkingDirectory = ~
 RootDirectory = /some/path
 RootImage = /some/path
+RootImageOptions = partition_name,noauto
 RootHash = /some/path
 RootHash = 0xABCDEF
 RootHashSignature =
 RootVerity = /some/path
 MountAPIVFS = true
+ProcSubset = pid
 BindPaths = /source/path,/destination/path,rbind \
   /source/path2,/destination/path2,norbind \
   /source/path3
 BindReadOnlyPaths = /source/path,/destination/path,rbind \
   /source/path2,/destination/path2,norbind \
   /source/path3
+MountImages = /source/path,dest
 ## from systemd.exec Credentials
 User = 1000
 Group = group-name
@@ -107,6 +110,8 @@ DynamicUser = true
 SupplementaryGroups = group1 group-two 100 \
   one-more-group
 PAMName =
+LoadCredential = some_id /path/to/credential/data
+SetCredential = some_visible_credential
 ## from systemd.exec Capabilities
 CapabilityBoundingSet = ~ CAP_SYS_ADMIN CAP_DAC_OVERRIDE   CAP_SYS_PTRACE \
   CAP_NET_ADMIN  CAP_SYS_BOOT
@@ -201,6 +206,8 @@ SystemCallFilter = @debug @aio
 SystemCallErrorNumber = ETIMEDOUT
 SystemCallArchitectures = mips64-n32 \
   native sparc
+SystemCallLog = ~ some_name \
+  another_name
 ## from systemd.exec System Call Environment
 Environment = DISPLAY=:%i
 Environment = XAUTHORITY=%t/Xauthority.%i \
@@ -272,6 +279,9 @@ DevicePolicy = strict
 Slice = some.slice
 Delegate = bpf-firewall
 DisableControllers = cpu io
+ManagedOOMSwap = auto
+ManagedOOMMemoryPressure = kill
+ManagedOOMMemoryPressureLimitPercent = 50%
 
 
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Slice]</beginfold id='1'>
@@ -302,6 +312,7 @@ SocketMode = 0644
 DirectoryMode = 0744
 Accept = no
 Writable = yes
+FlushPending = true
 MaxConnections = 34
 MaxConnectionsPerSource = 10
 KeepAlive = yes
@@ -330,6 +341,7 @@ Broadcast = true
 PassCredentials = yes
 PassSecurity = true
 PassPacketInfo = true
+Timestamping = nsec
 TCPCongestion = westwood
 ExecStartPre = +/usr/bin/start/pre
 ExecStartPost = @/usr/bin/start/post arg
@@ -361,6 +373,7 @@ OnUnitInactiveSec = 1m 30s
 OnCalendar = daily
 AccuracySec = 1min 10sec
 RandomizedDelaySec = 30s
+FixedRandomDelay = yes
 OnClockChange = false
 OnTimezoneChange = true
 Unit = some_timed.service
@@ -1759,6 +1772,17 @@ NotifyAccess = invalid
 NotifyAccess = exec none
 
 
+###### numa mask
+<endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
+NUMAMask = all
+NUMAMask = 1,2,3-8
+## invalid values
+NUMAMask = invalid
+# both all and cpu index list
+NUMAMask = all, 1,2,3-8
+NUMAMask = 1,2,3-8, all
+
+
 ###### numa policy
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
 NUMAPolicy = bind
@@ -1788,6 +1812,27 @@ OnFailureJobMode = invalid fail
 OnFailureJobMode = replace fail
 
 
+###### oom behavior (out-of-memory killer behavior)
+<endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
+ManagedOOMSwap = auto
+ManagedOOMSwap = kill
+## invalid values
+ManagedOOMSwap = invalid
+# multiple values
+ManagedOOMSwap = auto kill
+
+
+###### oom policy (out-of-memory killer policy)
+<endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
+OOMPolicy = continue
+OOMPolicy = kill
+OOMPolicy = stop
+## invalid values
+OOMPolicy = invalid
+# multiple values
+OOMPolicy = kill stop
+
+
 ###### oom score adjust (out-of-memory killer score adjustment)
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
 OOMScoreAdjust = -1000
@@ -1804,17 +1849,6 @@ OOMScoreAdjust = 1.2
 OOMScoreAdjust = -1001
 OOMScoreAdjust = +1001
 OOMScoreAdjust = 1001
-
-
-###### out-of-memory killer policy
-<endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
-OOMPolicy = continue
-OOMPolicy = kill
-OOMPolicy = stop
-## invalid values
-OOMPolicy = invalid
-# multiple values
-OOMPolicy = kill stop
 
 
 ###### percent
@@ -1843,6 +1877,16 @@ Personality = x86-64
 Personality = invalid
 # multiple values
 Personality = x86-64 s390x
+
+
+###### proc subset
+<endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
+ProcSubset = all
+ProcSubset = pid
+## invalid values
+ProcSubset = invalid
+# multiple values
+ProcSubset = all pid
 
 
 ###### protect home
@@ -2072,6 +2116,8 @@ SystemCallArchitectures = invalid
 
 ###### system call errno
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
+SystemCallErrorNumber = kill
+SystemCallErrorNumber = log
 # from man errno(3)
 SystemCallErrorNumber = EACCES
 SystemCallErrorNumber = EADDRINUSE
@@ -2302,13 +2348,25 @@ JobTimeoutSec = -10
 JobTimeoutSec = 0.235
 
 
+###### timestamping
+<endfold id='1'></endfold id='1'><beginfold id='1'>[Socket]</beginfold id='1'>
+Timestamping = ns
+Timestamping = nsec
+Timestamping = off
+Timestamping = us
+Timestamping = usec
+Timestamping = µs
+## invalid values
+Timestamping = nanosec
+# multiple values
+Timestamping = nsec off
+
+
 ###### unit
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Path]</beginfold id='1'>
 #### names
 Unit = dev-disk-by\x2duuid-5af23b\x2dfde6\x2d424e\x2da1bb\x2de88bc.swap
 Unit = some.name.service
-Unit = some.service.service \
-  some.other.service.service
 Unit = some@.service
 Unit = some@instance.service
 Unit = some@%i.service
@@ -2330,6 +2388,8 @@ Unit = some.invalid
 Unit = some.
 # multiple values
 Unit = some.service some-other.service
+Unit = some.service.service \
+  some.other.service.service
 
 
 ###### unit list

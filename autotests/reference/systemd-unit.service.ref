@@ -89,17 +89,20 @@
 <Option Name>WorkingDirectory</Option Name><Normal> = </Normal><Specifier>~</Specifier><br/>
 <Option Name>RootDirectory</Option Name><Normal> = /some/path</Normal><br/>
 <Option Name>RootImage</Option Name><Normal> = /some/path</Normal><br/>
+<Option Name>RootImageOptions</Option Name><Normal> = partition_name,noauto</Normal><br/>
 <Option Name>RootHash</Option Name><Normal> = /some/path</Normal><br/>
 <Option Name>RootHash</Option Name><Normal> = </Normal><Number Hexadecimal>0xABCDEF</Number Hexadecimal><br/>
 <Option Name>RootHashSignature</Option Name><Normal> =</Normal><br/>
 <Option Name>RootVerity</Option Name><Normal> = /some/path</Normal><br/>
 <Option Name>MountAPIVFS</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
+<Option Name>ProcSubset</Option Name><Normal> = </Normal><Constant>pid</Constant><br/>
 <Option Name>BindPaths</Option Name><Normal> = /source/path,/destination/path,</Normal><Constant>rbind</Constant><Normal> </Normal><Continuation>\</Continuation><br/>
 <Normal>  /source/path2,/destination/path2,</Normal><Constant>norbind</Constant><Normal> </Normal><Continuation>\</Continuation><br/>
 <Normal>  /source/path3</Normal><br/>
 <Option Name>BindReadOnlyPaths</Option Name><Normal> = /source/path,/destination/path,</Normal><Constant>rbind</Constant><Normal> </Normal><Continuation>\</Continuation><br/>
 <Normal>  /source/path2,/destination/path2,</Normal><Constant>norbind</Constant><Normal> </Normal><Continuation>\</Continuation><br/>
 <Normal>  /source/path3</Normal><br/>
+<Option Name>MountImages</Option Name><Normal> = /source/path,dest</Normal><br/>
 <Comment>## from systemd.exec Credentials</Comment><br/>
 <Option Name>User</Option Name><Normal> = </Normal><Number>1000</Number><br/>
 <Option Name>Group</Option Name><Normal> = group-name</Normal><br/>
@@ -107,6 +110,8 @@
 <Option Name>SupplementaryGroups</Option Name><Normal> = group1 group-two </Normal><Number>100</Number><Normal> </Normal><Continuation>\</Continuation><br/>
 <Normal>  one-more-group</Normal><br/>
 <Option Name>PAMName</Option Name><Normal> =</Normal><br/>
+<Option Name>LoadCredential</Option Name><Normal> = some_id /path/to/credential/data</Normal><br/>
+<Option Name>SetCredential</Option Name><Normal> = some_visible_credential</Normal><br/>
 <Comment>## from systemd.exec Capabilities</Comment><br/>
 <Option Name>CapabilityBoundingSet</Option Name><Normal> = </Normal><Prefix>~</Prefix><Normal> </Normal><Constant>CAP_SYS_ADMIN</Constant><Normal> </Normal><Constant>CAP_DAC_OVERRIDE</Constant><Normal>   </Normal><Constant>CAP_SYS_PTRACE</Constant><Normal> </Normal><Continuation>\</Continuation><br/>
 <Normal>  </Normal><Constant>CAP_NET_ADMIN</Constant><Normal>  </Normal><Constant>CAP_SYS_BOOT</Constant><br/>
@@ -201,6 +206,8 @@
 <Option Name>SystemCallErrorNumber</Option Name><Normal> = </Normal><Errno Name>ETIMEDOUT</Errno Name><br/>
 <Option Name>SystemCallArchitectures</Option Name><Normal> = </Normal><Constant>mips64-n32</Constant><Normal> </Normal><Continuation>\</Continuation><br/>
 <Normal>  </Normal><Constant>native</Constant><Normal> </Normal><Constant>sparc</Constant><br/>
+<Option Name>SystemCallLog</Option Name><Normal> = </Normal><Prefix>~</Prefix><Normal> some_name </Normal><Continuation>\</Continuation><br/>
+<Normal>  another_name</Normal><br/>
 <Comment>## from systemd.exec System Call Environment</Comment><br/>
 <Option Name>Environment</Option Name><Normal> = </Normal><Environment Variable>DISPLAY</Environment Variable><Normal>=:</Normal><Specifier>%i</Specifier><br/>
 <Option Name>Environment</Option Name><Normal> = </Normal><Environment Variable>XAUTHORITY</Environment Variable><Normal>=</Normal><Specifier>%t</Specifier><Normal>/Xauthority.</Normal><Specifier>%i</Specifier><Normal> </Normal><Continuation>\</Continuation><br/>
@@ -272,6 +279,9 @@
 <Option Name>Slice</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.slice</Unit Extension><br/>
 <Option Name>Delegate</Option Name><Normal> = </Normal><Constant>bpf-firewall</Constant><br/>
 <Option Name>DisableControllers</Option Name><Normal> = </Normal><Constant>cpu</Constant><Normal> </Normal><Constant>io</Constant><br/>
+<Option Name>ManagedOOMSwap</Option Name><Normal> = </Normal><Constant>auto</Constant><br/>
+<Option Name>ManagedOOMMemoryPressure</Option Name><Normal> = </Normal><Constant>kill</Constant><br/>
+<Option Name>ManagedOOMMemoryPressureLimitPercent</Option Name><Normal> = </Normal><Number>50</Number><Measurement Unit>%</Measurement Unit><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Section Header>[Slice]</Section Header><br/>
@@ -302,6 +312,7 @@
 <Option Name>DirectoryMode</Option Name><Normal> = </Normal><File Mode>0744</File Mode><br/>
 <Option Name>Accept</Option Name><Normal> = </Normal><Constant>no</Constant><br/>
 <Option Name>Writable</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
+<Option Name>FlushPending</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
 <Option Name>MaxConnections</Option Name><Normal> = </Normal><Number>34</Number><br/>
 <Option Name>MaxConnectionsPerSource</Option Name><Normal> = </Normal><Number>10</Number><br/>
 <Option Name>KeepAlive</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
@@ -330,6 +341,7 @@
 <Option Name>PassCredentials</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
 <Option Name>PassSecurity</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
 <Option Name>PassPacketInfo</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
+<Option Name>Timestamping</Option Name><Normal> = </Normal><Constant>nsec</Constant><br/>
 <Option Name>TCPCongestion</Option Name><Normal> = westwood</Normal><br/>
 <Option Name>ExecStartPre</Option Name><Normal> = </Normal><Prefix>+</Prefix><Normal>/usr/bin/start/pre</Normal><br/>
 <Option Name>ExecStartPost</Option Name><Normal> = </Normal><Prefix>@</Prefix><Normal>/usr/bin/start/post arg</Normal><br/>
@@ -361,6 +373,7 @@
 <Option Name>OnCalendar</Option Name><Normal> = </Normal><Constant>daily</Constant><br/>
 <Option Name>AccuracySec</Option Name><Normal> = </Normal><Number>1</Number><Measurement Unit>min</Measurement Unit><Normal> </Normal><Number>10</Number><Measurement Unit>sec</Measurement Unit><br/>
 <Option Name>RandomizedDelaySec</Option Name><Normal> = </Normal><Number>30</Number><Measurement Unit>s</Measurement Unit><br/>
+<Option Name>FixedRandomDelay</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
 <Option Name>OnClockChange</Option Name><Normal> = </Normal><Constant>false</Constant><br/>
 <Option Name>OnTimezoneChange</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
 <Option Name>Unit</Option Name><Normal> = </Normal><Unit Name>some_timed</Unit Name><Unit Extension>.service</Unit Extension><br/>
@@ -1759,6 +1772,17 @@
 <Option Name>NotifyAccess</Option Name><Normal> = </Normal><Constant>exec</Constant><Normal> none</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
+<Comment>###### numa mask</Comment><br/>
+<Section Header>[Service]</Section Header><br/>
+<Option Name>NUMAMask</Option Name><Normal> = </Normal><Constant>all</Constant><br/>
+<Option Name>NUMAMask</Option Name><Normal> = </Normal><Number>1</Number><Normal>,</Normal><Number>2</Number><Normal>,</Normal><Number>3-8</Number><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>NUMAMask</Option Name><Normal> = invalid</Normal><br/>
+<Comment># both all and cpu index list</Comment><br/>
+<Option Name>NUMAMask</Option Name><Normal> = </Normal><Constant>all</Constant><Normal>, 1,2,3-8</Normal><br/>
+<Option Name>NUMAMask</Option Name><Normal> = </Normal><Number>1</Number><Normal>,</Normal><Number>2</Number><Normal>,</Normal><Number>3-8</Number><Normal>, all</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
 <Comment>###### numa policy</Comment><br/>
 <Section Header>[Service]</Section Header><br/>
 <Option Name>NUMAPolicy</Option Name><Normal> = </Normal><Constant>bind</Constant><br/>
@@ -1788,6 +1812,27 @@
 <Option Name>OnFailureJobMode</Option Name><Normal> = </Normal><Constant>replace</Constant><Normal> fail</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
+<Comment>###### oom behavior (out-of-memory killer behavior)</Comment><br/>
+<Section Header>[Service]</Section Header><br/>
+<Option Name>ManagedOOMSwap</Option Name><Normal> = </Normal><Constant>auto</Constant><br/>
+<Option Name>ManagedOOMSwap</Option Name><Normal> = </Normal><Constant>kill</Constant><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>ManagedOOMSwap</Option Name><Normal> = invalid</Normal><br/>
+<Comment># multiple values</Comment><br/>
+<Option Name>ManagedOOMSwap</Option Name><Normal> = </Normal><Constant>auto</Constant><Normal> kill</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Comment>###### oom policy (out-of-memory killer policy)</Comment><br/>
+<Section Header>[Service]</Section Header><br/>
+<Option Name>OOMPolicy</Option Name><Normal> = </Normal><Constant>continue</Constant><br/>
+<Option Name>OOMPolicy</Option Name><Normal> = </Normal><Constant>kill</Constant><br/>
+<Option Name>OOMPolicy</Option Name><Normal> = </Normal><Constant>stop</Constant><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>OOMPolicy</Option Name><Normal> = invalid</Normal><br/>
+<Comment># multiple values</Comment><br/>
+<Option Name>OOMPolicy</Option Name><Normal> = </Normal><Constant>kill</Constant><Normal> stop</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
 <Comment>###### oom score adjust (out-of-memory killer score adjustment)</Comment><br/>
 <Section Header>[Service]</Section Header><br/>
 <Option Name>OOMScoreAdjust</Option Name><Normal> = </Normal><Number>-1000</Number><br/>
@@ -1804,17 +1849,6 @@
 <Option Name>OOMScoreAdjust</Option Name><Normal> = </Normal><Number>-100</Number><Normal>1</Normal><br/>
 <Option Name>OOMScoreAdjust</Option Name><Normal> = </Normal><Number>+100</Number><Normal>1</Normal><br/>
 <Option Name>OOMScoreAdjust</Option Name><Normal> = </Normal><Number>100</Number><Normal>1</Normal><br/>
-<Normal></Normal><br/>
-<Normal></Normal><br/>
-<Comment>###### out-of-memory killer policy</Comment><br/>
-<Section Header>[Service]</Section Header><br/>
-<Option Name>OOMPolicy</Option Name><Normal> = </Normal><Constant>continue</Constant><br/>
-<Option Name>OOMPolicy</Option Name><Normal> = </Normal><Constant>kill</Constant><br/>
-<Option Name>OOMPolicy</Option Name><Normal> = </Normal><Constant>stop</Constant><br/>
-<Comment>## invalid values</Comment><br/>
-<Option Name>OOMPolicy</Option Name><Normal> = invalid</Normal><br/>
-<Comment># multiple values</Comment><br/>
-<Option Name>OOMPolicy</Option Name><Normal> = </Normal><Constant>kill</Constant><Normal> stop</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### percent</Comment><br/>
@@ -1843,6 +1877,16 @@
 <Option Name>Personality</Option Name><Normal> = invalid</Normal><br/>
 <Comment># multiple values</Comment><br/>
 <Option Name>Personality</Option Name><Normal> = </Normal><Constant>x86-64</Constant><Normal> s390x</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Comment>###### proc subset</Comment><br/>
+<Section Header>[Service]</Section Header><br/>
+<Option Name>ProcSubset</Option Name><Normal> = </Normal><Constant>all</Constant><br/>
+<Option Name>ProcSubset</Option Name><Normal> = </Normal><Constant>pid</Constant><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>ProcSubset</Option Name><Normal> = invalid</Normal><br/>
+<Comment># multiple values</Comment><br/>
+<Option Name>ProcSubset</Option Name><Normal> = </Normal><Constant>all</Constant><Normal> pid</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### protect home</Comment><br/>
@@ -2072,6 +2116,8 @@
 <Normal></Normal><br/>
 <Comment>###### system call errno</Comment><br/>
 <Section Header>[Service]</Section Header><br/>
+<Option Name>SystemCallErrorNumber</Option Name><Normal> = </Normal><Errno Name>kill</Errno Name><br/>
+<Option Name>SystemCallErrorNumber</Option Name><Normal> = </Normal><Errno Name>log</Errno Name><br/>
 <Comment># from man errno(3)</Comment><br/>
 <Option Name>SystemCallErrorNumber</Option Name><Normal> = </Normal><Errno Name>EACCES</Errno Name><br/>
 <Option Name>SystemCallErrorNumber</Option Name><Normal> = </Normal><Errno Name>EADDRINUSE</Errno Name><br/>
@@ -2302,13 +2348,25 @@
 <Option Name>JobTimeoutSec</Option Name><Normal> = </Normal><Number>0.235</Number><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
+<Comment>###### timestamping</Comment><br/>
+<Section Header>[Socket]</Section Header><br/>
+<Option Name>Timestamping</Option Name><Normal> = </Normal><Constant>ns</Constant><br/>
+<Option Name>Timestamping</Option Name><Normal> = </Normal><Constant>nsec</Constant><br/>
+<Option Name>Timestamping</Option Name><Normal> = </Normal><Constant>off</Constant><br/>
+<Option Name>Timestamping</Option Name><Normal> = </Normal><Constant>us</Constant><br/>
+<Option Name>Timestamping</Option Name><Normal> = </Normal><Constant>usec</Constant><br/>
+<Option Name>Timestamping</Option Name><Normal> = </Normal><Constant>µs</Constant><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>Timestamping</Option Name><Normal> = nanosec</Normal><br/>
+<Comment># multiple values</Comment><br/>
+<Option Name>Timestamping</Option Name><Normal> = </Normal><Constant>nsec</Constant><Normal> off</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
 <Comment>###### unit</Comment><br/>
 <Section Header>[Path]</Section Header><br/>
 <Comment>#</Comment><Alert Level 3>###</Alert Level 3><Comment> names</Comment><br/>
 <Option Name>Unit</Option Name><Normal> = </Normal><Unit Name>dev-disk-by</Unit Name><Escape>\x2d</Escape><Unit Name>uuid-5af23b</Unit Name><Escape>\x2d</Escape><Unit Name>fde6</Unit Name><Escape>\x2d</Escape><Unit Name>424e</Unit Name><Escape>\x2d</Escape><Unit Name>a1bb</Unit Name><Escape>\x2d</Escape><Unit Name>e88bc</Unit Name><Unit Extension>.swap</Unit Extension><br/>
 <Option Name>Unit</Option Name><Normal> = </Normal><Unit Name>some.name</Unit Name><Unit Extension>.service</Unit Extension><br/>
-<Option Name>Unit</Option Name><Normal> = </Normal><Unit Name>some.service</Unit Name><Unit Extension>.service </Unit Extension><Normal>\</Normal><br/>
-<Normal>  some.other.service.service</Normal><br/>
 <Option Name>Unit</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Instance>@</Unit Instance><Unit Extension>.service</Unit Extension><br/>
 <Option Name>Unit</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Instance>@instance</Unit Instance><Unit Extension>.service</Unit Extension><br/>
 <Option Name>Unit</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Instance>@</Unit Instance><Specifier>%i</Specifier><Unit Extension>.service</Unit Extension><br/>
@@ -2330,6 +2388,8 @@
 <Option Name>Unit</Option Name><Normal> = some.</Normal><br/>
 <Comment># multiple values</Comment><br/>
 <Option Name>Unit</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service </Unit Extension><Normal>some-other.service</Normal><br/>
+<Option Name>Unit</Option Name><Normal> = </Normal><Unit Name>some.service</Unit Name><Unit Extension>.service </Unit Extension><Normal>\</Normal><br/>
+<Normal>  some.other.service.service</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### unit list</Comment><br/>

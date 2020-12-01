@@ -19,7 +19,13 @@
 
 my $file = "";
 
-while (<>)
+open(my $input, '<:encoding(UTF-8)', $ARGV[0])
+  or die "Could not open file '$ARGV[0]': $!";
+
+open(my $output, '>:encoding(UTF-8)', $ARGV[1])
+  or die "Could not open file '$ARGV[1]': $!";
+
+while (<$input>)
 {
   $file .= $_;
 }
@@ -62,5 +68,5 @@ $file =~ s/(<context\s[^>]*[^>\/]>)/$1\n<IncludeRules context="FindPHP" \/>/g;
 $file =~ s/(<context\s[^>]*[^>\/])\s*\/>/$1>\n<IncludeRules context="FindPHP" \/>\n<\/context>/g;
 $file =~ s/(?=<\/contexts\s*>)/$findphp/;
 
-print $file;
-print $warning;
+print $output $file;
+print $output $warning;

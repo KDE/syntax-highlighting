@@ -2,9 +2,14 @@
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax)
 
 macro(generate_syntax_definition generator targetFile srcFile)
-    execute_process(COMMAND ${PERL_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/generators/${generator}
-        INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/syntax/${srcFile}
-        OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/${targetFile})
+    add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/${targetFile}
+        COMMAND ${PERL_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/generators/${generator}
+                ${CMAKE_CURRENT_SOURCE_DIR}/syntax/${srcFile}
+                ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/${targetFile}
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/generators/${generator}
+                ${CMAKE_CURRENT_SOURCE_DIR}/syntax/${srcFile}
+    )
     set(gen_defs ${gen_defs} ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/${targetFile})
 endmacro()
 

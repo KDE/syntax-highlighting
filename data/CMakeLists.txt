@@ -2,6 +2,10 @@
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax)
 
 macro(generate_syntax_definition generator targetFile srcFile)
+    add_custom_target(
+        ${targetFile} ALL
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/${targetFile}
+    )
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/${targetFile}
         COMMAND ${PERL_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/generators/${generator}
@@ -9,13 +13,15 @@ macro(generate_syntax_definition generator targetFile srcFile)
                 ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/${targetFile}
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/generators/${generator}
                 ${CMAKE_CURRENT_SOURCE_DIR}/syntax/${srcFile}
+                ${ARGN}
+        VERBATIM
     )
     set(gen_defs ${gen_defs} ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/${targetFile})
 endmacro()
 
 # generate PHP definitions
 macro(generate_php_syntax_definition targetFile srcFile)
-    generate_syntax_definition(generate-php.pl ${targetFile} ${srcFile})
+    generate_syntax_definition(generate-php.pl ${targetFile} ${srcFile} ${CMAKE_CURRENT_SOURCE_DIR}/syntax/php.xml)
 endmacro()
 
 generate_php_syntax_definition(javascript-php.xml javascript.xml)

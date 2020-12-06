@@ -83,6 +83,7 @@ public:
     bool load(QXmlStreamReader &reader);
     void resolveContext();
     void resolveAttributeFormat(Context *lookupContext);
+    virtual void resolvePostProcessing() {}
 
     virtual MatchResult doMatch(const QString &text, int offset, const QStringList &captures) const = 0;
 
@@ -246,11 +247,13 @@ private:
 class RegExpr : public Rule
 {
 protected:
+    void resolvePostProcessing() override;
     bool doLoad(QXmlStreamReader &reader) override;
     MatchResult doMatch(const QString &text, int offset, const QStringList &captures) const override;
 
 private:
     QRegularExpression m_regexp;
+    bool m_isResolved = false;
 };
 
 class StringDetect : public Rule

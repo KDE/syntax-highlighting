@@ -539,21 +539,54 @@ bool RegExpr::doLoad(QXmlStreamReader &reader)
 
     const auto isMinimal = Xml::attrToBool(reader.attributes().value(QLatin1String("minimal")));
     const auto isCaseInsensitive = Xml::attrToBool(reader.attributes().value(QLatin1String("insensitive")));
-    m_regexp.setPatternOptions((isMinimal ? QRegularExpression::InvertedGreedinessOption : QRegularExpression::NoPatternOption) | (isCaseInsensitive ? QRegularExpression::CaseInsensitiveOption : QRegularExpression::NoPatternOption));
+    m_regexp.setPatternOptions(
+        (isMinimal ? QRegularExpression::InvertedGreedinessOption : QRegularExpression::NoPatternOption)
+      | (isCaseInsensitive ? QRegularExpression::CaseInsensitiveOption : QRegularExpression::NoPatternOption)
+      // DontCaptureOption is removed by doPostResolveContext() when necessary
+      | QRegularExpression::DontCaptureOption);
+
+    m_dynamic = Xml::attrToBool(reader.attributes().value(QLatin1String("dynamic")));
+
+    return !m_regexp.pattern().isEmpty();
+}
+
+void KSyntaxHighlighting::RegExpr::resolvePostProcessing()
+{
+    if (m_isResolved)
+        return;
+
+    m_isResolved = true;
+    bool hasCapture = false;
+
+    // disable DontCaptureOption when reference a context with dynamic rule
+    if (auto *ctx = context().context()) {
+        for (const Rule::Ptr &rule : ctx->rules()) {
+            if (rule->isDynamic()) {
+                hasCapture = true;
+                m_regexp.setPatternOptions(m_regexp.patternOptions() & ~QRegularExpression::DontCaptureOption);
+                break;
+            }
+        }
+    }
 
     // optimize the pattern for the non-dynamic case, we use them OFTEN
-    m_dynamic = Xml::attrToBool(reader.attributes().value(QLatin1String("dynamic")));
     if (!m_dynamic) {
         m_regexp.optimize();
     }
 
-    // always using m_regexp.isValid() would be better, but parses the regexp and thus is way too expensive for release builds
+    bool isValid = m_regexp.isValid();
+    if (!isValid) {
 
-    if (Log().isDebugEnabled()) {
-        if (!m_regexp.isValid())
+        // DontCaptureOption with back reference capture is an error, remove this option then try again
+        if (!hasCapture) {
+            m_regexp.setPatternOptions(m_regexp.patternOptions() & ~QRegularExpression::DontCaptureOption);
+            isValid = m_regexp.isValid();
+        }
+
+        if (!isValid) {
             qCDebug(Log) << "Invalid regexp:" << m_regexp.pattern();
+        }
     }
-    return !m_regexp.pattern().isEmpty();
 }
 
 MatchResult RegExpr::doMatch(const QString &text, int offset, const QStringList &captures) const

@@ -386,6 +386,12 @@ bool DefinitionData::load(OnlyKeywords onlyKeywords)
         context->resolveAttributeFormat();
     }
 
+    for (const auto context : qAsConst(contexts)) {
+        for (const auto &rule : context->rules()) {
+            rule->resolvePostProcessing();
+        }
+    }
+
     return true;
 }
 

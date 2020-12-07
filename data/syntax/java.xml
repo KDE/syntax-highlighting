@@ -3764,34 +3764,35 @@
 		</list>
 		<contexts>
 			<context attribute="Normal Text" lineEndContext="#stay" name="Normal">
-				<keyword attribute="Keyword" context="#stay" String="keywords"/>
-				<keyword attribute="Control Flow" context="#stay" String="control flow"/>
-				<keyword attribute="Data Type" context="#stay" String="types"/>
-				<keyword attribute="Java15" context="#stay" String="java15"/>
-
-				<DetectChar attribute="Symbol" context="#stay" char="{" beginRegion="Brace1"/>
-				<DetectChar attribute="Symbol" context="#stay" char="}" endRegion="Brace1"/>
+				<DetectSpaces context="#stay"/>
 
 				<DetectChar attribute="Symbol" context="Dot" char="." lookAhead="1"/>
+				<DetectChar attribute="Symbol" context="#stay" char="{" beginRegion="Brace1"/>
+				<DetectChar attribute="Symbol" context="#stay" char="}" endRegion="Brace1"/>
 				<DetectChar attribute="Annotation" context="Annotation" char="@" />
 				<DetectChar attribute="Symbol" context="InFunctionCall" char="("/>
-
-				<AnyChar context="Number" String="0123456789" lookAhead="1"/>
-
-				<DetectChar context="Char" char="'" lookAhead="1"/>
-				<DetectChar attribute="String" context="String" char="&quot;"/>
 
 				<!-- Comment next line if you don't use Javadoc tool -->
 				<IncludeRules context="##Javadoc"/>
 				<Detect2Chars attribute="Comment" context="Commentar 1" char="/" char1="/"/>
 				<Detect2Chars attribute="Comment" context="Commentar 2" char="/" char1="*" beginRegion="Comment"/>
 
-				<AnyChar attribute="Symbol" context="#stay" String=":!%&amp;+,-/*&lt;=&gt;?[]|~^;"/>
+				<AnyChar attribute="Symbol" context="#stay" String=".[]&amp;|+,-/*&lt;=&gt;;!%?:~^"/>
+
+				<AnyChar context="Number" String="0123456789" lookAhead="1"/>
+
+				<DetectChar attribute="String" context="String" char="&quot;"/>
+				<DetectChar context="Char" char="'" lookAhead="1"/>
+
+				<keyword attribute="Keyword" context="#stay" String="keywords"/>
+				<keyword attribute="Control Flow" context="#stay" String="control flow"/>
+				<keyword attribute="Data Type" context="#stay" String="types"/>
+				<keyword attribute="Java15" context="#stay" String="java15"/>
 
 				<WordDetect attribute="Keyword" context="Imports" String="package" />
 				<WordDetect attribute="Keyword" context="ImportsOrStaticImports" String="import" />
 
-				<RegExpr attribute="Function" context="#stay" String="\b[_\w][_\w]*(?=[\s]*(/\*\s*\d+\s*\*/\s*)?[(])" />
+				<RegExpr attribute="Function" context="#stay" String="\b[_a-zA-Z]\w*(?=[\s]*(/\*\s*\d+\s*\*/\s*)?[(])" />
 				<DetectIdentifier attribute="Normal Text"/>
 			</context>
 
@@ -3828,11 +3829,11 @@
 				<RegExpr attribute="Error" context="#pop" String="\\(u+[0-9a-fA-F]*|.)?"/>
 			</context>
 
-			<context attribute="Normal Text" lineEndContext="#stay" name="EnterPrintf" fallthroughContext="#pop">
-				<DetectChar attribute="Symbol" context="#pop!Printf" char="("/>
+			<context attribute="Normal Text" lineEndContext="#stay" name="Printf" fallthroughContext="#pop">
+				<DetectChar attribute="Symbol" context="#pop!InPrintf" char="("/>
 				<DetectSpaces attribute="Normal Text" context="#stay"/>
 			</context>
-			<context attribute="Normal Text" lineEndContext="#stay" name="Printf">
+			<context attribute="Normal Text" lineEndContext="#stay" name="InPrintf">
 				<DetectChar attribute="String" context="PrintfString" char="&quot;"/>
 				<IncludeRules context="InFunctionCall"/>
 			</context>
@@ -3848,8 +3849,8 @@
 			</context>
 			<context attribute="Normal Text" lineEndContext="#stay" name="Member" fallthroughContext="#pop">
 				<DetectSpaces attribute="Normal Text" context="#stay"/>
-				<WordDetect attribute="Function" context="#pop!EnterPrintf" String="printf"/>
-				<WordDetect attribute="Function" context="#pop!EnterPrintf" String="format"/>
+				<WordDetect attribute="Function" context="#pop!Printf" String="printf"/>
+				<WordDetect attribute="Function" context="#pop!Printf" String="format"/>
 				<DetectIdentifier attribute="Function" context="#pop"/>
 			</context>
 

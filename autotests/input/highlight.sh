@@ -187,6 +187,10 @@ You're right, this is definitely no bash code
 But ls more $parameters should be expanded. :->
 EOF
 
+cat <<bla || exit
+bla bla
+bla
+
 
 # indented:
 if true
@@ -204,6 +208,7 @@ fi
 case 1 in
 2) echo xxx;
 ;;
+?) foo || yyy ; foo abc || echo abc ;;
 1) echo yyy;
 esac
 
@@ -376,6 +381,7 @@ echo ${a^^l*} ${a,} ${!a} ${#a[1]} ${a:1:$b} $((++i,i--))
 [[ -f a||-f b ]]
 [ -d `echo .`] ]
 [[ -d `echo .`]] ]]
+[[ a != b && ${a}a = b${b} ]]
 
 ((3+1+a+$c*(x) & 0x43422fd+03-085/23#D9a@_^8))
 { echo
@@ -394,6 +400,8 @@ test a -eq b
 a() { echo x; }
 a  () { echo x; }
 function f { echo x; }
+kde.org() { echo x; }
+--func() { echo x; }
 
 # variables
 a=(a b c)

@@ -16,7 +16,7 @@
 
 <language
     name="CMake"
-    version="28"
+    version="29"
     kateversion="5.0"
     section="Other"
     extensions="CMakeLists.txt;*.cmake;*.cmake.in"

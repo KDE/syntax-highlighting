@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd">
 <language
-    version="2"
-    kateversion="5.0"
+    version="3"
+    kateversion="3.1"
     name="SPDX-Comments"
     section="Other"
     extensions=""

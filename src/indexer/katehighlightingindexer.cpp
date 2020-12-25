@@ -36,6 +36,8 @@ public:
         m_currentDefinition->languageName = name;
         m_currentDefinition->filename = filename;
         m_currentDefinition->kateVersionStr = verStr.toString();
+        m_currentKeywords = nullptr;
+        m_currentContext = nullptr;
 
         const auto idx = verStr.indexOf(QLatin1Char('.'));
         if (idx <= 0) {
@@ -1442,7 +1444,7 @@ private:
                 }
 
                 if (!contextName.context) {
-                    qWarning() << definition.filename << "line" << line << "unknown context in" << context.name;
+                    qWarning() << definition.filename << "line" << line << "unknown context" << name << "in" << context.name;
                     m_success = false;
                 }
             }

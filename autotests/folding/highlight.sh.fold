@@ -30,6 +30,10 @@ mkdir this\\ #is a comment
 
 # brace expansion
 mv my_file.{JPG,jpg}
+echo f.{01..100..3} f.{Z..a..-3}
+echo f.{01..100} f.{a..Z}
+# no brace expansion
+echo f.{..100} f.{1..Z} f.{a..Z..}
 
 
 # special characters are escaped:
@@ -230,6 +234,8 @@ pacman -syu --needed intel-ucode grub
 <beginfold id='1'>[[</beginfold id='1'> $name =~ (.*)_(S[0-9]{2})(E[0-9]{2,3}[a-z]{0,1})_(.*) <endfold id='1'>]]</endfold id='1'>
 rm /data/{hello1,hello2}/input/{bye1,$bye2}/si{a,${b},c{k,p{e,a}}}/*.non
 rm /data/{aa,{e,i}t{b,c} # Not closed
+rm /data/{aa,{e,i}t{b,c}}
+rm /data/{aa,{i}}
 rm /data{aa{bb{cc{dd}}}}
 rm /data{aaa`aaa}aa`aaa}a
 
@@ -284,7 +290,7 @@ opt param#nocomment ab'a'cd [[ param ]] } { ~a .a #comments
 path path/file dir/ / // 3/f a@/ 'a'/b d/'a'b a\ d/f f/f\
 ile
 path ~ ~/ ~a/ . .. ./a ../a
-path /path/* /path/f* /path/f@ /path/f@(|)
+path /path/* /path/f* /path/f@ /path/f@(|) {a/b} a{b}/c a/b{c} a/{b} a/{b}c
 glob ? * ?f *f f* f? **/ ~/* ~* /path/f* 'a'* 'a'f/?
 extglob @ @(*) @(f*|f??(f)) f!(+(?(@(*(f)f)f)f)f)f @'a'@(|) a@(?)
 subs f! f!! f!s 'a'!s \( $v {a,b} {a} {a}/d {a\,} {a,} {a,\},b} ds/{a,b}sa/s
@@ -444,5 +450,7 @@ echo
   a\( | b*c? <beginfold id='7'>)</beginfold id='7'> echo
   <beginfold id='5'>(</beginfold id='5'>b$c<endfold id='5'>)</endfold id='5'> # no pattern
   <endfold id='7'>;;</endfold id='7'>
+  (b$c<beginfold id='7'>)</beginfold id='7'> <endfold id='7'>;;</endfold id='7'>
+  # no pattern
   (b$c<beginfold id='7'>)</beginfold id='7'>
 <endfold id='7'></endfold id='7'><endfold id='6'>esac</endfold id='6'>

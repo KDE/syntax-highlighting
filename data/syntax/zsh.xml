@@ -282,18 +282,40 @@
         <WordDetect attribute="Control Flow" context="#pop" String="always"/>
       </context>
 
-      <context attribute="Command" lineEndContext="#pop" name="Command" fallthroughContext="#pop">
+      <context attribute="OtherCommand" lineEndContext="#pop" name="Command">
         <DetectSpaces attribute="Normal Text" context="#pop!CommandArgs"/>
+        <DetectIdentifier attribute="OtherCommand" context="#stay"/>
         <DetectChar context="CommandVariables" char="$" lookAhead="1"/>
         <IncludeRules context="FindStrings"/>
         <DetectChar context="#pop" char="`" lookAhead="1"/>
-        <RegExpr attribute="OtherCommand" context="CommandName" String="(?:[^&wordseps;&substseps;]++|\\.|&nogroupend;|&nobraceexpansion;)+"/>
-        <DetectChar context="AssumeEscape" char="\" lookAhead="1"/>
+        <Detect2Chars attribute="Control" context="#pop" char="&amp;" char1="&amp;"/>
+        <Detect2Chars attribute="Control" context="#pop" char="|" char1="|"/>
+        <AnyChar attribute="Control" context="#pop" String="|;"/>
+        <DetectChar context="#pop" char=")" lookAhead="1"/>
+        <AnyChar context="#pop!CommandArgs" String="&amp;&lt;>" lookAhead="1"/>
+        <!-- start expression in double parentheses -->
+        <Detect2Chars attribute="Error" context="#pop!ExprDblParen" char="(" char1="(" beginRegion="expression"/>
+        <!-- start a subshell -->
+        <DetectChar attribute="Error" context="#pop!SubShell" char="(" beginRegion="subshell"/>
+        <DetectChar context="CommandAssumeEscape" char="\" lookAhead="1"/>
         <DetectChar context="CommandMaybeBraceExpansion" char="{" lookAhead="1"/>
+        <DetectChar context="CommandMaybeGroupEnd" char="}" lookAhead="1"/>
       </context>
-      <context attribute="Command" lineEndContext="#pop#pop" name="CommandVariables">
+      <context attribute="Command" lineEndContext="#pop" name="CommandVariables">
         <IncludeRules context="DispatchVariables"/>
         <DetectChar attribute="OtherCommand" context="#pop" char="$"/>
+      </context>
+      <context attribute="OtherCommand" lineEndContext="#pop" name="CommandAssumeEscape">
+        <LineContinue attribute="Escape" context="#pop"/>
+        <RegExpr attribute="OtherCommand" context="#pop" String="\\."/>
+      </context>
+      <context attribute="OtherCommand" lineEndContext="#pop" name="CommandMaybeBraceExpansion">
+        <IncludeRules context="DispatchBraceExpansion"/>
+        <DetectChar attribute="OtherCommand" context="#pop" char="{"/>
+      </context>
+      <context attribute="Normal Text" lineEndContext="#pop" name="CommandMaybeGroupEnd">
+        <RegExpr attribute="OtherCommand" context="#pop" String="&nogroupend;+"/>
+        <DetectChar context="#pop#pop" char="}" lookAhead="1"/>
       </context>
 
       <context attribute="Command" lineEndContext="#pop" name="DispatchVariables">
@@ -339,34 +361,6 @@
       </context>
       <context attribute="Command" lineEndContext="#pop" name="VarNameParam+" fallthroughContext="#pop">
         <IncludeRules context="VarNameSubstLen"/>
-      </context>
-
-      <context attribute="OtherCommand" lineEndContext="#pop#pop" name="CommandName">
-        <DetectSpaces attribute="Normal Text" context="#pop#pop!CommandArgs"/>
-        <DetectChar context="CommandVariables" char="$" lookAhead="1"/>
-        <IncludeRules context="FindStrings"/>
-        <DetectChar context="#pop#pop" char="`" lookAhead="1"/>
-        <Detect2Chars attribute="Control" context="#pop#pop" char="&amp;" char1="&amp;"/>
-        <Detect2Chars attribute="Control" context="#pop#pop" char="|" char1="|"/>
-        <DetectChar attribute="Control" context="#pop#pop" char="|"/>
-        <DetectChar attribute="Control" context="#pop#pop" char=";"/>
-        <DetectChar context="#pop#pop" char=")" lookAhead="1"/>
-        <AnyChar context="#pop#pop!CommandArgs" String="&amp;&lt;>" lookAhead="1"/>
-        <!-- start expression in double parentheses -->
-        <Detect2Chars attribute="Error" context="#pop#pop!ExprDblParen" char="(" char1="(" beginRegion="expression"/>
-        <!-- start a subshell -->
-        <DetectChar attribute="Error" context="#pop#pop!SubShell" char="(" beginRegion="subshell"/>
-        <DetectChar context="AssumeEscape" char="\" lookAhead="1"/>
-        <DetectChar context="#pop!CommandMaybeBraceExpansion" char="{" lookAhead="1"/>
-        <DetectChar context="#pop!CommandMaybeGroupEnd" char="}" lookAhead="1"/>
-      </context>
-      <context attribute="OtherCommand" lineEndContext="#pop" name="CommandMaybeBraceExpansion">
-        <IncludeRules context="DispatchBraceExpansion"/>
-        <DetectChar attribute="OtherCommand" context="#pop" char="{"/>
-      </context>
-      <context attribute="Normal Text" lineEndContext="#pop" name="CommandMaybeGroupEnd">
-        <RegExpr attribute="OtherCommand" context="CommandName" String="&nogroupend;+"/>
-        <DetectChar context="#pop#pop" char="}" lookAhead="1"/>
       </context>
 
       <!-- called as soon as $xxx is encoutered -->

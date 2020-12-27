@@ -741,10 +741,8 @@ private:
         // Parse <keywords ...>
         bool parseKeywords(QXmlStreamReader &xml)
         {
-            for (QChar c : xml.attributes().value(QStringLiteral("additionalDeliminator")))
-                wordDelimiters.append(c);
-            for (QChar c : xml.attributes().value(QStringLiteral("weakDeliminator")))
-                wordDelimiters.remove(c);
+            wordDelimiters.append(xml.attributes().value(QStringLiteral("additionalDeliminator")));
+            wordDelimiters.remove(xml.attributes().value(QStringLiteral("weakDeliminator")));
             return true;
         }
     };

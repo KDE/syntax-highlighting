@@ -419,6 +419,9 @@ a[$((
     2+4
 ))]='x'
 a=([a]=2 `echo` -s > 'ds')
+a=(#comment
+value#nocomment #comment)
+)
 a=a cat
 a=`ls` cat
 

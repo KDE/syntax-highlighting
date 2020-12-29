@@ -749,10 +749,13 @@
 
       <context attribute="Normal Text" lineEndContext="#pop" name="DispatchKeyword">
         <!-- match do and if blocks -->
-        <Detect2Chars attribute="Control Flow" context="#pop" char="i" char1="f" beginRegion="if"/>
+        <Detect2Chars attribute="Control Flow" context="#pop!NotCond" char="i" char1="f" beginRegion="if"/>
         <Detect2Chars attribute="Control Flow" context="#pop" char="f" char1="i" endRegion="if"/>
         <StringDetect attribute="Control Flow" context="#pop" String="done" endRegion="do"/>
         <Detect2Chars attribute="Control Flow" context="#pop" char="d" char1="o" beginRegion="do"/>
+        <!-- handle while/until as a special case -->
+        <StringDetect attribute="Control Flow" context="#pop!NotCond" String="while"/>
+        <StringDetect attribute="Control Flow" context="#pop!NotCond" String="until"/>
         <!-- handle for as a special case -->
         <StringDetect attribute="Control Flow" context="#pop!For" String="for"/>
         <!-- handle select as a special case -->
@@ -767,6 +770,16 @@
         <StringDetect attribute="Error" context="#pop" String="esac"/>
         <!-- handle keywords -->
         <DetectIdentifier attribute="Control Flow" context="#pop"/>
+      </context>
+
+      <!-- if ! ..., while ! ... and until ! ... -->
+      <context attribute="Normal Text" lineEndContext="#pop" name="NotCond" fallthroughContext="#pop">
+        <DetectSpaces attribute="Normal Text" context="#pop!NotCond2"/>
+      </context>
+      <context attribute="Normal Text" lineEndContext="#pop" name="NotCond2" fallthroughContext="#pop">
+        <Detect2Chars attribute="Expression" context="#pop" char="!" char1="&tab;"/>
+        <Detect2Chars attribute="Expression" context="#pop" char="!" char1=" "/>
+        <LineContinue attribute="Expression" context="#pop" char="!"/>
       </context>
 
       <context attribute="Normal Text" lineEndContext="#pop" name="For" fallthroughContext="#pop">
@@ -1010,14 +1023,14 @@
         <Detect2Chars attribute="Parameter Expansion Operator" context="#pop!AlternateValue" char=":" char1="+"/>
         <Detect2Chars attribute="Parameter Expansion Operator" context="#pop!AlternateValue" char="#" char1="#"/>
         <Detect2Chars attribute="Parameter Expansion Operator" context="#pop!AlternateValue" char="%" char1="%"/>
-        <Detect2Chars attribute="Parameter Expansion Operator" context="#pop!AlternateValue" char="^" char1="^"/>
-        <Detect2Chars attribute="Parameter Expansion Operator" context="#pop!AlternateValue" char="," char1=","/>
+        <Detect2Chars attribute="Parameter Expansion Operator" context="#pop!AlternatePatternValue" char="^" char1="^"/>
+        <Detect2Chars attribute="Parameter Expansion Operator" context="#pop!AlternatePatternValue" char="," char1=","/>
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarSub" char=":"/>
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!AlternateValue" char="%"/>
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!AlternateValue" char="#"/>
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarSubst" char="/"/>
-        <DetectChar attribute="Parameter Expansion Operator" context="#pop!AlternateValue" char="^"/>
-        <DetectChar attribute="Parameter Expansion Operator" context="#pop!AlternateValue" char=","/>
+        <DetectChar attribute="Parameter Expansion Operator" context="#pop!AlternatePatternValue" char="^"/>
+        <DetectChar attribute="Parameter Expansion Operator" context="#pop!AlternatePatternValue" char=","/>
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarTransformation" char="@"/>
       </context>
 
@@ -1037,8 +1050,15 @@
         <DetectChar attribute="Error" context="#pop" char="$"/>
       </context>
 
-      <!-- called as soon as ${xxx:- ${xxx:= ${xxx:? ${xxx:+ ${xxx^ ${xxx ${xxx# and ${xxx% are encoutered -->
+      <!-- called as soon as ${xxx:- ${xxx:= ${xxx:? ${xxx:+ ${xxx# ${xxx% and ${xxx are encoutered -->
       <context attribute="Normal Text" lineEndContext="#stay" name="AlternateValue">
+        <DetectChar attribute="Parameter Expansion" context="#pop" char="}"/>
+        <IncludeRules context="FindWord"/>
+        <IncludeRules context="FindPattern"/>
+      </context>
+
+      <!-- called as soon as ${xxx^ are ${xxx, are encoutered -->
+      <context attribute="Pattern" lineEndContext="#stay" name="AlternatePatternValue">
         <DetectChar attribute="Parameter Expansion" context="#pop" char="}"/>
         <IncludeRules context="FindWord"/>
         <IncludeRules context="FindPattern"/>

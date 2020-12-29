@@ -193,6 +193,9 @@ elif [ -d $file ]; then
 	EOF
 fi
 
+if ! { cmd1 && cmd2 ; }; then echo ok ; fi
+if ! {cmd1 && cmd2}; then echo ok ; fi
+if ! cmd1 arg; then echo ok ; fi
 
 case 1 in
 2) echo xxx;

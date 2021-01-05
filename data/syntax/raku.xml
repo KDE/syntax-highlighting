@@ -7,7 +7,8 @@
     Alphanumeric characters additionally include characters with the Unicode General Category value Number, Decimal Digit (Nd).
   -->
   <!-- Large values -->
-  <!ENTITY rangealphabetic "_A-Za-z\xaa\xb5\xba\xc0-\xd6\xd8-\xf6\xf8-\x{2c1}\x{2C6}-\x{2D1}\x{2E0}-\x{2EE}\x{370}-\x{588}\x{5d0}-\x{17dc}\x{1820}-\x{1aa7}\x{1b05}-\x{2139}\x{2c00}-\x{31ff}\x{3400}\x{4db5}\x{4db5}\x{4e00}-\x{ac00}\x{d7a3}-\x{d7fb}\x{f900}-\x{FD3D}\x{FF64}\x{100fa}\x{10000}-\x{100fa}\x{10280}-\x{20000}\x{2a6d6}-\x{2fa1d}">
+  <!ENTITY _rangealphabetic "A-Za-z\xaa\xb5\xba\xc0-\xd6\xd8-\xf6\xf8-\x{2c1}\x{2C6}-\x{2D1}\x{2E0}-\x{2EE}\x{370}-\x{588}\x{5d0}-\x{17dc}\x{1820}-\x{1aa7}\x{1b05}-\x{2139}\x{2c00}-\x{31ff}\x{3400}\x{4db5}\x{4db5}\x{4e00}-\x{ac00}\x{d7a3}-\x{d7fb}\x{f900}-\x{FD3D}\x{FF64}\x{100fa}\x{10000}-\x{100fa}\x{10280}-\x{20000}\x{2a6d6}-\x{2fa1d}">
+  <!ENTITY rangealphabetic "_&_rangealphabetic;">
   <!ENTITY rangenumeric "0-9">
   <!ENTITY alphabetic "[&rangealphabetic;]">
   <!ENTITY numeric "[&rangenumeric;]">
@@ -51,7 +52,7 @@
   <!-- <!ENTITY regadverb "(?!\()\s*(?::\w+\s*)*(?=[^\w\s])"> -->
   <!ENTITY regadverb "(?!\()\s*(?=[^\w\s])">
 ]>
-<language name="Raku" version="6" kateversion="5.53" section="Scripts" extensions="*.raku;*.rakumod;*.rakudoc;*.rakutest;*.pl6;*.PL6;*.p6;*.pm6;*.pod6" priority="6" author="Jonathan Poelen (jonathan.poelen@gmail.com)" license="MIT">
+<language name="Raku" version="7" kateversion="5.53" section="Scripts" extensions="*.raku;*.rakumod;*.rakudoc;*.rakutest;*.pl6;*.PL6;*.p6;*.pm6;*.pod6" priority="6" author="Jonathan Poelen (jonathan.poelen@gmail.com)" license="MIT">
   <highlighting>
 
     <list name="pod">
@@ -498,7 +499,7 @@
         <Detect2Chars attribute="String Delimiter" context="qq_String&lt;&lt;" char="&lt;" char1="&lt;"/>
         <DetectChar attribute="String Delimiter" context="q_String&lt;" char="&lt;"/>
         <DetectChar attribute="String Delimiter" context="Q_String｢" char="｢"/>
-        <DetectChar attribute="Operator" context="Q_String" char="Q" lookAhead="1"/>
+        <RegExpr String="Q(\s++(?=['(_]|$)|\s*+(?=[^()>｣\]}'&rangealphabetic;&rangenumeric;]|$))" context="Q_String" attribute="String"/>
         <DetectChar char=":" context="MaybeAttribute" attribute="Operator"/>
         <AnyChar String="0123456789." context="Number" lookAhead="1"/>
         <RegExpr attribute="Operator" context="q_QuotingForm" String="q(?=&quotingform_q;&quotingform_q_assert;)"/>
@@ -1293,22 +1294,14 @@
       <!-- Q String -->
 
       <context name="Q_String" attribute="String" lineEndContext="#stay" fallthrough="1" fallthroughContext="#pop">
-        <RegExpr String="Q\s+(?=['(])|Q\s*(?=[^()>｣\]}'a-zA-Z0-9])" context="Q_StringOpen" attribute="String"/>
-        <RegExpr String="Q\s*$" context="Q_String2" attribute="String"/>
-      </context>
-
-      <context name="Q_String2" attribute="String" lineEndContext="#stay" fallthrough="1" fallthroughContext="#pop!Q_StringOpen">
-        <DetectSpaces/>
-      </context>
-
-      <context name="Q_StringOpen" attribute="String" lineEndContext="#stay">
-        <DetectChar char=":" context="#pop#pop!Q_StringModifier" attribute="Operator"/>
-        <DetectChar char="(" context="#pop#pop!Q_String(" attribute="String Delimiter"/>
-        <DetectChar char="[" context="#pop#pop!Q_String[" attribute="String Delimiter"/>
-        <DetectChar char="{" context="#pop#pop!Q_String{" attribute="String Delimiter"/>
-        <DetectChar char="｢" context="#pop#pop!Q_String｢" attribute="String Delimiter"/>
-        <DetectChar char="&lt;" context="#pop#pop!Q_String&lt;" attribute="String Delimiter"/>
-        <RegExpr String="(.)" context="#pop#pop!Q_StringAny" attribute="String Delimiter"/>
+        <DetectSpaces attribute="String"/>
+        <DetectChar char=":" context="#pop!Q_StringModifier" attribute="Operator"/>
+        <DetectChar char="(" context="#pop!Q_String(" attribute="String Delimiter"/>
+        <DetectChar char="[" context="#pop!Q_String[" attribute="String Delimiter"/>
+        <DetectChar char="{" context="#pop!Q_String{" attribute="String Delimiter"/>
+        <DetectChar char="｢" context="#pop!Q_String｢" attribute="String Delimiter"/>
+        <DetectChar char="&lt;" context="#pop!Q_String&lt;" attribute="String Delimiter"/>
+        <RegExpr String="([^()>｣\]}'&_rangealphabetic;&rangenumeric;])" context="#pop!Q_StringAny" attribute="String Delimiter"/>
       </context>
 
       <context name="Q_String(" attribute="String" lineEndContext="#stay">

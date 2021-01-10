@@ -81,11 +81,11 @@
 <span style="color:#7a7c7d;">--------------------------------------------------------------------------------</span>
 
 <span style="font-weight:bold;">library</span> ieee;
-<span style="font-weight:bold;">use</span> ieee<span style="color:#27ae60;">.</span>std_logic_1164<span style="color:#27ae60;">.</span>all;
-<span style="font-weight:bold;">use</span> ieee<span style="color:#27ae60;">.</span>numeric_std<span style="color:#27ae60;">.</span>all;
+<span style="font-weight:bold;">use</span> ieee<span style="color:#27ae60;">.</span>std_logic_1164<span style="color:#27ae60;">.</span><span style="font-weight:bold;">all</span>;
+<span style="font-weight:bold;">use</span> ieee<span style="color:#27ae60;">.</span>numeric_std<span style="color:#27ae60;">.</span><span style="font-weight:bold;">all</span>;
 
-<span style="font-weight:bold;">use</span> work<span style="color:#27ae60;">.</span>light52_pkg<span style="color:#27ae60;">.</span>all;
-<span style="font-weight:bold;">use</span> work<span style="color:#27ae60;">.</span>light52_ucode_pkg<span style="color:#27ae60;">.</span>all;
+<span style="font-weight:bold;">use</span> work<span style="color:#27ae60;">.</span>light52_pkg<span style="color:#27ae60;">.</span><span style="font-weight:bold;">all</span>;
+<span style="font-weight:bold;">use</span> work<span style="color:#27ae60;">.</span>light52_ucode_pkg<span style="color:#27ae60;">.</span><span style="font-weight:bold;">all</span>;
 
 <span style="color:#fdbc4b;font-weight:bold;">entity</span> <span style="color:#f67400;font-weight:bold;">light52_muldiv</span> <span style="font-weight:bold;">is</span>
     <span style="color:#fdbc4b;font-weight:bold;">generic</span> (
@@ -94,17 +94,17 @@
     <span style="color:#fdbc4b;font-weight:bold;">port</span>(
         clk <span style="color:#27ae60;">:</span>                   <span style="font-weight:bold;">in</span> <span style="color:#2980b9;">std_logic</span>;
         reset <span style="color:#27ae60;">:</span>                 <span style="font-weight:bold;">in</span> <span style="color:#2980b9;">std_logic</span>;
-        
+
         data_a <span style="color:#27ae60;">:</span>                <span style="font-weight:bold;">in</span> t_byte;
         data_b <span style="color:#27ae60;">:</span>                <span style="font-weight:bold;">in</span> t_byte;
         start <span style="color:#27ae60;">:</span>                 <span style="font-weight:bold;">in</span> <span style="color:#2980b9;">std_logic</span>;
-        
+
         prod_out <span style="color:#27ae60;">:</span>              <span style="font-weight:bold;">out</span> t_word;
         quot_out <span style="color:#27ae60;">:</span>              <span style="font-weight:bold;">out</span> t_byte;
         rem_out <span style="color:#27ae60;">:</span>               <span style="font-weight:bold;">out</span> t_byte;
         div_ov_out <span style="color:#27ae60;">:</span>            <span style="font-weight:bold;">out</span> <span style="color:#2980b9;">std_logic</span>;
         mul_ov_out <span style="color:#27ae60;">:</span>            <span style="font-weight:bold;">out</span> <span style="color:#2980b9;">std_logic</span>;
-        
+
         mul_ready <span style="color:#27ae60;">:</span>             <span style="font-weight:bold;">out</span> <span style="color:#2980b9;">std_logic</span>;
         div_ready <span style="color:#27ae60;">:</span>             <span style="font-weight:bold;">out</span> <span style="color:#2980b9;">std_logic</span>
     );
@@ -145,12 +145,12 @@
             <span style="color:#fdbc4b;font-weight:bold;">end if;</span>
         <span style="color:#fdbc4b;font-weight:bold;">end if;</span>
     <span style="color:#fdbc4b;font-weight:bold;">end if;</span>
-<span style="color:#3daee9;font-weight:bold;">end process control_counter</span>;
+<span style="color:#3daee9;font-weight:bold;">end process control_counter;</span>
 
 <span style="color:#7a7c7d;">-- Internal signal ready is asserted after 8 cycles.</span>
 <span style="color:#7a7c7d;">-- The sequential multiplier will use this signal too, IF it takes 8 cycles.</span>
 
-ready <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">'1'</span> <span style="font-weight:bold;">when</span> bit_ctr <span style="color:#27ae60;">&gt;=</span> <span style="color:#f67400;">8</span> else <span style="color:#f67400;">'0'</span>;
+ready <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">'1'</span> <span style="font-weight:bold;">when</span> bit_ctr <span style="color:#27ae60;">&gt;=</span> <span style="color:#f67400;">8</span> <span style="font-weight:bold;">else</span> <span style="color:#f67400;">'0'</span>;
 
 
 <span style="color:#7a7c7d;">---- Divider logic -------------------------------------------------------------</span>
@@ -192,17 +192,17 @@ ready <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">'1'
         
         load_regs <span style="color:#27ae60;">&lt;=</span> start;
     <span style="color:#fdbc4b;font-weight:bold;">end if;</span>
-<span style="color:#3daee9;font-weight:bold;">end process divider_registers</span>;
+<span style="color:#3daee9;font-weight:bold;">end process divider_registers;</span>
 
 denominator <span style="color:#27ae60;">&lt;=</span> b_shift_reg(<span style="color:#f67400;">7</span> <span style="color:#27ae60;">downto</span> <span style="color:#f67400;">0</span>);
 
 <span style="color:#7a7c7d;">-- The 16-bit comparison between b_shift_reg (denominator) and the zero-extended </span>
 <span style="color:#7a7c7d;">-- rem_reg (numerator) can be simplified by splitting it in 2: </span>
 <span style="color:#7a7c7d;">-- If the shifted denominator high byte is not zero, it is &gt;=256...</span>
-den_ge_256 <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">'1'</span> <span style="font-weight:bold;">when</span> b_shift_reg(<span style="color:#f67400;">15</span> <span style="color:#27ae60;">downto</span> <span style="color:#f67400;">8</span>) <span style="color:#27ae60;">/=</span> X<span style="color:#f44f4f;">&quot;00&quot;</span> else <span style="color:#f67400;">'0'</span>;
+den_ge_256 <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">'1'</span> <span style="font-weight:bold;">when</span> b_shift_reg(<span style="color:#f67400;">15</span> <span style="color:#27ae60;">downto</span> <span style="color:#f67400;">8</span>) <span style="color:#27ae60;">/=</span> X<span style="color:#f44f4f;">&quot;00&quot;</span> <span style="font-weight:bold;">else</span> <span style="color:#f67400;">'0'</span>;
 <span style="color:#7a7c7d;">-- ...otherwise we need to compare the low bytes.</span>
-num_ge_den <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">'1'</span> <span style="font-weight:bold;">when</span> rem_reg <span style="color:#27ae60;">&gt;=</span> denominator else <span style="color:#f67400;">'0'</span>;
-sub_num <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">'1'</span> <span style="font-weight:bold;">when</span> den_ge_256<span style="color:#27ae60;">=</span><span style="color:#f67400;">'0'</span> <span style="font-weight:bold;">and</span> num_ge_den<span style="color:#27ae60;">=</span><span style="color:#f67400;">'1'</span> else <span style="color:#f67400;">'0'</span>;
+num_ge_den <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">'1'</span> <span style="font-weight:bold;">when</span> rem_reg <span style="color:#27ae60;">&gt;=</span> denominator <span style="font-weight:bold;">else</span> <span style="color:#f67400;">'0'</span>;
+sub_num <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">'1'</span> <span style="font-weight:bold;">when</span> den_ge_256<span style="color:#27ae60;">=</span><span style="color:#f67400;">'0'</span> <span style="font-weight:bold;">and</span> num_ge_den<span style="color:#27ae60;">=</span><span style="color:#f67400;">'1'</span> <span style="font-weight:bold;">else</span> <span style="color:#f67400;">'0'</span>;
 
 
 quot_out <span style="color:#27ae60;">&lt;=</span> quot_reg;
@@ -221,16 +221,16 @@ div_ready <span style="color:#27ae60;">&lt;=</span> ready;
     <span style="color:#fdbc4b;font-weight:bold;">if</span> clk<span style="color:#f67400;">'event</span> <span style="font-weight:bold;">and</span> clk<span style="color:#27ae60;">=</span><span style="color:#f67400;">'1'</span> <span style="color:#fdbc4b;font-weight:bold;">then</span>
         prod_reg <span style="color:#27ae60;">&lt;=</span> data_a <span style="color:#27ae60;">*</span> data_b; <span style="color:#7a7c7d;">-- t_byte is unsigned</span>
     <span style="color:#fdbc4b;font-weight:bold;">end if;</span>
-<span style="color:#3daee9;font-weight:bold;">end process registered_combinational_multiplier</span>;
+<span style="color:#3daee9;font-weight:bold;">end process registered_combinational_multiplier;</span>
 
 <span style="color:#7a7c7d;">-- The multiplier output is valid in the cycle after the operands are loaded,</span>
 <span style="color:#7a7c7d;">-- so by the time MUL is executed it's already done.</span>
 mul_ready <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">'1'</span>;
 
-mul_ov_out <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">'1'</span> <span style="font-weight:bold;">when</span> prod_reg(<span style="color:#f67400;">15</span> <span style="color:#27ae60;">downto</span> <span style="color:#f67400;">8</span>)<span style="color:#27ae60;">/=</span>X<span style="color:#f44f4f;">&quot;00&quot;</span> else <span style="color:#f67400;">'0'</span>;
+mul_ov_out <span style="color:#27ae60;">&lt;=</span> <span style="color:#f67400;">'1'</span> <span style="font-weight:bold;">when</span> prod_reg(<span style="color:#f67400;">15</span> <span style="color:#27ae60;">downto</span> <span style="color:#f67400;">8</span>)<span style="color:#27ae60;">/=</span>X<span style="color:#f44f4f;">&quot;00&quot;</span> <span style="font-weight:bold;">else</span> <span style="color:#f67400;">'0'</span>;
 prod_out <span style="color:#27ae60;">&lt;=</span> prod_reg;
 
-<span style="color:#fdbc4b;font-weight:bold;">end generate multiplier_combinational</span>;
+<span style="color:#fdbc4b;font-weight:bold;">end generate multiplier_combinational;</span>
 
 <span style="color:#7a7c7d;">---- Sequential multiplier --------------------------------</span>
 <span style="color:#f67400;font-weight:bold;">multiplier_sequential</span><span style="color:#27ae60;">:</span> <span style="color:#fdbc4b;font-weight:bold;">if</span> SEQUENTIAL_MULTIPLIER <span style="color:#fdbc4b;font-weight:bold;">generate</span>
@@ -240,7 +240,163 @@ prod_out <span style="color:#27ae60;">&lt;=</span> prod_reg;
        <span style="color:#f44f4f;">&quot; Use combinational implementation.&quot;</span>
 <span style="font-weight:bold;">severity</span> <span style="font-weight:bold;">failure</span>;
 
-<span style="color:#fdbc4b;font-weight:bold;">end generate multiplier_sequential</span>;
+<span style="color:#fdbc4b;font-weight:bold;">end generate multiplier_sequential;</span>
 
 <span style="color:#fdbc4b;font-weight:bold;">end sequential;</span>
+
+
+<span style="font-weight:bold;">with</span> Types; <span style="font-weight:bold;">use</span> Types;
+<span style="font-weight:bold;">with</span> Files_Map;
+
+<span style="color:#fdbc4b;font-weight:bold;">package</span> <span style="color:#f67400;font-weight:bold;">p</span> <span style="font-weight:bold;">is</span>
+    <span style="color:#27ae60;">type</span> int_ptr <span style="color:#27ae60;">is</span> <span style="font-weight:bold;">access</span> <span style="color:#2980b9;">integer</span>;
+    <span style="color:#27ae60;">type</span> rec <span style="color:#27ae60;">is</span> <span style="font-weight:bold;">record</span>
+        value <span style="color:#27ae60;">:</span> integer;
+        link  <span style="color:#27ae60;">:</span> rec_ptr;
+    <span style="font-weight:bold;">end record;</span>
+    <span style="color:#27ae60;">type</span> int_vec <span style="color:#27ae60;">is</span> <span style="font-weight:bold;">array</span> (<span style="color:#2980b9;">integer</span> <span style="font-weight:bold;">range</span> <span style="color:#27ae60;">&lt;&gt;</span>) <span style="font-weight:bold;">of</span> <span style="color:#2980b9;">integer</span>;
+    <span style="color:#27ae60;">type</span> int_vec_ptr <span style="color:#27ae60;">is</span> <span style="font-weight:bold;">access</span> int_vec;
+    <span style="color:#27ae60;">constant</span> def_arr <span style="color:#27ae60;">:</span> t_int_array <span style="color:#27ae60;">:=</span> (<span style="color:#f67400;">0</span> <span style="color:#27ae60;">to</span> <span style="color:#f67400;">2</span> <span style="color:#27ae60;">=&gt;</span> <span style="color:#f67400;">10</span>);
+<span style="color:#fdbc4b;font-weight:bold;">end package;</span>
+
+<span style="color:#fdbc4b;font-weight:bold;">package</span> <span style="color:#fdbc4b;font-weight:bold;">body</span> <span style="color:#f67400;font-weight:bold;">p</span> <span style="font-weight:bold;">is</span>
+    <span style="font-weight:bold;">procedure</span> <span style="color:#f67400;font-weight:bold;">test</span> <span style="color:#fdbc4b;font-weight:bold;">is</span>
+        <span style="color:#27ae60;">variable</span> v <span style="color:#27ae60;">:</span> int_ptr;
+        <span style="color:#27ae60;">variable</span> i <span style="color:#27ae60;">:</span> <span style="color:#2980b9;">integer</span>;
+    <span style="color:#2980b9;font-weight:bold;">begin</span>
+        v <span style="color:#27ae60;">:=</span> <span style="font-weight:bold;">null</span>;
+        deallocate(v);
+        v <span style="color:#27ae60;">:=</span> <span style="font-weight:bold;">new</span> <span style="color:#2980b9;">integer</span>;
+        v <span style="color:#27ae60;">:=</span> <span style="font-weight:bold;">new</span> integer<span style="color:#f67400;">'(5)</span>;
+        v<span style="color:#27ae60;">.</span><span style="font-weight:bold;">all</span> <span style="color:#27ae60;">:=</span> <span style="color:#f67400;">5</span>;
+        r<span style="color:#27ae60;">.</span><span style="font-weight:bold;">all</span><span style="color:#27ae60;">.</span>value <span style="color:#27ae60;">:=</span> <span style="color:#f67400;">1</span>;
+        a <span style="color:#27ae60;">:=</span> <span style="font-weight:bold;">new</span> int_vec(<span style="color:#f67400;">1</span> <span style="color:#27ae60;">to</span> <span style="color:#f67400;">3</span>);
+        a<span style="color:#27ae60;">.</span><span style="font-weight:bold;">all</span>(<span style="color:#f67400;">5</span>) <span style="color:#27ae60;">:=</span> <span style="color:#f67400;">2</span>;
+        a(<span style="color:#f67400;">1</span> <span style="color:#27ae60;">to</span> <span style="color:#f67400;">2</span>) <span style="color:#27ae60;">:=</span> (<span style="color:#f67400;">1</span><span style="color:#27ae60;">,</span> <span style="color:#f67400;">2</span>);
+        s <span style="color:#27ae60;">:=</span> <span style="font-weight:bold;">new</span> string<span style="color:#f67400;">'(&quot;&quot;)</span>;
+    <span style="color:#2980b9;font-weight:bold;">end procedure;</span>
+
+    <span style="font-weight:bold;">procedure</span> <span style="color:#f67400;font-weight:bold;">test2</span>(x <span style="color:#27ae60;">:</span> <span style="font-weight:bold;">inout</span> rec_ptr) <span style="color:#fdbc4b;font-weight:bold;">is</span>
+    <span style="color:#2980b9;font-weight:bold;">begin</span>
+        x<span style="color:#27ae60;">.</span>value <span style="color:#27ae60;">:=</span> x<span style="color:#27ae60;">.</span>value <span style="color:#27ae60;">+</span> <span style="color:#f67400;">1</span>;
+    <span style="color:#2980b9;font-weight:bold;">end procedure;</span>
+
+    <span style="font-weight:bold;">procedure</span> <span style="color:#f67400;font-weight:bold;">test3</span> <span style="color:#fdbc4b;font-weight:bold;">is</span>
+        <span style="color:#27ae60;">type</span> a;
+        <span style="color:#27ae60;">type</span> a <span style="font-weight:bold;">is</span> <span style="font-weight:bold;">access</span> <span style="color:#2980b9;">integer</span>;
+        <span style="color:#27ae60;">variable</span> v <span style="color:#27ae60;">:</span> a;
+    <span style="color:#2980b9;font-weight:bold;">begin</span>
+    <span style="color:#2980b9;font-weight:bold;">end procedure;</span>
+
+    <span style="color:#27ae60;">type</span> int_ptr_array <span style="color:#27ae60;">is</span> <span style="font-weight:bold;">array</span> (<span style="color:#2980b9;">integer</span> <span style="font-weight:bold;">range</span> <span style="color:#27ae60;">&lt;&gt;</span>) <span style="font-weight:bold;">of</span> int_ptr;
+
+    <span style="font-weight:bold;">procedure</span> <span style="color:#f67400;font-weight:bold;">tets4</span> <span style="color:#fdbc4b;font-weight:bold;">is</span>
+        <span style="color:#27ae60;">type</span> bvp <span style="font-weight:bold;">is</span> <span style="font-weight:bold;">access</span> <span style="color:#2980b9;">bit_vector</span>;
+        <span style="color:#27ae60;">variable</span> y <span style="color:#27ae60;">:</span> int_ptr(<span style="color:#f67400;">1</span> <span style="color:#27ae60;">to</span> <span style="color:#f67400;">3</span>) <span style="color:#27ae60;">:=</span> int_ptr<span style="color:#f67400;">'(null)</span>;
+    <span style="color:#2980b9;font-weight:bold;">begin</span>
+    <span style="color:#2980b9;font-weight:bold;">end procedure;</span>
+
+    <span style="font-weight:bold;">procedure</span> <span style="color:#f67400;font-weight:bold;">Restore_Origin</span> (Mark <span style="color:#27ae60;">:</span> Instance_Index_Type) <span style="color:#fdbc4b;font-weight:bold;">is</span>
+    <span style="color:#2980b9;font-weight:bold;">begin</span>
+        <span style="color:#fdbc4b;font-weight:bold;">for</span> I <span style="font-weight:bold;">in</span> reverse Mark <span style="color:#27ae60;">+</span> <span style="color:#f67400;">1</span> <span style="color:#27ae60;">..</span> Prev_Instance_Table<span style="color:#27ae60;">.</span>Last <span style="color:#fdbc4b;font-weight:bold;">loop</span>
+            <span style="font-weight:bold;">declare</span>
+                El <span style="color:#27ae60;">:</span> Instance_Entry_Type renames Prev_Instance_Table<span style="color:#27ae60;">.</span>Table (I);
+            <span style="color:#2980b9;font-weight:bold;">begin</span>
+                Origin_Table<span style="color:#27ae60;">.</span>Table (El<span style="color:#27ae60;">.</span>N) <span style="color:#27ae60;">:=</span> El<span style="color:#27ae60;">.</span>Old_Origin;
+            <span style="color:#2980b9;font-weight:bold;">end;</span>
+        <span style="color:#fdbc4b;font-weight:bold;">end loop;</span>
+        Prev_Instance_Table<span style="color:#27ae60;">.</span>Set_Last (Mark);
+    <span style="color:#2980b9;font-weight:bold;">end Restore_Origin;</span>
+
+    <span style="color:#7a7c7d;">--  Instantiate a list.  Simply create a new list and instantiate nodes of</span>
+    <span style="color:#7a7c7d;">--  that list.</span>
+    <span style="color:#fdbc4b;font-weight:bold;">function</span> <span style="color:#f67400;font-weight:bold;">Instantiate_Iir_List</span> (L <span style="color:#27ae60;">:</span> Iir_List; Is_Ref <span style="color:#27ae60;">:</span> <span style="color:#2980b9;">Boolean</span>)
+                                    <span style="color:#fdbc4b;font-weight:bold;">return</span> Iir_List
+    <span style="font-weight:bold;">is</span>
+        Res <span style="color:#27ae60;">:</span> Iir_List;
+        El <span style="color:#27ae60;">:</span> Iir;
+    <span style="color:#2980b9;font-weight:bold;">begin</span>
+        <span style="color:#fdbc4b;font-weight:bold;">case</span> L <span style="font-weight:bold;">is</span>
+            <span style="color:#fdbc4b;font-weight:bold;">when</span> Null_Iir_List
+            <span style="color:#27ae60;">|</span> Iir_List_All <span style="color:#27ae60;">=&gt;</span>
+                <span style="color:#fdbc4b;font-weight:bold;">return</span> L;
+            <span style="color:#fdbc4b;font-weight:bold;">when</span> <span style="color:#27ae60;">others</span> <span style="color:#27ae60;">=&gt;</span>
+                It <span style="color:#27ae60;">:=</span> List_Iterate (L);
+                <span style="color:#fdbc4b;font-weight:bold;">while</span> Is_Valid (It) <span style="color:#fdbc4b;font-weight:bold;">loop</span>
+                    El <span style="color:#27ae60;">:=</span> Get_Element (It);
+                    Append_Element (Res<span style="color:#27ae60;">,</span> Instantiate_Iir (El<span style="color:#27ae60;">,</span> Is_Ref));
+                <span style="color:#fdbc4b;font-weight:bold;">end loop;</span>
+                <span style="color:#fdbc4b;font-weight:bold;">for</span> I <span style="font-weight:bold;">in</span> Flist_First <span style="color:#27ae60;">..</span> Flist_Last (L) <span style="color:#fdbc4b;font-weight:bold;">loop</span>
+                    Set_Nth_Element (Res<span style="color:#27ae60;">,</span> I<span style="color:#27ae60;">,</span> Instantiate_Iir (El<span style="color:#27ae60;">,</span> Is_Ref));
+                <span style="color:#fdbc4b;font-weight:bold;">end loop;</span>
+                <span style="color:#fdbc4b;font-weight:bold;">return</span> Res;
+        <span style="color:#fdbc4b;font-weight:bold;">end case;</span>
+    <span style="color:#2980b9;font-weight:bold;">end Instantiate_Iir_List;</span>
+<span style="color:#fdbc4b;font-weight:bold;">end package body;</span>
+
+<span style="color:#7a7c7d;">-- Library bar</span>
+<span style="font-weight:bold;">context</span> foo<span style="color:#27ae60;">.</span>test_context;
+
+<span style="color:#fdbc4b;font-weight:bold;">entity</span> <span style="color:#f67400;font-weight:bold;">concat</span> <span style="font-weight:bold;">is</span>
+<span style="color:#fdbc4b;font-weight:bold;">end entity;</span>
+
+<span style="color:#fdbc4b;font-weight:bold;">entity</span> <span style="color:#f67400;font-weight:bold;">foo</span> <span style="font-weight:bold;">is</span>
+    <span style="color:#fdbc4b;font-weight:bold;">port</span> (
+        x <span style="color:#27ae60;">:</span> <span style="font-weight:bold;">in</span> my_int );
+<span style="color:#fdbc4b;font-weight:bold;">end entity;</span>
+
+<span style="color:#fdbc4b;font-weight:bold;">architecture</span> <span style="color:#f67400;font-weight:bold;">t</span> <span style="font-weight:bold;">of</span> <span style="color:#8e44ad;">concat</span> <span style="font-weight:bold;">is</span>
+    <span style="color:#27ae60;">type</span> int_array <span style="color:#27ae60;">is</span> <span style="font-weight:bold;">array</span> (<span style="color:#2980b9;">integer</span> <span style="font-weight:bold;">range</span> <span style="color:#27ae60;">&lt;&gt;</span>) <span style="font-weight:bold;">of</span> <span style="color:#2980b9;">integer</span>;
+<span style="color:#fdbc4b;font-weight:bold;">begin</span>
+    <span style="color:#3daee9;font-weight:bold;">process</span>
+        <span style="color:#27ae60;">variable</span> s <span style="color:#27ae60;">:</span> <span style="color:#2980b9;">string</span>(<span style="color:#f67400;">1</span> <span style="color:#27ae60;">to</span> <span style="color:#f67400;">5</span>);
+        <span style="color:#27ae60;">variable</span> t <span style="color:#27ae60;">:</span> int_array(<span style="color:#f67400;">1</span> <span style="color:#27ae60;">to</span> <span style="color:#f67400;">2</span>);
+        <span style="color:#27ae60;">variable</span> c <span style="color:#27ae60;">:</span> <span style="color:#2980b9;">bit_vector</span>(<span style="color:#f67400;">1</span> <span style="color:#27ae60;">to</span> <span style="color:#f67400;">4</span>);
+    <span style="color:#3daee9;font-weight:bold;">begin</span>
+        x <span style="color:#27ae60;">:=</span> ( <span style="color:#f67400;">1</span><span style="color:#27ae60;">,</span> <span style="color:#f67400;">2</span><span style="color:#27ae60;">,</span> <span style="color:#f67400;">3</span> );
+        z <span style="color:#27ae60;">:=</span> x <span style="color:#27ae60;">&amp;</span> y;
+        w <span style="color:#27ae60;">:=</span> <span style="color:#f67400;">1</span> <span style="color:#27ae60;">&amp;</span> x;
+        s <span style="color:#27ae60;">:=</span> <span style="color:#f67400;">'h'</span> <span style="color:#27ae60;">&amp;</span> string<span style="color:#f67400;">'(&quot;ello&quot;)</span>;
+        <span style="font-weight:bold;">assert</span> <span style="color:#f44f4f;">&quot;10&quot;</span> <span style="color:#27ae60;">=</span> (b(<span style="color:#f67400;">1</span>) <span style="color:#27ae60;">&amp;</span> <span style="color:#f44f4f;">&quot;0&quot;</span>);
+        <span style="font-weight:bold;">wait</span>;
+    <span style="color:#3daee9;font-weight:bold;">end process;</span>
+
+    <span style="color:#fdbc4b;font-weight:bold;">function</span> <span style="color:#f67400;font-weight:bold;">CounterVal</span>(Seconds <span style="color:#27ae60;">:</span> <span style="color:#2980b9;">integer</span> <span style="color:#27ae60;">:=</span> <span style="color:#f67400;">0</span>) <span style="color:#fdbc4b;font-weight:bold;">return</span> <span style="color:#2980b9;">integer</span> <span style="font-weight:bold;">is</span>
+        <span style="color:#27ae60;">variable</span> TotalSeconds <span style="color:#27ae60;">:</span> interger;
+    <span style="color:#2980b9;font-weight:bold;">begin</span>
+        TotalSeconds <span style="color:#27ae60;">:=</span> Seconds <span style="color:#27ae60;">+</span> Minutes <span style="color:#27ae60;">*</span> <span style="color:#f67400;">60</span>;
+        <span style="color:#fdbc4b;font-weight:bold;">return</span> TotalSeconds <span style="color:#27ae60;">*</span> ClockFrequencyHz <span style="color:#27ae60;">-</span><span style="color:#f67400;">1</span>;
+    <span style="color:#2980b9;font-weight:bold;">end function;</span>
+
+    <span style="font-weight:bold;">component</span> <span style="color:#f67400;font-weight:bold;">or_entity</span> <span style="font-weight:bold;">is</span>
+    <span style="font-weight:bold;">port</span>(
+        input_1<span style="color:#27ae60;">:</span> <span style="font-weight:bold;">in</span> <span style="color:#2980b9;">std_logic</span>;
+        output<span style="color:#27ae60;">:</span> <span style="font-weight:bold;">out</span> <span style="color:#2980b9;">std_logic</span>
+        );
+    <span style="color:#fdbc4b;font-weight:bold;">end component;</span>
+
+    <span style="color:#27ae60;">type</span> enum_type <span style="color:#27ae60;">is</span> (a<span style="color:#27ae60;">,</span> b<span style="color:#27ae60;">,</span> c<span style="color:#27ae60;">,</span> <span style="color:#27ae60;">...,</span> z);
+    <span style="color:#27ae60;">type</span> int_array <span style="color:#27ae60;">is</span> <span style="font-weight:bold;">array</span>(<span style="color:#f67400;">3</span> <span style="color:#27ae60;">downto</span> <span style="color:#f67400;">0</span>) <span style="font-weight:bold;">of</span> <span style="color:#2980b9;">integer</span>;
+
+    <span style="font-weight:bold;">subtype</span> addr_int <span style="font-weight:bold;">is</span> <span style="color:#2980b9;">integer</span> <span style="font-weight:bold;">range</span> <span style="color:#f67400;">0</span> <span style="color:#27ae60;">to</span> <span style="color:#f67400;">65535</span>;
+    <span style="font-weight:bold;">subtype</span> sub_enum_type <span style="font-weight:bold;">is</span> enum_type <span style="font-weight:bold;">range</span> a <span style="color:#27ae60;">to</span> m;
+<span style="color:#fdbc4b;font-weight:bold;">end architecture;</span>
+
+<span style="color:#fdbc4b;font-weight:bold;">architecture</span> <span style="color:#f67400;font-weight:bold;">a2</span> <span style="font-weight:bold;">of</span> <span style="color:#8e44ad;">e</span> <span style="font-weight:bold;">is</span>
+    <span style="color:#fdbc4b;font-weight:bold;">function</span> <span style="color:#f44f4f;">&quot;&gt;&quot;</span>(a<span style="color:#27ae60;">,</span> b<span style="color:#27ae60;">:</span> my_int) <span style="color:#fdbc4b;font-weight:bold;">return</span> <span style="color:#2980b9;">boolean</span>;
+<span style="color:#fdbc4b;font-weight:bold;">begin</span>
+    <span style="color:#3daee9;font-weight:bold;">process</span> <span style="font-weight:bold;">is</span>
+        <span style="color:#27ae60;">variable</span> x<span style="color:#27ae60;">,</span> y <span style="color:#27ae60;">:</span> my_int;
+    <span style="color:#3daee9;font-weight:bold;">begin</span>
+        <span style="font-weight:bold;">assert</span> x <span style="color:#27ae60;">&gt;</span> y;
+        <span style="font-weight:bold;">assert</span> x <span style="color:#27ae60;">&lt;</span> y;                   <span style="color:#7a7c7d;">-- Error</span>
+    <span style="color:#3daee9;font-weight:bold;">end process;</span>
+
+    <span style="color:#f67400;font-weight:bold;">billowitch_tc586</span><span style="color:#27ae60;">:</span> <span style="color:#fdbc4b;font-weight:bold;">block</span> <span style="font-weight:bold;">is</span>
+        <span style="color:#27ae60;">type</span> real_cons_vector  <span style="color:#27ae60;">is</span> <span style="font-weight:bold;">array</span> (<span style="color:#f67400;">15</span> <span style="color:#27ae60;">downto</span> <span style="color:#f67400;">0</span>) <span style="font-weight:bold;">of</span> <span style="color:#2980b9;">real</span>;
+        <span style="color:#27ae60;">type</span> real_cons_vector_file <span style="color:#27ae60;">is</span> <span style="font-weight:bold;">file</span> <span style="font-weight:bold;">of</span> real_cons_vector;
+        <span style="color:#27ae60;">constant</span> C19 <span style="color:#27ae60;">:</span> real_cons_vector <span style="color:#27ae60;">:=</span> (<span style="color:#27ae60;">others</span> <span style="color:#27ae60;">=&gt;</span> <span style="color:#f67400;">3</span><span style="color:#27ae60;">.</span><span style="color:#f67400;">0</span>);
+    <span style="font-weight:bold;">begin</span>
+    <span style="color:#fdbc4b;font-weight:bold;">end block;</span>
+<span style="color:#fdbc4b;font-weight:bold;">end architecture;</span>
 </pre></body></html>

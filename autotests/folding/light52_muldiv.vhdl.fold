@@ -88,58 +88,58 @@ entity <beginfold id='1'>light52_muldiv</beginfold id='1'> is
     port(
         clk :                   in std_logic;
         reset :                 in std_logic;
-        
+
         data_a :                in t_byte;
         data_b :                in t_byte;
         start :                 in std_logic;
-        
+
         prod_out :              out t_word;
         quot_out :              out t_byte;
         rem_out :               out t_byte;
         div_ov_out :            out std_logic;
         mul_ov_out :            out std_logic;
-        
+
         mul_ready :             out std_logic;
         div_ready :             out std_logic
     );
 <endfold id='1'>end entity light52_muldiv;</endfold id='1'>
 
-<beginfold id='2'></beginfold id='2'>architecture sequential of light52_muldiv is
+architecture <beginfold id='2'>sequential</beginfold id='2'> of light52_muldiv is
 
-signal bit_ctr :            integer range 0 to 8<endfold id='3'></endfold id='3'>;
+signal bit_ctr :            integer range 0 to 8;
 
-signal b_shift_reg :        t_word<endfold id='3'></endfold id='3'>;
+signal b_shift_reg :        t_word;
 
-signal den_ge_256 :         std_logic<endfold id='3'></endfold id='3'>;
-signal num_ge_den :         std_logic<endfold id='3'></endfold id='3'>;
-signal sub_num :            std_logic<endfold id='3'></endfold id='3'>;
+signal den_ge_256 :         std_logic;
+signal num_ge_den :         std_logic;
+signal sub_num :            std_logic;
 
-signal denominator :        t_byte<endfold id='3'></endfold id='3'>;
-signal rem_reg :            t_byte<endfold id='3'></endfold id='3'>;
-signal quot_reg :           t_byte<endfold id='3'></endfold id='3'>;
-signal prod_reg :           t_word<endfold id='3'></endfold id='3'>;
-signal ready :              std_logic<endfold id='3'></endfold id='3'>;
+signal denominator :        t_byte;
+signal rem_reg :            t_byte;
+signal quot_reg :           t_byte;
+signal prod_reg :           t_word;
+signal ready :              std_logic;
 
-signal load_regs :          std_logic<endfold id='3'></endfold id='3'>;
+signal load_regs :          std_logic;
 
 begin
 
 -- Control logic ---------------------------------------------------------------
 
-control_counter: <beginfold id='4'>process</beginfold id='4'>(clk)
+control_counter: <beginfold id='3'>process</beginfold id='3'>(clk)
 begin
-    if clk'event and clk='1' <beginfold id='5'>then</beginfold id='5'>
-        if reset='1' <beginfold id='5'>then</beginfold id='5'>
+    <beginfold id='4'>if</beginfold id='4'> clk'event and clk='1' then
+        <beginfold id='4'>if</beginfold id='4'> reset='1' then
             bit_ctr <= 8;
         else
-            if load_regs='1' <beginfold id='5'>then</beginfold id='5'>
+            <beginfold id='4'>if</beginfold id='4'> load_regs='1' then
                 bit_ctr <= 0;
             elsif bit_ctr /= 8 then
                 bit_ctr <= bit_ctr + 1;
-            <endfold id='5'>end if;</endfold id='5'>
-        <endfold id='5'>end if;</endfold id='5'>
-    <endfold id='5'>end if;</endfold id='5'>
-<endfold id='4'>end process control_counter</endfold id='4'>;
+            <endfold id='4'>end if;</endfold id='4'>
+        <endfold id='4'>end if;</endfold id='4'>
+    <endfold id='4'>end if;</endfold id='4'>
+<endfold id='3'>end process control_counter;</endfold id='3'>
 
 -- Internal signal ready is asserted after 8 cycles.
 -- The sequential multiplier will use this signal too, IF it takes 8 cycles.
@@ -153,40 +153,40 @@ ready <= '1' when bit_ctr >= 8 else '0';
 -- 8 cycles to complete. We can get away with this because we deal with unsigned
 -- numbers only.
 
-divider_registers: <beginfold id='4'>process</beginfold id='4'>(clk)
+divider_registers: <beginfold id='3'>process</beginfold id='3'>(clk)
 begin
-    if clk'event and clk='1' <beginfold id='5'>then</beginfold id='5'>
+    <beginfold id='4'>if</beginfold id='4'> clk'event and clk='1' then
         -- denominator shift register
-        if load_regs='1' <beginfold id='5'>then</beginfold id='5'>
+        <beginfold id='4'>if</beginfold id='4'> load_regs='1' then
             b_shift_reg <= "0" & data_b & "0000000";
             -- Division overflow can be determined upon loading B reg data.
             -- OV will be raised only on div-by-zero.
-            if data_b=X"00" <beginfold id='5'>then</beginfold id='5'>
+            <beginfold id='4'>if</beginfold id='4'> data_b=X"00" then
                 div_ov_out <= '1';
             else
                 div_ov_out <= '0';
-            <endfold id='5'>end if;</endfold id='5'>
+            <endfold id='4'>end if;</endfold id='4'>
         else
             b_shift_reg <= "0" & b_shift_reg(b_shift_reg'high downto 1);
-        <endfold id='5'>end if;</endfold id='5'>
+        <endfold id='4'>end if;</endfold id='4'>
         
         -- numerator register
-        if load_regs='1' <beginfold id='5'>then</beginfold id='5'> 
+        <beginfold id='4'>if</beginfold id='4'> load_regs='1' then 
             rem_reg <= data_a;
         elsif bit_ctr/=8 and sub_num='1' then 
             rem_reg <= rem_reg - denominator;
-        <endfold id='5'>end if;</endfold id='5'>
+        <endfold id='4'>end if;</endfold id='4'>
 
         --- quotient register
-        if load_regs='1' <beginfold id='5'>then</beginfold id='5'>
+        <beginfold id='4'>if</beginfold id='4'> load_regs='1' then
             quot_reg <= (others => '0');
         elsif bit_ctr/=8 then
             quot_reg <= quot_reg(quot_reg'high-1 downto 0) & sub_num;
-        <endfold id='5'>end if;</endfold id='5'>
+        <endfold id='4'>end if;</endfold id='4'>
         
         load_regs <= start;
-    <endfold id='5'>end if;</endfold id='5'>
-<endfold id='4'>end process divider_registers</endfold id='4'>;
+    <endfold id='4'>end if;</endfold id='4'>
+<endfold id='3'>end process divider_registers;</endfold id='3'>
 
 denominator <= b_shift_reg(7 downto 0);
 
@@ -208,14 +208,14 @@ div_ready <= ready;
 ---- Multiplier logic ----------------------------------------------------------
 
 ---- Combinational multiplier -----------------------------
-multiplier_combinational: if not SEQUENTIAL_MULTIPLIER <beginfold id='6'>generate</beginfold id='6'>
+multiplier_combinational: <beginfold id='5'>if</beginfold id='5'> not SEQUENTIAL_MULTIPLIER generate
 
-registered_combinational_multiplier:<beginfold id='4'>process</beginfold id='4'>(clk)
+registered_combinational_multiplier:<beginfold id='3'>process</beginfold id='3'>(clk)
 begin
-    if clk'event and clk='1' <beginfold id='5'>then</beginfold id='5'>
+    <beginfold id='4'>if</beginfold id='4'> clk'event and clk='1' then
         prod_reg <= data_a * data_b; -- t_byte is unsigned
-    <endfold id='5'>end if;</endfold id='5'>
-<endfold id='4'>end process registered_combinational_multiplier</endfold id='4'>;
+    <endfold id='4'>end if;</endfold id='4'>
+<endfold id='3'>end process registered_combinational_multiplier;</endfold id='3'>
 
 -- The multiplier output is valid in the cycle after the operands are loaded,
 -- so by the time MUL is executed it's already done.
@@ -224,16 +224,172 @@ mul_ready <= '1';
 mul_ov_out <= '1' when prod_reg(15 downto 8)/=X"00" else '0';
 prod_out <= prod_reg;
 
-<endfold id='6'>end generate multiplier_combinational</endfold id='6'>;
+<endfold id='5'>end generate multiplier_combinational;</endfold id='5'>
 
 ---- Sequential multiplier --------------------------------
-multiplier_sequential: if SEQUENTIAL_MULTIPLIER <beginfold id='6'>generate</beginfold id='6'>
+multiplier_sequential: <beginfold id='5'>if</beginfold id='5'> SEQUENTIAL_MULTIPLIER generate
 
 assert false
 report "Sequential multiplier implementation not done yet."&
        " Use combinational implementation."
 severity failure;
 
-<endfold id='6'>end generate multiplier_sequential</endfold id='6'>;
+<endfold id='5'>end generate multiplier_sequential;</endfold id='5'>
 
 <endfold id='2'>end sequential;</endfold id='2'>
+
+
+with Types; use Types;
+with Files_Map;
+
+package <beginfold id='6'>p</beginfold id='6'> is
+    type int_ptr is access integer;
+    type rec is <beginfold id='7'>record</beginfold id='7'>
+        value : integer;
+        link  : rec_ptr;
+    <endfold id='7'>end record;</endfold id='7'>
+    type int_vec is array (integer range <>) of integer;
+    type int_vec_ptr is access int_vec;
+    constant def_arr : t_int_array := (0 to 2 => 10);
+<endfold id='1'>end package;</endfold id='1'>
+
+package body <beginfold id='8'>p</beginfold id='8'> is
+    procedure test is
+        variable v : int_ptr;
+        variable i : integer;
+    <endfold id='9'>begin</endfold id='9'>
+        v := null;
+        deallocate(v);
+        v := new integer;
+        v := new integer'(5);
+        v.all := 5;
+        r.all.value := 1;
+        a := new int_vec(1 to 3);
+        a.all(5) := 2;
+        a(1 to 2) := (1, 2);
+        s := new string'("");
+    <endfold id='9'>end procedure;</endfold id='9'>
+
+    procedure test2(x : inout rec_ptr) is
+    <endfold id='9'>begin</endfold id='9'>
+        x.value := x.value + 1;
+    <endfold id='9'>end procedure;</endfold id='9'>
+
+    procedure test3 is
+        type a;
+        type a is access integer;
+        variable v : a;
+    <endfold id='9'>begin</endfold id='9'>
+    <endfold id='9'>end procedure;</endfold id='9'>
+
+    type int_ptr_array is array (integer range <>) of int_ptr;
+
+    procedure tets4 is
+        type bvp is access bit_vector;
+        variable y : int_ptr(1 to 3) := int_ptr'(null);
+    <endfold id='9'>begin</endfold id='9'>
+    <endfold id='9'>end procedure;</endfold id='9'>
+
+    procedure Restore_Origin (Mark : Instance_Index_Type) is
+    <endfold id='9'>begin</endfold id='9'>
+        for I in reverse Mark + 1 .. Prev_Instance_Table.Last <beginfold id='10'>loop</beginfold id='10'>
+            <beginfold id='11'>declare</beginfold id='11'>
+                El : Instance_Entry_Type renames Prev_Instance_Table.Table (I);
+            begin
+                Origin_Table.Table (El.N) := El.Old_Origin;
+            <endfold id='11'>end;</endfold id='11'>
+        <endfold id='10'>end loop;</endfold id='10'>
+        Prev_Instance_Table.Set_Last (Mark);
+    <endfold id='9'>end Restore_Origin;</endfold id='9'>
+
+    --  Instantiate a list.  Simply create a new list and instantiate nodes of
+    --  that list.
+    function Instantiate_Iir_List (L : Iir_List; Is_Ref : Boolean)
+                                    return Iir_List
+    <beginfold id='12'>is</beginfold id='12'>
+        Res : Iir_List;
+        El : Iir;
+    <beginfold id='12'>begin</beginfold id='12'>
+        <beginfold id='13'>case</beginfold id='13'> L is
+            when Null_Iir_List
+            | Iir_List_All <beginfold id='14'>=></beginfold id='14'>
+                return L;
+            <endfold id='14'>when</endfold id='14'> others <beginfold id='14'>=></beginfold id='14'>
+                It := List_Iterate (L);
+                while Is_Valid (It) <beginfold id='10'>loop</beginfold id='10'>
+                    El := Get_Element (It);
+                    Append_Element (Res, Instantiate_Iir (El, Is_Ref));
+                <endfold id='10'>end loop;</endfold id='10'>
+                for I in Flist_First .. Flist_Last (L) <beginfold id='10'>loop</beginfold id='10'>
+                    Set_Nth_Element (Res, I, Instantiate_Iir (El, Is_Ref));
+                <endfold id='10'>end loop;</endfold id='10'>
+                return Res;
+        <endfold id='14'></endfold id='14'><endfold id='13'>end case;</endfold id='13'>
+    <endfold id='12'>end Instantiate_Iir_List;</endfold id='12'>
+<endfold id='1'>end package body;</endfold id='1'>
+
+-- Library bar
+context foo.test_context;
+
+entity <beginfold id='1'>concat</beginfold id='1'> is
+<endfold id='1'>end entity;</endfold id='1'>
+
+entity <beginfold id='1'>foo</beginfold id='1'> is
+    port (
+        x : in my_int );
+<endfold id='1'>end entity;</endfold id='1'>
+
+architecture <beginfold id='2'>t</beginfold id='2'> of concat is
+    type int_array is array (integer range <>) of integer;
+begin
+    <beginfold id='3'>process</beginfold id='3'>
+        variable s : string(1 to 5);
+        variable t : int_array(1 to 2);
+        variable c : bit_vector(1 to 4);
+    begin
+        x := ( 1, 2, 3 );
+        z := x & y;
+        w := 1 & x;
+        s := 'h' & string'("ello");
+        assert "10" = (b(1) & "0");
+        wait;
+    <endfold id='3'>end process;</endfold id='3'>
+
+    function CounterVal(Seconds : integer := 0) return integer <beginfold id='12'>is</beginfold id='12'>
+        variable TotalSeconds : interger;
+    <beginfold id='12'>begin</beginfold id='12'>
+        TotalSeconds := Seconds + Minutes * 60;
+        return TotalSeconds * ClockFrequencyHz -1;
+    <endfold id='12'>end function;</endfold id='12'>
+
+    component <beginfold id='15'>or_entity</beginfold id='15'> is
+    port(
+        input_1: in std_logic;
+        output: out std_logic
+        );
+    <endfold id='15'>end component;</endfold id='15'>
+
+    type enum_type is (a, b, c, ..., z);
+    type int_array is array(3 downto 0) of integer;
+
+    subtype addr_int is integer range 0 to 65535;
+    subtype sub_enum_type is enum_type range a to m;
+<endfold id='2'>end architecture;</endfold id='2'>
+
+architecture <beginfold id='2'>a2</beginfold id='2'> of e is
+    function ">"(a, b: my_int) return boolean;
+begin
+    <beginfold id='3'>process</beginfold id='3'> is
+        variable x, y : my_int;
+    begin
+        assert x > y;
+        assert x < y;                   -- Error
+    <endfold id='3'>end process;</endfold id='3'>
+
+    billowitch_tc586: <beginfold id='16'>block</beginfold id='16'> is
+        type real_cons_vector  is array (15 downto 0) of real;
+        type real_cons_vector_file is file of real_cons_vector;
+        constant C19 : real_cons_vector := (others => 3.0);
+    begin
+    <endfold id='16'>end block;</endfold id='16'>
+<endfold id='2'>end architecture;</endfold id='2'>

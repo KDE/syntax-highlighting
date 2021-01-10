@@ -88,17 +88,17 @@ entity light52_muldiv is
     port(
         clk :                   in std_logic;
         reset :                 in std_logic;
-        
+
         data_a :                in t_byte;
         data_b :                in t_byte;
         start :                 in std_logic;
-        
+
         prod_out :              out t_word;
         quot_out :              out t_byte;
         rem_out :               out t_byte;
         div_ov_out :            out std_logic;
         mul_ov_out :            out std_logic;
-        
+
         mul_ready :             out std_logic;
         div_ready :             out std_logic
     );
@@ -237,3 +237,159 @@ severity failure;
 end generate multiplier_sequential;
 
 end sequential;
+
+
+with Types; use Types;
+with Files_Map;
+
+package p is
+    type int_ptr is access integer;
+    type rec is record
+        value : integer;
+        link  : rec_ptr;
+    end record;
+    type int_vec is array (integer range <>) of integer;
+    type int_vec_ptr is access int_vec;
+    constant def_arr : t_int_array := (0 to 2 => 10);
+end package;
+
+package body p is
+    procedure test is
+        variable v : int_ptr;
+        variable i : integer;
+    begin
+        v := null;
+        deallocate(v);
+        v := new integer;
+        v := new integer'(5);
+        v.all := 5;
+        r.all.value := 1;
+        a := new int_vec(1 to 3);
+        a.all(5) := 2;
+        a(1 to 2) := (1, 2);
+        s := new string'("");
+    end procedure;
+
+    procedure test2(x : inout rec_ptr) is
+    begin
+        x.value := x.value + 1;
+    end procedure;
+
+    procedure test3 is
+        type a;
+        type a is access integer;
+        variable v : a;
+    begin
+    end procedure;
+
+    type int_ptr_array is array (integer range <>) of int_ptr;
+
+    procedure tets4 is
+        type bvp is access bit_vector;
+        variable y : int_ptr(1 to 3) := int_ptr'(null);
+    begin
+    end procedure;
+
+    procedure Restore_Origin (Mark : Instance_Index_Type) is
+    begin
+        for I in reverse Mark + 1 .. Prev_Instance_Table.Last loop
+            declare
+                El : Instance_Entry_Type renames Prev_Instance_Table.Table (I);
+            begin
+                Origin_Table.Table (El.N) := El.Old_Origin;
+            end;
+        end loop;
+        Prev_Instance_Table.Set_Last (Mark);
+    end Restore_Origin;
+
+    --  Instantiate a list.  Simply create a new list and instantiate nodes of
+    --  that list.
+    function Instantiate_Iir_List (L : Iir_List; Is_Ref : Boolean)
+                                    return Iir_List
+    is
+        Res : Iir_List;
+        El : Iir;
+    begin
+        case L is
+            when Null_Iir_List
+            | Iir_List_All =>
+                return L;
+            when others =>
+                It := List_Iterate (L);
+                while Is_Valid (It) loop
+                    El := Get_Element (It);
+                    Append_Element (Res, Instantiate_Iir (El, Is_Ref));
+                end loop;
+                for I in Flist_First .. Flist_Last (L) loop
+                    Set_Nth_Element (Res, I, Instantiate_Iir (El, Is_Ref));
+                end loop;
+                return Res;
+        end case;
+    end Instantiate_Iir_List;
+end package body;
+
+-- Library bar
+context foo.test_context;
+
+entity concat is
+end entity;
+
+entity foo is
+    port (
+        x : in my_int );
+end entity;
+
+architecture t of concat is
+    type int_array is array (integer range <>) of integer;
+begin
+    process
+        variable s : string(1 to 5);
+        variable t : int_array(1 to 2);
+        variable c : bit_vector(1 to 4);
+    begin
+        x := ( 1, 2, 3 );
+        z := x & y;
+        w := 1 & x;
+        s := 'h' & string'("ello");
+        assert "10" = (b(1) & "0");
+        wait;
+    end process;
+
+    function CounterVal(Seconds : integer := 0) return integer is
+        variable TotalSeconds : interger;
+    begin
+        TotalSeconds := Seconds + Minutes * 60;
+        return TotalSeconds * ClockFrequencyHz -1;
+    end function;
+
+    component or_entity is
+    port(
+        input_1: in std_logic;
+        output: out std_logic
+        );
+    end component;
+
+    type enum_type is (a, b, c, ..., z);
+    type int_array is array(3 downto 0) of integer;
+
+    subtype addr_int is integer range 0 to 65535;
+    subtype sub_enum_type is enum_type range a to m;
+end architecture;
+
+architecture a2 of e is
+    function ">"(a, b: my_int) return boolean;
+begin
+    process is
+        variable x, y : my_int;
+    begin
+        assert x > y;
+        assert x < y;                   -- Error
+    end process;
+
+    billowitch_tc586: block is
+        type real_cons_vector  is array (15 downto 0) of real;
+        type real_cons_vector_file is file of real_cons_vector;
+        constant C19 : real_cons_vector := (others => 3.0);
+    begin
+    end block;
+end architecture;

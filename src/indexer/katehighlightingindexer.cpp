@@ -1041,63 +1041,84 @@ private:
                 // ^ without |
                 // (^sas*) -> ok
                 // (^sa|s*) -> ko
+                // (^(sa|s*)) -> ok
                 auto first = qAsConst(reg).begin();
                 auto last = qAsConst(reg).end();
                 int depth = 0;
-                for (; first != last; ++last) {
-                    if (QLatin1Char('(') == *first) {
-                        ++depth;
-                        if (*first == QLatin1Char('?') || first[1] == QLatin1Char(':')) {
-                            first += 2;
-                        }
+
+                while (QLatin1Char('(') == *first) {
+                    ++depth;
+                    ++first;
+                    if (QLatin1Char('?') == *first || QLatin1Char(':') == first[1]) {
+                        first += 2;
                     }
-                    else if (QLatin1Char('^') == *first) {
-                        int bol = depth;
-                        bool isSubBol = depth;
-                        bool replace = true;
+                }
 
-                        while (++first != last) {
-                            if (QLatin1Char('(') == *first) {
-                                ++depth;
-                            }
-                            else if (QLatin1Char(')') == *first) {
-                                --depth;
-                                if (depth == bol && isSubBol) {
-                                    if (depth) {
-                                        --bol;
-                                        isSubBol = bol;
-                                    }
+                if (QLatin1Char('^') == *first) {
+                    const int bolDepth = depth;
+                    bool replace = true;
 
-                                    // (^a)? === (^a|) -> ko
-                                    if (first + 1 != last && QStringLiteral("*?").contains(first[1])) {
-                                        replace = false;
-                                        break;
-                                    }
-                                }
-                            }
-                            else if (QLatin1Char('|') == *first) {
-                                // ignore '|' within subgroup
-                                if (depth <= bol) {
+                    while (++first != last) {
+                        if (QLatin1Char('(') == *first) {
+                            ++depth;
+                        }
+                        else if (QLatin1Char(')') == *first) {
+                            --depth;
+                            if (depth < bolDepth) {
+                                // (^a)? === (^a|) -> ko
+                                if (first + 1 != last && QStringLiteral("*?").contains(first[1])) {
                                     replace = false;
                                     break;
                                 }
                             }
                         }
-
-                        if (replace) {
-                            qWarning() << filename << "line" << rule.line << "column=\"0\" or firstNonSpace=\"1\" missing with RegExpr:" << rule.string;
-                            return false;
+                        else if (QLatin1Char('|') == *first) {
+                            // ignore '|' within subgroup
+                            if (depth <= bolDepth) {
+                                replace = false;
+                                break;
+                            }
                         }
                     }
-                    break;
+
+                    if (replace) {
+                        qWarning() << filename << "line" << rule.line << "column=\"0\" or firstNonSpace=\"1\" missing with RegExpr:" << rule.string;
+                        return false;
+                    }
                 }
             }
 
             // detection of unnecessary capture
-#if 0
             if (regexp.captureCount()) {
-                int max = std::min(regexp.captureCount(), 9);
-                int min = max;
+                auto maximalCapture = [](const QString (&referenceNames)[9], const QString &s){
+                    int maxCapture = 9;
+                    while (maxCapture && !s.contains(referenceNames[maxCapture-1])) {
+                        --maxCapture;
+                    }
+                    return maxCapture;
+                };
+
+                int maxCaptureUsed = 0;
+                // maximal dynamic reference
+                if (rule.context.context && !rule.context.stay) {
+                    for (const auto &nextRule : rule.context.context->rules) {
+                        if (nextRule.dynamic == XmlBool::True) {
+                            static const QString cap[] {
+                                QStringLiteral("%1"),
+                                QStringLiteral("%2"),
+                                QStringLiteral("%3"),
+                                QStringLiteral("%4"),
+                                QStringLiteral("%5"),
+                                QStringLiteral("%6"),
+                                QStringLiteral("%7"),
+                                QStringLiteral("%8"),
+                                QStringLiteral("%9"),
+                            };
+                            int maxDynamicCapture = maximalCapture(cap, nextRule.string);
+                            maxCaptureUsed = std::max(maxCaptureUsed, maxDynamicCapture);
+                        }
+                    }
+                }
 
                 static const QString num1[] {
                     QStringLiteral("\\1"),
@@ -1121,60 +1142,15 @@ private:
                     QStringLiteral("\\g8"),
                     QStringLiteral("\\g9"),
                 };
-                // minimal back capture
-                while (min
-                    && !rule.string.contains(num1[min-1])
-                    && !rule.string.contains(num2[min-1])
-                ) {
-                    --min;
-                }
+                const int maxBackReference = std::max(maximalCapture(num1, rule.string), maximalCapture(num1, rule.string));
 
-                // minimal dynamic reference
-                if (min != max && rule.context.context && !rule.context.stay) {
-                    auto maximumCapture = [max](const QString &s){
-                        static const QString cap[] {
-                            QStringLiteral("%1"),
-                            QStringLiteral("%2"),
-                            QStringLiteral("%3"),
-                            QStringLiteral("%4"),
-                            QStringLiteral("%5"),
-                            QStringLiteral("%6"),
-                            QStringLiteral("%7"),
-                            QStringLiteral("%8"),
-                            QStringLiteral("%9"),
-                        };
-                        int min = max;
-                        while (min && !s.contains(cap[min-1])) {
-                            --min;
-                        }
-                        return min;
-                    };
+                const int maxCapture = std::max(maxCaptureUsed, maxBackReference);
 
-                    for (const auto &nextRule : rule.context.context->rules) {
-                        if (nextRule.dynamic == XmlBool::True) {
-                            min = std::max(min, maximumCapture(nextRule.string));
-                        }
-                        else {
-                            for (const auto &includedRule : nextRule.includedRules) {
-                                if (includedRule->dynamic == XmlBool::True) {
-                                    min = std::max(min, maximumCapture(includedRule->string));
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (min != max) {
-                    if (min == 0) {
-                        qWarning() << filename << "line" << rule.line << "RegExpr with a capture, but does not refer to any dynamic rules. Please, replace '(...)' with '(?:...)':" << rule.string;
-                    }
-                    else {
-                        qWarning() << filename << "line" << rule.line << "RegExpr with" << max << " capture but only" << min << "are used. Please, replace '(...)' with '(?:...)':" << rule.string;
-                    }
+                if (maxCapture && regexp.captureCount() > maxCapture) {
+                    qWarning() << filename << "line" << rule.line << "RegExpr with" << regexp.captureCount() << "captures but only" << maxCapture << "are used. Please, replace '(...)' with '(?:...)':" << rule.string;
                     return false;
                 }
             }
-#endif
         }
 
         return true;
@@ -1216,6 +1192,7 @@ private:
     bool checkRegularExpression(const QString &filename, const QRegularExpression &regexp, int line) const
     {
         const auto pattern = regexp.pattern();
+
         // validate regexp
         if (!regexp.isValid()) {
             qWarning() << filename << "line" << line << "broken regex:" << pattern << "problem:" << regexp.errorString() << "at offset" << regexp.patternErrorOffset();

@@ -16,6 +16,7 @@ echo 'single quoted string'
 echo "double quoted string"
 echo $'string with esc\apes\x0din it'
 echo $"string meant to be translated"
+echo "$"
 
 
 # comments:

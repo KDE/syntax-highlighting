@@ -331,6 +331,7 @@ static float floatQualifier = 0xf.p-1f;
 60.min;
 60.3min;
 0x1ffp10min;
+2us
 2d; // c++20
 23._f
 23._fd

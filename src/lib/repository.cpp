@@ -150,7 +150,7 @@ Theme Repository::themeForPalette(const QPalette &palette)
     QVector<KSyntaxHighlighting::Theme> matchingThemes;
     for (const auto &theme : themes) {
         const auto background = theme.editorColor(KSyntaxHighlighting::Theme::EditorColorRole::BackgroundColor);
-        if (background == base.rgba()) {
+        if (background == base.rgb()) {
             matchingThemes.append(theme);
         }
     }

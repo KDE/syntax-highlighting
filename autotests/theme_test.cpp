@@ -130,34 +130,34 @@ private Q_SLOTS:
         QVERIFY(t.isReadOnly());
 
         // make sure all editor colors are properly read
-        QCOMPARE(t.editorColor(Theme::BackgroundColor), QColor("#ffffff").rgb());
-        QCOMPARE(t.editorColor(Theme::TextSelection), QColor("#94caef").rgb());
-        QCOMPARE(t.editorColor(Theme::CurrentLine), QColor("#f8f7f6").rgb());
-        QCOMPARE(t.editorColor(Theme::SearchHighlight), QColor("#ffff00").rgb());
-        QCOMPARE(t.editorColor(Theme::ReplaceHighlight), QColor("#00ff00").rgb());
-        QCOMPARE(t.editorColor(Theme::BracketMatching), QColor("#ffff00").rgb());
-        QCOMPARE(t.editorColor(Theme::TabMarker), QColor("#d2d2d2").rgb());
-        QCOMPARE(t.editorColor(Theme::SpellChecking), QColor("#bf0303").rgb());
-        QCOMPARE(t.editorColor(Theme::IndentationLine), QColor("#d2d2d2").rgb());
-        QCOMPARE(t.editorColor(Theme::IconBorder), QColor("#f0f0f0").rgb());
-        QCOMPARE(t.editorColor(Theme::CodeFolding), QColor("#94caef").rgb());
-        QCOMPARE(t.editorColor(Theme::LineNumbers), QColor("#a0a0a0").rgb());
-        QCOMPARE(t.editorColor(Theme::CurrentLineNumber), QColor("#1e1e1e").rgb());
-        QCOMPARE(t.editorColor(Theme::WordWrapMarker), QColor("#ededed").rgb());
-        QCOMPARE(t.editorColor(Theme::ModifiedLines), QColor("#fdbc4b").rgb());
-        QCOMPARE(t.editorColor(Theme::SavedLines), QColor("#2ecc71").rgb());
-        QCOMPARE(t.editorColor(Theme::Separator), QColor("#d5d5d5").rgb());
-        QCOMPARE(t.editorColor(Theme::MarkBookmark), QColor("#0000ff").rgb());
-        QCOMPARE(t.editorColor(Theme::MarkBreakpointActive), QColor("#ff0000").rgb());
-        QCOMPARE(t.editorColor(Theme::MarkBreakpointReached), QColor("#ffff00").rgb());
-        QCOMPARE(t.editorColor(Theme::MarkBreakpointDisabled), QColor("#ff00ff").rgb());
-        QCOMPARE(t.editorColor(Theme::MarkExecution), QColor("#a0a0a4").rgb());
-        QCOMPARE(t.editorColor(Theme::MarkWarning), QColor("#00ff00").rgb());
-        QCOMPARE(t.editorColor(Theme::MarkError), QColor("#ff0000").rgb());
-        QCOMPARE(t.editorColor(Theme::TemplateBackground), QColor("#d6d2d0").rgb());
-        QCOMPARE(t.editorColor(Theme::TemplatePlaceholder), QColor("#baf8ce").rgb());
-        QCOMPARE(t.editorColor(Theme::TemplateFocusedPlaceholder), QColor("#76da98").rgb());
-        QCOMPARE(t.editorColor(Theme::TemplateReadOnlyPlaceholder), QColor("#f6e6e6").rgb());
+        QCOMPARE(t.editorColor(Theme::BackgroundColor), QColor("#ffffff").rgba());
+        QCOMPARE(t.editorColor(Theme::TextSelection), QColor("#94caef").rgba());
+        QCOMPARE(t.editorColor(Theme::CurrentLine), QColor("#f8f7f6").rgba());
+        QCOMPARE(t.editorColor(Theme::SearchHighlight), QColor("#ffff00").rgba());
+        QCOMPARE(t.editorColor(Theme::ReplaceHighlight), QColor("#00ff00").rgba());
+        QCOMPARE(t.editorColor(Theme::BracketMatching), QColor("#ffff00").rgba());
+        QCOMPARE(t.editorColor(Theme::TabMarker), QColor("#d2d2d2").rgba());
+        QCOMPARE(t.editorColor(Theme::SpellChecking), QColor("#bf0303").rgba());
+        QCOMPARE(t.editorColor(Theme::IndentationLine), QColor("#d2d2d2").rgba());
+        QCOMPARE(t.editorColor(Theme::IconBorder), QColor("#f0f0f0").rgba());
+        QCOMPARE(t.editorColor(Theme::CodeFolding), QColor("#94caef").rgba());
+        QCOMPARE(t.editorColor(Theme::LineNumbers), QColor("#a0a0a0").rgba());
+        QCOMPARE(t.editorColor(Theme::CurrentLineNumber), QColor("#1e1e1e").rgba());
+        QCOMPARE(t.editorColor(Theme::WordWrapMarker), QColor("#ededed").rgba());
+        QCOMPARE(t.editorColor(Theme::ModifiedLines), QColor("#fdbc4b").rgba());
+        QCOMPARE(t.editorColor(Theme::SavedLines), QColor("#2ecc71").rgba());
+        QCOMPARE(t.editorColor(Theme::Separator), QColor("#d5d5d5").rgba());
+        QCOMPARE(t.editorColor(Theme::MarkBookmark), QColor("#0000ff").rgba());
+        QCOMPARE(t.editorColor(Theme::MarkBreakpointActive), QColor("#ff0000").rgba());
+        QCOMPARE(t.editorColor(Theme::MarkBreakpointReached), QColor("#ffff00").rgba());
+        QCOMPARE(t.editorColor(Theme::MarkBreakpointDisabled), QColor("#ff00ff").rgba());
+        QCOMPARE(t.editorColor(Theme::MarkExecution), QColor("#a0a0a4").rgba());
+        QCOMPARE(t.editorColor(Theme::MarkWarning), QColor("#00ff00").rgba());
+        QCOMPARE(t.editorColor(Theme::MarkError), QColor("#ff0000").rgba());
+        QCOMPARE(t.editorColor(Theme::TemplateBackground), QColor("#d6d2d0").rgba());
+        QCOMPARE(t.editorColor(Theme::TemplatePlaceholder), QColor("#baf8ce").rgba());
+        QCOMPARE(t.editorColor(Theme::TemplateFocusedPlaceholder), QColor("#76da98").rgba());
+        QCOMPARE(t.editorColor(Theme::TemplateReadOnlyPlaceholder), QColor("#f6e6e6").rgba());
     }
 
     void testInvalidTheme()

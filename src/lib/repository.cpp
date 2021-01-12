@@ -150,7 +150,7 @@ Theme Repository::themeForPalette(const QPalette &palette)
     QVector<KSyntaxHighlighting::Theme> matchingThemes;
     for (const auto &theme : themes) {
         const auto background = theme.editorColor(KSyntaxHighlighting::Theme::EditorColorRole::BackgroundColor);
-        if (background == base.rgb()) {
+        if (background == base.rgba()) {
             matchingThemes.append(theme);
         }
     }
@@ -159,7 +159,7 @@ Theme Repository::themeForPalette(const QPalette &palette)
         const auto highlight = palette.color(QPalette::Highlight);
         for (const auto &theme : qAsConst(matchingThemes)) {
             auto selection = theme.editorColor(KSyntaxHighlighting::Theme::EditorColorRole::TextSelection);
-            if (selection == highlight.rgb()) {
+            if (selection == highlight.rgba()) {
                 return theme;
             }
         }

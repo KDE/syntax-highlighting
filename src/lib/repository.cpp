@@ -159,7 +159,7 @@ Theme Repository::themeForPalette(const QPalette &palette)
         const auto highlight = palette.color(QPalette::Highlight);
         for (const auto &theme : qAsConst(matchingThemes)) {
             auto selection = theme.editorColor(KSyntaxHighlighting::Theme::EditorColorRole::TextSelection);
-            if (selection == highlight.rgba()) {
+            if (selection == highlight.rgb()) {
                 return theme;
             }
         }

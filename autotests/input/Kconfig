@@ -201,3 +201,152 @@ endif # error
 
 # next line caused hang, see https://phabricator.kde.org/D18509
 menu
+
+# the next lines should all be fine
+plain:=plain_value
+ 	 with_whitespace 	:= 	 plain value whitespace
+value_with_expansion		:= $(ARCH)
+plain_expansion_mix		:= Linux/$(ARCH) $(KERNELVERSION) Kernel Configuration
+
+# function definition
+cc-option-bit 			= $(if-success,$(CC) -Werror $(1) -E -x c /dev/null -o /dev/null,$(1))
+
+# function call
+$(cc-option-bit,-m64)
+
+# function call and storing the result
+m32-flag			:= $(cc-option-bit,-m32)
+
+# call to known function
+name				:= $(filename)
+
+# call to known function with arguments
+$(warning-if,y,hello world 1)
+
+# ... with nested expansions
+$(error-if,$(success, $(LD) -v | grep -q gold), gold linker '$(LD)' not supported)
+
+# expansion in different contexts
+config FOO_$(BAR$(BAZ))
+	int "$(filename)"
+	default $(lineno) if $(lineno) >= 5
+
+menu "A MENU"
+visible if 01 > 00
+
+config A_BOOL
+	def_bool y && m || !!(!(!!n)) || "$(foo)"
+
+endmenu
+
+# Advanced real world example taken from init/Kconfig in Linux 5.10:
+# Invoke the system shell /bin/sh with a command to pipe a C program with an
+# asm goto statement to the C compiler that is set by the environment. If the
+# exit code is 0 then set the default value of CC_HAS_ASM_GOTO_OUTPUT to y,
+# otherwise to n.
+config CC_HAS_ASM_GOTO_OUTPUT
+	depends on CC_HAS_ASM_GOTO
+	def_bool $(success,echo 'int foo(int x) { asm goto ("": "=r"(x) ::: bar); return x; bar: return 0; }' | $(CC) -x c - -c -o /dev/null)
+
+# Real world example with irregular indentation
+config W1_MASTER_DS2490
+	tristate "DS2490 USB <-> W1 transport layer for 1-wire"
+  	depends on USB
+  	help
+	  Say Y here if you want to have a driver for DS2490 based USB <-> W1 bridges,
+	  for example DS9490*.
+
+  	  This support is also available as a module.  If so, the module
+	  will be called ds2490.
+
+# synthetic example
+to_upper=$(shell,echo $(1) | tr [:lower:] [:upper:])
+
+config ARGS_$(to_upper,$(CC))
+	string "Arguments for the current compiler \"$(CC)\""
+	help
+	  This is a bad idea.
+	  See <file:Documentation/completely/made-up.rst>
+
+# binary operator in expression of an if statement
+if CPU_SUPPORTS_CPUFREQ && MIPS_EXTERNAL_TIMER
+source "drivers/cpufreq/Kconfig"
+endif
+
+# alert on characters (here a colon) that are ignored (taken from axTLS 2.1.5)
+config CONFIG_LUA_CORE
+    string "Location of Lua CORE"
+    default "/usr/local"
+    help:
+        If the Lua exists on another directory then this needs to be changed
+
+comment "Comment texts know expansions, too: $(CC), and the depends property:"
+	depends on A_BOOL
+
+# "boolean" is now a free variable name ...
+boolean=foo
+# ... but it looks like a bad idea. This may be disputed.
+
+# the three modern options
+config OPTIONS
+	option allnoconfig_y
+	option modules
+	option defconfig_list
+
+# old option "env" and obsolete custom options
+config OPTIONS
+	option env=ARCH
+	option custom-without-argument
+	option custom-with-argument=ABC
+
+# old syntax
+menu OLD_STYLE_PROMPT
+visible if CPU_SUPPORTS_CPUFREQ
+
+# busybox 1.31.1
+source libbb/Config.in
+
+# uClibc-ng-1.0.37
+config DESIRED_TARGET_ARCH
+	string
+	option env="ARCH"
+
+config OLD_HELP
+	hex
+	---help---
+		old help property
+	default 0x1CEC0FEE
+endmenu
+
+# a few errors
+allnoconfig_y
+bool
+def_bool
+def_tristate
+default
+defconfig_list
+depends
+endchoice
+endif
+help
+hex
+imply
+int
+mainmenu
+modules
+on
+option
+optional
+prompt
+range
+select
+string
+tristate
+visible
+
+config OK
+    bool "still OK"
+    help
+        still OK
+now=fail
+andNow=OK

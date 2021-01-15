@@ -104,7 +104,7 @@ endif()
 #
 # CMake package config file generation
 #
-set(CMAKECONFIG_INSTALL_DIR "${CMAKECONFIG_INSTALL_PREFIX}/KF5SyntaxHighlighting")
+set(CMAKECONFIG_INSTALL_DIR "${KDE_INSTALL_CMAKEPACKAGEDIR}/KF5SyntaxHighlighting")
 
 if (BUILD_QCH)
     ecm_install_qch_export(

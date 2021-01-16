@@ -30,7 +30,7 @@
         <!ENTITY heredocq "(?|&quot;([^&quot;]+)&quot;|'([^']+)'|\\(.[^&wordseps;&substseps;]*))">
 ]>
 
-<language name="Bash" version="21" kateversion="5.62" section="Scripts" extensions="*.sh;*.bash;*.ebuild;*.eclass;*.nix;.bashrc;.bash_profile;.bash_login;.profile;PKGBUILD;APKBUILD" mimetype="application/x-shellscript" casesensitive="1" author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL">
+<language name="Bash" version="22" kateversion="5.62" section="Scripts" extensions="*.sh;*.bash;*.ebuild;*.eclass;*.nix;.bashrc;.bash_profile;.bash_login;.profile;PKGBUILD;APKBUILD" mimetype="application/x-shellscript" casesensitive="1" author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL">
 
 <!-- (c) 2004 by Wilbert Berendsen (wilbert@kde.nl)
     Changes by Matthew Woehlke (mw_triad@users.sourceforge.net)
@@ -993,16 +993,19 @@
 
       <!-- VarBraceStart is called as soon as ${ is encoutered -->
       <context attribute="Variable" lineEndContext="#pop!VarBrace" name="VarBraceStart" fallthroughContext="#pop!VarBrace">
-        <DetectChar attribute="Parameter Expansion" context="#pop!VarBracePrefix" char="!"/>
-        <DetectChar attribute="Parameter Expansion" context="#pop!VarBrace" char="#"/>
+        <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarBracePrefix" char="!"/>
+        <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarBrace" char="#"/>
       </context>
 
       <!-- VarBracePrefix called as soon as ${! is encoutered -->
       <context attribute="Variable" lineEndContext="#pop" name="VarBracePrefix">
         <RegExpr attribute="Variable" context="#pop!VarBracePrefixSuffix" String="&varname;"/>
       </context>
-      <context attribute="Variable" lineEndContext="#pop" name="VarBracePrefixSuffix">
-        <DetectChar attribute="Variable" context="#pop" char="}"/>
+      <context attribute="Variable" lineEndContext="#pop" name="VarBracePrefixSuffix" fallthroughContext="#pop!VarError">
+        <DetectChar attribute="Parameter Expansion" context="#pop" char="}"/>
+        <AnyChar attribute="Parameter Expansion Operator" context="#stay" String="@*"/>
+        <StringDetect attribute="Parameter Expansion Operator" context="#stay" String="[@]"/>
+        <StringDetect attribute="Parameter Expansion Operator" context="#stay" String="[*]"/>
       </context>
 
       <!-- VarBrace is called as soon as ${ or ${# are encoutered -->

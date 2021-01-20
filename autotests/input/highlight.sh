@@ -460,3 +460,10 @@ case a in
   # no pattern
   (b$c)
 esac
+
+case "$1" in
+ "a") run_a|&a;;
+ "b") run_b;;
+ "c") run_c;;
+ *) echo "Plase choose between 'a', 'b' or 'c'" && exit 1;;
+esac

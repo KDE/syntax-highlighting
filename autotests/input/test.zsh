@@ -777,6 +777,13 @@ case a in
   (b$c)
 esac
 
+case "$1" in
+ "a") run_a|&a;;
+ "b") run_b;;
+ "c") run_c;;
+ *) echo "Plase choose between 'a', 'b' or 'c'" && exit 1;;
+esac
+
 case $ans in
  1|a) sdba $key;;
  2|f) sdbf $key;;

@@ -97,12 +97,17 @@ private Q_SLOTS:
         QVERIFY(!f.hasBackgroundColor(t));
         QVERIFY(f.id() > 0);
 
-        // visually identical to normal text
+        // visually identical to normal text with Printing theme
         f = collector.formatMap.value(QLatin1String("Symbol"));
         QVERIFY(f.isValid());
         QCOMPARE(f.textStyle(), Theme::Operator);
-        QVERIFY(f.isDefaultTextStyle(t));
-        QVERIFY(!f.hasTextColor(t));
+        if (themeName == QLatin1String("Printing")) {
+            QVERIFY(f.isDefaultTextStyle(t));
+            QVERIFY(!f.hasTextColor(t));
+        } else {
+            QVERIFY(!f.isDefaultTextStyle(t));
+            QVERIFY(f.hasTextColor(t));
+        }
         QVERIFY(f.id() > 0);
 
         // visually different to normal text

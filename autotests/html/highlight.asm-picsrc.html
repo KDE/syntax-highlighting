@@ -6,8 +6,8 @@
 </head><body style="background-color:#ffffff;color:#1f1c1b"><pre>
                 <span style="color:#898887;">; Blank line</span>
 <span style="color:#644a9b;">loop</span>  <span style="font-weight:bold;">sleep</span>     <span style="color:#898887;">; Label and operation</span>
-      <span style="font-weight:bold;">incf</span> <span style="color:#b08000;">6</span>,<span style="color:#b08000;">1</span>  <span style="color:#898887;">; Operation with 2 parameters</span>
-      <span style="font-weight:bold;">goto</span> loop <span style="color:#898887;">; Operation with 1 parameter</span>
+      <span style="font-weight:bold;">incf</span> <span style="color:#b08000;">6</span><span style="color:#bf0303;">,</span><span style="color:#b08000;">1</span>  <span style="color:#898887;">; Operation with 2 parameters</span>
+      <span style="color:#f67400;font-weight:bold;">goto</span> loop <span style="color:#898887;">; Operation with 1 parameter</span>
 
 <span style="color:#006e28;">#define</span> X Y
 <span style="color:#006e28;">#</span><span style="color:#bf0303;text-decoration:underline;">defin</span> <span style="color:#898887;">; incomplete</span>
@@ -15,9 +15,9 @@
 
 <span style="color:#644a9b;">number</span> <span style="color:#006e28;">equ</span> <span style="color:#b08000;">5</span>
 
-<span style="color:#644a9b;">label_</span><span style="color:#924c9d;">#v</span>((number + <span style="color:#b08000;">1</span>) * <span style="color:#b08000;">5</span>)<span style="color:#644a9b;">_suffix</span> <span style="color:#006e28;">equ</span> <span style="color:#b08000;">0x</span><span style="color:#b08000;">10</span>
+<span style="color:#644a9b;">label_</span><span style="color:#924c9d;">#v</span><span style="color:#bf0303;">((</span>number <span style="color:#bf0303;">+</span> <span style="color:#b08000;">1</span><span style="color:#bf0303;">)</span> <span style="color:#bf0303;">*</span> <span style="color:#b08000;">5</span><span style="color:#bf0303;">)</span><span style="color:#644a9b;">_suffix</span> <span style="color:#006e28;">equ</span> <span style="color:#b08000;">0x</span><span style="color:#b08000;">10</span>
 
-<span style="color:#006e28;">db</span> <span style="color:#b08000;">.</span><span style="color:#b08000;">34</span>,<span style="color:#b08000;">O'</span><span style="color:#b08000;">35</span><span style="color:#b08000;">'</span>,<span style="color:#b08000;">O'</span><span style="color:#bf0303;text-decoration:underline;">9</span>3',<span style="color:#b08000;">0x</span><span style="color:#b08000;">Af</span>,<span style="color:#b08000;">0x</span><span style="color:#b08000;">ad</span><span style="color:#bf0303;text-decoration:underline;">y</span>,<span style="color:#924c9d;">a'a'</span>,<span style="color:#924c9d;">a'a</span><span style="color:#bf0303;text-decoration:underline;">p</span>,<span style="color:#924c9d;">A'\'</span>
+<span style="color:#006e28;">db</span> <span style="color:#b08000;">.</span><span style="color:#b08000;">34</span><span style="color:#bf0303;">,</span><span style="color:#b08000;">O'</span><span style="color:#b08000;">35</span><span style="color:#b08000;">'</span><span style="color:#bf0303;">,</span><span style="color:#b08000;">O'</span><span style="color:#bf0303;text-decoration:underline;">9</span>3'<span style="color:#bf0303;">,</span><span style="color:#b08000;">0x</span><span style="color:#b08000;">Af</span><span style="color:#bf0303;">,</span><span style="color:#b08000;">0x</span><span style="color:#b08000;">ad</span><span style="color:#bf0303;text-decoration:underline;">y</span><span style="color:#bf0303;">,</span><span style="color:#924c9d;">a'a'</span><span style="color:#bf0303;">,</span><span style="color:#924c9d;">a'a</span><span style="color:#bf0303;text-decoration:underline;">p</span><span style="color:#bf0303;">,</span><span style="color:#924c9d;">A'\'</span>
 
 <span style="color:#644a9b;">any</span>   <span style="color:#006e28;">macro</span> parm
       <span style="font-weight:bold;">movlw</span> parm
@@ -27,41 +27,41 @@
 <span style="color:#898887;">; Shift reg left</span>
 <span style="color:#644a9b;">slf</span>   <span style="color:#006e28;">macro</span> reg
       <span style="color:#000000;font-weight:bold;font-style:italic;">clrc</span>
-      <span style="font-weight:bold;">rlf</span>   reg,f
+      <span style="font-weight:bold;">rlf</span>   reg<span style="color:#bf0303;">,</span>f
 <span style="color:#006e28;">endm</span>
 
 <span style="color:#898887;">; Scale W by “factor”. Result in “reg”, W unchanged.</span>
-<span style="color:#644a9b;">scale</span> <span style="color:#006e28;">macro</span> reg, factor
-      <span style="color:#006e28;">if</span> (factor == <span style="color:#b08000;">1</span>)
+<span style="color:#644a9b;">scale</span> <span style="color:#006e28;">macro</span> reg<span style="color:#bf0303;">,</span> factor
+      <span style="color:#006e28;">if</span> <span style="color:#bf0303;">(</span>factor <span style="color:#bf0303;">==</span> <span style="color:#b08000;">1</span><span style="color:#bf0303;">)</span>
           <span style="font-weight:bold;">movwf</span> reg                <span style="color:#898887;">; 1 X is easy</span>
       <span style="color:#006e28;">else</span>
-          scale reg, (factor / <span style="color:#b08000;">2</span>)  <span style="color:#898887;">; W * (factor / 2)</span>
-          slf   reg,f              <span style="color:#898887;">; double reg</span>
-          <span style="color:#006e28;">if</span> ((factor &amp; <span style="color:#b08000;">1</span>) == <span style="color:#b08000;">1</span>)   <span style="color:#898887;">; if lo-bit set ..</span>
-              <span style="font-weight:bold;">addwf</span> reg,f          <span style="color:#898887;">; .. add W to reg</span>
+          scale reg<span style="color:#bf0303;">,</span> <span style="color:#bf0303;">(</span>factor <span style="color:#bf0303;">/</span> <span style="color:#b08000;">2</span><span style="color:#bf0303;">)</span>  <span style="color:#898887;">; W * (factor / 2)</span>
+          slf   reg<span style="color:#bf0303;">,</span>f              <span style="color:#898887;">; double reg</span>
+          <span style="color:#006e28;">if</span> <span style="color:#bf0303;">((</span>factor <span style="color:#bf0303;">&amp;</span> <span style="color:#b08000;">1</span><span style="color:#bf0303;">)</span> <span style="color:#bf0303;">==</span> <span style="color:#b08000;">1</span><span style="color:#bf0303;">)</span>   <span style="color:#898887;">; if lo-bit set ..</span>
+              <span style="font-weight:bold;">addwf</span> reg<span style="color:#bf0303;">,</span>f          <span style="color:#898887;">; .. add W to reg</span>
           <span style="color:#006e28;">endif</span>
       <span style="color:#006e28;">endif</span>
 <span style="color:#006e28;">endm</span>
 
-      scale tmp,<span style="color:#b08000;">D'</span><span style="color:#b08000;">10</span><span style="color:#b08000;">'</span>
+      scale tmp<span style="color:#bf0303;">,</span><span style="color:#b08000;">D'</span><span style="color:#b08000;">10</span><span style="color:#b08000;">'</span>
 
       <span style="font-weight:bold;">movwf</span>  tmp
       <span style="color:#000000;font-weight:bold;font-style:italic;">clrc</span>
-      <span style="font-weight:bold;">rlf</span>    tmp,f
-      <span style="font-weight:bold;">addwf</span>  tmp,f
+      <span style="font-weight:bold;">rlf</span>    tmp<span style="color:#bf0303;">,</span>f
+      <span style="font-weight:bold;">addwf</span>  tmp<span style="color:#bf0303;">,</span>f
 
 <span style="color:#644a9b;">spin</span>  <span style="color:#006e28;">macro</span>  n
       <span style="font-weight:bold;">movlw</span>  n
       <span style="font-weight:bold;">addlw</span>  <span style="color:#b08000;">0x</span><span style="color:#b08000;">ff</span>
-      <span style="font-weight:bold;">btfss</span>  STATUS,Z
-      <span style="font-weight:bold;">goto</span>   $-<span style="color:#b08000;">2</span>
+      <span style="font-weight:bold;">btfss</span>  STATUS<span style="color:#bf0303;">,</span>Z
+      <span style="color:#f67400;font-weight:bold;">goto</span>   $<span style="color:#bf0303;">-</span><span style="color:#b08000;">2</span>
 <span style="color:#006e28;">endm</span>
 
-<span style="color:#644a9b;">LOOP</span>: <span style="font-weight:bold;">BTFSS</span> flag,<span style="color:#b08000;">0x</span><span style="color:#b08000;">00</span>
-      <span style="font-weight:bold;">GOTO</span> LOOP
+<span style="color:#644a9b;">LOOP</span><span style="color:#bf0303;">:</span> <span style="font-weight:bold;">BTFSS</span> flag<span style="color:#bf0303;">,</span><span style="color:#b08000;">0x</span><span style="color:#b08000;">00</span>
+      <span style="color:#f67400;font-weight:bold;">GOTO</span> LOOP
 
       
-      <span style="font-weight:bold;">BTFSS</span> flag,<span style="color:#b08000;">0x</span><span style="color:#b08000;">00</span>
-      <span style="font-weight:bold;">GOTO</span> $ - <span style="color:#b08000;">1</span>
+      <span style="font-weight:bold;">BTFSS</span> flag<span style="color:#bf0303;">,</span><span style="color:#b08000;">0x</span><span style="color:#b08000;">00</span>
+      <span style="color:#f67400;font-weight:bold;">GOTO</span> $ <span style="color:#bf0303;">-</span> <span style="color:#b08000;">1</span>
 
 </pre></body></html>

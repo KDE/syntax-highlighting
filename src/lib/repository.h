@@ -210,12 +210,29 @@ public:
     /**
      * Returns a default theme instance of the given type.
      * The returned Theme is guaranteed to be a valid theme.
+     * @since 5.79
+     */
+    Theme defaultTheme(DefaultTheme t = LightTheme) const;
+
+    /**
+     * Returns a default theme instance of the given type.
+     * The returned Theme is guaranteed to be a valid theme.
+     *
+     * KF6: remove in favor of const variant
      */
     Theme defaultTheme(DefaultTheme t = LightTheme);
 
     /**
      * Returns the best matching theme for the given palette
+     * @since 5.79
+     **/
+    Theme themeForPalette(const QPalette &palette) const;
+
+    /**
+     * Returns the best matching theme for the given palette
      * @since 5.77
+     *
+     * KF6: remove in favor of const variant
      **/
     Theme themeForPalette(const QPalette &palette);
 

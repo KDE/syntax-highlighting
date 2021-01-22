@@ -134,14 +134,19 @@ Theme Repository::theme(const QString &themeName) const
     return Theme();
 }
 
-Theme Repository::defaultTheme(Repository::DefaultTheme t)
+Theme Repository::defaultTheme(Repository::DefaultTheme t) const
 {
     if (t == DarkTheme)
         return theme(QLatin1String("Breeze Dark"));
     return theme(QLatin1String("Breeze Light"));
 }
 
-Theme Repository::themeForPalette(const QPalette &palette)
+Theme Repository::defaultTheme(Repository::DefaultTheme t)
+{
+    return qAsConst(*this).defaultTheme(t);
+}
+
+Theme Repository::themeForPalette(const QPalette &palette) const
 {
     const auto base = palette.color(QPalette::Base);
     const auto themes = d->m_themes;
@@ -168,6 +173,11 @@ Theme Repository::themeForPalette(const QPalette &palette)
 
     // fallback to just use the default light or dark theme
     return defaultTheme((base.lightness() < 128) ? KSyntaxHighlighting::Repository::DarkTheme : KSyntaxHighlighting::Repository::LightTheme);
+}
+
+Theme Repository::themeForPalette(const QPalette &palette)
+{
+    return qAsConst(*this).themeForPalette(palette);
 }
 
 void RepositoryPrivate::load(Repository *repo)

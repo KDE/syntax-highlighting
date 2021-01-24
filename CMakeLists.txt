@@ -147,7 +147,6 @@ add_custom_target(update_kate_editor_org
     COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/utils/update-kate-editor-org.pl" "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
 
 # add clang-format target for all our real source files
-file(GLOB ALL_CLANG_FORMAT_TEST_FILES autotests/*.cpp autotests/*.h)
-file(GLOB_RECURSE ALL_CLANG_FORMAT_SOURCE_FILES examples/*.cpp examples/*.h src/*.cpp src/*.h)
-kde_clang_format(${ALL_CLANG_FORMAT_TEST_FILES} ${ALL_CLANG_FORMAT_SOURCE_FILES})
+file(GLOB_RECURSE ALL_CLANG_FORMAT_SOURCE_FILES *.cpp *.h)
+kde_clang_format(${ALL_CLANG_FORMAT_SOURCE_FILES})
 kde_configure_git_pre_commit_hook(CHECKS CLANG_FORMAT)

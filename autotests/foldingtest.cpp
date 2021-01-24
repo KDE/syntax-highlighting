@@ -152,6 +152,11 @@ private Q_SLOTS:
 
         const QDir dir(QStringLiteral(TESTSRCDIR "/input"));
         for (const auto &fileName : dir.entryList(QDir::Files | QDir::NoSymLinks | QDir::Readable | QDir::Hidden, QDir::Name)) {
+            // skip .clang-format file we use to avoid formatting test files
+            if (fileName == QLatin1String(".clang-format")) {
+                continue;
+            }
+
             const auto inFile = dir.absoluteFilePath(fileName);
             if (inFile.endsWith(QLatin1String(".syntax")))
                 continue;

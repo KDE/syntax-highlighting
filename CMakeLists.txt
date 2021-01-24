@@ -10,9 +10,10 @@ if(POLICY CMP0063)
 endif()
 
 include(KDEInstallDirs)
-include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
 include(KDECMakeSettings)
+include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
 include(KDEClangFormat)
+include(KDEGitCommitHooks)
 
 include(FeatureSummary)
 include(GenerateExportHeader)
@@ -149,3 +150,4 @@ add_custom_target(update_kate_editor_org
 file(GLOB ALL_CLANG_FORMAT_TEST_FILES autotests/*.cpp autotests/*.h)
 file(GLOB_RECURSE ALL_CLANG_FORMAT_SOURCE_FILES examples/*.cpp examples/*.h src/*.cpp src/*.h)
 kde_clang_format(${ALL_CLANG_FORMAT_TEST_FILES} ${ALL_CLANG_FORMAT_SOURCE_FILES})
+kde_configure_git_pre_commit_hook(CHECKS CLANG_FORMAT)

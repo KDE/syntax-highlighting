@@ -19,8 +19,8 @@
 #include "repository.h"
 #include "repository_p.h"
 #include "rule_p.h"
-#include "xml_p.h"
 #include "worddelimiters_p.h"
+#include "xml_p.h"
 
 #include <QCborMap>
 #include <QCoreApplication>
@@ -233,7 +233,9 @@ QVector<Format> Definition::formats() const
 
     // sort formats so that the order matches the order of the itemDatas in the xml files.
     auto formatList = QVector<Format>::fromList(d->formats.values());
-    std::sort(formatList.begin(), formatList.end(), [](const KSyntaxHighlighting::Format &lhs, const KSyntaxHighlighting::Format &rhs) { return lhs.id() < rhs.id(); });
+    std::sort(formatList.begin(), formatList.end(), [](const KSyntaxHighlighting::Format &lhs, const KSyntaxHighlighting::Format &rhs) {
+        return lhs.id() < rhs.id();
+    });
 
     return formatList;
 }
@@ -243,15 +245,16 @@ QVector<Definition> Definition::includedDefinitions() const
     d->load();
 
     // init worklist and result used as guard with this definition
-    QVector<Definition> queue {*this};
-    QVector<Definition> definitions {*this};
+    QVector<Definition> queue{*this};
+    QVector<Definition> definitions{*this};
     while (!queue.isEmpty()) {
         // Iterate all context rules to find associated Definitions. This will
         // automatically catch other Definitions referenced with IncludeRuldes or ContextSwitch.
         const auto definition = queue.takeLast();
         for (const auto &context : qAsConst(definition.d->contexts)) {
             // handle context switch attributes of this context itself
-            for (const auto switchContext : {context->lineEndContext().context(), context->lineEmptyContext().context(), context->fallthroughContext().context()}) {
+            for (const auto switchContext :
+                 {context->lineEndContext().context(), context->lineEmptyContext().context(), context->fallthroughContext().context()}) {
                 if (switchContext) {
                     if (!definitions.contains(switchContext->definition())) {
                         queue.push_back(switchContext->definition());

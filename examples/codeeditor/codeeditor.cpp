@@ -69,7 +69,8 @@ CodeEditor::CodeEditor(QWidget *parent)
 {
     setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 
-    setTheme((palette().color(QPalette::Base).lightness() < 128) ? m_repository.defaultTheme(KSyntaxHighlighting::Repository::DarkTheme) : m_repository.defaultTheme(KSyntaxHighlighting::Repository::LightTheme));
+    setTheme((palette().color(QPalette::Base).lightness() < 128) ? m_repository.defaultTheme(KSyntaxHighlighting::Repository::DarkTheme)
+                                                                 : m_repository.defaultTheme(KSyntaxHighlighting::Repository::LightTheme));
 
     connect(this, &QPlainTextEdit::blockCountChanged, this, &CodeEditor::updateSidebarGeometry);
     connect(this, &QPlainTextEdit::updateRequest, this, &CodeEditor::updateSidebarArea);
@@ -208,7 +209,8 @@ void CodeEditor::sidebarPaintEvent(QPaintEvent *event)
     while (block.isValid() && top <= event->rect().bottom()) {
         if (block.isVisible() && bottom >= event->rect().top()) {
             const auto number = QString::number(blockNumber + 1);
-            painter.setPen(m_highlighter->theme().editorColor((blockNumber == currentBlockNumber) ? KSyntaxHighlighting::Theme::CurrentLineNumber : KSyntaxHighlighting::Theme::LineNumbers));
+            painter.setPen(m_highlighter->theme().editorColor((blockNumber == currentBlockNumber) ? KSyntaxHighlighting::Theme::CurrentLineNumber
+                                                                                                  : KSyntaxHighlighting::Theme::LineNumbers));
             painter.drawText(0, top, m_sideBar->width() - 2 - foldingMarkerSize, fontMetrics().height(), Qt::AlignRight, number);
         }
 

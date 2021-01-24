@@ -11,7 +11,7 @@ using namespace KSyntaxHighlighting;
 WordDelimiters::WordDelimiters()
     : asciiDelimiters{}
 {
-    for(const char *p = "\t !%&()*+,-./:;<=>?[\\]^{|}~"; *p; ++p)
+    for (const char *p = "\t !%&()*+,-./:;<=>?[\\]^{|}~"; *p; ++p)
         // int(*p) fix -Wchar-subscripts
         asciiDelimiters[int(*p)] = true;
 }

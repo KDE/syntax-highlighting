@@ -15,9 +15,9 @@
 
 #include <QFileInfo>
 #include <QObject>
+#include <QPalette>
 #include <QStandardPaths>
 #include <QTest>
-#include <QPalette>
 
 #include <algorithm>
 
@@ -88,7 +88,9 @@ private Q_SLOTS:
         QTest::addColumn<QString>("fileName");
         QTest::addColumn<QStringList>("expectedNames");
 
-        QTest::newRow("Matlab") << QStringLiteral("/bla/foo.m") << (QStringList() << QStringLiteral("Objective-C") << QStringLiteral("Magma") << QStringLiteral("Matlab") << QStringLiteral("Octave"));
+        QTest::newRow("Matlab") << QStringLiteral("/bla/foo.m")
+                                << (QStringList() << QStringLiteral("Objective-C") << QStringLiteral("Magma") << QStringLiteral("Matlab")
+                                                  << QStringLiteral("Octave"));
     }
 
     void testDefinitionsForFileName()
@@ -110,7 +112,8 @@ private Q_SLOTS:
         QTest::addColumn<QStringList>("expectedNames");
 
         QTest::newRow("C Header") << QStringLiteral("text/x-chdr")
-                                  << (QStringList() << QStringLiteral("C++") << QStringLiteral("ISO C++") << QStringLiteral("C") << QStringLiteral("GCCExtensions") << QStringLiteral("ANSI C89") << QStringLiteral("SystemC"));
+                                  << (QStringList() << QStringLiteral("C++") << QStringLiteral("ISO C++") << QStringLiteral("C")
+                                                    << QStringLiteral("GCCExtensions") << QStringLiteral("ANSI C89") << QStringLiteral("SystemC"));
     }
 
     void testDefinitionsForMimeType()
@@ -206,7 +209,9 @@ private Q_SLOTS:
         QVERIFY(!formats.isEmpty());
 
         // verify that the formats are sorted, such that the order matches the order of the itemDatas in the xml files.
-        auto sortComparator = [](const KSyntaxHighlighting::Format &lhs, const KSyntaxHighlighting::Format &rhs) { return lhs.id() < rhs.id(); };
+        auto sortComparator = [](const KSyntaxHighlighting::Format &lhs, const KSyntaxHighlighting::Format &rhs) {
+            return lhs.id() < rhs.id();
+        };
         QVERIFY(std::is_sorted(formats.begin(), formats.end(), sortComparator));
 
         // check all names are listed
@@ -215,7 +220,11 @@ private Q_SLOTS:
             formatNames.append(format.name());
         }
 
-        const QStringList expectedItemDatas = {QStringLiteral("Normal Text"), QStringLiteral("Name"), QStringLiteral("E-Mail"), QStringLiteral("Date"), QStringLiteral("Entry")};
+        const QStringList expectedItemDatas = {QStringLiteral("Normal Text"),
+                                               QStringLiteral("Name"),
+                                               QStringLiteral("E-Mail"),
+                                               QStringLiteral("Date"),
+                                               QStringLiteral("Entry")};
         QCOMPARE(formatNames, expectedItemDatas);
     }
 
@@ -226,22 +235,22 @@ private Q_SLOTS:
         auto defs = def.includedDefinitions();
 
         QStringList expectedDefinitionNames = {QStringLiteral("PHP/PHP"),
-                                                     QStringLiteral("Alerts"),
-                                                     QStringLiteral("CSS/PHP"),
-                                                     QStringLiteral("JavaScript/PHP"),
-                                                     QStringLiteral("JavaScript React (JSX)/PHP"),
-                                                     QStringLiteral("JavaScript"),
-                                                     QStringLiteral("TypeScript/PHP"),
-                                                     QStringLiteral("Mustache/Handlebars (HTML)/PHP"),
-                                                     QStringLiteral("Doxygen"),
-                                                     QStringLiteral("Modelines"),
-                                                     QStringLiteral("SPDX-Comments"),
-                                                     QStringLiteral("HTML"),
-                                                     QStringLiteral("CSS"),
-                                                     QStringLiteral("SQL (MySQL)"),
-                                                     QStringLiteral("JavaScript React (JSX)"),
-                                                     QStringLiteral("TypeScript"),
-                                                     QStringLiteral("Mustache/Handlebars (HTML)")};
+                                               QStringLiteral("Alerts"),
+                                               QStringLiteral("CSS/PHP"),
+                                               QStringLiteral("JavaScript/PHP"),
+                                               QStringLiteral("JavaScript React (JSX)/PHP"),
+                                               QStringLiteral("JavaScript"),
+                                               QStringLiteral("TypeScript/PHP"),
+                                               QStringLiteral("Mustache/Handlebars (HTML)/PHP"),
+                                               QStringLiteral("Doxygen"),
+                                               QStringLiteral("Modelines"),
+                                               QStringLiteral("SPDX-Comments"),
+                                               QStringLiteral("HTML"),
+                                               QStringLiteral("CSS"),
+                                               QStringLiteral("SQL (MySQL)"),
+                                               QStringLiteral("JavaScript React (JSX)"),
+                                               QStringLiteral("TypeScript"),
+                                               QStringLiteral("Mustache/Handlebars (HTML)")};
         QStringList definitionNames;
         for (auto d : defs) {
             QVERIFY(d.isValid());
@@ -281,7 +290,7 @@ private Q_SLOTS:
         // this is no longer feasible, as we e.g. skip the "Comments"
         // syntax definition in includedDefinitions as it is not contributing
         // any context/rule
-        //for (int i = 1; i <= formatIds.size(); ++i) {
+        // for (int i = 1; i <= formatIds.size(); ++i) {
         //    QVERIFY(formatIds.contains(i));
         //}
     }
@@ -545,7 +554,6 @@ private Q_SLOTS:
         auto theme = m_repo.themeForPalette(palette);
         QCOMPARE(theme.name(), QStringLiteral("Breeze Dark"));
     }
-
 };
 }
 

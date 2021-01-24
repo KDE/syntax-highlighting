@@ -16,8 +16,8 @@
 #include <QFile>
 #include <QObject>
 #include <QStandardPaths>
-#include <QTextStream>
 #include <QTest>
+#include <QTextStream>
 
 #include <unordered_map>
 
@@ -161,8 +161,8 @@ private Q_SLOTS:
             if (syntaxOverride.exists() && syntaxOverride.open(QFile::ReadOnly))
                 syntax = QString::fromUtf8(syntaxOverride.readAll()).trimmed();
 
-            QTest::newRow(fileName.toUtf8().constData()) << inFile << (QStringLiteral(TESTBUILDDIR "/folding.out/") + fileName + QStringLiteral(".fold")) << (QStringLiteral(TESTSRCDIR "/folding/") + fileName + QStringLiteral(".fold"))
-                                                         << syntax;
+            QTest::newRow(fileName.toUtf8().constData()) << inFile << (QStringLiteral(TESTBUILDDIR "/folding.out/") + fileName + QStringLiteral(".fold"))
+                                                         << (QStringLiteral(TESTSRCDIR "/folding/") + fileName + QStringLiteral(".fold")) << syntax;
         }
 
         // cleanup before we test

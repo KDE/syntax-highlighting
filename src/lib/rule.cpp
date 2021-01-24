@@ -10,8 +10,8 @@
 #include "definition_p.h"
 #include "ksyntaxhighlighting_logging.h"
 #include "rule_p.h"
-#include "xml_p.h"
 #include "worddelimiters_p.h"
+#include "xml_p.h"
 
 #include <QString>
 #include <QXmlStreamReader>
@@ -31,9 +31,7 @@ static bool isOctalChar(QChar c)
 
 static bool isHexChar(QChar c)
 {
-    return isDigit(c)
-        || (c <= QLatin1Char('f') && QLatin1Char('a') <= c)
-        || (c <= QLatin1Char('F') && QLatin1Char('A') <= c);
+    return isDigit(c) || (c <= QLatin1Char('f') && QLatin1Char('a') <= c) || (c <= QLatin1Char('F') && QLatin1Char('A') <= c);
 }
 
 static int matchEscapedChar(const QString &text, int offset)
@@ -44,9 +42,18 @@ static int matchEscapedChar(const QString &text, int offset)
     const auto c = text.at(offset + 1);
     switch (c.unicode()) {
     // control chars
-    case 'a': case 'b': case 'e': case 'f':
-    case 'n': case 'r': case 't': case 'v':
-    case '"': case '\'': case '?': case '\\':
+    case 'a':
+    case 'b':
+    case 'e':
+    case 'f':
+    case 'n':
+    case 'r':
+    case 't':
+    case 'v':
+    case '"':
+    case '\'':
+    case '?':
+    case '\\':
         return offset + 2;
 
     // hex encoded character
@@ -59,8 +66,14 @@ static int matchEscapedChar(const QString &text, int offset)
         return offset;
 
     // octal encoding, simple \0 is OK, too, unlike simple \x above
-    case '0': case '1': case '2': case '3':
-    case '4': case '5': case '6': case '7':
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
         if (offset + 2 < text.size() && isOctalChar(text.at(offset + 2))) {
             if (offset + 3 < text.size() && isOctalChar(text.at(offset + 3)))
                 return offset + 4;
@@ -131,7 +144,7 @@ bool Rule::load(QXmlStreamReader &reader)
 
 void Rule::resolveContext()
 {
-    auto const& def = m_def.definition();
+    auto const &def = m_def.definition();
 
     m_context.resolve(def);
 
@@ -579,11 +592,10 @@ bool RegExpr::doLoad(QXmlStreamReader &reader)
 
     const auto isMinimal = Xml::attrToBool(reader.attributes().value(QLatin1String("minimal")));
     const auto isCaseInsensitive = Xml::attrToBool(reader.attributes().value(QLatin1String("insensitive")));
-    m_regexp.setPatternOptions(
-        (isMinimal ? QRegularExpression::InvertedGreedinessOption : QRegularExpression::NoPatternOption)
-      | (isCaseInsensitive ? QRegularExpression::CaseInsensitiveOption : QRegularExpression::NoPatternOption)
-      // DontCaptureOption is removed by resolvePostProcessing() when necessary
-      | QRegularExpression::DontCaptureOption);
+    m_regexp.setPatternOptions((isMinimal ? QRegularExpression::InvertedGreedinessOption : QRegularExpression::NoPatternOption)
+                               | (isCaseInsensitive ? QRegularExpression::CaseInsensitiveOption : QRegularExpression::NoPatternOption)
+                               // DontCaptureOption is removed by resolvePostProcessing() when necessary
+                               | QRegularExpression::DontCaptureOption);
 
     m_dynamic = Xml::attrToBool(reader.attributes().value(QLatin1String("dynamic")));
 
@@ -616,7 +628,6 @@ void KSyntaxHighlighting::RegExpr::resolvePostProcessing()
 
     bool isValid = m_regexp.isValid();
     if (!isValid) {
-
         // DontCaptureOption with back reference capture is an error, remove this option then try again
         if (!hasCapture) {
             m_regexp.setPatternOptions(m_regexp.patternOptions() & ~QRegularExpression::DontCaptureOption);

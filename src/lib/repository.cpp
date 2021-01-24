@@ -63,7 +63,9 @@ Definition Repository::definitionForName(const QString &defName) const
 
 static void sortDefinitions(QVector<Definition> &definitions)
 {
-    std::stable_sort(definitions.begin(), definitions.end(), [](const Definition &lhs, const Definition &rhs) { return lhs.priority() > rhs.priority(); });
+    std::stable_sort(definitions.begin(), definitions.end(), [](const Definition &lhs, const Definition &rhs) {
+        return lhs.priority() > rhs.priority();
+    });
 }
 
 Definition Repository::definitionForFileName(const QString &fileName) const
@@ -187,7 +189,8 @@ void RepositoryPrivate::load(Repository *repo)
 
     // do lookup in standard paths, if not disabled
 #ifndef NO_STANDARD_PATHS
-    for (const auto &dir : QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("org.kde.syntax-highlighting/syntax"), QStandardPaths::LocateDirectory))
+    for (const auto &dir :
+         QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("org.kde.syntax-highlighting/syntax"), QStandardPaths::LocateDirectory))
         loadSyntaxFolder(repo, dir);
 
     // backward compatibility with Kate
@@ -216,7 +219,8 @@ void RepositoryPrivate::load(Repository *repo)
 
     // do lookup in standard paths, if not disabled
 #ifndef NO_STANDARD_PATHS
-    for (const auto &dir : QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("org.kde.syntax-highlighting/themes"), QStandardPaths::LocateDirectory))
+    for (const auto &dir :
+         QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("org.kde.syntax-highlighting/themes"), QStandardPaths::LocateDirectory))
         loadThemeFolder(dir);
 #endif
 
@@ -296,7 +300,9 @@ static int themeRevision(const Theme &theme)
 
 void RepositoryPrivate::addTheme(const Theme &theme)
 {
-    const auto it = std::lower_bound(m_themes.begin(), m_themes.end(), theme, [](const Theme &lhs, const Theme &rhs) { return lhs.name() < rhs.name(); });
+    const auto it = std::lower_bound(m_themes.begin(), m_themes.end(), theme, [](const Theme &lhs, const Theme &rhs) {
+        return lhs.name() < rhs.name();
+    });
     if (it == m_themes.end() || (*it).name() != theme.name()) {
         m_themes.insert(it, theme);
         return;

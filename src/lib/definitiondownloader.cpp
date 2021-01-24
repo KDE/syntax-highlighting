@@ -94,7 +94,9 @@ void DefinitionDownloaderPrivate::downloadDefinition(const QUrl &downloadUrl)
 
     QNetworkRequest req(url);
     auto reply = nam->get(req);
-    QObject::connect(reply, &QNetworkReply::finished, q, [this, reply]() { downloadDefinitionFinished(reply); });
+    QObject::connect(reply, &QNetworkReply::finished, q, [this, reply]() {
+        downloadDefinitionFinished(reply);
+    });
     ++pendingDownloads;
     needsReload = true;
 }
@@ -161,9 +163,12 @@ DefinitionDownloader::~DefinitionDownloader()
 
 void DefinitionDownloader::start()
 {
-    const QString url = QLatin1String("https://www.kate-editor.org/syntax/update-") + QString::number(SyntaxHighlighting_VERSION_MAJOR) + QLatin1Char('.') + QString::number(SyntaxHighlighting_VERSION_MINOR) + QLatin1String(".xml");
+    const QString url = QLatin1String("https://www.kate-editor.org/syntax/update-") + QString::number(SyntaxHighlighting_VERSION_MAJOR) + QLatin1Char('.')
+        + QString::number(SyntaxHighlighting_VERSION_MINOR) + QLatin1String(".xml");
     auto req = QNetworkRequest(QUrl(url));
     req.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
     auto reply = d->nam->get(req);
-    QObject::connect(reply, &QNetworkReply::finished, this, [=]() { d->definitionListDownloadFinished(reply); });
+    QObject::connect(reply, &QNetworkReply::finished, this, [=]() {
+        d->definitionListDownloadFinished(reply);
+    });
 }

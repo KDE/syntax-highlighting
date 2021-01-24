@@ -195,31 +195,27 @@ private Q_SLOTS:
         }
     }
 
-    static bool isColorEntry(const QString& entry)
+    static bool isColorEntry(const QString &entry)
     {
-        static const QLatin1String predefColorEntries[] = {
-            QLatin1String("text-color"),
-            QLatin1String("selected-text-color"),
-            QLatin1String("background-color"),
-            QLatin1String("selected-background-color")
-        };
+        static const QLatin1String predefColorEntries[] = {QLatin1String("text-color"),
+                                                           QLatin1String("selected-text-color"),
+                                                           QLatin1String("background-color"),
+                                                           QLatin1String("selected-background-color")};
 
         return std::find(std::begin(predefColorEntries), std::end(predefColorEntries), entry) != std::end(predefColorEntries);
     }
 
-    static bool isFontStyleEntry(const QString& entry)
+    static bool isFontStyleEntry(const QString &entry)
     {
-        static const QLatin1String predefColorEntries[] = {
-            QLatin1String("bold"),
-            QLatin1String("italic"),
-            QLatin1String("underline"),
-            QLatin1String("strike-through")
-        };
+        static const QLatin1String predefColorEntries[] = {QLatin1String("bold"),
+                                                           QLatin1String("italic"),
+                                                           QLatin1String("underline"),
+                                                           QLatin1String("strike-through")};
 
         return std::find(std::begin(predefColorEntries), std::end(predefColorEntries), entry) != std::end(predefColorEntries);
     }
 
-    void verifyStyle(const QJsonObject& textStyle, const QString& textStyleName, QVector<QString>& unknown)
+    void verifyStyle(const QJsonObject &textStyle, const QString &textStyleName, QVector<QString> &unknown)
     {
         const QStringList definedColors = textStyle.keys();
         for (const auto &key : definedColors) {
@@ -326,14 +322,14 @@ private Q_SLOTS:
             const auto customStyles = obj.value(QLatin1String("custom-styles")).toObject();
             for (auto it = customStyles.constBegin(); it != customStyles.constEnd(); ++it) {
                 // get definitions for this language
-                const auto& lang = it.key();
+                const auto &lang = it.key();
                 const auto def = m_repo.definitionForName(lang);
                 QVERIFY2(def.isValid(), qPrintable(QStringLiteral("Definition %1 does not exist").arg(lang)));
 
                 const QVector<Format> fmts = def.formats();
                 QSet<QString> fmtNames;
                 fmtNames.reserve(fmts.size());
-                for (const auto& fmt: fmts) {
+                for (const auto &fmt : fmts) {
                     fmtNames.insert(fmt.name());
                 }
 
@@ -342,7 +338,7 @@ private Q_SLOTS:
                 const auto customStylesForLang = it.value().toObject();
                 for (auto csIt = customStylesForLang.constBegin(); csIt != customStylesForLang.constEnd(); ++csIt) {
                     // make sure the text style is present in language definition formats
-                    const auto& textStyleName = csIt.key();
+                    const auto &textStyleName = csIt.key();
 
                     // wasn't found, append it to the vector
                     // we will later print this and fail the test

@@ -83,7 +83,9 @@ public:
     bool load(QXmlStreamReader &reader);
     void resolveContext();
     void resolveAttributeFormat(Context *lookupContext);
-    virtual void resolvePostProcessing() {}
+    virtual void resolvePostProcessing()
+    {
+    }
 
     virtual MatchResult doMatch(const QString &text, int offset, const QStringList &captures) const = 0;
 
@@ -110,7 +112,7 @@ private:
     bool m_lookAhead = false;
 
     // cache for DefinitionData::wordDelimiters, is accessed VERY often
-    WordDelimiters* m_wordDelimiters = nullptr;
+    WordDelimiters *m_wordDelimiters = nullptr;
 
     QString m_additionalDeliminator;
     QString m_weakDeliminator;

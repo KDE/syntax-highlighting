@@ -77,7 +77,7 @@ void HtmlHighlighter::highlightFile(const QString &fileName, const QString &titl
  * @param color
  * @return
  */
-static QString toHtmlRgbaString(const QColor& color)
+static QString toHtmlRgbaString(const QColor &color)
 {
     if (color.alpha() == 0xFF)
         return color.name();
@@ -113,7 +113,8 @@ void HtmlHighlighter::highlightData(QIODevice *dev, const QString &title)
     *d->out << "<html><head>\n";
     *d->out << "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>\n";
     *d->out << "<title>" << htmlTitle << "</title>\n";
-    *d->out << "<meta name=\"generator\" content=\"KF5::SyntaxHighlighting - Definition (" << definition().name() << ") - Theme (" << theme().name() << ")\"/>\n";
+    *d->out << "<meta name=\"generator\" content=\"KF5::SyntaxHighlighting - Definition (" << definition().name() << ") - Theme (" << theme().name()
+            << ")\"/>\n";
     *d->out << "</head><body";
     *d->out << " style=\"background-color:" << toHtmlRgbaString(QColor::fromRgba(theme().editorColor(Theme::BackgroundColor)));
     if (theme().textColor(Theme::Normal))

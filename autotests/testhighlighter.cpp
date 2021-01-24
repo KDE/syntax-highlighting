@@ -16,8 +16,8 @@
 #include <QDir>
 #include <QFile>
 #include <QObject>
-#include <QTextStream>
 #include <QTest>
+#include <QTextStream>
 
 #include <map>
 
@@ -152,7 +152,8 @@ private Q_SLOTS:
             if (syntaxOverride.exists() && syntaxOverride.open(QFile::ReadOnly))
                 syntax = QString::fromUtf8(syntaxOverride.readAll()).trimmed();
 
-            QTest::newRow(fileName.toUtf8().constData()) << inFile << (QStringLiteral(TESTBUILDDIR "/output/") + fileName + QStringLiteral(".ref")) << (QStringLiteral(TESTSRCDIR "/reference/") + fileName + QStringLiteral(".ref")) << syntax;
+            QTest::newRow(fileName.toUtf8().constData()) << inFile << (QStringLiteral(TESTBUILDDIR "/output/") + fileName + QStringLiteral(".ref"))
+                                                         << (QStringLiteral(TESTSRCDIR "/reference/") + fileName + QStringLiteral(".ref")) << syntax;
         }
 
         // cleanup before we test

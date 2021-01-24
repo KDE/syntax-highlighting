@@ -65,14 +65,11 @@ private Q_SLOTS:
             if (syntaxOverride.exists() && syntaxOverride.open(QFile::ReadOnly))
                 syntax = QString::fromUtf8(syntaxOverride.readAll()).trimmed();
 
-            QTest::newRow(fileName.toUtf8().constData()) << inFile
-                                                         << (QStringLiteral(TESTBUILDDIR "/html.output/") + fileName + QStringLiteral(".html"))
+            QTest::newRow(fileName.toUtf8().constData()) << inFile << (QStringLiteral(TESTBUILDDIR "/html.output/") + fileName + QStringLiteral(".html"))
                                                          << (QStringLiteral(TESTSRCDIR "/html/") + fileName + QStringLiteral(".html"))
                                                          << (QStringLiteral(TESTBUILDDIR "/html.output/") + fileName + QStringLiteral(".dark.html"))
-                                                         << (QStringLiteral(TESTSRCDIR "/html/") + fileName + QStringLiteral(".dark.html"))
-                                                         << syntax;
+                                                         << (QStringLiteral(TESTSRCDIR "/html/") + fileName + QStringLiteral(".dark.html")) << syntax;
         }
-
 
         // cleanup before we test
         QDir(QStringLiteral(TESTBUILDDIR "/html.output/")).removeRecursively();

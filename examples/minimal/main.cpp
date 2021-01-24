@@ -6,14 +6,14 @@
 
 #include <QApplication>
 #include <QCommandLineParser>
-#include <QPlainTextEdit>
 #include <QDebug>
+#include <QPlainTextEdit>
 
 #include <definition.h>
 #include <foldingregion.h>
+#include <repository.h>
 #include <syntaxhighlighter.h>
 #include <theme.h>
-#include <repository.h>
 
 int main(int argc, char **argv)
 {
@@ -36,9 +36,8 @@ int main(int argc, char **argv)
         view->resize(500, 500);
 
         auto highlighter = new KSyntaxHighlighting::SyntaxHighlighter(view->document());
-        highlighter->setTheme((view->palette().color(QPalette::Base).lightness() < 128)
-                 ? repository.defaultTheme(KSyntaxHighlighting::Repository::DarkTheme)
-                 : repository.defaultTheme(KSyntaxHighlighting::Repository::LightTheme));
+        highlighter->setTheme((view->palette().color(QPalette::Base).lightness() < 128) ? repository.defaultTheme(KSyntaxHighlighting::Repository::DarkTheme)
+                                                                                        : repository.defaultTheme(KSyntaxHighlighting::Repository::LightTheme));
 
         const auto def = repository.definitionForFileName(url.toLocalFile());
         highlighter->setDefinition(def);

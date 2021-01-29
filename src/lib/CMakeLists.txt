@@ -66,7 +66,7 @@ if(BUILD_QCH)
         KF5SyntaxHighlighting_QCH
         NAME KSyntaxHighlighting
         BASE_NAME KF5SyntaxHighlighting
-        VERSION ${KF5_VERSION}
+        VERSION ${KF_VERSION}
         ORG_DOMAIN org.kde
         SOURCES # using only public headers, to cover only public API
             ${SyntaxHighlighting_HEADERS}

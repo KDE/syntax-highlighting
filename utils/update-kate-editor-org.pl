@@ -48,7 +48,7 @@ if (-d "kate-editor-org") {
 my $currentVersion;
 open (my $list, "<$sourceDir/CMakeLists.txt");
 for (<$list>) {
-    if ((my $version) = /^set\(KF5_VERSION "[0-9]+\.([0-9]+)\.[0-9]+"\)/) {
+    if ((my $version) = /^set\(KF_VERSION "[0-9]+\.([0-9]+)\.[0-9]+"\)/) {
        $currentVersion = $version;
        last;
     }

@@ -51,7 +51,7 @@
     <!ENTITY sectionL4 "^(?:={5}|#{5})\s+(?=\S)">
     <!ENTITY sectionL5 "^(?:={6}|#{6})\s+(?=\S)">
 ]>
-<language author="Andreas Gratzer" extensions="*.ad;*.adoc;*.asciidoc" kateversion="5.0" mimetype="text/asciidoc" name="AsciiDoc" license="MIT" section="Markup" version="6">
+<language author="Andreas Gratzer" extensions="*.ad;*.adoc;*.asciidoc" kateversion="5.0" mimetype="text/asciidoc" name="AsciiDoc" license="MIT" section="Markup" version="7">
     <highlighting>
         <list name="macro">
             <item>anchor</item>
@@ -95,35 +95,27 @@
 
             <!-- backlash, may function as an escape -->
             <context name="backlash" attribute="Normal" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop">
-                <!-- anchor, consuming leading char will make anchor matches fail -->
-                <DetectChar char="[" attribute="Normal" context="#pop"/>
-                <!-- cross reference -->
-                <DetectChar char="&lt;" attribute="Normal" context="#pop"/>
-                <!-- email - inline, needs to be ordered after mailto: -->
-                <RegExpr String="&email;" attribute="Normal" context="#pop"/>
                 <!-- attribute usage
                      formatted/quoted text
                      replacement of apostrophe
                      table separator (default)
+                     anchor, consuming leading char will make anchor matches fail
+                     cross reference
+                     indexterm, consuming leading char will make matches fail
                 -->
-                <AnyChar String="_#`+*~^'|{" attribute="Normal" context="#pop"/>
-                <!-- indexterm, consuming leading char will make matches fail -->
-                <DetectChar char="(" attribute="Normal" context="#pop"/>
+                <!-- replacement (besides apostrophe -->
+                <Detect2Chars char="&lt;" char1="-" attribute="Normal" context="#pop"/>
+                <Detect2Chars char="&lt;" char1="=" attribute="Normal" context="#pop"/>
+                <AnyChar String="_#`+*~^'|{[&lt;(" attribute="Normal" context="#pop"/>
+                <Detect2Chars char="-" char1="-" attribute="Normal" context="#pop"/>
+                <Detect2Chars char="-" char1="&gt;" attribute="Normal" context="#pop"/>
+                <Detect2Chars char="=" char1="&gt;" attribute="Normal" context="#pop"/>
+                <StringDetect String="..." attribute="Normal" context="#pop"/>
+                <!-- email - inline, needs to be ordered after mailto: -->
                 <!-- link and mailto macros, note that ftp, irc, http(s) don't match with leading `\` anyway -->
-                <RegExpr String="&link_mailto;" attribute="Normal" context="#pop"/>
+                <RegExpr String="&email;|&link_mailto;|&char_ref;" attribute="Normal" context="#pop"/>
                 <!-- macro -->
                 <keyword String="macro" attribute="Normal" context="#pop"/>
-                <!-- replacement (besides apostrophe -->
-                <StringDetect String="(C)" attribute="Normal" context="#pop"/>
-                <StringDetect String="(R)" attribute="Normal" context="#pop"/>
-                <StringDetect String="(TM)" attribute="Normal" context="#pop"/>
-                <Detect2Chars char="-" char1="-" attribute="Normal" context="#pop"/>
-                <StringDetect String="..." attribute="Normal" context="#pop"/>
-                <Detect2Chars char="&lt;" char1="-" attribute="Normal" context="#pop"/>
-                <Detect2Chars char="-" char1="&gt;" attribute="Normal" context="#pop"/>
-                <Detect2Chars char="&lt;" char1="=" attribute="Normal" context="#pop"/>
-                <Detect2Chars char="=" char1="&gt;" attribute="Normal" context="#pop"/>
-                <RegExpr String="&char_ref;" attribute="Normal" context="#pop"/>
             </context>
 
             <context name="block title" attribute="Block Title" lineEndContext="#pop">

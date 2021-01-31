@@ -1315,6 +1315,11 @@ private:
     }
 
     //! Check if a rule is hidden by another
+    //! - rule hidden by DetectChar or AnyChar
+    //! - DetectSpaces, AnyChar, Int, Float with all their characters hidden by DetectChar or AnyChar
+    //! - StringDetect, WordDetect, RegExpr with as prefix Detect2Chars or other strings
+    //! - duplicate rule (Int, Float, keyword with same String, etc)
+    //! - Rule hidden by a dot regex
     bool checkUreachableRules(const QString &filename, const Context &context) const
     {
         struct RuleAndInclude {
@@ -1329,14 +1334,17 @@ private:
 
         // Associate QChar with RuleAndInclude
         struct CharTable {
+            /// Search RuleAndInclude associated with @p c.
             RuleAndInclude find(QChar c) const
             {
                 if (c.unicode() < 128)
-                    return ascii[c.unicode()];
-                auto it = utf8.find(c);
-                return it == utf8.end() ? RuleAndInclude{nullptr, nullptr} : it.value();
+                    return m_asciiMap[c.unicode()];
+                auto it = m_utf8Map.find(c);
+                return it == m_utf8Map.end() ? RuleAndInclude{nullptr, nullptr} : it.value();
             }
 
+            /// Search RuleAndInclude associated with the characters of @p s.
+            /// \return an empty QVector when at least one character is not found.
             QVector<RuleAndInclude> find(QStringView s) const
             {
                 QVector<RuleAndInclude> result;
@@ -1354,14 +1362,16 @@ private:
                 return result;
             }
 
+            /// Associates @p c with a rule.
             void append(QChar c, const Context::Rule &rule, const Context::Rule *includeRule = nullptr)
             {
                 if (c.unicode() < 128)
-                    ascii[c.unicode()] = {&rule, includeRule};
+                    m_asciiMap[c.unicode()] = {&rule, includeRule};
                 else
-                    utf8[c] = {&rule, includeRule};
+                    m_utf8Map[c] = {&rule, includeRule};
             }
 
+            /// Associates each character of @p s with a rule.
             void append(QStringView s, const Context::Rule &rule, const Context::Rule *includeRule = nullptr)
             {
                 for (QChar c : s) {
@@ -1370,8 +1380,8 @@ private:
             }
 
         private:
-            RuleAndInclude ascii[127]{};
-            QMap<QChar, RuleAndInclude> utf8;
+            RuleAndInclude m_asciiMap[127]{};
+            QMap<QChar, RuleAndInclude> m_utf8Map;
         };
 
         struct Char4Tables {
@@ -1381,8 +1391,10 @@ private:
             CharTable charsFirstNonSpace;
         };
 
-        // View on Char4Tables taht satisfies firstNonSpace and column
+        // View on Char4Tables members
         struct CharTableArray {
+            // Append Char4Tables members that satisfies firstNonSpace and column.
+            // Char4Tables::char is always added.
             CharTableArray(Char4Tables &tables, const Context::Rule &rule)
             {
                 if (rule.firstNonSpace == XmlBool::True)
@@ -1396,6 +1408,7 @@ private:
                 appendTable(tables.chars);
             }
 
+            // Removes Char4Tables::chars when the rule contains firstNonSpace or column
             void removeNonSpecialWhenSpecial()
             {
                 if (m_size > 1) {
@@ -1403,6 +1416,7 @@ private:
                 }
             }
 
+            /// Search RuleAndInclude associated with @p c.
             RuleAndInclude find(QChar c) const
             {
                 for (int i = 0; i < m_size; ++i) {
@@ -1412,6 +1426,8 @@ private:
                 return RuleAndInclude{nullptr, nullptr};
             }
 
+            /// Search RuleAndInclude associated with the characters of @p s.
+            /// \return an empty QVector when at least one character is not found.
             QVector<RuleAndInclude> find(QStringView s) const
             {
                 for (int i = 0; i < m_size; ++i) {
@@ -1426,6 +1442,7 @@ private:
                 return QVector<RuleAndInclude>();
             }
 
+            /// Associates @p c with a rule.
             void append(QChar c, const Context::Rule &rule, const Context::Rule *includeRule = nullptr)
             {
                 for (int i = 0; i < m_size; ++i) {
@@ -1433,6 +1450,7 @@ private:
                 }
             }
 
+            /// Associates each character of @p s with a rule.
             void append(QStringView s, const Context::Rule &rule, const Context::Rule *includeRule = nullptr)
             {
                 for (int i = 0; i < m_size; ++i) {
@@ -1451,56 +1469,62 @@ private:
             int m_size = 0;
         };
 
-        // Iterates over rules and uses Rule::includedRules for includedRules rule
+        // Iterates over all the rules, including those in includedRules
         struct RuleIterator {
             RuleIterator(const QVector<Context::Rule> &rules, const Context::Rule &endRule)
-                : end(&endRule - rules.data())
-                , rules(rules)
+                : m_end(&endRule - rules.data())
+                , m_rules(rules)
             {
             }
 
+            /// \return next rule or nullptr
             const Context::Rule *next()
             {
-                if (includedRules) {
-                    ++i2;
-                    if (i2 != rules[i].includedRules.size()) {
-                        return (*includedRules)[i2];
+                // if in includedRules
+                if (m_includedRules) {
+                    ++m_i2;
+                    if (m_i2 != m_rules[m_i].includedRules.size()) {
+                        return (*m_includedRules)[m_i2];
                     }
-                    ++i;
-                    includedRules = nullptr;
+                    ++m_i;
+                    m_includedRules = nullptr;
                 }
 
-                while (i < end && rules[i].type == Context::Rule::Type::IncludeRules) {
-                    if (rules[i].includedRules.size()) {
-                        i2 = 0;
-                        includedRules = &rules[i].includedRules;
-                        return (*includedRules)[i2];
+                // if is a includedRules
+                while (m_i < m_end && m_rules[m_i].type == Context::Rule::Type::IncludeRules) {
+                    if (m_rules[m_i].includedRules.size()) {
+                        m_i2 = 0;
+                        m_includedRules = &m_rules[m_i].includedRules;
+                        return (*m_includedRules)[m_i2];
                     }
-                    ++i;
+                    ++m_i;
                 }
 
-                if (i < end) {
-                    ++i;
-                    return &rules[i - 1];
+                if (m_i < m_end) {
+                    ++m_i;
+                    return &m_rules[m_i - 1];
                 }
 
                 return nullptr;
             }
 
+            /// \return current IncludeRules or nullptr
             const Context::Rule *currentIncludeRules() const
             {
-                return includedRules ? &rules[i] : nullptr;
+                return m_includedRules ? &m_rules[m_i] : nullptr;
             }
 
         private:
-            int i = 0;
-            int i2;
-            int end;
-            const QVector<Context::Rule> &rules;
-            const QVector<const Context::Rule *> *includedRules = nullptr;
+            int m_i = 0;
+            int m_i2;
+            int m_end;
+            const QVector<Context::Rule> &m_rules;
+            const QVector<const Context::Rule *> *m_includedRules = nullptr;
         };
 
+        // Dot regex container that satisfies firstNonSpace and column.
         struct DotRegex {
+            /// Append a dot regex rule.
             void append(const Context::Rule &rule, const Context::Rule *includedRule)
             {
                 auto array = extractDotRegexes(rule);
@@ -1510,6 +1534,7 @@ private:
                     *array[1] = {&rule, includedRule};
             }
 
+            /// Search dot regex which hides @p rule
             RuleAndInclude find(const Context::Rule &rule)
             {
                 auto array = extractDotRegexes(rule);
@@ -1548,45 +1573,21 @@ private:
             RuleAndInclude dotRegexFirstNonSpace{};
         };
 
-        QString sanitizedRegex;
-        // extract rule.string:
-        // - front part '%' when dynamic
-        // - up to a special character for RegExpr
-        // - ignore RegExpr with `|`
-        auto getString = [&sanitizedRegex](const Context::Rule &rule) {
-            QStringView s = rule.string;
-
-            if (rule.dynamic == XmlBool::True) {
-                static const QRegularExpression dynamicPosition(QStringLiteral(R"(^(?:[^%]*|%(?![1-9]))*)"));
-                auto result = dynamicPosition.match(rule.string);
-                s = s.left(result.capturedLength());
-            }
-
-            if (rule.type == Context::Rule::Type::RegExpr) {
-                static const QRegularExpression regularChars(QStringLiteral(R"(^(?:[^.?*+^$[{(\\|]+|\\[-.?*+^$[\]{}()\\|]+|\[[^^\\]\])+)"));
-                static const QRegularExpression sanitizeChars(QStringLiteral(R"(\\([-.?*+^$[\]{}()\\|])|\[([^^\\])\])"));
-                const qsizetype result = regularChars.match(rule.string).capturedLength();
-                const qsizetype pos = qMin(result, s.size());
-                if (rule.string.indexOf(QLatin1Char('|'), pos) < pos) {
-                    sanitizedRegex = rule.string.left(qMin(result, s.size()));
-                    sanitizedRegex.replace(sanitizeChars, QStringLiteral("\\1"));
-                    s = sanitizedRegex;
-                } else {
-                    s = QStringView();
-                }
-            }
-
-            return s;
-        };
-
         bool success = true;
 
-        // characters of DetectChar
+        // characters of DetectChar/AnyChar
         Char4Tables detectChars;
-        // first character of WordDetect, StringDetect, Detect2Chars
-        Char4Tables firstChars;
-        // second character of Detect2Chars
-        Char4Tables secondChars;
+        // characters of dynamic DetectChar
+        Char4Tables dynamicDetectChars;
+        // characters of LineContinue
+        Char4Tables lineContinueChars;
+
+        RuleAndInclude intRule{};
+        RuleAndInclude floatRule{};
+        RuleAndInclude hlCCharRule{};
+        RuleAndInclude hlCOctRule{};
+        RuleAndInclude hlCHexRule{};
+        RuleAndInclude hlCStringCharRule{};
 
         DotRegex dotRegex;
 
@@ -1594,6 +1595,7 @@ private:
             bool isUnreachable = false;
             QVector<RuleAndInclude> unreachableBy;
 
+            // declare rule as unreacheable if ruleAndInclude is not empty
             auto updateUnreachable1 = [&](RuleAndInclude ruleAndInclude) {
                 if (ruleAndInclude) {
                     isUnreachable = true;
@@ -1601,6 +1603,7 @@ private:
                 }
             };
 
+            // declare rule as unreacheable if ruleAndIncludes is not empty
             auto updateUnreachable2 = [&](const QVector<RuleAndInclude> &ruleAndIncludes) {
                 if (!ruleAndIncludes.isEmpty()) {
                     isUnreachable = true;
@@ -1608,6 +1611,7 @@ private:
                 }
             };
 
+            // check if rule2.firstNonSpace/column is compatible with those of rule
             auto isCompatible = [&rule](Context::Rule const &rule2) {
                 return (rule2.firstNonSpace != XmlBool::True && rule2.column == -1) || (rule.column == rule2.column && rule.column != -1)
                     || (rule.firstNonSpace == rule2.firstNonSpace && rule.firstNonSpace == XmlBool::True);
@@ -1616,6 +1620,8 @@ private:
             updateUnreachable1(dotRegex.find(rule));
 
             switch (rule.type) {
+            // checks if hidden by DetectChar/AnyChar
+            // then add the characters to detectChars
             case Context::Rule::Type::AnyChar: {
                 auto tables = CharTableArray(detectChars, rule);
                 updateUnreachable2(tables.find(rule.string));
@@ -1624,15 +1630,19 @@ private:
                 break;
             }
 
-            case Context::Rule::Type::DetectChar:
-                if (rule.dynamic != XmlBool::True) {
-                    auto tables = CharTableArray(detectChars, rule);
-                    updateUnreachable1(tables.find(rule.char0));
-                    tables.removeNonSpecialWhenSpecial();
-                    tables.append(rule.char0, rule);
-                }
+            // check if is hidden by DetectChar/AnyChar
+            // then add the characters to detectChars or dynamicDetectChars
+            case Context::Rule::Type::DetectChar: {
+                auto &chars4 = (rule.dynamic != XmlBool::True) ? detectChars : dynamicDetectChars;
+                auto tables = CharTableArray(chars4, rule);
+                updateUnreachable1(tables.find(rule.char0));
+                tables.removeNonSpecialWhenSpecial();
+                tables.append(rule.char0, rule);
                 break;
+            }
 
+            // check if hidden by DetectChar/AnyChar
+            // then add spaces characters to detectChars
             case Context::Rule::Type::DetectSpaces: {
                 auto tables = CharTableArray(detectChars, rule);
                 updateUnreachable2(tables.find(QStringLiteral(" \t")));
@@ -1642,53 +1652,73 @@ private:
                 break;
             }
 
+            // check if hidden by DetectChar/AnyChar
             case Context::Rule::Type::HlCChar:
                 updateUnreachable1(CharTableArray(detectChars, rule).find(QLatin1Char('\'')));
+                updateUnreachable1(hlCCharRule);
+                hlCCharRule = {&rule, nullptr};
                 break;
 
+            // check if hidden by DetectChar/AnyChar
             case Context::Rule::Type::HlCHex:
+                updateUnreachable1(CharTableArray(detectChars, rule).find(QLatin1Char('0')));
+                updateUnreachable1(hlCHexRule);
+                hlCHexRule = {&rule, nullptr};
+                break;
+
+            // check if hidden by DetectChar/AnyChar
             case Context::Rule::Type::HlCOct:
                 updateUnreachable1(CharTableArray(detectChars, rule).find(QLatin1Char('0')));
+                updateUnreachable1(hlCOctRule);
+                hlCOctRule = {&rule, nullptr};
                 break;
 
+            // check if hidden by DetectChar/AnyChar
             case Context::Rule::Type::HlCStringChar:
                 updateUnreachable1(CharTableArray(detectChars, rule).find(QLatin1Char('\\')));
+                updateUnreachable1(hlCStringCharRule);
+                hlCStringCharRule = {&rule, nullptr};
                 break;
 
+            // check if hidden by DetectChar/AnyChar
             case Context::Rule::Type::Int:
                 updateUnreachable2(CharTableArray(detectChars, rule).find(QStringLiteral("0123456789")));
+                updateUnreachable1(intRule);
+                intRule = {&rule, nullptr};
                 break;
 
+            // check if hidden by DetectChar/AnyChar
             case Context::Rule::Type::Float:
                 updateUnreachable2(CharTableArray(detectChars, rule).find(QStringLiteral("0123456789.")));
+                updateUnreachable1(floatRule);
+                floatRule = {&rule, nullptr};
                 break;
 
-            case Context::Rule::Type::LineContinue:
+            // check if hidden by DetectChar/AnyChar or another LineContinue
+            case Context::Rule::Type::LineContinue: {
+                updateUnreachable1(CharTableArray(detectChars, rule).find(rule.char0));
+
+                auto tables = CharTableArray(lineContinueChars, rule);
+                updateUnreachable1(tables.find(rule.char0));
+                tables.removeNonSpecialWhenSpecial();
+                tables.append(rule.char0, rule);
+                break;
+            }
+
+            // check if hidden by DetectChar/AnyChar or another Detect2Chars/RangeDetect
+            case Context::Rule::Type::Detect2Chars:
             case Context::Rule::Type::RangeDetect:
                 updateUnreachable1(CharTableArray(detectChars, rule).find(rule.char0));
-                break;
-
-            case Context::Rule::Type::Detect2Chars:
-                updateUnreachable1(CharTableArray(detectChars, rule).find(rule.char0));
                 if (!isUnreachable) {
-                    auto t1 = CharTableArray(firstChars, rule);
-                    auto t2 = CharTableArray(secondChars, rule);
-                    if (t1.find(rule.char0) && t2.find(rule.char1)) {
-                        RuleIterator ruleIterator(context.rules, rule);
-                        while (const auto *rulePtr = ruleIterator.next()) {
-                            if (isUnreachable)
-                                break;
-                            const auto &rule2 = *rulePtr;
-                            if (rule2.type == Context::Rule::Type::Detect2Chars && isCompatible(rule2) && rule.char0 == rule2.char0
-                                && rule.char1 == rule2.char1) {
-                                updateUnreachable1({&rule2, ruleIterator.currentIncludeRules()});
-                            }
+                    RuleIterator ruleIterator(context.rules, rule);
+                    while (const auto *rulePtr = ruleIterator.next()) {
+                        if (isUnreachable)
+                            break;
+                        const auto &rule2 = *rulePtr;
+                        if (rule2.type == rule.type && isCompatible(rule2) && rule.char0 == rule2.char0 && rule.char1 == rule2.char1) {
+                            updateUnreachable1({&rule2, ruleIterator.currentIncludeRules()});
                         }
                     }
-                    t1.removeNonSpecialWhenSpecial();
-                    t2.removeNonSpecialWhenSpecial();
-                    t1.append(rule.char0, rule);
-                    t2.append(rule.char1, rule);
                 }
                 break;
 
@@ -1712,9 +1742,10 @@ private:
 
                 Q_FALLTHROUGH();
             }
+            // check if a rule does not have another rule as a prefix
             case Context::Rule::Type::WordDetect:
             case Context::Rule::Type::StringDetect: {
-                // check that dynamic `rule` does not have another StringDetect as a prefix
+                // check that dynamic `rule` does not have another dynamic StringDetect as a prefix
                 if (rule.type == Context::Rule::Type::StringDetect && rule.dynamic == XmlBool::True) {
                     RuleIterator ruleIterator(context.rules, rule);
                     while (const auto *rulePtr = ruleIterator.next()) {
@@ -1734,93 +1765,107 @@ private:
                     }
                 }
 
-                const QStringView s = getString(rule);
+                // string used for comparison and truncated from "dynamic" part
+                QStringView s = rule.string;
 
-                auto containsChar = [](const CharTableArray &t, QChar c, XmlBool insensitive) {
-                    if (insensitive != XmlBool::True) {
-                        return t.find(c);
-                    }
-                    if (auto ruleAndInclude = t.find(c.toLower())) {
-                        return ruleAndInclude;
-                    }
-                    return t.find(c.toUpper());
-                };
-
-                // check against DetectChar
-                if (s.size() > 0) {
-                    auto t = CharTableArray(detectChars, rule);
-                    updateUnreachable1(containsChar(t, s[0], rule.insensitive));
+                // truncate to '%' with dynamic rules
+                if (rule.dynamic == XmlBool::True) {
+                    static const QRegularExpression dynamicPosition(QStringLiteral(R"(^(?:[^%]*|%(?![1-9]))*)"));
+                    auto result = dynamicPosition.match(rule.string);
+                    s = s.left(result.capturedLength());
                 }
 
-                // check against Detect2Chars, StringDetect, WordDetect
+                QString sanitizedRegex;
+                // truncate to special character with RegExpr.
+                // If regexp contains '|', `s` becomes empty.
+                if (rule.type == Context::Rule::Type::RegExpr) {
+                    static const QRegularExpression regularChars(QStringLiteral(R"(^(?:[^.?*+^$[{(\\|]+|\\[-.?*+^$[\]{}()\\|]+|\[[^^\\]\])+)"));
+                    static const QRegularExpression sanitizeChars(QStringLiteral(R"(\\([-.?*+^$[\]{}()\\|])|\[([^^\\])\])"));
+                    const qsizetype result = regularChars.match(rule.string).capturedLength();
+                    const qsizetype pos = qMin(result, s.size());
+                    if (rule.string.indexOf(QLatin1Char('|'), pos) < pos) {
+                        sanitizedRegex = rule.string.left(qMin(result, s.size()));
+                        sanitizedRegex.replace(sanitizeChars, QStringLiteral("\\1"));
+                        s = sanitizedRegex;
+                    } else {
+                        s = QStringView();
+                    }
+                }
+
+                // check if hidden by DetectChar/AnyChar
+                if (s.size() > 0) {
+                    auto t = CharTableArray(detectChars, rule);
+                    if (rule.insensitive != XmlBool::True) {
+                        updateUnreachable1(t.find(s[0]));
+                    }
+                    else {
+                        QChar c2[]{s[0].toLower(), s[0].toUpper()};
+                        updateUnreachable2(t.find(QStringView(c2, 2)));
+                    }
+                }
+
+                // check if Detect2Chars, StringDetect, WordDetect is not a prefix of s
                 if (s.size() > 0 && !isUnreachable) {
-                    auto t = CharTableArray(firstChars, rule);
-                    if (containsChar(t, s[0], rule.insensitive)) {
-                        // combination of uppercase and lowercase
-                        RuleAndInclude detect2CharsInsensitives[]{{}, {}, {}, {}};
+                    // combination of uppercase and lowercase
+                    RuleAndInclude detect2CharsInsensitives[]{{}, {}, {}, {}};
 
-                        RuleIterator ruleIterator(context.rules, rule);
-                        while (const auto *rulePtr = ruleIterator.next()) {
-                            if (isUnreachable)
-                                break;
-                            const auto &rule2 = *rulePtr;
-                            const bool isSensitive = (rule2.insensitive == XmlBool::True);
-                            const auto caseSensitivity = isSensitive ? Qt::CaseInsensitive : Qt::CaseSensitive;
+                    RuleIterator ruleIterator(context.rules, rule);
+                    while (const auto *rulePtr = ruleIterator.next()) {
+                        if (isUnreachable)
+                            break;
+                        const auto &rule2 = *rulePtr;
+                        const bool isSensitive = (rule2.insensitive == XmlBool::True);
+                        const auto caseSensitivity = isSensitive ? Qt::CaseInsensitive : Qt::CaseSensitive;
 
-                            switch (rule2.type) {
-                            case Context::Rule::Type::Detect2Chars:
-                                if (isCompatible(rule2) && s.size() >= 2) {
-                                    if (rule.insensitive != XmlBool::True) {
-                                        if (rule2.char0 == s[0] && rule2.char1 == s[1]) {
-                                            updateUnreachable1({&rule2, ruleIterator.currentIncludeRules()});
+                        switch (rule2.type) {
+                        // check that it is not a detectChars prefix
+                        case Context::Rule::Type::Detect2Chars:
+                            if (isCompatible(rule2) && s.size() >= 2) {
+                                if (rule.insensitive != XmlBool::True) {
+                                    if (rule2.char0 == s[0] && rule2.char1 == s[1]) {
+                                        updateUnreachable1({&rule2, ruleIterator.currentIncludeRules()});
+                                    }
+                                } else {
+                                    // when the string is case insensitive,
+                                    // all 4 upper/lower case combinations must be found
+                                    auto set = [&](RuleAndInclude &x, QChar c1, QChar c2) {
+                                        if (!x && rule2.char0 == c1 && rule2.char0 == c2) {
+                                            x = {&rule2, ruleIterator.currentIncludeRules()};
                                         }
-                                    } else {
-                                        auto set = [&](RuleAndInclude &x, QChar c1, QChar c2) {
-                                            if (!x && rule2.char0 == c1 && rule2.char0 == c2) {
-                                                x = {&rule2, ruleIterator.currentIncludeRules()};
-                                            }
-                                        };
-                                        set(detect2CharsInsensitives[0], s[0].toLower(), s[1].toLower());
-                                        set(detect2CharsInsensitives[1], s[0].toLower(), s[1].toUpper());
-                                        set(detect2CharsInsensitives[2], s[0].toUpper(), s[1].toUpper());
-                                        set(detect2CharsInsensitives[3], s[0].toUpper(), s[1].toLower());
+                                    };
+                                    set(detect2CharsInsensitives[0], s[0].toLower(), s[1].toLower());
+                                    set(detect2CharsInsensitives[1], s[0].toLower(), s[1].toUpper());
+                                    set(detect2CharsInsensitives[2], s[0].toUpper(), s[1].toUpper());
+                                    set(detect2CharsInsensitives[3], s[0].toUpper(), s[1].toLower());
 
-                                        if (detect2CharsInsensitives[0] && detect2CharsInsensitives[1] && detect2CharsInsensitives[2]
-                                            && detect2CharsInsensitives[3]) {
-                                            isUnreachable = true;
-                                            unreachableBy.append(detect2CharsInsensitives[0]);
-                                            unreachableBy.append(detect2CharsInsensitives[1]);
-                                            unreachableBy.append(detect2CharsInsensitives[2]);
-                                            unreachableBy.append(detect2CharsInsensitives[3]);
-                                        }
+                                    if (detect2CharsInsensitives[0] && detect2CharsInsensitives[1] && detect2CharsInsensitives[2]
+                                        && detect2CharsInsensitives[3]) {
+                                        isUnreachable = true;
+                                        unreachableBy.append(detect2CharsInsensitives[0]);
+                                        unreachableBy.append(detect2CharsInsensitives[1]);
+                                        unreachableBy.append(detect2CharsInsensitives[2]);
+                                        unreachableBy.append(detect2CharsInsensitives[3]);
                                     }
                                 }
-                                break;
-
-                            case Context::Rule::Type::StringDetect:
-                                if (isCompatible(rule2) && rule2.dynamic != XmlBool::True && (isSensitive || rule.insensitive != XmlBool::True)
-                                    && s.startsWith(rule2.string, caseSensitivity)) {
-                                    updateUnreachable1({&rule2, ruleIterator.currentIncludeRules()});
-                                }
-                                break;
-
-                            case Context::Rule::Type::WordDetect:
-                                if (isCompatible(rule2) && rule.type == Context::Rule::Type::WordDetect && (isSensitive || rule.insensitive != XmlBool::True)
-                                    && s.startsWith(rule2.string, caseSensitivity)) {
-                                    updateUnreachable1({&rule2, ruleIterator.currentIncludeRules()});
-                                }
-                                break;
-
-                            default:;
                             }
-                        }
+                            break;
 
-                        t.removeNonSpecialWhenSpecial();
-                        if (rule.insensitive != XmlBool::True) {
-                            t.append(s[0], rule);
-                        } else {
-                            t.append(s[0].toLower(), rule);
-                            t.append(s[0].toUpper(), rule);
+                        // check that it is not a StringDetect prefix
+                        case Context::Rule::Type::StringDetect:
+                            if (isCompatible(rule2) && rule2.dynamic != XmlBool::True && (isSensitive || rule.insensitive != XmlBool::True)
+                                && s.startsWith(rule2.string, caseSensitivity)) {
+                                updateUnreachable1({&rule2, ruleIterator.currentIncludeRules()});
+                            }
+                            break;
+
+                        // check if a WordDetect is hidden by another WordDetect
+                        case Context::Rule::Type::WordDetect:
+                            if (rule.type == Context::Rule::Type::WordDetect && isCompatible(rule2) && (isSensitive || rule.insensitive != XmlBool::True) && 0 == rule.string.compare(rule2.string, caseSensitivity)) {
+                                updateUnreachable1({&rule2, ruleIterator.currentIncludeRules()});
+                            }
+                            break;
+
+                        default:;
                         }
                     }
                 }
@@ -1828,6 +1873,26 @@ private:
                 break;
             }
 
+            // check if hidden by another keyword rule
+            case Context::Rule::Type::keyword: {
+                RuleIterator ruleIterator(context.rules, rule);
+                while (const auto *rulePtr = ruleIterator.next()) {
+                    if (isUnreachable)
+                        break;
+                    const auto &rule2 = *rulePtr;
+                    if (rule2.type == Context::Rule::Type::keyword && isCompatible(rule2) && rule.string == rule2.string) {
+                        updateUnreachable1({&rule2, ruleIterator.currentIncludeRules()});
+                    }
+                }
+                // TODO check that all keywords are hidden by another rules
+                break;
+            }
+
+            // add characters in those used but without checking if they are already.
+            //  <DetectChar char="}" />
+            //  <includedRules .../> <- reference an another <DetectChar char="}" /> who will not be checked
+            //  <includedRules .../> <- reference a <DetectChar char="{" /> who will be added
+            //  <DetectChar char="{" /> <- hidden by previous rule
             case Context::Rule::Type::IncludeRules:
                 for (const auto *rulePtr : rule.includedRules) {
                     const auto &rule2 = *rulePtr;
@@ -1839,13 +1904,13 @@ private:
                         break;
                     }
 
-                    case Context::Rule::Type::DetectChar:
-                        if (rule2.dynamic != XmlBool::True) {
-                            auto tables = CharTableArray(detectChars, rule2);
-                            tables.removeNonSpecialWhenSpecial();
-                            tables.append(rule2.char0, rule2, &rule);
-                        }
+                    case Context::Rule::Type::DetectChar: {
+                        auto &chars4 = (rule.dynamic != XmlBool::True) ? detectChars : dynamicDetectChars;
+                        auto tables = CharTableArray(chars4, rule2);
+                        tables.removeNonSpecialWhenSpecial();
+                        tables.append(rule2.char0, rule2, &rule);
                         break;
+                    }
 
                     case Context::Rule::Type::DetectSpaces: {
                         auto tables = CharTableArray(detectChars, rule2);
@@ -1855,49 +1920,50 @@ private:
                         break;
                     }
 
-                    case Context::Rule::Type::Detect2Chars: {
-                        auto t1 = CharTableArray(firstChars, rule2);
-                        auto t2 = CharTableArray(secondChars, rule2);
-                        t1.removeNonSpecialWhenSpecial();
-                        t2.removeNonSpecialWhenSpecial();
-                        t1.append(rule2.char0, rule2, &rule);
-                        t2.append(rule2.char1, rule2, &rule);
+                    case Context::Rule::Type::HlCChar:
+                        hlCCharRule = {&rule2, &rule};
+                        break;
+
+                    case Context::Rule::Type::HlCHex:
+                        hlCHexRule = {&rule2, &rule};
+                        break;
+
+                    case Context::Rule::Type::HlCOct:
+                        hlCOctRule = {&rule2, &rule};
+                        break;
+
+                    case Context::Rule::Type::HlCStringChar:
+                        hlCStringCharRule = {&rule2, &rule};
+                        break;
+
+                    case Context::Rule::Type::Int:
+                        intRule = {&rule2, &rule};
+                        break;
+
+                    case Context::Rule::Type::Float:
+                        floatRule = {&rule2, &rule};
+                        break;
+
+                    case Context::Rule::Type::LineContinue: {
+                        auto tables = CharTableArray(lineContinueChars, rule2);
+                        tables.removeNonSpecialWhenSpecial();
+                        tables.append(rule2.char0, rule2, &rule);
                         break;
                     }
 
                     case Context::Rule::Type::RegExpr:
                         if (rule2.isDotRegex) {
                             dotRegex.append(rule2, &rule);
-                            break;
-                        }
-                        Q_FALLTHROUGH();
-                    case Context::Rule::Type::WordDetect:
-                    case Context::Rule::Type::StringDetect: {
-                        const QStringView s = getString(rule2);
-                        if (s.size() > 0) {
-                            auto t = CharTableArray(firstChars, rule2);
-                            t.removeNonSpecialWhenSpecial();
-                            if (rule2.insensitive != XmlBool::True) {
-                                t.append(s[0], rule2, &rule);
-                            } else {
-                                t.append(s[0].toLower(), rule2, &rule);
-                                t.append(s[0].toUpper(), rule2, &rule);
-                            }
                         }
                         break;
-                    }
 
+                    case Context::Rule::Type::WordDetect:
+                    case Context::Rule::Type::StringDetect:
+                    case Context::Rule::Type::Detect2Chars:
                     case Context::Rule::Type::IncludeRules:
                     case Context::Rule::Type::DetectIdentifier:
                     case Context::Rule::Type::keyword:
                     case Context::Rule::Type::Unknown:
-                    case Context::Rule::Type::HlCChar:
-                    case Context::Rule::Type::HlCHex:
-                    case Context::Rule::Type::HlCOct:
-                    case Context::Rule::Type::HlCStringChar:
-                    case Context::Rule::Type::Int:
-                    case Context::Rule::Type::Float:
-                    case Context::Rule::Type::LineContinue:
                     case Context::Rule::Type::RangeDetect:
                         break;
                     }
@@ -1905,7 +1971,6 @@ private:
                 break;
 
             case Context::Rule::Type::DetectIdentifier:
-            case Context::Rule::Type::keyword:
             case Context::Rule::Type::Unknown:
                 break;
             }

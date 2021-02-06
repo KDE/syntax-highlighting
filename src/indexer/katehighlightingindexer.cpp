@@ -23,6 +23,8 @@
 #include "../lib/worddelimiters_p.h"
 #include "../lib/xml_p.h"
 
+#include <array>
+
 using KSyntaxHighlighting::WordDelimiters;
 using KSyntaxHighlighting::Xml::attrToBool;
 

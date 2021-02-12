@@ -36,6 +36,8 @@ echo text${array["string"]}.text
 echo short are $_, $$, $?, ${@}, etc.
 echo ${variable/a/d}
 echo ${1:-default}
+echo ${10} $10a
+echo $!
 
 
 # expression subst:

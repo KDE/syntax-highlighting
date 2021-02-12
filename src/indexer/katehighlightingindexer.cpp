@@ -396,6 +396,10 @@ private:
             // AnyChar, DetectChar, StringDetect, RegExpr, WordDetect, keyword
             QString string;
 
+            // Float, HlCHex, HlCOct, Int, WordDetect, keyword
+            QString additionalDeliminator;
+            QString weakDeliminator;
+
             // included by IncludeRules
             QVector<const Rule *> includedRules;
 
@@ -460,22 +464,53 @@ private:
                     Parser parser{filename, xml, attr, success};
                     XmlBool includeAttrib{};
 
-                    const bool isExtracted = parser.extractString(attribute, QStringLiteral("attribute"))
-                        || parser.extractString(context.name, QStringLiteral("context")) || parser.extractXmlBool(lookhAhead, QStringLiteral("lookAhead"))
-                        || parser.extractXmlBool(firstNonSpace, QStringLiteral("firstNonSpace"))
-                        || parser.extractString(beginRegion, QStringLiteral("beginRegion")) || parser.extractString(endRegion, QStringLiteral("endRegion"))
-                        || parser.extractPositive(column, QStringLiteral("column"))
-                        || ((type == Type::RegExpr || type == Type::StringDetect || type == Type::WordDetect || type == Type::keyword)
-                            && parser.extractXmlBool(insensitive, QStringLiteral("insensitive")))
-                        || ((type == Type::DetectChar || type == Type::RegExpr || type == Type::StringDetect || type == Type::keyword)
-                            && parser.extractXmlBool(dynamic, QStringLiteral("dynamic")))
-                        || ((type == Type::RegExpr) && parser.extractXmlBool(minimal, QStringLiteral("minimal")))
-                        || ((type == Type::DetectChar || type == Type::Detect2Chars || type == Type::LineContinue || type == Type::RangeDetect)
-                            && parser.extractChar(char0, QStringLiteral("char")))
-                        || ((type == Type::Detect2Chars || type == Type::RangeDetect) && parser.extractChar(char1, QStringLiteral("char1")))
-                        || ((type == Type::AnyChar || type == Type::RegExpr || type == Type::StringDetect || type == Type::WordDetect || type == Type::keyword)
-                            && parser.extractString(string, QStringLiteral("String")))
-                        || ((type == Type::IncludeRules) && parser.extractXmlBool(includeAttrib, QStringLiteral("includeAttrib")));
+                    // clang-format off
+                    const bool isExtracted
+                        = parser.extractString(attribute, QStringLiteral("attribute"))
+                       || parser.extractString(context.name, QStringLiteral("context"))
+                       || parser.extractXmlBool(lookhAhead, QStringLiteral("lookAhead"))
+                       || parser.extractXmlBool(firstNonSpace, QStringLiteral("firstNonSpace"))
+                       || parser.extractString(beginRegion, QStringLiteral("beginRegion"))
+                       || parser.extractString(endRegion, QStringLiteral("endRegion"))
+                       || parser.extractPositive(column, QStringLiteral("column"))
+                       || ((type == Type::RegExpr
+                         || type == Type::StringDetect
+                         || type == Type::WordDetect
+                         || type == Type::keyword
+                         ) && parser.extractXmlBool(insensitive, QStringLiteral("insensitive")))
+                       || ((type == Type::DetectChar
+                         || type == Type::RegExpr
+                         || type == Type::StringDetect
+                         || type == Type::keyword
+                         ) && parser.extractXmlBool(dynamic, QStringLiteral("dynamic")))
+                       || ((type == Type::RegExpr)
+                           && parser.extractXmlBool(minimal, QStringLiteral("minimal")))
+                       || ((type == Type::DetectChar
+                         || type == Type::Detect2Chars
+                         || type == Type::LineContinue
+                         || type == Type::RangeDetect
+                         ) && parser.extractChar(char0, QStringLiteral("char")))
+                       || ((type == Type::Detect2Chars
+                         || type == Type::RangeDetect
+                         ) && parser.extractChar(char1, QStringLiteral("char1")))
+                       || ((type == Type::AnyChar
+                         || type == Type::RegExpr
+                         || type == Type::StringDetect
+                         || type == Type::WordDetect
+                         || type == Type::keyword
+                         ) && parser.extractString(string, QStringLiteral("String")))
+                       || ((type == Type::IncludeRules)
+                           && parser.extractXmlBool(includeAttrib, QStringLiteral("includeAttrib")))
+                       || ((type == Type::Float
+                         || type == Type::HlCHex
+                         || type == Type::HlCOct
+                         || type == Type::Int
+                         || type == Type::keyword
+                         || type == Type::WordDetect
+                         ) && (parser.extractString(additionalDeliminator, QStringLiteral("additionalDeliminator"))
+                            || parser.extractString(weakDeliminator, QStringLiteral("weakDeliminator"))))
+                    ;
+                    // clang-format on
 
                     success = parser.checkIfExtracted(isExtracted);
 
@@ -864,6 +899,7 @@ private:
                 success = checkAnyChar(rule) && success;
                 success = checkKeyword(definition, rule, referencedKeywords) && success;
                 success = checkRegExpr(filename, rule, context) && success;
+                success = checkDelimiters(definition, rule) && success;
             }
         }
 
@@ -876,7 +912,7 @@ private:
     //! - dynamic=true but no place holder used?
     //! - is not . with lookAhead="1"
     //! - is not ^... without column ou firstNonSpace attribute
-    //! - is not equivalent to DetectSpaces, DetectChar, Detect2Chars, StringDetect
+    //! - is not equivalent to DetectSpaces, DetectChar, Detect2Chars, StringDetect, DetectIdentifier
     //! - has no unused captures
     bool checkRegExpr(const QString &filename, const Context::Rule &rule, const Context &context) const
     {
@@ -1063,6 +1099,19 @@ private:
                 useCapture = maxCapture;
             }
 
+            if (!useCapture) {
+                // is DetectIdentifier
+                static const QRegularExpression isInsensitiveDetectIdentifier(
+                    QStringLiteral(R"(^(\((\?:)?)?\[((a-z|_){2}|(A-Z|_){2})\]([+][*?]?)?\[((0-9|a-z|_){3}|(0-9|A-Z|_){3})\][*][*?]?(\))?$)"));
+                static const QRegularExpression isSensitiveDetectIdentifier(
+                    QStringLiteral(R"(^(\((\?:)?)?\[(a-z|A-Z|_){3}\]([+][*?]?)?\[(0-9|a-z|A-Z|_){4}\][*][*?]?(\))?$)"));
+                auto &isDetectIdentifier = (rule.insensitive == XmlBool::True) ? isInsensitiveDetectIdentifier : isSensitiveDetectIdentifier;
+                if (rule.string.contains(isDetectIdentifier)) {
+                    qWarning() << rule.filename << "line" << rule.line << "RegExpr should be replaced by DetectIdentifier:" << rule.string;
+                    return false;
+                }
+            }
+
             if (rule.isDotRegex) {
                 // search next rule with same column or firstNonSpace
                 int i = &rule - context.rules.data() + 1;
@@ -1181,6 +1230,36 @@ private:
         }
 
         return success;
+    }
+
+    //! Search for additionalDeliminator/weakDeliminator which has no effect.
+    bool checkDelimiters(const Definition &definition, const Context::Rule &rule) const
+    {
+        if (rule.additionalDeliminator.isEmpty() && rule.weakDeliminator.isEmpty())
+            return true;
+
+        bool success = true;
+
+        if (definition.kateVersion < Version{5, 79}) {
+            qWarning() << definition.filename << "line" << rule.line
+                       << "additionalDeliminator and weakDeliminator are only available since version \"5.79\". Please, increase kateversion.";
+            success = false;
+        }
+
+        for (QChar c : rule.additionalDeliminator) {
+            if (!definition.wordDelimiters.contains(c)) {
+                return success;
+            }
+        }
+
+        for (QChar c : rule.weakDeliminator) {
+            if (definition.wordDelimiters.contains(c)) {
+                return success;
+            }
+        }
+
+        qWarning() << rule.filename << "line" << rule.line << "unnecessary use of additionalDeliminator and/or weakDeliminator" << rule.string;
+        return false;
     }
 
     //! Search for rules with lookAhead="true" and context="#stay".
@@ -1799,8 +1878,7 @@ private:
                     auto t = CharTableArray(detectChars, rule);
                     if (rule.insensitive != XmlBool::True) {
                         updateUnreachable1(t.find(s[0]));
-                    }
-                    else {
+                    } else {
                         QChar c2[]{s[0].toLower(), s[0].toUpper()};
                         updateUnreachable2(t.find(QStringView(c2, 2)));
                     }
@@ -1862,7 +1940,8 @@ private:
 
                         // check if a WordDetect is hidden by another WordDetect
                         case Context::Rule::Type::WordDetect:
-                            if (rule.type == Context::Rule::Type::WordDetect && isCompatible(rule2) && (isSensitive || rule.insensitive != XmlBool::True) && 0 == rule.string.compare(rule2.string, caseSensitivity)) {
+                            if (rule.type == Context::Rule::Type::WordDetect && isCompatible(rule2) && (isSensitive || rule.insensitive != XmlBool::True)
+                                && 0 == rule.string.compare(rule2.string, caseSensitivity)) {
                                 updateUnreachable1({&rule2, ruleIterator.currentIncludeRules()});
                             }
                             break;

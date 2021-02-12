@@ -52,10 +52,10 @@
 
         <!ENTITY heredocq "(?|&quot;([^&quot;]+)&quot;|'([^']+)'|\\(.[^&wordseps;&substseps;]*))">
 
-        <!ENTITY int "(?:[0-9]++(_++[0-9]++)*+)">
+        <!ENTITY int "(?:[0-9]++[_0-9]*+)">
         <!ENTITY exp "(?:[eE][-+]?&int;)">
 ]>
-<language name="Zsh" version="17" kateversion="5.62" section="Scripts" extensions="*.sh;*.zsh;.zshrc;.zprofile;.zlogin;.zlogout;.profile" mimetype="application/x-shellscript" casesensitive="1" author="Jonathan Poelen (jonathan.poelen@gmail.com)" license="MIT">
+<language name="Zsh" version="18" kateversion="5.79" section="Scripts" extensions="*.sh;*.zsh;.zshrc;.zprofile;.zlogin;.zlogout;.profile" mimetype="application/x-shellscript" casesensitive="1" author="Jonathan Poelen (jonathan.poelen@gmail.com)" license="MIT">
 
   <highlighting>
     <list name="keywords">
@@ -332,7 +332,7 @@
       </context>
       <context attribute="Command" lineEndContext="#pop" name="DispatchVarNameVariables">
         <Detect2Chars context="#pop!VarNameSpe" char="$" char1="#" lookAhead="1"/>
-        <RegExpr attribute="Variable" context="#pop!AfterVarName" String="\$(?:&varname;|[0-9]+|[-*@?$])"/>
+        <RegExpr attribute="Variable" context="#pop!AfterVarName" String="\$(?:&varname;|[0-9]+|[-*@?$!])"/>
         <Detect2Chars context="#pop!VarNameSpe" char="$" char1="~" lookAhead="1"/>
         <Detect2Chars context="#pop!VarNameSpe" char="$" char1="=" lookAhead="1"/>
         <Detect2Chars context="#pop!VarNameSpe" char="$" char1="^" lookAhead="1"/>
@@ -349,7 +349,9 @@
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarNameParam+" char="+"/>
       </context>
       <context attribute="Command" lineEndContext="#pop" name="VarNameSubstLen" fallthroughContext="#pop!AfterVarName">
-        <RegExpr attribute="Variable" context="#pop!AfterVarName" String="&varname;|[0-9]+|[-*@?$]"/>
+        <DetectIdentifier attribute="Variable" context="#pop!AfterVarName"/>
+        <AnyChar attribute="Variable" context="#pop!AfterVarName" String="-*@?$"/>
+        <Int attribute="Variable" context="#pop!AfterVarName" additionalDeliminator="#~=^+{}[]:-/$"/>
       </context>
       <context attribute="Command" lineEndContext="#pop" name="VarNameParam" fallthroughContext="#pop!AfterVarName">
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarNameSubstLen" char="#"/>
@@ -1001,9 +1003,6 @@
         <DetectChar attribute="Parameter Expansion" context="#pop!VarFlags" char="("/>
         <IncludeRules context="VarFlagsVar"/>
       </context>
-      <context attribute="Variable" lineEndContext="#stay" name="FindBraceVarName">
-        <RegExpr attribute="Variable" context="#pop!CheckVarAlt" String="&varname;|[0-9]+|[*@?$!-]"/>
-      </context>
       <context attribute="Variable" lineEndContext="#stay" name="VarBraceStartRecursive" fallthroughContext="#pop#pop!CheckVarAlt">
         <Detect2Chars attribute="Parameter Expansion" context="VarBraceStart" char="$" char1="{"/>
         <StringDetect attribute="Parameter Expansion" context="#pop!ExprDblParenSubst" String="$((" beginRegion="expression"/>
@@ -1143,7 +1142,9 @@
         <DetectChar attribute="Parameter Expansion" context="#pop" char="}"/>
         <DetectChar attribute="String DoubleQ" context="StringDQ" char="&quot;"/>
         <AnyChar attribute="Parameter Expansion Operator" context="#stay" String="#+^=~"/>
-        <IncludeRules context="FindBraceVarName"/>
+        <DetectIdentifier attribute="Variable" context="#pop!CheckVarAlt"/>
+        <AnyChar attribute="Variable" context="#pop!CheckVarAlt" String="*@?$!-"/>
+        <Int attribute="Variable" context="#pop!CheckVarAlt" additionalDeliminator="#~=^+{}[]:-/$"/>
       </context>
 
       <context attribute="Parameter Expansion" lineEndContext="#stay" name="VarFlag_s">
@@ -1377,7 +1378,7 @@
       <context attribute="Number" lineEndContext="#pop" name="Number">
         <Detect2Chars attribute="Hex" context="#pop!Hex" char="0" char1="x"/>
         <Detect2Chars attribute="Hex" context="#pop!Hex" char="0" char1="X"/>
-        <RegExpr attribute="Base" context="#pop!BaseN" String="[1-9][0-9_]*#"/>
+        <RegExpr attribute="Base" context="#pop!BaseN" String="[1-9][0-9_]*+#"/>
         <RegExpr attribute="Number" context="#pop" String="&int;(\.(&int;&exp;?+|&exp;)?|&exp;)?|\.&int;&exp;?"/>
         <DetectChar attribute="Operator" context="#pop" char="."/>
       </context>

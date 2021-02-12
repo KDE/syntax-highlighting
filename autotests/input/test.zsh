@@ -142,6 +142,10 @@ read x y z <<< $hallo
 unset B
 declare -a VAR1 VAR2 && exit
 declare less a && b
+declare a=(1 2)
+getopts :h:l::d arg
+read #comment
+let a=4+4 3+a b=c+3 d+3 d*4 # * is a glob
 
 # options are recoqnized:
 zip -f=file.zip

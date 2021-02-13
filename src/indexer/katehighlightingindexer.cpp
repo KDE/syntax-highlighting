@@ -400,8 +400,11 @@ private:
             QString additionalDeliminator;
             QString weakDeliminator;
 
-            // included by IncludeRules
+            // rules included by IncludeRules
             QVector<const Rule *> includedRules;
+
+            // IncludeRules included by IncludeRules
+            QSet<const Rule *> includedIncludeRules;
 
             QString filename;
 
@@ -803,14 +806,18 @@ private:
                             } else if (&rule == &includedRule) {
                                 qWarning() << definition.filename << "line" << rule.line << "IncludeRules refers to himself by recursivity";
                                 m_success = false;
-                            } else if (includedRule.includedRules.isEmpty()) {
-                                const auto *context = includedRule.context.context;
-                                if (context && !usedContexts.contains(context)) {
-                                    contexts.append(context);
-                                    usedContexts.insert(context);
-                                }
                             } else {
-                                rule.includedRules.append(includedRule.includedRules);
+                                rule.includedIncludeRules.insert(&includedRule);
+
+                                if (includedRule.includedRules.isEmpty()) {
+                                    const auto *context = includedRule.context.context;
+                                    if (context && !usedContexts.contains(context)) {
+                                        contexts.append(context);
+                                        usedContexts.insert(context);
+                                    }
+                                } else {
+                                    rule.includedRules.append(includedRule.includedRules);
+                                }
                             }
                         }
                     }
@@ -1707,6 +1714,9 @@ private:
         RuleAndInclude hlCHexRule{};
         RuleAndInclude hlCStringCharRule{};
 
+        // Contains includedRules and included includedRules
+        QMap<Context const*, RuleAndInclude> includeContexts;
+
         DotRegex dotRegex;
 
         for (const Context::Rule &rule : context.rules) {
@@ -2012,6 +2022,17 @@ private:
             //  <includedRules .../> <- reference a <DetectChar char="{" /> who will be added
             //  <DetectChar char="{" /> <- hidden by previous rule
             case Context::Rule::Type::IncludeRules:
+                if (auto &ruleAndInclude = includeContexts[rule.context.context]) {
+                    updateUnreachable1(ruleAndInclude);
+                }
+                else {
+                    ruleAndInclude.rule = &rule;
+                }
+
+                for (const auto *rulePtr : rule.includedIncludeRules) {
+                    includeContexts.insert(rulePtr->context.context, RuleAndInclude{rulePtr, &rule});
+                }
+
                 for (const auto *rulePtr : rule.includedRules) {
                     const auto &rule2 = *rulePtr;
                     switch (rule2.type) {
@@ -2101,9 +2122,9 @@ private:
                     message += QStringLiteral("line ");
                     if (ruleAndInclude.includeRules) {
                         message += QString::number(ruleAndInclude.includeRules->line);
-                        message += QStringLiteral(" [");
+                        message += QStringLiteral(" [by '");
                         message += ruleAndInclude.includeRules->context.name;
-                        message += QStringLiteral(" line ");
+                        message += QStringLiteral("' line ");
                         message += QString::number(ruleAndInclude.rule->line);
                         if (ruleAndInclude.includeRules->filename != ruleAndInclude.rule->filename) {
                             message += QStringLiteral(" (");

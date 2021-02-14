@@ -376,7 +376,7 @@ private:
             QString beginRegion;
             QString endRegion;
             int column = -1;
-            XmlBool lookhAhead{};
+            XmlBool lookAhead{};
             XmlBool firstNonSpace{};
 
             // StringDetect, WordDetect, keyword
@@ -471,7 +471,7 @@ private:
                     const bool isExtracted
                         = parser.extractString(attribute, QStringLiteral("attribute"))
                        || parser.extractString(context.name, QStringLiteral("context"))
-                       || parser.extractXmlBool(lookhAhead, QStringLiteral("lookAhead"))
+                       || parser.extractXmlBool(lookAhead, QStringLiteral("lookAhead"))
                        || parser.extractXmlBool(firstNonSpace, QStringLiteral("firstNonSpace"))
                        || parser.extractString(beginRegion, QStringLiteral("beginRegion"))
                        || parser.extractString(endRegion, QStringLiteral("endRegion"))
@@ -897,6 +897,7 @@ private:
 
             success = checkfallthrough(definition, context) && success;
             success = checkUreachableRules(definition.filename, context) && success;
+            success = suggestRuleMerger(definition.filename, context) && success;
 
             for (const auto &rule : context.rules) {
                 if (!rule.attribute.isEmpty())
@@ -956,7 +957,7 @@ private:
             // is RangeDetect
             static const QRegularExpression isRange(QStringLiteral(
                 R"(^(\\(?:[^0BDPSWbdpswoux]|x[0-9a-fA-F]{2}|x\{[0-9a-fA-F]+\}|0\d\d|o\{[0-7]+\}|u[0-9a-fA-F]{4})|[^[.]|\[[^].\\]\])(?:\.|\[^\1\])\*[?*]?\1$)"));
-            if (( rule.lookhAhead == XmlBool::True
+            if (( rule.lookAhead == XmlBool::True
                || rule.minimal == XmlBool::True
                || rule.string.contains(QStringLiteral(".*?"))
                || rule.string.contains(QStringLiteral("[^"))
@@ -974,7 +975,7 @@ private:
             // use minimal or lazy operator
             static const QRegularExpression isMinimal(QStringLiteral(
                 R"([.][*+][^][?+*()|$]*$)"));
-            if (rule.lookhAhead == XmlBool::True
+            if (rule.lookAhead == XmlBool::True
              && rule.minimal != XmlBool::True
              && reg.contains(isMinimal)
             ) {
@@ -1167,7 +1168,7 @@ private:
 
                 auto ruleFilename = (filename == rule.filename) ? QString() : QStringLiteral("in ") + rule.filename;
                 if (i == context.rules.size()) {
-                    if (rule.lookhAhead == XmlBool::True && rule.firstNonSpace != XmlBool::True && rule.column == -1 && rule.beginRegion.isEmpty()
+                    if (rule.lookAhead == XmlBool::True && rule.firstNonSpace != XmlBool::True && rule.column == -1 && rule.beginRegion.isEmpty()
                         && rule.endRegion.isEmpty() && !useCapture) {
                         qWarning() << filename << "context line" << context.line << ": RegExpr line" << rule.line << ruleFilename
                                    << "should be replaced by fallthroughContext:" << rule.string;
@@ -1185,7 +1186,7 @@ private:
                 static const QRegularExpression unnecessaryQuantifier2(QStringLiteral(
                     R"([*+?]([.][*+?]{0,2})?[)]*$)"));
                 auto &unnecessaryQuantifier = useCapture ? unnecessaryQuantifier1 : unnecessaryQuantifier2;
-                if (rule.lookhAhead == XmlBool::True && rule.minimal != XmlBool::True && reg.contains(unnecessaryQuantifier)) {
+                if (rule.lookAhead == XmlBool::True && rule.minimal != XmlBool::True && reg.contains(unnecessaryQuantifier)) {
                     qWarning() << filename << "line" << rule.line << "Last quantifier is not necessary (i.g., 'xyz*' -> 'xy', 'xyz+.' -> 'xyz.'):"
                                << rule.string;
                     return false;
@@ -1326,7 +1327,7 @@ private:
     //! This would cause an infinite loop.
     bool checkLookAhead(const Context::Rule &rule) const
     {
-        if (rule.lookhAhead == XmlBool::True && rule.context.stay) {
+        if (rule.lookAhead == XmlBool::True && rule.context.stay) {
             qWarning() << rule.filename << "line" << rule.line << "infinite loop: lookAhead with context #stay";
         }
         return true;
@@ -2139,6 +2140,71 @@ private:
                 }
                 message.chop(2);
                 qWarning() << filename << "line" << rule.line << "unreachable element by" << message;
+            }
+        }
+
+        return success;
+    }
+
+    //! Proposes to merge certain rule sequences
+    //! - several DetectChar/AnyChar into AnyChar
+    //! - several RegExpr into one RegExpr
+    bool suggestRuleMerger(const QString &filename, const Context &context) const
+    {
+        bool success = true;
+
+        if (context.rules.isEmpty())
+            return success;
+
+        auto it = context.rules.begin();
+        const auto end = context.rules.end() - 1;
+
+        for (; it < end; ++it) {
+            auto& rule1 = *it;
+            auto& rule2 = it[1];
+
+            auto isCompatible = [&]{
+                return rule1.attribute == rule2.attribute
+                    && rule1.beginRegion == rule2.beginRegion
+                    && rule1.endRegion == rule2.endRegion
+                    && rule1.lookAhead == rule2.lookAhead
+                    && rule1.column == rule2.column
+                    && rule1.firstNonSpace == rule2.firstNonSpace
+                    && rule1.context.context == rule2.context.context
+                    && rule1.context.popCount == rule2.context.popCount
+                    // && rule1.dynamic == rule2.dynamic
+                    ;
+            };
+
+            switch (rule1.type) {
+                case Context::Rule::Type::AnyChar:
+                case Context::Rule::Type::DetectChar:
+                    if ((rule2.type == Context::Rule::Type::AnyChar || rule2.type == Context::Rule::Type::DetectChar) && isCompatible()) {
+                        qWarning() << filename << "line" << rule2.line << "can be merged as AnyChar with the previous rule";
+                        success = false;
+                    }
+                    break;
+
+                case Context::Rule::Type::RegExpr:
+                    break;
+
+                case Context::Rule::Type::DetectSpaces:
+                case Context::Rule::Type::HlCChar:
+                case Context::Rule::Type::HlCHex:
+                case Context::Rule::Type::HlCOct:
+                case Context::Rule::Type::HlCStringChar:
+                case Context::Rule::Type::Int:
+                case Context::Rule::Type::Float:
+                case Context::Rule::Type::LineContinue:
+                case Context::Rule::Type::WordDetect:
+                case Context::Rule::Type::StringDetect:
+                case Context::Rule::Type::Detect2Chars:
+                case Context::Rule::Type::IncludeRules:
+                case Context::Rule::Type::DetectIdentifier:
+                case Context::Rule::Type::keyword:
+                case Context::Rule::Type::Unknown:
+                case Context::Rule::Type::RangeDetect:
+                    break;
             }
         }
 

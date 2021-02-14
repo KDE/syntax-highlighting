@@ -316,21 +316,21 @@
         <DetectChar context="#pop#pop" char="}" lookAhead="1"/>
       </context>
 
-      <context attribute="Command" lineEndContext="#pop" name="DispatchVariables">
+      <context attribute="Variable" lineEndContext="#pop" name="DispatchVariables">
         <IncludeRules context="DispatchSubstVariables"/>
         <IncludeRules context="DispatchStringVariables"/>
         <IncludeRules context="DispatchVarNameVariables"/>
       </context>
-      <context attribute="Command" lineEndContext="#pop" name="DispatchSubstVariables">
+      <context attribute="Variable" lineEndContext="#pop" name="DispatchSubstVariables">
         <Detect2Chars attribute="Parameter Expansion" context="#pop!VarBraceStart" char="$" char1="{"/>
         <StringDetect attribute="Parameter Expansion" context="#pop!ExprDblParenSubst" String="$((" beginRegion="expression"/>
         <Detect2Chars attribute="Parameter Expansion" context="#pop!SubstCommand" char="$" char1="("/>
       </context>
-      <context attribute="Command" lineEndContext="#pop" name="DispatchStringVariables">
+      <context attribute="Variable" lineEndContext="#pop" name="DispatchStringVariables">
         <Detect2Chars attribute="String SingleQ" context="#pop!StringEsc" char="$" char1="'"/>
         <Detect2Chars attribute="String Transl." context="#pop!StringDQ" char="$" char1="&quot;"/>
       </context>
-      <context attribute="Command" lineEndContext="#pop" name="DispatchVarNameVariables">
+      <context attribute="Variable" lineEndContext="#pop" name="DispatchVarNameVariables">
         <Detect2Chars context="#pop!VarNameSpe" char="$" char1="#" lookAhead="1"/>
         <RegExpr attribute="Variable" context="#pop!AfterVarName" String="\$(?:&varname;|[0-9]+|[-*@?$!])"/>
         <Detect2Chars context="#pop!VarNameSpe" char="$" char1="~" lookAhead="1"/>
@@ -338,28 +338,28 @@
         <Detect2Chars context="#pop!VarNameSpe" char="$" char1="^" lookAhead="1"/>
         <Detect2Chars context="#pop!VarNameSpe" char="$" char1="+" lookAhead="1"/>
       </context>
-      <context attribute="Command" lineEndContext="#pop" name="VarNameSpe">
+      <context attribute="Variable" lineEndContext="#pop" name="VarNameSpe">
         <DetectChar attribute="Variable" context="#pop!VarNameSpeParam" char="$"/>
       </context>
-      <context attribute="Command" lineEndContext="#pop" name="VarNameSpeParam">
+      <context attribute="Variable" lineEndContext="#pop" name="VarNameSpeParam">
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarNameSubstLen" char="#"/>
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarNameParam" char="~"/>
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarNameParam" char="="/>
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarNameParam" char="^"/>
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarNameParam+" char="+"/>
       </context>
-      <context attribute="Command" lineEndContext="#pop" name="VarNameSubstLen" fallthroughContext="#pop!AfterVarName">
+      <context attribute="Variable" lineEndContext="#pop" name="VarNameSubstLen" fallthroughContext="#pop!AfterVarName">
         <DetectIdentifier attribute="Variable" context="#pop!AfterVarName"/>
-        <AnyChar attribute="Variable" context="#pop!AfterVarName" String="-*@?$"/>
+        <AnyChar attribute="Variable" context="#pop!AfterVarName" String="-*@?$!"/>
         <Int attribute="Variable" context="#pop!AfterVarName" additionalDeliminator="#~=^+{}[]:-/$"/>
       </context>
-      <context attribute="Command" lineEndContext="#pop" name="VarNameParam" fallthroughContext="#pop!AfterVarName">
+      <context attribute="Variable" lineEndContext="#pop" name="VarNameParam" fallthroughContext="#pop!AfterVarName">
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarNameSubstLen" char="#"/>
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarNameParam+" char="+"/>
         <AnyChar attribute="Parameter Expansion Operator" context="#stay" String="^=~"/>
         <IncludeRules context="VarNameSubstLen"/>
       </context>
-      <context attribute="Command" lineEndContext="#pop" name="VarNameParam+" fallthroughContext="#pop">
+      <context attribute="Variable" lineEndContext="#pop" name="VarNameParam+" fallthroughContext="#pop">
         <IncludeRules context="VarNameSubstLen"/>
       </context>
 

@@ -56,7 +56,7 @@
 -->
 
 <language name="SELinux Policy"
-          version="6"
+          version="7"
           kateversion="5.53"
           section="Sources"
           extensions="*.te;*.if;*.spt;policy.conf;access_vectors;mls;mcs;mls_macros;te_macros;policy_capabilities;seapp_contexts;port_contexts"
@@ -818,8 +818,8 @@
 			<DetectChar context="#pop" attribute="Symbol" char=";" lookAhead="true"/>
 			<RegExpr context="_class_range_transition_statement" String="&identifierWithArg;\s*:\s*&identifierWithArg;\s+[a-zA-Z\$]" lookAhead="true"/>
 
-			<RegExpr context="#pop!_mls_level_range" String="&identifierWithArg;(?:\s*\:\s*&identifierWithArg;(?:\s*,\s*&identifierWithArg;)*)?\s+\-\s+&identifierWithArg;(?:\s*\:\s*&identifierWithArg;(?:\s*,\s*&identifierWithArg;)*)?" lookAhead="true"/>
-			<RegExpr context="#pop!_mls_level_range" String="&identifierWithArg;(?:\s*\:\s*&identifierWithArg;(?:\s*,\s*&identifierWithArg;)*)?(?:\s*\-\s*&identifierWithArg;(?:\s*\:\s*&identifierWithArg;(?:\s*,\s*&identifierWithArg;)*)?)?(?=\s*;)" lookAhead="true"/>
+			<RegExpr context="#pop!_mls_level_range" String="&identifierWithArg;(?:\s*\:\s*&identifierWithArg;(?:\s*,\s*&identifierWithArg;)*)?\s+\-\s+&identifierWithArg;" lookAhead="true" minimal="1"/>
+			<RegExpr context="#pop!_mls_level_range" String="&identifierWithArg;(?:\s*\:\s*&identifierWithArg;(?:\s*,\s*&identifierWithArg;)*)?(?:\s*\-\s*&identifierWithArg;(?:\s*\:\s*&identifierWithArg;(?:\s*,\s*&identifierWithArg;)*)?)?(?=\s*;)" lookAhead="true" minimal="1"/>
 			<IncludeRules context="_normal"/>
 		</context>
 		<context name="_class_range_transition_statement" attribute="Normal Text" lineEndContext="#pop">
@@ -843,12 +843,12 @@
 		<!-- Detect MLS/MCS Level (s0.s1:c0,c1) -->
 		<context name="_find_mls_level" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop">
 			<IncludeRules context="_default_find_identifier"/>
-			<RegExpr context="#pop!_mls_level" String="&identifierWithArg;" lookAhead="true"/>
+			<RegExpr context="#pop!_mls_level" String="&identifierWithArg;" lookAhead="true" minimal="1"/>
 		</context>
 		<!-- Detect MLS/MCS Range (s0:c0 - s1:c1) -->
 		<context name="_find_mls_level_range" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop">
 			<IncludeRules context="_default_find_identifier"/>
-			<RegExpr context="#pop!_mls_level_range" String="&identifierWithArg;" lookAhead="true"/>
+			<RegExpr context="#pop!_mls_level_range" String="&identifierWithArg;" lookAhead="true" minimal="1"/>
 		</context>
 		<!-- MLS/MCS Range: Sensitivity:Category - Sensitivity:Category -->
 		<context name="_mls_level_range" attribute="MLS/MCS Level/Range" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">

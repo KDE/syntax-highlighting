@@ -912,8 +912,9 @@ private:
     //! - dynamic=true but no place holder used?
     //! - is not . with lookAhead="1"
     //! - is not ^... without column ou firstNonSpace attribute
-    //! - is not equivalent to DetectSpaces, DetectChar, Detect2Chars, StringDetect, DetectIdentifier
+    //! - is not equivalent to DetectSpaces, DetectChar, Detect2Chars, StringDetect, DetectIdentifier, RangeDetect
     //! - has no unused captures
+    //! - has no unnecessary quantifier with lookAhead
     bool checkRegExpr(const QString &filename, const Context::Rule &rule, const Context &context) const
     {
         if (rule.type == Context::Rule::Type::RegExpr) {
@@ -945,10 +946,34 @@ private:
                 return false;
             }
 
+            // is RangeDetect
+            static const QRegularExpression isRange(QStringLiteral(
+                R"(^(\\(?:[^0BDPSWbdpswoux]|x[0-9a-fA-F]{2}|x\{[0-9a-fA-F]+\}|0\d\d|o\{[0-7]+\}|u[0-9a-fA-F]{4})|[^[.]|\[[^].\\]\])(?:\.|\[^\1\])\*[?*]?\1$)"));
+            if (( rule.lookhAhead == XmlBool::True
+               || rule.minimal == XmlBool::True
+               || rule.string.contains(QStringLiteral(".*?"))
+               || rule.string.contains(QStringLiteral("[^"))
+                ) && reg.contains(isRange)
+            ) {
+                qWarning() << filename << "line" << rule.line << "RegExpr should be replaced by RangeDetect:" << rule.string;
+                return false;
+            }
+
             // replace \c, \xhhh, \x{hhh...}, \0dd, \o{ddd}, \uhhhh, with _
             static const QRegularExpression sanitize1(
                 QStringLiteral(R"(\\(?:[^0BDPSWbdpswoux]|x[0-9a-fA-F]{2}|x\{[0-9a-fA-F]+\}|0\d\d|o\{[0-7]+\}|u[0-9a-fA-F]{4}))"));
             reg.replace(sanitize1, QStringLiteral("_"));
+
+            // use minimal or lazy operator
+            static const QRegularExpression isMinimal(QStringLiteral(
+                R"([.][*+][^][?+*()|$]*$)"));
+            if (rule.lookhAhead == XmlBool::True
+             && rule.minimal != XmlBool::True
+             && reg.contains(isMinimal)
+            ) {
+                qWarning() << filename << "line" << rule.line << "RegExpr should be have minimal=\"1\" or use lazy operator (i.g, '.*' -> '.*?'):" << rule.string;
+                return false;
+            }
 
             // replace [:...:] with ___
             static const QRegularExpression sanitize2(QStringLiteral(R"(\[:\w+:\])"));
@@ -1145,6 +1170,18 @@ private:
                     auto nextRuleFilename = (filename == nextRule.filename) ? QString() : QStringLiteral("in ") + nextRule.filename;
                     qWarning() << filename << "context line" << context.line << "contains unreachable element line" << nextRule.line << nextRuleFilename
                                << "because a dot RegExpr is used line" << rule.line << ruleFilename;
+                }
+
+                // unnecessary quantifier
+                static const QRegularExpression unnecessaryQuantifier1(QStringLiteral(
+                    R"([*+?]([.][*+?]{0,2})?$)"));
+                static const QRegularExpression unnecessaryQuantifier2(QStringLiteral(
+                    R"([*+?]([.][*+?]{0,2})?[)]*$)"));
+                auto &unnecessaryQuantifier = useCapture ? unnecessaryQuantifier1 : unnecessaryQuantifier2;
+                if (rule.lookhAhead == XmlBool::True && rule.minimal != XmlBool::True && reg.contains(unnecessaryQuantifier)) {
+                    qWarning() << filename << "line" << rule.line << "Last quantifier is not necessary (i.g., 'xyz*' -> 'xy', 'xyz+.' -> 'xyz.'):"
+                               << rule.string;
+                    return false;
                 }
             }
         }

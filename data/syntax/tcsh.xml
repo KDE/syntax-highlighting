@@ -180,8 +180,7 @@
 <!--!--><RegExpr attribute="Control Flow" context="#stay" String="\b(foreach|while)&noword;" beginRegion="loop" />
 <!--!--><RegExpr attribute="Control Flow" context="#stay" String="\bend&noword;" endRegion="loop" />
         <!-- handle command line options -->
-        <RegExpr attribute="Option" context="#stay" String="-[A-Za-z0-9][A-Za-z0-9_]*" />
-        <RegExpr attribute="Option" context="#stay" String="--[a-z][A-Za-z0-9_-]*" />
+        <RegExpr attribute="Option" context="#stay" String="-[A-Za-z0-9][A-Za-z0-9_]*|--[a-z][A-Za-z0-9_-]*" />
         <!-- handle variable assignments -->
 <!--R--><RegExpr attribute="Keyword" context="#stay" String="\b@\s" />
 <!--R--><WordDetect attribute="Keyword" context="#stay" String="set" />
@@ -207,9 +206,7 @@
       <context attribute="Normal Text" lineEndContext="#stay" name="FindOthers">
         <RegExpr attribute="Escape" context="#stay" String="\\[;&quot;\\'$`{}()|&amp;&lt;&gt;* ]" />
 <!--?   <RegExpr attribute="Escape" context="#stay" String="\{(?!(\s|$))\S*\}" />-->
-        <RegExpr attribute="Path" context="#stay" String="&pathpart;*(?=/)" />
-        <RegExpr attribute="Path" context="#stay" String="~\w*" />
-        <RegExpr attribute="Path" context="#stay" String="/&pathpart;*(?=([\s/):;$`'&quot;]|$))" />
+        <RegExpr attribute="Path" context="#stay" String="&pathpart;*(?=/)|~\w*|/&pathpart;*(?=([\s/):;$`'&quot;]|$))" />
         <!-- TODO: shell globs -->
       </context>
 
@@ -224,13 +221,8 @@
       <!-- FindSubstitutions goes after anything starting with $ and ` and their escapes -->
       <context attribute="Normal Text" lineEndContext="#stay" name="FindSubstitutions">
         <RegExpr attribute="Variable" context="Subscript" String="\$&varname;\[" />
-        <RegExpr attribute="Variable" context="#stay" String="\$&varname;" />
-        <RegExpr attribute="Variable" context="#stay" String="\$[*@#?$!_0-9-]" />
-        <RegExpr attribute="Variable" context="#stay" String="\$\{[*@#?$!_0-9-]\}" />
-        <RegExpr attribute="Variable" context="#stay" String="\$\{#&varname;\}" />
-        <RegExpr attribute="Variable" context="#stay" String="\$\{!&varname;\*?\}" />
-        <RegExpr attribute="Variable" context="VarBrace" String="\$\{&varname;" />
-        <RegExpr attribute="Variable" context="VarBrace" String="\$\{[*@#?$!_0-9-](?=[:#%/])" />
+        <RegExpr attribute="Variable" context="#stay" String="\$(&varname;)|\$[*@#?$!_0-9-]|\$\{[*@#?$!_0-9-]\}|\$\{#&varname;\}|\$\{!&varname;\*?\}" />
+        <RegExpr attribute="Variable" context="VarBrace" String="\$\{&varname;|\$\{[*@#?$!_0-9-](?=[:#%/])" />
         <StringDetect attribute="Variable" context="ExprDblParenSubst" String="$((" beginRegion="expression" />
 <!--?   <StringDetect attribute="Redirection" context="SubstFile" String="$(&lt;" />-->
 <!--?   <StringDetect attribute="Variable" context="SubstCommand" String="$(" />-->
@@ -240,10 +232,7 @@
 
       <!-- FindTests finds operators valid in tests -->
       <context attribute="Normal Text" lineEndContext="#stay" name="FindTests">
-        <RegExpr attribute="Expression" context="#stay" String="-[rwxXeozsfdlbcpSugktRLDIFNZ](?=\s)"/>
-        <RegExpr attribute="Expression" context="#stay" String="-[AMCUG]:?(?=\s)"/>
-        <RegExpr attribute="Expression" context="#stay" String="-P[0-7]{,3}:?(?=\s)"/>
-        <RegExpr attribute="Expression" context="#stay" String="[=!][~=]|[*>&lt;!~]"/>
+        <RegExpr attribute="Expression" context="#stay" String="-[rwxXeozsfdlbcpSugktRLDIFNZ](?=\s)|-[AMCUG]:?(?=\s)|-P[0-7]{,3}:?(?=\s)|[=!][~=]|[*>&lt;!~]"/>
       </context>
 
 
@@ -332,8 +321,7 @@
       <!-- VarName consumes spare variable names and assignments -->
       <context attribute="Normal Text" lineEndContext="#pop" name="VarName" fallthrough="true" fallthroughContext="#pop">
         <!-- handle command line options -->
-        <RegExpr attribute="Option" context="#stay" String="-[A-Za-z0-9]+" />
-        <RegExpr attribute="Option" context="#stay" String="--[a-z][A-Za-z0-9_-]*" />
+        <RegExpr attribute="Option" context="#stay" String="-[A-Za-z0-9]+|--[a-z][A-Za-z0-9_-]*" />
         <RegExpr attribute="Variable" context="#stay" String="\b&varname;" />
         <DetectChar attribute="Variable" context="Subscript" char="[" />
         <DetectChar attribute="Variable" context="Assign" char="=" />
@@ -357,8 +345,7 @@
       <!-- StringEsc eats till ', but escaping many characters -->
       <context attribute="String SingleQ" lineEndContext="#stay" name="StringEsc">
         <DetectChar attribute="String SingleQ" context="#pop" char="'" />
-        <RegExpr attribute="String Escape" context="#stay" String="\\[abefnrtv\\']" />
-        <RegExpr attribute="String Escape" context="#stay" String="\\([0-7]{1,3}|x[A-Fa-f0-9]{1,2}|c.)" />
+        <RegExpr attribute="String Escape" context="#stay" String="\\[abefnrtv\\']|\\([0-7]{1,3}|x[A-Fa-f0-9]{1,2}|c.)" />
       </context>
 
       <!-- VarBrace is called as soon as ${xxx is encoutered -->

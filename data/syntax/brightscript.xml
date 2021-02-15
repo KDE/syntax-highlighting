@@ -395,8 +395,7 @@
 </context>
 
 <context name="try_test" attribute="g" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!lvalue">
-	<RegExpr String="try\s*$" context="#pop!try_begin" lookAhead="true"/>
-	<RegExpr String="try\s*'" context="#pop!try_begin" lookAhead="true"/>
+	<RegExpr String="try\s*('|$)" context="#pop!try_begin" lookAhead="true"/>
 </context>
 
 <context name="try_begin" attribute="g" lineEndContext="#pop">
@@ -683,13 +682,7 @@
 
 <context name="rvalue_end" attribute="g" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
 	<DetectSpaces/>
-	<RegExpr String="(=|&lt;&gt;|&lt;&lt;|&gt;&gt;|&lt;=|&gt;=|&lt;|&gt;|\^|\-|\+|\*|\/|\\)" context="#pop!rvalue_binary" lookAhead="true"/>
-	<RegExpr String="(and|or|mod)[\W]" insensitive="true" context="#pop!rvalue_binary" lookAhead="true"/>
-</context>
-
-<context name="rvalue_binary" attribute="invalid" lineEndContext="#stay">
-	<DetectSpaces/>
-	<RegExpr String="(=|&lt;&gt;|&lt;&lt;|&gt;&gt;|&lt;=|&gt;=|&lt;|&gt;|\^|\-|\+|\*|\/|\\|and|or|mod)" insensitive="true" attribute="binary" context="#pop!rvalue"/>
+	<RegExpr String="=|&lt;&gt;|&lt;&lt;|&gt;&gt;|&lt;=|&gt;=|&lt;|&gt;|\^|\-|\+|\*|\/|\\|(and|or|mod)(?=\W)" insensitive="true" attribute="binary" context="#pop!rvalue"/>
 </context>
 
 <context name="rvalue_m_dot" attribute="g" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!rvalue_end">

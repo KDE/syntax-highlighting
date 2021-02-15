@@ -19,6 +19,19 @@
 
 	<!ENTITY codeContent "&quot;(?:[^&quot;]|\\.)*&quot;|'(?:[^']|\\.)*'|`(?:[^`]|\\.)`|/\*.*\*/|/(?:[^/\\\[]|\\.|\[(?:[^\]\\]|\\.)+\])+/">
 	<!ENTITY conditionalExpression "\?(?=\s*(?:(?:[^/&quot;'`\s\?:\.;,\=\}\]\)]|&codeContent;)(?:[^/&quot;'`]|&codeContent;)*)?&identifier;\s*(?:/\*.*\*/\s*)*:|(?:&amp;&amp;|\|\||\s*(?:/\*.*\*/\s*)*&identifier;)?&endLine;)">
+
+	<!-- Because TSX cannot have "cast" expression, we can say "<T extends" starts the type parameter of arrow
+	     See: https://github.com/microsoft/TypeScript-TmLanguage/commit/11b1a4f8dc3a3eaa4df71e8cc1ad6f01a688961d#diff-d5222b162266b45fd998419db416fddd -->
+	<!ENTITY typesAngleBracket1 "&lt;(?=\s*&identifier;\s+extends\s*[^\=&gt;])">
+	<!-- Invalid Tag, do not highlight tags in these cases:
+		  * "?" or "," after tag name:
+		      <Tag ? ...
+		      <Tag< ? ...
+		      <Tag /* comment */ ? ...
+		  * Invalid delimiter after comment (without spaces):
+		      <Tag/* comment */#
+	-->
+	<!ENTITY typesAngleBracket2 "&lt;(?=\s*&name;(?:(&lt;(?:\s*&mlComment;)*)?(?:\s*&mlComment;)*\s*[\?,]|(?:&mlComment;)+(?!&endTagName;|&baseName;|\{)))">
 ]>
 
 <!--
@@ -293,9 +306,7 @@
 			<RegExpr context="Types-BeforeTag" attribute="Symbol" String=":\s*(?=&tag;|/\*)" />
 
 			<RegExpr context="ConditionalExpression-BeforeTag" attribute="Symbol" String="&conditionalExpression;" minimal="true" />
-			<RegExpr context="ValidTag" attribute="Symbol" String="\?\s*(?=&tag;|/\*)" />
-
-			<RegExpr context="ValidTag" attribute="Symbol" String="&lt;\s*&gt;\s*(?=&tag;|/\*)" />
+			<RegExpr context="ValidTag" attribute="Symbol" String="\?\s*(?=&tag;|/\*)|&lt;\s*&gt;\s*(?=&tag;|/\*)" />
 
 			<!-- Tag after a comment on a new line -->
 			<Detect2Chars context="ValidTag" attribute="Comment" char="/" char1="*" firstNonSpace="true" lookAhead="true" />
@@ -363,19 +374,7 @@
 		                             Tags with invalid names are highlighted as "Error".
 		-->
 		<context name="FindTags" attribute="Normal Text" lineEndContext="#stay">
-			<!-- Because TSX cannot have "cast" expression, we can say "<T extends" starts the type parameter of arrow
-			     See: https://github.com/microsoft/TypeScript-TmLanguage/commit/11b1a4f8dc3a3eaa4df71e8cc1ad6f01a688961d#diff-d5222b162266b45fd998419db416fddd -->
-			<RegExpr context="#pop!TypesAngleBracket" attribute="Symbol" String="&lt;(?=\s*&identifier;\s+extends\s*[^\=&gt;])" />
-
-			<!-- Invalid Tag, do not highlight tags in these cases:
-				  * "?" or "," after tag name:
-				      <Tag ? ...
-				      <Tag< ? ...
-				      <Tag /* comment */ ? ...
-				  * Invalid delimiter after comment (without spaces):
-				      <Tag/* comment */#
-			-->
-			<RegExpr context="#pop!TypesAngleBracket" attribute="Symbol" String="&lt;(?=\s*&name;(?:(&lt;(?:\s*&mlComment;)*)?(?:\s*&mlComment;)*\s*[\?,]|(?:&mlComment;)+(?!&endTagName;|&baseName;|\{)))" />
+			<RegExpr context="#pop!TypesAngleBracket" attribute="Symbol" String="&typesAngleBracket1;|&typesAngleBracket2;" />
 			<!-- Empty tag (element) -->
 			<RegExpr context="ElementTagContent" attribute="Element Tag" String="&lt;\s*&gt;" beginRegion="Element" />
 			<!-- Detect Tags -->
@@ -456,15 +455,14 @@
 			<RegExpr context="Attribute" attribute="Attribute" String="&nameWithBound;" />
 			<IncludeRules context="FindEvaluatedCode" />
 			<IncludeRules context="AllComments" />
-			<RegExpr context="#stay" attribute="Error" String="\S+&name;" />
-			<RegExpr context="#stay" attribute="Error" String="\S" />
+			<RegExpr context="#stay" attribute="Error" String="\S+&name;|\S" />
 		</context>
 
 		<!-- Tag content: <Tag> content </Tag> -->
 		<context name="ElementTagContent" attribute="Tag Content Text" lineEndContext="#stay">
 			<RegExpr context="#pop" attribute="Element Tag" String="&lt;/\s*&gt;" endRegion="Element" />
-			<RegExpr context="ElementTagEnd" attribute="Element Tag" String="&lt;/\s*&simpleName;" />
-			<RegExpr context="ElementTagEnd" attribute="Element Tag" String="&lt;/\s*(?=[A-Z_\$])" /> <!-- Component tag (error) -->
+			<!-- With component tag (error) -->
+			<RegExpr context="ElementTagEnd" attribute="Element Tag" String="&lt;/\s*&simpleName;|&lt;/\s*(?=[A-Z_\$])" />
 			<IncludeRules context="DefaultTagContent" />
 		</context>
 		<context name="ComponentTagContent" attribute="Tag Content Text" lineEndContext="#stay">
@@ -496,8 +494,7 @@
 			<DetectChar context="#pop" char="{" lookAhead="true" /> <!-- EvaluatedCode -->
 			<IncludeRules context="AllComments" />
 			<RegExpr context="#stay" attribute="Attribute" String="&nameWithBound;" />
-			<RegExpr context="#stay" attribute="Error" String="\S+&name;" />
-			<RegExpr context="#stay" attribute="Error" String="\S" />
+			<RegExpr context="#stay" attribute="Error" String="\S+&name;|\S" />
 		</context>
 
 		<context name="Value" attribute="Normal Text" lineEndContext="#stay">

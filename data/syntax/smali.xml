@@ -7,6 +7,11 @@
     <!ENTITY fieldTypeLookBehind "\w\:">
     <!ENTITY fieldLookBehind "[\s,;\(\)]">
     <!ENTITY builtin "(javax?|dalvik|android)/[\w\$/]+">
+
+    <!ENTITY float1 "\-?\d*(\d+\.|\.\d+|\d+)\d*[eE][\-\+]?\d+[dDfF]?\b">
+    <!ENTITY float2 "\-?\d*(\d+\.|\.\d+)\d*[dDfF]?">
+    <!ENTITY float3 "\-?\d+[dDfF]\b">
+    <!ENTITY float4 "\-?0x&hex;*(\.|&hex;+)&hex;*[pP]\-?\d+[dDfF]?\b">
 ]>
 <language name="Smali" version="3" kateversion="5.0" section="Sources" extensions="*.smali" mimetype="text/x-smali" license="MIT">
     <highlighting>
@@ -307,10 +312,7 @@
                 <WordDetect attribute="Float" String="NaN" insensitive="true" context="#stay" />
                 <WordDetect attribute="Float" String="NaND" insensitive="true" context="#stay" />
                 <WordDetect attribute="Float" String="NaNF" insensitive="true" context="#stay" />
-                <RegExpr attribute="Float" context="#stay" String="\-?\d*(\d+\.|\.\d+|\d+)\d*[eE][\-\+]?\d+[dDfF]?\b" />
-                <RegExpr attribute="Float" context="#stay" String="\-?\d*(\d+\.|\.\d+)\d*[dDfF]?" />
-                <RegExpr attribute="Float" context="#stay" String="\-?\d+[dDfF]\b" />
-                <RegExpr attribute="Float" context="#stay" String="\-?0x&hex;*(\.|&hex;+)&hex;*[pP]\-?\d+[dDfF]?\b" />
+                <RegExpr attribute="Float" context="#stay" String="&float1;|&float2;|&float3;|&float4;" />
                 <RegExpr attribute="Hex" context="#stay" String="\-?0x&hex;+[LtTsS]?\b" />
                 <RegExpr attribute="Decimal" context="#stay" String="\-?\d+[tTLsS]?\b" />
                 <HlCChar attribute="Char" context="#stay" />
@@ -322,17 +324,9 @@
                 <RegExpr attribute="Method" context="#stay" String="\b[\w\$]+\s*(?=\s*>?\s*\()" />
                 <RegExpr attribute="Field" context="#stay" String="\b[\w\$]+\s*(?=\:)" />
                 <IncludeRules context="Literal" />
-                <RegExpr attribute="Built-in" context="#stay" String="(?&lt;=&fieldTypeLookBehind;L)&builtin;" />
-                <RegExpr attribute="Built-in" context="#stay" String="(?&lt;=&fieldLookBehind;L)&builtin;" />
-                <RegExpr attribute="Built-in" context="#stay" String="(?&lt;=\[L)&builtin;" />
-                <RegExpr attribute="Built-in" context="#stay" String="(?&lt;=[&typeIdentifiers;]L)&builtin;" />
-                <RegExpr attribute="Data Type" context="#stay" String="(?&lt;=&fieldTypeLookBehind;L)[\w/\$]+" />
-                <RegExpr attribute="Data Type" context="#stay" String="(?&lt;=&fieldLookBehind;L)[\w/\$]+" />
-                <RegExpr attribute="Data Type" context="#stay" String="(?&lt;=\[L)[\w/\$]+" />
-                <RegExpr attribute="Data Type" context="#stay" String="(?&lt;=[&typeIdentifiers;]L)[\w/\$]+" />
-                <RegExpr attribute="Type Identifier" context="#stay" String="(?&lt;=&fieldTypeLookBehind;)\[*([&typeIdentifiers;]|L)" />
-                <RegExpr attribute="Type Identifier" context="#stay" String="(?&lt;=&fieldLookBehind;)(\[*[&typeIdentifiers;])*\[*([&typeIdentifiers;]|L)" />
-                <RegExpr attribute="Type Identifier" context="#stay" String="(?&lt;=[;&typeIdentifiers;\(]\))V" />
+                <RegExpr attribute="Built-in" context="#stay" String="((?&lt;=&fieldTypeLookBehind;L)|(?&lt;=&fieldLookBehind;L)|(?&lt;=\[L)|(?&lt;=[&typeIdentifiers;]L))&builtin;" />
+                <RegExpr attribute="Data Type" context="#stay" String="((?&lt;=&fieldTypeLookBehind;L)|(?&lt;=&fieldLookBehind;L)|(?&lt;=\[L)|(?&lt;=[&typeIdentifiers;]L))[\w/\$]+" />
+                <RegExpr attribute="Type Identifier" context="#stay" String="((?&lt;=&fieldTypeLookBehind;)|(?&lt;=&fieldLookBehind;)(\[*[&typeIdentifiers;])*)\[*([&typeIdentifiers;]|L)|(?&lt;=[;&typeIdentifiers;\(]\))V" />
                 <Detect2Chars attribute="Operator" context="#stay" char="." char1="." />
                 <AnyChar attribute="Symbol" context="#stay" String="{}&lt;&gt;:;=()" />
             </context>
@@ -351,14 +345,12 @@
                 <WordDetect attribute="Attribute" String=".catchall" context="#stay" />
                 <WordDetect attribute="Attribute" String=".line" context="#stay" />
                 <WordDetect attribute="Attribute" String=".param" context="Param" />
-                <RegExpr attribute="Attribute" String="\.end\s+param" firstNonSpace="true" context="#stay" />
                 <WordDetect attribute="Attribute" String=".local" context="#stay" />
-                <RegExpr attribute="Attribute" String="\.end\s+local" firstNonSpace="true" context="#stay" />
-                <RegExpr attribute="Attribute" String="\.restart\s+local" firstNonSpace="true" context="#stay" />
+                <RegExpr attribute="Attribute" String="\.end\s+param|\.(end|restart)\s+local" firstNonSpace="true" context="#stay" />
+                <RegExpr attribute="Attribute" String="\.end\s+method" firstNonSpace="true" context="#pop#pop" endRegion="Method" />
                 <WordDetect attribute="Attribute" String=".prologue" context="#stay" />
                 <WordDetect attribute="Attribute" String=".epilogue" context="#stay" />
                 <keyword attribute="Mnemonic" context="#stay" String="mnemonics" />
-                <RegExpr attribute="Attribute" String="\.end\s+method" firstNonSpace="true" context="#pop#pop" endRegion="Method" />
                 <RegExpr attribute="Register" context="#stay" String="\b(v|p)[0-9]+\b" />
                 <RegExpr attribute="Label" context="#stay" String="&label;" />
                 <Detect2Chars attribute="Operator" context="#stay" char="-" char1=">" />

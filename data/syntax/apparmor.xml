@@ -9,6 +9,20 @@
 	<!ENTITY noPathChar  "\s\)&quot;">
 	<!ENTITY noPathCharWithoutSpace ")&quot;">
 	<!ENTITY endPath     ",(?:[\s&quot;]|$)">
+	<!ENTITY url         "\bhttps?://[^\s&lt;&gt;&quot;&apos;`]*[^\s&lt;&gt;&quot;&apos;`\}\)\]\.,;\|]">
+	<!-- Email (Source: http://emailregex.com) -->
+	<!ENTITY email       "(?:(?:[^&lt;&gt;\(\)\[\]\\\.,;:\s@&quot;]+(?:\.[^&lt;&gt;\(\)\[\]\\\.,;:\s@&quot;]+)*)|(?:&quot;[^&quot;]+&quot;))@(?:(?:\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}])|(?:(?:[a-zA-Z\-\d]+\.)+[a-zA-Z]{2,}))\b">
+
+	<!ENTITY _perm_correction_in_p "p[iUu]?x(?:[rwakml]|p[iUu]?x)*[PcC]?[iUu]?">
+	<!ENTITY _perm_correction_in_P "P[iUu]?x(?:[rwakml]|P[iUu]?x)*[pcC]?[iUu]?">
+	<!ENTITY _perm_correction_in_c "c[iUu]?x(?:[rwakml]|c[iUu]?x)*[PpC]?[iUu]?">
+	<!ENTITY _perm_correction_in_C "C[iUu]?x(?:[rwakml]|C[iUu]?x)*[Ppc]?[iUu]?">
+	<!ENTITY _perm_correction_in_i "[PpCc]?ix(?:[rwakml]|[PpCc]?ix)*[PpCc]?[Uu]?">
+	<!ENTITY _perm_correction_in_u "[PpCc]?ux(?:[rwakml]|[PpCc]?ux)*[PpCc]?[iU]?">
+	<!ENTITY _perm_correction_in_U "[PpCc]?Ux(?:[rwakml]|[PpCc]?Ux)*[PpCc]?[iu]?">
+	<!ENTITY _perm_correction_in_x1 "[iuU]?x(?:[rwakml]|[iuU]?x)*[PpCc][iuU]?"> <!-- x, ix, ux or Ux followed by P, p, C or c -->
+	<!ENTITY _perm_correction_in_x2 "x[rwakmlx]*[iuU]"> <!-- x followed by ix, ux or Ux -->
+	<!ENTITY perm_correction_in "(?:^|\s)[rwakml]*(?:&_perm_correction_in_p;|&_perm_correction_in_P;|&_perm_correction_in_c;|&_perm_correction_in_C;|&_perm_correction_in_i;|&_perm_correction_in_u;|&_perm_correction_in_U;|&_perm_correction_in_x1;|&_perm_correction_in_x2;)x(?:[rwakml]|&exec;)*(?:[\s,]|$)"> <!-- x followed by ix, ux or Ux -->
 ]>
 
 <!--
@@ -866,10 +880,7 @@
 			<DetectSpaces />
 			<LineContinue context="#pop" attribute="Comment"/>
 			<IncludeRules context="##Comments"/>
-			<!-- URL -->
-			<RegExpr context="#stay" attribute="URL in Comment" String="\bhttps?://[^\s&lt;&gt;&quot;&apos;`]*[^\s&lt;&gt;&quot;&apos;`\}\)\]\.,;\|]"/>
-			<!-- Email (Source: http://emailregex.com) -->
-			<RegExpr context="#stay" attribute="URL in Comment" String="(?:(?:[^&lt;&gt;\(\)\[\]\\\.,;:\s@&quot;]+(?:\.[^&lt;&gt;\(\)\[\]\\\.,;:\s@&quot;]+)*)|(?:&quot;[^&quot;]+&quot;))@(?:(?:\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}])|(?:(?:[a-zA-Z\-\d]+\.)+[a-zA-Z]{2,}))\b"/>
+			<RegExpr context="#stay" attribute="URL in Comment" String="&url;|&email;"/>
 		</context>
 
 		<!-- Profile Header:
@@ -1056,25 +1067,15 @@
 		<!-- Access Modes / File Permissions -->
 		<context name="_permissions" attribute="Normal Text" lineEndContext="#stay">
 			<IncludeRules context="_permissions_correction"/>
-			<RegExpr context="#stay" attribute="Permissions" String="(?:^|\s)(?:[rwkml]|&exec;)+(?=[\s,]|$)"/>
-			<RegExpr context="#stay" attribute="Permissions" String="(?:^|\s)(?:[rakml]|&exec;)+(?=[\s,]|$)"/>
+			<RegExpr context="#stay" attribute="Permissions" String="(?:^|\s)(?:(?:[rwkml]|&exec;)+|(?:[rakml]|&exec;)+)(?=[\s,]|$)"/>
 		</context>
 		<context name="_file_rule_permissions" attribute="Normal Text" lineEndContext="#stay">
 			<IncludeRules context="_permissions_correction"/>
-			<RegExpr context="_rule_file" attribute="Permissions" String="(?:^|\s)(?:[rwkml]|&exec;)+(?=[\s,]|$)"/>
-			<RegExpr context="_rule_file" attribute="Permissions" String="(?:^|\s)(?:[rakml]|&exec;)+(?=[\s,]|$)"/>
+			<RegExpr context="_rule_file" attribute="Permissions" String="(?:^|\s)(?:(?:[rwkml]|&exec;)+|(?:[rakml]|&exec;)+)(?=[\s,]|$)"/>
 		</context>
 		<context name="_permissions_correction" attribute="Normal Text" lineEndContext="#stay">
 			<!-- Incompatible execution modes -->
-			<RegExpr context="_perm_correction_in" String="(?:^|\s)[rwakml]*p[iUu]?x(?:[rwakml]|p[iUu]?x)*[PcC]?[iUu]?x(?:[rwakml]|&exec;)*(?:[\s,]|$)" lookAhead="true"/> <!-- p -->
-			<RegExpr context="_perm_correction_in" String="(?:^|\s)[rwakml]*P[iUu]?x(?:[rwakml]|P[iUu]?x)*[pcC]?[iUu]?x(?:[rwakml]|&exec;)*(?:[\s,]|$)" lookAhead="true"/> <!-- P -->
-			<RegExpr context="_perm_correction_in" String="(?:^|\s)[rwakml]*c[iUu]?x(?:[rwakml]|c[iUu]?x)*[PpC]?[iUu]?x(?:[rwakml]|&exec;)*(?:[\s,]|$)" lookAhead="true"/> <!-- c -->
-			<RegExpr context="_perm_correction_in" String="(?:^|\s)[rwakml]*C[iUu]?x(?:[rwakml]|C[iUu]?x)*[Ppc]?[iUu]?x(?:[rwakml]|&exec;)*(?:[\s,]|$)" lookAhead="true"/> <!-- C -->
-			<RegExpr context="_perm_correction_in" String="(?:^|\s)[rwakml]*[PpCc]?ix(?:[rwakml]|[PpCc]?ix)*[PpCc]?[Uu]?x(?:[rwakml]|&exec;)*(?:[\s,]|$)" lookAhead="true"/> <!-- i -->
-			<RegExpr context="_perm_correction_in" String="(?:^|\s)[rwakml]*[PpCc]?ux(?:[rwakml]|[PpCc]?ux)*[PpCc]?[iU]?x(?:[rwakml]|&exec;)*(?:[\s,]|$)" lookAhead="true"/> <!-- u -->
-			<RegExpr context="_perm_correction_in" String="(?:^|\s)[rwakml]*[PpCc]?Ux(?:[rwakml]|[PpCc]?Ux)*[PpCc]?[iu]?x(?:[rwakml]|&exec;)*(?:[\s,]|$)" lookAhead="true"/> <!-- U -->
-			<RegExpr context="_perm_correction_in" String="(?:^|\s)[rwakml]*[iuU]?x(?:[rwakml]|[iuU]?x)*[PpCc][iuU]?x(?:[rwakml]|&exec;)*(?:[\s,]|$)" lookAhead="true"/> <!-- x, ix, ux or Ux followed by P, p, C or c -->
-			<RegExpr context="_perm_correction_in" String="(?:^|\s)[rwakml]*x[rwakmlx]*[iuU]x(?:[rwakml]|&exec;)*(?:[\s,]|$)" lookAhead="true"/> <!-- x followed by ix, ux or Ux -->
+			<RegExpr context="_perm_correction_in" String="&perm_correction_in;" lookAhead="true" minimal="1"/>
 		</context>
 		<context name="_perm_correction_in" attribute="Normal Text" lineEndContext="#pop">
 			<!-- Highlight the previous space or the full permission -->

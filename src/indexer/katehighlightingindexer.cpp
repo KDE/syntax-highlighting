@@ -2186,6 +2186,11 @@ private:
                     break;
 
                 case Context::Rule::Type::RegExpr:
+                    if (rule2.type == Context::Rule::Type::RegExpr && isCompatible() && rule1.dynamic == rule2.dynamic) {
+                        qWarning() << filename << "line" << rule2.line << "can be merged with the previous rule";
+                        success = false;
+                        // TODO column="0" and no column
+                    }
                     break;
 
                 case Context::Rule::Type::DetectSpaces:

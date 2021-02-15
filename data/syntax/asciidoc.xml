@@ -274,14 +274,12 @@
             </context>
 
             <context name="R anchor" attribute="Normal" lineEndContext="#stay">
-                <!-- bibliographic anchor -->
-                <RegExpr String="\[{3}&anchor_mid;\]{3}" attribute="Anchor"/>
-                <!-- normal form -->
-                <RegExpr String="\[{2}&anchor_mid;\]{2}" attribute="Anchor"/>
                 <!-- shorthand form at line start -->
                 <RegExpr String="^\[#&anchor_mid;\](?:&anchor_phrase;|\s*$)" attribute="Anchor" column="0"/>
+                <!-- bibliographic anchor -->
+                <!-- normal form -->
                 <!-- shorthand form inline -->
-                <RegExpr String="(?&lt;=\S\s)\s*\[\s*#&anchor_mid;\s*\]&anchor_phrase;" attribute="Anchor"/>
+                <RegExpr String="\[{3}&anchor_mid;\]{3}|\[{2}&anchor_mid;\]{2}|(?&lt;=\S\s)\s*\[\s*#&anchor_mid;\s*\]&anchor_phrase;" attribute="Anchor"/>
             </context>
 
             <context name="R attribute" attribute="Normal" lineEndContext="#stay">
@@ -302,8 +300,7 @@
                 <IncludeRules context="R block title"/>
 
                 <!-- name matching -->
-                <RegExpr String="^\[(?:&admonition_names;)&block_name_post;" attribute="Preprocessor" context="normal" column="0"/>
-                <RegExpr String="^\[(?:example|quote|sidebar|verse)&block_name_post;" attribute="Preprocessor" context="normal" column="0"/>
+                <RegExpr String="^\[(?:&admonition_names;)&block_name_post;|^\[(?:example|quote|sidebar|verse)&block_name_post;" attribute="Preprocessor" context="normal" column="0"/>
                 <RegExpr String="^\[(?:pass|stem)&block_name_post;" attribute="Preprocessor" context="passthrough" column="0"/>
                 <RegExpr String="^\[(?:listing|literal|source)&block_name_post;" attribute="Preprocessor" context="verbatim" column="0"/>
 
@@ -335,35 +332,29 @@
                 <!-- combined highlighting must be ordered before simple highlighting -->
 
                 <!-- emphasized monospaced strong unconstrained - must be ordered before constrained -->
-                <RegExpr String="`{2}\*_.*_\*`{2}" minimal="true" attribute="Emphasized Monospaced Strong"/>
                 <!-- emphasized monospaced strong - constrained must be ordered after unconstrained -->
-                <RegExpr String="&quoted_pre;`\*_&quoted;_\*`&quoted_post;" attribute="Emphasized Monospaced Strong"/>
+                <RegExpr String="`{2}\*_.*?_\*`{2}|&quoted_pre;`\*_&quoted;_\*`&quoted_post;" attribute="Emphasized Monospaced Strong"/>
 
                 <!-- emphasized strong unconstrained - must be ordered before constrained -->
-                <RegExpr String="\*{2}_.*_\*{2}" minimal="true" attribute="Emphasized Strong"/>
                 <!-- emphasized strong constrained - must be ordered after unconstrained -->
-                <RegExpr String="&quoted_pre;\*_&quoted;_\*&quoted_post;" attribute="Emphasized Strong"/>
+                <RegExpr String="\*{2}_.*?_\*{2}|&quoted_pre;\*_&quoted;_\*&quoted_post;" attribute="Emphasized Strong"/>
 
                 <!-- monospaced strong unconstrained - must be ordered before constrained -->
-                <RegExpr String="`{2}\*.*\*`{2}" minimal="true" attribute="Monospaced Strong"/>
                 <!-- monospaced strong constrained - must be ordered after unconstrained -->
-                <RegExpr String="&quoted_pre;`\*&quoted;\*`&quoted_post;" attribute="Monospaced Strong"/>
+                <RegExpr String="`{2}\*.*?\*`{2}|&quoted_pre;`\*&quoted;\*`&quoted_post;" attribute="Monospaced Strong"/>
 
                 <!-- emphasized monospaced unconstrained - must be ordered before constrained -->
-                <RegExpr String="`{2}_.*_`{2}" minimal="true" attribute="Emphasized Monospaced"/>
                 <!-- emphasized monospaced constrained - must be ordered after unconstrained -->
-                <RegExpr String="&quoted_pre;`_&quoted;_`&quoted_post;" attribute="Emphasized Monospaced"/>
+                <RegExpr String="`{2}_.*?_`{2}|&quoted_pre;`_&quoted;_`&quoted_post;" attribute="Emphasized Monospaced"/>
 
                 <!-- strong unconstrained - must be ordered before constrained -->
-                <RegExpr String="\*{2}[^*].*\*{2}" minimal="true" attribute="Strong"/>
                 <!-- strong constrained - must be ordered after unconstrained -->
-                <RegExpr String="&quoted_pre;\*&quoted;\*&quoted_post;" attribute="Strong"/>
+                <RegExpr String="\*{2}[^*].*?\*{2}|&quoted_pre;\*&quoted;\*&quoted_post;" attribute="Strong"/>
 
                 <!-- emphasized unconstrained - must be ordered before constrained -->
-                <RegExpr String="_{2}[^_].*_{2}" minimal="true" attribute="Emphasized"/>
                 <!-- emphasized constrained - must be ordered after unconstrained
                      Can't use &quoted_pre; as that excludes \w which excludes `_` too. -->
-                <RegExpr String="(?&lt;=^|[^&alp;;:}])_&quoted;_&quoted_post;" attribute="Emphasized"/>
+                <RegExpr String="_{2}[^_].*?_{2}|(?&lt;=^|[^&alp;;:}])_&quoted;_&quoted_post;" attribute="Emphasized"/>
 
                 <IncludeRules context="R marked"/>
                 <IncludeRules context="R monospaced"/>
@@ -379,25 +370,20 @@
             </context>
 
             <context name="R macro" attribute="Normal" lineEndContext="#stay">
-                <RegExpr String="(?:anchor|xref):&id;\[.*?\]" attribute="Preprocessor"/>
-                <RegExpr String="(?:btn|footnote(?:ref)?|kbd):\[.*?\]" attribute="Preprocessor"/>
-                <RegExpr String="pass:\w*\[.*?\]" attribute="Preprocessor"/>
-                <RegExpr String="(?:icon|image|menu):[^:].*?\[.*?\]" attribute="Preprocessor"/>
+                <RegExpr String="(?:anchor|xref):&id;\[.*?\]|(?:btn|footnote(?:ref)?|kbd):\[.*?\]|pass:\w*\[.*?\]|(?:icon|image|menu):[^:].*?\[.*?\]" attribute="Preprocessor"/>
                 <StringDetect String="toc::[]" attribute="Preprocessor"/>
             </context>
 
             <context name="R marked" attribute="Normal" lineEndContext="#stay">
                 <!-- marked unconstrained - must be ordered before constrained -->
-                <RegExpr String="#{2}.+#{2}" minimal="true" attribute="Marked"/>
                 <!-- marked constrained - must be ordered after unconstrained -->
-                <RegExpr String="&quoted_pre;#&quoted;#&quoted_post;" attribute="Marked"/>
+                <RegExpr String="#{2}.+?#{2}|&quoted_pre;#&quoted;#&quoted_post;" attribute="Marked"/>
             </context>
 
             <context name="R monospaced" attribute="Normal" lineEndContext="#stay">
                 <!-- monospaced unconstrained - must be ordered before constrained -->
-                <RegExpr String="`{2}[^`].*`{2}" minimal="true" attribute="Monospaced"/>
                 <!-- monospaced constrained - must be ordered after unconstrained -->
-                <RegExpr String="&quoted_pre;`&quoted;`&quoted_post;" attribute="Monospaced"/>
+                <RegExpr String="`{2}[^`].*?`{2}|&quoted_pre;`&quoted;`&quoted_post;" attribute="Monospaced"/>
             </context>
 
             <!-- replacements -->
@@ -463,37 +449,27 @@
                 <RegExpr String="&lt;&lt;[^&lt;\s].*?&gt;&gt;" attribute="Link"/>
 
                 <!-- index term -->
-                <RegExpr String="\({3}.+?\){3}" attribute="Preprocessor"/>
-                <RegExpr String="\({2}.+?\){2}" attribute="Preprocessor"/>
-                <RegExpr String="indexterm2?:\[.+?\]" attribute="Preprocessor"/>
+                <RegExpr String="\({3}.+?\){3}|\({2}.+?\){2}|indexterm2?:\[.+?\]" attribute="Preprocessor"/>
 
                 <!-- marker for description list -->
-                <RegExpr String="^\s*\S.+::(?=\s|$)" attribute="List Marker" column="0"/>
                 <!-- marker for numbered list -->
-                <RegExpr String="^\s*(?:\.+|\d+\.)(?=\s+\S)" attribute="List Marker" column="0"/>
                 <!-- marker for checklist and bulleted/unnumbered list
                      To enable highlighting of the horizontal rules using "- - -" or "* * *",
                      keep this after the horizontal rules definition -->
-                <RegExpr String="^\s*(?:-|\*+)(?:\s+\[[*x ]\])?(?=\s+\S)" attribute="List Marker" column="0"/>
+                <RegExpr String="^\s*(?:\S.+::(?=\s|$)|(?:(?:\.+|\d+\.)|(?:-|\*+)(?:\s+\[[*x ]\])?)(?=\s+\S))" attribute="List Marker" column="0"/>
 
                 <!-- media - block format -->
                 <RegExpr String="^(?:audio|image|video)::.*\[.*?\](?=\s*$)" attribute="Preprocessor" column="0"/>
 
                 <!-- links -->
-                <RegExpr String="(?&lt;=^|[\s\[\]();&lt;&gt;])(?:ftp|https?|irc)://[^\s\[]*(?:\[\]|\[.*[^\\]\]|(?=(?:[\[\]]|[\.,;:]?(?:\s|$))))" minimal="true" attribute="Link"/>
-                <RegExpr String="&link_mailto;" attribute="Link"/>
+                <RegExpr String="(?&lt;=^|[\s\[\]();&lt;&gt;])(?:ftp|https?|irc)://[^\s\[]*?(?:\[\]|\[.*?[^\\]\]|(?=(?:[\[\]]|[\.,;:]??(?:\s|$))))|&link_mailto;|&email;" attribute="Link"/>
                 <!-- email - inline,  needs to be ordered after mailto:
                      For some reason, Asciidoctor recognizes emails with leading : or / but does not render them as link -->
                 <RegExpr String="[:/]&email;" attribute="Normal"/>
-                <RegExpr String="&email;" attribute="Link"/>
 
                 <!-- preprocessor -->
-                <RegExpr String="^ifn?def::&id;(?:[,\+]&id;)*\[.*\]" minimal="true" attribute="Preprocessor" column="0"/>
-                <RegExpr String="^ifeval::\[.*\]" minimal="true" attribute="Preprocessor" column="0"/>
-                <RegExpr String="^endif::(?:&id;)?\[\]" attribute="Preprocessor" column="0"/>
-
                 <!-- general meta data attribute list - must be ordered after other rules matching for lines of the form of [some content] -->
-                <RegExpr String="^\[[^\s\[].*\](?=\s*$)" attribute="Preprocessor" column="0"/>
+                <RegExpr String="^ifn?def::&id;(?:[,\+]&id;)*\[.*\]|^ifeval::\[.*\]|^endif::(?:&id;)?\[\]|^\[[^\s\[].*\](?=\s*$)" attribute="Preprocessor" column="0"/>
 
                 <!-- continuation `+`, both at end of line and on a line on its own -->
                 <RegExpr String="(?:^|\s)\s*\+\s*$" lookAhead="true" attribute="Normal" context="continuation"/>

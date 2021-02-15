@@ -284,10 +284,8 @@
 
             <!-- find comments // /* comment */  // comment -->
             <context attribute="Normal Text" lineEndContext="#stay" name="FindComments">
-                <RegExpr attribute="Region Marker" context="#stay" String="/\*BEGIN.*\*/" beginRegion="UserDefined"/>
-                <RegExpr attribute="Region Marker" context="#stay" String="//\s*BEGIN.*" beginRegion="UserDefined"/>
-                <RegExpr attribute="Region Marker" context="#stay" String="/\*END.*\*/" endRegion="UserDefined"/>
-                <RegExpr attribute="Region Marker" context="#stay" String="//\s*END.*" endRegion="UserDefined"/>
+                <RegExpr attribute="Region Marker" context="#stay" String="/\*BEGIN.*\*/|//\s*BEGIN.*" beginRegion="UserDefined"/>
+                <RegExpr attribute="Region Marker" context="#stay" String="/\*END.*\*/|//\s*END.*" endRegion="UserDefined"/>
                 <Detect2Chars attribute="Comment" context="Comment" char="/" char1="*" beginRegion="comment"/>
                 <Detect2Chars attribute="Comment" context="LessComment" char="/" char1="/" />
             </context>
@@ -364,11 +362,9 @@
                 <DetectChar attribute="Normal Text" char="{" context="RuleSet" beginRegion="ruleset"/>
                 <DetectChar attribute="Normal Text" char="}" context="#pop" endRegion="ruleset"/>
                 <!-- find CSS property, like border-radius with optional + or +- decorators -->
-                <RegExpr attribute="Property" context="Rule" String="-?[A-Za-z_\-]+(?=\s*(\+|\+_)?\s*:)"
-                         lookAhead="true"/>
                 <!-- as above, but include support for interpolation -->
                 <RegExpr attribute="Property" context="Rule"
-                         String="-?[A-Za-z_\-]*@{\s*[a-zA-Z0-9\-_]+}[A-Za-z_\-]*(?=\s*(\+|\+_)?\s*:)" lookAhead="true"
+                         String="-?[A-Za-z_\-]+(?=\s*(\+|\+_)?\s*:)|-?[A-Za-z_\-]*@{\s*[a-zA-Z0-9\-_]+}[A-Za-z_\-]*(?=\s*(\+|\+_)?\s*:)" lookAhead="true"
                          />
 
                 <IncludeRules context="Base"/>

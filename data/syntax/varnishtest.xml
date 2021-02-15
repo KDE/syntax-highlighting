@@ -199,8 +199,7 @@
         <RegExpr    attribute="Decimal"              context="http_expectation_operator" String="[0-9]+(\s+|$)" />
         <StringDetect attribute="Keyword"            context="http_expectation_operator" String="&lt;undef&gt;" />
         <!-- Written from cmd_var_resolve() in bin/varnishtest/vtc_http.c. -->
-        <RegExpr    attribute="HTTP Property"        context="http_expectation_operator" String="req\.(method|url|proto|bodylen)" />
-        <RegExpr    attribute="HTTP Property"        context="http_expectation_operator" String="resp\.(proto|status|msg|chunklen|bodylen|body)" />
+        <RegExpr    attribute="HTTP Property"        context="http_expectation_operator" String="req\.(method|url|proto|bodylen)|resp\.(proto|status|msg|chunklen|bodylen|body)" />
         <RegExpr    attribute="HTTP X- Header"       context="http_expectation_operator" String="(req|resp)\.http\.X\-[\-_A-Za-z0-9]*" />
         <RegExpr    attribute="HTTP Header"          context="http_expectation_operator" String="(req|resp)\.http\.[A-Za-z][\-_A-Za-z0-9]*" />
         <RegExpr    attribute="HTTP announce"        context="http_expectation_operator" String="HTTP/[0-9\.]+" />
@@ -226,8 +225,7 @@
         <RegExpr    attribute="Decimal"              context="common_expectation_end" String="[0-9]+(\s+|$)" />
         <StringDetect attribute="Keyword"            context="common_expectation_end" String="&lt;undef&gt;" />
         <!-- Written from cmd_var_resolve() in bin/varnishtest/vtc_http.c. -->
-        <RegExpr    attribute="HTTP Property"        context="common_expectation_end" String="req\.(method|url|proto|bodylen)" />
-        <RegExpr    attribute="HTTP Property"        context="common_expectation_end" String="resp\.(proto|status|msg|chunklen|bodylen|body)" />
+        <RegExpr    attribute="HTTP Property"        context="common_expectation_end" String="req\.(method|url|proto|bodylen)|resp\.(proto|status|msg|chunklen|bodylen|body)" />
         <RegExpr    attribute="HTTP X- Header"       context="common_expectation_end" String="(req|resp)\.http\.X\-[\-_A-Za-z0-9]*" />
         <RegExpr    attribute="HTTP Header"          context="common_expectation_end" String="(req|resp)\.http\.[A-Za-z][\-_A-Za-z0-9]*" />
         <RegExpr    attribute="HTTP announce"        context="common_expectation_end" String="HTTP/[0-9\.]+" />
@@ -276,29 +274,8 @@
         <!-- Varnish's expect takes a Varnish counter as first argument. -->
         <IncludeRules context="comments" />
         <!-- Mostly extracted using man 7 varnish-counters | grep - - - | grep _ | sort -->
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="backend_(?:busy|conn|fail|recycle|req|retry|reuse|toolate|unhealthy)" />
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="bans_(?:added|completed|deleted|dups|lurker_(?:contention|obj_killed|tested|tests_tested)|obj|obj_killed|persisted_(bytes|fragmentation)|req|tested|tests_tested)" />
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="busy_(?:sleep|wakeup)" />
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="cache_(?:hit(pass)?|miss)" />
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="client_(?:req|req_4(?:00|11|13|17))" />
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="esi_(?:errors|warnings)" />
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="exp_(?:mailed|received)" />
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="fetch_(?:1xx|204|304|bad|chunked|close|eof|failed|head|length|oldhttp|zero)" />
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="hcb_(?:insert|lock|nolock)" />
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="n_(?:backend|expired|gunzip|gzip|lru_moved|lru_nuked|obj_purged|object|objectcore|objecthead|purges|vampireobject|vcl|vcl_avail|vcl_discard|waitinglist)" />
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="s_(?:fetch|pass|pipe|pipe_(?:hdrbytes|in|out)|req|(req|resp)_(?:body|hdr)bytes|sess|synth)" />
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="sess_(?:closed|conn|drop|dropped|fail|herd|pipe_overflow|pipeline|queued|readahead)" />
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="shm_(?:cont|cycles|flushes|records|writes)" />
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="sms_(?:balloc|bfree|nbytes|nobj|nreq)" />
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="thread_(?:queue_len|created|destroyed|failed|limited)" />
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="vsm_(?:cooling|free|overflow(ed)?|user)" />
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="(?:bans|losthdr|pools|threads|uptime|vmods)" />
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="LCK\.(?:sm[spaf]|hsl|hcb|hcl|vcl|stat|sessmem|wstat|herder|wq|objhdr|exp|lru|cli|ban|vbp|vbe|backend)\.(?:creat|destroy|locks)" />
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="SMA\.[a-zA-Z0-9_\-]+\.(?:c_(?:req|fail|bytes|freed)|g_(?:alloc|bytes|space))" />
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="SMF\.[a-zA-Z0-9_\-]+\.(?:c_(?:req|fail|bytes|freed)|g_(?:alloc|bytes|space|smf|smf_frag|smf_large))" />
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="VBE\..+\.(?:happy|vcls|be(?:req|resp)_(?:body|hdr)bytes|pipe_(?:in|hdrbytes|out))" />
-        <!-- Found out in c00050.vtc -->
-        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="MEMPOOL\.vbc\.(?:pool|surplus|timeout)" />
+        <!-- MEMPOOL.* found out in c00050.vtc -->
+        <RegExpr attribute="VarnishStat metric"    context="varnish_expectation_operator" String="backend_(?:busy|conn|fail|recycle|req|retry|reuse|toolate|unhealthy)|bans_(?:added|completed|deleted|dups|lurker_(?:contention|obj_killed|tested|tests_tested)|obj|obj_killed|persisted_(bytes|fragmentation)|req|tested|tests_tested)|busy_(?:sleep|wakeup)|cache_(?:hit(pass)?|miss)|client_(?:req|req_4(?:00|11|13|17))|esi_(?:errors|warnings)|exp_(?:mailed|received)|fetch_(?:1xx|204|304|bad|chunked|close|eof|failed|head|length|oldhttp|zero)|hcb_(?:insert|lock|nolock)|n_(?:backend|expired|gunzip|gzip|lru_moved|lru_nuked|obj_purged|object|objectcore|objecthead|purges|vampireobject|vcl|vcl_avail|vcl_discard|waitinglist)|s_(?:fetch|pass|pipe|pipe_(?:hdrbytes|in|out)|req|(req|resp)_(?:body|hdr)bytes|sess|synth)|sess_(?:closed|conn|drop|dropped|fail|herd|pipe_overflow|pipeline|queued|readahead)|shm_(?:cont|cycles|flushes|records|writes)|sms_(?:balloc|bfree|nbytes|nobj|nreq)|thread_(?:queue_len|created|destroyed|failed|limited)|vsm_(?:cooling|free|overflow(ed)?|user)|(?:bans|losthdr|pools|threads|uptime|vmods)|LCK\.(?:sm[spaf]|hsl|hcb|hcl|vcl|stat|sessmem|wstat|herder|wq|objhdr|exp|lru|cli|ban|vbp|vbe|backend)\.(?:creat|destroy|locks)|SMA\.[a-zA-Z0-9_\-]+\.(?:c_(?:req|fail|bytes|freed)|g_(?:alloc|bytes|space))|SMF\.[a-zA-Z0-9_\-]+\.(?:c_(?:req|fail|bytes|freed)|g_(?:alloc|bytes|space|smf|smf_frag|smf_large))|VBE\..+\.(?:happy|vcls|be(?:req|resp)_(?:body|hdr)bytes|pipe_(?:in|hdrbytes|out))|MEMPOOL\.vbc\.(?:pool|surplus|timeout)" />
       </context>
       <context name="varnish_expectation_operator" attribute="Normal Text" lineEndContext="#pop#pop">
         <IncludeRules context="comments" />

@@ -2163,33 +2163,30 @@ private:
             auto& rule1 = *it;
             auto& rule2 = it[1];
 
-            auto isCompatible = [&]{
+            auto isCommonCompatible = [&]{
                 return rule1.attribute == rule2.attribute
                     && rule1.beginRegion == rule2.beginRegion
                     && rule1.endRegion == rule2.endRegion
                     && rule1.lookAhead == rule2.lookAhead
-                    && rule1.column == rule2.column
                     && rule1.firstNonSpace == rule2.firstNonSpace
                     && rule1.context.context == rule2.context.context
                     && rule1.context.popCount == rule2.context.popCount
-                    // && rule1.dynamic == rule2.dynamic
                     ;
             };
 
             switch (rule1.type) {
                 case Context::Rule::Type::AnyChar:
                 case Context::Rule::Type::DetectChar:
-                    if ((rule2.type == Context::Rule::Type::AnyChar || rule2.type == Context::Rule::Type::DetectChar) && isCompatible()) {
+                    if ((rule2.type == Context::Rule::Type::AnyChar || rule2.type == Context::Rule::Type::DetectChar) && isCommonCompatible() && rule1.column == rule2.column) {
                         qWarning() << filename << "line" << rule2.line << "can be merged as AnyChar with the previous rule";
                         success = false;
                     }
                     break;
 
                 case Context::Rule::Type::RegExpr:
-                    if (rule2.type == Context::Rule::Type::RegExpr && isCompatible() && rule1.dynamic == rule2.dynamic) {
+                    if (rule2.type == Context::Rule::Type::RegExpr && isCommonCompatible() && rule1.dynamic == rule2.dynamic && (rule1.column == rule2.column || (rule1.column <= 0 && rule2.column <= 0))) {
                         qWarning() << filename << "line" << rule2.line << "can be merged with the previous rule";
                         success = false;
-                        // TODO column="0" and no column
                     }
                     break;
 

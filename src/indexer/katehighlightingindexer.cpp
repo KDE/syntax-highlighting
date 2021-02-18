@@ -1063,6 +1063,32 @@ private:
                 }
             }
 
+            // add ^ with column=0
+            if (rule.column == 0 && !rule.isDotRegex) {
+                bool hasStartOfLine = false;
+                auto first = qAsConst(reg).begin();
+                auto last = qAsConst(reg).end();
+                for (; first != last; ++first) {
+                    if (*first == QLatin1Char('^')) {
+                        hasStartOfLine = true;
+                        break;
+                    }
+                    else if (*first == QLatin1Char('(')) {
+                        if (last - first >= 3 && first[1] == QLatin1Char('?') && first[2] == QLatin1Char(':')) {
+                            first += 2;
+                        }
+                    }
+                    else {
+                        break;
+                    }
+                }
+
+                if (!hasStartOfLine) {
+                    qWarning() << rule.filename << "line" << rule.line << "start of line missing in the pattern with column=\"0\" (i.e. abc -> ^abc):" << rule.string;
+                    return false;
+                }
+            }
+
             bool useCapture = false;
 
             // detection of unnecessary capture
@@ -2175,6 +2201,7 @@ private:
             };
 
             switch (rule1.type) {
+                // request to merge AnyChar/DetectChar
                 case Context::Rule::Type::AnyChar:
                 case Context::Rule::Type::DetectChar:
                     if ((rule2.type == Context::Rule::Type::AnyChar || rule2.type == Context::Rule::Type::DetectChar) && isCommonCompatible() && rule1.column == rule2.column) {
@@ -2183,6 +2210,7 @@ private:
                     }
                     break;
 
+                // request to merge multiple RegExpr
                 case Context::Rule::Type::RegExpr:
                     if (rule2.type == Context::Rule::Type::RegExpr && isCommonCompatible() && rule1.dynamic == rule2.dynamic && (rule1.column == rule2.column || (rule1.column <= 0 && rule2.column <= 0))) {
                         qWarning() << filename << "line" << rule2.line << "can be merged with the previous rule";

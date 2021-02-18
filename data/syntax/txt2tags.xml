@@ -27,11 +27,11 @@
 
 	<!-- Start Document: find header -->
 	<context name="StartDocument" attribute="Normal" lineEndContext="Normal" lineEmptyContext="Normal" fallthrough="true" fallthroughContext="Normal">
-		<RegExpr attribute="Header Title" context="HeaderValue1" String="&headerKey;" column="0"/>
+		<RegExpr attribute="Header Title" context="HeaderValue1" String="^&headerKey;" column="0"/>
 	</context>
 	<context name="HeaderValue1" attribute="Header Value" lineEndContext="#pop!HeaderKey2" lineEmptyContext="#pop!Normal" />
 	<context name="HeaderKey2" attribute="Normal" lineEndContext="#stay" lineEmptyContext="#pop!Normal" fallthrough="true" fallthroughContext="#pop!Normal">
-		<RegExpr attribute="Header Title" context="#pop!HeaderValue2" String="&headerKey;" column="0"/>
+		<RegExpr attribute="Header Title" context="#pop!HeaderValue2" String="^&headerKey;" column="0"/>
 		<RegExpr context="#pop!Normal" String="^." column="0" lookAhead="true"/>
 	</context>
 	<context name="HeaderValue2" attribute="Header Value" lineEndContext="#pop!HeaderKey3" lineEmptyContext="#pop!Normal" />
@@ -43,9 +43,9 @@
 
 	<!-- Normal Document -->
 	<context name="Normal" attribute="Normal" lineEndContext="#stay">
-		<RegExpr attribute="Verbatim Block" context="VerbatimBlock" String="```&end;" column="0" beginRegion="VerbatimBlock"/>
-		<RegExpr attribute="Raw Block" context="RawBlock" String="&quot;&quot;&quot;&end;" column="0" beginRegion="RawBlock"/>
-		<RegExpr attribute="Tagged Block" context="TagBlock" String="'''&end;" column="0" beginRegion="TagBlock"/>
+		<RegExpr attribute="Verbatim Block" context="VerbatimBlock" String="^```&end;" column="0" beginRegion="VerbatimBlock"/>
+		<RegExpr attribute="Raw Block" context="RawBlock" String="^&quot;&quot;&quot;&end;" column="0" beginRegion="RawBlock"/>
+		<RegExpr attribute="Tagged Block" context="TagBlock" String="^'''&end;" column="0" beginRegion="TagBlock"/>
 		<StringDetect attribute="Verbatim Line" context="VerbatimLine" String="```&space;" column="0"/>
 		<StringDetect attribute="Raw Line" context="RawLine" String="&quot;&quot;&quot;&space;" column="0"/>
 		<StringDetect attribute="Tagged Line" context="TagLine" String="'''&space;" column="0"/>
@@ -81,7 +81,7 @@
 
 	<context name="FindComments" attribute="Comment" lineEndContext="#pop">
 		<RegExpr attribute="Constant Character" context="#pop!ConstantChar" String="^%!\s*(?:target|encoding|style|options|include|includeconf|preproc|postproc|guicolors)\s*(?:\(\w*\)\s*)?\:" column="0"/>
-		<RegExpr attribute="Comment" context="#pop!CommentBlock" String="%%%&end;" column="0" beginRegion="CommentBlock"/>
+		<RegExpr attribute="Comment" context="#pop!CommentBlock" String="^%%%&end;" column="0" beginRegion="CommentBlock"/>
 		<DetectChar attribute="Comment" context="#pop!CommentLine" char="%" column="0"/>
 	</context>
 	<context name="CommentLine" attribute="Comment" lineEndContext="#pop">
@@ -89,7 +89,7 @@
 		<IncludeRules context="##Comments"/>
 	</context>
 	<context name="CommentBlock" attribute="Comment" lineEndContext="#stay">
-		<RegExpr attribute="Comment" context="#pop" String="%%%&end;" column="0" endRegion="CommentBlock"/>
+		<RegExpr attribute="Comment" context="#pop" String="^%%%&end;" column="0" endRegion="CommentBlock"/>
 		<DetectSpaces />
 		<IncludeRules context="##Comments"/>
 	</context>
@@ -118,13 +118,13 @@
 		<RangeDetect attribute="Interpolated String" context="#pop" char="(" char1=")"/>
 	</context>
 	<context name="VerbatimBlock" attribute="Verbatim Block" lineEndContext="#stay">
-		<RegExpr attribute="Verbatim Block" context="#pop" String="```&end;" column="0" endRegion="VerbatimBlock"/>
+		<RegExpr attribute="Verbatim Block" context="#pop" String="^```&end;" column="0" endRegion="VerbatimBlock"/>
 	</context>
 	<context name="RawBlock" attribute="Raw Block" lineEndContext="#stay">
-		<RegExpr attribute="Raw Block" context="#pop" String="&quot;&quot;&quot;&end;" column="0" endRegion="RawBlock"/>
+		<RegExpr attribute="Raw Block" context="#pop" String="^&quot;&quot;&quot;&end;" column="0" endRegion="RawBlock"/>
 	</context>
 	<context name="TagBlock" attribute="Tagged Block" lineEndContext="#stay">
-		<RegExpr attribute="Tagged Block" context="#pop" String="'''&end;" column="0" endRegion="TagBlock"/>
+		<RegExpr attribute="Tagged Block" context="#pop" String="^'''&end;" column="0" endRegion="TagBlock"/>
 	</context>
 	<context name="VerbatimLine" attribute="Verbatim Line" lineEndContext="#pop" />
 	<context name="RawLine" attribute="Raw Line" lineEndContext="#pop" />

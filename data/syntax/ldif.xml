@@ -262,31 +262,31 @@
 				<DetectChar char=":" attribute="Description Keyword" context="ctxEncoded"/>
 				<DetectChar char="&lt;" attribute="Description Keyword" context="ctxURL"/>
 				<RegExpr String="[^:&lt;]" attribute="Value (Standard)" context="ctxStandard"/>
-				<RegExpr String="[\w\-]+((;[\w\-]+)+)?:" attribute="Description Keyword" context="#stay" column="0"/>
+				<RegExpr String="^[\w\-]+(;[\w\-]+)*:" attribute="Description Keyword" context="#stay" column="0"/>
 			</context>
 			<context name="ctxEncoded" attribute="Value (Encoded)" lineEndContext="#stay">
 				<DetectChar char="#" attribute="Comment" context="Comment"/>
 				<DetectSpaces attribute="Value (Encoded)" context="Value (Encoded)"/>
-				<RegExpr String="[\w\-]+((;[\w\-]+)+)?:" attribute="Description Keyword" context="#pop" column="0"/>
+				<RegExpr String="^[\w\-]+(;[\w\-]+)*:" attribute="Description Keyword" context="#pop" column="0"/>
 			</context>
 			<context name="ctxURL" attribute="Value (URL)" lineEndContext="#stay">
 				<DetectChar char="#" attribute="Comment" context="Comment"/>
 				<RegExpr String="\s+[\w]+://[\w/.]+" attribute="Value (URL)" context="#stay"/>
 				<DetectSpaces attribute="Value (URL)" context="Value (URL)"/>
-				<RegExpr String="[\w\-]+((;[\w\-]+)+)?:" attribute="Description Keyword" context="#pop" column="0"/>
+				<RegExpr String="^[\w\-]+(;[\w\-]+)*:" attribute="Description Keyword" context="#pop" column="0"/>
 			</context>
 			<context name="ctxStandard" attribute="Value (Standard)" lineEndContext="#stay">
 				<DetectChar char="#" attribute="Comment" context="Comment"/>
 				<RegExpr String="\{\w+\}.*$" attribute="Value (Encrypted)" context="ctxEncrypted"/>
 				<keyword String="attributetypes" attribute="AttributeType" context="#stay"/>
 				<keyword String="objectclasses" attribute="ObjectClass" context="#stay"/>
-				<RegExpr String="[\w\-]+((;[\w\-]+)+)?:" attribute="Description Keyword" context="#pop" column="0"/>
+				<RegExpr String="^[\w\-]+(;[\w\-]+)*:" attribute="Description Keyword" context="#pop" column="0"/>
 				<RegExpr String="[a-zA-Z0-9\-]+=" attribute="Value (Keyword)" context="#stay"/>
 			</context>
 			<context name="ctxEncrypted" attribute="Value (Encrypted)" lineEndContext="#stay">
 				<DetectChar char="#" attribute="Comment" context="Comment"/>
 				<DetectSpaces attribute="Value (Encrypted)" context="Value (Encrypted)"/>
-				<RegExpr String="[\w\-]+((;[\w\-]+)+)?:" attribute="Description Keyword" context="#pop#pop" column="0"/>
+				<RegExpr String="^[\w\-]+(;[\w\-]+)*:" attribute="Description Keyword" context="#pop#pop" column="0"/>
 			</context>
 			<context name="Comment" attribute="Comment" lineEndContext="#pop">
 				<DetectSpaces />

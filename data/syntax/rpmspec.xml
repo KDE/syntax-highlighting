@@ -87,18 +87,18 @@
       in this file, it is also the context with which the interpreter starts. -->
       <context attribute="Error" lineEndContext="#stay" name="package section">
         <!-- Handle tags: -->
-        <RegExpr attribute="Tag" context="tag_line_value" String="((Icon)[ \t]*:[ \t]*)" column="0" />
-        <RegExpr attribute="Tag" context="tag_line_os" String="((ExclusiveOs|ExcludeOs)[ \t]*:[ \t]*)" column="0" />
-        <RegExpr attribute="Tag" context="tag_line_arch" String="((BuildArch|BuildArchitectures|ExclusiveArch|ExcludeArch)[ \t]*:[ \t]*)" column="0" />
-        <RegExpr attribute="Tag" context="tag_line_package" String="((Conflicts|Obsoletes|Provides|Requires|Requires\(.*\)|Enhances|Suggests|BuildConflicts|BuildRequires|Recommends|PreReq|BuildPreReq|Supplements)[ \t]*:[ \t]*)" column="0" />
-        <RegExpr attribute="Tag" context="tag_line_integer" String="((Epoch|Serial|Nosource|Nopatch)[ \t]*:[ \t]*)" column="0" />
-        <RegExpr attribute="Tag" context="tag_line_switch" String="((AutoReq|AutoProv|AutoReqProv)[ \t]*:[ \t]*)" column="0" />
-        <RegExpr attribute="Tag" context="tag_line_string" String="((Copyright|License|Summary|Summary\(.*\)|Distribution|Vendor|Packager|Group|Source\d*|Patch\d*|BuildRoot|Prefix)[ \t]*:[ \t]*)" column="0" />
-        <RegExpr attribute="Tag" context="tag_line_string_only_one_word" String="((Name|Version|Release|Url|URL)[ \t]*:[ \t]*)" column="0" />
+        <RegExpr attribute="Tag" context="tag_line_value" String="^((Icon)[ \t]*:[ \t]*)" column="0" />
+        <RegExpr attribute="Tag" context="tag_line_os" String="^((ExclusiveOs|ExcludeOs)[ \t]*:[ \t]*)" column="0" />
+        <RegExpr attribute="Tag" context="tag_line_arch" String="^((BuildArch|BuildArchitectures|ExclusiveArch|ExcludeArch)[ \t]*:[ \t]*)" column="0" />
+        <RegExpr attribute="Tag" context="tag_line_package" String="^((Conflicts|Obsoletes|Provides|Requires|Requires\(.*\)|Enhances|Suggests|BuildConflicts|BuildRequires|Recommends|PreReq|BuildPreReq|Supplements)[ \t]*:[ \t]*)" column="0" />
+        <RegExpr attribute="Tag" context="tag_line_integer" String="^((Epoch|Serial|Nosource|Nopatch)[ \t]*:[ \t]*)" column="0" />
+        <RegExpr attribute="Tag" context="tag_line_switch" String="^((AutoReq|AutoProv|AutoReqProv)[ \t]*:[ \t]*)" column="0" />
+        <RegExpr attribute="Tag" context="tag_line_string" String="^((Copyright|License|Summary|Summary\(.*\)|Distribution|Vendor|Packager|Group|Source\d*|Patch\d*|BuildRoot|Prefix)[ \t]*:[ \t]*)" column="0" />
+        <RegExpr attribute="Tag" context="tag_line_string_only_one_word" String="^((Name|Version|Release|Url|URL)[ \t]*:[ \t]*)" column="0" />
         <!-- Handle % -->
         <AnyChar context="macro entry in package section" String="%$" lookAhead="true" />
         <!-- Handle comments. "# norootforbuild" is displayed like a tag. -->
-        <RegExpr context="Comment" String="[ \t]*#" column="0" lookAhead="true" />
+        <RegExpr context="Comment" String="^[ \t]*#" column="0" lookAhead="true" />
                 <!-- Spaces are okay -->
         <DetectSpaces attribute="Fallback for separator spaces" />
         <!-- Fallback value for every non-space -->
@@ -131,7 +131,7 @@
         <!-- Handle % -->
         <AnyChar context="handle_percent" String="%$" lookAhead="true" />
         <!-- Handle comments. "# norootforbuild" is displayed like a tag. -->
-        <RegExpr context="Comment" String="[ \t]*#" column="0" lookAhead="true" />
+        <RegExpr context="Comment" String="^[ \t]*#" column="0" lookAhead="true" />
       </context>
 
       <!-- "changelog section" is the context for the changelog. By default, everything that is
@@ -142,7 +142,7 @@
         <!-- Handle % -->
         <AnyChar context="handle_percent" String="%$" lookAhead="true" />
         <!-- Handle comments. "# norootforbuild" is displayed like a tag. -->
-        <RegExpr context="Comment" String="[ \t]*#" column="0" lookAhead="true" />
+        <RegExpr context="Comment" String="^[ \t]*#" column="0" lookAhead="true" />
       </context>
 
       <!-- "description section start line" simply is used for the parameters after the
@@ -159,12 +159,12 @@
         <!-- Handle % -->
         <AnyChar context="handle_percent" String="%$" lookAhead="true" />
         <!-- Handle comments. "# norootforbuild" is displayed like a tag. -->
-        <RegExpr context="Comment" String="[ \t]*#" column="0" lookAhead="true" />
+        <RegExpr context="Comment" String="^[ \t]*#" column="0" lookAhead="true" />
       </context>
 
       <!-- This is a convenience context that is handling comments automatically. Furthermore it
       handles "# norootforbuild" because it looks like a comment. If a context supports comments,
-      simple use "<RegExpr context="Comment" String="[ \t]*#" column="0" lookAhead="true" />".
+      simple use "<RegExpr context="Comment" String="^[ \t]*#" column="0" lookAhead="true" />".
       (This context relies on the asumption that # is the first non-whitespace. We have to
       guarantee this when calling this context! -->
       <context attribute="Comment" lineEndContext="#pop" name="Comment">
@@ -172,7 +172,7 @@
         http://docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0.1/html/RPM_Guide/ch-specfile-syntax.html#id1961462),
         rpmbuild accepts them nevertheless. We highlight them as comments, but we mark the
         indeet. -->
-        <RegExpr attribute="Hint" context="#stay" String="[ \t]+(?=#)" column="0" />
+        <RegExpr attribute="Hint" context="#stay" String="^[ \t]+(?=#)" column="0" />
 	<!-- Handle "# norootforbuild" and some of its miss-spellings. -->
         <StringDetect attribute="Tag" context="every_non_whitespace_is_warning" String="# norootforbuild" column="0" />
         <RegExpr attribute="Warning" context="#stay" String="#[ \t]*norootforbuild" />
@@ -424,10 +424,10 @@
         <RegExpr attribute="Keyword" context="undefine macro" String="%undefine&lookahead_whitespace_eol;" firstNonSpace="true" />
         <!-- If a command section starts (=section macro at begin of the line), we switch
              to the corresponding context. There will never be a return to THIS context...: -->
-        <RegExpr attribute="Section" context="package section start line" String="%package&lookahead_whitespace_eol;" column="0" />
-        <RegExpr attribute="Section" context="description section start line" String="%description&lookahead_whitespace_eol;" column="0" />
-        <RegExpr attribute="Section" context="command section" String="%&command_section_name;&lookahead_whitespace_eol;" column="0" />
-        <RegExpr attribute="Section" context="changelog section" String="%changelog&lookahead_whitespace_eol;" column="0" />
+        <RegExpr attribute="Section" context="package section start line" String="^%package&lookahead_whitespace_eol;" column="0" />
+        <RegExpr attribute="Section" context="description section start line" String="^%description&lookahead_whitespace_eol;" column="0" />
+        <RegExpr attribute="Section" context="command section" String="^%&command_section_name;&lookahead_whitespace_eol;" column="0" />
+        <RegExpr attribute="Section" context="changelog section" String="^%changelog&lookahead_whitespace_eol;" column="0" />
         <!-- Handle normal macros -->
         <RegExpr attribute="Error" context="#pop" String="%([\{\(][ \t]{0,}){0,1}(if|&arch_conditionals_names;|&os_conditionals_names;|else|endif|define|global|undefine|package|description|&command_section_name;|changelog)(?=($|[^&a_valid_char_in_macro_names;]))" />
         <RegExpr attribute="Macro call" context="macro content in parenthesis" String="%[&a_valid_char_in_macro_names;]*\(" />

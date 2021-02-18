@@ -44,7 +44,7 @@
             <context name="Base" attribute="Normal Text" lineEndContext="#stay">
                 <IncludeRules context="FindCommentsColumn0" />
                 <IncludeRules context="FindComments" />
-                <RegExpr attribute="Property" context="Rule" String="\s*[-_A-Za-z]+(/\*.*\*/)?\s*(?=:(\s|$))" lookAhead="true" column="0" />
+                <RegExpr attribute="Property" context="Rule" String="^\s*[-_A-Za-z]+(/\*.*\*/)?\s*(?=:(\s|$))" lookAhead="true" column="0" />
                 <DetectSpaces />
                 <DetectChar attribute="At Rule" context="@mixin" char="=" firstNonSpace="true" />
                 <DetectChar attribute="At Rule" context="AtRule" char="+" firstNonSpace="true" />
@@ -137,8 +137,8 @@
             <!-- find comments // and /* at the beginning of line -->
             <context name="FindCommentsColumn0" attribute="Comment" lineEndContext="#stay">
                 <!-- (\s*)(?=/[*/]) is not selected when the match is empty -->
-                <RegExpr attribute="Normal Text" context="Comment" String="(\s+)(?=/[*/])" column="0" />
-                <RegExpr attribute="Comment" context="Comment" String="()/[*/]" column="0" />
+                <RegExpr attribute="Normal Text" context="Comment" String="^(\s+)(?=/[*/])" column="0" />
+                <RegExpr attribute="Comment" context="Comment" String="^()/[*/]" column="0" />
             </context>
 
             <!-- find comments // and /* -->
@@ -148,7 +148,7 @@
             </context>
 
             <context name="Comment" attribute="Comment" lineEndContext="#stay" dynamic="true" fallthrough="true" fallthroughContext="IsInlineComment">
-                <RegExpr attribute="Comment" context="IsInlineComment" String="%1\s|\s*$" dynamic="true" column="0" />
+                <RegExpr attribute="Comment" context="IsInlineComment" String="^%1\s|^\s*$" dynamic="true" column="0" />
                 <DetectSpaces attribute="Normal Text" context="#pop" lookAhead="true" column="0" />
                 <RegExpr attribute="Comment" context="#pop" String="." lookAhead="true" column="0"/>
             </context>

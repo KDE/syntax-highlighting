@@ -4,7 +4,7 @@
 	name="BrightScript"
 	section="Scripts"
 	extensions="*.brs"
-	version="9"
+	version="10"
 	kateversion="5.0"
 	author="Daniel Levin (dendy.ua@gmail.com)"
 	license="MIT">
@@ -259,6 +259,13 @@
 </context>
 
 
+<!-- Inline lambda call for sub/function -->
+<context name="inline_call" attribute="g" lineEndContext="#pop">
+	<DetectSpaces/>
+	<DetectChar char="(" attribute="scope" context="#pop!lvalue_call_args"/>
+</context>
+
+
 <!-- Regular function definition. -->
 <context name="@function" attribute="g" lineEndContext="#stay">
 	<keyword String="function" attribute="keyword" context="function" beginRegion="function"/>
@@ -303,7 +310,7 @@
 
 <context name="function_end" attribute="keyword" lineEndContext="#pop#pop" fallthrough="true" fallthroughContext="#pop#pop">
 	<DetectSpaces/>
-	<StringDetect String="function" insensitive="true" attribute="keyword" context="#pop#pop" endRegion="function"/>
+	<StringDetect String="function" insensitive="true" attribute="keyword" context="#pop#pop!inline_call" endRegion="function"/>
 </context>
 
 
@@ -351,7 +358,7 @@
 
 <context name="sub_end" attribute="keyword" lineEndContext="#pop#pop" fallthrough="true" fallthroughContext="#pop#pop">
 	<DetectSpaces/>
-	<StringDetect String="sub" insensitive="true" attribute="keyword" context="#pop#pop" endRegion="sub"/>
+	<StringDetect String="sub" insensitive="true" attribute="keyword" context="#pop#pop!inline_call" endRegion="sub"/>
 </context>
 
 

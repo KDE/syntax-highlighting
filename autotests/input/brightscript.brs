@@ -128,3 +128,16 @@ sub exceptions()
 
 	throw {a: "abc"}
 end sub
+
+sub inline_lambda()
+	a(a, "string")(a, "string")
+
+	a = sub()
+	end sub(a, "string", [a, foo("string")])
+
+	b = function()
+	end function(a, "string")
+
+	c = sub()
+	end sub
+end sub

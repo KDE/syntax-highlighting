@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd"
+[
+  <!-- In EBNF: Identifier ::= [a-zA-Z] [a-zA-Z0-9_-]*-->
+  <!ENTITY identifier "[a-zA-Z0-9_-]">
+  <!ENTITY not_escaped "(?&lt;=(?:.[^\\])|(?:\\{2}))">
+]>
+<language name="Fluent" version="1" kateversion="5.0" section="Markup" extensions="*.ftl" mimetype="text/x-fluent-translation" author="Fabian Wunsch (fabian@uriah.heep.sax.de)" license="MIT" priority="-1">
+  <highlighting>
+    <contexts>
+      <context name="Normal" attribute="Normal Text" lineEndContext="#stay">
+        <DetectChar char="#" attribute="Comment" context="MessageComment" firstNonSpace="true"/>
+        <RegExpr String="^(&identifier;+)" context="Identifier" column="0"/>
+        <DetectSpaces/>
+      </context>
+
+      <context name="Identifier" attribute="Identifier" lineEndContext="#pop!Error">
+        <RegExpr String="\s*=\s*" context="SingleLineText" attribute="Normal Text"/>
+        <DetectChar char=" " context="#pop!Error"/>
+      </context>
+
+      <context name="Error" attribute="Error" lineEndContext="#pop">
+      </context>
+
+      <context name="MessageComment" attribute="Comment" lineEndContext="#pop">
+        <DetectChar char="#" attribute="Comment" context="StandaloneComment"/>
+      </context>
+
+      <context name="StandaloneComment" attribute="Comment" lineEndContext="#pop">
+        <DetectChar char="#" attribute="Comment" context="FileComment"/>
+      </context>
+
+      <context name="FileComment" attribute="Comment" lineEndContext="#pop">
+      </context>
+
+      <context name="SingleLineText" attribute="Text" lineEndContext="MultiLineText">
+        <DetectChar char="{" context="Placeable"/>
+      </context>
+
+
+      <context name="MultiLineText" attribute="Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop#pop#pop">
+        <IncludeRules context="SingleLineText"/>
+        <DetectChar char=" " context="#stay" column="0"/>
+      </context>
+
+      <context name="Placeable" attribute="Placeable" lineEndContext="#stay">
+        <DetectSpaces/>
+        <DetectChar char="}" context="#pop" attribute="Placeable"/>
+        <RegExpr String="&not_escaped;(?:&quot;)" context="Quoted"/>
+        <RegExpr String="(?:&identifier;+)(?=\()" context="Function"/>
+        <RegExpr String="(?:\$&identifier;+)" context="Variable"/>
+      </context>
+
+      <context name="Quoted" attribute="Quoted" lineEndContext="#pop!Error">
+        <RegExpr String="&not_escaped;(?:&quot;)" context="#pop" attribute="Quoted"/>
+      </context>
+
+      <context name="Function" attribute="Function" lineEndContext="#pop!Error">
+        <RegExpr String="&not_escaped;(?:&quot;)" context="Quoted"/>
+        <DetectChar char=")" context="#pop" attribute="Function"/>
+        <RegExpr String="(?:\$&identifier;+)" context="Variable"/>
+      </context>
+
+      <context name="Variable" attribute="Variable" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+        <RegExpr String="(?:&identifier;)" context="#stay"/>
+      </context>
+    </contexts>
+
+    <itemDatas>
+      <itemData name="Normal Text" defStyleNum="dsNormal" spellChecking="false"/>
+      <itemData name="Error" defStyleNum="dsError" spellChecking="false"/>
+      <itemData name="Identifier" defStyleNum="dsKeyword" spellChecking="false"/>
+      <itemData name="Text" defStyleNum="dsString" spellChecking="true"/>
+      <itemData name="Function" defStyleNum="dsFunction" spellChecking="false"/>
+      <itemData name="Placeable" defStyleNum="dsSpecialChar" spellChecking="false"/>
+      <itemData name="Comment" defStyleNum="dsComment" spellChecking="true"/>
+      <itemData name="Quoted" defStyleNum="dsString" spellChecking="true"/>
+      <itemData name="Variable" defStyleNum="dsVariable" spellChecking="false"/>
+    </itemDatas>
+  </highlighting>
+  <general>
+    <comments>
+      <comment name="singleLine" start="#"/>
+    </comments>
+    <folding>
+      <folding indentationsensitive="true"/>
+    </folding>
+  </general>
+</language>
+<!-- kate: replace-tabs on; tab-width 2; indent-width 2; -->

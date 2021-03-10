@@ -15,7 +15,7 @@
       </context>
 
       <context name="Identifier" attribute="Identifier" lineEndContext="#pop!Error">
-        <RegExpr String="\s*=\s*" context="SingleLineText" attribute="Normal Text"/>
+        <RegExpr String="\s*=\s*" context="MultiLineText" attribute="Normal Text"/>
         <DetectChar char=" " context="#pop!Error"/>
       </context>
 
@@ -33,9 +33,13 @@
       <context name="FileComment" attribute="Comment" lineEndContext="#pop">
       </context>
 
-      <context name="SingleLineText" attribute="Text" lineEndContext="#stay">
+      <context name="SingleLineText" attribute="Text" lineEndContext="#pop">
         <DetectChar char="{" context="Placeable"/>
+      </context>
+
+      <context name="MultiLineText" attribute="Text" lineEndContext="#stay">
         <RegExpr String="^[^\s]" context="#pop#pop" column="0" lookAhead="true"/>
+        <IncludeRules context="SingleLineText"/>
       </context>
 
       <context name="Placeable" attribute="Placeable" lineEndContext="#stay">
@@ -44,6 +48,8 @@
         <RegExpr String="&not_escaped;(?:&quot;)" context="Quoted"/>
         <RegExpr String="(?:&identifier;+)(?=\()" context="Function"/>
         <RegExpr String="(?:\$&identifier;+)" context="Variable"/>
+        <RegExpr String="(?:\*\[&identifier;+\])" context="SingleLineText" attribute="DefaultIdentifier"/>
+        <RegExpr String="(?:\[&identifier;+\])" context="SingleLineText" attribute="Identifier"/>
       </context>
 
       <context name="Quoted" attribute="Quoted" lineEndContext="#pop!Error">
@@ -65,6 +71,7 @@
       <itemData name="Normal Text" defStyleNum="dsNormal" spellChecking="false"/>
       <itemData name="Error" defStyleNum="dsError" spellChecking="false"/>
       <itemData name="Identifier" defStyleNum="dsKeyword" spellChecking="false"/>
+      <itemData name="DefaultIdentifier" defStyleNum="dsKeyword" spellChecking="false"/>
       <itemData name="Text" defStyleNum="dsString" spellChecking="true"/>
       <itemData name="Function" defStyleNum="dsFunction" spellChecking="false"/>
       <itemData name="Placeable" defStyleNum="dsSpecialChar" spellChecking="false"/>

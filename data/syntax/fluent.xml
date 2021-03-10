@@ -40,6 +40,7 @@
       </context>
 
       <context name="SingleLineText" attribute="Text" lineEndContext="#pop">
+        <DetectIdentifier/>
         <DetectChar char="{" context="Placeable"/>
       </context>
 
@@ -52,8 +53,8 @@
       <context name="Placeable" attribute="Placeable" lineEndContext="#stay">
         <DetectSpaces/>
         <DetectChar char="}" context="#pop" attribute="Placeable"/>
-        <RegExpr String="&not_escaped;(?:&quot;)" context="Quoted"/>
-        <RegExpr String="(?:&identifier;+)(?=\()" context="Function"/>
+        <DetectChar char="&quot;" context="Quoted"/>
+        <RegExpr String="(?:&identifier;+)(?=\s*\(\s*)" context="Function"/>
         <RegExpr String="(?:\$&identifier;+)" context="Variable"/>
         <RegExpr String="(?:\*&variant_key;)" context="SingleLineText" attribute="DefaultIdentifier"/>
         <RegExpr String="(?:&variant_key;)" context="SingleLineText" attribute="Identifier"/>
@@ -64,7 +65,8 @@
       </context>
 
       <context name="Function" attribute="Function" lineEndContext="#pop!Error">
-        <RegExpr String="&not_escaped;(?:&quot;)" context="Quoted"/>
+        <DetectSpaces/>
+        <DetectChar char="&quot;" context="Quoted"/>
         <DetectChar char=")" context="#pop" attribute="Function"/>
         <RegExpr String="(?:\$&identifier;+)" context="Variable"/>
       </context>

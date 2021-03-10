@@ -3,8 +3,8 @@
 [
   <!-- In EBNF: Identifier ::= [a-zA-Z] [a-zA-Z0-9_-]*-->
   <!ENTITY identifier "[a-zA-Z0-9_-]">
-  <!ENTITY not_escaped "(?&lt;=(?:.[^\\])|(?:\\{2}))">
   <!ENTITY variant_key "\[(?:&identifier;+|(?:-?[0-9]+(?:\.[0-9]+)?))\]">
+  <!ENTITY hex "[0-9a-fA-F]">
 ]>
 <language name="Fluent" version="1" kateversion="5.0" section="Markup" extensions="*.ftl" mimetype="text/x-fluent-translation" author="Fabian Wunsch (fabian@uriah.heep.sax.de)" license="MIT" priority="-1">
   <highlighting>
@@ -67,7 +67,10 @@
       </context>
 
       <context name="Quoted" attribute="Quoted" lineEndContext="#pop!Error">
-        <RegExpr String="&not_escaped;(?:&quot;)" context="#pop" attribute="Quoted"/>
+        <DetectIdentifier/>
+        <RegExpr String="\\(?:&quot;|\\|u&hex;{4}|U&hex;{6})"/>
+        <DetectChar char="\" context="#pop!Error"/>
+        <DetectChar char="&quot;" context="#pop" attribute="Quoted"/>
       </context>
 
       <context name="Function" attribute="Function" lineEndContext="#pop!Error">

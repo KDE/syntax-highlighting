@@ -17,9 +17,14 @@
         <DetectSpaces/>
       </context>
 
-      <context name="Identifier" attribute="Identifier" lineEndContext="#pop!Error">
+      <context name="Identifier" attribute="Identifier" lineEndContext="#pop">
         <RegExpr String="\s*=\s*" context="MultiLineText" attribute="Normal Text"/>
         <DetectChar char=" " context="#pop!Error"/>
+      </context>
+
+      <context name="AttributeIdentifier" attribute="Identifier" lineEndContext="#pop">
+        <RegExpr String="\s*=\s*" context="#pop#pop!MultiLineText" attribute="Normal Text"/>
+        <DetectChar char=" " context="#pop#pop!Error"/>
       </context>
 
       <context name="Error" attribute="Error" lineEndContext="#pop">
@@ -40,6 +45,7 @@
 
       <context name="MultiLineText" attribute="Text" lineEndContext="#stay">
         <RegExpr String="^[^ ]" context="#pop#pop" column="0" lookAhead="true"/>
+        <RegExpr String="(?&lt;=[ ])(?:\.&identifier;)" context="AttributeIdentifier" lookAhead="true"/>
         <IncludeRules context="SingleLineText"/>
       </context>
 

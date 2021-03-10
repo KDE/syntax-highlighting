@@ -28,7 +28,7 @@ about = { -name } is great
 -special-term = Wrapper around { $parameter }
 using-wrapper = Wrapping { -special-term(parameter: "stuff") }
 
-placeable-with-special-character = Using a {"{"}
+placeable-with-special-character = Using a {"{ and \U01F91A or \\"}
 
 builtin-number = Time elapsed: { NUMBER($duration, maximumFractionDigits: 0) }s.
 
@@ -67,3 +67,24 @@ login-input = Predefined value
 
 # accessible via .
 login-placeholder = {login-input.placeholder}
+
+## Faulty code, no gurantees for sense of the end of errors
+
+faulty-quote = Won't work {"\"}
+    still-inside\
+    {"lonely \\ \ "}
+}
+
+disallowed-identifier characters
+
+# Hilight only at the end of the line, not visible since err only visible on same line
+broken-function = {fn(
+}
+
+# Same for open ended string and wron unicode characters
+broken-string = {
+    "
+    "\u923"
+    "\U92345"
+    "\Ubcdefg"
+}

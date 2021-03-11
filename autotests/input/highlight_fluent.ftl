@@ -19,6 +19,7 @@ block =
 
 ## Placeables, insert text from variables etc.
 variable-placeable = We currently have { $users } users
+stacked-placeable = More {{"Placeables"}}
 
 # Term, used only in other texts, not final translation string
 -name = Fluent
@@ -76,9 +77,13 @@ faulty-quote = Won't work {"\"}
 }
 
 disallowed-identifier characters
+disallowed-character$
 
 # Hilight only at the end of the line, not visible since err only visible on same line
 broken-function = {fn(
+    fn(smth:123, 0, {)
+    fn(noth!ng:3)
+    fn(\)
 }
 
 # Same for open ended string and wron unicode characters

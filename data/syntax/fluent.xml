@@ -3,7 +3,8 @@
 [
   <!-- In EBNF: Identifier ::= [a-zA-Z] [a-zA-Z0-9_-]*-->
   <!ENTITY identifier "[a-zA-Z0-9_-]">
-  <!ENTITY variant_key "\[(?:&identifier;+|(?:-?[0-9]+(?:\.[0-9]+)?))\]">
+  <!ENTITY number "-?\d+(?:\.\d+)?">
+  <!ENTITY variant_key "\[(?:&identifier;+|(?:&number;))\]">
   <!ENTITY hex "[0-9a-fA-F]">
 ]>
 <language name="Fluent" version="1" kateversion="5.0" section="Markup" extensions="*.ftl" mimetype="text/x-fluent-translation" author="Fabian Wunsch (fabian@uriah.heep.sax.de)" license="MIT" priority="-1">
@@ -17,9 +18,8 @@
         <DetectSpaces/>
       </context>
 
-      <context name="Identifier" attribute="Identifier" lineEndContext="#pop">
+      <context name="Identifier" attribute="Identifier" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!Error">
         <RegExpr String="\s*=\s*" context="MultiLineText" attribute="Normal Text"/>
-        <DetectChar char=" " context="#pop!Error"/>
       </context>
 
       <context name="AttributeIdentifier" attribute="Identifier" lineEndContext="#pop">
@@ -54,16 +54,30 @@
         <IncludeRules context="SingleLineText"/>
       </context>
 
+      <context name="Expression" lineEndContext="#pop" attribute="Normal Text">
+        <DetectChar char="&quot;" context="Quoted"/>
+        <RegExpr String="&number;" attribute="Number"/>
+        <RegExpr String="(?:&identifier;+\s*\()" context="Function"/>
+        <RegExpr String="(?:\$&identifier;+)" attribute="Variable"/>
+        <RegExpr String="(?:&identifier;+(?:\.&identifier;+)?)"/>
+        <DetectChar char="{" context="Placeable"/>
+      </context>
+
       <context name="Placeable" attribute="Placeable" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop!Error">
         <DetectSpaces/>
         <DetectChar char="}" context="#pop" attribute="Placeable"/>
-        <DetectChar char="&quot;" context="Quoted"/>
-        <RegExpr String="(?:&identifier;+)(?=\s*\(\s*)" context="Function"/>
-        <RegExpr String="(?:\$&identifier;+)" attribute="Variable"/>
         <RegExpr String="(?:\*&variant_key;)" context="SingleLineText" attribute="DefaultIdentifier"/>
         <RegExpr String="(?:&variant_key;)" context="SingleLineText" attribute="Identifier"/>
         <Detect2Chars char="-" char1="&gt;"/>
-        <RegExpr String="(?:&identifier;+(?:\.&identifier;+)?)"/>
+        <IncludeRules context="Expression"/>
+      </context>
+
+      <context name="Function" attribute="Function" lineEndContext="#pop!Error" fallthrough="true" fallthroughContext="#pop!Error">
+        <DetectSpaces/>
+        <DetectChar char=")" context="#pop" attribute="Function"/>
+        <RegExpr String="(?:&identifier;+\s*:\s*)"/>
+        <DetectChar char=","/>
+        <IncludeRules context="Expression"/>
       </context>
 
       <context name="Quoted" attribute="Quoted" lineEndContext="#pop!Error">
@@ -71,13 +85,6 @@
         <RegExpr String="\\(?:&quot;|\\|u&hex;{4}|U&hex;{6})"/>
         <DetectChar char="\" context="#pop!Error"/>
         <DetectChar char="&quot;" context="#pop" attribute="Quoted"/>
-      </context>
-
-      <context name="Function" attribute="Function" lineEndContext="#pop!Error">
-        <DetectSpaces/>
-        <DetectChar char="&quot;" context="Quoted"/>
-        <DetectChar char=")" context="#pop" attribute="Function"/>
-        <RegExpr String="(?:\$&identifier;+)" attribute="Variable"/>
       </context>
     </contexts>
 
@@ -93,6 +100,7 @@
       <itemData name="DocumentationComment" defStyleNum="dsDocumentation" spellChecking="true"/>
       <itemData name="Quoted" defStyleNum="dsString" spellChecking="true"/>
       <itemData name="Variable" defStyleNum="dsVariable" spellChecking="false"/>
+      <itemData name="Number" defStyleNum="dsDecVal" spellChecking="false"/>
     </itemDatas>
   </highlighting>
   <general>

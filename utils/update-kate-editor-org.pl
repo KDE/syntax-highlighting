@@ -205,6 +205,7 @@ open (my $syntax_page, ">$syntax_md");
 print $syntax_page
     "---\n".
     "title: Syntax Highlighting\n".
+    "hideMeta: true\n".
     "author: Christoph Cullmann\n".
     "date: 2019-08-24T12:12:12+00:00\n".
     "menu:\n".
@@ -319,6 +320,7 @@ open (my $themes_page, ">$themes_md");
 print $themes_page
     "---\n".
     "title: Color Themes\n".
+    "hideMeta: true\n".
     "author: Christoph Cullmann\n".
     "date: 2019-08-24T12:12:12+00:00\n".
     "menu:\n".

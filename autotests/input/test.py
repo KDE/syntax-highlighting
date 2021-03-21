@@ -80,3 +80,19 @@ u = 1_0.e+3_22j + .2_1e2j + 11_1.j
 aaa.123
 aaa123
 .0x123
+
+# match and case keywords
+foo(
+    # no keyword
+    match if xx else yyy
+)
+match = 3
+match.foo()
+match command.split():
+    case ["quit"]:
+        print("Goodbye!")
+
+match(command.split())
+match(command.split()):
+    case ["quit"]:
+        print("Goodbye!")

@@ -18,6 +18,13 @@
         <!ENTITY opt        "(?:[^&_fragpathseps;=/]*+&_fragpathnosep;)*+">
         <!ENTITY pathpart   "(?:~|\.\.?|&fragpath;)(?:/&path;|(?=[*?]|[+!@]\(|&fragpath;(?:[/*?]|[+!@]\()))|(?:~|\.\.?)(?=[&wordseps;]|$)">
 
+        <!ENTITY _fragpathseps_alt  "*?+!@&substseps;}">
+        <!ENTITY _fragpathnosep_alt "(?:[+!@](?!\()|\\.)?+">
+        <!ENTITY path_alt       "(?:[^&_fragpathseps_alt;]*+&_fragpathnosep_alt;)*+">
+        <!ENTITY fragpath_alt   "(?:[^&_fragpathseps_alt;/]*+&_fragpathnosep_alt;)*+">
+        <!ENTITY opt_alt        "(?:[^&_fragpathseps_alt;=/]*+&_fragpathnosep_alt;)*+">
+        <!ENTITY pathpart_alt   "(?:~|\.\.?|&fragpath_alt;)(?:/&path_alt;|(?=[*?]|[+!@]\(|&fragpath_alt;(?:[/*?]|[+!@]\()))|(?:~|\.\.?)(?=\}|$)">
+
         <!ENTITY _braceexpansion_spe     " &tab;&lt;>|&amp;;{}\\`'&quot;$">
         <!ENTITY _brace_noexpansion       "\{[^&_braceexpansion_spe;,]*+\}">
         <!ENTITY _braceexpansion_var     "\$(?:\{[^\[\]&_braceexpansion_spe;]*+(?:\[[*@a-zA-Z0-9]\])\})?">
@@ -30,7 +37,7 @@
         <!ENTITY heredocq "(?|&quot;([^&quot;]+)&quot;|'([^']+)'|\\(.[^&wordseps;&substseps;]*))">
 ]>
 
-<language name="Bash" version="27" kateversion="5.79" section="Scripts" extensions="*.sh;*.bash;*.ebuild;*.eclass;*.nix;.bashrc;.bash_profile;.bash_login;.profile;PKGBUILD;APKBUILD" mimetype="application/x-shellscript" casesensitive="1" author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL">
+<language name="Bash" version="28" kateversion="5.79" section="Scripts" extensions="*.sh;*.bash;*.ebuild;*.eclass;*.nix;.bashrc;.bash_profile;.bash_login;.profile;PKGBUILD;APKBUILD" mimetype="application/x-shellscript" casesensitive="1" author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL">
 
 <!-- (c) 2004 by Wilbert Berendsen (wilbert@kde.nl)
     Changes by Matthew Woehlke (mw_triad@users.sourceforge.net)
@@ -695,33 +702,77 @@
       </context>
       <context attribute="Path" lineEndContext="#stay" name="ExtGlobAndPop">
         <DetectChar attribute="Glob" context="#pop!PathThenPop" char=")"/>
+        <IncludeRules context="FindWord"/>
         <IncludeRules context="IncExtGlob"/>
       </context>
-      <context attribute="Path" lineEndContext="#stay" name="RecursiveExtGlob">
-        <DetectChar attribute="Glob" context="#pop" char=")"/>
-        <IncludeRules context="IncExtGlob"/>
-      </context>
-      <context attribute="Path" lineEndContext="#stay" name="IncExtGlob">
+      <context attribute="Path" lineEndContext="#stay" name="FindExtGlob">
         <Detect2Chars attribute="Glob" context="RecursiveExtGlob" char="?" char1="("/>
         <Detect2Chars attribute="Glob" context="RecursiveExtGlob" char="*" char1="("/>
         <Detect2Chars attribute="Glob" context="RecursiveExtGlob" char="+" char1="("/>
         <Detect2Chars attribute="Glob" context="RecursiveExtGlob" char="@" char1="("/>
         <Detect2Chars attribute="Glob" context="RecursiveExtGlob" char="!" char1="("/>
         <AnyChar attribute="Glob" context="#stay" String="|?*"/>
+      </context>
+      <context attribute="Path" lineEndContext="#stay" name="RecursiveExtGlob">
+        <DetectChar attribute="Glob" context="#pop" char=")"/>
         <IncludeRules context="FindWord"/>
+        <IncludeRules context="IncExtGlob"/>
+      </context>
+      <context attribute="Path" lineEndContext="#stay" name="IncExtGlob">
+        <IncludeRules context="FindExtGlob"/>
         <DetectChar context="PathMaybeBraceExpansion" char="{" lookAhead="1"/>
       </context>
       <context attribute="Path" lineEndContext="#pop#pop" name="PathThenPop">
         <AnyChar context="#pop#pop" String="&wordseps;`" lookAhead="1"/>
         <IncludeRules context="FindWord"/>
-        <IncludeRules context="FindExtGlobAndPop"/>
-        <AnyChar attribute="Glob" context="#stay" String="?*"/>
+        <IncludeRules context="FindExtGlob"/>
         <DetectChar context="PathMaybeBraceExpansion" char="{" lookAhead="1"/>
         <RegExpr attribute="Path" context="#stay" String="&path;"/>
       </context>
       <context attribute="Path" lineEndContext="#pop" name="PathMaybeBraceExpansion" fallthroughContext="#pop">
         <IncludeRules context="DispatchBraceExpansion"/>
         <DetectChar attribute="Path" context="#pop" char="{"/>
+      </context>
+
+      <!-- FindPathThenPopInAlternateValue consumes path in ${xx:here}-->
+      <context attribute="Normal Text" lineEndContext="#pop" name="FindPathThenPopInAlternateValue">
+        <IncludeRules context="FindExtGlobAndPopInAlternateValue"/>
+        <AnyChar attribute="Glob" context="PathThenPopInAlternateValue" String="?*"/>
+        <RegExpr attribute="Path" context="PathThenPopInAlternateValue" String="&pathpart_alt;"/>
+      </context>
+      <context attribute="Path" lineEndContext="#stay" name="FindExtGlobAndPopInAlternateValue">
+        <Detect2Chars attribute="Glob" context="ExtGlobAndPopInAlternateValue" char="?" char1="("/>
+        <Detect2Chars attribute="Glob" context="ExtGlobAndPopInAlternateValue" char="*" char1="("/>
+        <Detect2Chars attribute="Glob" context="ExtGlobAndPopInAlternateValue" char="+" char1="("/>
+        <Detect2Chars attribute="Glob" context="ExtGlobAndPopInAlternateValue" char="@" char1="("/>
+        <Detect2Chars attribute="Glob" context="ExtGlobAndPopInAlternateValue" char="!" char1="("/>
+      </context>
+      <context attribute="Path" lineEndContext="#stay" name="FindExtGlobInAlternateValue">
+        <Detect2Chars attribute="Glob" context="RecursiveExtGlobInAlternateValue" char="?" char1="("/>
+        <Detect2Chars attribute="Glob" context="RecursiveExtGlobInAlternateValue" char="*" char1="("/>
+        <Detect2Chars attribute="Glob" context="RecursiveExtGlobInAlternateValue" char="+" char1="("/>
+        <Detect2Chars attribute="Glob" context="RecursiveExtGlobInAlternateValue" char="@" char1="("/>
+        <Detect2Chars attribute="Glob" context="RecursiveExtGlobInAlternateValue" char="!" char1="("/>
+        <AnyChar attribute="Glob" context="#stay" String="|?*"/>
+      </context>
+      <context attribute="Path" lineEndContext="#stay" name="RecursiveExtGlobInAlternateValue">
+        <DetectChar attribute="Glob" context="#pop" char=")"/>
+        <DetectChar context="#pop" char="}" lookAhead="1"/>
+        <IncludeRules context="FindWord"/>
+        <IncludeRules context="FindExtGlobInAlternateValue"/>
+      </context>
+      <context attribute="Path" lineEndContext="#stay" name="ExtGlobAndPopInAlternateValue">
+        <DetectChar attribute="Glob" context="#pop!PathThenPopInAlternateValue" char=")"/>
+        <DetectChar attribute="Error" context="#pop#pop" char="}"/>
+        <IncludeRules context="FindWord"/>
+        <IncludeRules context="FindExtGlobInAlternateValue"/>
+      </context>
+      <context attribute="Path" lineEndContext="#pop#pop" name="PathThenPopInAlternateValue">
+        <DetectChar attribute="Parameter Expansion" context="#pop#pop" char="}"/>
+        <IncludeRules context="FindWord"/>
+        <IncludeRules context="FindExtGlobAndPopInAlternateValue"/>
+        <AnyChar attribute="Glob" context="#stay" String="?*"/>
+        <RegExpr attribute="Path" context="#stay" String="&path_alt;"/>
       </context>
 
       <context attribute="Pattern" lineEndContext="#stay" name="FindPattern">
@@ -1084,7 +1135,7 @@
         <Detect2Chars attribute="Parameter Expansion Operator" context="#pop!AlternatePatternValue" char="," char1=","/>
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarSub" char=":"/>
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarSubst" char="/"/>
-        <AnyChar attribute="Parameter Expansion Operator" context="#pop!AlternateValue" String="%#"/>
+        <AnyChar attribute="Parameter Expansion Operator" context="#pop!AlternateValue" String="-+=?#%"/>
         <AnyChar attribute="Parameter Expansion Operator" context="#pop!AlternatePatternValue" String="^,"/>
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarTransformation" char="@"/>
       </context>
@@ -1109,7 +1160,7 @@
       <context attribute="Normal Text" lineEndContext="#stay" name="AlternateValue">
         <DetectChar attribute="Parameter Expansion" context="#pop" char="}"/>
         <IncludeRules context="FindWord"/>
-        <IncludeRules context="FindPattern"/>
+        <IncludeRules context="FindPathThenPopInAlternateValue"/>
       </context>
 
       <!-- called as soon as ${xxx^ are ${xxx, are encoutered -->
@@ -1125,7 +1176,7 @@
       </context>
       <context attribute="Pattern" lineEndContext="#stay" name="VarSubstPat">
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!AlternateValue" char="/"/>
-        <IncludeRules context="AlternateValue"/>
+        <IncludeRules context="AlternatePatternValue"/>
       </context>
 
       <!-- called as soon as ${xxx@ is encoutered -->

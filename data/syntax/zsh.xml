@@ -55,7 +55,7 @@
         <!ENTITY int "(?:[0-9]++[_0-9]*+)">
         <!ENTITY exp "(?:[eE][-+]?&int;)">
 ]>
-<language name="Zsh" version="19" kateversion="5.79" section="Scripts" extensions="*.sh;*.zsh;.zshrc;.zprofile;.zlogin;.zlogout;.profile" mimetype="application/x-shellscript" casesensitive="1" author="Jonathan Poelen (jonathan.poelen@gmail.com)" license="MIT">
+<language name="Zsh" version="20" kateversion="5.79" section="Scripts" extensions="*.sh;*.zsh;.zshrc;.zprofile;.zlogin;.zlogout;.profile" mimetype="application/x-shellscript" casesensitive="1" author="Jonathan Poelen (jonathan.poelen@gmail.com)" license="MIT">
 
   <highlighting>
     <list name="keywords">
@@ -565,6 +565,18 @@
         <DetectChar attribute="Glob" context="#pop" char=">"/>
       </context>
 
+      <!-- FindPathThenPopInAlternateValue consumes path in ${xx:here}-->
+      <context attribute="Normal Text" lineEndContext="#pop" name="FindPathThenPopInAlternateValue">
+        <AnyChar attribute="Glob" context="PathThenPopInAlternateValue" String="?*#^~|"/>
+        <Detect2Chars context="PathThenPopInAlternateValue" char="(" char1="#" lookAhead="1"/>
+        <AnyChar context="PathThenPopInAlternateValue" String="[(" lookAhead="1"/>
+        <RegExpr attribute="Path" context="PathThenPopInAlternateValue" String="&pathpart;"/>
+      </context>
+      <context attribute="Path" lineEndContext="#pop" name="PathThenPopInAlternateValue">
+        <AnyChar context="#pop" String="&wordseps_or_extglog;}" lookAhead="1"/>
+        <IncludeRules context="IncPath"/>
+      </context>
+
       <context attribute="Glob" lineEndContext="#stay" name="FindGlobAny">
         <DetectChar attribute="Glob" context="GlobAnyFlag" char="["/>
       </context>
@@ -1013,16 +1025,18 @@
         <StringDetect attribute="Parameter Expansion Operator" context="#stay" String="[@]"/>
         <StringDetect attribute="Parameter Expansion Operator" context="#stay" String="[*]"/>
         <DetectChar attribute="Parameter Expansion Operator" context="Subscript" char="["/>
-        <Detect2Chars attribute="Parameter Expansion Operator" context="#pop!AlternateValue" char="%" char1="%"/>
-        <Detect2Chars attribute="Parameter Expansion Operator" context="#pop!AlternateValue" char="#" char1="#"/>
-        <AnyChar attribute="Parameter Expansion Operator" context="#pop!AlternateValue" String="-+=?#%"/>
+        <Detect2Chars attribute="Parameter Expansion Operator" context="#pop!AlternatePatternValue" char="%" char1="%"/>
+        <Detect2Chars attribute="Parameter Expansion Operator" context="#pop!AlternatePatternValue" char="#" char1="#"/>
+        <AnyChar attribute="Parameter Expansion Operator" context="#pop!AlternatePatternValue" String="#%"/>
+        <AnyChar attribute="Parameter Expansion Operator" context="#pop!AlternateValue" String="-+=?"/>
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!AlternateValuePrefix" char=":"/>
         <Detect2Chars attribute="Parameter Expansion Operator" context="#pop!VarBraceSubst" char="/" char1="/"/>
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarBraceSubst" char="/"/>
       </context>
       <context attribute="Parameter Expansion" lineEndContext="#stay" name="AlternateValuePrefix" fallthroughContext="#pop!VarSub">
         <Detect2Chars attribute="Parameter Expansion Operator" context="#pop!AlternateValue" char="^" char1="^"/>
-        <AnyChar attribute="Parameter Expansion Operator" context="#pop!AlternateValue" String="-+=?#|*^"/>
+        <DetectChar attribute="Parameter Expansion Operator" context="#pop!AlternatePatternValue" char="#"/>
+        <AnyChar attribute="Parameter Expansion Operator" context="#pop!AlternateValue" String="-+=?|*^"/>
         <Detect2Chars attribute="Parameter Expansion Operator" context="#pop!AlternateValue" char=":" char1="="/>
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarBraceSubst" char="/"/>
 
@@ -1091,9 +1105,23 @@
         <DetectChar attribute="String DoubleQ" context="RecursiveAlternateValue" char="{"/>
         <DetectChar attribute="Parameter Expansion" context="#pop" char="}"/>
         <IncludeRules context="FindWord"/>
-        <IncludeRules context="FindStringDQPattern"/>
+        <IncludeRules context="FindPathThenPopInAlternateValue"/>
       </context>
       <context attribute="String DoubleQ" lineEndContext="#stay" name="RecursiveAlternateValue">
+        <DetectChar attribute="String DoubleQ" context="RecursiveAlternateValue" char="{"/>
+        <DetectChar attribute="String DoubleQ" context="#pop" char="}"/>
+        <IncludeRules context="FindWord"/>
+        <IncludeRules context="FindPathThenPopInAlternateValue"/>
+      </context>
+
+      <!-- called as soon as ${xxx%, etc are encoutered -->
+      <context attribute="String DoubleQ" lineEndContext="#stay" name="AlternatePatternValue">
+        <DetectChar attribute="String DoubleQ" context="RecursiveAlternatePatternValue" char="{"/>
+        <DetectChar attribute="Parameter Expansion" context="#pop" char="}"/>
+        <IncludeRules context="FindWord"/>
+        <IncludeRules context="FindStringDQPattern"/>
+      </context>
+      <context attribute="String DoubleQ" lineEndContext="#stay" name="RecursiveAlternatePatternValue">
         <DetectChar attribute="String DoubleQ" context="RecursiveAlternateValue" char="{"/>
         <DetectChar attribute="String DoubleQ" context="#pop" char="}"/>
         <IncludeRules context="FindWord"/>

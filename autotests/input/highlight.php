@@ -115,7 +115,8 @@ DOC;
 echo 123456 1_2_34_5 1__2 1_;
 echo 0x12345af 0x1_2_3_45_a_f 0x1__2 0x_1 0x1_ 0x1g 0xg;
 echo 0b1011 0b1_01_1 0b1__0 0b_1 0b1_ 0b12 0b2;
-echo 01234 01_23_4 0_1 01_ 018 08;
+echo 01234 01_23_4 0_1 0__1 01_ 018 08;
+echo 0o1234 0O1_23_4 0o1_1_ 0o1__1 0o_1;
 echo 123. .45 123.45 1_23.4_5e1_2;
 echo 123.e1 .45e1 123.45e1;
 echo 123.e+1 .45e+1 123.45e+1;
@@ -207,6 +208,16 @@ $x = new A\B\Foo('hi');
 $n = \strlen($str) - 1;
 
 $r = $x <=> $y and $z;
+
+#[ExampleAttribute('Hello world', 42)]
+class Foo {}
+function foo(#[TestAttr] $bar){
+}
+
+enum Suit {
+    case Clubs;
+    case Diamonds;
+}
 ?>
 
 <?php if (n): ?>

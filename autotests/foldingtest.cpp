@@ -34,7 +34,9 @@ public:
             return;
         }
         m_out.setDevice(&outFile);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         m_out.setCodec("UTF-8");
+#endif
 
         QFile f(inFileName);
         if (!f.open(QFile::ReadOnly)) {
@@ -43,7 +45,9 @@ public:
         }
 
         QTextStream in(&f);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         in.setCodec("UTF-8");
+#endif
         State state;
         bool indentationFoldEnabled = definition().indentationBasedFoldingEnabled();
         if (indentationFoldEnabled)

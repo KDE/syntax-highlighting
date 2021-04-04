@@ -557,3 +557,5 @@ int z; // variable shall not be grey
 
 //! formula @f$a+b@f$ inside a inline comment
 // formula @f$a+b@f$ inside a normal comment
+
+/// \b sa

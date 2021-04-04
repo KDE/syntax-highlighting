@@ -398,6 +398,16 @@ echo ${a^^l*} ${a,} ${!a} ${#a[1]} ${a:1:$b} $((++i,i--))
 [[ a != b && ${a}a = b${b} ]]
 
 ((3+1+a+$c*(x) & 0x43422fd+03-085/23#D9a@_^8))
+((1/(2-(a-4))))
+
+# they are not arithmetic evaluations...
+((cmd && cmd) || cmd)
+$((cmd && cmd) || cmd)
+((cmd &&
+cmd) || cmd)
+$((cmd &&
+cmd) || cmd)
+
 { echo
     echo
 }

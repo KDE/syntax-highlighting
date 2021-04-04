@@ -641,6 +641,16 @@ print root@192.168.168.157:${PWD/test/live}v
 [ a -eq 2 ]||[ a -eq 2] ]&&[[ a -eq 2 ]]||[[ a != b ]];
 
 ((3+1+a+$c*(x) & 0x4342_2fd+03-08_5/23#D9a@_^8))
+((1.3/(2-(a-4))))
+
+# they are not arithmetic evaluations...
+((cmd && cmd) || cmd)
+$((cmd && cmd) || cmd)
+((cmd &&
+cmd) || cmd)
+$((cmd &&
+cmd) || cmd)
+
 print $(( [#_] sqrt(1e7) 0__39 1423e23 .2443 43.34 34.43e4 .d))
 
 { echo

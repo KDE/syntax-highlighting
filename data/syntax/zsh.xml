@@ -52,10 +52,12 @@
 
         <!ENTITY heredocq "(?|&quot;([^&quot;]+)&quot;|'([^']+)'|\\(.[^&wordseps;&substseps;]*))">
 
+        <!ENTITY arithmetic_as_subshell "\(((?:[^`'&quot;()$]++|\$\{[^`'&quot;(){}$]+\}|\$(?=[^{`'&quot;()])|`[^`]*+`|\((?1)(?:[)]|(?=['&quot;])))++)(?:[)](?=$|[^)])|[&quot;'])">
+
         <!ENTITY int "(?:[0-9]++[_0-9]*+)">
         <!ENTITY exp "(?:[eE][-+]?&int;)">
 ]>
-<language name="Zsh" version="20" kateversion="5.79" section="Scripts" extensions="*.sh;*.zsh;.zshrc;.zprofile;.zlogin;.zlogout;.profile" mimetype="application/x-shellscript" casesensitive="1" author="Jonathan Poelen (jonathan.poelen@gmail.com)" license="MIT">
+<language name="Zsh" version="21" kateversion="5.79" section="Scripts" extensions="*.sh;*.zsh;.zshrc;.zprofile;.zlogin;.zlogout;.profile" mimetype="application/x-shellscript" casesensitive="1" author="Jonathan Poelen (jonathan.poelen@gmail.com)" license="MIT">
 
   <highlighting>
     <list name="keywords">
@@ -206,7 +208,7 @@
         <DetectSpaces attribute="Normal Text" context="#stay"/>
         <DetectChar attribute="Comment" context="Comment" char="#"/>
         <!-- start expression in double parentheses -->
-        <Detect2Chars attribute="Keyword" context="ExprDblParen" char="(" char1="(" beginRegion="expression"/>
+        <Detect2Chars context="ExprDblParenOrSubShell" char="(" char1="(" lookAhead="1"/>
         <!-- start a subshell -->
         <DetectChar attribute="Keyword" context="SubShell" char="(" beginRegion="subshell"/>
         <!-- start expression in single/double brackets -->
@@ -323,8 +325,8 @@
       </context>
       <context attribute="Variable" lineEndContext="#pop" name="DispatchSubstVariables">
         <Detect2Chars attribute="Parameter Expansion" context="#pop!VarBraceStart" char="$" char1="{"/>
-        <StringDetect attribute="Parameter Expansion" context="#pop!ExprDblParenSubst" String="$((" beginRegion="expression"/>
-        <Detect2Chars attribute="Parameter Expansion" context="#pop!SubstCommand" char="$" char1="("/>
+        <StringDetect context="#pop!ExprDblParenSubstOrSubstCommand" String="$((" lookAhead="1"/>
+        <Detect2Chars attribute="Parameter Expansion" context="#pop!SubstCommand" char="$" char1="(" beginRegion="subshell"/>
       </context>
       <context attribute="Variable" lineEndContext="#pop" name="DispatchStringVariables">
         <Detect2Chars attribute="String SingleQ" context="#pop!StringEsc" char="$" char1="'"/>
@@ -1002,7 +1004,7 @@
 
       <!-- SubstCommand is called after a $( is encountered -->
       <context attribute="Normal Text" lineEndContext="#stay" name="SubstCommand" fallthroughContext="Command">
-        <DetectChar attribute="Parameter Expansion" context="#pop" char=")"/>
+        <DetectChar attribute="Parameter Expansion" context="#pop" char=")" endRegion="subshell"/>
         <IncludeRules context="Start"/>
       </context>
 
@@ -1013,8 +1015,8 @@
       </context>
       <context attribute="Variable" lineEndContext="#stay" name="VarBraceStartRecursive" fallthroughContext="#pop#pop!CheckVarAlt">
         <Detect2Chars attribute="Parameter Expansion" context="VarBraceStart" char="$" char1="{"/>
-        <StringDetect attribute="Parameter Expansion" context="#pop!ExprDblParenSubst" String="$((" beginRegion="expression"/>
-        <Detect2Chars attribute="Parameter Expansion" context="#pop!SubstCommand" char="$" char1="("/>
+        <StringDetect context="#pop!ExprDblParenSubstOrSubstCommand" String="$((" lookAhead="1"/>
+        <Detect2Chars attribute="Parameter Expansion" context="#pop!SubstCommand" char="$" char1="(" beginRegion="subshell"/>
         <DetectChar attribute="Error" context="#pop" char="$"/>
       </context>
       <context attribute="Error" lineEndContext="#stay" name="VarError">
@@ -1371,17 +1373,25 @@
 
 <!-- ====== These are the contexts that can be branched to ======= -->
 
+      <context attribute="Normal Text" lineEndContext="#stay" name="ExprDblParenOrSubShell">
+        <RegExpr attribute="Keyword" context="#pop!SubShell" String="\((?=&arithmetic_as_subshell;)|" beginRegion="subshell"/>
+        <Detect2Chars attribute="Keyword" context="#pop!ExprDblParen" char="(" char1="(" beginRegion="expression"/>
+      </context>
       <!-- ExprDblParen consumes an expression started in command mode till )) -->
       <context attribute="Normal Text" lineEndContext="#stay" name="ExprDblParen">
         <DetectSpaces attribute="Normal Text" context="#stay"/>
         <Detect2Chars attribute="Keyword" context="#pop" char=")" char1=")" endRegion="expression"/>
         <IncludeRules context="FindExprDblParen"/>
+        <!-- ((cmd
+              ) # jump to SubShell context -->
+        <DetectChar attribute="Keyword" context="#pop!SubShell" char=")" endRegion="expression" beginRegion="subshell"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="FindExprDblParen">
         <Detect2Chars attribute="Control" context="#stay" char="&amp;" char1="&amp;"/>
         <Detect2Chars attribute="Control" context="#stay" char="|" char1="|"/>
         <AnyChar attribute="Operator" context="#stay" String="+-!~*/%&lt;>=&amp;^|?:"/>
         <DetectChar attribute="Control" context="#stay" char=","/>
+        <DetectChar attribute="Normal Text" context="ExprSubDblParen" char="("/>
         <AnyChar context="Number" String="0123456789." lookAhead="1"/>
         <DetectChar attribute="Parameter Expansion Operator" context="Subscript" char="["/>
         <IncludeRules context="FindWord"/>
@@ -1389,6 +1399,11 @@
         <Detect2Chars attribute="BaseN" context="NoPrefix" char="#" char1="#"/>
         <DetectChar attribute="Error" context="#stay" char="#"/>
         <DetectIdentifier attribute="Variable" context="#stay"/>
+      </context>
+      <context attribute="Normal Text" lineEndContext="#stay" name="ExprSubDblParen">
+        <DetectSpaces attribute="Normal Text" context="#stay"/>
+        <DetectChar attribute="Normal Text" context="#pop" char=")"/>
+        <IncludeRules context="FindExprDblParen"/>
       </context>
       <context attribute="Error" lineEndContext="#pop" name="MaybeArithmeticBrace">
         <IncludeRules context="DispatchBraceExpansion"/>
@@ -1413,11 +1428,18 @@
         <RegExpr attribute="BaseN" context="#pop" String="[0-9a-zA-Z@_]+"/>
       </context>
 
+      <context attribute="Normal Text" lineEndContext="#stay" name="ExprDblParenSubstOrSubstCommand">
+        <RegExpr attribute="Parameter Expansion" context="#pop!SubstCommand" String="\$\((?=&arithmetic_as_subshell;)|" beginRegion="subshell"/>
+        <StringDetect attribute="Parameter Expansion" context="#pop!ExprDblParenSubst" String="$((" beginRegion="expression"/>
+      </context>
       <!-- ExprDblParenSubst like ExprDblParen but matches )) as Variable -->
       <context attribute="Normal Text" lineEndContext="#stay" name="ExprDblParenSubst">
         <DetectSpaces attribute="Normal Text" context="#stay"/>
         <Detect2Chars attribute="Variable" context="#pop" char=")" char1=")" endRegion="expression"/>
         <IncludeRules context="FindExprDblParen"/>
+        <!-- $((cmd
+              ) # jump to SubstCommand context -->
+        <DetectChar attribute="Parameter Expansion" context="#pop!SubstCommand" char=")" endRegion="expression" beginRegion="subshell"/>
       </context>
 
       <!-- ExprBracket consumes an expression till ] -->

@@ -45,13 +45,13 @@ echo <beginfold id='1'>$((</beginfold id='1'> cd << ed + 1 <endfold id='1'>))</e
 
 
 # command subst:
-echo $(ls -l)
+echo <beginfold id='2'>$(</beginfold id='2'>ls -l<endfold id='2'>)</endfold id='2'>
 echo `cat myfile`
 
 
 # file subst:
-echo $(<$filename)
-echo $(</path/to/myfile)
+echo <beginfold id='2'>$(</beginfold id='2'><$filename<endfold id='2'>)</endfold id='2'>
+echo <beginfold id='2'>$(</beginfold id='2'></path/to/myfile<endfold id='2'>)</endfold id='2'>
 
 # process subst:
 sort <(show_labels) | sed 's/a/bg' > my_file.txt 2>&1
@@ -83,9 +83,9 @@ error() {
 
 # do - done make code blocks
 while <beginfold id='1'>[</beginfold id='1'> $p -lt $q <endfold id='1'>]</endfold id='1'>
-<beginfold id='2'>do</beginfold id='2'>
+<beginfold id='3'>do</beginfold id='3'>
 	chown 0644 $file.$p
-<endfold id='2'>done</endfold id='2'>
+<endfold id='3'>done</endfold id='3'>
 
 
 # braces as well
@@ -93,25 +93,25 @@ run_prog | sort -u |
 {
 	echo Header
 	while read a b d
-	<beginfold id='2'>do</beginfold id='2'>
+	<beginfold id='3'>do</beginfold id='3'>
 		echo $a/$b/$c
-	<endfold id='2'>done</endfold id='2'>
+	<endfold id='3'>done</endfold id='3'>
 	echo Footer
 }
 
 
 # Any constructions can be nested:
-echo "A long string with $(
-	<beginfold id='3'>if</beginfold id='3'> <beginfold id='1'>[</beginfold id='1'> $count -gt 100 <endfold id='1'>]</endfold id='1'> ; then
+echo "A long string with <beginfold id='2'>$(</beginfold id='2'>
+	<beginfold id='4'>if</beginfold id='4'> <beginfold id='1'>[</beginfold id='1'> $count -gt 100 <endfold id='1'>]</endfold id='1'> ; then
 		echo "much"
 	else
 		echo "not much"
-	<endfold id='3'>fi</endfold id='3'> ) substitutions." ;
+	<endfold id='4'>fi</endfold id='4'> <endfold id='2'>)</endfold id='2'> substitutions." ;
 
 
 # Even the case construct is correctly folded:
 test -f blaat &&
-<beginfold id='4'>(</beginfold id='4'>	do_something
+<beginfold id='2'>(</beginfold id='2'>	do_something
 	<beginfold id='5'>case</beginfold id='5'> $p in
 		*bak<beginfold id='6'>)</beginfold id='6'>
 			do_bak $p
@@ -120,7 +120,7 @@ test -f blaat &&
 			dont_bak $p
 			<endfold id='6'>;;</endfold id='6'>
 	<endfold id='5'>esac</endfold id='5'>
-<endfold id='4'>)</endfold id='4'> # despite the extra parentheses in the case construction.
+<endfold id='2'>)</endfold id='2'> # despite the extra parentheses in the case construction.
 
 
 # variable assignments:
@@ -157,11 +157,11 @@ make  destdir=/usr/
 
 # [[ and [ correctly need spaces to be regarded as structure,
 # otherwise they are patterns (currently treated as normal text)
-<beginfold id='3'>if</beginfold id='3'> <beginfold id='1'>[</beginfold id='1'> "$p" == "" <endfold id='1'>]</endfold id='1'> ; then
+<beginfold id='4'>if</beginfold id='4'> <beginfold id='1'>[</beginfold id='1'> "$p" == "" <endfold id='1'>]</endfold id='1'> ; then
 	ls /usr/bin/[a-z]*
 elif <beginfold id='1'>[[</beginfold id='1'> $p == 0 <endfold id='1'>]]</endfold id='1'> ; then
 	ls /usr/share/$p
-<endfold id='3'>fi</endfold id='3'>
+<endfold id='4'>fi</endfold id='4'>
 
 # Fixed:
 ls a[ab]*		# dont try to interprete as assignment with subscript (fixed)
@@ -188,7 +188,7 @@ bla
 
 
 # indented:
-<beginfold id='3'>if</beginfold id='3'> true
+<beginfold id='4'>if</beginfold id='4'> true
 then
 	cat <<- EOF
 		Indented text with a $dollar or \$two
@@ -197,11 +197,11 @@ elif <beginfold id='1'>[</beginfold id='1'> -d $file <endfold id='1'>]</endfold 
 	cat <<- "EOF"
 		Indented text without a $dollar
 	EOF
-<endfold id='3'>fi</endfold id='3'>
+<endfold id='4'>fi</endfold id='4'>
 
-<beginfold id='3'>if</beginfold id='3'> ! { cmd1 && cmd2 ; }; then echo ok ; <endfold id='3'>fi</endfold id='3'>
-<beginfold id='3'>if</beginfold id='3'> ! {cmd1 && cmd2}; then echo ok ; <endfold id='3'>fi</endfold id='3'>
-<beginfold id='3'>if</beginfold id='3'> ! cmd1 arg; then echo ok ; <endfold id='3'>fi</endfold id='3'>
+<beginfold id='4'>if</beginfold id='4'> ! { cmd1 && cmd2 ; }; then echo ok ; <endfold id='4'>fi</endfold id='4'>
+<beginfold id='4'>if</beginfold id='4'> ! {cmd1 && cmd2}; then echo ok ; <endfold id='4'>fi</endfold id='4'>
+<beginfold id='4'>if</beginfold id='4'> ! cmd1 arg; then echo ok ; <endfold id='4'>fi</endfold id='4'>
 
 <beginfold id='5'>case</beginfold id='5'> 1 in
 2<beginfold id='6'>)</beginfold id='6'> echo xxx;
@@ -212,10 +212,10 @@ elif <beginfold id='1'>[</beginfold id='1'> -d $file <endfold id='1'>]</endfold 
 
 ls #should be outside of case 1 folding block
 
-for i in `ls tests/auto/output/*.html`; <beginfold id='2'>do</beginfold id='2'>
+for i in `ls tests/auto/output/*.html`; <beginfold id='3'>do</beginfold id='3'>
     refFile=`echo $i | sed -e s,build,src, | sed -e s,output,reference, | sed -e s,.html,.ref.html,`
     cp -v $i $refFile
-<endfold id='2'>done</endfold id='2'>
+<endfold id='3'>done</endfold id='3'>
 
 ## >Settings >Configure Kate >Fonts & Colors >Highlitghing Text Styles >Scripts/Bash >Option >Change colors to some distinct color
 ## 1- In following line the -ucode should not be colored as option
@@ -279,7 +279,7 @@ echo /tmp/foo*(u0^@:t) *(W,X) *(%W)
 subs f! f!! f!s 'a'!s \( $v {a,b} {a} {a}/d {a\,} {a,} {a,\},b} ds/{a,b}sa/s
 
 ls !?main
-ls $(echo NF)(:a)
+ls <beginfold id='2'>$(</beginfold id='2'>echo NF<endfold id='2'>)</endfold id='2'>(:a)
 ls ${(s.:.)PATH} | grep '^...s'
 ls (#i)*.pmm
 ls (#ia1)README
@@ -402,10 +402,10 @@ ls **/*.(js|php|css)~(libs|temp|test)/*
 ls **/*.(js|php|css)~libs/*~temp/*~test/*
 ls report/**/*.{inc,php}  # searching for a php variable
 ls *.log(Ne-age 2006/10/04:10:15 2006/10/04:12:45-)
-ls $(echo /c/aax/*(.om[1]))(+cyg) &
+ls <beginfold id='2'>$(</beginfold id='2'>echo /c/aax/*(.om[1])<endfold id='2'>)</endfold id='2'>(+cyg) &
 ls *~vssver.scc(.om[1])
 ls /c/aax/*(.om[1]+cyg)
-ls ${(ps:\0:)"$(grep -lZ foobar ./*.txt(.))"}
+ls ${(ps:\0:)"<beginfold id='2'>$(</beginfold id='2'>grep -lZ foobar ./*.txt(.)<endfold id='2'>)</endfold id='2'>"}
 ls [[[[]]x*
 
 2 - f -f
@@ -468,11 +468,11 @@ cat a'a';cat
 # substitutions
 echo '' 'a' '\' "" "a" "\\" "$a" "a""a"'a''a' a'b'c a"b"c a$'\n'c
 echo a!bc a{a}b a{b,c}d a{b,{d,e}}d a\ b
-echo a$bc a$b/c a${b}c a<beginfold id='1'>$((</beginfold id='1'>b-3<endfold id='1'>))</endfold id='1'>c a$(b)c a$(a b c)c
+echo a$bc a$b/c a${b}c a<beginfold id='1'>$((</beginfold id='1'>b-3<endfold id='1'>))</endfold id='1'>c a<beginfold id='2'>$(</beginfold id='2'>b<endfold id='2'>)</endfold id='2'>c a<beginfold id='2'>$(</beginfold id='2'>a b c<endfold id='2'>)</endfold id='2'>c
 echo ${a[*]} ${a[@]} ${a[${b}]} ${a:-x$z} ${a/g} ${a//f/f} ${a//f*/f*}
 echo ${!a} ${#a[1]} ${a:1:$b} <beginfold id='1'>$((</beginfold id='1'>++i,i--<endfold id='1'>))</endfold id='1'>
 echo ${a:^v} ${=a:/#%a#?*/bla} ${x#??(#i)} ${das:-{}<a.zsh}
-echo ${(f)"$(<$1)"} ${${(Az)l}[$2]} ${(f)"$(eval ${(q)@[2,$]})"}
+echo ${(f)"<beginfold id='2'>$(</beginfold id='2'><$1<endfold id='2'>)</endfold id='2'>"} ${${(Az)l}[$2]} ${(f)"<beginfold id='2'>$(</beginfold id='2'>eval ${(q)@[2,$]}<endfold id='2'>)</endfold id='2'>"}
 echo ${(@)foo} ${(@)foo[1,2]} ${${(A)name}[1]} ${(AA)=name=...} ${(Q)${(z)foo}}
 echo ${(ps.$sep.)val} ${(ps.${sep}.)val} ${(s.$sep.)val} ${(s.)(.)val}
 echo ${(pr:2+3::_::$d:)var} ${(r:2+3::_::$d:)var}
@@ -499,16 +499,16 @@ echo ${(l:3::0:)${RANDOM}} ${(s/x/)foo%%1*} ${0##*[!0-9]}
 echo ${a:2:2} ${a:2} ${a[1,3]} ${d/#?/} ${d/%?/} ${d[1,-2]} ${d[2,$]}
 echo ${d[2,-1]} ${file##*/} ${file%.*} ${texfilepath%/*.*} *(f:u+rx,o-x:)
 echo *(f:u+rx:) **/*(@-^./=%p) **/*(@-^./=%p) convert_csv.php(:a)
-cd $(locate -l1 -r "/zoo.txt$")(:h) # cd to directory of first occurence of a file zoo.txt
-cd ${$(!!)[3]:h}  # cd to 3rd in list
-cd ${$(locate zoo.txt)[1]:h}
+cd <beginfold id='2'>$(</beginfold id='2'>locate -l1 -r "/zoo.txt$"<endfold id='2'>)</endfold id='2'>(:h) # cd to directory of first occurence of a file zoo.txt
+cd ${<beginfold id='2'>$(</beginfold id='2'>!!<endfold id='2'>)</endfold id='2'>[3]:h}  # cd to 3rd in list
+cd ${<beginfold id='2'>$(</beginfold id='2'>locate zoo.txt<endfold id='2'>)</endfold id='2'>[1]:h}
 cd ${drive}/inetpub/wwwdev/www.some.co.uk/
 cd **/*.php(.om[1]:h) # cd to directory of newest php file
 cd -
 cd /tmp/test/;touch {1..5} {6,7,8,12} {00..03}
 cd ~www/admin
 chmod g+w **/*
-chmod someuser /**/*(D^u:${(j.:u:.)${(f)"$(</etc/passwd)"}%%:*}:)
+chmod someuser /**/*(D^u:${(j.:u:.)${(f)"<beginfold id='2'>$(</beginfold id='2'></etc/passwd<endfold id='2'>)</endfold id='2'>"}%%:*}:)
 cp *.mp3(mh-4) /tmp # copy files less than 4 hours old
 cp -a file1 file   # -a transfer  permissions etc of file1 to file2preserve
 file **/*(D@) | fgrep broken
@@ -518,8 +518,8 @@ file=${1/%\//C:\/} # substitute / with c:/ End of string
 file=${1/\//C:\/} # substitute / with c:/ ANYWHERE in string
 filelst+=($x)
 filelst[<beginfold id='1'>$((</beginfold id='1'>$#filelst+1<endfold id='1'>))</endfold id='1'>]=$x
-files=(${(f)"$(egrepcmd1l)"} )
-files=(${(f)"$(ls *$**)"}(.N)) # ")`
+files=(${(f)"<beginfold id='2'>$(</beginfold id='2'>egrepcmd1l<endfold id='2'>)</endfold id='2'>"} )
+files=(${(f)"<beginfold id='2'>$(</beginfold id='2'>ls *$**<endfold id='2'>)</endfold id='2'>"}(.N)) # ")`
 files=(**/*(ND.L0m+0m-2))
 mkdir $f:h;touch $f
 mv Licence\ to\ Print\ Money.pdf !#^:gs/\\ //
@@ -530,19 +530,19 @@ pattern=${(q)str}
 print "$aa[one\"two\"three\"quotes]"
 print "$bg[cyan]$fg[blue]Welcome to man zsh-lovers" >> $TTY
 print <beginfold id='1'>$((</beginfold id='1'> [#8] x = 32, y = 32 <endfold id='1'>))</endfold id='1'>
-print <beginfold id='1'>$((</beginfold id='1'>${${(z)${(f)"$(dirs -v)"}[-1]}[1]} + 1<endfold id='1'>))</endfold id='1'> # or
-print $(history -n -1|sed 's/.* //')
+print <beginfold id='1'>$((</beginfold id='1'>${${(z)${(f)"<beginfold id='2'>$(</beginfold id='2'>dirs -v<endfold id='2'>)</endfold id='2'>"}[-1]}[1]} + 1<endfold id='1'>))</endfold id='1'> # or
+print <beginfold id='2'>$(</beginfold id='2'>history -n -1|sed 's/.* //'<endfold id='2'>)</endfold id='2'>
 print $aa[(e)*]
 print $ass_array[one]
 print $x $y
 print ${#path[1]}       # length of first element in path array
 print ${#path}          # length of "path" array
-print ${$( date )[2,4]} # Print words two to four of output of ’date’:
-print ${$(/sbin/ifconfig tun0)[6]}
-print ${${$( LC_ALL=C /sbin/ifconfig lo )[6]}#addr:}
-print ${${$(LC_ALL=C /sbin/ifconfig eth0)[7]}:gs/addr://}
+print ${<beginfold id='2'>$(</beginfold id='2'> date <endfold id='2'>)</endfold id='2'>[2,4]} # Print words two to four of output of ’date’:
+print ${<beginfold id='2'>$(</beginfold id='2'>/sbin/ifconfig tun0<endfold id='2'>)</endfold id='2'>[6]}
+print ${${<beginfold id='2'>$(</beginfold id='2'> LC_ALL=C /sbin/ifconfig lo <endfold id='2'>)</endfold id='2'>[6]}#addr:}
+print ${${<beginfold id='2'>$(</beginfold id='2'>LC_ALL=C /sbin/ifconfig eth0<endfold id='2'>)</endfold id='2'>[7]}:gs/addr://}
 print ${${(Cs:-:):-fred-goat-dog.jpg}%.*}
-print ${${(z)$(history -n -1)}[-1]}
+print ${${(z)<beginfold id='2'>$(</beginfold id='2'>history -n -1<endfold id='2'>)</endfold id='2'>}[-1]}
 print ${${(z)history[<beginfold id='1'>$((</beginfold id='1'>HISTCMD-1<endfold id='1'>))</endfold id='1'>]}[-1]}
 print ${(L)s// /-}.jpg
 print ${(L)s:gs/ /-/}.jpg
@@ -558,7 +558,7 @@ print ${foo//$'\n'}                # strip out any carriage returns (some system
 print ${foo//${~sub}/$rep}
 print ${foo: 1 + 2}
 print ${foo:<beginfold id='1'>$((</beginfold id='1'> 1 + 2<endfold id='1'>))</endfold id='1'>}
-print ${foo:$(echo 1 + 2)}
+print ${foo:<beginfold id='2'>$(</beginfold id='2'>echo 1 + 2<endfold id='2'>)</endfold id='2'>}
 print ${foo:3}
 print ${param:&}   (last substitute)
 print ${somevar//[^[:alnum:]]/_}   # replace all non-alphanumerics with _ the // indicates global substitution
@@ -606,8 +606,8 @@ print root@192.168.168.157:${PWD/test/live}v
 <beginfold id='1'>[</beginfold id='1'> 1+2 -eq 1+2 <endfold id='1'>]</endfold id='1'>
 <beginfold id='1'>[[</beginfold id='1'> 1+2 -eq 1+2 <endfold id='1'>]]</endfold id='1'>
 <beginfold id='1'>[</beginfold id='1'> a = b <endfold id='1'>c</endfold id='1'> ]
-<beginfold id='4'>(</beginfold id='4'> <beginfold id='1'>[</beginfold id='1'> a = b <endfold id='1'>]</endfold id='1'> <endfold id='4'>)</endfold id='4'>
-<beginfold id='4'>(</beginfold id='4'><beginfold id='1'>[</beginfold id='1'> a = b <endfold id='1'>]</endfold id='1'><endfold id='4'>)</endfold id='4'>
+<beginfold id='2'>(</beginfold id='2'> <beginfold id='1'>[</beginfold id='1'> a = b <endfold id='1'>]</endfold id='1'> <endfold id='2'>)</endfold id='2'>
+<beginfold id='2'>(</beginfold id='2'><beginfold id='1'>[</beginfold id='1'> a = b <endfold id='1'>]</endfold id='1'><endfold id='2'>)</endfold id='2'>
 <beginfold id='1'>[[</beginfold id='1'> a = b <endfold id='1'>c</endfold id='1'> ]]
 <beginfold id='1'>[[</beginfold id='1'> x =~ a(b c|$)' '{1,}[a[.digit.]] <endfold id='1'>]]</endfold id='1'>
 <beginfold id='1'>[[</beginfold id='1'> x =~ [ <endfold id='1'>] </endfold id='1'>]]
@@ -633,14 +633,24 @@ print root@192.168.168.157:${PWD/test/live}v
 <beginfold id='1'>[[</beginfold id='1'> $str = ${~pattern} <endfold id='1'>]]</endfold id='1'>
 <beginfold id='1'>[[</beginfold id='1'> $str = ${~pattern} <endfold id='1'>]]</endfold id='1'>
 <beginfold id='1'>[[</beginfold id='1'> "?" = ${(~j.|.)array} <endfold id='1'>]]</endfold id='1'>
-<beginfold id='4'>(</beginfold id='4'> <beginfold id='1'>[[</beginfold id='1'> a = b <endfold id='1'>]]</endfold id='1'> <endfold id='4'>)</endfold id='4'>
-<beginfold id='4'>(</beginfold id='4'><beginfold id='1'>[[</beginfold id='1'> a = b <endfold id='1'>]]</endfold id='1'><endfold id='4'>)</endfold id='4'>
+<beginfold id='2'>(</beginfold id='2'> <beginfold id='1'>[[</beginfold id='1'> a = b <endfold id='1'>]]</endfold id='1'> <endfold id='2'>)</endfold id='2'>
+<beginfold id='2'>(</beginfold id='2'><beginfold id='1'>[[</beginfold id='1'> a = b <endfold id='1'>]]</endfold id='1'><endfold id='2'>)</endfold id='2'>
 
 
 <beginfold id='1'>[</beginfold id='1'> a -eq 2 <endfold id='1'>]</endfold id='1'> || <beginfold id='1'>[</beginfold id='1'> a -eq 2] <endfold id='1'>]</endfold id='1'> && <beginfold id='1'>[[</beginfold id='1'> a -eq 2 <endfold id='1'>]]</endfold id='1'> || <beginfold id='1'>[[</beginfold id='1'> a != b <endfold id='1'>]]</endfold id='1'>;
 <beginfold id='1'>[</beginfold id='1'> a -eq 2 <endfold id='1'>]</endfold id='1'>||<beginfold id='1'>[</beginfold id='1'> a -eq 2] <endfold id='1'>]</endfold id='1'>&&<beginfold id='1'>[[</beginfold id='1'> a -eq 2 <endfold id='1'>]]</endfold id='1'>||<beginfold id='1'>[[</beginfold id='1'> a != b <endfold id='1'>]]</endfold id='1'>;
 
 <beginfold id='1'>((</beginfold id='1'>3+1+a+$c*(x) & 0x4342_2fd+03-08_5/23#D9a@_^8<endfold id='1'>))</endfold id='1'>
+<beginfold id='1'>((</beginfold id='1'>1.3/(2-(a-4))<endfold id='1'>))</endfold id='1'>
+
+# they are not arithmetic evaluations...
+<beginfold id='2'>(</beginfold id='2'><beginfold id='2'>(</beginfold id='2'>cmd && cmd<endfold id='2'>)</endfold id='2'> || cmd<endfold id='2'>)</endfold id='2'>
+<beginfold id='2'>$(</beginfold id='2'><beginfold id='2'>(</beginfold id='2'>cmd && cmd<endfold id='2'>)</endfold id='2'> || cmd<endfold id='2'>)</endfold id='2'>
+<beginfold id='1'>((</beginfold id='1'>cmd &&
+cmd<endfold id='1'></endfold id='1'><beginfold id='2'>)</beginfold id='2'> || cmd<endfold id='2'>)</endfold id='2'>
+<beginfold id='1'>$((</beginfold id='1'>cmd &&
+cmd<endfold id='1'></endfold id='1'><beginfold id='2'>)</beginfold id='2'> || cmd<endfold id='2'>)</endfold id='2'>
+
 print <beginfold id='1'>$((</beginfold id='1'> [#_] sqrt(1e7) 0__39 1423e23 .2443 43.34 34.43e4 .d<endfold id='1'>))</endfold id='1'>
 
 { echo
@@ -685,10 +695,10 @@ echo}
 
 cat >f{oo,ar}
 
-<beginfold id='4'>(</beginfold id='4'>echo ; echo<endfold id='4'>)</endfold id='4'>
-<beginfold id='4'>(</beginfold id='4'>echo
-    echo<endfold id='4'>)</endfold id='4'>
-<beginfold id='4'>(</beginfold id='4'>echo a<endfold id='4'>)</endfold id='4'>
+<beginfold id='2'>(</beginfold id='2'>echo ; echo<endfold id='2'>)</endfold id='2'>
+<beginfold id='2'>(</beginfold id='2'>echo
+    echo<endfold id='2'>)</endfold id='2'>
+<beginfold id='2'>(</beginfold id='2'>echo a<endfold id='2'>)</endfold id='2'>
 test a -eq b
 
 # functions
@@ -716,18 +726,18 @@ a=`ls` cat
 a[2+3][d]=5
 
 # control structure
-for name in a b c {d,e} ; <beginfold id='2'>do</beginfold id='2'> echo ; <endfold id='2'>done</endfold id='2'>
-for name; <beginfold id='2'>do</beginfold id='2'> echo ; <endfold id='2'>done</endfold id='2'>
-for name do echo ; <endfold id='2'>done</endfold id='2'>
-for ((i=0;i<5;++i)) ; <beginfold id='2'>do</beginfold id='2'> echo $i ; <endfold id='2'>done</endfold id='2'>
+for name in a b c {d,e} ; <beginfold id='3'>do</beginfold id='3'> echo ; <endfold id='3'>done</endfold id='3'>
+for name; <beginfold id='3'>do</beginfold id='3'> echo ; <endfold id='3'>done</endfold id='3'>
+for name do echo ; <endfold id='3'>done</endfold id='3'>
+for ((i=0;i<5;++i)) ; <beginfold id='3'>do</beginfold id='3'> echo $i ; <endfold id='3'>done</endfold id='3'>
 for ((i=1;$#A[i];i++)) echo $A[$i]
 for c ({1..50}) {php ./test.php; sleep 5;}
-for count in {1..10}; <beginfold id='2'>do</beginfold id='2'> echo $count ; <endfold id='2'>done</endfold id='2'>
+for count in {1..10}; <beginfold id='3'>do</beginfold id='3'> echo $count ; <endfold id='3'>done</endfold id='3'>
 for f (*(.)) mv $f fixed_$f
 for f (**/x) cp newx $f
 for f (*.txt) { echo $f }
-for f in **/x; <beginfold id='2'>do</beginfold id='2'>;cp newx $f; <endfold id='2'>done</endfold id='2'>
-for f in */include/dbcommon.php; <beginfold id='2'>do</beginfold id='2'>;cp dbcommon.php $f; <endfold id='2'>done</endfold id='2'>
+for f in **/x; <beginfold id='3'>do</beginfold id='3'>;cp newx $f; <endfold id='3'>done</endfold id='3'>
+for f in */include/dbcommon.php; <beginfold id='3'>do</beginfold id='3'>;cp dbcommon.php $f; <endfold id='3'>done</endfold id='3'>
 for file (*(ND-.)) IFS= read -re < $file
 for i (./*.mp3){mpg321 --w - $i > ${i:r}.wav}
 for i in *(.); mv $i ${i:u} # `bar to `BAR
@@ -737,27 +747,27 @@ for i in {3,4}; sed s/flag=2/flag=$i/ fred.txt > fred$i.txt
 for ip ({217..219} 225) {echo -n $ip ;ping -n 1 11.2.2.$ip| grep Received}
 for user (${(k)f}) {print -rn $f[$user]|mailx -s "..." $user}
 for x ( 1 2 {7..4} a b c {p..n} *.php) {echo $x}
-select name in a ; <beginfold id='2'>do</beginfold id='2'> echo ; <endfold id='2'>done</endfold id='2'>
-select name; <beginfold id='2'>do</beginfold id='2'> echo ; <endfold id='2'>done</endfold id='2'>
-<beginfold id='3'>if</beginfold id='3'> : ; then echo ; elif <beginfold id='1'>[[</beginfold id='1'> : <endfold id='1'>]]</endfold id='1'> ; then echo ; else echo ; <endfold id='3'>fi</endfold id='3'>
-<beginfold id='3'>if</beginfold id='3'> <beginfold id='1'>[</beginfold id='1'> $# -gt 0 <endfold id='1'>]</endfold id='1'>;then string=$*;else;string=$(getclip);<endfold id='3'>fi</endfold id='3'>
-<beginfold id='3'>if</beginfold id='3'> <beginfold id='1'>[</beginfold id='1'> $# -gt 0 <endfold id='1'>]</endfold id='1'>;then string=$*;else;string=$(getclip);<endfold id='3'>fi</endfold id='3'> # get parameter OR paste buffer
-<beginfold id='3'>if</beginfold id='3'> <beginfold id='1'>[[</beginfold id='1'> (($x -lt 8) && ($y -ge 32)) || (($z -gt 32) && ($w -eq 16)) <endfold id='1'>]]</endfold id='1'> ; then print "complex combinations"; <endfold id='3'>fi</endfold id='3'>
-<beginfold id='3'>if</beginfold id='3'> builtin cd $1 &> /dev/null ; then echo ; <endfold id='3'>fi</endfold id='3'>
-<beginfold id='3'>if</beginfold id='3'> grep -iq 'matching' *.php ;then echo "Found" ;else echo "Not Found"; fim=("${(@Q)${(z)"$(cat -- $nameoffile)"}}") <endfold id='3'>fi</endfold id='3'>
-while : || : ; <beginfold id='2'>do</beginfold id='2'> echo ; <endfold id='2'>done</endfold id='2'>
-while <beginfold id='4'>(</beginfold id='4'>true<endfold id='4'>)</endfold id='4'>{echo -n .;sleep 1}
-while <beginfold id='4'>(</beginfold id='4'>true<endfold id='4'>)</endfold id='4'>{echo .;sleep 1}
-while true ;<beginfold id='2'>do</beginfold id='2'> date; sleep 5; <endfold id='2'>done</endfold id='2'> # forever
-while true; <beginfold id='2'>do</beginfold id='2'> echo "infinite loop"; sleep 5; <endfold id='2'>done</endfold id='2'>
-until : ; : ; <beginfold id='2'>do</beginfold id='2'> echo ; <endfold id='2'>done</endfold id='2'>
+select name in a ; <beginfold id='3'>do</beginfold id='3'> echo ; <endfold id='3'>done</endfold id='3'>
+select name; <beginfold id='3'>do</beginfold id='3'> echo ; <endfold id='3'>done</endfold id='3'>
+<beginfold id='4'>if</beginfold id='4'> : ; then echo ; elif <beginfold id='1'>[[</beginfold id='1'> : <endfold id='1'>]]</endfold id='1'> ; then echo ; else echo ; <endfold id='4'>fi</endfold id='4'>
+<beginfold id='4'>if</beginfold id='4'> <beginfold id='1'>[</beginfold id='1'> $# -gt 0 <endfold id='1'>]</endfold id='1'>;then string=$*;else;string=<beginfold id='2'>$(</beginfold id='2'>getclip<endfold id='2'>)</endfold id='2'>;<endfold id='4'>fi</endfold id='4'>
+<beginfold id='4'>if</beginfold id='4'> <beginfold id='1'>[</beginfold id='1'> $# -gt 0 <endfold id='1'>]</endfold id='1'>;then string=$*;else;string=<beginfold id='2'>$(</beginfold id='2'>getclip<endfold id='2'>)</endfold id='2'>;<endfold id='4'>fi</endfold id='4'> # get parameter OR paste buffer
+<beginfold id='4'>if</beginfold id='4'> <beginfold id='1'>[[</beginfold id='1'> (($x -lt 8) && ($y -ge 32)) || (($z -gt 32) && ($w -eq 16)) <endfold id='1'>]]</endfold id='1'> ; then print "complex combinations"; <endfold id='4'>fi</endfold id='4'>
+<beginfold id='4'>if</beginfold id='4'> builtin cd $1 &> /dev/null ; then echo ; <endfold id='4'>fi</endfold id='4'>
+<beginfold id='4'>if</beginfold id='4'> grep -iq 'matching' *.php ;then echo "Found" ;else echo "Not Found"; fim=("${(@Q)${(z)"<beginfold id='2'>$(</beginfold id='2'>cat -- $nameoffile<endfold id='2'>)</endfold id='2'>"}}") <endfold id='4'>fi</endfold id='4'>
+while : || : ; <beginfold id='3'>do</beginfold id='3'> echo ; <endfold id='3'>done</endfold id='3'>
+while <beginfold id='2'>(</beginfold id='2'>true<endfold id='2'>)</endfold id='2'>{echo -n .;sleep 1}
+while <beginfold id='2'>(</beginfold id='2'>true<endfold id='2'>)</endfold id='2'>{echo .;sleep 1}
+while true ;<beginfold id='3'>do</beginfold id='3'> date; sleep 5; <endfold id='3'>done</endfold id='3'> # forever
+while true; <beginfold id='3'>do</beginfold id='3'> echo "infinite loop"; sleep 5; <endfold id='3'>done</endfold id='3'>
+until : ; : ; <beginfold id='3'>do</beginfold id='3'> echo ; <endfold id='3'>done</endfold id='3'>
 <beginfold id='5'>case</beginfold id='5'> a in a<beginfold id='6'>)</beginfold id='6'> <endfold id='6'></endfold id='6'><endfold id='5'>esac</endfold id='5'>
 <beginfold id='5'>case</beginfold id='5'> a in a<beginfold id='6'>)</beginfold id='6'> echo ; <endfold id='6'></endfold id='6'><endfold id='5'>esac</endfold id='5'>
 <beginfold id='5'>case</beginfold id='5'> pwd in (patt1<beginfold id='6'>)</beginfold id='6'> echo ; echo <endfold id='6'>;;</endfold id='6'> (patt*<beginfold id='6'>)</beginfold id='6'> echo <endfold id='6'>;&</endfold id='6'> patt?|patt<beginfold id='6'>)</beginfold id='6'> echo <endfold id='6'>;|</endfold id='6'>
 patt<beginfold id='6'>)</beginfold id='6'> echo <endfold id='6'>;;</endfold id='6'> <endfold id='5'>esac</endfold id='5'>
-repeat 1+2+`echo 1`+23 <beginfold id='2'>do</beginfold id='2'> echo pl; <endfold id='2'>done</endfold id='2'>
+repeat 1+2+`echo 1`+23 <beginfold id='3'>do</beginfold id='3'> echo pl; <endfold id='3'>done</endfold id='3'>
 repeat 3 time sleep 3   # single command
-repeat 5 ;<beginfold id='2'>do</beginfold id='2'> date; sleep 5; <endfold id='2'>done</endfold id='2'> # multi
+repeat 5 ;<beginfold id='3'>do</beginfold id='3'> date; sleep 5; <endfold id='3'>done</endfold id='3'> # multi
 foreach x y z ( a `a b`; c ) echo ;end
 for x y ( a b bc d ds ) echo $x $y
 for x y in a b c ; echo $x $y
@@ -770,13 +780,13 @@ a#<beginfold id='6'>)</beginfold id='6'> echo <endfold id='6'>;;</endfold id='6'
 
 for name in a
  b c ;
-<beginfold id='2'>do</beginfold id='2'>
+<beginfold id='3'>do</beginfold id='3'>
 echo
-<endfold id='2'>done</endfold id='2'>
+<endfold id='3'>done</endfold id='3'>
 
 <beginfold id='5'>case</beginfold id='5'> a in
   a\( | b*c? <beginfold id='6'>)</beginfold id='6'> echo
-  <beginfold id='4'>(</beginfold id='4'>b$c<endfold id='4'>)</endfold id='4'> # no pattern
+  <beginfold id='2'>(</beginfold id='2'>b$c<endfold id='2'>)</endfold id='2'> # no pattern
   <endfold id='6'>;;</endfold id='6'>
   (b$c<beginfold id='6'>)</beginfold id='6'> <endfold id='6'>;;</endfold id='6'>
   # no pattern
@@ -798,19 +808,19 @@ echo
 <endfold id='5'>esac</endfold id='5'>
 
 <beginfold id='5'>case</beginfold id='5'> "$ans" in
- 2|${prog}9<beginfold id='6'>)</beginfold id='6'> cd "$(cat /c/aam/${prog}9)" <endfold id='6'>;;</endfold id='6'>
+ 2|${prog}9<beginfold id='6'>)</beginfold id='6'> cd "<beginfold id='2'>$(</beginfold id='2'>cat /c/aam/${prog}9<endfold id='2'>)</endfold id='2'>" <endfold id='6'>;;</endfold id='6'>
  **<beginfold id='6'>)</beginfold id='6'> echo "wrong number $ans\n" <endfold id='6'>;;</endfold id='6'>
 <endfold id='5'>esac</endfold id='5'>
 
-select f in $(ls **/*.tex |egrep -i "${param}[^/]*.tex")
-<beginfold id='2'>do</beginfold id='2'>
- <beginfold id='3'>if</beginfold id='3'> <beginfold id='1'>[[</beginfold id='1'> "$REPLY" = q <endfold id='1'>]]</endfold id='1'>
+select f in <beginfold id='2'>$(</beginfold id='2'>ls **/*.tex |egrep -i "${param}[^/]*.tex"<endfold id='2'>)</endfold id='2'>
+<beginfold id='3'>do</beginfold id='3'>
+ <beginfold id='4'>if</beginfold id='4'> <beginfold id='1'>[[</beginfold id='1'> "$REPLY" = q <endfold id='1'>]]</endfold id='1'>
  then
     break
  elif <beginfold id='1'>[[</beginfold id='1'> -n "$f" <endfold id='1'>]]</endfold id='1'>; then
     gvim $f
- <endfold id='3'>fi</endfold id='3'>
-<endfold id='2'>done</endfold id='2'>
+ <endfold id='4'>fi</endfold id='4'>
+<endfold id='3'>done</endfold id='3'>
 
 for d (. ./**/*(N/m-2)) {
   print -r -- $'\n'${d}:
@@ -821,60 +831,60 @@ for d (. ./**/*(N/m-2)) {
   }
 }
 
-for f in http://zsh.sunsite.dk/Guide/zshguide{,{01..08}}.html; <beginfold id='2'>do</beginfold id='2'>
+for f in http://zsh.sunsite.dk/Guide/zshguide{,{01..08}}.html; <beginfold id='3'>do</beginfold id='3'>
     lynx -source $f >${f:t}
-<endfold id='2'>done</endfold id='2'>
+<endfold id='3'>done</endfold id='3'>
 
-for f in ./**/*(-@); <beginfold id='2'>do</beginfold id='2'>
+for f in ./**/*(-@); <beginfold id='3'>do</beginfold id='3'>
     stat +link -A l $f
-    <beginfold id='4'>(</beginfold id='4'>cd $f:h & <beginfold id='1'>[[</beginfold id='1'> -e $l.gz <endfold id='1'>]]</endfold id='1'><endfold id='4'>)</endfold id='4'> & ln -sf $l.gz $f
-<endfold id='2'>done</endfold id='2'>
+    <beginfold id='2'>(</beginfold id='2'>cd $f:h & <beginfold id='1'>[[</beginfold id='1'> -e $l.gz <endfold id='1'>]]</endfold id='1'><endfold id='2'>)</endfold id='2'> & ln -sf $l.gz $f
+<endfold id='3'>done</endfold id='3'>
 
-for ((i=1; i <= $#fpath; ++i)); <beginfold id='2'>do</beginfold id='2'>
+for ((i=1; i <= $#fpath; ++i)); <beginfold id='3'>do</beginfold id='3'>
     dir=$fpath[i]
     zwc=${dir:t}.zwc
-    <beginfold id='3'>if</beginfold id='3'> <beginfold id='1'>[[</beginfold id='1'> $dir == (.|..) || $dir == (.|..)/* <endfold id='1'>]]</endfold id='1'>; then
+    <beginfold id='4'>if</beginfold id='4'> <beginfold id='1'>[[</beginfold id='1'> $dir == (.|..) || $dir == (.|..)/* <endfold id='1'>]]</endfold id='1'>; then
         continue
-    <endfold id='3'>fi</endfold id='3'>
+    <endfold id='4'>fi</endfold id='4'>
     files=($dir/*(N-.))
-    <beginfold id='3'>if</beginfold id='3'> <beginfold id='1'>[[</beginfold id='1'> -w $dir:h && -n $files <endfold id='1'>]]</endfold id='1'>; then
+    <beginfold id='4'>if</beginfold id='4'> <beginfold id='1'>[[</beginfold id='1'> -w $dir:h && -n $files <endfold id='1'>]]</endfold id='1'>; then
         files=(${${(M)files%/*/*}#/})
-        <beginfold id='3'>if</beginfold id='3'> <beginfold id='4'>(</beginfold id='4'> cd $dir:h &&
-            zrecompile -p -U -z $zwc $files <endfold id='4'>)</endfold id='4'>; then
+        <beginfold id='4'>if</beginfold id='4'> <beginfold id='2'>(</beginfold id='2'> cd $dir:h &&
+            zrecompile -p -U -z $zwc $files <endfold id='2'>)</endfold id='2'>; then
         fpath[i]=$fpath[i].zwc
-        <endfold id='3'>fi</endfold id='3'>
-    <endfold id='3'>fi</endfold id='3'>
-<endfold id='2'>done</endfold id='2'>
+        <endfold id='4'>fi</endfold id='4'>
+    <endfold id='4'>fi</endfold id='4'>
+<endfold id='3'>done</endfold id='3'>
 
-<beginfold id='3'>if</beginfold id='3'> ztcp pwspc 2811; then
+<beginfold id='4'>if</beginfold id='4'> ztcp pwspc 2811; then
     tcpfd=$REPLY
     handler() {
         zle -I
         local line
-        <beginfold id='3'>if</beginfold id='3'> ! read -r line <&$1; then
+        <beginfold id='4'>if</beginfold id='4'> ! read -r line <&$1; then
             # select marks this fd if we reach EOF,
             # so handle this specially.
             print "[Read on fd $1 failed, removing.]" >&2
             zle -F $1
             return 1
-        <endfold id='3'>fi</endfold id='3'>
+        <endfold id='4'>fi</endfold id='4'>
         print -r - $line
     }
     zle -F $tcpfd handler
-<endfold id='3'>fi</endfold id='3'>
+<endfold id='4'>fi</endfold id='4'>
 
-while <beginfold id='1'>[[</beginfold id='1'> $? -eq 0 <endfold id='1'>]]</endfold id='1'> <beginfold id='2'>do</beginfold id='2'>
+while <beginfold id='1'>[[</beginfold id='1'> $? -eq 0 <endfold id='1'>]]</endfold id='1'> <beginfold id='3'>do</beginfold id='3'>
     b=($=ZPCRE_OP)
     accum+=$MATCH
     pcre_match -b -n $b[2] -- $string
-<endfold id='2'>done</endfold id='2'>
+<endfold id='3'>done</endfold id='3'>
 
 # bug #380229
 ${str:<beginfold id='1'>$((</beginfold id='1'>${#a[1]}+1<endfold id='1'>))</endfold id='1'>}
 
 # from http://zshwiki.org/home/examples/hardstatus
 function title {
-  <beginfold id='3'>if</beginfold id='3'> <beginfold id='1'>[[</beginfold id='1'> $TERM == "screen" <endfold id='1'>]]</endfold id='1'>; then
+  <beginfold id='4'>if</beginfold id='4'> <beginfold id='1'>[[</beginfold id='1'> $TERM == "screen" <endfold id='1'>]]</endfold id='1'>; then
     # Use these two for GNU Screen:
     print -nR $'\033k'$1$'\033'\\
 
@@ -882,7 +892,7 @@ function title {
   elif <beginfold id='1'>[[</beginfold id='1'> $TERM == "xterm" || $TERM == "rxvt" <endfold id='1'>]]</endfold id='1'>; then
     # Use this one instead for XTerms:
     print -nR $'\033]0;'$*$'\a'
-  <endfold id='3'>fi</endfold id='3'>
+  <endfold id='4'>fi</endfold id='4'>
 }
 
 function precmd {
@@ -900,7 +910,7 @@ function g{0..9} { gmark $0 $* }          # declaring multiple functions
 function hello_function { echo "hello world" ; zle .accept-line}
 function scd(){setopt nonomatch;e=/dev/null;cd $1(/) &> $e||cd $1*(/) &> $e||cd *$1(/) &> $e||cd *${1}*(/) &> $e||echo sorry}
 function vx{0..9} {gvim.exe c:/aax/${0/#v/} &}
-function {xyt,xyy} { <beginfold id='3'>if</beginfold id='3'> <beginfold id='1'>[</beginfold id='1'> "$0" = "xyy" <endfold id='1'>]</endfold id='1'>; then echo run xyy code; else  echo run xyt code; <endfold id='3'>fi</endfold id='3'> ; echo run common code } #
+function {xyt,xyy} { <beginfold id='4'>if</beginfold id='4'> <beginfold id='1'>[</beginfold id='1'> "$0" = "xyy" <endfold id='1'>]</endfold id='1'>; then echo run xyy code; else  echo run xyt code; <endfold id='4'>fi</endfold id='4'> ; echo run common code } #
 
 # creating a family of functions
 # generate hrefs from url
@@ -910,12 +920,12 @@ function href{,s}
     # hrefs creates an HTML hyperlink from a URL with modified anchor text
     PROGNAME=`basename $0`
     url=`cat /dev/clipboard`
-    <beginfold id='3'>if</beginfold id='3'> <beginfold id='1'>[</beginfold id='1'> "$PROGNAME" = "href" <endfold id='1'>]</endfold id='1'> ; then
+    <beginfold id='4'>if</beginfold id='4'> <beginfold id='1'>[</beginfold id='1'> "$PROGNAME" = "href" <endfold id='1'>]</endfold id='1'> ; then
         href="<a href='$url'>$url"
     elif <beginfold id='1'>[</beginfold id='1'> "$PROGNAME" = "hrefs" <endfold id='1'>]</endfold id='1'> ; then
         anchortext=${${(C)url//[_-]/ }:t}
         href="<a href='$url'>$anchortext"
-    <endfold id='3'>fi</endfold id='3'>
+    <endfold id='4'>fi</endfold id='4'>
     echo -n $col
     echo $href > /dev/clipboard | more
 }
@@ -927,9 +937,9 @@ function vx{a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,q,r,s,t,u,v,w,x,y,z}
     gvim.exe c:/aax/$scratchfile &
 }
 
-VDF(){cd *(/om[1]);F=$(echo *(.om[1]));vi $F}
-cyg(){reply=("$(cygpath -m $REPLY)")}
-f  (){for i; <beginfold id='2'>do</beginfold id='2'> echo $i;<endfold id='2'>done</endfold id='2'>}
+VDF(){cd *(/om[1]);F=<beginfold id='2'>$(</beginfold id='2'>echo *(.om[1])<endfold id='2'>)</endfold id='2'>;vi $F}
+cyg(){reply=("<beginfold id='2'>$(</beginfold id='2'>cygpath -m $REPLY<endfold id='2'>)</endfold id='2'>")}
+f  (){for i; <beginfold id='3'>do</beginfold id='3'> echo $i;<endfold id='3'>done</endfold id='3'>}
 fg_light_red=$'%{\e[1;31m%}'
 fn() { setopt localtraps; trap '' INT; sleep 3; }
 nt() { <beginfold id='1'>[[</beginfold id='1'> $REPLY -nt $NTREF <endfold id='1'>]]</endfold id='1'> }
@@ -945,13 +955,13 @@ preexec() {
   # Construct a command that will output the desired job number.
   <beginfold id='5'>case</beginfold id='5'> $cmd[1] in
       fg<beginfold id='6'>)</beginfold id='6'>
-        <beginfold id='3'>if</beginfold id='3'> <beginfold id='1'>((</beginfold id='1'> $#cmd == 1 <endfold id='1'>))</endfold id='1'>; then
+        <beginfold id='4'>if</beginfold id='4'> <beginfold id='1'>((</beginfold id='1'> $#cmd == 1 <endfold id='1'>))</endfold id='1'>; then
           # No arguments, must find the current job
           cmd=(builtin jobs -l %+)
         else
           # Replace the command name, ignore extra args.
           cmd=(builtin jobs -l ${(Q)cmd[2]})
-        <endfold id='3'>fi</endfold id='3'><endfold id='6'>;;</endfold id='6'>
+        <endfold id='4'>fi</endfold id='4'><endfold id='6'>;;</endfold id='6'>
        %*<beginfold id='6'>)</beginfold id='6'> cmd=(builtin jobs -l ${(Q)cmd[1]})<endfold id='6'>;;</endfold id='6'> # Same as "else" above
        exec<beginfold id='6'>)</beginfold id='6'> shift cmd<endfold id='6'>;&</endfold id='6'> # If the command is 'exec', drop that, because
           # we'd rather just see the command that is being
@@ -970,21 +980,21 @@ preexec() {
 }
 
 function precmd() {
-  title zsh "$IDENTITY:$(print -P %~)"
+  title zsh "$IDENTITY:<beginfold id='2'>$(</beginfold id='2'>print -P %~<endfold id='2'>)</endfold id='2'>"
 }
 
 "%{^[]0;screen ^En (^Et) ^G%}"
 
 print -nRP $'\033k%(!.#\[.)'$1$'%'$\(\(20\-${#1}\)\)$'< ..<'${${2:+${${${@[${#${@}}]##/*/}/#/ }:-}}//\"/}$'%(!.\].)\033'\\
 
-c() { echo -E "$(<$1)" }
-col() { for l in ${(f)"$(<$1)"} ; echo ${${(Az)l}[$2]} }
-colx() { for l in ${(f)"$(eval ${(q)@[2,$]})"} ; echo ${${(Az)l}[$1]} }
+c() { echo -E "<beginfold id='2'>$(</beginfold id='2'><$1<endfold id='2'>)</endfold id='2'>" }
+col() { for l in ${(f)"<beginfold id='2'>$(</beginfold id='2'><$1<endfold id='2'>)</endfold id='2'>"} ; echo ${${(Az)l}[$2]} }
+colx() { for l in ${(f)"<beginfold id='2'>$(</beginfold id='2'>eval ${(q)@[2,$]}<endfold id='2'>)</endfold id='2'>"} ; echo ${${(Az)l}[$1]} }
 
-<beginfold id='1'>[[</beginfold id='1'> -r /etc/ssh/ssh_known_hosts <endfold id='1'>]]</endfold id='1'> && _global_ssh_hosts=(${${${${(f)"$(</etc/ssh/ssh_known_hosts)"}:#[\|]*}%%\ *}%%,*}) || _global_ssh_hosts=()
-_ssh_hosts=(${${${${(f)"$(<$HOME/.ssh/known_hosts)"}:#[\|]*}%%\ *}%%,*}) || _ssh_hosts=()
-_ssh_config=($(cat ~/.ssh/config | sed -ne 's/Host[=\t ]//p')) || _ssh_config=()
-: ${(A)_etc_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}} || _etc_hosts=()
+<beginfold id='1'>[[</beginfold id='1'> -r /etc/ssh/ssh_known_hosts <endfold id='1'>]]</endfold id='1'> && _global_ssh_hosts=(${${${${(f)"<beginfold id='2'>$(</beginfold id='2'></etc/ssh/ssh_known_hosts<endfold id='2'>)</endfold id='2'>"}:#[\|]*}%%\ *}%%,*}) || _global_ssh_hosts=()
+_ssh_hosts=(${${${${(f)"<beginfold id='2'>$(</beginfold id='2'><$HOME/.ssh/known_hosts<endfold id='2'>)</endfold id='2'>"}:#[\|]*}%%\ *}%%,*}) || _ssh_hosts=()
+_ssh_config=(<beginfold id='2'>$(</beginfold id='2'>cat ~/.ssh/config | sed -ne 's/Host[=\t ]//p'<endfold id='2'>)</endfold id='2'>) || _ssh_config=()
+: ${(A)_etc_hosts:=${(s: :)${(ps:\t:)${${(f)~~"<beginfold id='2'>$(</beginfold id='2'></etc/hosts<endfold id='2'>)</endfold id='2'>"}%%\#*}##[:blank:]#[^[:blank:]]#}}} || _etc_hosts=()
 
 prefix='(I:'$@[<beginfold id='1'>$((</beginfold id='1'>$i+1<endfold id='1'>))</endfold id='1'>]':)'$prefix || prefix='${('$tmp'I:'$@[<beginfold id='1'>$((</beginfold id='1'>$i+1<endfold id='1'>))</endfold id='1'>]':'${prefix[<beginfold id='1'>$((</beginfold id='1'>$#tmp+4<endfold id='1'>))</endfold id='1'>,-1]}
 prefix='${'${j:+($j)}$prefix; suffix+=':#'${@[<beginfold id='1'>$((</beginfold id='1'>$i+1<endfold id='1'>))</endfold id='1'>]//(#m)[\/\'\"]/\\$MATCH}'}'
@@ -1006,14 +1016,14 @@ zsh_directory_name() {
     emulate -L zsh
     setopt extendedglob
     local -a match mbegin mend
-    <beginfold id='3'>if</beginfold id='3'> <beginfold id='1'>[[</beginfold id='1'> $1 = d <endfold id='1'>]]</endfold id='1'>; then
+    <beginfold id='4'>if</beginfold id='4'> <beginfold id='1'>[[</beginfold id='1'> $1 = d <endfold id='1'>]]</endfold id='1'>; then
         # turn the directory into a name
-        <beginfold id='3'>if</beginfold id='3'> <beginfold id='1'>[[</beginfold id='1'> $2 = (#b)(/home/pws/perforce/)([^/]##)* <endfold id='1'>]]</endfold id='1'>; then
+        <beginfold id='4'>if</beginfold id='4'> <beginfold id='1'>[[</beginfold id='1'> $2 = (#b)(/home/pws/perforce/)([^/]##)* <endfold id='1'>]]</endfold id='1'>; then
             typeset -ga reply
             reply=(p:$match[2] <beginfold id='1'>$((</beginfold id='1'> ${#match[1]} + ${#match[2]} <endfold id='1'>))</endfold id='1'> )
         else
             return 1
-        <endfold id='3'>fi</endfold id='3'>
+        <endfold id='4'>fi</endfold id='4'>
     elif <beginfold id='1'>[[</beginfold id='1'> $1 = n <endfold id='1'>]]</endfold id='1'>; then
         # turn the name into a directory
         <beginfold id='1'>[[</beginfold id='1'> $2 != (#b)p:(?*) <endfold id='1'>]]</endfold id='1'> && return 1
@@ -1029,18 +1039,18 @@ zsh_directory_name() {
         return
     else
         return 1
-    <endfold id='3'>fi</endfold id='3'>
+    <endfold id='4'>fi</endfold id='4'>
     return 0
 }
 
-<beginfold id='4'>(</beginfold id='4'><endfold id='4'>)</endfold id='4'> {
+<beginfold id='2'>(</beginfold id='2'><endfold id='2'>)</endfold id='2'> {
     print File $1:
     cat $1
 } =(print This be the verse)
 
-<beginfold id='3'>if</beginfold id='3'> <beginfold id='1'>[[</beginfold id='1'> $foo = (a|an)_(#b)(*) <endfold id='1'>]]</endfold id='1'>; then
+<beginfold id='4'>if</beginfold id='4'> <beginfold id='1'>[[</beginfold id='1'> $foo = (a|an)_(#b)(*) <endfold id='1'>]]</endfold id='1'>; then
     print ${foo[$mbegin[1],$mend[1]]}
-<endfold id='3'>fi</endfold id='3'>
+<endfold id='4'>fi</endfold id='4'>
 
 zshaddhistory() {
     emulate -L zsh
@@ -1051,11 +1061,11 @@ zshaddhistory() {
 }
 
 pick-recent-dirs-file() {
-    <beginfold id='3'>if</beginfold id='3'> <beginfold id='1'>[[</beginfold id='1'> $PWD = ~/text/writing(|/*) <endfold id='1'>]]</endfold id='1'>; then
+    <beginfold id='4'>if</beginfold id='4'> <beginfold id='1'>[[</beginfold id='1'> $PWD = ~/text/writing(|/*) <endfold id='1'>]]</endfold id='1'>; then
         reply=(~/.chpwd-recent-dirs-writing)
     else
         reply=(+)
-    <endfold id='3'>fi</endfold id='3'>
+    <endfold id='4'>fi</endfold id='4'>
 }
 
 run-help-ssh() {
@@ -1065,11 +1075,11 @@ run-help-ssh() {
     zparseopts -D -E -a args l:
     # Delete other options, leaving: host command
     args=(${@:#-*})
-    <beginfold id='3'>if</beginfold id='3'> <beginfold id='1'>[[</beginfold id='1'> ${#args} -lt 2 <endfold id='1'>]]</endfold id='1'>; then
+    <beginfold id='4'>if</beginfold id='4'> <beginfold id='1'>[[</beginfold id='1'> ${#args} -lt 2 <endfold id='1'>]]</endfold id='1'>; then
         man ssh
     else
         run-help $args[2]
-    <endfold id='3'>fi</endfold id='3'>
+    <endfold id='4'>fi</endfold id='4'>
 }
 
 local -A zdn_top=(
@@ -1118,27 +1128,27 @@ trap '
 
 <beginfold id='1'>((</beginfold id='1'>$#l<endfold id='1'>))</endfold id='1'> && ls -ltd -- $l
 <beginfold id='1'>((</beginfold id='1'>val2 = val1 * 2<endfold id='1'>))</endfold id='1'>
-<beginfold id='4'>(</beginfold id='4'>mycmd =(myoutput)<endfold id='4'>)</endfold id='4'> &!
+<beginfold id='2'>(</beginfold id='2'>mycmd =(myoutput)<endfold id='2'>)</endfold id='2'> &!
 : *(.e{'grep -q pattern $REPLY || print -r -- $REPLY'})
 : > /apache/access.log  # truncate a log file
 < readme.txt
 A=(1 2 5 6 7 9) # pre-populate an array
 C:\cygwin\bin\mintty.exe -i /Cygwin-Terminal.ico /bin/zsh --login
-C=3 && F=$(print *(.om[1,$C])) && for f ($(print $F)){php -l $f} && scp -rp $(print $F) user@192.168.1.1:$PWD
+C=3 && F=<beginfold id='2'>$(</beginfold id='2'>print *(.om[1,$C])<endfold id='2'>)</endfold id='2'> && for f (<beginfold id='2'>$(</beginfold id='2'>print $F<endfold id='2'>)</endfold id='2'>){php -l $f} && scp -rp <beginfold id='2'>$(</beginfold id='2'>print $F<endfold id='2'>)</endfold id='2'> user@192.168.1.1:$PWD
 EDITOR='/bin/vim'
-FILE=$(echo *(.om[1])) && ls -l $FILE && ssh 192.168.1.1 -l root "zsh -c 'ls -l $PWD/$FILE'"
+FILE=<beginfold id='2'>$(</beginfold id='2'>echo *(.om[1])<endfold id='2'>)</endfold id='2'> && ls -l $FILE && ssh 192.168.1.1 -l root "zsh -c 'ls -l $PWD/$FILE'"
 FILES=( .../files/* )
-IFS=$'\n\n'; print -rl -- ${(Oau)${(Oa)$(cat file;echo .)[1,-2]}}
+IFS=$'\n\n'; print -rl -- ${(Oau)${(Oa)<beginfold id='2'>$(</beginfold id='2'>cat file;echo .<endfold id='2'>)</endfold id='2'>[1,-2]}}
 IPREFIX=${PREFIX%%\=*}=
 PREFIX=${PREFIX#*=}
 PROMPT3="Choose File : "
 PROMPT="%{$bg[cyan]%}%% "
 PS3="$fg_light_red Select file : "
 REPORTTIME=10 # Automatically /Report CPU usage for commands running longer than 10 seconds
-RPROMPT="[%t]" <beginfold id='4'>(</beginfold id='4'>display the time<endfold id='4'>)</endfold id='4'>
+RPROMPT="[%t]" <beginfold id='2'>(</beginfold id='2'>display the time<endfold id='2'>)</endfold id='2'>
 X=(x1 x2)
 Y=(+ -)
-<beginfold id='1'>[[</beginfold id='1'> "$(< $i)" = *\((${(j:|:)~@})\)* <endfold id='1'>]]</endfold id='1'> && echo $i:h:t
+<beginfold id='1'>[[</beginfold id='1'> "<beginfold id='2'>$(</beginfold id='2'>< $i<endfold id='2'>)</endfold id='2'>" = *\((${(j:|:)~@})\)* <endfold id='1'>]]</endfold id='1'> && echo $i:h:t
 <beginfold id='1'>[[</beginfold id='1'> $OSTYPE == (#i)LINUX*(#I) <endfold id='1'>]]</endfold id='1'>;
 <beginfold id='1'>[[</beginfold id='1'> 'cell=456' =~ '(cell)=(\d+)' <endfold id='1'>]]</endfold id='1'> && echo $match[1,2] $MATCH
 <beginfold id='1'>[[</beginfold id='1'> -e $L/config.php <endfold id='1'>]]</endfold id='1'> && cp -p -update $T/config.php $L
@@ -1160,7 +1170,7 @@ alias '..'='cd ..'
 alias -g ...='../..'
 alias -g NF='*(.om[1])' # newest file
 alias gcd="cd $MCD"  # double quote stops once only evaluation
-alias mcd="MCD=$(pwd)"  # double quote stops once only evaluation
+alias mcd="MCD=<beginfold id='2'>$(</beginfold id='2'>pwd<endfold id='2'>)</endfold id='2'>"  # double quote stops once only evaluation
 anchortext=${${(C)url//[_-]/ }:t}  # titlecase
 arr=(veldt jynx grimps waqf zho buck)
 array=(~/.zshenv ~/.zshrc ~/.zlogout)
@@ -1175,11 +1185,11 @@ cd !$:h
 cd !?ls
 diff <(find / | sort) <(cat /var/lib/dpkg/info/*.list | sort)
 dpath=${upath/#\/c\//c:/}          # convert /c/path/ to c:\path\
-drive=$(<beginfold id='1'>[[</beginfold id='1'> "$LOGNAME" != davidr <endfold id='1'>]]</endfold id='1'> && echo '/o' || echo '/c') # trad way
+drive=<beginfold id='2'>$(</beginfold id='2'><beginfold id='1'>[[</beginfold id='1'> "$LOGNAME" != davidr <endfold id='1'>]]</endfold id='1'> && echo '/o' || echo '/c'<endfold id='2'>)</endfold id='2'> # trad way
 drive=${${${LOGNAME:#davidr}:+/o}:-/c}                        # zsh way
 egrep -i "^ *mail\(" **/*.php
 eval "$1=$PWD"
-eval "m=($(cat -- $nameoffile)"
+eval "m=(<beginfold id='2'>$(</beginfold id='2'>cat -- $nameoffile<endfold id='2'>)</endfold id='2'>"
 feh $FILES[$RANDOM%$#FILES+1]
 foo="twinkle twinkle little star" sub="t*e" rep="spy"
 foo=$'bar\n\nbaz\n'
@@ -1197,10 +1207,10 @@ fred=<beginfold id='1'>$((</beginfold id='1'>6**2 + 6<endfold id='1'>))</endfold
 p1 p2 p3
 pcre_compile -m "\d{5}"
 pcre_match -b -- $string
-perl -ne 's/(<\/\w+>)/$1\n/g; print' < NF > $(print NF).txt
+perl -ne 's/(<\/\w+>)/$1\n/g; print' < NF > <beginfold id='2'>$(</beginfold id='2'>print NF<endfold id='2'>)</endfold id='2'>.txt
 ps -p $$ | grep $$ | awk '{print $NF}'
 r oldstr=newstr
-r\m $(locate nohup.out)
+r\m <beginfold id='2'>$(</beginfold id='2'>locate nohup.out<endfold id='2'>)</endfold id='2'>
 read -r line <&$fd; print -r - $line
 read ans ; # read in a parameter
 setopt EXTENDED_GLOB   # lots of clever stuff requires this
@@ -1223,7 +1233,7 @@ unsetopt localtraps
 upath=${wpath//\\/\/}              # convert backslashes to forward slashes (Dos to Unix
 url='www.some.com/some_strIng-HERe'
 val=a:b:c
-var=133;<beginfold id='3'>if</beginfold id='3'> <beginfold id='1'>[[</beginfold id='1'> "$var" = <-> <endfold id='1'>]]</endfold id='1'> ; then echo "$var is numeric" ;<endfold id='3'>fi</endfold id='3'>
+var=133;<beginfold id='4'>if</beginfold id='4'> <beginfold id='1'>[[</beginfold id='1'> "$var" = <-> <endfold id='1'>]]</endfold id='1'> ; then echo "$var is numeric" ;<endfold id='4'>fi</endfold id='4'>
 var=ddddd; <beginfold id='1'>[[</beginfold id='1'> "$var" =~ ^d+$ <endfold id='1'>]]</endfold id='1'> && echo matched || echo did not match
 var=dddee; regexp="^e+$"; <beginfold id='1'>[[</beginfold id='1'> "$var" =~ $regexp <endfold id='1'>]]</endfold id='1'> && echo $regexp matched $var || echo $regexp did not match $var
 vared -p "choose 1-3 : " -c ans

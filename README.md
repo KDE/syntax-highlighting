@@ -56,16 +56,20 @@ Usually it is:
         <td>$HOME/.local/share/org.kde.syntax-highlighting/syntax/</td>
     </tr>
     <tr>
-        <td>For <a href="https://flathub.org/apps/details/org.kde.kate">Kate's Flatpak package</a></td>
-        <td>$HOME/.var/app/org.kde.kate/data/org.kde.syntax-highlighting/syntax/</td>
+        <td>For Flatpak packages</td>
+        <td>$HOME/.var/app/<em>package-name</em>/data/org.kde.syntax-highlighting/syntax/</td>
     </tr>
     <tr>
-        <td>For <a href="https://snapcraft.io/kate">Kate's Snap package</a></td>
-        <td>$HOME/snap/kate/current/.local/share/org.kde.syntax-highlighting/syntax/</td>
+        <td>For Snap packages</a></td>
+        <td>$HOME/snap/<em>package-name</em>/current/.local/share/org.kde.syntax-highlighting/syntax/</td>
     </tr>
     <tr>
         <td>On Windows®</td>
         <td>&#37;USERPROFILE&#37;&#92;AppData&#92;Local&#92;org.kde.syntax-highlighting&#92;syntax&#92;</td>
+    </tr>
+    <tr>
+        <td>On macOS®</td>
+        <td>$HOME/Library/Application Support/org.kde.syntax-highlighting/syntax/</td>
     </tr>
 </table>
 
@@ -76,27 +80,32 @@ files. Use the command `validatehl.sh mySyntax.xml`.
 
 ## Color theme files
 
-This library includes the color themes, the theme files use the **JSON**
-format and are located in **data/themes/** with the **.theme** extension.
+This library includes the color themes, which are documented
+[here](https://docs.kde.org/?application=katepart&branch=trunk5&path=color-themes.html).
 
+The color theme files use the JSON format and are located in **data/themes/**
+with the **.theme** extension.
 Additional ones are also picked up from the file system if present,
 in the **org.kde.syntax-highlighting/themes/** folder of your user directory,
-allowing you to easily add custom color theme files.
-The location of **org.kde.syntax-highlighting/themes/** is the same
+allowing you to easily add custom color theme files. This location is the same
 as shown in the table of the [previous section](#syntax-definition-files),
 replacing the **syntax** folder with **themes**.
+For more details, see ["The Color Themes JSON Format" (Working with Color Themes, KDE Documentation)](https://docs.kde.org/?application=katepart&branch=trunk5&path=color-themes.html#color-themes-json).
 
 The [KTextEditor](https://api.kde.org/frameworks/ktexteditor/html/) library
-(used by Kate, Kile and KDevelop, for example) provides
-a user interface for editing and creating KSyntaxHighlighting color themes, including
+(used by Kate, Kile and KDevelop, for example) provides a
+[user interface](https://docs.kde.org/?application=katepart&branch=trunk5&path=color-themes.html#color-themes-gui)
+for editing and creating KSyntaxHighlighting color themes, including
 a tool for exporting and importing the JSON theme files.
+
+Note that in KDE text editors, the KSyntaxHighlighting color themes are used
+[since KDE Frameworks 5.75](https://kate-editor.org/post/2020/2020-09-13-kate-color-themes-5.75/),
+released on October 10, 2020. Previously, Kate's color schemes
+(KConfig based schema config) were used and are now deprecated.
 The tool **utils/schema-converter/** and the script **utils/kateschema_to_theme_converter.py**
 convert the old Kate schemas to KSyntaxHighlighting themes.
 
-For more information, see:
-
-* [Kate - Color Themes with Frameworks 5.75 (Kate Editor Website)](https://kate-editor.org/post/2020/2020-09-13-kate-color-themes-5.75/)
-* [Submit a KSyntaxHighlighting Color Theme (Kate Editor Website)](https://kate-editor.org/post/2020/2020-09-18-submit-a-ksyntaxhighlighting-color-theme/)
+Also see ["Submit a KSyntaxHighlighting Color Theme" (Kate Editor Website)](https://kate-editor.org/post/2020/2020-09-18-submit-a-ksyntaxhighlighting-color-theme/).
 
 ## Build it
 

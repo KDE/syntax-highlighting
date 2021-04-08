@@ -21,7 +21,7 @@
 <!ENTITY tsp_unit "&tsp_year;|&tsp_month;|&tsp_week;|&tsp_day;|&tsp_hour;|&tsp_sec;|&tsp_msec;|&tsp_usec;|&tsp_min;">
 <!ENTITY tsp "\d+(?:\.\d+)?\h*(?=(&tsp_unit;)?)">
 ]>
-<language author="Andreas Gratzer" extensions="*.automount;*.device;*.mount;*.path;*.service;*.slice;*.socket;*.swap;*.target;*.timer" kateversion="5.0" license="MIT" mimetype="text/x-systemd-unit" name="systemd unit" section="Configuration" version="5">
+<language author="Andreas Gratzer" extensions="*.automount;*.device;*.mount;*.path;*.service;*.slice;*.socket;*.swap;*.target;*.timer" kateversion="5.0" license="MIT" mimetype="text/x-systemd-unit" name="systemd unit" section="Configuration" version="6">
   <highlighting>
     <list name="boolean">
       <!-- 0, 1, t, f, y, n are also valid, but handled using AnyChar. -->
@@ -1174,8 +1174,9 @@
         <!-- Escapes (not exactly the same as detected by HlCStringChar). -->
         <RegExpr String="\\(?:['&quot;,\\abfnrstv]|[0-7]{3}|u[&hex;]{4}|U[&hex;]{8}|x[&hex;]{2})" attribute="Escape"/>
         <!-- Environment variable as a separate word. -->
+        <RegExpr String="(?&lt;=\h)\$\w+(?=\h|,|\\|$)" attribute="Environment Variable"/>
         <!-- Environment variable optionally within word. -->
-        <RegExpr String="(?&lt;=\h)\$\w+(?=\h|,|\\|$)|\${\w+}" attribute="Environment Variable"/>
+        <RegExpr String="\${\w+}" attribute="Environment Variable"/>
         <IncludeRules context="text"/>
       </context>
       <context name="exec prefix" attribute="Normal" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!exec command">
@@ -1385,7 +1386,8 @@
         <RegExpr String="&specifier;" attribute="Specifier"/>
       </context>
       <context name="standard io" attribute="Normal" lineEndContext="#stay">
-        <RegExpr String="fd(?::(?=\S))?|file:(?=/\S)" attribute="Constant" context="#pop"/>
+        <RegExpr String="fd(?::(?=\S))?" attribute="Constant" context="#pop"/>
+        <RegExpr String="file:(?=/\S)" attribute="Constant" context="#pop"/>
       </context>
       <context name="standard input" attribute="Normal" lineEndContext="#pop">
         <IncludeRules context="standard io"/>

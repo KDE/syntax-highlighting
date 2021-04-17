@@ -85,6 +85,12 @@ USBFunctionDescriptors = /some/absolute/path
 USBFunctionStrings = /some/absolute/path
 OOMPolicy = stop
 
+## from systemd.exec
+ExecPaths = some/path some/other/path
+ExtensionImages = /source/path
+IPCNamespacePath = /some/absolute/path
+NoExecPaths = some/path some/other/path
+PrivateIPC = false
 ## from systemd.exec Paths
 WorkingDirectory = ~
 RootDirectory = /some/path
@@ -281,7 +287,7 @@ Delegate = bpf-firewall
 DisableControllers = cpu io
 ManagedOOMSwap = auto
 ManagedOOMMemoryPressure = kill
-ManagedOOMMemoryPressureLimitPercent = 50%
+ManagedOOMMemoryPressureLimit = 50%
 
 
 [Slice]
@@ -981,6 +987,7 @@ ConditionCapability = CAP_AUDIT_CONTROL
 ConditionCapability = CAP_AUDIT_READ
 ConditionCapability = CAP_AUDIT_WRITE
 ConditionCapability = CAP_BLOCK_SUSPEND
+ConditionCapability = CAP_CHECKPOINT_RESTORE
 ConditionCapability = CAP_CHOWN
 ConditionCapability = CAP_DAC_OVERRIDE
 ConditionCapability = CAP_DAC_READ_SEARCH
@@ -1125,6 +1132,8 @@ AssertControlGroupController = cpuacct
 AssertControlGroupController = devices
 AssertControlGroupController = io
 AssertControlGroupController = memory
+AssertControlGroupController = v1
+AssertControlGroupController = v2
 ## invalid values
 AssertControlGroupController = invalid
 AssertControlGroupController = bpf-firewall
@@ -1165,6 +1174,65 @@ CPUAffinity = numa numa
 # no CPU index list and "numa"
 CPUAffinity = numa 0 1 2
 CPUAffinity = 0 1 2 numa
+
+
+###### cpu feature
+[Unit]
+ConditionCPUFeature = abm
+ConditionCPUFeature = adx
+ConditionCPUFeature = aes
+ConditionCPUFeature = apic
+ConditionCPUFeature = avx
+ConditionCPUFeature = avx2
+ConditionCPUFeature = bmi1
+ConditionCPUFeature = bmi2
+ConditionCPUFeature = clflush
+ConditionCPUFeature = cmov
+ConditionCPUFeature = constant_tsc
+ConditionCPUFeature = cx16
+ConditionCPUFeature = cx8
+ConditionCPUFeature = de
+ConditionCPUFeature = f16c
+ConditionCPUFeature = fma3
+ConditionCPUFeature = fpu
+ConditionCPUFeature = fxsr
+ConditionCPUFeature = ht
+ConditionCPUFeature = lahf_lm
+ConditionCPUFeature = lm
+ConditionCPUFeature = mca
+ConditionCPUFeature = mce
+ConditionCPUFeature = mmx
+ConditionCPUFeature = monitor
+ConditionCPUFeature = movbe
+ConditionCPUFeature = msr
+ConditionCPUFeature = mtrr
+ConditionCPUFeature = osxsave
+ConditionCPUFeature = pae
+ConditionCPUFeature = pat
+ConditionCPUFeature = pclmul
+ConditionCPUFeature = pge
+ConditionCPUFeature = pni
+ConditionCPUFeature = popcnt
+ConditionCPUFeature = pse
+ConditionCPUFeature = pse36
+ConditionCPUFeature = rdrand
+ConditionCPUFeature = rdseed
+ConditionCPUFeature = rdtscp
+ConditionCPUFeature = sep
+ConditionCPUFeature = sha_ni
+ConditionCPUFeature = sse
+ConditionCPUFeature = sse2
+ConditionCPUFeature = sse4_1
+ConditionCPUFeature = sse4_2
+ConditionCPUFeature = ssse3
+ConditionCPUFeature = syscall
+ConditionCPUFeature = tsc
+ConditionCPUFeature = vme
+ConditionCPUFeature = xsave
+## invalid values
+ConditionCPUFeature = invalid
+# multiple values
+ConditionCPUFeature = tsc mmx
 
 
 ###### cpu index list
@@ -1283,7 +1351,7 @@ ExecStart = /some/cmd %u arg $var1 inside${var2}word ${var3} $var4
 ExecStart = cmd1 %h arg1_1 $var1, cmd2 %u arg2_1 $var2_1\
   $var2_2
 # escapes (not exactly the same as detected by HlCStringChar)
-ExecStart = cmd \, \' \" \\ \a \b \f \n \r \s \t \v \x0A \012
+ExecStart = cmd \, \' \" \\ \a \b \f \n \r \s \t \v \x0A \012 \u1234 \U12abcdef
 # prefix
 ExecStart = @/some/cmd arg "@!+-:"
 ExecStart = -/some/cmd-1 -option arg
@@ -1320,6 +1388,7 @@ SuccessExitStatus = CONFIG
 SuccessExitStatus = CONFIGURATION_DIRECTORY
 SuccessExitStatus = CONFIRM
 SuccessExitStatus = CPUAFFINITY
+SuccessExitStatus = CREDENTIALS
 SuccessExitStatus = DATAERR
 SuccessExitStatus = EXCEPTION
 SuccessExitStatus = EXEC
@@ -1822,6 +1891,17 @@ ManagedOOMSwap = invalid
 ManagedOOMSwap = auto kill
 
 
+###### oom preference (out-of-memory killer preference)
+[Service]
+ManagedOOMPreference = avoid
+ManagedOOMPreference = none
+ManagedOOMPreference = omit
+## invalid values
+ManagedOOMPreference = invalid
+# multiple values
+ManagedOOMPreference = avoid none
+
+
 ###### oom policy (out-of-memory killer policy)
 [Service]
 OOMPolicy = continue
@@ -1966,6 +2046,7 @@ ConditionSecurity = ima
 ConditionSecurity = selinux
 ConditionSecurity = smack
 ConditionSecurity = tomoyo
+ConditionSecurity = tpm2
 ConditionSecurity = uefi-secureboot
 ## invalid values
 ConditionSecurity = invalid
@@ -2085,6 +2166,7 @@ StandardOutput = kmsg
 StandardOutput = kmsg+console
 StandardOutput = null
 StandardOutput = socket
+StandardOutput = truncate:/some/absolute/path
 StandardOutput = tty
 ## invalid values
 StandardOutput = invalid

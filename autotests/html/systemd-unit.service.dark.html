@@ -91,6 +91,12 @@
 <span style="color:#2980b9;">USBFunctionStrings</span> = /some/absolute/path
 <span style="color:#2980b9;">OOMPolicy</span> = <span style="color:#27aeae;font-weight:bold;">stop</span>
 
+<span style="color:#7a7c7d;">## from systemd.exec</span>
+<span style="color:#2980b9;">ExecPaths</span> = some/path some/other/path
+<span style="color:#2980b9;">ExtensionImages</span> = /source/path
+<span style="color:#2980b9;">IPCNamespacePath</span> = /some/absolute/path
+<span style="color:#2980b9;">NoExecPaths</span> = some/path some/other/path
+<span style="color:#2980b9;">PrivateIPC</span> = <span style="color:#27aeae;font-weight:bold;">false</span>
 <span style="color:#7a7c7d;">## from systemd.exec Paths</span>
 <span style="color:#2980b9;">WorkingDirectory</span> = <span style="color:#3daee9;">~</span>
 <span style="color:#2980b9;">RootDirectory</span> = /some/path
@@ -287,7 +293,7 @@
 <span style="color:#2980b9;">DisableControllers</span> = <span style="color:#27aeae;font-weight:bold;">cpu</span> <span style="color:#27aeae;font-weight:bold;">io</span>
 <span style="color:#2980b9;">ManagedOOMSwap</span> = <span style="color:#27aeae;font-weight:bold;">auto</span>
 <span style="color:#2980b9;">ManagedOOMMemoryPressure</span> = <span style="color:#27aeae;font-weight:bold;">kill</span>
-<span style="color:#2980b9;">ManagedOOMMemoryPressureLimitPercent</span> = <span style="color:#f67400;">50</span><span style="font-style:italic;">%</span>
+<span style="color:#2980b9;">ManagedOOMMemoryPressureLimit</span> = <span style="color:#f67400;">50</span><span style="font-style:italic;">%</span>
 
 
 <span style="font-weight:bold;">[Slice]</span>
@@ -987,6 +993,7 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">ConditionCapability</span> = <span style="color:#27aeae;font-weight:bold;">CAP_AUDIT_READ</span>
 <span style="color:#2980b9;">ConditionCapability</span> = <span style="color:#27aeae;font-weight:bold;">CAP_AUDIT_WRITE</span>
 <span style="color:#2980b9;">ConditionCapability</span> = <span style="color:#27aeae;font-weight:bold;">CAP_BLOCK_SUSPEND</span>
+<span style="color:#2980b9;">ConditionCapability</span> = <span style="color:#27aeae;font-weight:bold;">CAP_CHECKPOINT_RESTORE</span>
 <span style="color:#2980b9;">ConditionCapability</span> = <span style="color:#27aeae;font-weight:bold;">CAP_CHOWN</span>
 <span style="color:#2980b9;">ConditionCapability</span> = <span style="color:#27aeae;font-weight:bold;">CAP_DAC_OVERRIDE</span>
 <span style="color:#2980b9;">ConditionCapability</span> = <span style="color:#27aeae;font-weight:bold;">CAP_DAC_READ_SEARCH</span>
@@ -1131,6 +1138,8 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">devices</span>
 <span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">io</span>
 <span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">memory</span>
+<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">v1</span>
+<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">v2</span>
 <span style="color:#7a7c7d;">## invalid values</span>
 <span style="color:#2980b9;">AssertControlGroupController</span> = invalid
 <span style="color:#2980b9;">AssertControlGroupController</span> = bpf-firewall
@@ -1171,6 +1180,65 @@ WantedBy = some.service some.socket
 <span style="color:#7a7c7d;"># no CPU index list and &quot;numa&quot;</span>
 <span style="color:#2980b9;">CPUAffinity</span> = <span style="color:#27aeae;font-weight:bold;">numa</span> 0 1 2
 <span style="color:#2980b9;">CPUAffinity</span> = <span style="color:#f67400;">0</span> <span style="color:#f67400;">1</span> <span style="color:#f67400;">2</span> numa
+
+
+<span style="color:#7a7c7d;">###### cpu feature</span>
+<span style="font-weight:bold;">[Unit]</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">abm</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">adx</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">aes</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">apic</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">avx</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">avx2</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">bmi1</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">bmi2</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">clflush</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">cmov</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">constant_tsc</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">cx16</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">cx8</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">de</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">f16c</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">fma3</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">fpu</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">fxsr</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">ht</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">lahf_lm</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">lm</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">mca</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">mce</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">mmx</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">monitor</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">movbe</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">msr</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">mtrr</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">osxsave</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">pae</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">pat</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">pclmul</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">pge</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">pni</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">popcnt</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">pse</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">pse36</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">rdrand</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">rdseed</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">rdtscp</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">sep</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">sha_ni</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">sse</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">sse2</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">sse4_1</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">sse4_2</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">ssse3</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">syscall</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">tsc</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">vme</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">xsave</span>
+<span style="color:#7a7c7d;">## invalid values</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = invalid
+<span style="color:#7a7c7d;"># multiple values</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#27aeae;font-weight:bold;">tsc</span> mmx
 
 
 <span style="color:#7a7c7d;">###### cpu index list</span>
@@ -1289,7 +1357,7 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">ExecStart</span> = cmd1 <span style="color:#3daee9;">%h</span> arg1_1 <span style="color:#27aeae;">$var1</span>, cmd2 <span style="color:#3daee9;">%u</span> arg2_1 <span style="color:#27aeae;">$var2_1</span><span style="color:#fdbc4b;font-weight:bold;">\</span>
   <span style="color:#27aeae;">$var2_2</span>
 <span style="color:#7a7c7d;"># escapes (not exactly the same as detected by HlCStringChar)</span>
-<span style="color:#2980b9;">ExecStart</span> = cmd <span style="color:#3daee9;">\,</span> <span style="color:#3daee9;">\'</span> <span style="color:#3daee9;">\&quot;</span> <span style="color:#3daee9;">\\</span> <span style="color:#3daee9;">\a</span> <span style="color:#3daee9;">\b</span> <span style="color:#3daee9;">\f</span> <span style="color:#3daee9;">\n</span> <span style="color:#3daee9;">\r</span> <span style="color:#3daee9;">\s</span> <span style="color:#3daee9;">\t</span> <span style="color:#3daee9;">\v</span> <span style="color:#3daee9;">\x0A</span> <span style="color:#3daee9;">\012</span>
+<span style="color:#2980b9;">ExecStart</span> = cmd <span style="color:#3daee9;">\,</span> <span style="color:#3daee9;">\'</span> <span style="color:#3daee9;">\&quot;</span> <span style="color:#3daee9;">\\</span> <span style="color:#3daee9;">\a</span> <span style="color:#3daee9;">\b</span> <span style="color:#3daee9;">\f</span> <span style="color:#3daee9;">\n</span> <span style="color:#3daee9;">\r</span> <span style="color:#3daee9;">\s</span> <span style="color:#3daee9;">\t</span> <span style="color:#3daee9;">\v</span> <span style="color:#3daee9;">\x0A</span> <span style="color:#3daee9;">\012</span> <span style="color:#3daee9;">\u1234</span> <span style="color:#3daee9;">\U12abcdef</span>
 <span style="color:#7a7c7d;"># prefix</span>
 <span style="color:#2980b9;">ExecStart</span> = <span style="color:#da4453;">@</span>/some/cmd arg &quot;@!+-:&quot;
 <span style="color:#2980b9;">ExecStart</span> = <span style="color:#da4453;">-</span>/some/cmd-1 -option arg
@@ -1326,6 +1394,7 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">SuccessExitStatus</span> = <span style="color:#27aeae;font-weight:bold;">CONFIGURATION_DIRECTORY</span>
 <span style="color:#2980b9;">SuccessExitStatus</span> = <span style="color:#27aeae;font-weight:bold;">CONFIRM</span>
 <span style="color:#2980b9;">SuccessExitStatus</span> = <span style="color:#27aeae;font-weight:bold;">CPUAFFINITY</span>
+<span style="color:#2980b9;">SuccessExitStatus</span> = <span style="color:#27aeae;font-weight:bold;">CREDENTIALS</span>
 <span style="color:#2980b9;">SuccessExitStatus</span> = <span style="color:#27aeae;font-weight:bold;">DATAERR</span>
 <span style="color:#2980b9;">SuccessExitStatus</span> = <span style="color:#27aeae;font-weight:bold;">EXCEPTION</span>
 <span style="color:#2980b9;">SuccessExitStatus</span> = <span style="color:#27aeae;font-weight:bold;">EXEC</span>
@@ -1828,6 +1897,17 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">ManagedOOMSwap</span> = <span style="color:#27aeae;font-weight:bold;">auto</span> kill
 
 
+<span style="color:#7a7c7d;">###### oom preference (out-of-memory killer preference)</span>
+<span style="font-weight:bold;">[Service]</span>
+<span style="color:#2980b9;">ManagedOOMPreference</span> = <span style="color:#27aeae;font-weight:bold;">avoid</span>
+<span style="color:#2980b9;">ManagedOOMPreference</span> = <span style="color:#27aeae;font-weight:bold;">none</span>
+<span style="color:#2980b9;">ManagedOOMPreference</span> = <span style="color:#27aeae;font-weight:bold;">omit</span>
+<span style="color:#7a7c7d;">## invalid values</span>
+<span style="color:#2980b9;">ManagedOOMPreference</span> = invalid
+<span style="color:#7a7c7d;"># multiple values</span>
+<span style="color:#2980b9;">ManagedOOMPreference</span> = <span style="color:#27aeae;font-weight:bold;">avoid</span> none
+
+
 <span style="color:#7a7c7d;">###### oom policy (out-of-memory killer policy)</span>
 <span style="font-weight:bold;">[Service]</span>
 <span style="color:#2980b9;">OOMPolicy</span> = <span style="color:#27aeae;font-weight:bold;">continue</span>
@@ -1972,6 +2052,7 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">ConditionSecurity</span> = <span style="color:#27aeae;font-weight:bold;">selinux</span>
 <span style="color:#2980b9;">ConditionSecurity</span> = <span style="color:#27aeae;font-weight:bold;">smack</span>
 <span style="color:#2980b9;">ConditionSecurity</span> = <span style="color:#27aeae;font-weight:bold;">tomoyo</span>
+<span style="color:#2980b9;">ConditionSecurity</span> = <span style="color:#27aeae;font-weight:bold;">tpm2</span>
 <span style="color:#2980b9;">ConditionSecurity</span> = <span style="color:#27aeae;font-weight:bold;">uefi-secureboot</span>
 <span style="color:#7a7c7d;">## invalid values</span>
 <span style="color:#2980b9;">ConditionSecurity</span> = invalid
@@ -2091,6 +2172,7 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">StandardOutput</span> = <span style="color:#27aeae;font-weight:bold;">kmsg+console</span>
 <span style="color:#2980b9;">StandardOutput</span> = <span style="color:#27aeae;font-weight:bold;">null</span>
 <span style="color:#2980b9;">StandardOutput</span> = <span style="color:#27aeae;font-weight:bold;">socket</span>
+<span style="color:#2980b9;">StandardOutput</span> = <span style="color:#27aeae;font-weight:bold;">truncate:</span>/some/absolute/path
 <span style="color:#2980b9;">StandardOutput</span> = <span style="color:#27aeae;font-weight:bold;">tty</span>
 <span style="color:#7a7c7d;">## invalid values</span>
 <span style="color:#2980b9;">StandardOutput</span> = invalid

@@ -1173,10 +1173,8 @@
         <DetectChar char="," context="#pop!exec prefix"/>
         <!-- Escapes (not exactly the same as detected by HlCStringChar). -->
         <RegExpr String="\\(?:['&quot;,\\abfnrstv]|[0-7]{3}|u[&hex;]{4}|U[&hex;]{8}|x[&hex;]{2})" attribute="Escape"/>
-        <!-- Environment variable as a separate word. -->
-        <RegExpr String="(?&lt;=\h)\$\w+(?=\h|,|\\|$)" attribute="Environment Variable"/>
-        <!-- Environment variable optionally within word. -->
-        <RegExpr String="\${\w+}" attribute="Environment Variable"/>
+        <!-- Environment variable as a separate word. | Environment variable within word. -->
+        <RegExpr String="(?&lt;=\h)\$\w+(?=\h|,|\\|$)|\${\w+}" attribute="Environment Variable"/>
         <IncludeRules context="text"/>
       </context>
       <context name="exec prefix" attribute="Normal" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!exec command">
@@ -1386,8 +1384,7 @@
         <RegExpr String="&specifier;" attribute="Specifier"/>
       </context>
       <context name="standard io" attribute="Normal" lineEndContext="#stay">
-        <RegExpr String="fd(?::(?=\S))?" attribute="Constant" context="#pop"/>
-        <RegExpr String="file:(?=/\S)" attribute="Constant" context="#pop"/>
+        <RegExpr String="fd(?::(?=\S))?|file:(?=/\S)" attribute="Constant" context="#pop"/>
       </context>
       <context name="standard input" attribute="Normal" lineEndContext="#pop">
         <IncludeRules context="standard io"/>

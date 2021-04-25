@@ -12,7 +12,6 @@ endif()
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
-include(KDEClangFormat)
 include(KDEGitCommitHooks)
 
 include(FeatureSummary)
@@ -144,7 +143,4 @@ feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAG
 add_custom_target(update_kate_editor_org
     COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/utils/update-kate-editor-org.pl" "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
 
-# add clang-format target for all our real source files
-file(GLOB_RECURSE ALL_CLANG_FORMAT_SOURCE_FILES *.cpp *.h)
-kde_clang_format(${ALL_CLANG_FORMAT_SOURCE_FILES})
 kde_configure_git_pre_commit_hook(CHECKS CLANG_FORMAT)

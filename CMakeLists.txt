@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.5)
 set(KF_VERSION "5.82.0")
 project(KSyntaxHighlighting VERSION ${KF_VERSION})
 
-find_package(ECM 5.81.0 REQUIRED NO_MODULE)
+find_package(ECM 5.82.0 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 if(POLICY CMP0063)
     cmake_policy(SET CMP0063 NEW)

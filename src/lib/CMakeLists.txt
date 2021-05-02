@@ -33,7 +33,7 @@ ecm_qt_declare_logging_category(syntax_highlighting_srcs
 add_library(KF5SyntaxHighlighting ${syntax_highlighting_srcs} $<TARGET_OBJECTS:SyntaxHighlightingData>)
 generate_export_header(KF5SyntaxHighlighting BASE_NAME KSyntaxHighlighting)
 set_target_properties(KF5SyntaxHighlighting PROPERTIES
-    VERSION ${SyntaxHighlighting_VERSION_STRING}
+    VERSION ${SyntaxHighlighting_VERSION}
     SOVERSION ${SyntaxHighlighting_SOVERSION}
     EXPORT_NAME SyntaxHighlighting
 )

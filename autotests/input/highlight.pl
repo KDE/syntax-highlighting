@@ -30,7 +30,23 @@ __EOF
 	next if( $match =~ /go/i );
 
 	@array = (1,2,3);		# a comment
+	# Test qw versions with special ending characters
 	@array = qw(apple foo bar);
+	@array = qw[apple foo bar];
+	@array = qw{apple foo bar};
+	@array = qw<apple foo bar>;
+	@array = qw(
+		multi
+		line
+		test
+	);
+	# Test qw with non special ending characters;
+	@array = qw/apple foo bar/;
+	@array = qw|apple foo bar|;
+	@array = qw@apple foo bar@;
+	@array = qw!apple foo bar!;
+	@array = qw"apple foo bar";
+	@array = qw'apple foo bar';
 	push(@array, 4);
 	%hash = (red => 'rot',
 		blue => 'blau');

@@ -39,7 +39,7 @@ file(GLOB src_defs "${CMAKE_CURRENT_SOURCE_DIR}/syntax/*.xml")
 set(defs ${src_defs} ${gen_defs})
 
 # theme data resource
-qt5_add_resources(themes_QRC ${CMAKE_CURRENT_SOURCE_DIR}/themes/theme-data.qrc)
+qt_add_resources(themes_QRC ${CMAKE_CURRENT_SOURCE_DIR}/themes/theme-data.qrc)
 
 # do we want syntax files bundled in the library?
 if (QRC_SYNTAX)

@@ -39,7 +39,12 @@ set_target_properties(KF5SyntaxHighlighting PROPERTIES
 )
 target_include_directories(KF5SyntaxHighlighting INTERFACE "$<INSTALL_INTERFACE:${KDE_INSTALL_INCLUDEDIR_KF5}/KSyntaxHighlighting;${KDE_INSTALL_INCLUDEDIR_KF5}>")
 target_include_directories(KF5SyntaxHighlighting PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR};${CMAKE_CURRENT_BINARY_DIR};>")
-target_link_libraries(KF5SyntaxHighlighting LINK_PUBLIC Qt5::Gui LINK_PRIVATE Qt5::Network)
+target_link_libraries(KF5SyntaxHighlighting
+    PUBLIC
+        Qt5::Gui
+    PRIVATE
+        Qt5::Network
+)
 
 ecm_generate_headers(SyntaxHighlighting_HEADERS
     HEADER_NAMES

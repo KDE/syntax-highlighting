@@ -1,6 +1,8 @@
+add_library(KF5SyntaxHighlighting)
+
 ecm_create_qm_loader(syntax_highlighting_QM_LOADER syntaxhighlighting5_qt)
 
-set(syntax_highlighting_srcs
+target_sources(KF5SyntaxHighlighting PRIVATE
     abstracthighlighter.cpp
     context.cpp
     contextswitch.cpp
@@ -20,8 +22,9 @@ set(syntax_highlighting_srcs
     themedata.cpp
     worddelimiters.cpp
     ${syntax_highlighting_QM_LOADER}
+    $<TARGET_OBJECTS:SyntaxHighlightingData>
 )
-ecm_qt_declare_logging_category(syntax_highlighting_srcs
+ecm_qt_declare_logging_category(KF5SyntaxHighlighting
     HEADER ksyntaxhighlighting_logging.h
     IDENTIFIER KSyntaxHighlighting::Log
     CATEGORY_NAME kf.syntaxhighlighting
@@ -30,7 +33,6 @@ ecm_qt_declare_logging_category(syntax_highlighting_srcs
     EXPORT KSYNTAXHIGHLIGHTING
 )
 
-add_library(KF5SyntaxHighlighting ${syntax_highlighting_srcs} $<TARGET_OBJECTS:SyntaxHighlightingData>)
 generate_export_header(KF5SyntaxHighlighting BASE_NAME KSyntaxHighlighting)
 set_target_properties(KF5SyntaxHighlighting PROPERTIES
     VERSION ${SyntaxHighlighting_VERSION}

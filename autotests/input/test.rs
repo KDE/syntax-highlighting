@@ -104,3 +104,27 @@ fn types() {
 
 	let invalid_string: str = "hello \b \u{_123} \u{1234567} \  bye";
 }
+
+//ControlFlow-specific keywords
+fn controlflow(y: Vec<usize>) -> usize {
+    let mut x = 0;
+    while x < 10 {
+        if x > 5 {
+            x = 1;
+        }
+        else {
+            return 5
+        }
+    }
+    loop {
+        x+= 1;
+        break;
+    }
+    for z in y {
+        match z {
+            1 => continue,
+            _ => x = 2,
+        }
+    }
+    x
+}

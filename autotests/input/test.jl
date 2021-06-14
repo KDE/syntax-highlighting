@@ -71,3 +71,30 @@ chars = ['0', '1', '2', '3', 'a', 'b', 'c', 'd', 'e', 'X', 'Y', 'Z',
 
 @test docstrings_equal(@doc(ModuleMacroDoc), doc"I am a module")
 match(r"^\s*(?:#|$)", "# a comment")
+
+abstract type Test2 end
+
+function ∇abc∇def(a::Int,
+                 b:: Int,
+                 c::Dict{String, Int},
+                 d:: Dict{String, Vector{eltype(var1)}},
+                 f::AbstractVector{T <: Number},
+                 g::T,
+                 h::T) where {T <: Number}
+    x::String = 1
+    return x
+end
+
+mutable struct TestType <: AbstractVector{Number}
+    field1::Int
+    ∇field2::Vector
+end
+
+struct ParametricType{T, V <: Tuple}
+    field1
+    field2::Float
+
+    function ParametricType{T, V}(r, d) where {T, V <: Tuple}
+        return new{T, V}(r, d)
+    end
+end

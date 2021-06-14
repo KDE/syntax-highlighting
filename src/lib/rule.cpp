@@ -596,7 +596,9 @@ bool RegExpr::doLoad(QXmlStreamReader &reader)
     m_regexp.setPatternOptions((isMinimal ? QRegularExpression::InvertedGreedinessOption : QRegularExpression::NoPatternOption)
                                | (isCaseInsensitive ? QRegularExpression::CaseInsensitiveOption : QRegularExpression::NoPatternOption)
                                // DontCaptureOption is removed by resolvePostProcessing() when necessary
-                               | QRegularExpression::DontCaptureOption);
+                               | QRegularExpression::DontCaptureOption
+                               // ensure Unicode support is enabled
+                               | QRegularExpression::UseUnicodePropertiesOption);
 
     m_dynamic = Xml::attrToBool(reader.attributes().value(QLatin1String("dynamic")));
 

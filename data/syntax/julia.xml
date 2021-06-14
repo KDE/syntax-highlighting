@@ -31,6 +31,9 @@
 [
   <!ENTITY int "[0-9]([0-9_]*[0-9])?">
   <!ENTITY hex "[0-9a-fA-F]([0-9a-fA-F_]*[0-9a-fA-F])?">
+  <!ENTITY function_disallowed_chars "\s.,(){}\[\];:&#37;'&quot;&amp;$=/?\|^#@">
+  <!ENTITY function_disallowed_first_char "0-9!&function_disallowed_chars;">
+  <!ENTITY function_begin_boundary "(?:(?&lt;=[&function_disallowed_chars;!]|^)(?=[^&function_disallowed_first_char;]))">
 ]>
 
 <language name="Julia" section="Sources" version="12" kateversion="5.0" extensions="*.jl" casesensitive="1" priority="5" license="MIT">
@@ -498,8 +501,8 @@
         <StringDetect String="#END" context="region_marker" attribute="FoldingComment" endRegion="user_region" />
 
         <!-- functions have to be before built-in types to properly match constructors -->
-        <RegExpr context="#stay" attribute="Function" String="\b[^0-9.,(){}\s\[\];:%'&quot;&amp;$=/?\|^]\w*!?(?=\.?\()" />
-        <RegExpr context="parametric-constructor" attribute="Function" String="\b[^0-9.,(){}\s\[\];:%'&quot;&amp;$=/?\|^]\w*(?=\{.+\}.?\()" />
+        <RegExpr context="#stay" attribute="Function" String="&function_begin_boundary;[^&function_disallowed_first_char;][^&function_disallowed_chars;]*!?(?=\.?\()" />
+        <RegExpr context="parametric-constructor" attribute="Function" String="&function_begin_boundary;[^&function_disallowed_first_char;][^&function_disallowed_chars;]*(?=\{.+\}.?\()" />
 
         <!-- Keywords, types, and comments -->
         <RegExpr context="#stay" attribute="Keyword" String="\b(abstract|primitive)\s+type\b|\bmutable\s+struct\b" beginRegion="block"/>

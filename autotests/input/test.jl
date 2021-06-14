@@ -78,7 +78,7 @@ function ∇abc∇def(a::Int,
                  b:: Int,
                  c::Dict{String, Int},
                  d:: Dict{String, Vector{eltype(var1)}},
-                 f::AbstractVector{T <: Number},
+                 f::AbstractVector{<:Number},
                  g::T,
                  h::T) where {T <: Number}
     x::String = 1

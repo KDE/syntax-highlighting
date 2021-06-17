@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>test.swift</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (Swift) - Theme (Breeze Light)"/>
+</head><body style="background-color:#ffffff;color:#1f1c1b"><pre>
+<span style="color:#898887;">//</span>
+<span style="color:#898887;">//  Arguments.swift</span>
+<span style="color:#898887;">//  SwiftFormat</span>
+<span style="color:#898887;">//</span>
+<span style="color:#898887;">//  Created by Nick Lockwood on 07/08/2018.</span>
+<span style="color:#898887;">//  Copyright © 2018 Nick Lockwood.</span>
+<span style="color:#898887;">//</span>
+<span style="color:#898887;">//  Distributed under the permissive MIT license</span>
+<span style="color:#898887;">//  Get the latest version from here:</span>
+<span style="color:#898887;">//</span>
+<span style="color:#898887;">//  https://github.com/nicklockwood/SwiftFormat</span>
+<span style="color:#898887;">//</span>
+<span style="color:#898887;">//  Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span style="color:#898887;">//  of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span style="color:#898887;">//  in the Software without restriction, including without limitation the rights</span>
+<span style="color:#898887;">//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span style="color:#898887;">//  copies of the Software, and to permit persons to whom the Software is</span>
+<span style="color:#898887;">//  furnished to do so, subject to the following conditions:</span>
+<span style="color:#898887;">//</span>
+<span style="color:#898887;">//  The above copyright notice and this permission notice shall be included in all</span>
+<span style="color:#898887;">//  copies or substantial portions of the Software.</span>
+<span style="color:#898887;">//</span>
+<span style="color:#898887;">//  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span style="color:#898887;">//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span style="color:#898887;">//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span style="color:#898887;">//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span style="color:#898887;">//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span style="color:#898887;">//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span style="color:#898887;">//  SOFTWARE.</span>
+<span style="color:#898887;">//</span>
+
+<span style="font-weight:bold;">import</span> <span style="color:#ff5500;">Foundation</span>
+
+<span style="font-weight:bold;">extension</span> Options <span style="color:#ca60ca;">{</span>
+    <span style="font-weight:bold;">static</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">maxArgumentNameLength</span> <span style="color:#ca60ca;">=</span> <span style="color:#b08000;">16</span>
+
+    <span style="font-weight:bold;">init</span><span style="color:#ca60ca;">(</span>_ args<span style="color:#ca60ca;">:</span> <span style="color:#ca60ca;">[</span>String<span style="color:#ca60ca;">:</span> String<span style="color:#ca60ca;">],</span> <span style="font-weight:bold;">in</span> directory<span style="color:#ca60ca;">:</span> String<span style="color:#ca60ca;">)</span> <span style="font-weight:bold;">throws</span> <span style="color:#ca60ca;">{</span>
+        fileOptions <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">try</span> fileOptionsFor<span style="color:#ca60ca;">(</span>args<span style="color:#ca60ca;">,</span> <span style="font-weight:bold;">in</span><span style="color:#ca60ca;">:</span> directory<span style="color:#ca60ca;">)</span>
+        formatOptions <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">try</span> formatOptionsFor<span style="color:#ca60ca;">(</span>args<span style="color:#ca60ca;">)</span>
+        <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">lint</span> <span style="color:#ca60ca;">=</span> args<span style="color:#ca60ca;">.</span>keys<span style="color:#ca60ca;">.</span>contains<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;lint&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="font-weight:bold;">self</span><span style="color:#ca60ca;">.</span>lint <span style="color:#ca60ca;">=</span> lint
+        rules <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">try</span> rulesFor<span style="color:#ca60ca;">(</span>args<span style="color:#ca60ca;">,</span> lint<span style="color:#ca60ca;">:</span> lint<span style="color:#ca60ca;">)</span>
+    <span style="color:#ca60ca;">}</span>
+
+    <span style="font-weight:bold;">mutating</span> <span style="font-weight:bold;">func</span> <span style="color:#644a9b;">addArguments</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">_</span> <span style="color:#0057ae;">args</span><span style="color:#ca60ca;">:</span> [<span style="color:#0057ae;">String</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span>]<span style="color:#ca60ca;">,</span> <span style="color:#0057ae;">in</span> <span style="color:#0057ae;">directory</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span><span style="color:#ca60ca;">)</span> <span style="font-weight:bold;">throws</span> <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">oldArguments</span> <span style="color:#ca60ca;">=</span> argumentsFor<span style="color:#ca60ca;">(</span><span style="font-weight:bold;">self</span><span style="color:#ca60ca;">)</span>
+        <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">newArguments</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">try</span> mergeArguments<span style="color:#ca60ca;">(</span>args<span style="color:#ca60ca;">,</span> into<span style="color:#ca60ca;">:</span> oldArguments<span style="color:#ca60ca;">)</span>
+        <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">newOptions</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">try</span> Options<span style="color:#ca60ca;">(</span>newArguments<span style="color:#ca60ca;">,</span> <span style="font-weight:bold;">in</span><span style="color:#ca60ca;">:</span> directory<span style="color:#ca60ca;">)</span>
+        <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">fileInfo</span> <span style="color:#ca60ca;">=</span> formatOptions<span style="color:#ca60ca;">?.</span>fileInfo <span style="color:#ca60ca;">{</span>
+            newOptions<span style="color:#ca60ca;">.</span>formatOptions<span style="color:#ca60ca;">?.</span>fileInfo <span style="color:#ca60ca;">=</span> fileInfo
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">self</span> <span style="color:#ca60ca;">=</span> newOptions
+    <span style="color:#ca60ca;">}</span>
+<span style="color:#ca60ca;">}</span>
+
+<span style="color:#898887;">// Parse a space-delimited string into an array of command-line arguments</span>
+<span style="color:#898887;">// Replicates the behavior implemented by the console when parsing input</span>
+<span style="font-weight:bold;">func</span> <span style="color:#644a9b;">parseArguments</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">_</span> <span style="color:#0057ae;">argumentString</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span><span style="color:#ca60ca;">,</span> <span style="color:#0057ae;">ignoreComments</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">Bool</span> <span style="color:#ca60ca;">=</span> true<span style="color:#ca60ca;">)</span> -&gt; [<span style="color:#644a9b;">String</span>] <span style="color:#ca60ca;">{</span>
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">arguments</span> <span style="color:#ca60ca;">=</span> <span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#898887;">// Arguments always begin with script path</span>
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">characters</span> <span style="color:#ca60ca;">=</span> String<span style="color:#ca60ca;">.</span>UnicodeScalarView<span style="color:#ca60ca;">.</span>SubSequence<span style="color:#ca60ca;">(</span>argumentString<span style="color:#ca60ca;">.</span>unicodeScalars<span style="color:#ca60ca;">)</span>
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">string</span> <span style="color:#ca60ca;">=</span> <span style="color:#bf0303;">&quot;&quot;</span>
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">escaped</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">false</span>
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">quoted</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">false</span>
+    loop<span style="color:#ca60ca;">:</span> <span style="font-weight:bold;">while</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">char</span> <span style="color:#ca60ca;">=</span> characters<span style="color:#ca60ca;">.</span>popFirst<span style="color:#ca60ca;">()</span> <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">switch</span> char <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">case</span> <span style="color:#bf0303;">&quot;#&quot;</span> <span style="font-weight:bold;">where</span> <span style="color:#ca60ca;">!</span>ignoreComments <span style="color:#ca60ca;">&amp;&amp;</span> <span style="color:#ca60ca;">!</span>escaped <span style="color:#ca60ca;">&amp;&amp;</span> <span style="color:#ca60ca;">!</span>quoted<span style="color:#ca60ca;">:</span>
+            <span style="font-weight:bold;">break</span> loop <span style="color:#898887;">// comment</span>
+        <span style="font-weight:bold;">case</span> <span style="color:#bf0303;">&quot;</span><span style="color:#3daee9;">\\</span><span style="color:#bf0303;">&quot;</span> <span style="font-weight:bold;">where</span> <span style="color:#ca60ca;">!</span>escaped<span style="color:#ca60ca;">:</span>
+            escaped <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">true</span>
+        <span style="font-weight:bold;">case</span> <span style="color:#bf0303;">&quot;</span><span style="color:#3daee9;">\&quot;</span><span style="color:#bf0303;">&quot;</span> <span style="font-weight:bold;">where</span> <span style="color:#ca60ca;">!</span>escaped <span style="color:#ca60ca;">&amp;&amp;</span> <span style="color:#ca60ca;">!</span>quoted<span style="color:#ca60ca;">:</span>
+            quoted <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">true</span>
+        <span style="font-weight:bold;">case</span> <span style="color:#bf0303;">&quot;</span><span style="color:#3daee9;">\&quot;</span><span style="color:#bf0303;">&quot;</span> <span style="font-weight:bold;">where</span> <span style="color:#ca60ca;">!</span>escaped <span style="color:#ca60ca;">&amp;&amp;</span> quoted<span style="color:#ca60ca;">:</span>
+            quoted <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">false</span>
+            <span style="font-weight:bold;">fallthrough</span>
+        <span style="font-weight:bold;">case</span> <span style="color:#bf0303;">&quot; &quot;</span> <span style="font-weight:bold;">where</span> <span style="color:#ca60ca;">!</span>escaped <span style="color:#ca60ca;">&amp;&amp;</span> <span style="color:#ca60ca;">!</span>quoted<span style="color:#ca60ca;">:</span>
+            <span style="font-weight:bold;">if</span> <span style="color:#ca60ca;">!</span>string<span style="color:#ca60ca;">.</span>isEmpty <span style="color:#ca60ca;">{</span>
+                arguments<span style="color:#ca60ca;">.</span>append<span style="color:#ca60ca;">(</span>string<span style="color:#ca60ca;">)</span>
+            <span style="color:#ca60ca;">}</span>
+            string<span style="color:#ca60ca;">.</span>removeAll<span style="color:#ca60ca;">()</span>
+        <span style="font-weight:bold;">case</span> <span style="color:#bf0303;">&quot;</span><span style="color:#3daee9;">\&quot;</span><span style="color:#bf0303;">&quot;</span> <span style="font-weight:bold;">where</span> escaped<span style="color:#ca60ca;">:</span>
+            escaped <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">false</span>
+            string<span style="color:#ca60ca;">.</span>append<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;</span><span style="color:#3daee9;">\&quot;</span><span style="color:#bf0303;">&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="font-weight:bold;">case</span> _ <span style="font-weight:bold;">where</span> escaped <span style="color:#ca60ca;">&amp;&amp;</span> quoted<span style="color:#ca60ca;">:</span>
+            string<span style="color:#ca60ca;">.</span>append<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;</span><span style="color:#3daee9;">\\</span><span style="color:#bf0303;">&quot;</span><span style="color:#ca60ca;">)</span>
+            <span style="font-weight:bold;">fallthrough</span>
+        <span style="font-weight:bold;">default</span><span style="color:#ca60ca;">:</span>
+            escaped <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">false</span>
+            string<span style="color:#ca60ca;">.</span>append<span style="color:#ca60ca;">(</span>Character<span style="color:#ca60ca;">(</span>char<span style="color:#ca60ca;">))</span>
+        <span style="color:#ca60ca;">}</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">if</span> <span style="color:#ca60ca;">!</span>string<span style="color:#ca60ca;">.</span>isEmpty <span style="color:#ca60ca;">{</span>
+        arguments<span style="color:#ca60ca;">.</span>append<span style="color:#ca60ca;">(</span>string<span style="color:#ca60ca;">)</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">return</span> arguments
+<span style="color:#ca60ca;">}</span>
+
+<span style="color:#898887;">// Parse a flat array of command-line arguments into a dictionary of flags and values</span>
+<span style="font-weight:bold;">func</span> <span style="color:#644a9b;">preprocessArguments</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">_</span> <span style="color:#0057ae;">args</span><span style="color:#ca60ca;">:</span> [<span style="color:#0057ae;">String</span>]<span style="color:#ca60ca;">,</span> <span style="color:#0057ae;">_</span> <span style="color:#0057ae;">names</span><span style="color:#ca60ca;">:</span> [<span style="color:#0057ae;">String</span>]<span style="color:#ca60ca;">)</span> <span style="font-weight:bold;">throws</span> -&gt; [<span style="color:#644a9b;">String</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span>] <span style="color:#ca60ca;">{</span>
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">anonymousArgs</span> <span style="color:#ca60ca;">=</span> <span style="color:#b08000;">0</span>
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">namedArgs</span><span style="color:#ca60ca;">:</span> <span style="color:#ca60ca;">[</span>String<span style="color:#ca60ca;">:</span> String<span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> <span style="color:#ca60ca;">[:]</span>
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">name</span> <span style="color:#ca60ca;">=</span> <span style="color:#bf0303;">&quot;&quot;</span>
+    <span style="font-weight:bold;">for</span> arg <span style="font-weight:bold;">in</span> args <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">if</span> arg<span style="color:#ca60ca;">.</span>hasPrefix<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;--&quot;</span><span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+            <span style="color:#898887;">// Long argument names</span>
+            <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">key</span> <span style="color:#ca60ca;">=</span> String<span style="color:#ca60ca;">(</span>arg<span style="color:#ca60ca;">.</span>unicodeScalars<span style="color:#ca60ca;">.</span>dropFirst<span style="color:#ca60ca;">(</span><span style="color:#b08000;">2</span><span style="color:#ca60ca;">))</span>
+            <span style="font-weight:bold;">guard</span> names<span style="color:#ca60ca;">.</span>contains<span style="color:#ca60ca;">(</span>key<span style="color:#ca60ca;">)</span> <span style="font-weight:bold;">else</span> <span style="color:#ca60ca;">{</span>
+                <span style="font-weight:bold;">guard</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">match</span> <span style="color:#ca60ca;">=</span> bestMatches<span style="color:#ca60ca;">(</span><span style="font-weight:bold;">for</span><span style="color:#ca60ca;">:</span> key<span style="color:#ca60ca;">,</span> <span style="font-weight:bold;">in</span><span style="color:#ca60ca;">:</span> names<span style="color:#ca60ca;">).</span>first <span style="font-weight:bold;">else</span> <span style="color:#ca60ca;">{</span>
+                    <span style="font-weight:bold;">throw</span> FormatError<span style="color:#ca60ca;">.</span>options<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;Unknown option --</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">key)&quot;</span><span style="color:#ca60ca;">)</span>
+                <span style="color:#ca60ca;">}</span>
+                <span style="font-weight:bold;">throw</span> FormatError<span style="color:#ca60ca;">.</span>options<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;Unknown option --</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">key). Did you mean --</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">match)?&quot;</span><span style="color:#ca60ca;">)</span>
+            <span style="color:#ca60ca;">}</span>
+            name <span style="color:#ca60ca;">=</span> key
+            namedArgs<span style="color:#ca60ca;">[</span>name<span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> namedArgs<span style="color:#ca60ca;">[</span>name<span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">??</span> <span style="color:#bf0303;">&quot;&quot;</span>
+            <span style="font-weight:bold;">continue</span>
+        <span style="color:#ca60ca;">}</span> <span style="font-weight:bold;">else</span> <span style="font-weight:bold;">if</span> arg<span style="color:#ca60ca;">.</span>hasPrefix<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;-&quot;</span><span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+            <span style="color:#898887;">// Short argument names</span>
+            <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">flag</span> <span style="color:#ca60ca;">=</span> String<span style="color:#ca60ca;">(</span>arg<span style="color:#ca60ca;">.</span>unicodeScalars<span style="color:#ca60ca;">.</span>dropFirst<span style="color:#ca60ca;">())</span>
+            <span style="font-weight:bold;">guard</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">match</span> <span style="color:#ca60ca;">=</span> names<span style="color:#ca60ca;">.</span>first<span style="color:#ca60ca;">(</span><span style="font-weight:bold;">where</span><span style="color:#ca60ca;">:</span> <span style="color:#ca60ca;">{</span> $<span style="color:#b08000;">0.</span>hasPrefix<span style="color:#ca60ca;">(</span>flag<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">})</span> <span style="font-weight:bold;">else</span> <span style="color:#ca60ca;">{</span>
+                <span style="font-weight:bold;">throw</span> FormatError<span style="color:#ca60ca;">.</span>options<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;Unknown flag -</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">flag)&quot;</span><span style="color:#ca60ca;">)</span>
+            <span style="color:#ca60ca;">}</span>
+            name <span style="color:#ca60ca;">=</span> match
+            namedArgs<span style="color:#ca60ca;">[</span>name<span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> namedArgs<span style="color:#ca60ca;">[</span>name<span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">??</span> <span style="color:#bf0303;">&quot;&quot;</span>
+            <span style="font-weight:bold;">continue</span>
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">if</span> name <span style="color:#ca60ca;">==</span> <span style="color:#bf0303;">&quot;&quot;</span> <span style="color:#ca60ca;">{</span>
+            <span style="color:#898887;">// Argument is anonymous</span>
+            name <span style="color:#ca60ca;">=</span> String<span style="color:#ca60ca;">(</span>anonymousArgs<span style="color:#ca60ca;">)</span>
+            anonymousArgs <span style="color:#ca60ca;">+=</span> <span style="color:#b08000;">1</span>
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">arg</span> <span style="color:#ca60ca;">=</span> arg
+        <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">hasTrailingComma</span> <span style="color:#ca60ca;">=</span> arg<span style="color:#ca60ca;">.</span>hasSuffix<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;,&quot;</span><span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">&amp;&amp;</span> arg <span style="color:#ca60ca;">!=</span> <span style="color:#bf0303;">&quot;,&quot;</span>
+        <span style="font-weight:bold;">if</span> hasTrailingComma <span style="color:#ca60ca;">{</span>
+            arg <span style="color:#ca60ca;">=</span> String<span style="color:#ca60ca;">(</span>arg<span style="color:#ca60ca;">.</span>dropLast<span style="color:#ca60ca;">())</span>
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">existing</span> <span style="color:#ca60ca;">=</span> namedArgs<span style="color:#ca60ca;">[</span>name<span style="color:#ca60ca;">],</span> <span style="color:#ca60ca;">!</span>existing<span style="color:#ca60ca;">.</span>isEmpty<span style="color:#ca60ca;">,</span>
+           <span style="color:#898887;">// </span><span style="color:#ca9219;background-color:#451e1a;font-weight:bold;">TODO</span><span style="color:#898887;">: find a more general way to represent merge-able options</span>
+           <span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;exclude&quot;</span><span style="color:#ca60ca;">,</span> <span style="color:#bf0303;">&quot;unexclude&quot;</span><span style="color:#ca60ca;">,</span> <span style="color:#bf0303;">&quot;disable&quot;</span><span style="color:#ca60ca;">,</span> <span style="color:#bf0303;">&quot;enable&quot;</span><span style="color:#ca60ca;">,</span> <span style="color:#bf0303;">&quot;lintonly&quot;</span><span style="color:#ca60ca;">,</span> <span style="color:#bf0303;">&quot;rules&quot;</span><span style="color:#ca60ca;">].</span>contains<span style="color:#ca60ca;">(</span>name<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">||</span>
+           Descriptors<span style="color:#ca60ca;">.</span>all<span style="color:#ca60ca;">.</span>contains<span style="color:#ca60ca;">(</span><span style="font-weight:bold;">where</span><span style="color:#ca60ca;">:</span> <span style="color:#ca60ca;">{</span>
+               $<span style="color:#b08000;">0.</span>argumentName <span style="color:#ca60ca;">==</span> name <span style="color:#ca60ca;">&amp;&amp;</span> $<span style="color:#b08000;">0.</span>isSetType
+           <span style="color:#ca60ca;">})</span>
+        <span style="color:#ca60ca;">{</span>
+            namedArgs<span style="color:#ca60ca;">[</span>name<span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> existing <span style="color:#ca60ca;">+</span> <span style="color:#bf0303;">&quot;,&quot;</span> <span style="color:#ca60ca;">+</span> arg
+        <span style="color:#ca60ca;">}</span> <span style="font-weight:bold;">else</span> <span style="color:#ca60ca;">{</span>
+            namedArgs<span style="color:#ca60ca;">[</span>name<span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> arg
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">if</span> <span style="color:#ca60ca;">!</span>hasTrailingComma <span style="color:#ca60ca;">{</span>
+            name <span style="color:#ca60ca;">=</span> <span style="color:#bf0303;">&quot;&quot;</span>
+        <span style="color:#ca60ca;">}</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">return</span> namedArgs
+<span style="color:#ca60ca;">}</span>
+
+<span style="color:#898887;">// Find best match for a given string in a list of options</span>
+<span style="font-weight:bold;">func</span> <span style="color:#644a9b;">bestMatches</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">for</span> <span style="color:#0057ae;">query</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span><span style="color:#ca60ca;">,</span> <span style="color:#0057ae;">in</span> <span style="color:#0057ae;">options</span><span style="color:#ca60ca;">:</span> [<span style="color:#0057ae;">String</span>]<span style="color:#ca60ca;">)</span> -&gt; [<span style="color:#644a9b;">String</span>] <span style="color:#ca60ca;">{</span>
+    <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">lowercaseQuery</span> <span style="color:#ca60ca;">=</span> query<span style="color:#ca60ca;">.</span>lowercased<span style="color:#ca60ca;">()</span>
+    <span style="color:#898887;">// Sort matches by Levenshtein edit distance</span>
+    <span style="font-weight:bold;">return</span> options
+        <span style="color:#ca60ca;">.</span>compactMap <span style="color:#ca60ca;">{</span> option <span style="color:#ca60ca;">-&gt;</span> <span style="color:#ca60ca;">(</span>String<span style="color:#ca60ca;">,</span> distance<span style="color:#ca60ca;">:</span> Int<span style="color:#ca60ca;">,</span> commonPrefix<span style="color:#ca60ca;">:</span> Int<span style="color:#ca60ca;">)?</span> <span style="font-weight:bold;">in</span>
+            <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">lowercaseOption</span> <span style="color:#ca60ca;">=</span> option<span style="color:#ca60ca;">.</span>lowercased<span style="color:#ca60ca;">()</span>
+            <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">distance</span> <span style="color:#ca60ca;">=</span> editDistance<span style="color:#ca60ca;">(</span>lowercaseOption<span style="color:#ca60ca;">,</span> lowercaseQuery<span style="color:#ca60ca;">)</span>
+            <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">commonPrefix</span> <span style="color:#ca60ca;">=</span> lowercaseOption<span style="color:#ca60ca;">.</span>commonPrefix<span style="color:#ca60ca;">(</span>with<span style="color:#ca60ca;">:</span> lowercaseQuery<span style="color:#ca60ca;">)</span>
+            <span style="font-weight:bold;">if</span> commonPrefix<span style="color:#ca60ca;">.</span>isEmpty<span style="color:#ca60ca;">,</span> distance <span style="color:#ca60ca;">&gt;</span> lowercaseQuery<span style="color:#ca60ca;">.</span>count <span style="color:#ca60ca;">/</span> <span style="color:#b08000;">2</span> <span style="color:#ca60ca;">{</span>
+                <span style="font-weight:bold;">return</span> <span style="font-weight:bold;">nil</span>
+            <span style="color:#ca60ca;">}</span>
+            <span style="font-weight:bold;">return</span> <span style="color:#ca60ca;">(</span>option<span style="color:#ca60ca;">,</span> distance<span style="color:#ca60ca;">,</span> commonPrefix<span style="color:#ca60ca;">.</span>count<span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+        <span style="color:#ca60ca;">.</span>sorted <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">if</span> $<span style="color:#b08000;">0.</span>distance <span style="color:#ca60ca;">==</span> $<span style="color:#b08000;">1.</span>distance <span style="color:#ca60ca;">{</span>
+                <span style="font-weight:bold;">return</span> $<span style="color:#b08000;">0.</span>commonPrefix <span style="color:#ca60ca;">&gt;</span> $<span style="color:#b08000;">1.</span>commonPrefix
+            <span style="color:#ca60ca;">}</span>
+            <span style="font-weight:bold;">return</span> $<span style="color:#b08000;">0.</span>distance <span style="color:#ca60ca;">&lt;</span> $<span style="color:#b08000;">1.</span>distance
+        <span style="color:#ca60ca;">}</span>
+        <span style="color:#ca60ca;">.</span>map <span style="color:#ca60ca;">{</span> $<span style="color:#b08000;">0.0</span> <span style="color:#ca60ca;">}</span>
+<span style="color:#ca60ca;">}</span>
+
+<span style="color:#898887;">/// The Damerau-Levenshtein edit-distance between two strings</span>
+<span style="font-weight:bold;">func</span> <span style="color:#644a9b;">editDistance</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">_</span> <span style="color:#0057ae;">lhs</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span><span style="color:#ca60ca;">,</span> <span style="color:#0057ae;">_</span> <span style="color:#0057ae;">rhs</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span><span style="color:#ca60ca;">)</span> -&gt; <span style="color:#644a9b;">Int</span> <span style="color:#ca60ca;">{</span>
+    <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">lhs</span> <span style="color:#ca60ca;">=</span> Array<span style="color:#ca60ca;">(</span>lhs<span style="color:#ca60ca;">)</span>
+    <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">rhs</span> <span style="color:#ca60ca;">=</span> Array<span style="color:#ca60ca;">(</span>rhs<span style="color:#ca60ca;">)</span>
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">dist</span> <span style="color:#ca60ca;">=</span> <span style="color:#ca60ca;">[[</span>Int<span style="color:#ca60ca;">]]()</span>
+    <span style="font-weight:bold;">for</span> i <span style="font-weight:bold;">in</span> <span style="color:#b08000;">0</span> <span style="color:#ca60ca;">...</span> lhs<span style="color:#ca60ca;">.</span>count <span style="color:#ca60ca;">{</span>
+        dist<span style="color:#ca60ca;">.</span>append<span style="color:#ca60ca;">([</span>i<span style="color:#ca60ca;">])</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">for</span> j <span style="font-weight:bold;">in</span> <span style="color:#b08000;">1</span> <span style="color:#ca60ca;">...</span> rhs<span style="color:#ca60ca;">.</span>count <span style="color:#ca60ca;">{</span>
+        dist<span style="color:#ca60ca;">[</span><span style="color:#b08000;">0</span><span style="color:#ca60ca;">].</span>append<span style="color:#ca60ca;">(</span>j<span style="color:#ca60ca;">)</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">for</span> i <span style="font-weight:bold;">in</span> <span style="color:#b08000;">1</span> <span style="color:#ca60ca;">...</span> lhs<span style="color:#ca60ca;">.</span>count <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">for</span> j <span style="font-weight:bold;">in</span> <span style="color:#b08000;">1</span> <span style="color:#ca60ca;">...</span> rhs<span style="color:#ca60ca;">.</span>count <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">if</span> lhs<span style="color:#ca60ca;">[</span>i <span style="color:#ca60ca;">-</span> <span style="color:#b08000;">1</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">==</span> rhs<span style="color:#ca60ca;">[</span>j <span style="color:#ca60ca;">-</span> <span style="color:#b08000;">1</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">{</span>
+                dist<span style="color:#ca60ca;">[</span>i<span style="color:#ca60ca;">].</span>append<span style="color:#ca60ca;">(</span>dist<span style="color:#ca60ca;">[</span>i <span style="color:#ca60ca;">-</span> <span style="color:#b08000;">1</span><span style="color:#ca60ca;">][</span>j <span style="color:#ca60ca;">-</span> <span style="color:#b08000;">1</span><span style="color:#ca60ca;">])</span>
+            <span style="color:#ca60ca;">}</span> <span style="font-weight:bold;">else</span> <span style="color:#ca60ca;">{</span>
+                dist<span style="color:#ca60ca;">[</span>i<span style="color:#ca60ca;">].</span>append<span style="color:#ca60ca;">(</span>min<span style="color:#ca60ca;">(</span>dist<span style="color:#ca60ca;">[</span>i <span style="color:#ca60ca;">-</span> <span style="color:#b08000;">1</span><span style="color:#ca60ca;">][</span>j<span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">+</span> <span style="color:#b08000;">1</span><span style="color:#ca60ca;">,</span>
+                                   dist<span style="color:#ca60ca;">[</span>i<span style="color:#ca60ca;">][</span>j <span style="color:#ca60ca;">-</span> <span style="color:#b08000;">1</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">+</span> <span style="color:#b08000;">1</span><span style="color:#ca60ca;">,</span>
+                                   dist<span style="color:#ca60ca;">[</span>i <span style="color:#ca60ca;">-</span> <span style="color:#b08000;">1</span><span style="color:#ca60ca;">][</span>j <span style="color:#ca60ca;">-</span> <span style="color:#b08000;">1</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">+</span> <span style="color:#b08000;">1</span><span style="color:#ca60ca;">))</span>
+            <span style="color:#ca60ca;">}</span>
+            <span style="font-weight:bold;">if</span> i <span style="color:#ca60ca;">&gt;</span> <span style="color:#b08000;">1</span><span style="color:#ca60ca;">,</span> j <span style="color:#ca60ca;">&gt;</span> <span style="color:#b08000;">1</span><span style="color:#ca60ca;">,</span> lhs<span style="color:#ca60ca;">[</span>i <span style="color:#ca60ca;">-</span> <span style="color:#b08000;">1</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">==</span> rhs<span style="color:#ca60ca;">[</span>j <span style="color:#ca60ca;">-</span> <span style="color:#b08000;">2</span><span style="color:#ca60ca;">],</span> lhs<span style="color:#ca60ca;">[</span>i <span style="color:#ca60ca;">-</span> <span style="color:#b08000;">2</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">==</span> rhs<span style="color:#ca60ca;">[</span>j <span style="color:#ca60ca;">-</span> <span style="color:#b08000;">1</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">{</span>
+                dist<span style="color:#ca60ca;">[</span>i<span style="color:#ca60ca;">][</span>j<span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> min<span style="color:#ca60ca;">(</span>dist<span style="color:#ca60ca;">[</span>i<span style="color:#ca60ca;">][</span>j<span style="color:#ca60ca;">],</span> dist<span style="color:#ca60ca;">[</span>i <span style="color:#ca60ca;">-</span> <span style="color:#b08000;">2</span><span style="color:#ca60ca;">][</span>j <span style="color:#ca60ca;">-</span> <span style="color:#b08000;">2</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">+</span> <span style="color:#b08000;">1</span><span style="color:#ca60ca;">)</span>
+            <span style="color:#ca60ca;">}</span>
+        <span style="color:#ca60ca;">}</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">return</span> dist<span style="color:#ca60ca;">[</span>lhs<span style="color:#ca60ca;">.</span>count<span style="color:#ca60ca;">][</span>rhs<span style="color:#ca60ca;">.</span>count<span style="color:#ca60ca;">]</span>
+<span style="color:#ca60ca;">}</span>
+
+<span style="color:#898887;">// Parse a comma-delimited list of items</span>
+<span style="font-weight:bold;">func</span> <span style="color:#644a9b;">parseCommaDelimitedList</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">_</span> <span style="color:#0057ae;">string</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span><span style="color:#ca60ca;">)</span> -&gt; [<span style="color:#644a9b;">String</span>] <span style="color:#ca60ca;">{</span>
+    <span style="font-weight:bold;">return</span> string<span style="color:#ca60ca;">.</span>components<span style="color:#ca60ca;">(</span>separatedBy<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;,&quot;</span><span style="color:#ca60ca;">).</span>compactMap <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">item</span> <span style="color:#ca60ca;">=</span> $<span style="color:#b08000;">0.</span>trimmingCharacters<span style="color:#ca60ca;">(</span><span style="font-weight:bold;">in</span><span style="color:#ca60ca;">:</span> <span style="color:#ca60ca;">.</span>whitespacesAndNewlines<span style="color:#ca60ca;">)</span>
+        <span style="font-weight:bold;">return</span> item<span style="color:#ca60ca;">.</span>isEmpty <span style="color:#ca60ca;">?</span> <span style="font-weight:bold;">nil</span> <span style="color:#ca60ca;">:</span> item
+    <span style="color:#ca60ca;">}</span>
+<span style="color:#ca60ca;">}</span>
+
+<span style="color:#898887;">// Parse a comma-delimited string into an array of rules</span>
+<span style="font-weight:bold;">let</span> <span style="color:#0057ae;">allRules</span> <span style="color:#ca60ca;">=</span> Set<span style="color:#ca60ca;">(</span>FormatRules<span style="color:#ca60ca;">.</span>byName<span style="color:#ca60ca;">.</span>keys<span style="color:#ca60ca;">)</span>
+<span style="font-weight:bold;">func</span> <span style="color:#644a9b;">parseRules</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">_</span> <span style="color:#0057ae;">rules</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span><span style="color:#ca60ca;">)</span> <span style="font-weight:bold;">throws</span> -&gt; [<span style="color:#644a9b;">String</span>] <span style="color:#ca60ca;">{</span>
+    <span style="font-weight:bold;">return</span> <span style="font-weight:bold;">try</span> parseCommaDelimitedList<span style="color:#ca60ca;">(</span>rules<span style="color:#ca60ca;">).</span>map <span style="color:#ca60ca;">{</span> proposedName <span style="font-weight:bold;">in</span>
+        <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">name</span> <span style="color:#ca60ca;">=</span> allRules<span style="color:#ca60ca;">.</span>first<span style="color:#ca60ca;">(</span><span style="font-weight:bold;">where</span><span style="color:#ca60ca;">:</span> <span style="color:#ca60ca;">{</span>
+            $<span style="color:#b08000;">0.</span>lowercased<span style="color:#ca60ca;">()</span> <span style="color:#ca60ca;">==</span> proposedName<span style="color:#ca60ca;">.</span>lowercased<span style="color:#ca60ca;">()</span>
+        <span style="color:#ca60ca;">})</span> <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">return</span> name
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">if</span> Descriptors<span style="color:#ca60ca;">.</span>all<span style="color:#ca60ca;">.</span>contains<span style="color:#ca60ca;">(</span><span style="font-weight:bold;">where</span><span style="color:#ca60ca;">:</span> <span style="color:#ca60ca;">{</span>
+            $<span style="color:#b08000;">0.</span>argumentName <span style="color:#ca60ca;">==</span> proposedName
+        <span style="color:#ca60ca;">})</span> <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">for</span> rule <span style="font-weight:bold;">in</span> FormatRules<span style="color:#ca60ca;">.</span>all <span style="font-weight:bold;">where</span> rule<span style="color:#ca60ca;">.</span>options<span style="color:#ca60ca;">.</span>contains<span style="color:#ca60ca;">(</span>proposedName<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+                <span style="font-weight:bold;">throw</span> FormatError<span style="color:#ca60ca;">.</span>options<span style="color:#ca60ca;">(</span>
+                    <span style="color:#bf0303;">&quot;'</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">proposedName)' is not a formatting rule. Did you mean '</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">rule.name)'?&quot;</span>
+                <span style="color:#ca60ca;">)</span>
+            <span style="color:#ca60ca;">}</span>
+            <span style="font-weight:bold;">throw</span> FormatError<span style="color:#ca60ca;">.</span>options<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;'</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">proposedName)' is not a formatting rule&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">guard</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">match</span> <span style="color:#ca60ca;">=</span> bestMatches<span style="color:#ca60ca;">(</span><span style="font-weight:bold;">for</span><span style="color:#ca60ca;">:</span> proposedName<span style="color:#ca60ca;">,</span> <span style="font-weight:bold;">in</span><span style="color:#ca60ca;">:</span> Array<span style="color:#ca60ca;">(</span>allRules<span style="color:#ca60ca;">)).</span>first <span style="font-weight:bold;">else</span> <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">throw</span> FormatError<span style="color:#ca60ca;">.</span>options<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;Unknown rule '</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">proposedName)'&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">throw</span> FormatError<span style="color:#ca60ca;">.</span>options<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;Unknown rule '</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">proposedName)'. Did you mean '</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">match)'?&quot;</span><span style="color:#ca60ca;">)</span>
+    <span style="color:#ca60ca;">}</span>
+<span style="color:#ca60ca;">}</span>
+
+<span style="color:#898887;">// Parse single file path, disallowing globs or commas</span>
+<span style="font-weight:bold;">func</span> <span style="color:#644a9b;">parsePath</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">_</span> <span style="color:#0057ae;">path</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span><span style="color:#ca60ca;">,</span> <span style="color:#0057ae;">for</span> <span style="color:#0057ae;">argument</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span><span style="color:#ca60ca;">,</span> <span style="color:#0057ae;">in</span> <span style="color:#0057ae;">directory</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span><span style="color:#ca60ca;">)</span> <span style="font-weight:bold;">throws</span> -&gt; <span style="color:#644a9b;">URL</span> <span style="color:#ca60ca;">{</span>
+    <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">expandedPath</span> <span style="color:#ca60ca;">=</span> expandPath<span style="color:#ca60ca;">(</span>path<span style="color:#ca60ca;">,</span> <span style="font-weight:bold;">in</span><span style="color:#ca60ca;">:</span> directory<span style="color:#ca60ca;">)</span>
+    <span style="font-weight:bold;">if</span> <span style="color:#ca60ca;">!</span>FileManager<span style="color:#ca60ca;">.</span><span style="font-weight:bold;">default</span><span style="color:#ca60ca;">.</span>fileExists<span style="color:#ca60ca;">(</span>atPath<span style="color:#ca60ca;">:</span> expandedPath<span style="color:#ca60ca;">.</span>path<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">if</span> path<span style="color:#ca60ca;">.</span>contains<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;,&quot;</span><span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">throw</span> FormatError<span style="color:#ca60ca;">.</span>options<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">argument) argument does not support multiple paths&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">if</span> pathContainsGlobSyntax<span style="color:#ca60ca;">(</span>path<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">throw</span> FormatError<span style="color:#ca60ca;">.</span>options<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">argument) path cannot contain wildcards&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">return</span> expandedPath
+<span style="color:#ca60ca;">}</span>
+
+<span style="color:#898887;">// Parse one or more comma-delimited file paths, expanding globs as required</span>
+<span style="font-weight:bold;">func</span> <span style="color:#644a9b;">parsePaths</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">_</span> <span style="color:#0057ae;">paths</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span><span style="color:#ca60ca;">,</span> <span style="color:#0057ae;">in</span> <span style="color:#0057ae;">directory</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span><span style="color:#ca60ca;">)</span> <span style="font-weight:bold;">throws</span> -&gt; [<span style="color:#644a9b;">URL</span>] <span style="color:#ca60ca;">{</span>
+    <span style="font-weight:bold;">return</span> <span style="font-weight:bold;">try</span> matchGlobs<span style="color:#ca60ca;">(</span>expandGlobs<span style="color:#ca60ca;">(</span>paths<span style="color:#ca60ca;">,</span> <span style="font-weight:bold;">in</span><span style="color:#ca60ca;">:</span> directory<span style="color:#ca60ca;">),</span> <span style="font-weight:bold;">in</span><span style="color:#ca60ca;">:</span> directory<span style="color:#ca60ca;">)</span>
+<span style="color:#ca60ca;">}</span>
+
+<span style="color:#898887;">// Merge two dictionaries of arguments</span>
+<span style="font-weight:bold;">func</span> <span style="color:#644a9b;">mergeArguments</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">_</span> <span style="color:#0057ae;">args</span><span style="color:#ca60ca;">:</span> [<span style="color:#0057ae;">String</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span>]<span style="color:#ca60ca;">,</span> <span style="color:#0057ae;">into</span> <span style="color:#0057ae;">config</span><span style="color:#ca60ca;">:</span> [<span style="color:#0057ae;">String</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span>]<span style="color:#ca60ca;">)</span> <span style="font-weight:bold;">throws</span> -&gt; [<span style="color:#644a9b;">String</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span>] <span style="color:#ca60ca;">{</span>
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">input</span> <span style="color:#ca60ca;">=</span> config
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">output</span> <span style="color:#ca60ca;">=</span> args
+    <span style="color:#898887;">// Merge excluded urls</span>
+    <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">exclude</span> <span style="color:#ca60ca;">=</span> output<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;exclude&quot;</span><span style="color:#ca60ca;">].</span>map<span style="color:#ca60ca;">(</span>parseCommaDelimitedList<span style="color:#ca60ca;">),</span>
+       <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">excluded</span> <span style="color:#ca60ca;">=</span> input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;exclude&quot;</span><span style="color:#ca60ca;">].</span>map<span style="color:#ca60ca;">({</span> Set<span style="color:#ca60ca;">(</span>parseCommaDelimitedList<span style="color:#ca60ca;">(</span>$<span style="color:#b08000;">0</span><span style="color:#ca60ca;">))</span> <span style="color:#ca60ca;">})</span>
+    <span style="color:#ca60ca;">{</span>
+        excluded<span style="color:#ca60ca;">.</span>formUnion<span style="color:#ca60ca;">(</span>exclude<span style="color:#ca60ca;">)</span>
+        output<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;exclude&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> Array<span style="color:#ca60ca;">(</span>excluded<span style="color:#ca60ca;">).</span>sorted<span style="color:#ca60ca;">().</span>joined<span style="color:#ca60ca;">(</span>separator<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;,&quot;</span><span style="color:#ca60ca;">)</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="color:#898887;">// Merge unexcluded urls</span>
+    <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">unexclude</span> <span style="color:#ca60ca;">=</span> output<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;unexclude&quot;</span><span style="color:#ca60ca;">].</span>map<span style="color:#ca60ca;">(</span>parseCommaDelimitedList<span style="color:#ca60ca;">),</span>
+       <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">unexcluded</span> <span style="color:#ca60ca;">=</span> input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;unexclude&quot;</span><span style="color:#ca60ca;">].</span>map<span style="color:#ca60ca;">({</span> Set<span style="color:#ca60ca;">(</span>parseCommaDelimitedList<span style="color:#ca60ca;">(</span>$<span style="color:#b08000;">0</span><span style="color:#ca60ca;">))</span> <span style="color:#ca60ca;">})</span>
+    <span style="color:#ca60ca;">{</span>
+        unexcluded<span style="color:#ca60ca;">.</span>formUnion<span style="color:#ca60ca;">(</span>unexclude<span style="color:#ca60ca;">)</span>
+        output<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;unexclude&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> Array<span style="color:#ca60ca;">(</span>unexcluded<span style="color:#ca60ca;">).</span>sorted<span style="color:#ca60ca;">().</span>joined<span style="color:#ca60ca;">(</span>separator<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;,&quot;</span><span style="color:#ca60ca;">)</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="color:#898887;">// Merge rules</span>
+    <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">rules</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">try</span> output<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;rules&quot;</span><span style="color:#ca60ca;">].</span>map<span style="color:#ca60ca;">(</span>parseRules<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">if</span> rules<span style="color:#ca60ca;">.</span>isEmpty <span style="color:#ca60ca;">{</span>
+            output<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;rules&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">nil</span>
+        <span style="color:#ca60ca;">}</span> <span style="font-weight:bold;">else</span> <span style="color:#ca60ca;">{</span>
+            input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;rules&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">nil</span>
+            input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;enable&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">nil</span>
+            input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;disable&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">nil</span>
+            input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;lintonly&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">nil</span>
+        <span style="color:#ca60ca;">}</span>
+    <span style="color:#ca60ca;">}</span> <span style="font-weight:bold;">else</span> <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">_disable</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">try</span> output<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;disable&quot;</span><span style="color:#ca60ca;">].</span>map<span style="color:#ca60ca;">(</span>parseRules<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">rules</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">try</span> input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;rules&quot;</span><span style="color:#ca60ca;">].</span>map<span style="color:#ca60ca;">(</span>parseRules<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+                input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;rules&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> Set<span style="color:#ca60ca;">(</span>rules<span style="color:#ca60ca;">).</span>subtracting<span style="color:#ca60ca;">(</span>_disable<span style="color:#ca60ca;">).</span>sorted<span style="color:#ca60ca;">().</span>joined<span style="color:#ca60ca;">(</span>separator<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;,&quot;</span><span style="color:#ca60ca;">)</span>
+            <span style="color:#ca60ca;">}</span>
+            <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">enable</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">try</span> input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;enable&quot;</span><span style="color:#ca60ca;">].</span>map<span style="color:#ca60ca;">(</span>parseRules<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+                input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;enable&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> Set<span style="color:#ca60ca;">(</span>enable<span style="color:#ca60ca;">).</span>subtracting<span style="color:#ca60ca;">(</span>_disable<span style="color:#ca60ca;">).</span>sorted<span style="color:#ca60ca;">().</span>joined<span style="color:#ca60ca;">(</span>separator<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;,&quot;</span><span style="color:#ca60ca;">)</span>
+            <span style="color:#ca60ca;">}</span>
+            <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">lintonly</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">try</span> input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;lintonly&quot;</span><span style="color:#ca60ca;">].</span>map<span style="color:#ca60ca;">(</span>parseRules<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+                input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;lintonly&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> Set<span style="color:#ca60ca;">(</span>lintonly<span style="color:#ca60ca;">).</span>subtracting<span style="color:#ca60ca;">(</span>_disable<span style="color:#ca60ca;">).</span>sorted<span style="color:#ca60ca;">().</span>joined<span style="color:#ca60ca;">(</span>separator<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;,&quot;</span><span style="color:#ca60ca;">)</span>
+            <span style="color:#ca60ca;">}</span>
+            <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">disable</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">try</span> input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;disable&quot;</span><span style="color:#ca60ca;">].</span>map<span style="color:#ca60ca;">(</span>parseRules<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+                input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;disable&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> Set<span style="color:#ca60ca;">(</span>disable<span style="color:#ca60ca;">).</span>union<span style="color:#ca60ca;">(</span>_disable<span style="color:#ca60ca;">).</span>sorted<span style="color:#ca60ca;">().</span>joined<span style="color:#ca60ca;">(</span>separator<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;,&quot;</span><span style="color:#ca60ca;">)</span>
+                output<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;disable&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">nil</span>
+            <span style="color:#ca60ca;">}</span>
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">_enable</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">try</span> output<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;enable&quot;</span><span style="color:#ca60ca;">].</span>map<span style="color:#ca60ca;">(</span>parseRules<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">enable</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">try</span> input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;enable&quot;</span><span style="color:#ca60ca;">].</span>map<span style="color:#ca60ca;">(</span>parseRules<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+                input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;enable&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> Set<span style="color:#ca60ca;">(</span>enable<span style="color:#ca60ca;">).</span>union<span style="color:#ca60ca;">(</span>_enable<span style="color:#ca60ca;">).</span>sorted<span style="color:#ca60ca;">().</span>joined<span style="color:#ca60ca;">(</span>separator<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;,&quot;</span><span style="color:#ca60ca;">)</span>
+                output<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;enable&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">nil</span>
+            <span style="color:#ca60ca;">}</span>
+            <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">lintonly</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">try</span> input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;lintonly&quot;</span><span style="color:#ca60ca;">].</span>map<span style="color:#ca60ca;">(</span>parseRules<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+                input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;lintonly&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> Set<span style="color:#ca60ca;">(</span>lintonly<span style="color:#ca60ca;">).</span>subtracting<span style="color:#ca60ca;">(</span>_enable<span style="color:#ca60ca;">).</span>sorted<span style="color:#ca60ca;">().</span>joined<span style="color:#ca60ca;">(</span>separator<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;,&quot;</span><span style="color:#ca60ca;">)</span>
+            <span style="color:#ca60ca;">}</span>
+            <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">disable</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">try</span> input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;disable&quot;</span><span style="color:#ca60ca;">].</span>map<span style="color:#ca60ca;">(</span>parseRules<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+                input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;disable&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> Set<span style="color:#ca60ca;">(</span>disable<span style="color:#ca60ca;">).</span>subtracting<span style="color:#ca60ca;">(</span>_enable<span style="color:#ca60ca;">).</span>sorted<span style="color:#ca60ca;">().</span>joined<span style="color:#ca60ca;">(</span>separator<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;,&quot;</span><span style="color:#ca60ca;">)</span>
+            <span style="color:#ca60ca;">}</span>
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">_lintonly</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">try</span> output<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;lintonly&quot;</span><span style="color:#ca60ca;">].</span>map<span style="color:#ca60ca;">(</span>parseRules<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">lintonly</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">try</span> input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;lintonly&quot;</span><span style="color:#ca60ca;">].</span>map<span style="color:#ca60ca;">(</span>parseRules<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+                input<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;lintonly&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> Set<span style="color:#ca60ca;">(</span>lintonly<span style="color:#ca60ca;">).</span>union<span style="color:#ca60ca;">(</span>_lintonly<span style="color:#ca60ca;">).</span>sorted<span style="color:#ca60ca;">().</span>joined<span style="color:#ca60ca;">(</span>separator<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;,&quot;</span><span style="color:#ca60ca;">)</span>
+                output<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;lintonly&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">nil</span>
+            <span style="color:#ca60ca;">}</span>
+        <span style="color:#ca60ca;">}</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="color:#898887;">// Merge other arguments</span>
+    <span style="font-weight:bold;">for</span> <span style="color:#ca60ca;">(</span>key<span style="color:#ca60ca;">,</span> inValue<span style="color:#ca60ca;">)</span> <span style="font-weight:bold;">in</span> input <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">guard</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">outValue</span> <span style="color:#ca60ca;">=</span> output<span style="color:#ca60ca;">[</span>key<span style="color:#ca60ca;">]</span> <span style="font-weight:bold;">else</span> <span style="color:#ca60ca;">{</span>
+            output<span style="color:#ca60ca;">[</span>key<span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> inValue
+            <span style="font-weight:bold;">continue</span>
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">if</span> Descriptors<span style="color:#ca60ca;">.</span>all<span style="color:#ca60ca;">.</span>contains<span style="color:#ca60ca;">(</span><span style="font-weight:bold;">where</span><span style="color:#ca60ca;">:</span> <span style="color:#ca60ca;">{</span> $<span style="color:#b08000;">0.</span>argumentName <span style="color:#ca60ca;">==</span> key <span style="color:#ca60ca;">&amp;&amp;</span> $<span style="color:#b08000;">0.</span>isSetType <span style="color:#ca60ca;">})</span> <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">inOptions</span> <span style="color:#ca60ca;">=</span> parseCommaDelimitedList<span style="color:#ca60ca;">(</span>inValue<span style="color:#ca60ca;">)</span>
+            <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">outOptions</span> <span style="color:#ca60ca;">=</span> parseCommaDelimitedList<span style="color:#ca60ca;">(</span>outValue<span style="color:#ca60ca;">)</span>
+            output<span style="color:#ca60ca;">[</span>key<span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> Set<span style="color:#ca60ca;">(</span>inOptions<span style="color:#ca60ca;">).</span>union<span style="color:#ca60ca;">(</span>outOptions<span style="color:#ca60ca;">).</span>sorted<span style="color:#ca60ca;">().</span>joined<span style="color:#ca60ca;">(</span>separator<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;,&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">return</span> output
+<span style="color:#ca60ca;">}</span>
+
+<span style="color:#898887;">// Parse a configuration file into a dictionary of arguments</span>
+<span style="font-weight:bold;">public</span> <span style="font-weight:bold;">func</span> <span style="color:#644a9b;">parseConfigFile</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">_</span> <span style="color:#0057ae;">data</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">Data</span><span style="color:#ca60ca;">)</span> <span style="font-weight:bold;">throws</span> -&gt; [<span style="color:#644a9b;">String</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span>] <span style="color:#ca60ca;">{</span>
+    <span style="font-weight:bold;">guard</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">input</span> <span style="color:#ca60ca;">=</span> String<span style="color:#ca60ca;">(</span>data<span style="color:#ca60ca;">:</span> data<span style="color:#ca60ca;">,</span> encoding<span style="color:#ca60ca;">:</span> <span style="color:#ca60ca;">.</span>utf8<span style="color:#ca60ca;">)</span> <span style="font-weight:bold;">else</span> <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">throw</span> FormatError<span style="color:#ca60ca;">.</span>reading<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;Unable to read data for configuration file&quot;</span><span style="color:#ca60ca;">)</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">lines</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">try</span> cumulate<span style="color:#ca60ca;">(</span>successiveLines<span style="color:#ca60ca;">:</span> input<span style="color:#ca60ca;">.</span>components<span style="color:#ca60ca;">(</span>separatedBy<span style="color:#ca60ca;">:</span> <span style="color:#ca60ca;">.</span>newlines<span style="color:#ca60ca;">))</span>
+    <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">arguments</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">try</span> lines<span style="color:#ca60ca;">.</span>flatMap <span style="color:#ca60ca;">{</span> line <span style="color:#ca60ca;">-&gt;</span> <span style="color:#ca60ca;">[</span>String<span style="color:#ca60ca;">]</span> <span style="font-weight:bold;">in</span>
+        <span style="color:#898887;">// </span><span style="color:#ca9219;background-color:#451e1a;font-weight:bold;">TODO</span><span style="color:#898887;">: parseArguments isn't a perfect fit here - should we use a different approach?</span>
+        <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">line</span> <span style="color:#ca60ca;">=</span> line<span style="color:#ca60ca;">.</span>replacingOccurrences<span style="color:#ca60ca;">(</span>of<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;</span><span style="color:#3daee9;">\\</span><span style="color:#bf0303;">n&quot;</span><span style="color:#ca60ca;">,</span> with<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;</span><span style="color:#3daee9;">\n</span><span style="color:#bf0303;">&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">parts</span> <span style="color:#ca60ca;">=</span> parseArguments<span style="color:#ca60ca;">(</span>line<span style="color:#ca60ca;">,</span> ignoreComments<span style="color:#ca60ca;">:</span> <span style="font-weight:bold;">false</span><span style="color:#ca60ca;">).</span>dropFirst<span style="color:#ca60ca;">().</span>map <span style="color:#ca60ca;">{</span>
+            $<span style="color:#b08000;">0.</span>replacingOccurrences<span style="color:#ca60ca;">(</span>of<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;</span><span style="color:#3daee9;">\n</span><span style="color:#bf0303;">&quot;</span><span style="color:#ca60ca;">,</span> with<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;</span><span style="color:#3daee9;">\\</span><span style="color:#bf0303;">n&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">guard</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">key</span> <span style="color:#ca60ca;">=</span> parts<span style="color:#ca60ca;">.</span>first <span style="font-weight:bold;">else</span> <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">return</span> <span style="color:#ca60ca;">[]</span>
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">if</span> <span style="color:#ca60ca;">!</span>key<span style="color:#ca60ca;">.</span>hasPrefix<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;-&quot;</span><span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">throw</span> FormatError<span style="color:#ca60ca;">.</span>options<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;Unknown option '</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">key)' in configuration file&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">return</span> <span style="color:#ca60ca;">[</span>key<span style="color:#ca60ca;">,</span> parts<span style="color:#ca60ca;">.</span>dropFirst<span style="color:#ca60ca;">().</span>joined<span style="color:#ca60ca;">(</span>separator<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot; &quot;</span><span style="color:#ca60ca;">)]</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">do</span> <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">return</span> <span style="font-weight:bold;">try</span> preprocessArguments<span style="color:#ca60ca;">(</span>arguments<span style="color:#ca60ca;">,</span> optionsArguments<span style="color:#ca60ca;">)</span>
+    <span style="color:#ca60ca;">}</span> <span style="font-weight:bold;">catch</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">FormatError</span><span style="color:#ca60ca;">.</span>options<span style="color:#ca60ca;">(</span>message<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">throw</span> FormatError<span style="color:#ca60ca;">.</span>options<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">message) in configuration file&quot;</span><span style="color:#ca60ca;">)</span>
+    <span style="color:#ca60ca;">}</span>
+<span style="color:#ca60ca;">}</span>
+
+<span style="font-weight:bold;">private</span> <span style="font-weight:bold;">func</span> <span style="color:#644a9b;">cumulate</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">successiveLines</span><span style="color:#ca60ca;">:</span> [<span style="color:#0057ae;">String</span>]<span style="color:#ca60ca;">)</span> <span style="font-weight:bold;">throws</span> -&gt; [<span style="color:#644a9b;">String</span>] <span style="color:#ca60ca;">{</span>
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">cumulatedLines</span> <span style="color:#ca60ca;">=</span> <span style="color:#ca60ca;">[</span>String<span style="color:#ca60ca;">]()</span>
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">iterator</span> <span style="color:#ca60ca;">=</span> successiveLines<span style="color:#ca60ca;">.</span>makeIterator<span style="color:#ca60ca;">()</span>
+    <span style="font-weight:bold;">while</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">currentLine</span> <span style="color:#ca60ca;">=</span> iterator<span style="color:#ca60ca;">.</span>next<span style="color:#ca60ca;">()</span> <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">cumulatedLine</span> <span style="color:#ca60ca;">=</span> effectiveContent<span style="color:#ca60ca;">(</span>of<span style="color:#ca60ca;">:</span> currentLine<span style="color:#ca60ca;">)</span>
+        <span style="font-weight:bold;">while</span> cumulatedLine<span style="color:#ca60ca;">.</span>hasSuffix<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;</span><span style="color:#3daee9;">\\</span><span style="color:#bf0303;">&quot;</span><span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">guard</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">nextLine</span> <span style="color:#ca60ca;">=</span> iterator<span style="color:#ca60ca;">.</span>next<span style="color:#ca60ca;">()</span> <span style="font-weight:bold;">else</span> <span style="color:#ca60ca;">{</span>
+                <span style="font-weight:bold;">throw</span> FormatError<span style="color:#ca60ca;">.</span>reading<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;Configuration file ends with an illegal line continuation character '</span><span style="color:#3daee9;">\'</span><span style="color:#bf0303;">&quot;</span><span style="color:#ca60ca;">)</span>
+            <span style="color:#ca60ca;">}</span>
+            <span style="font-weight:bold;">if</span> <span style="color:#ca60ca;">!</span>nextLine<span style="color:#ca60ca;">.</span>trimmingCharacters<span style="color:#ca60ca;">(</span><span style="font-weight:bold;">in</span><span style="color:#ca60ca;">:</span> <span style="color:#ca60ca;">.</span>whitespaces<span style="color:#ca60ca;">).</span>starts<span style="color:#ca60ca;">(</span>with<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;#&quot;</span><span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+                cumulatedLine <span style="color:#ca60ca;">=</span> cumulatedLine<span style="color:#ca60ca;">.</span>dropLast<span style="color:#ca60ca;">()</span> <span style="color:#ca60ca;">+</span> effectiveContent<span style="color:#ca60ca;">(</span>of<span style="color:#ca60ca;">:</span> nextLine<span style="color:#ca60ca;">)</span>
+            <span style="color:#ca60ca;">}</span>
+        <span style="color:#ca60ca;">}</span>
+        cumulatedLines<span style="color:#ca60ca;">.</span>append<span style="color:#ca60ca;">(</span>String<span style="color:#ca60ca;">(</span>cumulatedLine<span style="color:#ca60ca;">))</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">return</span> cumulatedLines
+<span style="color:#ca60ca;">}</span>
+
+<span style="font-weight:bold;">private</span> <span style="font-weight:bold;">func</span> <span style="color:#644a9b;">effectiveContent</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">of</span> <span style="color:#0057ae;">line</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span><span style="color:#ca60ca;">)</span> -&gt; <span style="color:#644a9b;">String</span> <span style="color:#ca60ca;">{</span>
+    <span style="font-weight:bold;">return</span> line
+        <span style="color:#ca60ca;">.</span>prefix <span style="color:#ca60ca;">{</span> $<span style="color:#b08000;">0</span> <span style="color:#ca60ca;">!=</span> <span style="color:#bf0303;">&quot;#&quot;</span> <span style="color:#ca60ca;">}</span>
+        <span style="color:#ca60ca;">.</span>trimmingCharacters<span style="color:#ca60ca;">(</span><span style="font-weight:bold;">in</span><span style="color:#ca60ca;">:</span> <span style="color:#ca60ca;">.</span>whitespaces<span style="color:#ca60ca;">)</span>
+<span style="color:#ca60ca;">}</span>
+
+<span style="color:#898887;">// Serialize a set of options into either an arguments string or a file</span>
+<span style="font-weight:bold;">func</span> <span style="color:#644a9b;">serialize</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">options</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">Options</span><span style="color:#ca60ca;">,</span>
+               <span style="color:#0057ae;">swiftVersion</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">Version</span> <span style="color:#ca60ca;">=</span> <span style="color:#ca60ca;">.</span>undefined<span style="color:#ca60ca;">,</span>
+               <span style="color:#0057ae;">excludingDefaults</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">Bool</span> <span style="color:#ca60ca;">=</span> false<span style="color:#ca60ca;">,</span>
+               <span style="color:#0057ae;">separator</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span> <span style="color:#ca60ca;">=</span> <span style="color:#bf0303;">&quot;</span><span style="color:#3daee9;">\n</span><span style="color:#bf0303;">&quot;</span><span style="color:#ca60ca;">)</span> -&gt; <span style="color:#644a9b;">String</span>
+<span style="color:#ca60ca;">{</span>
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">arguments</span> <span style="color:#ca60ca;">=</span> <span style="color:#ca60ca;">[[</span>String<span style="color:#ca60ca;">:</span> String<span style="color:#ca60ca;">]]()</span>
+    <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">fileOptions</span> <span style="color:#ca60ca;">=</span> options<span style="color:#ca60ca;">.</span>fileOptions <span style="color:#ca60ca;">{</span>
+        arguments<span style="color:#ca60ca;">.</span>append<span style="color:#ca60ca;">(</span>argumentsFor<span style="color:#ca60ca;">(</span>
+            Options<span style="color:#ca60ca;">(</span>fileOptions<span style="color:#ca60ca;">:</span> fileOptions<span style="color:#ca60ca;">),</span>
+            excludingDefaults<span style="color:#ca60ca;">:</span> excludingDefaults
+        <span style="color:#ca60ca;">))</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">formatOptions</span> <span style="color:#ca60ca;">=</span> options<span style="color:#ca60ca;">.</span>formatOptions <span style="color:#ca60ca;">{</span>
+        arguments<span style="color:#ca60ca;">.</span>append<span style="color:#ca60ca;">(</span>argumentsFor<span style="color:#ca60ca;">(</span>
+            Options<span style="color:#ca60ca;">(</span>formatOptions<span style="color:#ca60ca;">:</span> formatOptions<span style="color:#ca60ca;">),</span>
+            excludingDefaults<span style="color:#ca60ca;">:</span> excludingDefaults
+        <span style="color:#ca60ca;">))</span>
+    <span style="color:#ca60ca;">}</span> <span style="font-weight:bold;">else</span> <span style="font-weight:bold;">if</span> swiftVersion <span style="color:#ca60ca;">!=</span> <span style="color:#ca60ca;">.</span>undefined <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">descriptor</span> <span style="color:#ca60ca;">=</span> Descriptors<span style="color:#ca60ca;">.</span>swiftVersion
+        arguments<span style="color:#ca60ca;">.</span>append<span style="color:#ca60ca;">([</span>descriptor<span style="color:#ca60ca;">.</span>argumentName<span style="color:#ca60ca;">:</span> swiftVersion<span style="color:#ca60ca;">.</span>rawValue<span style="color:#ca60ca;">])</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">rules</span> <span style="color:#ca60ca;">=</span> options<span style="color:#ca60ca;">.</span>rules <span style="color:#ca60ca;">{</span>
+        arguments<span style="color:#ca60ca;">.</span>append<span style="color:#ca60ca;">(</span>argumentsFor<span style="color:#ca60ca;">(</span>
+            Options<span style="color:#ca60ca;">(</span>rules<span style="color:#ca60ca;">:</span> rules<span style="color:#ca60ca;">),</span>
+            excludingDefaults<span style="color:#ca60ca;">:</span> excludingDefaults
+        <span style="color:#ca60ca;">))</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">return</span> arguments
+        <span style="color:#ca60ca;">.</span>map <span style="color:#ca60ca;">{</span> serialize<span style="color:#ca60ca;">(</span>arguments<span style="color:#ca60ca;">:</span> $<span style="color:#b08000;">0</span><span style="color:#ca60ca;">,</span> separator<span style="color:#ca60ca;">:</span> separator<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">}</span>
+        <span style="color:#ca60ca;">.</span>filter <span style="color:#ca60ca;">{</span> <span style="color:#ca60ca;">!</span>$<span style="color:#b08000;">0.</span>isEmpty <span style="color:#ca60ca;">}</span>
+        <span style="color:#ca60ca;">.</span>joined<span style="color:#ca60ca;">(</span>separator<span style="color:#ca60ca;">:</span> separator<span style="color:#ca60ca;">)</span>
+<span style="color:#ca60ca;">}</span>
+
+<span style="color:#898887;">// Serialize arguments</span>
+<span style="font-weight:bold;">func</span> <span style="color:#644a9b;">serialize</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">arguments</span><span style="color:#ca60ca;">:</span> [<span style="color:#0057ae;">String</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span>]<span style="color:#ca60ca;">,</span>
+               <span style="color:#0057ae;">separator</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span> <span style="color:#ca60ca;">=</span> <span style="color:#bf0303;">&quot;</span><span style="color:#3daee9;">\n</span><span style="color:#bf0303;">&quot;</span><span style="color:#ca60ca;">)</span> -&gt; <span style="color:#644a9b;">String</span>
+<span style="color:#ca60ca;">{</span>
+    <span style="font-weight:bold;">return</span> arguments<span style="color:#ca60ca;">.</span>map <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">value</span> <span style="color:#ca60ca;">=</span> $<span style="color:#b08000;">1</span>
+        <span style="font-weight:bold;">if</span> value<span style="color:#ca60ca;">.</span>contains<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot; &quot;</span><span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+            value <span style="color:#ca60ca;">=</span> <span style="color:#bf0303;">&quot;</span><span style="color:#3daee9;">\&quot;</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">value.replacingOccurrences(of: &quot;</span>\<span style="color:#bf0303;">&quot;&quot;</span><span style="color:#ca60ca;">,</span> with<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;</span><span style="color:#3daee9;">\\\&quot;</span><span style="color:#bf0303;">&quot;</span><span style="color:#ca60ca;">))</span>\<span style="color:#bf0303;">&quot;&quot;</span>
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">return</span> <span style="color:#bf0303;">&quot;--</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#ff5500;">$</span><span style="color:#bf0303;">0) </span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">value)&quot;</span>
+    <span style="color:#ca60ca;">}.</span>sorted<span style="color:#ca60ca;">().</span>joined<span style="color:#ca60ca;">(</span>separator<span style="color:#ca60ca;">:</span> separator<span style="color:#ca60ca;">)</span>
+<span style="color:#ca60ca;">}</span>
+
+<span style="color:#898887;">// Get command line arguments from options</span>
+<span style="font-weight:bold;">func</span> <span style="color:#644a9b;">argumentsFor</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">_</span> <span style="color:#0057ae;">options</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">Options</span><span style="color:#ca60ca;">,</span> <span style="color:#0057ae;">excludingDefaults</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">Bool</span> <span style="color:#ca60ca;">=</span> false<span style="color:#ca60ca;">)</span> -&gt; [<span style="color:#644a9b;">String</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span>] <span style="color:#ca60ca;">{</span>
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">args</span> <span style="color:#ca60ca;">=</span> <span style="color:#ca60ca;">[</span>String<span style="color:#ca60ca;">:</span> String<span style="color:#ca60ca;">]()</span>
+    <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">fileOptions</span> <span style="color:#ca60ca;">=</span> options<span style="color:#ca60ca;">.</span>fileOptions <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">arguments</span> <span style="color:#ca60ca;">=</span> Set<span style="color:#ca60ca;">(</span>fileArguments<span style="color:#ca60ca;">)</span>
+        <span style="font-weight:bold;">do</span> <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">if</span> <span style="color:#ca60ca;">!</span>excludingDefaults <span style="color:#ca60ca;">||</span> fileOptions<span style="color:#ca60ca;">.</span>followSymlinks <span style="color:#ca60ca;">!=</span> FileOptions<span style="color:#ca60ca;">.</span><span style="font-weight:bold;">default</span><span style="color:#ca60ca;">.</span>followSymlinks <span style="color:#ca60ca;">{</span>
+                args<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;symlinks&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> fileOptions<span style="color:#ca60ca;">.</span>followSymlinks <span style="color:#ca60ca;">?</span> <span style="color:#bf0303;">&quot;follow&quot;</span> <span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;ignore&quot;</span>
+            <span style="color:#ca60ca;">}</span>
+            arguments<span style="color:#ca60ca;">.</span>remove<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;symlinks&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">do</span> <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">if</span> <span style="color:#ca60ca;">!</span>fileOptions<span style="color:#ca60ca;">.</span>excludedGlobs<span style="color:#ca60ca;">.</span>isEmpty <span style="color:#ca60ca;">{</span>
+                <span style="color:#898887;">// </span><span style="color:#ca9219;background-color:#451e1a;font-weight:bold;">TODO</span><span style="color:#898887;">: find a better alternative to stringifying url</span>
+                args<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;exclude&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> fileOptions<span style="color:#ca60ca;">.</span>excludedGlobs<span style="color:#ca60ca;">.</span>map <span style="color:#ca60ca;">{</span> $<span style="color:#b08000;">0.</span>description <span style="color:#ca60ca;">}.</span>sorted<span style="color:#ca60ca;">().</span>joined<span style="color:#ca60ca;">(</span>separator<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;,&quot;</span><span style="color:#ca60ca;">)</span>
+            <span style="color:#ca60ca;">}</span>
+            arguments<span style="color:#ca60ca;">.</span>remove<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;exclude&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">do</span> <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">if</span> <span style="color:#ca60ca;">!</span>fileOptions<span style="color:#ca60ca;">.</span>unexcludedGlobs<span style="color:#ca60ca;">.</span>isEmpty <span style="color:#ca60ca;">{</span>
+                <span style="color:#898887;">// </span><span style="color:#ca9219;background-color:#451e1a;font-weight:bold;">TODO</span><span style="color:#898887;">: find a better alternative to stringifying url</span>
+                args<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;unexclude&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> fileOptions<span style="color:#ca60ca;">.</span>unexcludedGlobs<span style="color:#ca60ca;">.</span>map <span style="color:#ca60ca;">{</span> $<span style="color:#b08000;">0.</span>description <span style="color:#ca60ca;">}.</span>sorted<span style="color:#ca60ca;">().</span>joined<span style="color:#ca60ca;">(</span>separator<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;,&quot;</span><span style="color:#ca60ca;">)</span>
+            <span style="color:#ca60ca;">}</span>
+            arguments<span style="color:#ca60ca;">.</span>remove<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;unexclude&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">do</span> <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">if</span> <span style="color:#ca60ca;">!</span>excludingDefaults <span style="color:#ca60ca;">||</span> fileOptions<span style="color:#ca60ca;">.</span>minVersion <span style="color:#ca60ca;">!=</span> FileOptions<span style="color:#ca60ca;">.</span><span style="font-weight:bold;">default</span><span style="color:#ca60ca;">.</span>minVersion <span style="color:#ca60ca;">{</span>
+                args<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;minversion&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> fileOptions<span style="color:#ca60ca;">.</span>minVersion<span style="color:#ca60ca;">.</span>description
+            <span style="color:#ca60ca;">}</span>
+            arguments<span style="color:#ca60ca;">.</span>remove<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;minversion&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+        assert<span style="color:#ca60ca;">(</span>arguments<span style="color:#ca60ca;">.</span>isEmpty<span style="color:#ca60ca;">)</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">formatOptions</span> <span style="color:#ca60ca;">=</span> options<span style="color:#ca60ca;">.</span>formatOptions <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">for</span> descriptor <span style="font-weight:bold;">in</span> Descriptors<span style="color:#ca60ca;">.</span>all <span style="font-weight:bold;">where</span> <span style="color:#ca60ca;">!</span>descriptor<span style="color:#ca60ca;">.</span>isRenamed <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">value</span> <span style="color:#ca60ca;">=</span> descriptor<span style="color:#ca60ca;">.</span>fromOptions<span style="color:#ca60ca;">(</span>formatOptions<span style="color:#ca60ca;">)</span>
+            <span style="font-weight:bold;">guard</span> value <span style="color:#ca60ca;">!=</span> descriptor<span style="color:#ca60ca;">.</span>fromOptions<span style="color:#ca60ca;">(.</span><span style="font-weight:bold;">default</span><span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">||</span>
+                <span style="color:#ca60ca;">(!</span>excludingDefaults <span style="color:#ca60ca;">&amp;&amp;</span> <span style="color:#ca60ca;">!</span>descriptor<span style="color:#ca60ca;">.</span>isDeprecated<span style="color:#ca60ca;">)</span>
+            <span style="font-weight:bold;">else</span> <span style="color:#ca60ca;">{</span>
+                <span style="font-weight:bold;">continue</span>
+            <span style="color:#ca60ca;">}</span>
+            <span style="color:#898887;">// Special case for swiftVersion</span>
+            <span style="color:#898887;">// </span><span style="color:#ca9219;background-color:#451e1a;font-weight:bold;">TODO</span><span style="color:#898887;">: find a better solution for this</span>
+            <span style="font-weight:bold;">if</span> descriptor<span style="color:#ca60ca;">.</span>argumentName <span style="color:#ca60ca;">==</span> Descriptors<span style="color:#ca60ca;">.</span>swiftVersion<span style="color:#ca60ca;">.</span>argumentName<span style="color:#ca60ca;">,</span>
+               value <span style="color:#ca60ca;">==</span> Version<span style="color:#ca60ca;">.</span>undefined<span style="color:#ca60ca;">.</span>rawValue
+            <span style="color:#ca60ca;">{</span>
+                <span style="font-weight:bold;">continue</span>
+            <span style="color:#ca60ca;">}</span>
+            args<span style="color:#ca60ca;">[</span>descriptor<span style="color:#ca60ca;">.</span>argumentName<span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> value
+        <span style="color:#ca60ca;">}</span>
+        <span style="color:#898887;">// Special case for wrapParameters</span>
+        <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">argumentName</span> <span style="color:#ca60ca;">=</span> Descriptors<span style="color:#ca60ca;">.</span>wrapParameters<span style="color:#ca60ca;">.</span>argumentName
+        <span style="font-weight:bold;">if</span> args<span style="color:#ca60ca;">[</span>argumentName<span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">==</span> WrapMode<span style="color:#ca60ca;">.</span><span style="font-weight:bold;">default</span><span style="color:#ca60ca;">.</span>rawValue <span style="color:#ca60ca;">{</span>
+            args<span style="color:#ca60ca;">[</span>argumentName<span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> args<span style="color:#ca60ca;">[</span>Descriptors<span style="color:#ca60ca;">.</span>wrapArguments<span style="color:#ca60ca;">.</span>argumentName<span style="color:#ca60ca;">]</span>
+        <span style="color:#ca60ca;">}</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">if</span> options<span style="color:#ca60ca;">.</span>lint <span style="color:#ca60ca;">{</span>
+        args<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;lint&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> <span style="color:#bf0303;">&quot;&quot;</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">rules</span> <span style="color:#ca60ca;">=</span> options<span style="color:#ca60ca;">.</span>rules <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">defaultRules</span> <span style="color:#ca60ca;">=</span> allRules<span style="color:#ca60ca;">.</span>subtracting<span style="color:#ca60ca;">(</span>FormatRules<span style="color:#ca60ca;">.</span>disabledByDefault<span style="color:#ca60ca;">)</span>
+
+        <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">enabled</span> <span style="color:#ca60ca;">=</span> rules<span style="color:#ca60ca;">.</span>subtracting<span style="color:#ca60ca;">(</span>defaultRules<span style="color:#ca60ca;">)</span>
+        <span style="font-weight:bold;">if</span> <span style="color:#ca60ca;">!</span>enabled<span style="color:#ca60ca;">.</span>isEmpty <span style="color:#ca60ca;">{</span>
+            args<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;enable&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> enabled<span style="color:#ca60ca;">.</span>sorted<span style="color:#ca60ca;">().</span>joined<span style="color:#ca60ca;">(</span>separator<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;,&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+
+        <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">disabled</span> <span style="color:#ca60ca;">=</span> defaultRules<span style="color:#ca60ca;">.</span>subtracting<span style="color:#ca60ca;">(</span>rules<span style="color:#ca60ca;">)</span>
+        <span style="font-weight:bold;">if</span> <span style="color:#ca60ca;">!</span>disabled<span style="color:#ca60ca;">.</span>isEmpty <span style="color:#ca60ca;">{</span>
+            args<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;disable&quot;</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> disabled<span style="color:#ca60ca;">.</span>sorted<span style="color:#ca60ca;">().</span>joined<span style="color:#ca60ca;">(</span>separator<span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">&quot;,&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">return</span> args
+<span style="color:#ca60ca;">}</span>
+
+<span style="font-weight:bold;">private</span> <span style="font-weight:bold;">func</span> <span style="color:#644a9b;">processOption</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">_</span> <span style="color:#0057ae;">key</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span><span style="color:#ca60ca;">,</span>
+                           <span style="color:#0057ae;">in</span> <span style="color:#0057ae;">args</span><span style="color:#ca60ca;">:</span> [<span style="color:#0057ae;">String</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span>]<span style="color:#ca60ca;">,</span>
+                           <span style="color:#0057ae;">from</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">inout</span> <span style="color:#0057ae;">Set</span>&lt;<span style="color:#0057ae;">String</span>&gt;<span style="color:#ca60ca;">,</span>
+                           <span style="color:#0057ae;">handler</span><span style="color:#ca60ca;">:</span> <span style="color:#ca60ca;">(</span><span style="color:#0057ae;">String</span><span style="color:#ca60ca;">)</span> <span style="color:#0057ae;">throws</span> -&gt; <span style="color:#0057ae;">Void</span><span style="color:#ca60ca;">)</span> <span style="font-weight:bold;">throws</span>
+<span style="color:#ca60ca;">{</span>
+    precondition<span style="color:#ca60ca;">(</span>optionsArguments<span style="color:#ca60ca;">.</span>contains<span style="color:#ca60ca;">(</span>key<span style="color:#ca60ca;">),</span> <span style="color:#bf0303;">&quot;</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">key) not in optionsArguments&quot;</span><span style="color:#ca60ca;">)</span>
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">arguments</span> <span style="color:#ca60ca;">=</span> from
+    arguments<span style="color:#ca60ca;">.</span>remove<span style="color:#ca60ca;">(</span>key<span style="color:#ca60ca;">)</span>
+    from <span style="color:#ca60ca;">=</span> arguments
+    <span style="font-weight:bold;">guard</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">value</span> <span style="color:#ca60ca;">=</span> args<span style="color:#ca60ca;">[</span>key<span style="color:#ca60ca;">]</span> <span style="font-weight:bold;">else</span> <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">return</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">do</span> <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">try</span> handler<span style="color:#ca60ca;">(</span>value<span style="color:#ca60ca;">)</span>
+    <span style="color:#ca60ca;">}</span> <span style="font-weight:bold;">catch</span> <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">guard</span> <span style="color:#ca60ca;">!</span>value<span style="color:#ca60ca;">.</span>isEmpty <span style="font-weight:bold;">else</span> <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">throw</span> FormatError<span style="color:#ca60ca;">.</span>options<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;--</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">key) option expects a value&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">case</span> <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">FormatError</span><span style="color:#ca60ca;">.</span>options<span style="color:#ca60ca;">(</span>string<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">=</span> error<span style="color:#ca60ca;">,</span> <span style="color:#ca60ca;">!</span>string<span style="color:#ca60ca;">.</span>isEmpty <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">if</span> <span style="color:#ca60ca;">!</span>string<span style="color:#ca60ca;">.</span>contains<span style="color:#ca60ca;">(</span>key<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+                string <span style="color:#ca60ca;">+=</span> <span style="color:#bf0303;">&quot; in --</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">key)&quot;</span>
+            <span style="color:#ca60ca;">}</span>
+            <span style="font-weight:bold;">throw</span> FormatError<span style="color:#ca60ca;">.</span>options<span style="color:#ca60ca;">(</span>string<span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">throw</span> FormatError<span style="color:#ca60ca;">.</span>options<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;Unsupported --</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">key) value '</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">value)'&quot;</span><span style="color:#ca60ca;">)</span>
+    <span style="color:#ca60ca;">}</span>
+<span style="color:#ca60ca;">}</span>
+
+<span style="color:#898887;">// Parse rule names from arguments</span>
+<span style="font-weight:bold;">public</span> <span style="font-weight:bold;">func</span> <span style="color:#644a9b;">rulesFor</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">_</span> <span style="color:#0057ae;">args</span><span style="color:#ca60ca;">:</span> [<span style="color:#0057ae;">String</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span>]<span style="color:#ca60ca;">,</span> <span style="color:#0057ae;">lint</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">Bool</span><span style="color:#ca60ca;">)</span> <span style="font-weight:bold;">throws</span> -&gt; <span style="color:#644a9b;">Set</span><span style="color:#ca60ca;">&lt;</span><span style="color:#0057ae;">String</span><span style="color:#ca60ca;">&gt;</span> <span style="color:#ca60ca;">{</span>
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">rules</span> <span style="color:#ca60ca;">=</span> allRules
+    rules <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">try</span> args<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;rules&quot;</span><span style="color:#ca60ca;">].</span>map <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">try</span> Set<span style="color:#ca60ca;">(</span>parseRules<span style="color:#ca60ca;">(</span>$<span style="color:#b08000;">0</span><span style="color:#ca60ca;">))</span>
+    <span style="color:#ca60ca;">}</span> <span style="color:#ca60ca;">??</span> rules<span style="color:#ca60ca;">.</span>subtracting<span style="color:#ca60ca;">(</span>FormatRules<span style="color:#ca60ca;">.</span>disabledByDefault<span style="color:#ca60ca;">)</span>
+    <span style="font-weight:bold;">try</span> args<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;enable&quot;</span><span style="color:#ca60ca;">].</span>map <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">try</span> rules<span style="color:#ca60ca;">.</span>formUnion<span style="color:#ca60ca;">(</span>parseRules<span style="color:#ca60ca;">(</span>$<span style="color:#b08000;">0</span><span style="color:#ca60ca;">))</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">try</span> args<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;disable&quot;</span><span style="color:#ca60ca;">].</span>map <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">try</span> rules<span style="color:#ca60ca;">.</span>subtract<span style="color:#ca60ca;">(</span>parseRules<span style="color:#ca60ca;">(</span>$<span style="color:#b08000;">0</span><span style="color:#ca60ca;">))</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">try</span> args<span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;lintonly&quot;</span><span style="color:#ca60ca;">].</span>map <span style="color:#ca60ca;">{</span> rulesString <span style="font-weight:bold;">in</span>
+        <span style="font-weight:bold;">if</span> lint <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">try</span> rules<span style="color:#ca60ca;">.</span>formUnion<span style="color:#ca60ca;">(</span>parseRules<span style="color:#ca60ca;">(</span>rulesString<span style="color:#ca60ca;">))</span>
+        <span style="color:#ca60ca;">}</span> <span style="font-weight:bold;">else</span> <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">try</span> rules<span style="color:#ca60ca;">.</span>subtract<span style="color:#ca60ca;">(</span>parseRules<span style="color:#ca60ca;">(</span>rulesString<span style="color:#ca60ca;">))</span>
+        <span style="color:#ca60ca;">}</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">return</span> rules
+<span style="color:#ca60ca;">}</span>
+
+<span style="color:#898887;">// Parse FileOptions from arguments</span>
+<span style="font-weight:bold;">func</span> <span style="color:#644a9b;">fileOptionsFor</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">_</span> <span style="color:#0057ae;">args</span><span style="color:#ca60ca;">:</span> [<span style="color:#0057ae;">String</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span>]<span style="color:#ca60ca;">,</span> <span style="color:#0057ae;">in</span> <span style="color:#0057ae;">directory</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span><span style="color:#ca60ca;">)</span> <span style="font-weight:bold;">throws</span> -&gt; <span style="color:#644a9b;">FileOptions</span>? <span style="color:#ca60ca;">{</span>
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">options</span> <span style="color:#ca60ca;">=</span> FileOptions<span style="color:#ca60ca;">()</span>
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">arguments</span> <span style="color:#ca60ca;">=</span> Set<span style="color:#ca60ca;">(</span>fileArguments<span style="color:#ca60ca;">)</span>
+
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">containsFileOption</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">false</span>
+    <span style="font-weight:bold;">try</span> processOption<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;symlinks&quot;</span><span style="color:#ca60ca;">,</span> <span style="font-weight:bold;">in</span><span style="color:#ca60ca;">:</span> args<span style="color:#ca60ca;">,</span> from<span style="color:#ca60ca;">:</span> <span style="color:#ca60ca;">&amp;</span>arguments<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+        containsFileOption <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">true</span>
+        <span style="font-weight:bold;">switch</span> $<span style="color:#b08000;">0.</span>lowercased<span style="color:#ca60ca;">()</span> <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">case</span> <span style="color:#bf0303;">&quot;follow&quot;</span><span style="color:#ca60ca;">:</span>
+            options<span style="color:#ca60ca;">.</span>followSymlinks <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">true</span>
+        <span style="font-weight:bold;">case</span> <span style="color:#bf0303;">&quot;ignore&quot;</span><span style="color:#ca60ca;">:</span>
+            options<span style="color:#ca60ca;">.</span>followSymlinks <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">false</span>
+        <span style="font-weight:bold;">default</span><span style="color:#ca60ca;">:</span>
+            <span style="font-weight:bold;">throw</span> FormatError<span style="color:#ca60ca;">.</span>options<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">try</span> processOption<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;exclude&quot;</span><span style="color:#ca60ca;">,</span> <span style="font-weight:bold;">in</span><span style="color:#ca60ca;">:</span> args<span style="color:#ca60ca;">,</span> from<span style="color:#ca60ca;">:</span> <span style="color:#ca60ca;">&amp;</span>arguments<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+        containsFileOption <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">true</span>
+        options<span style="color:#ca60ca;">.</span>excludedGlobs <span style="color:#ca60ca;">+=</span> expandGlobs<span style="color:#ca60ca;">(</span>$<span style="color:#b08000;">0</span><span style="color:#ca60ca;">,</span> <span style="font-weight:bold;">in</span><span style="color:#ca60ca;">:</span> directory<span style="color:#ca60ca;">)</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">try</span> processOption<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;unexclude&quot;</span><span style="color:#ca60ca;">,</span> <span style="font-weight:bold;">in</span><span style="color:#ca60ca;">:</span> args<span style="color:#ca60ca;">,</span> from<span style="color:#ca60ca;">:</span> <span style="color:#ca60ca;">&amp;</span>arguments<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+        containsFileOption <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">true</span>
+        options<span style="color:#ca60ca;">.</span>unexcludedGlobs <span style="color:#ca60ca;">+=</span> expandGlobs<span style="color:#ca60ca;">(</span>$<span style="color:#b08000;">0</span><span style="color:#ca60ca;">,</span> <span style="font-weight:bold;">in</span><span style="color:#ca60ca;">:</span> directory<span style="color:#ca60ca;">)</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">try</span> processOption<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;minversion&quot;</span><span style="color:#ca60ca;">,</span> <span style="font-weight:bold;">in</span><span style="color:#ca60ca;">:</span> args<span style="color:#ca60ca;">,</span> from<span style="color:#ca60ca;">:</span> <span style="color:#ca60ca;">&amp;</span>arguments<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+        containsFileOption <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">true</span>
+        <span style="font-weight:bold;">guard</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">minVersion</span> <span style="color:#ca60ca;">=</span> Version<span style="color:#ca60ca;">(</span>rawValue<span style="color:#ca60ca;">:</span> $<span style="color:#b08000;">0</span><span style="color:#ca60ca;">)</span> <span style="font-weight:bold;">else</span> <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">throw</span> FormatError<span style="color:#ca60ca;">.</span>options<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;Unsupported --minversion value '</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#ff5500;">$</span><span style="color:#bf0303;">0)'&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+        <span style="font-weight:bold;">guard</span> minVersion <span style="color:#ca60ca;">&lt;=</span> Version<span style="color:#ca60ca;">(</span>stringLiteral<span style="color:#ca60ca;">:</span> swiftFormatVersion<span style="color:#ca60ca;">)</span> <span style="font-weight:bold;">else</span> <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">throw</span> FormatError<span style="color:#ca60ca;">.</span>options<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;Project specifies SwiftFormat --minversion of </span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">minVersion)&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+        options<span style="color:#ca60ca;">.</span>minVersion <span style="color:#ca60ca;">=</span> minVersion
+    <span style="color:#ca60ca;">}</span>
+    assert<span style="color:#ca60ca;">(</span>arguments<span style="color:#ca60ca;">.</span>isEmpty<span style="color:#ca60ca;">,</span> <span style="color:#bf0303;">&quot;</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">arguments.joined(separator: &quot;</span><span style="color:#ca60ca;">,</span><span style="color:#bf0303;">&quot;))&quot;</span><span style="color:#ca60ca;">)</span>
+    <span style="font-weight:bold;">return</span> containsFileOption <span style="color:#ca60ca;">?</span> options <span style="color:#ca60ca;">:</span> <span style="font-weight:bold;">nil</span>
+<span style="color:#ca60ca;">}</span>
+
+<span style="color:#898887;">// Parse FormatOptions from arguments</span>
+<span style="color:#898887;">// Returns nil if the arguments dictionary does not contain any formatting arguments</span>
+<span style="font-weight:bold;">public</span> <span style="font-weight:bold;">func</span> <span style="color:#644a9b;">formatOptionsFor</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">_</span> <span style="color:#0057ae;">args</span><span style="color:#ca60ca;">:</span> [<span style="color:#0057ae;">String</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span>]<span style="color:#ca60ca;">)</span> <span style="font-weight:bold;">throws</span> -&gt; <span style="color:#644a9b;">FormatOptions</span>? <span style="color:#ca60ca;">{</span>
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">options</span> <span style="color:#ca60ca;">=</span> FormatOptions<span style="color:#ca60ca;">.</span><span style="font-weight:bold;">default</span>
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">arguments</span> <span style="color:#ca60ca;">=</span> Set<span style="color:#ca60ca;">(</span>formattingArguments<span style="color:#ca60ca;">)</span>
+
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">containsFormatOption</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">false</span>
+    <span style="font-weight:bold;">for</span> option <span style="font-weight:bold;">in</span> Descriptors<span style="color:#ca60ca;">.</span>all <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">try</span> processOption<span style="color:#ca60ca;">(</span>option<span style="color:#ca60ca;">.</span>argumentName<span style="color:#ca60ca;">,</span> <span style="font-weight:bold;">in</span><span style="color:#ca60ca;">:</span> args<span style="color:#ca60ca;">,</span> from<span style="color:#ca60ca;">:</span> <span style="color:#ca60ca;">&amp;</span>arguments<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+            containsFormatOption <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">true</span>
+            <span style="font-weight:bold;">try</span> option<span style="color:#ca60ca;">.</span>toOptions<span style="color:#ca60ca;">(</span>$<span style="color:#b08000;">0</span><span style="color:#ca60ca;">,</span> <span style="color:#ca60ca;">&amp;</span>options<span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+    <span style="color:#ca60ca;">}</span>
+    assert<span style="color:#ca60ca;">(</span>arguments<span style="color:#ca60ca;">.</span>isEmpty<span style="color:#ca60ca;">,</span> <span style="color:#bf0303;">&quot;</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">arguments.joined(separator: &quot;</span><span style="color:#ca60ca;">,</span><span style="color:#bf0303;">&quot;))&quot;</span><span style="color:#ca60ca;">)</span>
+    <span style="font-weight:bold;">return</span> containsFormatOption <span style="color:#ca60ca;">?</span> options <span style="color:#ca60ca;">:</span> <span style="font-weight:bold;">nil</span>
+<span style="color:#ca60ca;">}</span>
+
+<span style="color:#898887;">// Get deprecation warnings from a set of arguments</span>
+<span style="font-weight:bold;">func</span> <span style="color:#644a9b;">warningsForArguments</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">_</span> <span style="color:#0057ae;">args</span><span style="color:#ca60ca;">:</span> [<span style="color:#0057ae;">String</span><span style="color:#ca60ca;">:</span> <span style="color:#0057ae;">String</span>]<span style="color:#ca60ca;">)</span> -&gt; [<span style="color:#644a9b;">String</span>] <span style="color:#ca60ca;">{</span>
+    <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">warnings</span> <span style="color:#ca60ca;">=</span> <span style="color:#ca60ca;">[</span>String<span style="color:#ca60ca;">]()</span>
+    <span style="font-weight:bold;">for</span> option <span style="font-weight:bold;">in</span> Descriptors<span style="color:#ca60ca;">.</span>all <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">if</span> args<span style="color:#ca60ca;">[</span>option<span style="color:#ca60ca;">.</span>argumentName<span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">!=</span> <span style="font-weight:bold;">nil</span><span style="color:#ca60ca;">,</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">message</span> <span style="color:#ca60ca;">=</span> option<span style="color:#ca60ca;">.</span>deprecationMessage <span style="color:#ca60ca;">{</span>
+            warnings<span style="color:#ca60ca;">.</span>append<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;--</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">option.argumentName) option is deprecated. </span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">message)&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">for</span> name <span style="font-weight:bold;">in</span> Set<span style="color:#ca60ca;">(</span>rulesArguments<span style="color:#ca60ca;">.</span>flatMap <span style="color:#ca60ca;">{</span> <span style="color:#ca60ca;">(</span><span style="font-weight:bold;">try</span><span style="color:#ca60ca;">?</span> args<span style="color:#ca60ca;">[</span>$<span style="color:#b08000;">0</span><span style="color:#ca60ca;">].</span>map<span style="color:#ca60ca;">(</span>parseRules<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">??</span> <span style="color:#ca60ca;">[])</span> <span style="color:#ca60ca;">??</span> <span style="color:#ca60ca;">[]</span> <span style="color:#ca60ca;">})</span> <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">message</span> <span style="color:#ca60ca;">=</span> FormatRules<span style="color:#ca60ca;">.</span>byName<span style="color:#ca60ca;">[</span>name<span style="color:#ca60ca;">]?.</span>deprecationMessage <span style="color:#ca60ca;">{</span>
+            warnings<span style="color:#ca60ca;">.</span>append<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">name) rule is deprecated. </span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">message)&quot;</span><span style="color:#ca60ca;">)</span>
+        <span style="color:#ca60ca;">}</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">rules</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">try</span><span style="color:#ca60ca;">?</span> rulesFor<span style="color:#ca60ca;">(</span>args<span style="color:#ca60ca;">,</span> lint<span style="color:#ca60ca;">:</span> <span style="font-weight:bold;">true</span><span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+        <span style="font-weight:bold;">for</span> arg <span style="font-weight:bold;">in</span> args<span style="color:#ca60ca;">.</span>keys <span style="font-weight:bold;">where</span> formattingArguments<span style="color:#ca60ca;">.</span>contains<span style="color:#ca60ca;">(</span>arg<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
+            <span style="font-weight:bold;">if</span> <span style="color:#ca60ca;">!</span>rules<span style="color:#ca60ca;">.</span>contains<span style="color:#ca60ca;">(</span><span style="font-weight:bold;">where</span><span style="color:#ca60ca;">:</span> <span style="color:#ca60ca;">{</span>
+                <span style="font-weight:bold;">guard</span> <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">rule</span> <span style="color:#ca60ca;">=</span> FormatRules<span style="color:#ca60ca;">.</span>byName<span style="color:#ca60ca;">[</span>$<span style="color:#b08000;">0</span><span style="color:#ca60ca;">]</span> <span style="font-weight:bold;">else</span> <span style="color:#ca60ca;">{</span>
+                    <span style="font-weight:bold;">return</span> <span style="font-weight:bold;">false</span>
+                <span style="color:#ca60ca;">}</span>
+                <span style="font-weight:bold;">return</span> rule<span style="color:#ca60ca;">.</span>options<span style="color:#ca60ca;">.</span>contains<span style="color:#ca60ca;">(</span>arg<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">||</span> rule<span style="color:#ca60ca;">.</span>sharedOptions<span style="color:#ca60ca;">.</span>contains<span style="color:#ca60ca;">(</span>arg<span style="color:#ca60ca;">)</span>
+            <span style="color:#ca60ca;">})</span> <span style="color:#ca60ca;">{</span>
+                <span style="font-weight:bold;">let</span> <span style="color:#0057ae;">expected</span> <span style="color:#ca60ca;">=</span> FormatRules<span style="color:#ca60ca;">.</span>all<span style="color:#ca60ca;">.</span>first<span style="color:#ca60ca;">(</span><span style="font-weight:bold;">where</span><span style="color:#ca60ca;">:</span> <span style="color:#ca60ca;">{</span>
+                    $<span style="color:#b08000;">0.</span>options<span style="color:#ca60ca;">.</span>contains<span style="color:#ca60ca;">(</span>arg<span style="color:#ca60ca;">)</span>
+                <span style="color:#ca60ca;">})?.</span>name <span style="color:#ca60ca;">??</span> <span style="color:#bf0303;">&quot;associated&quot;</span>
+                warnings<span style="color:#ca60ca;">.</span>append<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;--</span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">arg) option has no effect when </span><span style="color:#bf0303;text-decoration:underline;">\(</span><span style="color:#bf0303;">expected) rule is disabled&quot;</span><span style="color:#ca60ca;">)</span>
+            <span style="color:#ca60ca;">}</span>
+        <span style="color:#ca60ca;">}</span>
+    <span style="color:#ca60ca;">}</span>
+    <span style="font-weight:bold;">return</span> warnings
+<span style="color:#ca60ca;">}</span>
+
+<span style="font-weight:bold;">let</span> <span style="color:#0057ae;">fileArguments</span> <span style="color:#ca60ca;">=</span> <span style="color:#ca60ca;">[</span>
+    <span style="color:#bf0303;">&quot;symlinks&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#bf0303;">&quot;exclude&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#bf0303;">&quot;unexclude&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#bf0303;">&quot;minversion&quot;</span><span style="color:#ca60ca;">,</span>
+<span style="color:#ca60ca;">]</span>
+
+<span style="font-weight:bold;">let</span> <span style="color:#0057ae;">rulesArguments</span> <span style="color:#ca60ca;">=</span> <span style="color:#ca60ca;">[</span>
+    <span style="color:#bf0303;">&quot;disable&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#bf0303;">&quot;enable&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#bf0303;">&quot;lintonly&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#bf0303;">&quot;rules&quot;</span><span style="color:#ca60ca;">,</span>
+<span style="color:#ca60ca;">]</span>
+
+<span style="font-weight:bold;">let</span> <span style="color:#0057ae;">formattingArguments</span> <span style="color:#ca60ca;">=</span> Descriptors<span style="color:#ca60ca;">.</span>formatting<span style="color:#ca60ca;">.</span>map <span style="color:#ca60ca;">{</span> $<span style="color:#b08000;">0.</span>argumentName <span style="color:#ca60ca;">}</span>
+<span style="font-weight:bold;">let</span> <span style="color:#0057ae;">internalArguments</span> <span style="color:#ca60ca;">=</span> Descriptors<span style="color:#ca60ca;">.</span><span style="font-weight:bold;">internal</span><span style="color:#ca60ca;">.</span>map <span style="color:#ca60ca;">{</span> $<span style="color:#b08000;">0.</span>argumentName <span style="color:#ca60ca;">}</span>
+<span style="font-weight:bold;">let</span> <span style="color:#0057ae;">optionsArguments</span> <span style="color:#ca60ca;">=</span> fileArguments <span style="color:#ca60ca;">+</span> rulesArguments <span style="color:#ca60ca;">+</span> formattingArguments <span style="color:#ca60ca;">+</span> internalArguments
+
+<span style="font-weight:bold;">let</span> <span style="color:#0057ae;">commandLineArguments</span> <span style="color:#ca60ca;">=</span> <span style="color:#ca60ca;">[</span>
+    <span style="color:#898887;">// Input options</span>
+    <span style="color:#bf0303;">&quot;filelist&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#bf0303;">&quot;stdinpath&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#bf0303;">&quot;config&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#bf0303;">&quot;inferoptions&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#bf0303;">&quot;linerange&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#bf0303;">&quot;output&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#bf0303;">&quot;cache&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#bf0303;">&quot;dryrun&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#bf0303;">&quot;lint&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#bf0303;">&quot;lenient&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#bf0303;">&quot;verbose&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#bf0303;">&quot;quiet&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#bf0303;">&quot;report&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#898887;">// Misc</span>
+    <span style="color:#bf0303;">&quot;help&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#bf0303;">&quot;version&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#bf0303;">&quot;options&quot;</span><span style="color:#ca60ca;">,</span>
+    <span style="color:#bf0303;">&quot;ruleinfo&quot;</span><span style="color:#ca60ca;">,</span>
+<span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">+</span> optionsArguments
+
+<span style="font-weight:bold;">let</span> <span style="color:#0057ae;">deprecatedArguments</span> <span style="color:#ca60ca;">=</span> Descriptors<span style="color:#ca60ca;">.</span>all<span style="color:#ca60ca;">.</span>compactMap <span style="color:#ca60ca;">{</span>
+    $<span style="color:#b08000;">0.</span>isDeprecated <span style="color:#ca60ca;">?</span> $<span style="color:#b08000;">0.</span>argumentName <span style="color:#ca60ca;">:</span> <span style="font-weight:bold;">nil</span>
+<span style="color:#ca60ca;">}</span>
+</pre></body></html>

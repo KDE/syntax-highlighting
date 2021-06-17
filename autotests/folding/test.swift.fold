@@ -1,0 +1,687 @@
+//
+//  Arguments.swift
+//  SwiftFormat
+//
+//  Created by Nick Lockwood on 07/08/2018.
+//  Copyright © 2018 Nick Lockwood.
+//
+//  Distributed under the permissive MIT license
+//  Get the latest version from here:
+//
+//  https://github.com/nicklockwood/SwiftFormat
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in all
+//  copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//  SOFTWARE.
+//
+
+import Foundation
+
+extension Options <beginfold id='1'>{</beginfold id='1'>
+    static let maxArgumentNameLength = 16
+
+    init(_ args: [String: String], in directory: String) throws <beginfold id='1'>{</beginfold id='1'>
+        fileOptions = try fileOptionsFor(args, in: directory)
+        formatOptions = try formatOptionsFor(args)
+        let lint = args.keys.contains("lint")
+        self.lint = lint
+        rules = try rulesFor(args, lint: lint)
+    <endfold id='1'>}</endfold id='1'>
+
+    mutating func addArguments(_ args: [String: String], in directory: String) throws <beginfold id='1'>{</beginfold id='1'>
+        let oldArguments = argumentsFor(self)
+        let newArguments = try mergeArguments(args, into: oldArguments)
+        var newOptions = try Options(newArguments, in: directory)
+        if let fileInfo = formatOptions?.fileInfo <beginfold id='1'>{</beginfold id='1'>
+            newOptions.formatOptions?.fileInfo = fileInfo
+        <endfold id='1'>}</endfold id='1'>
+        self = newOptions
+    <endfold id='1'>}</endfold id='1'>
+<endfold id='1'>}</endfold id='1'>
+
+// Parse a space-delimited string into an array of command-line arguments
+// Replicates the behavior implemented by the console when parsing input
+func parseArguments(_ argumentString: String, ignoreComments: Bool = true) -> [String] <beginfold id='1'>{</beginfold id='1'>
+    var arguments = [""] // Arguments always begin with script path
+    var characters = String.UnicodeScalarView.SubSequence(argumentString.unicodeScalars)
+    var string = ""
+    var escaped = false
+    var quoted = false
+    loop: while let char = characters.popFirst() <beginfold id='1'>{</beginfold id='1'>
+        switch char <beginfold id='1'>{</beginfold id='1'>
+        case "#" where !ignoreComments && !escaped && !quoted:
+            break loop // comment
+        case "\\" where !escaped:
+            escaped = true
+        case "\"" where !escaped && !quoted:
+            quoted = true
+        case "\"" where !escaped && quoted:
+            quoted = false
+            fallthrough
+        case " " where !escaped && !quoted:
+            if !string.isEmpty <beginfold id='1'>{</beginfold id='1'>
+                arguments.append(string)
+            <endfold id='1'>}</endfold id='1'>
+            string.removeAll()
+        case "\"" where escaped:
+            escaped = false
+            string.append("\"")
+        case _ where escaped && quoted:
+            string.append("\\")
+            fallthrough
+        default:
+            escaped = false
+            string.append(Character(char))
+        <endfold id='1'>}</endfold id='1'>
+    <endfold id='1'>}</endfold id='1'>
+    if !string.isEmpty <beginfold id='1'>{</beginfold id='1'>
+        arguments.append(string)
+    <endfold id='1'>}</endfold id='1'>
+    return arguments
+<endfold id='1'>}</endfold id='1'>
+
+// Parse a flat array of command-line arguments into a dictionary of flags and values
+func preprocessArguments(_ args: [String], _ names: [String]) throws -> [String: String] <beginfold id='1'>{</beginfold id='1'>
+    var anonymousArgs = 0
+    var namedArgs: [String: String] = [:]
+    var name = ""
+    for arg in args <beginfold id='1'>{</beginfold id='1'>
+        if arg.hasPrefix("--") <beginfold id='1'>{</beginfold id='1'>
+            // Long argument names
+            let key = String(arg.unicodeScalars.dropFirst(2))
+            guard names.contains(key) else <beginfold id='1'>{</beginfold id='1'>
+                guard let match = bestMatches(for: key, in: names).first else <beginfold id='1'>{</beginfold id='1'>
+                    throw FormatError.options("Unknown option --\(key)")
+                <endfold id='1'>}</endfold id='1'>
+                throw FormatError.options("Unknown option --\(key). Did you mean --\(match)?")
+            <endfold id='1'>}</endfold id='1'>
+            name = key
+            namedArgs[name] = namedArgs[name] ?? ""
+            continue
+        <endfold id='1'>}</endfold id='1'> else if arg.hasPrefix("-") <beginfold id='1'>{</beginfold id='1'>
+            // Short argument names
+            let flag = String(arg.unicodeScalars.dropFirst())
+            guard let match = names.first(where: <beginfold id='1'>{</beginfold id='1'> $0.hasPrefix(flag) <endfold id='1'>}</endfold id='1'>) else <beginfold id='1'>{</beginfold id='1'>
+                throw FormatError.options("Unknown flag -\(flag)")
+            <endfold id='1'>}</endfold id='1'>
+            name = match
+            namedArgs[name] = namedArgs[name] ?? ""
+            continue
+        <endfold id='1'>}</endfold id='1'>
+        if name == "" <beginfold id='1'>{</beginfold id='1'>
+            // Argument is anonymous
+            name = String(anonymousArgs)
+            anonymousArgs += 1
+        <endfold id='1'>}</endfold id='1'>
+        var arg = arg
+        let hasTrailingComma = arg.hasSuffix(",") && arg != ","
+        if hasTrailingComma <beginfold id='1'>{</beginfold id='1'>
+            arg = String(arg.dropLast())
+        <endfold id='1'>}</endfold id='1'>
+        if let existing = namedArgs[name], !existing.isEmpty,
+           // TODO: find a more general way to represent merge-able options
+           ["exclude", "unexclude", "disable", "enable", "lintonly", "rules"].contains(name) ||
+           Descriptors.all.contains(where: <beginfold id='1'>{</beginfold id='1'>
+               $0.argumentName == name && $0.isSetType
+           <endfold id='1'>}</endfold id='1'>)
+        <beginfold id='1'>{</beginfold id='1'>
+            namedArgs[name] = existing + "," + arg
+        <endfold id='1'>}</endfold id='1'> else <beginfold id='1'>{</beginfold id='1'>
+            namedArgs[name] = arg
+        <endfold id='1'>}</endfold id='1'>
+        if !hasTrailingComma <beginfold id='1'>{</beginfold id='1'>
+            name = ""
+        <endfold id='1'>}</endfold id='1'>
+    <endfold id='1'>}</endfold id='1'>
+    return namedArgs
+<endfold id='1'>}</endfold id='1'>
+
+// Find best match for a given string in a list of options
+func bestMatches(for query: String, in options: [String]) -> [String] <beginfold id='1'>{</beginfold id='1'>
+    let lowercaseQuery = query.lowercased()
+    // Sort matches by Levenshtein edit distance
+    return options
+        .compactMap <beginfold id='1'>{</beginfold id='1'> option -> (String, distance: Int, commonPrefix: Int)? in
+            let lowercaseOption = option.lowercased()
+            let distance = editDistance(lowercaseOption, lowercaseQuery)
+            let commonPrefix = lowercaseOption.commonPrefix(with: lowercaseQuery)
+            if commonPrefix.isEmpty, distance > lowercaseQuery.count / 2 <beginfold id='1'>{</beginfold id='1'>
+                return nil
+            <endfold id='1'>}</endfold id='1'>
+            return (option, distance, commonPrefix.count)
+        <endfold id='1'>}</endfold id='1'>
+        .sorted <beginfold id='1'>{</beginfold id='1'>
+            if $0.distance == $1.distance <beginfold id='1'>{</beginfold id='1'>
+                return $0.commonPrefix > $1.commonPrefix
+            <endfold id='1'>}</endfold id='1'>
+            return $0.distance < $1.distance
+        <endfold id='1'>}</endfold id='1'>
+        .map <beginfold id='1'>{</beginfold id='1'> $0.0 <endfold id='1'>}</endfold id='1'>
+<endfold id='1'>}</endfold id='1'>
+
+/// The Damerau-Levenshtein edit-distance between two strings
+func editDistance(_ lhs: String, _ rhs: String) -> Int <beginfold id='1'>{</beginfold id='1'>
+    let lhs = Array(lhs)
+    let rhs = Array(rhs)
+    var dist = [[Int]]()
+    for i in 0 ... lhs.count <beginfold id='1'>{</beginfold id='1'>
+        dist.append([i])
+    <endfold id='1'>}</endfold id='1'>
+    for j in 1 ... rhs.count <beginfold id='1'>{</beginfold id='1'>
+        dist[0].append(j)
+    <endfold id='1'>}</endfold id='1'>
+    for i in 1 ... lhs.count <beginfold id='1'>{</beginfold id='1'>
+        for j in 1 ... rhs.count <beginfold id='1'>{</beginfold id='1'>
+            if lhs[i - 1] == rhs[j - 1] <beginfold id='1'>{</beginfold id='1'>
+                dist[i].append(dist[i - 1][j - 1])
+            <endfold id='1'>}</endfold id='1'> else <beginfold id='1'>{</beginfold id='1'>
+                dist[i].append(min(dist[i - 1][j] + 1,
+                                   dist[i][j - 1] + 1,
+                                   dist[i - 1][j - 1] + 1))
+            <endfold id='1'>}</endfold id='1'>
+            if i > 1, j > 1, lhs[i - 1] == rhs[j - 2], lhs[i - 2] == rhs[j - 1] <beginfold id='1'>{</beginfold id='1'>
+                dist[i][j] = min(dist[i][j], dist[i - 2][j - 2] + 1)
+            <endfold id='1'>}</endfold id='1'>
+        <endfold id='1'>}</endfold id='1'>
+    <endfold id='1'>}</endfold id='1'>
+    return dist[lhs.count][rhs.count]
+<endfold id='1'>}</endfold id='1'>
+
+// Parse a comma-delimited list of items
+func parseCommaDelimitedList(_ string: String) -> [String] <beginfold id='1'>{</beginfold id='1'>
+    return string.components(separatedBy: ",").compactMap <beginfold id='1'>{</beginfold id='1'>
+        let item = $0.trimmingCharacters(in: .whitespacesAndNewlines)
+        return item.isEmpty ? nil : item
+    <endfold id='1'>}</endfold id='1'>
+<endfold id='1'>}</endfold id='1'>
+
+// Parse a comma-delimited string into an array of rules
+let allRules = Set(FormatRules.byName.keys)
+func parseRules(_ rules: String) throws -> [String] <beginfold id='1'>{</beginfold id='1'>
+    return try parseCommaDelimitedList(rules).map <beginfold id='1'>{</beginfold id='1'> proposedName in
+        if let name = allRules.first(where: <beginfold id='1'>{</beginfold id='1'>
+            $0.lowercased() == proposedName.lowercased()
+        <endfold id='1'>}</endfold id='1'>) <beginfold id='1'>{</beginfold id='1'>
+            return name
+        <endfold id='1'>}</endfold id='1'>
+        if Descriptors.all.contains(where: <beginfold id='1'>{</beginfold id='1'>
+            $0.argumentName == proposedName
+        <endfold id='1'>}</endfold id='1'>) <beginfold id='1'>{</beginfold id='1'>
+            for rule in FormatRules.all where rule.options.contains(proposedName) <beginfold id='1'>{</beginfold id='1'>
+                throw FormatError.options(
+                    "'\(proposedName)' is not a formatting rule. Did you mean '\(rule.name)'?"
+                )
+            <endfold id='1'>}</endfold id='1'>
+            throw FormatError.options("'\(proposedName)' is not a formatting rule")
+        <endfold id='1'>}</endfold id='1'>
+        guard let match = bestMatches(for: proposedName, in: Array(allRules)).first else <beginfold id='1'>{</beginfold id='1'>
+            throw FormatError.options("Unknown rule '\(proposedName)'")
+        <endfold id='1'>}</endfold id='1'>
+        throw FormatError.options("Unknown rule '\(proposedName)'. Did you mean '\(match)'?")
+    <endfold id='1'>}</endfold id='1'>
+<endfold id='1'>}</endfold id='1'>
+
+// Parse single file path, disallowing globs or commas
+func parsePath(_ path: String, for argument: String, in directory: String) throws -> URL <beginfold id='1'>{</beginfold id='1'>
+    let expandedPath = expandPath(path, in: directory)
+    if !FileManager.default.fileExists(atPath: expandedPath.path) <beginfold id='1'>{</beginfold id='1'>
+        if path.contains(",") <beginfold id='1'>{</beginfold id='1'>
+            throw FormatError.options("\(argument) argument does not support multiple paths")
+        <endfold id='1'>}</endfold id='1'>
+        if pathContainsGlobSyntax(path) <beginfold id='1'>{</beginfold id='1'>
+            throw FormatError.options("\(argument) path cannot contain wildcards")
+        <endfold id='1'>}</endfold id='1'>
+    <endfold id='1'>}</endfold id='1'>
+    return expandedPath
+<endfold id='1'>}</endfold id='1'>
+
+// Parse one or more comma-delimited file paths, expanding globs as required
+func parsePaths(_ paths: String, in directory: String) throws -> [URL] <beginfold id='1'>{</beginfold id='1'>
+    return try matchGlobs(expandGlobs(paths, in: directory), in: directory)
+<endfold id='1'>}</endfold id='1'>
+
+// Merge two dictionaries of arguments
+func mergeArguments(_ args: [String: String], into config: [String: String]) throws -> [String: String] <beginfold id='1'>{</beginfold id='1'>
+    var input = config
+    var output = args
+    // Merge excluded urls
+    if let exclude = output["exclude"].map(parseCommaDelimitedList),
+       var excluded = input["exclude"].map(<beginfold id='1'>{</beginfold id='1'> Set(parseCommaDelimitedList($0)) <endfold id='1'>}</endfold id='1'>)
+    <beginfold id='1'>{</beginfold id='1'>
+        excluded.formUnion(exclude)
+        output["exclude"] = Array(excluded).sorted().joined(separator: ",")
+    <endfold id='1'>}</endfold id='1'>
+    // Merge unexcluded urls
+    if let unexclude = output["unexclude"].map(parseCommaDelimitedList),
+       var unexcluded = input["unexclude"].map(<beginfold id='1'>{</beginfold id='1'> Set(parseCommaDelimitedList($0)) <endfold id='1'>}</endfold id='1'>)
+    <beginfold id='1'>{</beginfold id='1'>
+        unexcluded.formUnion(unexclude)
+        output["unexclude"] = Array(unexcluded).sorted().joined(separator: ",")
+    <endfold id='1'>}</endfold id='1'>
+    // Merge rules
+    if let rules = try output["rules"].map(parseRules) <beginfold id='1'>{</beginfold id='1'>
+        if rules.isEmpty <beginfold id='1'>{</beginfold id='1'>
+            output["rules"] = nil
+        <endfold id='1'>}</endfold id='1'> else <beginfold id='1'>{</beginfold id='1'>
+            input["rules"] = nil
+            input["enable"] = nil
+            input["disable"] = nil
+            input["lintonly"] = nil
+        <endfold id='1'>}</endfold id='1'>
+    <endfold id='1'>}</endfold id='1'> else <beginfold id='1'>{</beginfold id='1'>
+        if let _disable = try output["disable"].map(parseRules) <beginfold id='1'>{</beginfold id='1'>
+            if let rules = try input["rules"].map(parseRules) <beginfold id='1'>{</beginfold id='1'>
+                input["rules"] = Set(rules).subtracting(_disable).sorted().joined(separator: ",")
+            <endfold id='1'>}</endfold id='1'>
+            if let enable = try input["enable"].map(parseRules) <beginfold id='1'>{</beginfold id='1'>
+                input["enable"] = Set(enable).subtracting(_disable).sorted().joined(separator: ",")
+            <endfold id='1'>}</endfold id='1'>
+            if let lintonly = try input["lintonly"].map(parseRules) <beginfold id='1'>{</beginfold id='1'>
+                input["lintonly"] = Set(lintonly).subtracting(_disable).sorted().joined(separator: ",")
+            <endfold id='1'>}</endfold id='1'>
+            if let disable = try input["disable"].map(parseRules) <beginfold id='1'>{</beginfold id='1'>
+                input["disable"] = Set(disable).union(_disable).sorted().joined(separator: ",")
+                output["disable"] = nil
+            <endfold id='1'>}</endfold id='1'>
+        <endfold id='1'>}</endfold id='1'>
+        if let _enable = try output["enable"].map(parseRules) <beginfold id='1'>{</beginfold id='1'>
+            if let enable = try input["enable"].map(parseRules) <beginfold id='1'>{</beginfold id='1'>
+                input["enable"] = Set(enable).union(_enable).sorted().joined(separator: ",")
+                output["enable"] = nil
+            <endfold id='1'>}</endfold id='1'>
+            if let lintonly = try input["lintonly"].map(parseRules) <beginfold id='1'>{</beginfold id='1'>
+                input["lintonly"] = Set(lintonly).subtracting(_enable).sorted().joined(separator: ",")
+            <endfold id='1'>}</endfold id='1'>
+            if let disable = try input["disable"].map(parseRules) <beginfold id='1'>{</beginfold id='1'>
+                input["disable"] = Set(disable).subtracting(_enable).sorted().joined(separator: ",")
+            <endfold id='1'>}</endfold id='1'>
+        <endfold id='1'>}</endfold id='1'>
+        if let _lintonly = try output["lintonly"].map(parseRules) <beginfold id='1'>{</beginfold id='1'>
+            if let lintonly = try input["lintonly"].map(parseRules) <beginfold id='1'>{</beginfold id='1'>
+                input["lintonly"] = Set(lintonly).union(_lintonly).sorted().joined(separator: ",")
+                output["lintonly"] = nil
+            <endfold id='1'>}</endfold id='1'>
+        <endfold id='1'>}</endfold id='1'>
+    <endfold id='1'>}</endfold id='1'>
+    // Merge other arguments
+    for (key, inValue) in input <beginfold id='1'>{</beginfold id='1'>
+        guard let outValue = output[key] else <beginfold id='1'>{</beginfold id='1'>
+            output[key] = inValue
+            continue
+        <endfold id='1'>}</endfold id='1'>
+        if Descriptors.all.contains(where: <beginfold id='1'>{</beginfold id='1'> $0.argumentName == key && $0.isSetType <endfold id='1'>}</endfold id='1'>) <beginfold id='1'>{</beginfold id='1'>
+            let inOptions = parseCommaDelimitedList(inValue)
+            let outOptions = parseCommaDelimitedList(outValue)
+            output[key] = Set(inOptions).union(outOptions).sorted().joined(separator: ",")
+        <endfold id='1'>}</endfold id='1'>
+    <endfold id='1'>}</endfold id='1'>
+    return output
+<endfold id='1'>}</endfold id='1'>
+
+// Parse a configuration file into a dictionary of arguments
+public func parseConfigFile(_ data: Data) throws -> [String: String] <beginfold id='1'>{</beginfold id='1'>
+    guard let input = String(data: data, encoding: .utf8) else <beginfold id='1'>{</beginfold id='1'>
+        throw FormatError.reading("Unable to read data for configuration file")
+    <endfold id='1'>}</endfold id='1'>
+    let lines = try cumulate(successiveLines: input.components(separatedBy: .newlines))
+    let arguments = try lines.flatMap <beginfold id='1'>{</beginfold id='1'> line -> [String] in
+        // TODO: parseArguments isn't a perfect fit here - should we use a different approach?
+        let line = line.replacingOccurrences(of: "\\n", with: "\n")
+        let parts = parseArguments(line, ignoreComments: false).dropFirst().map <beginfold id='1'>{</beginfold id='1'>
+            $0.replacingOccurrences(of: "\n", with: "\\n")
+        <endfold id='1'>}</endfold id='1'>
+        guard let key = parts.first else <beginfold id='1'>{</beginfold id='1'>
+            return []
+        <endfold id='1'>}</endfold id='1'>
+        if !key.hasPrefix("-") <beginfold id='1'>{</beginfold id='1'>
+            throw FormatError.options("Unknown option '\(key)' in configuration file")
+        <endfold id='1'>}</endfold id='1'>
+        return [key, parts.dropFirst().joined(separator: " ")]
+    <endfold id='1'>}</endfold id='1'>
+    do <beginfold id='1'>{</beginfold id='1'>
+        return try preprocessArguments(arguments, optionsArguments)
+    <endfold id='1'>}</endfold id='1'> catch let FormatError.options(message) <beginfold id='1'>{</beginfold id='1'>
+        throw FormatError.options("\(message) in configuration file")
+    <endfold id='1'>}</endfold id='1'>
+<endfold id='1'>}</endfold id='1'>
+
+private func cumulate(successiveLines: [String]) throws -> [String] <beginfold id='1'>{</beginfold id='1'>
+    var cumulatedLines = [String]()
+    var iterator = successiveLines.makeIterator()
+    while let currentLine = iterator.next() <beginfold id='1'>{</beginfold id='1'>
+        var cumulatedLine = effectiveContent(of: currentLine)
+        while cumulatedLine.hasSuffix("\\") <beginfold id='1'>{</beginfold id='1'>
+            guard let nextLine = iterator.next() else <beginfold id='1'>{</beginfold id='1'>
+                throw FormatError.reading("Configuration file ends with an illegal line continuation character '\'")
+            <endfold id='1'>}</endfold id='1'>
+            if !nextLine.trimmingCharacters(in: .whitespaces).starts(with: "#") <beginfold id='1'>{</beginfold id='1'>
+                cumulatedLine = cumulatedLine.dropLast() + effectiveContent(of: nextLine)
+            <endfold id='1'>}</endfold id='1'>
+        <endfold id='1'>}</endfold id='1'>
+        cumulatedLines.append(String(cumulatedLine))
+    <endfold id='1'>}</endfold id='1'>
+    return cumulatedLines
+<endfold id='1'>}</endfold id='1'>
+
+private func effectiveContent(of line: String) -> String <beginfold id='1'>{</beginfold id='1'>
+    return line
+        .prefix <beginfold id='1'>{</beginfold id='1'> $0 != "#" <endfold id='1'>}</endfold id='1'>
+        .trimmingCharacters(in: .whitespaces)
+<endfold id='1'>}</endfold id='1'>
+
+// Serialize a set of options into either an arguments string or a file
+func serialize(options: Options,
+               swiftVersion: Version = .undefined,
+               excludingDefaults: Bool = false,
+               separator: String = "\n") -> String
+<beginfold id='1'>{</beginfold id='1'>
+    var arguments = [[String: String]]()
+    if let fileOptions = options.fileOptions <beginfold id='1'>{</beginfold id='1'>
+        arguments.append(argumentsFor(
+            Options(fileOptions: fileOptions),
+            excludingDefaults: excludingDefaults
+        ))
+    <endfold id='1'>}</endfold id='1'>
+    if let formatOptions = options.formatOptions <beginfold id='1'>{</beginfold id='1'>
+        arguments.append(argumentsFor(
+            Options(formatOptions: formatOptions),
+            excludingDefaults: excludingDefaults
+        ))
+    <endfold id='1'>}</endfold id='1'> else if swiftVersion != .undefined <beginfold id='1'>{</beginfold id='1'>
+        let descriptor = Descriptors.swiftVersion
+        arguments.append([descriptor.argumentName: swiftVersion.rawValue])
+    <endfold id='1'>}</endfold id='1'>
+    if let rules = options.rules <beginfold id='1'>{</beginfold id='1'>
+        arguments.append(argumentsFor(
+            Options(rules: rules),
+            excludingDefaults: excludingDefaults
+        ))
+    <endfold id='1'>}</endfold id='1'>
+    return arguments
+        .map <beginfold id='1'>{</beginfold id='1'> serialize(arguments: $0, separator: separator) <endfold id='1'>}</endfold id='1'>
+        .filter <beginfold id='1'>{</beginfold id='1'> !$0.isEmpty <endfold id='1'>}</endfold id='1'>
+        .joined(separator: separator)
+<endfold id='1'>}</endfold id='1'>
+
+// Serialize arguments
+func serialize(arguments: [String: String],
+               separator: String = "\n") -> String
+<beginfold id='1'>{</beginfold id='1'>
+    return arguments.map <beginfold id='1'>{</beginfold id='1'>
+        var value = $1
+        if value.contains(" ") <beginfold id='1'>{</beginfold id='1'>
+            value = "\"\(value.replacingOccurrences(of: "\"", with: "\\\""))\""
+        <endfold id='1'>}</endfold id='1'>
+        return "--\($0) \(value)"
+    <endfold id='1'>}</endfold id='1'>.sorted().joined(separator: separator)
+<endfold id='1'>}</endfold id='1'>
+
+// Get command line arguments from options
+func argumentsFor(_ options: Options, excludingDefaults: Bool = false) -> [String: String] <beginfold id='1'>{</beginfold id='1'>
+    var args = [String: String]()
+    if let fileOptions = options.fileOptions <beginfold id='1'>{</beginfold id='1'>
+        var arguments = Set(fileArguments)
+        do <beginfold id='1'>{</beginfold id='1'>
+            if !excludingDefaults || fileOptions.followSymlinks != FileOptions.default.followSymlinks <beginfold id='1'>{</beginfold id='1'>
+                args["symlinks"] = fileOptions.followSymlinks ? "follow" : "ignore"
+            <endfold id='1'>}</endfold id='1'>
+            arguments.remove("symlinks")
+        <endfold id='1'>}</endfold id='1'>
+        do <beginfold id='1'>{</beginfold id='1'>
+            if !fileOptions.excludedGlobs.isEmpty <beginfold id='1'>{</beginfold id='1'>
+                // TODO: find a better alternative to stringifying url
+                args["exclude"] = fileOptions.excludedGlobs.map <beginfold id='1'>{</beginfold id='1'> $0.description <endfold id='1'>}</endfold id='1'>.sorted().joined(separator: ",")
+            <endfold id='1'>}</endfold id='1'>
+            arguments.remove("exclude")
+        <endfold id='1'>}</endfold id='1'>
+        do <beginfold id='1'>{</beginfold id='1'>
+            if !fileOptions.unexcludedGlobs.isEmpty <beginfold id='1'>{</beginfold id='1'>
+                // TODO: find a better alternative to stringifying url
+                args["unexclude"] = fileOptions.unexcludedGlobs.map <beginfold id='1'>{</beginfold id='1'> $0.description <endfold id='1'>}</endfold id='1'>.sorted().joined(separator: ",")
+            <endfold id='1'>}</endfold id='1'>
+            arguments.remove("unexclude")
+        <endfold id='1'>}</endfold id='1'>
+        do <beginfold id='1'>{</beginfold id='1'>
+            if !excludingDefaults || fileOptions.minVersion != FileOptions.default.minVersion <beginfold id='1'>{</beginfold id='1'>
+                args["minversion"] = fileOptions.minVersion.description
+            <endfold id='1'>}</endfold id='1'>
+            arguments.remove("minversion")
+        <endfold id='1'>}</endfold id='1'>
+        assert(arguments.isEmpty)
+    <endfold id='1'>}</endfold id='1'>
+    if let formatOptions = options.formatOptions <beginfold id='1'>{</beginfold id='1'>
+        for descriptor in Descriptors.all where !descriptor.isRenamed <beginfold id='1'>{</beginfold id='1'>
+            let value = descriptor.fromOptions(formatOptions)
+            guard value != descriptor.fromOptions(.default) ||
+                (!excludingDefaults && !descriptor.isDeprecated)
+            else <beginfold id='1'>{</beginfold id='1'>
+                continue
+            <endfold id='1'>}</endfold id='1'>
+            // Special case for swiftVersion
+            // TODO: find a better solution for this
+            if descriptor.argumentName == Descriptors.swiftVersion.argumentName,
+               value == Version.undefined.rawValue
+            <beginfold id='1'>{</beginfold id='1'>
+                continue
+            <endfold id='1'>}</endfold id='1'>
+            args[descriptor.argumentName] = value
+        <endfold id='1'>}</endfold id='1'>
+        // Special case for wrapParameters
+        let argumentName = Descriptors.wrapParameters.argumentName
+        if args[argumentName] == WrapMode.default.rawValue <beginfold id='1'>{</beginfold id='1'>
+            args[argumentName] = args[Descriptors.wrapArguments.argumentName]
+        <endfold id='1'>}</endfold id='1'>
+    <endfold id='1'>}</endfold id='1'>
+    if options.lint <beginfold id='1'>{</beginfold id='1'>
+        args["lint"] = ""
+    <endfold id='1'>}</endfold id='1'>
+    if let rules = options.rules <beginfold id='1'>{</beginfold id='1'>
+        let defaultRules = allRules.subtracting(FormatRules.disabledByDefault)
+
+        let enabled = rules.subtracting(defaultRules)
+        if !enabled.isEmpty <beginfold id='1'>{</beginfold id='1'>
+            args["enable"] = enabled.sorted().joined(separator: ",")
+        <endfold id='1'>}</endfold id='1'>
+
+        let disabled = defaultRules.subtracting(rules)
+        if !disabled.isEmpty <beginfold id='1'>{</beginfold id='1'>
+            args["disable"] = disabled.sorted().joined(separator: ",")
+        <endfold id='1'>}</endfold id='1'>
+    <endfold id='1'>}</endfold id='1'>
+    return args
+<endfold id='1'>}</endfold id='1'>
+
+private func processOption(_ key: String,
+                           in args: [String: String],
+                           from: inout Set<String>,
+                           handler: (String) throws -> Void) throws
+<beginfold id='1'>{</beginfold id='1'>
+    precondition(optionsArguments.contains(key), "\(key) not in optionsArguments")
+    var arguments = from
+    arguments.remove(key)
+    from = arguments
+    guard let value = args[key] else <beginfold id='1'>{</beginfold id='1'>
+        return
+    <endfold id='1'>}</endfold id='1'>
+    do <beginfold id='1'>{</beginfold id='1'>
+        try handler(value)
+    <endfold id='1'>}</endfold id='1'> catch <beginfold id='1'>{</beginfold id='1'>
+        guard !value.isEmpty else <beginfold id='1'>{</beginfold id='1'>
+            throw FormatError.options("--\(key) option expects a value")
+        <endfold id='1'>}</endfold id='1'>
+        if case var FormatError.options(string) = error, !string.isEmpty <beginfold id='1'>{</beginfold id='1'>
+            if !string.contains(key) <beginfold id='1'>{</beginfold id='1'>
+                string += " in --\(key)"
+            <endfold id='1'>}</endfold id='1'>
+            throw FormatError.options(string)
+        <endfold id='1'>}</endfold id='1'>
+        throw FormatError.options("Unsupported --\(key) value '\(value)'")
+    <endfold id='1'>}</endfold id='1'>
+<endfold id='1'>}</endfold id='1'>
+
+// Parse rule names from arguments
+public func rulesFor(_ args: [String: String], lint: Bool) throws -> Set<String> <beginfold id='1'>{</beginfold id='1'>
+    var rules = allRules
+    rules = try args["rules"].map <beginfold id='1'>{</beginfold id='1'>
+        try Set(parseRules($0))
+    <endfold id='1'>}</endfold id='1'> ?? rules.subtracting(FormatRules.disabledByDefault)
+    try args["enable"].map <beginfold id='1'>{</beginfold id='1'>
+        try rules.formUnion(parseRules($0))
+    <endfold id='1'>}</endfold id='1'>
+    try args["disable"].map <beginfold id='1'>{</beginfold id='1'>
+        try rules.subtract(parseRules($0))
+    <endfold id='1'>}</endfold id='1'>
+    try args["lintonly"].map <beginfold id='1'>{</beginfold id='1'> rulesString in
+        if lint <beginfold id='1'>{</beginfold id='1'>
+            try rules.formUnion(parseRules(rulesString))
+        <endfold id='1'>}</endfold id='1'> else <beginfold id='1'>{</beginfold id='1'>
+            try rules.subtract(parseRules(rulesString))
+        <endfold id='1'>}</endfold id='1'>
+    <endfold id='1'>}</endfold id='1'>
+    return rules
+<endfold id='1'>}</endfold id='1'>
+
+// Parse FileOptions from arguments
+func fileOptionsFor(_ args: [String: String], in directory: String) throws -> FileOptions? <beginfold id='1'>{</beginfold id='1'>
+    var options = FileOptions()
+    var arguments = Set(fileArguments)
+
+    var containsFileOption = false
+    try processOption("symlinks", in: args, from: &arguments) <beginfold id='1'>{</beginfold id='1'>
+        containsFileOption = true
+        switch $0.lowercased() <beginfold id='1'>{</beginfold id='1'>
+        case "follow":
+            options.followSymlinks = true
+        case "ignore":
+            options.followSymlinks = false
+        default:
+            throw FormatError.options("")
+        <endfold id='1'>}</endfold id='1'>
+    <endfold id='1'>}</endfold id='1'>
+    try processOption("exclude", in: args, from: &arguments) <beginfold id='1'>{</beginfold id='1'>
+        containsFileOption = true
+        options.excludedGlobs += expandGlobs($0, in: directory)
+    <endfold id='1'>}</endfold id='1'>
+    try processOption("unexclude", in: args, from: &arguments) <beginfold id='1'>{</beginfold id='1'>
+        containsFileOption = true
+        options.unexcludedGlobs += expandGlobs($0, in: directory)
+    <endfold id='1'>}</endfold id='1'>
+    try processOption("minversion", in: args, from: &arguments) <beginfold id='1'>{</beginfold id='1'>
+        containsFileOption = true
+        guard let minVersion = Version(rawValue: $0) else <beginfold id='1'>{</beginfold id='1'>
+            throw FormatError.options("Unsupported --minversion value '\($0)'")
+        <endfold id='1'>}</endfold id='1'>
+        guard minVersion <= Version(stringLiteral: swiftFormatVersion) else <beginfold id='1'>{</beginfold id='1'>
+            throw FormatError.options("Project specifies SwiftFormat --minversion of \(minVersion)")
+        <endfold id='1'>}</endfold id='1'>
+        options.minVersion = minVersion
+    <endfold id='1'>}</endfold id='1'>
+    assert(arguments.isEmpty, "\(arguments.joined(separator: ","))")
+    return containsFileOption ? options : nil
+<endfold id='1'>}</endfold id='1'>
+
+// Parse FormatOptions from arguments
+// Returns nil if the arguments dictionary does not contain any formatting arguments
+public func formatOptionsFor(_ args: [String: String]) throws -> FormatOptions? <beginfold id='1'>{</beginfold id='1'>
+    var options = FormatOptions.default
+    var arguments = Set(formattingArguments)
+
+    var containsFormatOption = false
+    for option in Descriptors.all <beginfold id='1'>{</beginfold id='1'>
+        try processOption(option.argumentName, in: args, from: &arguments) <beginfold id='1'>{</beginfold id='1'>
+            containsFormatOption = true
+            try option.toOptions($0, &options)
+        <endfold id='1'>}</endfold id='1'>
+    <endfold id='1'>}</endfold id='1'>
+    assert(arguments.isEmpty, "\(arguments.joined(separator: ","))")
+    return containsFormatOption ? options : nil
+<endfold id='1'>}</endfold id='1'>
+
+// Get deprecation warnings from a set of arguments
+func warningsForArguments(_ args: [String: String]) -> [String] <beginfold id='1'>{</beginfold id='1'>
+    var warnings = [String]()
+    for option in Descriptors.all <beginfold id='1'>{</beginfold id='1'>
+        if args[option.argumentName] != nil, let message = option.deprecationMessage <beginfold id='1'>{</beginfold id='1'>
+            warnings.append("--\(option.argumentName) option is deprecated. \(message)")
+        <endfold id='1'>}</endfold id='1'>
+    <endfold id='1'>}</endfold id='1'>
+    for name in Set(rulesArguments.flatMap <beginfold id='1'>{</beginfold id='1'> (try? args[$0].map(parseRules) ?? []) ?? [] <endfold id='1'>}</endfold id='1'>) <beginfold id='1'>{</beginfold id='1'>
+        if let message = FormatRules.byName[name]?.deprecationMessage <beginfold id='1'>{</beginfold id='1'>
+            warnings.append("\(name) rule is deprecated. \(message)")
+        <endfold id='1'>}</endfold id='1'>
+    <endfold id='1'>}</endfold id='1'>
+    if let rules = try? rulesFor(args, lint: true) <beginfold id='1'>{</beginfold id='1'>
+        for arg in args.keys where formattingArguments.contains(arg) <beginfold id='1'>{</beginfold id='1'>
+            if !rules.contains(where: <beginfold id='1'>{</beginfold id='1'>
+                guard let rule = FormatRules.byName[$0] else <beginfold id='1'>{</beginfold id='1'>
+                    return false
+                <endfold id='1'>}</endfold id='1'>
+                return rule.options.contains(arg) || rule.sharedOptions.contains(arg)
+            <endfold id='1'>}</endfold id='1'>) <beginfold id='1'>{</beginfold id='1'>
+                let expected = FormatRules.all.first(where: <beginfold id='1'>{</beginfold id='1'>
+                    $0.options.contains(arg)
+                <endfold id='1'>}</endfold id='1'>)?.name ?? "associated"
+                warnings.append("--\(arg) option has no effect when \(expected) rule is disabled")
+            <endfold id='1'>}</endfold id='1'>
+        <endfold id='1'>}</endfold id='1'>
+    <endfold id='1'>}</endfold id='1'>
+    return warnings
+<endfold id='1'>}</endfold id='1'>
+
+let fileArguments = [
+    "symlinks",
+    "exclude",
+    "unexclude",
+    "minversion",
+]
+
+let rulesArguments = [
+    "disable",
+    "enable",
+    "lintonly",
+    "rules",
+]
+
+let formattingArguments = Descriptors.formatting.map <beginfold id='1'>{</beginfold id='1'> $0.argumentName <endfold id='1'>}</endfold id='1'>
+let internalArguments = Descriptors.internal.map <beginfold id='1'>{</beginfold id='1'> $0.argumentName <endfold id='1'>}</endfold id='1'>
+let optionsArguments = fileArguments + rulesArguments + formattingArguments + internalArguments
+
+let commandLineArguments = [
+    // Input options
+    "filelist",
+    "stdinpath",
+    "config",
+    "inferoptions",
+    "linerange",
+    "output",
+    "cache",
+    "dryrun",
+    "lint",
+    "lenient",
+    "verbose",
+    "quiet",
+    "report",
+    // Misc
+    "help",
+    "version",
+    "options",
+    "ruleinfo",
+] + optionsArguments
+
+let deprecatedArguments = Descriptors.all.compactMap <beginfold id='1'>{</beginfold id='1'>
+    $0.isDeprecated ? $0.argumentName : nil
+<endfold id='1'>}</endfold id='1'>

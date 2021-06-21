@@ -123,6 +123,14 @@ test -f blaat &&
 ) # despite the extra parentheses in the case construction.
 
 
+# more control flow
+while :;
+  break
+  continue
+  return
+done
+
+
 # variable assignments:
 DIR=/dev
 p=`ls`
@@ -451,6 +459,7 @@ h
 <<"'" cat
 bla
 '
+r=$(xxx $@ 2>&1)
 
 # branches
 cat a|cat
@@ -707,6 +716,7 @@ a  () { echo x; }
 function f { echo x; }
 kde.org() { echo x; }
 --func() { echo x; }
+noglob function f { echo x; }
 
 # variables
 a=(a b c)

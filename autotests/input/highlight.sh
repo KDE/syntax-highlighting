@@ -138,6 +138,14 @@ test -f blaat &&
 ) # despite the extra parentheses in the case construction.
 
 
+# more control flow
+while :;
+  break
+  continue
+  return
+done
+
+
 # variable assignments:
 DIR=/dev
 p=`ls`
@@ -339,6 +347,7 @@ h
 <<"'" cat
 bla
 '
+r=$(xxx $@ 2>&1)
 
 # branches
 cat a|cat
@@ -416,6 +425,7 @@ cmd) || cmd)
 (echo
     echo)
 (echo a)
+({ echo plop;})
 [ a -eq 2 ] || [ a -eq 2] ] && [[ a -eq 2 ]] || [[ a != b ]];
 [ a -eq 2 ]||[ a -eq 2] ]&&[[ a -eq 2 ]]||[[ a != b ]];
 test a -eq b

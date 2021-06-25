@@ -137,13 +137,6 @@ public:
             success = checkKeywordsList(definition, referencedKeywords) && success;
             success = checkContexts(definition, referencedKeywords, usedAttributeNames, usedContexts) && success;
 
-            // search for non-existing or unreferenced keyword lists.
-            for (const auto &keywords : definition.keywordsList) {
-                if (!referencedKeywords.contains(&keywords)) {
-                    qWarning() << filename << "line" << keywords.line << "unused keyword:" << keywords.name;
-                }
-            }
-
             // search for non-existing itemDatas.
             const auto invalidNames = usedAttributeNames - definition.itemDatas.styleNames;
             for (const auto &styleName : invalidNames) {

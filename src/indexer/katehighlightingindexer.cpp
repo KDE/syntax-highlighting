@@ -93,6 +93,12 @@ public:
                 continue;
             }
 
+            auto markAsUsedContext = [](ContextName &ContextName) {
+                if (!ContextName.stay && ContextName.context) {
+                    ContextName.context->isOnlyIncluded = false;
+                }
+            };
+
             QMutableMapIterator<QString, Context> contextIt(contexts);
             while (contextIt.hasNext()) {
                 contextIt.next();
@@ -100,12 +106,20 @@ public:
                 resolveContextName(definition, context, context.lineEndContext, context.line);
                 resolveContextName(definition, context, context.lineEmptyContext, context.line);
                 resolveContextName(definition, context, context.fallthroughContext, context.line);
+                markAsUsedContext(context.lineEndContext);
+                markAsUsedContext(context.lineEmptyContext);
+                markAsUsedContext(context.fallthroughContext);
                 for (auto &rule : context.rules) {
+                    rule.parentContext = &context;
                     resolveContextName(definition, context, rule.context, rule.line);
+                    if (rule.type != Context::Rule::Type::IncludeRules)
+                        markAsUsedContext(rule.context);
                 }
             }
 
-            definition.firstContext = &*definition.contexts.find(definition.firstContextName);
+            auto *firstContext = &*definition.contexts.find(definition.firstContextName);
+            firstContext->isOnlyIncluded = false;
+            definition.firstContext = firstContext;
         }
 
         resolveIncludeRules();
@@ -118,6 +132,7 @@ public:
         const auto usedContexts = extractUsedContexts();
 
         QMap<const Definition *, const Definition *> maxVersionByDefinitions;
+        QMap<const Context::Rule *, IncludedRuleUnreachableBy> unreachableIncludedRules;
 
         QMapIterator<QString, Definition> def(m_definitions);
         while (def.hasNext()) {
@@ -135,7 +150,7 @@ public:
             QSet<const Keywords *> referencedKeywords;
             QSet<ItemDatas::Style> usedAttributeNames;
             success = checkKeywordsList(definition, referencedKeywords) && success;
-            success = checkContexts(definition, referencedKeywords, usedAttributeNames, usedContexts) && success;
+            success = checkContexts(definition, referencedKeywords, usedAttributeNames, usedContexts, unreachableIncludedRules) && success;
 
             // search for non-existing itemDatas.
             const auto invalidNames = usedAttributeNames - definition.itemDatas.styleNames;
@@ -148,6 +163,55 @@ public:
             const auto unusedNames = definition.itemDatas.styleNames - usedAttributeNames;
             for (const auto &styleName : unusedNames) {
                 qWarning() << filename << "line" << styleName.line << "unused itemData:" << styleName.name;
+                success = false;
+            }
+        }
+
+        QMutableMapIterator<const Context::Rule *, IncludedRuleUnreachableBy> unreachableIncludedRuleIt(unreachableIncludedRules);
+        while (unreachableIncludedRuleIt.hasNext()) {
+            unreachableIncludedRuleIt.next();
+            IncludedRuleUnreachableBy &unreachableRulesBy = unreachableIncludedRuleIt.value();
+            if (unreachableRulesBy.alwaysUnreachable) {
+                auto *rule = unreachableIncludedRuleIt.key();
+
+                if (!rule->parentContext->isOnlyIncluded) {
+                    continue;
+                }
+
+                // remove duplicates rules
+                QSet<const Context::Rule *> rules;
+                auto &unreachableBy = unreachableRulesBy.unreachableBy;
+                unreachableBy.erase(std::remove_if(unreachableBy.begin(),
+                                                   unreachableBy.end(),
+                                                   [&](const RuleAndInclude &ruleAndInclude) {
+                                                       if (rules.contains(ruleAndInclude.rule))
+                                                           return true;
+                                                       rules.insert(ruleAndInclude.rule);
+                                                       return false;
+                                                   }),
+                                    unreachableBy.end());
+
+                QString message;
+                message.reserve(128);
+                for (auto &ruleAndInclude : qAsConst(unreachableBy)) {
+                    message += QStringLiteral("line ");
+                    message += QString::number(ruleAndInclude.rule->line);
+                    message += QStringLiteral(" [");
+                    message += ruleAndInclude.rule->parentContext->name;
+                    if (rule->filename != ruleAndInclude.rule->filename) {
+                        message += QStringLiteral(" (");
+                        message += ruleAndInclude.rule->filename;
+                        message += QLatin1Char(')');
+                    }
+                    if (ruleAndInclude.includeRules) {
+                        message += QStringLiteral(" via line ");
+                        message += QString::number(ruleAndInclude.includeRules->line);
+                    }
+                    message += QStringLiteral("], ");
+                }
+                message.chop(2);
+
+                qWarning() << rule->filename << "line" << rule->line << "no IncludeRule can reach this rule, hidden by" << message;
                 success = false;
             }
         }
@@ -169,7 +233,7 @@ private:
         int popCount = 0;
         bool stay = false;
 
-        const Context *context = nullptr;
+        Context *context = nullptr;
     };
 
     struct Parser {
@@ -393,18 +457,19 @@ private:
             QString additionalDeliminator;
             QString weakDeliminator;
 
-            // rules included by IncludeRules
+            // rules included by IncludeRules (without IncludeRule)
             QVector<const Rule *> includedRules;
 
             // IncludeRules included by IncludeRules
             QSet<const Rule *> includedIncludeRules;
+
+            Context const *parentContext = nullptr;
 
             QString filename;
 
             bool parseElement(const QString &filename, QXmlStreamReader &xml)
             {
                 this->filename = filename;
-
                 line = xml.lineNumber();
 
                 using Pair = QPair<QString, Type>;
@@ -572,6 +637,8 @@ private:
         };
 
         int line;
+        // becomes false when a context refers to it
+        bool isOnlyIncluded = true;
         QString name;
         QString attribute;
         ContextName lineEndContext;
@@ -777,6 +844,7 @@ private:
                         m_success = false;
                         continue;
                     }
+
                     if (rule.context.popCount) {
                         qWarning() << definition.filename << "line" << rule.line << "IncludeRules with #pop prefix";
                         m_success = false;
@@ -786,6 +854,8 @@ private:
                         m_success = false;
                         continue;
                     }
+
+                    // resolve includedRules and includedIncludeRules
 
                     usedContexts.clear();
                     usedContexts.insert(rule.context.context);
@@ -859,11 +929,27 @@ private:
         return usedContexts;
     }
 
+    struct RuleAndInclude {
+        const Context::Rule *rule;
+        const Context::Rule *includeRules;
+
+        explicit operator bool() const
+        {
+            return rule;
+        }
+    };
+
+    struct IncludedRuleUnreachableBy {
+        QVector<RuleAndInclude> unreachableBy;
+        bool alwaysUnreachable = true;
+    };
+
     //! Check contexts and rules
     bool checkContexts(const Definition &definition,
                        QSet<const Keywords *> &referencedKeywords,
                        QSet<ItemDatas::Style> &usedAttributeNames,
-                       const QSet<const Context *> &usedContexts) const
+                       const QSet<const Context *> &usedContexts,
+                       QMap<const Context::Rule *, IncludedRuleUnreachableBy> &unreachableIncludedRules) const
     {
         bool success = true;
 
@@ -889,7 +975,7 @@ private:
                 usedAttributeNames.insert({context.attribute, context.line});
 
             success = checkfallthrough(definition, context) && success;
-            success = checkUreachableRules(definition.filename, context) && success;
+            success = checkUreachableRules(definition.filename, context, unreachableIncludedRules) && success;
             success = suggestRuleMerger(definition.filename, context) && success;
 
             for (const auto &rule : context.rules) {
@@ -1465,16 +1551,38 @@ private:
     //! - StringDetect, WordDetect, RegExpr with as prefix Detect2Chars or other strings
     //! - duplicate rule (Int, Float, keyword with same String, etc)
     //! - Rule hidden by a dot regex
-    bool checkUreachableRules(const QString &filename, const Context &context) const
+    bool checkUreachableRules(const QString &filename,
+                              const Context &context,
+                              QMap<const Context::Rule *, IncludedRuleUnreachableBy> &unreachableIncludedRules) const
     {
-        struct RuleAndInclude {
-            const Context::Rule *rule;
-            const Context::Rule *includeRules;
+        if (context.isOnlyIncluded) {
+            return true;
+        }
 
-            explicit operator bool() const
+        struct Rule4 {
+            RuleAndInclude setRule(const Context::Rule &rule, const Context::Rule *includeRules = nullptr)
             {
-                return rule;
+                auto set = [&](RuleAndInclude &ruleAndInclude) {
+                    auto old = ruleAndInclude;
+                    ruleAndInclude = {&rule, includeRules};
+                    return old;
+                };
+
+                if (rule.firstNonSpace == XmlBool::True)
+                    return set(firstNonSpace);
+                else if (rule.column == 0)
+                    return set(column0);
+                else if (rule.column > 0)
+                    return set(columnGreaterThan0[rule.column]);
+                else
+                    return set(normal);
             }
+
+        private:
+            RuleAndInclude normal;
+            RuleAndInclude column0;
+            QMap<int, RuleAndInclude> columnGreaterThan0;
+            RuleAndInclude firstNonSpace;
         };
 
         // Associate QChar with RuleAndInclude
@@ -1614,9 +1722,19 @@ private:
             int m_size = 0;
         };
 
+        struct ObservableRule {
+            const Context::Rule *rule;
+            const Context::Rule *includeRules;
+
+            bool hasResolvedIncludeRules() const
+            {
+                return rule == includeRules;
+            }
+        };
+
         // Iterates over all the rules, including those in includedRules
         struct RuleIterator {
-            RuleIterator(const QVector<Context::Rule> &rules, const Context::Rule &endRule)
+            RuleIterator(const QVector<ObservableRule> &rules, const ObservableRule &endRule)
                 : m_end(&endRule - rules.data())
                 , m_rules(rules)
             {
@@ -1628,7 +1746,7 @@ private:
                 // if in includedRules
                 if (m_includedRules) {
                     ++m_i2;
-                    if (m_i2 != m_rules[m_i].includedRules.size()) {
+                    if (m_i2 != m_includedRules->size()) {
                         return (*m_includedRules)[m_i2];
                     }
                     ++m_i;
@@ -1636,10 +1754,10 @@ private:
                 }
 
                 // if is a includedRules
-                while (m_i < m_end && m_rules[m_i].type == Context::Rule::Type::IncludeRules) {
-                    if (m_rules[m_i].includedRules.size()) {
+                while (m_i < m_end && m_rules[m_i].rule->type == Context::Rule::Type::IncludeRules) {
+                    if (!m_rules[m_i].includeRules && m_rules[m_i].rule->includedRules.size()) {
                         m_i2 = 0;
-                        m_includedRules = &m_rules[m_i].includedRules;
+                        m_includedRules = &m_rules[m_i].rule->includedRules;
                         return (*m_includedRules)[m_i2];
                     }
                     ++m_i;
@@ -1647,7 +1765,7 @@ private:
 
                 if (m_i < m_end) {
                     ++m_i;
-                    return &m_rules[m_i - 1];
+                    return m_rules[m_i - 1].rule;
                 }
 
                 return nullptr;
@@ -1656,14 +1774,14 @@ private:
             /// \return current IncludeRules or nullptr
             const Context::Rule *currentIncludeRules() const
             {
-                return m_includedRules ? &m_rules[m_i] : nullptr;
+                return m_includedRules ? m_rules[m_i].rule : m_rules[m_i].includeRules;
             }
 
         private:
             int m_i = 0;
             int m_i2;
             int m_end;
-            const QVector<Context::Rule> &m_rules;
+            const QVector<ObservableRule> &m_rules;
             const QVector<const Context::Rule *> *m_includedRules = nullptr;
         };
 
@@ -1727,19 +1845,40 @@ private:
         // characters of LineContinue
         Char4Tables lineContinueChars;
 
-        RuleAndInclude intRule{};
-        RuleAndInclude floatRule{};
-        RuleAndInclude hlCCharRule{};
-        RuleAndInclude hlCOctRule{};
-        RuleAndInclude hlCHexRule{};
-        RuleAndInclude hlCStringCharRule{};
+        Rule4 intRule{};
+        Rule4 floatRule{};
+        Rule4 hlCCharRule{};
+        Rule4 hlCOctRule{};
+        Rule4 hlCHexRule{};
+        Rule4 hlCStringCharRule{};
+        Rule4 detectIdentifierRule{};
 
         // Contains includedRules and included includedRules
         QMap<Context const*, RuleAndInclude> includeContexts;
 
         DotRegex dotRegex;
 
+        QVector<ObservableRule> observedRules;
+        observedRules.reserve(context.rules.size());
         for (const Context::Rule &rule : context.rules) {
+            const Context::Rule *includeRule = nullptr;
+            if (rule.type == Context::Rule::Type::IncludeRules) {
+                auto *context = rule.context.context;
+                if (context && context->isOnlyIncluded) {
+                    includeRule = &rule;
+                }
+            }
+
+            observedRules.push_back({&rule, includeRule});
+            if (includeRule) {
+                for (const Context::Rule *rule2 : rule.includedRules) {
+                    observedRules.push_back({rule2, includeRule});
+                }
+            }
+        }
+
+        for (auto &observedRule : observedRules) {
+            const Context::Rule &rule = *observedRule.rule;
             bool isUnreachable = false;
             QVector<RuleAndInclude> unreachableBy;
 
@@ -1803,43 +1942,42 @@ private:
             // check if hidden by DetectChar/AnyChar
             case Context::Rule::Type::HlCChar:
                 updateUnreachable1(CharTableArray(detectChars, rule).find(QLatin1Char('\'')));
-                updateUnreachable1(hlCCharRule);
-                hlCCharRule = {&rule, nullptr};
+                updateUnreachable1(hlCCharRule.setRule(rule));
                 break;
 
             // check if hidden by DetectChar/AnyChar
             case Context::Rule::Type::HlCHex:
                 updateUnreachable1(CharTableArray(detectChars, rule).find(QLatin1Char('0')));
-                updateUnreachable1(hlCHexRule);
-                hlCHexRule = {&rule, nullptr};
+                updateUnreachable1(hlCHexRule.setRule(rule));
                 break;
 
             // check if hidden by DetectChar/AnyChar
             case Context::Rule::Type::HlCOct:
                 updateUnreachable1(CharTableArray(detectChars, rule).find(QLatin1Char('0')));
-                updateUnreachable1(hlCOctRule);
-                hlCOctRule = {&rule, nullptr};
+                updateUnreachable1(hlCOctRule.setRule(rule));
                 break;
 
             // check if hidden by DetectChar/AnyChar
             case Context::Rule::Type::HlCStringChar:
                 updateUnreachable1(CharTableArray(detectChars, rule).find(QLatin1Char('\\')));
-                updateUnreachable1(hlCStringCharRule);
-                hlCStringCharRule = {&rule, nullptr};
+                updateUnreachable1(hlCStringCharRule.setRule(rule));
                 break;
 
             // check if hidden by DetectChar/AnyChar
             case Context::Rule::Type::Int:
                 updateUnreachable2(CharTableArray(detectChars, rule).find(QStringLiteral("0123456789")));
-                updateUnreachable1(intRule);
-                intRule = {&rule, nullptr};
+                updateUnreachable1(intRule.setRule(rule));
                 break;
 
             // check if hidden by DetectChar/AnyChar
             case Context::Rule::Type::Float:
                 updateUnreachable2(CharTableArray(detectChars, rule).find(QStringLiteral("0123456789.")));
-                updateUnreachable1(floatRule);
-                floatRule = {&rule, nullptr};
+                updateUnreachable1(floatRule.setRule(rule));
+                break;
+
+            // check if hidden by another DetectIdentifier rule
+            case Context::Rule::Type::DetectIdentifier:
+                updateUnreachable1(detectIdentifierRule.setRule(rule));
                 break;
 
             // check if hidden by DetectChar/AnyChar or another LineContinue
@@ -1858,7 +1996,7 @@ private:
             case Context::Rule::Type::RangeDetect:
                 updateUnreachable1(CharTableArray(detectChars, rule).find(rule.char0));
                 if (!isUnreachable) {
-                    RuleIterator ruleIterator(context.rules, rule);
+                    RuleIterator ruleIterator(observedRules, observedRule);
                     while (const auto *rulePtr = ruleIterator.next()) {
                         if (isUnreachable)
                             break;
@@ -1877,7 +2015,7 @@ private:
                 }
 
                 // check that `rule` does not have another RegExpr as a prefix
-                RuleIterator ruleIterator(context.rules, rule);
+                RuleIterator ruleIterator(observedRules, observedRule);
                 while (const auto *rulePtr = ruleIterator.next()) {
                     if (isUnreachable)
                         break;
@@ -1895,7 +2033,7 @@ private:
             case Context::Rule::Type::StringDetect: {
                 // check that dynamic `rule` does not have another dynamic StringDetect as a prefix
                 if (rule.type == Context::Rule::Type::StringDetect && rule.dynamic == XmlBool::True) {
-                    RuleIterator ruleIterator(context.rules, rule);
+                    RuleIterator ruleIterator(observedRules, observedRule);
                     while (const auto *rulePtr = ruleIterator.next()) {
                         if (isUnreachable)
                             break;
@@ -1956,7 +2094,7 @@ private:
                     // combination of uppercase and lowercase
                     RuleAndInclude detect2CharsInsensitives[]{{}, {}, {}, {}};
 
-                    RuleIterator ruleIterator(context.rules, rule);
+                    RuleIterator ruleIterator(observedRules, observedRule);
                     while (const auto *rulePtr = ruleIterator.next()) {
                         if (isUnreachable)
                             break;
@@ -2023,7 +2161,7 @@ private:
 
             // check if hidden by another keyword rule
             case Context::Rule::Type::keyword: {
-                RuleIterator ruleIterator(context.rules, rule);
+                RuleIterator ruleIterator(observedRules, observedRule);
                 while (const auto *rulePtr = ruleIterator.next()) {
                     if (isUnreachable)
                         break;
@@ -2042,6 +2180,10 @@ private:
             //  <includedRules .../> <- reference a <DetectChar char="{" /> who will be added
             //  <DetectChar char="{" /> <- hidden by previous rule
             case Context::Rule::Type::IncludeRules:
+                if (observedRule.includeRules && !observedRule.hasResolvedIncludeRules()) {
+                    break;
+                }
+
                 if (auto &ruleAndInclude = includeContexts[rule.context.context]) {
                     updateUnreachable1(ruleAndInclude);
                 }
@@ -2051,6 +2193,10 @@ private:
 
                 for (const auto *rulePtr : rule.includedIncludeRules) {
                     includeContexts.insert(rulePtr->context.context, RuleAndInclude{rulePtr, &rule});
+                }
+
+                if (observedRule.includeRules) {
+                    break;
                 }
 
                 for (const auto *rulePtr : rule.includedRules) {
@@ -2080,27 +2226,27 @@ private:
                     }
 
                     case Context::Rule::Type::HlCChar:
-                        hlCCharRule = {&rule2, &rule};
+                        hlCCharRule.setRule(rule2, &rule);
                         break;
 
                     case Context::Rule::Type::HlCHex:
-                        hlCHexRule = {&rule2, &rule};
+                        hlCHexRule.setRule(rule2, &rule);
                         break;
 
                     case Context::Rule::Type::HlCOct:
-                        hlCOctRule = {&rule2, &rule};
+                        hlCOctRule.setRule(rule2, &rule);
                         break;
 
                     case Context::Rule::Type::HlCStringChar:
-                        hlCStringCharRule = {&rule2, &rule};
+                        hlCStringCharRule.setRule(rule2, &rule);
                         break;
 
                     case Context::Rule::Type::Int:
-                        intRule = {&rule2, &rule};
+                        intRule.setRule(rule2, &rule);
                         break;
 
                     case Context::Rule::Type::Float:
-                        floatRule = {&rule2, &rule};
+                        floatRule.setRule(rule2, &rule);
                         break;
 
                     case Context::Rule::Type::LineContinue: {
@@ -2129,12 +2275,18 @@ private:
                 }
                 break;
 
-            case Context::Rule::Type::DetectIdentifier:
             case Context::Rule::Type::Unknown:
                 break;
             }
 
-            if (isUnreachable) {
+            if (observedRule.includeRules && !observedRule.hasResolvedIncludeRules()) {
+                auto &unreachableIncludedRule = unreachableIncludedRules[&rule];
+                if (isUnreachable && unreachableIncludedRule.alwaysUnreachable) {
+                    unreachableIncludedRule.unreachableBy.append(unreachableBy);
+                } else {
+                    unreachableIncludedRule.alwaysUnreachable = false;
+                }
+            } else if (isUnreachable) {
                 success = false;
                 QString message;
                 message.reserve(128);
@@ -2158,7 +2310,7 @@ private:
                     message += QStringLiteral(", ");
                 }
                 message.chop(2);
-                qWarning() << filename << "line" << rule.line << "unreachable element by" << message;
+                qWarning() << filename << "line" << rule.line << "unreachable rule by" << message;
             }
         }
 
@@ -2242,7 +2394,7 @@ private:
     //! - "#pop!Comment"  -> "Comment"
     //! - "##ISO C++"     -> ""
     //! - "Comment##ISO C++"-> "Comment" in ISO C++
-    void resolveContextName(Definition &definition, const Context &context, ContextName &contextName, int line)
+    void resolveContextName(Definition &definition, Context &context, ContextName &contextName, int line)
     {
         QString name = contextName.name;
         if (name.isEmpty()) {

@@ -16,6 +16,7 @@ Things like "a string" or a 'c' character shouldn't be highlighted in here.
 -}
 
 import Prelude --
+import Prelude ---
 
 -- a data definition
 

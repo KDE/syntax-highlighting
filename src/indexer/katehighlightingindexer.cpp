@@ -1033,9 +1033,14 @@ private:
                 return false;
             }
 
+#define REG_ESCAPE_CHAR R"(\\(?:[^0BDPSWbdpswoux]|x[0-9a-fA-F]{2}|x\{[0-9a-fA-F]+\}|0\d\d|o\{[0-7]+\}|u[0-9a-fA-F]{4}))"
+#define REG_CHAR "(?:" REG_ESCAPE_CHAR "|\\[(?:" REG_ESCAPE_CHAR "|.)\\]|[^[.^])"
+
             // is RangeDetect
-            static const QRegularExpression isRange(QStringLiteral(
-                R"(^(\\(?:[^0BDPSWbdpswoux]|x[0-9a-fA-F]{2}|x\{[0-9a-fA-F]+\}|0\d\d|o\{[0-7]+\}|u[0-9a-fA-F]{4})|[^[.]|\[[^].\\]\])(?:\.|\[^\1\])\*[?*]?\1$)"));
+            static const QRegularExpression isRange(QStringLiteral("\\^?^" REG_CHAR "(?:"
+                                                                   "\\.\\*[?*]?" REG_CHAR "|"
+                                                                   "\\[\\^(" REG_ESCAPE_CHAR "|.)\\]\\*[?*]?\\1"
+                                                                   ")$"));
             if (( rule.lookAhead == XmlBool::True
                || rule.minimal == XmlBool::True
                || rule.string.contains(QStringLiteral(".*?"))
@@ -1047,9 +1052,11 @@ private:
             }
 
             // replace \c, \xhhh, \x{hhh...}, \0dd, \o{ddd}, \uhhhh, with _
-            static const QRegularExpression sanitize1(
-                QStringLiteral(R"(\\(?:[^0BDPSWbdpswoux]|x[0-9a-fA-F]{2}|x\{[0-9a-fA-F]+\}|0\d\d|o\{[0-7]+\}|u[0-9a-fA-F]{4}))"));
+            static const QRegularExpression sanitize1(QStringLiteral(REG_ESCAPE_CHAR));
             reg.replace(sanitize1, QStringLiteral("_"));
+
+#undef REG_CHAR
+#undef REG_ESCAPE_CHAR
 
             // use minimal or lazy operator
             static const QRegularExpression isMinimal(QStringLiteral(

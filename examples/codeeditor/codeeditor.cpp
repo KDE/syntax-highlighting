@@ -11,6 +11,7 @@
 #include <syntaxhighlighter.h>
 #include <theme.h>
 
+#include <QActionGroup>
 #include <QApplication>
 #include <QDebug>
 #include <QFile>

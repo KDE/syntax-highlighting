@@ -1037,7 +1037,7 @@ private:
 #define REG_CHAR "(?:" REG_ESCAPE_CHAR "|\\[(?:" REG_ESCAPE_CHAR "|.)\\]|[^[.^])"
 
             // is RangeDetect
-            static const QRegularExpression isRange(QStringLiteral("\\^?^" REG_CHAR "(?:"
+            static const QRegularExpression isRange(QStringLiteral("^\\^?" REG_CHAR "(?:"
                                                                    "\\.\\*[?*]?" REG_CHAR "|"
                                                                    "\\[\\^(" REG_ESCAPE_CHAR "|.)\\]\\*[?*]?\\1"
                                                                    ")$"));
@@ -1048,6 +1048,14 @@ private:
                 ) && reg.contains(isRange)
             ) {
                 qWarning() << filename << "line" << rule.line << "RegExpr should be replaced by RangeDetect:" << rule.string;
+                return false;
+            }
+
+            // is LineContinue
+            static const QRegularExpression isLineContinue(QStringLiteral("^\\^?" REG_CHAR "\\$$"));
+            if (reg.contains(isLineContinue)) {
+                auto extra = (reg[0] == QLatin1Char('^')) ? "with column=\"0\"" : "";
+                qWarning() << filename << "line" << rule.line << "RegExpr should be replaced by LineContinue:" << rule.string << extra;
                 return false;
             }
 

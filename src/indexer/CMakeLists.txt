@@ -28,7 +28,7 @@ elseif(CMAKE_CROSSCOMPILING)
 else()
     # host build
     add_executable(katehighlightingindexer katehighlightingindexer.cpp ../lib/worddelimiters.cpp)
-    if(Qt5XmlPatterns_FOUND)
+    if(Qt5XmlPatterns_FOUND AND NOT ECM_ENABLE_SANITIZERS)
         target_link_libraries(katehighlightingindexer Qt5::XmlPatterns)
     else()
         target_link_libraries(katehighlightingindexer Qt5::Core)

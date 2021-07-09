@@ -44,6 +44,8 @@ def test_f_literals():
     f'x{bar["baz"]!r}y\n'
     f'x{bar["baz"]:.2}y\n'
 
+    f'{{x{bar["baz"]:.2}}}} }} {{ {x!a}'
+
 a = "Escapes in String \U12345678 \xAB \""
 a = u'''\'''
 '''

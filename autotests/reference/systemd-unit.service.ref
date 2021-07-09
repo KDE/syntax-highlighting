@@ -288,7 +288,7 @@
 <Option Name>ManagedOOMSwap</Option Name><Normal> = </Normal><Constant>auto</Constant><br/>
 <Option Name>ManagedOOMMemoryPressure</Option Name><Normal> = </Normal><Constant>kill</Constant><br/>
 <Option Name>ManagedOOMMemoryPressureLimit</Option Name><Normal> = </Normal><Number>50</Number><Measurement Unit>%</Measurement Unit><br/>
-<Normal></Normal><br/>
+<Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>bind6</Constant><Normal>:/sys/fs/bpf/sock-addr-hook</Normal><br/>
 <Normal></Normal><br/>
 <Section Header>[Slice]</Section Header><br/>
 <Option Name>CPUAccounting</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
@@ -398,13 +398,17 @@
 <Option Name>BindsTo</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service</Unit Extension><br/>
 <Option Name>BindsTo</Option Name><Normal> = </Normal><Specifier>%i</Specifier><Unit Extension>.mount</Unit Extension><br/>
 <Option Name>PartOf</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service</Unit Extension><br/>
+<Option Name>Upholds</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service </Unit Extension><Unit Name>some-other</Unit Name><Unit Extension>.service</Unit Extension><br/>
 <Option Name>Conflicts</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service</Unit Extension><br/>
 <Option Name>Before</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service</Unit Extension><br/>
 <Option Name>After</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service </Unit Extension><Unit Name>some</Unit Name><Unit Instance>@instance</Unit Instance><Unit Extension>.service</Unit Extension><br/>
 <Option Name>OnFailure</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service</Unit Extension><br/>
+<Option Name>OnSuccess</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service </Unit Extension><Unit Name>some-other</Unit Name><Unit Extension>.service</Unit Extension><br/>
 <Option Name>PropagatesReloadTo</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service</Unit Extension><br/>
 <Option Name>ReloadPropagatedFrom</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service</Unit Extension><br/>
 <Option Name>JoinsNamespaceOf</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service</Unit Extension><br/>
+<Option Name>PropagatesStopTo</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service </Unit Extension><Unit Name>some-other</Unit Name><Unit Extension>.service</Unit Extension><br/>
+<Option Name>StopPropagatedFrom</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service </Unit Extension><Unit Name>some-other</Unit Name><Unit Extension>.service</Unit Extension><br/>
 <Option Name>RequiresMountsFor</Option Name><Normal> = /tmp /var/log </Normal><Specifier>%h</Specifier><br/>
 <Option Name>OnFailureJobMode</Option Name><Normal> = </Normal><Constant>fail</Constant><br/>
 <Option Name>IgnoreOnIsolate</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
@@ -452,6 +456,7 @@
 <Option Name>ConditionControlGroupController</Option Name><Normal> = </Normal><Constant>memory</Constant><br/>
 <Option Name>ConditionMemory</Option Name><Normal> = </Normal><Prefix>| </Prefix><Normal>>= </Normal><Number>1500000</Number><br/>
 <Option Name>ConditionCPUs</Option Name><Normal> = </Normal><Prefix>| </Prefix><Normal>< </Normal><Number>8</Number><br/>
+<Option Name>ConditionOSRelease</Option Name><Normal> = ID=some-id</Normal><br/>
 <Option Name>AssertArchitecture</Option Name><Normal> = </Normal><Constant>x86</Constant><br/>
 <Option Name>AssertVirtualization</Option Name><Normal> = </Normal><Prefix>|</Prefix><Constant>vmware</Constant><br/>
 <Option Name>AssertHost</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>shodan</Normal><Wildcard>*</Wildcard><br/>
@@ -476,6 +481,7 @@
 <Option Name>AssertUser</Option Name><Normal> = </Normal><Prefix>|</Prefix><Constant>@system</Constant><br/>
 <Option Name>AssertGroup</Option Name><Normal> = </Normal><Prefix>|</Prefix><Normal>groupname</Normal><br/>
 <Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>memory</Constant><br/>
+<Option Name>AssertOSRelease</Option Name><Normal> = ID=some-id</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### invalid sections</Comment><br/>
@@ -624,7 +630,14 @@
 <Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>! </Normal><Constant>blkio</Constant><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
+<Comment>###### AC firmware type</Comment><br/>
+<Section Header>[Unit]</Section Header><br/>
+<Comment># see "firmware type" for all possible values</Comment><br/>
+<Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Prefix>|!</Prefix><Normal> </Normal><Constant>uefi</Constant><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
 <Comment>###### AC group</Comment><br/>
+<Section Header>[Unit]</Section Header><br/>
 <Option Name>AssertGroup</Option Name><Normal> = </Normal><Prefix>| </Prefix><Normal>name</Normal><br/>
 <Option Name>AssertGroup</Option Name><Normal> = </Normal><Prefix>|!</Prefix><Normal> name</Normal><br/>
 <Option Name>AssertGroup</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal> name</Normal><br/>
@@ -812,8 +825,12 @@
 <Option Name>RestrictAddressFamilies</Option Name><Normal> = </Normal><Constant>AF_XDP</Constant><br/>
 <Option Name>RestrictAddressFamilies</Option Name><Normal> = </Normal><Prefix>~</Prefix><Normal> </Normal><Constant>AF_XDP</Constant><Normal> </Normal><Constant>AF_LOCAL</Constant><Normal> </Normal><Continuation>\</Continuation><br/>
 <Normal>  </Normal><Constant>AF_SECURITY</Constant><br/>
+<Comment># since version 249 an additional 'none' is supported</Comment><br/>
+<Option Name>RestrictAddressFamilies</Option Name><Normal> = </Normal><Constant>none</Constant><br/>
 <Comment>## invalid values</Comment><br/>
 <Option Name>RestrictAddressFamilies</Option Name><Normal> = AF_INVALID</Normal><br/>
+<Comment># multiple values including `none`</Comment><br/>
+<Option Name>RestrictAddressFamilies</Option Name><Normal> = </Normal><Constant>AF_ROUTE</Constant><Normal> </Normal><Constant>none</Constant><Normal> AF_ROSE</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### ~ capability list</Comment><br/>
@@ -1167,6 +1184,8 @@
 <Option Name>CPUAffinity</Option Name><Normal> = </Normal><Constant>numa</Constant><br/>
 <Option Name>CPUAffinity</Option Name><Normal> = </Normal><Number>0</Number><Normal> </Normal><Number>1</Number><Normal>, </Normal><Number>2</Number><Normal> , </Normal><Continuation>\</Continuation><br/>
 <Normal>  </Normal><Number>3</Number><Normal>, </Normal><Number>4-8</Number><Normal> , </Normal><Number>10 - 12</Number><br/>
+<Comment># since version 249 specifiers are supported</Comment><br/>
+<Option Name>CPUAffinity</Option Name><Normal> = </Normal><Specifier>%I</Specifier><br/>
 <Comment>## invalid values</Comment><br/>
 <Option Name>CPUAffinity</Option Name><Normal> = numa-x</Normal><br/>
 <Comment># no multiple "numa"</Comment><br/>
@@ -1459,6 +1478,22 @@
 <Option Name>TimeoutStartFailureMode</Option Name><Normal> = invalid</Normal><br/>
 <Comment># multiple values</Comment><br/>
 <Option Name>TimeoutStartFailureMode</Option Name><Normal> = </Normal><Constant>abort</Constant><Normal> kill</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Comment>###### firmware type</Comment><br/>
+<Section Header>[Unit]</Section Header><br/>
+<Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Constant>uefi</Constant><br/>
+<Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Constant>device-tree</Constant><br/>
+<Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Constant>device-tree-compatible</Constant><Normal>(some-device-tree)</Normal><br/>
+<Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Constant>device-tree-compatible</Constant><Normal>(  some-device-tree )</Normal><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>ConditionFirmware</Option Name><Normal> = invalid</Normal><br/>
+<Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Constant>device-tree</Constant><Normal>-invalid</Normal><br/>
+<Comment># missing argument</Comment><br/>
+<Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Constant>device-tree</Constant><Normal>-compatible</Normal><br/>
+<Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Constant>device-tree</Constant><Normal>-compatible()</Normal><br/>
+<Comment># multiple values</Comment><br/>
+<Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Constant>uefi</Constant><Normal> device-tree</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### fs type</Comment><br/>
@@ -2118,6 +2153,28 @@
 <Option Name>KillSignal</Option Name><Normal> = </Normal><Constant>SIG_MAX</Constant><br/>
 <Comment>## invalid values</Comment><br/>
 <Option Name>KillSignal</Option Name><Normal> = SIG_INVALID</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Comment>###### socket bind rule</Comment><br/>
+<Section Header>[Service]</Section Header><br/>
+<Option Name>SocketBindAllow</Option Name><Normal> = </Normal><Constant>any</Constant><br/>
+<Option Name>SocketBindAllow</Option Name><Normal> = </Normal><Constant>ipv4</Constant><Normal>:</Normal><br/>
+<Option Name>SocketBindAllow</Option Name><Normal> = </Normal><Constant>ipv4</Constant><Normal>:</Normal><Constant>tcp</Constant><Normal>:</Normal><br/>
+<Option Name>SocketBindAllow</Option Name><Normal> = </Normal><Constant>ipv4</Constant><Normal>:</Normal><Constant>tcp</Constant><Normal>:</Normal><Number>12345</Number><br/>
+<Option Name>SocketBindAllow</Option Name><Normal> = </Normal><Constant>ipv4</Constant><Normal>:</Normal><Constant>tcp</Constant><Normal>:</Normal><Number>1</Number><Normal>-</Normal><Number>123</Number><br/>
+<Option Name>SocketBindAllow</Option Name><Normal> = </Normal><Constant>ipv6</Constant><Normal>:</Normal><Constant>udp</Constant><Normal>:</Normal><Number>1</Number><Normal>-</Normal><Number>123</Number><br/>
+<Option Name>SocketBindAllow</Option Name><Normal> = </Normal><Constant>ipv6</Constant><Normal>: </Normal><Constant>udp</Constant><Normal>:  </Normal><Number>1</Number><Normal>  -  </Normal><Number>123</Number><br/>
+<Option Name>SocketBindAllow</Option Name><Normal> = </Normal><Constant>tcp</Constant><Normal>:</Normal><br/>
+<Option Name>SocketBindAllow</Option Name><Normal> = </Normal><Number>12345</Number><br/>
+<Option Name>SocketBindAllow</Option Name><Normal> = </Normal><Number>123</Number><Normal>-</Normal><Number>456</Number><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>SocketBindAllow</Option Name><Normal> = ipv4 :</Normal><br/>
+<Option Name>SocketBindAllow</Option Name><Normal> = ipv5:</Normal><Constant>tcp</Constant><Normal>:</Normal><br/>
+<Option Name>SocketBindAllow</Option Name><Normal> = ipv4:udcp:</Normal><br/>
+<Option Name>SocketBindAllow</Option Name><Normal> = tcp:ipv</Normal><Number>4</Number><br/>
+<Option Name>SocketBindAllow</Option Name><Normal> = </Normal><Constant>ipv4</Constant><Normal>:</Normal><Constant>tcp</Constant><Normal>: </Normal><Number>12345</Number><br/>
+<Comment># multiple values</Comment><br/>
+<Option Name>SocketBindAllow</Option Name><Normal> = </Normal><Constant>any</Constant><Normal> ipv4:</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### socket protocol</Comment><br/>

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created for systemd version 248. -->
+<!-- Created for systemd version 249. -->
 <!DOCTYPE language SYSTEM "language.dtd" [
 <!ENTITY alp "A-Za-z">
 <!ENTITY aln "&alp;0-9">
 <!ENTITY end "(?:\s+|$)">
 <!ENTITY escaped "\\x[0-9a-f]{2}">
 <!ENTITY hex "0-9A-Fa-f">
-<!ENTITY specifier "&#x0025;[&#x0025;BCEGHIJLNPSTUVWabfghijlmnopstuvw]">
+<!ENTITY specifier "&#x0025;[&#x0025;ABCEGHIJLMNPSTUVWabfghijlmnopstuvw]">
 <!ENTITY name "(?:[-\w]|&specifier;)+@?(?:[-.@\:\w]|&escaped;|&specifier;)*">
 <!ENTITY extension "automount|device|mount|path|service|slice|socket|swap|target|timer">
 <!ENTITY unit "&name;\.(?:&extension;)&end;">
@@ -126,6 +126,26 @@
       <item>arc-be</item>
       <item>arc</item>
       <item>alpha</item>
+    </list>
+    <list name="bpf program type">
+      <item>sysctl</item>
+      <item>sock_ops</item>
+      <item>sock_create</item>
+      <item>setsockopt</item>
+      <item>sendmsg6</item>
+      <item>sendmsg4</item>
+      <item>recvmsg6</item>
+      <item>recvmsg4</item>
+      <item>post_bind6</item>
+      <item>post_bind4</item>
+      <item>ingress</item>
+      <item>getsockopt</item>
+      <item>egress</item>
+      <item>device</item>
+      <item>connect6</item>
+      <item>connect4</item>
+      <item>bind6</item>
+      <item>bind4</item>
     </list>
     <list name="calendar">
       <item>yearly</item>
@@ -844,6 +864,7 @@
       <item>container</item>
       <item>bochs</item>
       <item>bhyve</item>
+      <item>amazon</item>
       <item>acrn</item>
     </list>
     <list name="options exec">
@@ -976,6 +997,11 @@
         <DetectChar char="="/>
         <RegExpr String="\|?\h*(?:!(?!=))?" attribute="Prefix" context="#pop!controller cg"/>
       </context>
+      <context name="AC firmware type" attribute="Normal" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!firmware type">
+        <DetectSpaces/>
+        <DetectChar char="="/>
+        <RegExpr String="\|?\h*(?:!(?!=))?" attribute="Prefix" context="#pop!firmware type"/>
+      </context>
       <context name="AC group" attribute="Normal" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!group user">
         <DetectSpaces/>
         <DetectChar char="="/>
@@ -1056,6 +1082,7 @@
         <keyword String="action" attribute="Constant" context="#pop"/>
       </context>
       <context name="address family list" attribute="Normal" lineEndContext="#pop">
+        <WordDetect String="none" attribute="Constant" context="#pop"/>
         <keyword String="address family" attribute="Constant"/>
         <IncludeRules context="list"/>
       </context>
@@ -1074,6 +1101,9 @@
       <context name="boolean virtualization" attribute="Normal" lineEndContext="#pop">
         <IncludeRules context="boolean"/>
         <IncludeRules context="virtualization"/>
+      </context>
+      <context name="bpf program" attribute="Normal" lineEndContext="#pop">
+        <keyword String="bpf program type" attribute="Constant"/>
       </context>
       <context name="calendar" attribute="Normal" lineEndContext="#pop">
         <keyword String="calendar" attribute="Constant"/>
@@ -1138,6 +1168,7 @@
       <context name="cpu affinity" attribute="Normal" lineEndContext="#pop">
         <WordDetect String="numa" attribute="Constant" context="#pop"/>
         <Int lookAhead="true" context="#pop!cpu index list"/>
+        <IncludeRules context="specifier"/>
       </context>
       <context name="cpu feature" attribute="Normal" lineEndContext="#pop">
         <keyword String="cpu feature" attribute="Constant" context="#pop"/>
@@ -1203,6 +1234,10 @@
       </context>
       <context name="file mode" attribute="Normal" lineEndContext="#pop">
         <RegExpr String="[0-7]{3,4}" attribute="File Mode" context="#pop"/>
+      </context>
+      <context name="firmware type" attribute="Normal" lineEndContext="#pop">
+        <WordDetect String="uefi" attribute="Constant" context="#pop"/>
+        <RegExpr String="device-tree(?:-compatible(?=\(.+\)))?" attribute="Constant" context="#pop"/>
       </context>
       <context name="fs type" attribute="Normal" lineEndContext="#pop">
         <keyword String="fs type" attribute="Constant" context="#pop"/>
@@ -1380,6 +1415,18 @@
       </context>
       <context name="socket protocol" attribute="Normal" lineEndContext="#pop">
         <keyword String="socket protocol" attribute="Constant" context="#pop"/>
+      </context>
+      <context name="socket bind rule" attribute="Normal" lineEndContext="#pop">
+        <WordDetect String="any" attribute="Constant" context="#pop"/>
+        <RegExpr String="(?:ipv[46]:)?(?:\s*(?:tcp|udp):)?(?:\s*\d{1,5}(?:\s*-\s*\d{1,5})?)?\s*$" attribute="Normal" lookAhead="true" context="#pop!socket bind rule S"/>
+      </context>
+      <context name="socket bind rule S" attribute="Normal" lineEndContext="#pop">
+        <WordDetect String="ipv4" attribute="Constant"/>
+        <WordDetect String="ipv6" attribute="Constant"/>
+        <WordDetect String="tcp" attribute="Constant"/>
+        <WordDetect String="udp" attribute="Constant"/>
+        <!-- The "Int" rule does not detect the second part of a range, so just use a "RegExpr". -->
+        <RegExpr String="\d+" attribute="Number"/>
       </context>
       <context name="specifier" attribute="Normal" lineEndContext="#stay">
         <RegExpr String="&specifier;" attribute="Specifier"/>
@@ -1637,6 +1684,7 @@
         <keyword String="options resource-control" firstNonSpace="true" attribute="Option Name" context="text"/>
         <WordDetect String="AllowedCPUs" firstNonSpace="true" attribute="Option Name" context="cpu index list"/>
         <WordDetect String="AllowedMemoryNodes" firstNonSpace="true" attribute="Option Name" context="cpu index list"/>
+        <WordDetect String="BPFProgram" firstNonSpace="true" attribute="Option Name" context="bpf program"/>
         <WordDetect String="CPUAccounting" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="CPUQuota" firstNonSpace="true" attribute="Option Name" context="percent"/>
         <WordDetect String="CPUQuotaPeriodSec" firstNonSpace="true" attribute="Option Name" context="time span"/>
@@ -1666,6 +1714,8 @@
         <WordDetect String="MemoryMin" firstNonSpace="true" attribute="Option Name" context="cardinal %KMGT infinity"/>
         <WordDetect String="MemorySwapMax" firstNonSpace="true" attribute="Option Name" context="cardinal KMGT infinity"/>
         <WordDetect String="Slice" firstNonSpace="true" attribute="Option Name" context="unit slice"/>
+        <WordDetect String="SocketBindAllow" firstNonSpace="true" attribute="Option Name" context="socket bind rule"/>
+        <WordDetect String="SocketBindDeny" firstNonSpace="true" attribute="Option Name" context="socket bind rule"/>
         <WordDetect String="StartupCPUWeight" firstNonSpace="true" attribute="Option Name" context="weight"/>
         <WordDetect String="StartupIOWeight" firstNonSpace="true" attribute="Option Name" context="weight"/>
         <WordDetect String="TasksAccounting" firstNonSpace="true" attribute="Option Name" context="boolean"/>
@@ -1793,6 +1843,7 @@
         <WordDetect String="AssertKernelVersion" firstNonSpace="true" attribute="Option Name" context="AC text *"/>
         <WordDetect String="AssertMemory" firstNonSpace="true" attribute="Option Name" context="AC cardinal"/>
         <WordDetect String="AssertNeedsUpdate" firstNonSpace="true" attribute="Option Name" context="AC text"/>
+        <WordDetect String="AssertOSRelease" firstNonSpace="true" attribute="Option Name" context="AC text"/>
         <WordDetect String="AssertPathExists" firstNonSpace="true" attribute="Option Name" context="AC text"/>
         <WordDetect String="AssertPathExistsGlob" firstNonSpace="true" attribute="Option Name" context="AC text glob"/>
         <WordDetect String="AssertPathIsDirectory" firstNonSpace="true" attribute="Option Name" context="AC text"/>
@@ -1816,6 +1867,7 @@
         <WordDetect String="ConditionEnvironment" firstNonSpace="true" attribute="Option Name" context="AC text"/>
         <WordDetect String="ConditionFileIsExecutable" firstNonSpace="true" attribute="Option Name" context="AC text"/>
         <WordDetect String="ConditionFileNotEmpty" firstNonSpace="true" attribute="Option Name" context="AC text"/>
+        <WordDetect String="ConditionFirmware" firstNonSpace="true" attribute="Option Name" context="AC firmware type"/>
         <WordDetect String="ConditionFirstBoot" firstNonSpace="true" attribute="Option Name" context="AC boolean"/>
         <WordDetect String="ConditionGroup" firstNonSpace="true" attribute="Option Name" context="AC group"/>
         <WordDetect String="ConditionHost" firstNonSpace="true" attribute="Option Name" context="AC text *"/>
@@ -1823,6 +1875,7 @@
         <WordDetect String="ConditionKernelVersion" firstNonSpace="true" attribute="Option Name" context="AC text *"/>
         <WordDetect String="ConditionMemory" firstNonSpace="true" attribute="Option Name" context="AC cardinal"/>
         <WordDetect String="ConditionNeedsUpdate" firstNonSpace="true" attribute="Option Name" context="AC text"/>
+        <WordDetect String="ConditionOSRelease" firstNonSpace="true" attribute="Option Name" context="AC text"/>
         <WordDetect String="ConditionPathExists" firstNonSpace="true" attribute="Option Name" context="AC text"/>
         <WordDetect String="ConditionPathExistsGlob" firstNonSpace="true" attribute="Option Name" context="AC text glob"/>
         <WordDetect String="ConditionPathIsDirectory" firstNonSpace="true" attribute="Option Name" context="AC text"/>
@@ -1844,8 +1897,10 @@
         <WordDetect String="JoinsNamespaceOf" firstNonSpace="true" attribute="Option Name" context="unit list"/>
         <WordDetect String="OnFailure" firstNonSpace="true" attribute="Option Name" context="unit list"/>
         <WordDetect String="OnFailureJobMode" firstNonSpace="true" attribute="Option Name" context="on failure job mode"/>
+        <WordDetect String="OnSuccess" firstNonSpace="true" attribute="Option Name" context="unit list"/>
         <WordDetect String="PartOf" firstNonSpace="true" attribute="Option Name" context="unit list"/>
         <WordDetect String="PropagatesReloadTo" firstNonSpace="true" attribute="Option Name" context="unit list"/>
+        <WordDetect String="PropagatesStopTo" firstNonSpace="true" attribute="Option Name" context="unit list"/>
         <WordDetect String="RefuseManualStart" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="RefuseManualStop" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="ReloadPropagatedFrom" firstNonSpace="true" attribute="Option Name" context="unit list"/>
@@ -1854,9 +1909,11 @@
         <WordDetect String="StartLimitAction" firstNonSpace="true" attribute="Option Name" context="action"/>
         <WordDetect String="StartLimitBurst" firstNonSpace="true" attribute="Option Name" context="cardinal"/>
         <WordDetect String="StartLimitIntervalSec" firstNonSpace="true" attribute="Option Name" context="cardinal"/>
+        <WordDetect String="StopPropagatedFrom" firstNonSpace="true" attribute="Option Name" context="unit list"/>
         <WordDetect String="StopWhenUnneeded" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="SuccessAction" firstNonSpace="true" attribute="Option Name" context="action"/>
         <WordDetect String="SuccessActionExitStatus" firstNonSpace="true" attribute="Option Name" context="cardinal"/>
+        <WordDetect String="Upholds" firstNonSpace="true" attribute="Option Name" context="unit list"/>
         <WordDetect String="Wants" firstNonSpace="true" attribute="Option Name" context="unit list"/>
       </context>
       <!-- Contexts for sections. -->

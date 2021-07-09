@@ -288,7 +288,7 @@ DisableControllers = cpu io
 ManagedOOMSwap = auto
 ManagedOOMMemoryPressure = kill
 ManagedOOMMemoryPressureLimit = 50%
-
+BPFProgram = bind6:/sys/fs/bpf/sock-addr-hook
 
 [Slice]
 CPUAccounting = yes
@@ -398,13 +398,17 @@ Wants = some.service
 BindsTo = some.service
 BindsTo = %i.mount
 PartOf = some.service
+Upholds = some.service some-other.service
 Conflicts = some.service
 Before = some.service
 After = some.service some@instance.service
 OnFailure = some.service
+OnSuccess = some.service some-other.service
 PropagatesReloadTo = some.service
 ReloadPropagatedFrom = some.service
 JoinsNamespaceOf = some.service
+PropagatesStopTo = some.service some-other.service
+StopPropagatedFrom = some.service some-other.service
 RequiresMountsFor = /tmp /var/log %h
 OnFailureJobMode = fail
 IgnoreOnIsolate = true
@@ -452,6 +456,7 @@ ConditionGroup = |groupname
 ConditionControlGroupController = memory
 ConditionMemory = | >= 1500000
 ConditionCPUs = | < 8
+ConditionOSRelease = ID=some-id
 AssertArchitecture = x86
 AssertVirtualization = |vmware
 AssertHost = !shodan*
@@ -476,6 +481,7 @@ AssertFileIsExecutable = !/some/path
 AssertUser = |@system
 AssertGroup = |groupname
 AssertControlGroupController = memory
+AssertOSRelease = ID=some-id
 
 
 ###### invalid sections
@@ -624,7 +630,14 @@ AssertControlGroupController = || blkio
 AssertControlGroupController = !! blkio
 
 
+###### AC firmware type
+[Unit]
+# see "firmware type" for all possible values
+ConditionFirmware = |! uefi
+
+
 ###### AC group
+[Unit]
 AssertGroup = | name
 AssertGroup = |! name
 AssertGroup = ! name
@@ -812,8 +825,12 @@ RestrictAddressFamilies = AF_X25
 RestrictAddressFamilies = AF_XDP
 RestrictAddressFamilies = ~ AF_XDP AF_LOCAL \
   AF_SECURITY
+# since version 249 an additional 'none' is supported
+RestrictAddressFamilies = none
 ## invalid values
 RestrictAddressFamilies = AF_INVALID
+# multiple values including `none`
+RestrictAddressFamilies = AF_ROUTE none AF_ROSE
 
 
 ###### ~ capability list
@@ -1167,6 +1184,8 @@ DisableControllers = dev invalid
 CPUAffinity = numa
 CPUAffinity = 0 1, 2 , \
   3, 4-8 , 10 - 12
+# since version 249 specifiers are supported
+CPUAffinity = %I
 ## invalid values
 CPUAffinity = numa-x
 # no multiple "numa"
@@ -1459,6 +1478,22 @@ TimeoutStartFailureMode = terminate
 TimeoutStartFailureMode = invalid
 # multiple values
 TimeoutStartFailureMode = abort kill
+
+
+###### firmware type
+[Unit]
+ConditionFirmware = uefi
+ConditionFirmware = device-tree
+ConditionFirmware = device-tree-compatible(some-device-tree)
+ConditionFirmware = device-tree-compatible(  some-device-tree )
+## invalid values
+ConditionFirmware = invalid
+ConditionFirmware = device-tree-invalid
+# missing argument
+ConditionFirmware = device-tree-compatible
+ConditionFirmware = device-tree-compatible()
+# multiple values
+ConditionFirmware = uefi device-tree
 
 
 ###### fs type
@@ -2118,6 +2153,28 @@ KillSignal = SIGXFSZ
 KillSignal = SIG_MAX
 ## invalid values
 KillSignal = SIG_INVALID
+
+
+###### socket bind rule
+[Service]
+SocketBindAllow = any
+SocketBindAllow = ipv4:
+SocketBindAllow = ipv4:tcp:
+SocketBindAllow = ipv4:tcp:12345
+SocketBindAllow = ipv4:tcp:1-123
+SocketBindAllow = ipv6:udp:1-123
+SocketBindAllow = ipv6: udp:  1  -  123
+SocketBindAllow = tcp:
+SocketBindAllow = 12345
+SocketBindAllow = 123-456
+## invalid values
+SocketBindAllow = ipv4 :
+SocketBindAllow = ipv5:tcp:
+SocketBindAllow = ipv4:udcp:
+SocketBindAllow = tcp:ipv4
+SocketBindAllow = ipv4:tcp: 12345
+# multiple values
+SocketBindAllow = any ipv4:
 
 
 ###### socket protocol

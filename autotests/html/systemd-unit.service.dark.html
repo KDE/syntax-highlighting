@@ -294,7 +294,7 @@
 <span style="color:#2980b9;">ManagedOOMSwap</span> = <span style="color:#27aeae;font-weight:bold;">auto</span>
 <span style="color:#2980b9;">ManagedOOMMemoryPressure</span> = <span style="color:#27aeae;font-weight:bold;">kill</span>
 <span style="color:#2980b9;">ManagedOOMMemoryPressureLimit</span> = <span style="color:#f67400;">50</span><span style="font-style:italic;">%</span>
-
+<span style="color:#2980b9;">BPFProgram</span> = <span style="color:#27aeae;font-weight:bold;">bind6</span>:/sys/fs/bpf/sock-addr-hook
 
 <span style="font-weight:bold;">[Slice]</span>
 <span style="color:#2980b9;">CPUAccounting</span> = <span style="color:#27aeae;font-weight:bold;">yes</span>
@@ -404,13 +404,17 @@
 <span style="color:#2980b9;">BindsTo</span> = <span style="color:#27ae60;">some</span><span style="color:#27ae60;font-style:italic;">.service</span>
 <span style="color:#2980b9;">BindsTo</span> = <span style="color:#3daee9;">%i</span><span style="color:#27ae60;font-style:italic;">.mount</span>
 <span style="color:#2980b9;">PartOf</span> = <span style="color:#27ae60;">some</span><span style="color:#27ae60;font-style:italic;">.service</span>
+<span style="color:#2980b9;">Upholds</span> = <span style="color:#27ae60;">some</span><span style="color:#27ae60;font-style:italic;">.service </span><span style="color:#27ae60;">some-other</span><span style="color:#27ae60;font-style:italic;">.service</span>
 <span style="color:#2980b9;">Conflicts</span> = <span style="color:#27ae60;">some</span><span style="color:#27ae60;font-style:italic;">.service</span>
 <span style="color:#2980b9;">Before</span> = <span style="color:#27ae60;">some</span><span style="color:#27ae60;font-style:italic;">.service</span>
 <span style="color:#2980b9;">After</span> = <span style="color:#27ae60;">some</span><span style="color:#27ae60;font-style:italic;">.service </span><span style="color:#27ae60;">some</span><span style="color:#27ae60;font-weight:bold;">@instance</span><span style="color:#27ae60;font-style:italic;">.service</span>
 <span style="color:#2980b9;">OnFailure</span> = <span style="color:#27ae60;">some</span><span style="color:#27ae60;font-style:italic;">.service</span>
+<span style="color:#2980b9;">OnSuccess</span> = <span style="color:#27ae60;">some</span><span style="color:#27ae60;font-style:italic;">.service </span><span style="color:#27ae60;">some-other</span><span style="color:#27ae60;font-style:italic;">.service</span>
 <span style="color:#2980b9;">PropagatesReloadTo</span> = <span style="color:#27ae60;">some</span><span style="color:#27ae60;font-style:italic;">.service</span>
 <span style="color:#2980b9;">ReloadPropagatedFrom</span> = <span style="color:#27ae60;">some</span><span style="color:#27ae60;font-style:italic;">.service</span>
 <span style="color:#2980b9;">JoinsNamespaceOf</span> = <span style="color:#27ae60;">some</span><span style="color:#27ae60;font-style:italic;">.service</span>
+<span style="color:#2980b9;">PropagatesStopTo</span> = <span style="color:#27ae60;">some</span><span style="color:#27ae60;font-style:italic;">.service </span><span style="color:#27ae60;">some-other</span><span style="color:#27ae60;font-style:italic;">.service</span>
+<span style="color:#2980b9;">StopPropagatedFrom</span> = <span style="color:#27ae60;">some</span><span style="color:#27ae60;font-style:italic;">.service </span><span style="color:#27ae60;">some-other</span><span style="color:#27ae60;font-style:italic;">.service</span>
 <span style="color:#2980b9;">RequiresMountsFor</span> = /tmp /var/log <span style="color:#3daee9;">%h</span>
 <span style="color:#2980b9;">OnFailureJobMode</span> = <span style="color:#27aeae;font-weight:bold;">fail</span>
 <span style="color:#2980b9;">IgnoreOnIsolate</span> = <span style="color:#27aeae;font-weight:bold;">true</span>
@@ -458,6 +462,7 @@
 <span style="color:#2980b9;">ConditionControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">memory</span>
 <span style="color:#2980b9;">ConditionMemory</span> = <span style="color:#da4453;">| </span>&gt;= <span style="color:#f67400;">1500000</span>
 <span style="color:#2980b9;">ConditionCPUs</span> = <span style="color:#da4453;">| </span>&lt; <span style="color:#f67400;">8</span>
+<span style="color:#2980b9;">ConditionOSRelease</span> = ID=some-id
 <span style="color:#2980b9;">AssertArchitecture</span> = <span style="color:#27aeae;font-weight:bold;">x86</span>
 <span style="color:#2980b9;">AssertVirtualization</span> = <span style="color:#da4453;">|</span><span style="color:#27aeae;font-weight:bold;">vmware</span>
 <span style="color:#2980b9;">AssertHost</span> = <span style="color:#da4453;">!</span>shodan<span style="color:#3daee9;">*</span>
@@ -482,6 +487,7 @@
 <span style="color:#2980b9;">AssertUser</span> = <span style="color:#da4453;">|</span><span style="color:#27aeae;font-weight:bold;">@system</span>
 <span style="color:#2980b9;">AssertGroup</span> = <span style="color:#da4453;">|</span>groupname
 <span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">memory</span>
+<span style="color:#2980b9;">AssertOSRelease</span> = ID=some-id
 
 
 <span style="color:#7a7c7d;">###### invalid sections</span>
@@ -630,7 +636,14 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#da4453;">!</span>! <span style="color:#27aeae;font-weight:bold;">blkio</span>
 
 
+<span style="color:#7a7c7d;">###### AC firmware type</span>
+<span style="font-weight:bold;">[Unit]</span>
+<span style="color:#7a7c7d;"># see &quot;firmware type&quot; for all possible values</span>
+<span style="color:#2980b9;">ConditionFirmware</span> = <span style="color:#da4453;">|!</span> <span style="color:#27aeae;font-weight:bold;">uefi</span>
+
+
 <span style="color:#7a7c7d;">###### AC group</span>
+<span style="font-weight:bold;">[Unit]</span>
 <span style="color:#2980b9;">AssertGroup</span> = <span style="color:#da4453;">| </span>name
 <span style="color:#2980b9;">AssertGroup</span> = <span style="color:#da4453;">|!</span> name
 <span style="color:#2980b9;">AssertGroup</span> = <span style="color:#da4453;">!</span> name
@@ -818,8 +831,12 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">RestrictAddressFamilies</span> = <span style="color:#27aeae;font-weight:bold;">AF_XDP</span>
 <span style="color:#2980b9;">RestrictAddressFamilies</span> = <span style="color:#da4453;">~</span> <span style="color:#27aeae;font-weight:bold;">AF_XDP</span> <span style="color:#27aeae;font-weight:bold;">AF_LOCAL</span> <span style="color:#fdbc4b;font-weight:bold;">\</span>
   <span style="color:#27aeae;font-weight:bold;">AF_SECURITY</span>
+<span style="color:#7a7c7d;"># since version 249 an additional 'none' is supported</span>
+<span style="color:#2980b9;">RestrictAddressFamilies</span> = <span style="color:#27aeae;font-weight:bold;">none</span>
 <span style="color:#7a7c7d;">## invalid values</span>
 <span style="color:#2980b9;">RestrictAddressFamilies</span> = AF_INVALID
+<span style="color:#7a7c7d;"># multiple values including `none`</span>
+<span style="color:#2980b9;">RestrictAddressFamilies</span> = <span style="color:#27aeae;font-weight:bold;">AF_ROUTE</span> <span style="color:#27aeae;font-weight:bold;">none</span> AF_ROSE
 
 
 <span style="color:#7a7c7d;">###### ~ capability list</span>
@@ -1173,6 +1190,8 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">CPUAffinity</span> = <span style="color:#27aeae;font-weight:bold;">numa</span>
 <span style="color:#2980b9;">CPUAffinity</span> = <span style="color:#f67400;">0</span> <span style="color:#f67400;">1</span>, <span style="color:#f67400;">2</span> , <span style="color:#fdbc4b;font-weight:bold;">\</span>
   <span style="color:#f67400;">3</span>, <span style="color:#f67400;">4-8</span> , <span style="color:#f67400;">10 - 12</span>
+<span style="color:#7a7c7d;"># since version 249 specifiers are supported</span>
+<span style="color:#2980b9;">CPUAffinity</span> = <span style="color:#3daee9;">%I</span>
 <span style="color:#7a7c7d;">## invalid values</span>
 <span style="color:#2980b9;">CPUAffinity</span> = numa-x
 <span style="color:#7a7c7d;"># no multiple &quot;numa&quot;</span>
@@ -1465,6 +1484,22 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">TimeoutStartFailureMode</span> = invalid
 <span style="color:#7a7c7d;"># multiple values</span>
 <span style="color:#2980b9;">TimeoutStartFailureMode</span> = <span style="color:#27aeae;font-weight:bold;">abort</span> kill
+
+
+<span style="color:#7a7c7d;">###### firmware type</span>
+<span style="font-weight:bold;">[Unit]</span>
+<span style="color:#2980b9;">ConditionFirmware</span> = <span style="color:#27aeae;font-weight:bold;">uefi</span>
+<span style="color:#2980b9;">ConditionFirmware</span> = <span style="color:#27aeae;font-weight:bold;">device-tree</span>
+<span style="color:#2980b9;">ConditionFirmware</span> = <span style="color:#27aeae;font-weight:bold;">device-tree-compatible</span>(some-device-tree)
+<span style="color:#2980b9;">ConditionFirmware</span> = <span style="color:#27aeae;font-weight:bold;">device-tree-compatible</span>(  some-device-tree )
+<span style="color:#7a7c7d;">## invalid values</span>
+<span style="color:#2980b9;">ConditionFirmware</span> = invalid
+<span style="color:#2980b9;">ConditionFirmware</span> = <span style="color:#27aeae;font-weight:bold;">device-tree</span>-invalid
+<span style="color:#7a7c7d;"># missing argument</span>
+<span style="color:#2980b9;">ConditionFirmware</span> = <span style="color:#27aeae;font-weight:bold;">device-tree</span>-compatible
+<span style="color:#2980b9;">ConditionFirmware</span> = <span style="color:#27aeae;font-weight:bold;">device-tree</span>-compatible()
+<span style="color:#7a7c7d;"># multiple values</span>
+<span style="color:#2980b9;">ConditionFirmware</span> = <span style="color:#27aeae;font-weight:bold;">uefi</span> device-tree
 
 
 <span style="color:#7a7c7d;">###### fs type</span>
@@ -2124,6 +2159,28 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">KillSignal</span> = <span style="color:#27aeae;font-weight:bold;">SIG_MAX</span>
 <span style="color:#7a7c7d;">## invalid values</span>
 <span style="color:#2980b9;">KillSignal</span> = SIG_INVALID
+
+
+<span style="color:#7a7c7d;">###### socket bind rule</span>
+<span style="font-weight:bold;">[Service]</span>
+<span style="color:#2980b9;">SocketBindAllow</span> = <span style="color:#27aeae;font-weight:bold;">any</span>
+<span style="color:#2980b9;">SocketBindAllow</span> = <span style="color:#27aeae;font-weight:bold;">ipv4</span>:
+<span style="color:#2980b9;">SocketBindAllow</span> = <span style="color:#27aeae;font-weight:bold;">ipv4</span>:<span style="color:#27aeae;font-weight:bold;">tcp</span>:
+<span style="color:#2980b9;">SocketBindAllow</span> = <span style="color:#27aeae;font-weight:bold;">ipv4</span>:<span style="color:#27aeae;font-weight:bold;">tcp</span>:<span style="color:#f67400;">12345</span>
+<span style="color:#2980b9;">SocketBindAllow</span> = <span style="color:#27aeae;font-weight:bold;">ipv4</span>:<span style="color:#27aeae;font-weight:bold;">tcp</span>:<span style="color:#f67400;">1</span>-<span style="color:#f67400;">123</span>
+<span style="color:#2980b9;">SocketBindAllow</span> = <span style="color:#27aeae;font-weight:bold;">ipv6</span>:<span style="color:#27aeae;font-weight:bold;">udp</span>:<span style="color:#f67400;">1</span>-<span style="color:#f67400;">123</span>
+<span style="color:#2980b9;">SocketBindAllow</span> = <span style="color:#27aeae;font-weight:bold;">ipv6</span>: <span style="color:#27aeae;font-weight:bold;">udp</span>:  <span style="color:#f67400;">1</span>  -  <span style="color:#f67400;">123</span>
+<span style="color:#2980b9;">SocketBindAllow</span> = <span style="color:#27aeae;font-weight:bold;">tcp</span>:
+<span style="color:#2980b9;">SocketBindAllow</span> = <span style="color:#f67400;">12345</span>
+<span style="color:#2980b9;">SocketBindAllow</span> = <span style="color:#f67400;">123</span>-<span style="color:#f67400;">456</span>
+<span style="color:#7a7c7d;">## invalid values</span>
+<span style="color:#2980b9;">SocketBindAllow</span> = ipv4 :
+<span style="color:#2980b9;">SocketBindAllow</span> = ipv5:<span style="color:#27aeae;font-weight:bold;">tcp</span>:
+<span style="color:#2980b9;">SocketBindAllow</span> = ipv4:udcp:
+<span style="color:#2980b9;">SocketBindAllow</span> = tcp:ipv<span style="color:#f67400;">4</span>
+<span style="color:#2980b9;">SocketBindAllow</span> = <span style="color:#27aeae;font-weight:bold;">ipv4</span>:<span style="color:#27aeae;font-weight:bold;">tcp</span>: <span style="color:#f67400;">12345</span>
+<span style="color:#7a7c7d;"># multiple values</span>
+<span style="color:#2980b9;">SocketBindAllow</span> = <span style="color:#27aeae;font-weight:bold;">any</span> ipv4:
 
 
 <span style="color:#7a7c7d;">###### socket protocol</span>

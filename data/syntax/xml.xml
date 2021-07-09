@@ -6,7 +6,7 @@
 	<!ENTITY name    "(?![0-9])[\w_:][\w.:_-]*">
 	<!ENTITY entref  "&amp;(?:#[0-9]+|#[xX][0-9A-Fa-f]+|&name;);">
 ]>
-<language name="XML" version="12" kateversion="5.0" section="Markup" extensions="*.docbook;*.xml;*.rc;*.daml;*.rdf;*.rss;*.xspf;*.xsd;*.svg;*.ui;*.kcfg;*.qrc;*.wsdl;*.scxml;*.xbel;*.dae;*.sch;*.brd" mimetype="text/xml;text/book;text/daml;text/rdf;application/rss+xml;application/xspf+xml;image/svg+xml;application/x-designer;application/x-xbel;application/xml;application/scxml+xml" casesensitive="1" indenter="xml" author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL">
+<language name="XML" version="13" kateversion="5.0" section="Markup" extensions="*.docbook;*.xml;*.rc;*.daml;*.rdf;*.rss;*.xspf;*.xsd;*.svg;*.ui;*.kcfg;*.qrc;*.wsdl;*.scxml;*.xbel;*.dae;*.sch;*.brd" mimetype="text/xml;text/book;text/daml;text/rdf;application/rss+xml;application/xspf+xml;image/svg+xml;application/x-designer;application/x-xbel;application/xml;application/scxml+xml" casesensitive="1" indenter="xml" author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL">
 
 <highlighting>
 <contexts>
@@ -16,13 +16,13 @@
 
   <context name="FindXML" attribute="Normal Text" lineEndContext="#stay">
     <DetectSpaces />
+    <DetectIdentifier />
+    <RegExpr attribute="Element Symbols" context="ElementTagName" String="&lt;(?=(&name;))" beginRegion="element" />
     <StringDetect attribute="Comment" context="Comment" String="&lt;!--" beginRegion="comment" />
     <StringDetect attribute="CDATA" context="CDATAStart" String="&lt;![CDATA[" lookAhead="true" />
-    <RegExpr attribute="Doctype Symbols" context="DoctypeTagName" String="&lt;!(?=DOCTYPE\s+)" beginRegion="doctype" />
+    <RegExpr attribute="Doctype Symbols" context="DoctypeTagName" String="&lt;!(?=DOCTYPE(\s|$))" beginRegion="doctype" />
     <IncludeRules context="FindProcessingInstruction" />
-    <RegExpr attribute="Element Symbols" context="ElementTagName" String="&lt;(?=(&name;))" beginRegion="element" />
     <IncludeRules context="FindEntityRefs" />
-    <DetectIdentifier />
   </context>
 
   <context name="FindEntityRefs" attribute="Other Text" lineEndContext="#stay">
@@ -76,7 +76,7 @@
   <context name="DoctypeTagName" attribute="Other Text" lineEndContext="#pop">
     <StringDetect attribute="Doctype" context="#pop!DoctypeVariableName" String="DOCTYPE" />
   </context>
-  <context name="DoctypeVariableName" attribute="Other Text" lineEndContext="#pop!Doctype" fallthrough="true" fallthroughContext="#pop!Doctype">
+  <context name="DoctypeVariableName" attribute="Other Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop!Doctype">
     <DetectSpaces />
     <RegExpr attribute="Doctype Name" context="#pop!Doctype" String="&name;" />
   </context>
@@ -116,7 +116,7 @@
     <IncludeRules context="FindPEntityRefs" />
   </context>
 
-  <context name="ElementTagName" attribute="Other Text" lineEndContext="#pop!Element" fallthrough="true" fallthroughContext="#pop!Element">
+  <context name="ElementTagName" attribute="Other Text" lineEndContext="#pop!Element">
     <StringDetect attribute="Element" context="#pop!Element" String="%1" dynamic="true" />
   </context>
   <context name="Element" attribute="Other Text" lineEndContext="#stay">
@@ -131,7 +131,7 @@
     <IncludeRules context="FindXML" />
   </context>
 
-  <context name="El End TagName" attribute="Other Text" lineEndContext="#pop!El End" fallthrough="true" fallthroughContext="#pop!El End">
+  <context name="El End TagName" attribute="Other Text" lineEndContext="#pop!El End">
     <StringDetect attribute="Element" context="#pop!El End" String="%1" dynamic="true" />
   </context>
   <context name="El End" attribute="Other Text" lineEndContext="#stay">

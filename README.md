@@ -46,7 +46,7 @@ in **data/syntax/** and have the **.xml** extension. Additional ones are
 picked up from the file system if present, so you can easily extend this
 by application-specific syntax definitions for example.
 
-To install or test a syntax definiton file locally, place it in
+To install or test a syntax definition file locally, place it in
 **org.kde.syntax-highlighting/syntax/**, which is located in your user directory.
 Usually it is:
 
@@ -75,7 +75,7 @@ Usually it is:
 
 For more details, see ["The Highlight Definition XML Format" (Working with Syntax Highlighting, KDE Documentation)](https://docs.kde.org/?application=katepart&branch=trunk5&path=highlight.html#katehighlight-xml-format).
 
-Also, in **data/schema/** there is a script to validate the syntax definiton XML
+Also, in **data/schema/** there is a script to validate the syntax definition XML
 files. Use the command `validatehl.sh mySyntax.xml`.
 
 ## Color theme files

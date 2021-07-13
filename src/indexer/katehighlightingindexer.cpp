@@ -242,7 +242,7 @@ private:
         QXmlStreamAttribute &attr;
         bool success;
 
-        //! Read a string type attribute, \c sucess = \c false when \p str is not empty
+        //! Read a string type attribute, \c success = \c false when \p str is not empty
         //! \return \c true when attr.name() == attrName, otherwise false
         bool extractString(QString &str, const QString &attrName)
         {
@@ -258,7 +258,7 @@ private:
             return true;
         }
 
-        //! Read a bool type attribute, \c sucess = \c false when \p xmlBool is not \c XmlBool::Unspecified.
+        //! Read a bool type attribute, \c success = \c false when \p xmlBool is not \c XmlBool::Unspecified.
         //! \return \c true when attr.name() == attrName, otherwise false
         bool extractXmlBool(XmlBool &xmlBool, const QString &attrName)
         {
@@ -270,7 +270,7 @@ private:
             return true;
         }
 
-        //! Read a positive integer type attribute, \c sucess = \c false when \p positive is already greater than or equal to 0
+        //! Read a positive integer type attribute, \c success = \c false when \p positive is already greater than or equal to 0
         //! \return \c true when attr.name() == attrName, otherwise false
         bool extractPositive(int &positive, const QString &attrName)
         {
@@ -288,7 +288,7 @@ private:
             return true;
         }
 
-        //! Read a color, \c sucess = \c false when \p color is already greater than or equal to 0
+        //! Read a color, \c success = \c false when \p color is already greater than or equal to 0
         //! \return \c true when attr.name() == attrName, otherwise false
         bool checkColor(const QString &attrName)
         {
@@ -304,7 +304,7 @@ private:
             return true;
         }
 
-        //! Read a QChar, \c sucess = \c false when \p c is not \c '\0' or does not have one char
+        //! Read a QChar, \c success = \c false when \p c is not \c '\0' or does not have one char
         //! \return \c true when attr.name() == attrName, otherwise false
         bool extractChar(QChar &c, const QString &attrName)
         {
@@ -1897,7 +1897,7 @@ private:
             bool isUnreachable = false;
             QVector<RuleAndInclude> unreachableBy;
 
-            // declare rule as unreacheable if ruleAndInclude is not empty
+            // declare rule as unreachable if ruleAndInclude is not empty
             auto updateUnreachable1 = [&](RuleAndInclude ruleAndInclude) {
                 if (ruleAndInclude) {
                     isUnreachable = true;
@@ -1905,7 +1905,7 @@ private:
                 }
             };
 
-            // declare rule as unreacheable if ruleAndIncludes is not empty
+            // declare rule as unreachable if ruleAndIncludes is not empty
             auto updateUnreachable2 = [&](const QVector<RuleAndInclude> &ruleAndIncludes) {
                 if (!ruleAndIncludes.isEmpty()) {
                     isUnreachable = true;

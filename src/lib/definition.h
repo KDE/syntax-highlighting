@@ -74,7 +74,7 @@ enum class CommentPosition {
  * singleLineCommentMarker() and multiLineCommentMarker() provide comment
  * markers that can be used for commenting/uncommenting code. Similarly,
  * formats() returns a list of Format items defined by this Definition (which
- * equal the itemDatas of a highlighing definition file). includedDefinitions()
+ * equal the itemDatas of a highlighting definition file). includedDefinitions()
  * returns a list of all included Definition%s referenced by this Definition via
  * the rule IncludeRules, which is useful for displaying all Format items for
  * color configuration in the user interface.

@@ -120,7 +120,7 @@ protected:
      * @param state The highlighting state handle returned by the call
      *        to highlightLine() for the previous line. For the very first line,
      *        just pass a default constructed State().
-     * @returns The state of the highlighing engine after processing the
+     * @returns The state of the highlighting engine after processing the
      *        given line. This needs to passed into highlightLine() for the
      *        next line. You can store the state for efficient partial
      *        re-highlighting for example during editing.

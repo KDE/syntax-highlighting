@@ -58,6 +58,8 @@ a = b""""""
 a = b"""\""""
 a = 'a' \
     u'\x12'
+a = b"t\e's\t"
+a = rb"t\e's\t"
 
 "Escapes in Doc/Comment String \u1234 \xAb \"\\"
 ''' Doc/Comment String \N{123} \''''

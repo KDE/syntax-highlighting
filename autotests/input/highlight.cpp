@@ -404,9 +404,9 @@ static const char*      rawString1a = u8R"(string)";
 static const char16_t*  rawString1b = uR"(string)";
 static const char32_t*  rawString1c = UR"(string)";
 static const wchar_t*   rawString1d = LR"(string\nstring)";
-static const char* rawString2 = R"ab(string\nstring)ab";
+static const char* rawString2 = R"ab(string\nstring%s)ab ")ab";
 static const char* rawString3 = R"ab(string
-string)ab";
+string%)ab";
 " %d %df fd" U"ds %d" R"(a%d)";
   "\x123xsk";
  u"\x123xsk";

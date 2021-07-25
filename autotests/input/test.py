@@ -51,7 +51,8 @@ a = u'''\'''
 '''
 a = u'''\''''
 a = b'\u1234a\xffé\12k\n\g\
-'
+s\
+\"\ '
 a = rb'\u1234aé\n\g\
 '
 a = b""""""
@@ -112,3 +113,12 @@ match(command.split())
 match(command.split()):
     case ["quit"]:
         print("Goodbye!")
+
+"\\\\\\\\\\ENSURE THAT THIS AND THE FOLLOWING LINES ARE AT THE END OF THE FILE\\\\\\\\\\ \
+"
+a = 'otherwise all succeeding lines will be
+stuck on the Error attribute'
+br"Strings delimited by single quotes (' or ")
+can NOT be defined across multiple lines
+unless escaped with \
+"

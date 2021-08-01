@@ -4,6 +4,7 @@
     SPDX-License-Identifier: MIT
 */
 
+#include "repository_test_base.h"
 #include "test-config.h"
 
 #include <abstracthighlighter.h>
@@ -14,9 +15,7 @@
 #include <theme.h>
 
 #include <QFileInfo>
-#include <QObject>
 #include <QPalette>
-#include <QStandardPaths>
 #include <QTest>
 
 #include <algorithm>
@@ -37,73 +36,34 @@ public:
     }
 };
 
-class RepositoryTest : public QObject
+class RepositoryTest : public RepositoryTestBase
 {
     Q_OBJECT
-private:
-    Repository m_repo;
-
 private Q_SLOTS:
-    void initTestCase()
-    {
-        QStandardPaths::setTestModeEnabled(true);
-        initRepositorySearchPaths(m_repo);
-    }
-
     void testDefinitionByExtension_data()
     {
-        QTest::addColumn<QString>("fileName");
-        QTest::addColumn<QString>("defName");
-
-        QTest::newRow("empty") << QString() << QString();
-        QTest::newRow("qml") << QStringLiteral("/bla/foo.qml") << QStringLiteral("QML");
-        QTest::newRow("glsl") << QStringLiteral("flat.frag") << QStringLiteral("GLSL");
-        // the following ones are defined in multiple syntax definitions
-        QTest::newRow("c") << QStringLiteral("test.c") << QStringLiteral("C");
-        QTest::newRow("c++") << QStringLiteral("test.cpp") << QStringLiteral("C++");
-        QTest::newRow("fs") << QStringLiteral("test.fs") << QStringLiteral("FSharp");
-        QTest::newRow("markdown") << QStringLiteral("test.md") << QStringLiteral("Markdown");
-
-        QTest::newRow("Makefile 1") << QStringLiteral("Makefile") << QStringLiteral("Makefile");
-        QTest::newRow("Makefile 2") << QStringLiteral("/some/path/to/Makefile") << QStringLiteral("Makefile");
-        QTest::newRow("Makefile 3") << QStringLiteral("Makefile.am") << QStringLiteral("Makefile");
+        definitionByExtensionTestData();
     }
 
     void testDefinitionByExtension()
     {
         QFETCH(QString, fileName);
-        QFETCH(QString, defName);
+        QFETCH(QString, definitionName);
 
-        auto def = m_repo.definitionForFileName(fileName);
-        if (defName.isEmpty()) {
-            QVERIFY(!def.isValid());
-        } else {
-            QVERIFY(def.isValid());
-            QCOMPARE(def.name(), defName);
-        }
+        definitionByExtensionTest(fileName, definitionName);
     }
 
     void testDefinitionsForFileName_data()
     {
-        QTest::addColumn<QString>("fileName");
-        QTest::addColumn<QStringList>("expectedNames");
-
-        QTest::newRow("Matlab") << QStringLiteral("/bla/foo.m")
-                                << (QStringList() << QStringLiteral("Objective-C") << QStringLiteral("Magma") << QStringLiteral("Matlab")
-                                                  << QStringLiteral("Octave"));
+        definitionsForFileNameTestData();
     }
 
     void testDefinitionsForFileName()
     {
         QFETCH(QString, fileName);
-        QFETCH(QStringList, expectedNames);
+        QFETCH(QStringList, definitionNames);
 
-        const auto defs = m_repo.definitionsForFileName(fileName);
-        QStringList names;
-        for (auto def : defs) {
-            names.push_back(def.name());
-        }
-        QCOMPARE(names, expectedNames);
+        definitionsForFileNameTest(fileName, definitionNames);
     }
 
     void testDefinitionsForMimeType_data()

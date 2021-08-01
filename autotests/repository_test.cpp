@@ -561,4 +561,4 @@ private Q_SLOTS:
 
 QTEST_GUILESS_MAIN(KSyntaxHighlighting::RepositoryTest)
 
-#include "syntaxrepository_test.moc"
+#include "repository_test.moc"

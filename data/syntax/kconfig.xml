@@ -15,7 +15,7 @@ Kate Kconfig highlighting definition
 This is for Kconfig files of LKC (LinuxKernelConf), the configuration system
 that is in use by and maintained with the Linux Kernel since release 2.5.45,
 i.e. in particular throughout all 2.6 release series and the 5.x releases so far
-(up to 5.11 as of this writing).
+(up to 5.14 as of this writing).
 
 There have been several minor syntax modifications since Linux Kernel 2.5.45,
 and it is likely that there will be more in the future.
@@ -76,9 +76,14 @@ Newer changes in the configuration language:
   and if (deprecated here)
 5.9:
 - remove triple-dash enclosed "help" property (deprecated here)
+5.13:
+- remove "allnoconfig_yes" option introduced in 3.15 (deprecated here)
+- remove "defconfig_list" option introduced in 2.6.18 (deprecated here)
+- promote "modules" option to a standalone property
+- remove "option" keyword introduced in 2.6.18 (deprecated here)
 -->
 
-<language name="Kconfig" section="Configuration" extensions="Kconfig*;Config.*" version="11" kateversion="5.74" casesensitive="true" priority="-9" author="Martin Walch (walch.martin@web.de)" license="GPLv3">
+<language name="Kconfig" section="Configuration" extensions="Kconfig*;Config.*" version="12" kateversion="5.74" casesensitive="true" priority="-9" author="Martin Walch (walch.martin@web.de)" license="GPLv3">
 
 	<highlighting>
 		<list name="choice_type">
@@ -127,7 +132,6 @@ Newer changes in the configuration language:
 		</list>
 
 		<list name="keyword">
-			<item>allnoconfig_y</item>
 			<item>bool</item>
 			<item>choice</item>
 			<item>comment</item>
@@ -135,7 +139,6 @@ Newer changes in the configuration language:
 			<item>def_bool</item>
 			<item>def_tristate</item>
 			<item>default</item>
-			<item>defconfig_list</item>
 			<item>depends</item>
 			<item>endchoice</item>
 			<item>endif</item>
@@ -150,7 +153,6 @@ Newer changes in the configuration language:
 			<item>menuconfig</item>
 			<item>modules</item>
 			<item>on</item>
-			<item>option</item>
 			<item>optional</item>
 			<item>prompt</item>
 			<item>range</item>
@@ -175,9 +177,12 @@ Newer changes in the configuration language:
 		</list>
 
 		<list name="option">
+			<item>modules</item>
+		</list>
+
+		<list name="option_deprecated">
 			<item>allnoconfig_y</item>
 			<item>defconfig_list</item>
-			<item>modules</item>
 		</list>
 
 		<list name="tristate_const">
@@ -195,532 +200,541 @@ Newer changes in the configuration language:
 			<item>warning-if</item>
 		</list>
 
+		<list name="questionable_identifier">
+			<item>allnoconfig_y</item>
+			<item>boolean</item>
+			<item>defconfig_list</item>
+			<item>option</item>
+		</list>
+
 		<contexts>
-			<context name="input" attribute="plain" lineEndContext="#stay" fallthroughContext="#pop!stmt_list">
+			<context name="input" attribute="Plain" lineEndContext="#stay" fallthroughContext="#pop!stmt_list">
 				<IncludeRules context="wsOrComment" />
-				<WordDetect String="mainmenu" attribute="keyword" context="mainmenuPrompt" />
+				<WordDetect String="mainmenu" attribute="Keyword" context="mainmenuPrompt" />
 			</context>
 
-			<context name="mainmenuPrompt" attribute="plain" lineEndContext="#pop!stmt_list.error" fallthroughContext="#pop!stmt_list.error">
+			<context name="mainmenuPrompt" attribute="Plain" lineEndContext="#pop!stmt_list.error" fallthroughContext="#pop!stmt_list.error">
 				<IncludeRules context="wsOrComment" />
-				<DetectChar char="'" attribute="quotedMainmenuPrompt" context="#pop!stmt_list.nl.SQMainmenuPrompt" />
-				<DetectChar char="&quot;" attribute="quotedMainmenuPrompt" context="#pop!stmt_list.nl.DQMainmenuPrompt" />
-				<RegExpr String="&n1;+" attribute="deprecatedUnquotedMainmenuPrompt" context="#pop!stmt_list.nl" />
+				<DetectChar char="'" attribute="Quoted Mainmenu Prompt" context="#pop!stmt_list.nl.SQMainmenuPrompt" />
+				<DetectChar char="&quot;" attribute="Quoted Mainmenu Prompt" context="#pop!stmt_list.nl.DQMainmenuPrompt" />
+				<RegExpr String="&n1;+" attribute="Deprecated Unquoted Mainmenu Prompt" context="#pop!stmt_list.nl" />
 			</context>
 
-			<context name="stmt_list.nl.SQMainmenuPrompt" attribute="quotedMainmenuPrompt" lineEndContext="#pop!stmt_list.error">
+			<context name="stmt_list.nl.SQMainmenuPrompt" attribute="Quoted Mainmenu Prompt" lineEndContext="#pop!stmt_list.error">
 				<IncludeRules context="expansionAndEscape" />
-				<DetectChar char="'" attribute="quotedMainmenuPrompt" context="#pop!stmt_list.nl" />
-				<RegExpr String="\$&n;+" attribute="deprecatedExpansion" context="#stay" />
+				<DetectChar char="'" attribute="Quoted Mainmenu Prompt" context="#pop!stmt_list.nl" />
+				<RegExpr String="\$&n;+" attribute="Deprecated Expansion" context="#stay" />
 			</context>
 
-			<context name="stmt_list.nl.DQMainmenuPrompt" attribute="quotedMainmenuPrompt" lineEndContext="#pop!stmt_list.error">
-				<DetectChar char="&quot;" attribute="quotedMainmenuPrompt" context="#pop!stmt_list.nl" />
+			<context name="stmt_list.nl.DQMainmenuPrompt" attribute="Quoted Mainmenu Prompt" lineEndContext="#pop!stmt_list.error">
+				<DetectChar char="&quot;" attribute="Quoted Mainmenu Prompt" context="#pop!stmt_list.nl" />
 				<IncludeRules context="expansionAndEscape" />
-				<RegExpr String="\$&n;+" attribute="deprecatedExpansion" context="#stay" />
+				<RegExpr String="\$&n;+" attribute="Deprecated Expansion" context="#stay" />
 			</context>
 
-			<context name="stmt_list.nl" attribute="plain" lineEndContext="#pop!stmt_list" fallthroughContext="#pop!stmt_list.error">
+			<context name="stmt_list.nl" attribute="Plain" lineEndContext="#pop!stmt_list" fallthroughContext="#pop!stmt_list.error">
 				<IncludeRules context="wsOrComment" />
 				<IncludeRules context="ignoreBadParamChars" />
 			</context>
 
 			<!-- Mainmenu over -->
 
-			<context name="source_stmt" attribute="plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
+			<context name="source_stmt" attribute="Plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
-				<DetectChar char="'" attribute="quotedSourceString" context="#pop!nl.SQStringSource" />
-				<DetectChar char="&quot;" attribute="quotedSourceString" context="#pop!nl.DQStringSource" />
-				<RegExpr String="&n1;+" attribute="deprecatedUnquotedSourceString" context="#pop" />
+				<DetectChar char="'" attribute="Quoted Source String" context="#pop!nl.SQStringSource" />
+				<DetectChar char="&quot;" attribute="Quoted Source String" context="#pop!nl.DQStringSource" />
+				<RegExpr String="&n1;+" attribute="Deprecated Unquoted Source String" context="#pop" />
 			</context>
 
-			<context name="nl.SQStringSource" attribute="quotedSourceString" lineEndContext="stmt_list.error">
-				<DetectChar char="'" attribute="quotedSourceString" context="#pop!nl" />
+			<context name="nl.SQStringSource" attribute="Quoted Source String" lineEndContext="stmt_list.error">
+				<DetectChar char="'" attribute="Quoted Source String" context="#pop!nl" />
 				<IncludeRules context="expansionAndEscape" />
-				<RegExpr String="\$&n;+" attribute="deprecatedExpansion" context="#stay" />
+				<RegExpr String="\$&n;+" attribute="Deprecated Expansion" context="#stay" />
 			</context>
 
-			<context name="nl.DQStringSource" attribute="quotedSourceString" lineEndContext="stmt_list.error">
-				<DetectChar char="&quot;" attribute="quotedSourceString" context="#pop!nl" />
+			<context name="nl.DQStringSource" attribute="Quoted Source String" lineEndContext="stmt_list.error">
+				<DetectChar char="&quot;" attribute="Quoted Source String" context="#pop!nl" />
 				<IncludeRules context="expansionAndEscape" />
-				<RegExpr String="\$&n;+" attribute="deprecatedExpansion" context="#stay" />
+				<RegExpr String="\$&n;+" attribute="Deprecated Expansion" context="#stay" />
 			</context>
 
-			<context name="choice_entry" attribute="plain" lineEndContext="#pop!choice_option_list" fallthroughContext="#pop!error">
+			<context name="choice_entry" attribute="Plain" lineEndContext="#pop!choice_option_list" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
 				<RegExpr String="(&n;|\$)+(?!&n1;)" lookAhead="true" context="#pop!choice_option_list.nl.expandableIdentifier" />
-				<RegExpr String="&n1;+" attribute="deprecatedSymbolVar" context="#pop!choice_option_list.nl" />
+				<RegExpr String="&n1;+" attribute="Deprecated Variable Symbol" context="#pop!choice_option_list.nl" />
 			</context>
 
-			<context name="choice_option_list.nl.expandableIdentifier" attribute="symbolVar" lineEndContext="#pop!choice_option_list" fallthroughContext="#pop!error">
+			<context name="choice_option_list.nl.expandableIdentifier" attribute="Variable Symbol" lineEndContext="#pop!choice_option_list" fallthroughContext="#pop!error">
 				<IncludeRules context="expandableIdentifier" />
 			</context>
 
-			<context name="choice_option_list.nl" attribute="plain" lineEndContext="#pop!choice_option_list" fallthroughContext="#pop!choice_option_list.error">
+			<context name="choice_option_list.nl" attribute="Plain" lineEndContext="#pop!choice_option_list" fallthroughContext="#pop!choice_option_list.error">
 				<IncludeRules context="wsOrComment" />
 				<IncludeRules context="ignoreBadParamChars" />
 			</context>
 
-			<context name="choice_option_list" attribute="plain" lineEndContext="#stay" fallthroughContext="error">
+			<context name="choice_option_list" attribute="Plain" lineEndContext="#stay" fallthroughContext="error">
 				<IncludeRules context="wsOrComment" />
-				<WordDetect String="prompt" attribute="property" context="ifOpt.prompt" />
-				<keyword String="choice_type" attribute="type" context="ifOpt.prompt_stmt_opt" />
-				<keyword String="choice_type_deprecated" attribute="deprecatedType" context="ifOpt.prompt_stmt_opt" />
-				<keyword String="choice_bad_type" attribute="deprecatedBadChoiceType" context="ifOpt.prompt_stmt_opt" />
-				<WordDetect String="optional" attribute="property" context="nl" />
-				<WordDetect String="default" attribute="property" context="ifOpt.symbolVar" />
-				<WordDetect String="depends" attribute="property" context="depends" />
-				<WordDetect String="help" attribute="property" beginRegion="help" context="helpEntry" />
-				<StringDetect String="---help---" attribute="deprecatedProperty" beginRegion="help" context="helpEntry" />
+				<WordDetect String="prompt" attribute="Property" context="ifOpt.prompt" />
+				<keyword String="choice_type" attribute="Type" context="ifOpt.prompt_stmt_opt" />
+				<keyword String="choice_type_deprecated" attribute="Deprecated Type" context="ifOpt.prompt_stmt_opt" />
+				<keyword String="choice_bad_type" attribute="Deprecated Bad Choice Type" context="ifOpt.prompt_stmt_opt" />
+				<WordDetect String="optional" attribute="Property" context="nl" />
+				<WordDetect String="default" attribute="Property" context="ifOpt.symbolVar" />
+				<WordDetect String="depends" attribute="Property" context="depends" />
+				<WordDetect String="help" attribute="Property" beginRegion="help" context="helpEntry" />
+				<StringDetect String="---help---" attribute="Deprecated Property" beginRegion="help" context="helpEntry" />
 				<keyword String="entry" lookAhead="true" context="#pop!choice_block" />
-				<WordDetect String="endchoice" attribute="keyword" endRegion="choice_stmt" context="#pop!nl" />
+				<WordDetect String="endchoice" attribute="Keyword" endRegion="choice_stmt" context="#pop!nl" />
 				<IncludeRules context="ignoreBadComChars" />
 			</context>
 
-			<context name="choice_block" attribute="plain" lineEndContext="#stay" fallthroughContext="#pop!error">
+			<context name="choice_block" attribute="Plain" lineEndContext="#stay" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
 				<IncludeRules context="common_stmt" />
-				<WordDetect String="endchoice" attribute="keyword" endRegion="choice_stmt" context="#pop!nl" />
+				<WordDetect String="endchoice" attribute="Keyword" endRegion="choice_stmt" context="#pop!nl" />
 				<IncludeRules context="ignoreBadComChars" />
 			</context>
 
-			<context name="depends" attribute="plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
+			<context name="depends" attribute="Plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
 				<LineContinue context="#stay" />
-				<WordDetect String="on" attribute="property" context="#pop!nl.expr" />
+				<WordDetect String="on" attribute="Property" context="#pop!nl.expr" />
 				<IncludeRules context="ignoreBadParamChars" />
 			</context>
 
-			<context name="ifOpt.prompt_stmt_opt" attribute="plain" lineEndContext="#pop">
+			<context name="ifOpt.prompt_stmt_opt" attribute="Plain" lineEndContext="#pop">
 				<IncludeRules context="wsOrComment" />
-				<DetectChar char="'" attribute="quotedPrompt" context="#pop!ifOpt.SQPrompt" />
-				<DetectChar char="&quot;" attribute="quotedPrompt" context="#pop!ifOpt.DQPrompt" />
-				<RegExpr String="&n1;+" attribute="deprecatedUnquotedPrompt" context="#pop!ifOpt" />
+				<DetectChar char="'" attribute="Quoted Prompt" context="#pop!ifOpt.SQPrompt" />
+				<DetectChar char="&quot;" attribute="Quoted Prompt" context="#pop!ifOpt.DQPrompt" />
+				<RegExpr String="&n1;+" attribute="Deprecated Unquoted Prompt" context="#pop!ifOpt" />
 			</context>
 
-			<context name="ifOpt" attribute="plain" lineEndContext="#pop" fallthroughContext="#pop!error">
+			<context name="ifOpt" attribute="Plain" lineEndContext="#pop" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
 				<LineContinue context="#stay" />
-				<WordDetect String="if" attribute="keyword" context="#pop!nl.expr" />
+				<WordDetect String="if" attribute="Keyword" context="#pop!nl.expr" />
 				<IncludeRules context="ignoreBadParamChars" />
 			</context>
 
-			<context name="nl" attribute="plain" lineEndContext="#pop" fallthroughContext="#pop!error">
-				<IncludeRules context="wsOrComment" />
-				<IncludeRules context="ignoreBadParamChars" />
-			</context>
-
-			<context name="ifOpt.prompt" attribute="plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
-				<IncludeRules context="wsOrComment" />
-				<DetectChar char="'" attribute="quotedPrompt" context="#pop!ifOpt.SQPrompt" />
-				<DetectChar char="&quot;" attribute="quotedPrompt" context="#pop!ifOpt.DQPrompt" />
-				<RegExpr String="&n1;+" attribute="deprecatedUnquotedPrompt" context="#pop!ifOpt" />
-			</context>
-
-			<context name="ifOpt.SQPrompt" attribute="quotedPrompt" lineEndContext="#pop!error">
-				<DetectChar char="'" attribute="quotedPrompt" context="#pop!ifOpt" />
-				<IncludeRules context="expansionAndEscape" />
-			</context>
-
-			<context name="ifOpt.DQPrompt" attribute="quotedPrompt" lineEndContext="#pop!error">
-				<DetectChar char="&quot;" attribute="quotedPrompt" context="#pop!ifOpt" />
-				<IncludeRules context="expansionAndEscape" />
-			</context>
-
-			<context name="menu_visList.nl.SQPrompt" attribute="quotedPrompt" lineEndContext="#pop!error">
-				<DetectChar char="'" attribute="quotedPrompt" context="#pop!menu_visList.nl" />
-				<IncludeRules context="expansionAndEscape" />
-			</context>
-
-			<context name="menu_visList.nl.DQPrompt" attribute="quotedPrompt" lineEndContext="#pop!error">
-				<DetectChar char="&quot;" attribute="quotedPrompt" context="#pop!menu_visList.nl" />
-				<IncludeRules context="expansionAndEscape" />
-			</context>
-
-			<context name="comment_stmt.nl.prompt" attribute="plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
-				<IncludeRules context="wsOrComment" />
-				<DetectChar char="'" attribute="quotedPrompt" context="#pop!comment_stmt.nl.SQPrompt" />
-				<DetectChar char="&quot;" attribute="quotedPrompt" context="#pop!comment_stmt.nl.DQPrompt" />
-				<RegExpr String="&n1;+" attribute="deprecatedUnquotedPrompt" context="#pop!comment_stmt.nl" />
-			</context>
-
-			<context name="comment_stmt.nl.SQPrompt" attribute="quotedPrompt" lineEndContext="#pop!error">
-				<DetectChar char="'" attribute="quotedPrompt" context="#pop!comment_stmt.nl" />
-				<IncludeRules context="expansionAndEscape" />
-			</context>
-
-			<context name="comment_stmt.nl.DQPrompt" attribute="quotedPrompt" lineEndContext="#pop!error">
-				<DetectChar char="&quot;" attribute="quotedPrompt" context="#pop!comment_stmt.nl" />
-				<IncludeRules context="expansionAndEscape" />
-			</context>
-
-			<context name="comment_stmt.nl" attribute="plain" lineEndContext="#pop!comment_stmt" fallthroughContext="error">
+			<context name="nl" attribute="Plain" lineEndContext="#pop" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
 				<IncludeRules context="ignoreBadParamChars" />
 			</context>
 
-			<context name="comment_stmt" attribute="plain" lineEndContext="#stay" fallthroughContext="error">
+			<context name="ifOpt.prompt" attribute="Plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
-				<WordDetect String="depends" attribute="property" context="depends" />
+				<DetectChar char="'" attribute="Quoted Prompt" context="#pop!ifOpt.SQPrompt" />
+				<DetectChar char="&quot;" attribute="Quoted Prompt" context="#pop!ifOpt.DQPrompt" />
+				<RegExpr String="&n1;+" attribute="Deprecated Unquoted Prompt" context="#pop!ifOpt" />
+			</context>
+
+			<context name="ifOpt.SQPrompt" attribute="Quoted Prompt" lineEndContext="#pop!error">
+				<DetectChar char="'" attribute="Quoted Prompt" context="#pop!ifOpt" />
+				<IncludeRules context="expansionAndEscape" />
+			</context>
+
+			<context name="ifOpt.DQPrompt" attribute="Quoted Prompt" lineEndContext="#pop!error">
+				<DetectChar char="&quot;" attribute="Quoted Prompt" context="#pop!ifOpt" />
+				<IncludeRules context="expansionAndEscape" />
+			</context>
+
+			<context name="menu_visList.nl.SQPrompt" attribute="Quoted Prompt" lineEndContext="#pop!error">
+				<DetectChar char="'" attribute="Quoted Prompt" context="#pop!menu_visList.nl" />
+				<IncludeRules context="expansionAndEscape" />
+			</context>
+
+			<context name="menu_visList.nl.DQPrompt" attribute="Quoted Prompt" lineEndContext="#pop!error">
+				<DetectChar char="&quot;" attribute="Quoted Prompt" context="#pop!menu_visList.nl" />
+				<IncludeRules context="expansionAndEscape" />
+			</context>
+
+			<context name="comment_stmt.nl.prompt" attribute="Plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
+				<IncludeRules context="wsOrComment" />
+				<DetectChar char="'" attribute="Quoted Prompt" context="#pop!comment_stmt.nl.SQPrompt" />
+				<DetectChar char="&quot;" attribute="Quoted Prompt" context="#pop!comment_stmt.nl.DQPrompt" />
+				<RegExpr String="&n1;+" attribute="Deprecated Unquoted Prompt" context="#pop!comment_stmt.nl" />
+			</context>
+
+			<context name="comment_stmt.nl.SQPrompt" attribute="Quoted Prompt" lineEndContext="#pop!error">
+				<DetectChar char="'" attribute="Quoted Prompt" context="#pop!comment_stmt.nl" />
+				<IncludeRules context="expansionAndEscape" />
+			</context>
+
+			<context name="comment_stmt.nl.DQPrompt" attribute="Quoted Prompt" lineEndContext="#pop!error">
+				<DetectChar char="&quot;" attribute="Quoted Prompt" context="#pop!comment_stmt.nl" />
+				<IncludeRules context="expansionAndEscape" />
+			</context>
+
+			<context name="comment_stmt.nl" attribute="Plain" lineEndContext="#pop!comment_stmt" fallthroughContext="error">
+				<IncludeRules context="wsOrComment" />
+				<IncludeRules context="ignoreBadParamChars" />
+			</context>
+
+			<context name="comment_stmt" attribute="Plain" lineEndContext="#stay" fallthroughContext="error">
+				<IncludeRules context="wsOrComment" />
+				<WordDetect String="depends" attribute="Property" context="depends" />
 				<keyword String="entry_keyword" lookAhead="true" endRegion="comment_stmt" context="#pop" />
 				<IncludeRules context="ignoreBadComChars" />
 				<RegExpr String="." lookAhead="true" endRegion="config_stmt" context="#pop" />
 			</context>
 
-			<context name="config_entry_start" attribute="plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
+			<context name="config_entry_start" attribute="Plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
 				<RegExpr String="(&n;|\$)+(?!&n1;)" lookAhead="true" context="#pop!config_option_list.nl.expandableIdentifier" />
-				<RegExpr String="&n1;+" attribute="deprecatedSymbolVar" context="#pop!config_option_list.nl" />
+				<RegExpr String="&n1;+" attribute="Deprecated Variable Symbol" context="#pop!config_option_list.nl" />
 			</context>
 
-			<context name="config_option_list.nl.expandableIdentifier" attribute="symbolVar" lineEndContext="#pop!config_option_list" fallthroughContext="#pop!config_option_list.nl">
+			<context name="config_option_list.nl.expandableIdentifier" attribute="Variable Symbol" lineEndContext="#pop!config_option_list" fallthroughContext="#pop!config_option_list.nl">
 				<IncludeRules context="expandableIdentifier" />
 			</context>
 
-			<context name="config_option_list.nl" attribute="plain" lineEndContext="#pop!config_option_list" fallthroughContext="#pop!config_option_list.error">
+			<context name="config_option_list.nl" attribute="Plain" lineEndContext="#pop!config_option_list" fallthroughContext="#pop!config_option_list.error">
 				<IncludeRules context="wsOrComment" />
 				<IncludeRules context="ignoreBadParamChars" />
 			</context>
 
-			<context name="config_option_list" attribute="plain" lineEndContext="#stay">
+			<context name="config_option_list" attribute="Plain" lineEndContext="#stay">
 				<IncludeRules context="wsOrComment" />
-				<WordDetect String="prompt" attribute="property" context="ifOpt.prompt" />
-				<keyword String="type" attribute="type" context="ifOpt.prompt_stmt_opt" />
-				<keyword String="type_deprecated" attribute="deprecatedType" context="ifOpt.prompt_stmt_opt" />
-				<WordDetect String="default" attribute="property" context="ifOpt.expr" />
+				<WordDetect String="prompt" attribute="Property" context="ifOpt.prompt" />
+				<keyword String="type" attribute="Type" context="ifOpt.prompt_stmt_opt" />
+				<keyword String="type_deprecated" attribute="Deprecated Type" context="ifOpt.prompt_stmt_opt" />
+				<WordDetect String="default" attribute="Property" context="ifOpt.expr" />
 				<keyword String="def_type" lookAhead="true" context="ifOpt.expr.type" />
-				<WordDetect String="depends" attribute="property" context="depends" />
-				<WordDetect String="select" attribute="property" context="ifOpt.symbolVar" />
-				<WordDetect String="imply" attribute="property" context="ifOpt.symbolVar" />
-				<WordDetect String="range" attribute="property" context="range" />
-				<WordDetect String="help" attribute="property" beginRegion="help" context="helpEntry" />
-				<StringDetect String="---help---" attribute="deprecatedProperty" beginRegion="help" context="helpEntry" />
-				<WordDetect String="option" attribute="keyword" context="option" />
+				<WordDetect String="depends" attribute="Property" context="depends" />
+				<WordDetect String="select" attribute="Property" context="ifOpt.symbolVar" />
+				<WordDetect String="imply" attribute="Property" context="ifOpt.symbolVar" />
+				<WordDetect String="range" attribute="Property" context="range" />
+				<WordDetect String="help" attribute="Property" beginRegion="help" context="helpEntry" />
+				<StringDetect String="---help---" attribute="Deprecated Property" beginRegion="help" context="helpEntry" />
+				<WordDetect String="option" attribute="Deprecated Keyword" context="option" />
+				<WordDetect String="modules" attribute="Property" context="nl" />
 				<keyword String="entry_keyword" lookAhead="true" endRegion="config_stmt" context="#pop" />
 				<IncludeRules context="ignoreBadComChars" />
 				<RegExpr String="." lookAhead="true" endRegion="config_stmt" context="#pop" />
 			</context>
 
-			<context name="ifOpt.expr.type" attribute="plain" lineEndContext="#pop!error">
-				<StringDetect String="def_" attribute="property" context="#stay" />
-				<StringDetect String="bool" attribute="type" context="#pop!ifOpt.expr" />
-				<StringDetect String="tristate" attribute="type" context="#pop!ifOpt.expr" />
+			<context name="ifOpt.expr.type" attribute="Plain" lineEndContext="#pop!error">
+				<StringDetect String="def_" attribute="Property" context="#stay" />
+				<StringDetect String="bool" attribute="Type" context="#pop!ifOpt.expr" />
+				<StringDetect String="tristate" attribute="Type" context="#pop!ifOpt.expr" />
 			</context>
 
-			<context name="option" attribute="plain" lineEndContext="#pop" fallthroughContext="#pop!error">
+			<context name="option" attribute="Plain" lineEndContext="#pop" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
-				<keyword String="option" attribute="option" context="optionWithoutValue" />
-				<WordDetect String="env" attribute="deprecatedOption" context="optionValue.eq" />
-				<RegExpr String="&n;+(?!&n1;)" attribute="unknownOption" context="optionValue.eq" />
-				<RegExpr String="&n1;+" attribute="deprecatedUnknownOptionString" context="optionValue.eq" />
+				<keyword String="option" attribute="Option" context="optionWithoutValue" />
+				<keyword String="option_deprecated" attribute="Deprecated Option" context="optionWithoutValue" />
+				<WordDetect String="env" attribute="Deprecated Option" context="optionValue.eq" />
+				<RegExpr String="&n;+(?!&n1;)" attribute="Unknown Option" context="optionValue.eq" />
+				<RegExpr String="&n1;+" attribute="Deprecated Unknown Option String" context="optionValue.eq" />
 			</context>
 
-			<context name="optionValue.eq" attribute="deprecatedOption" lineEndContext="#pop" fallthroughContext="#pop!error">
+			<context name="optionValue.eq" attribute="Deprecated Option" lineEndContext="#pop" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
-				<DetectChar char="=" attribute="deprecatedOptionEq" context="#pop!optionValue" />
+				<DetectChar char="=" attribute="Deprecated Option: Equals Sign" context="#pop!optionValue" />
 			</context>
 
-			<context name="optionWithoutValue" attribute="plain" lineEndContext="#pop" fallthroughContext="#pop!error">
+			<context name="optionWithoutValue" attribute="Plain" lineEndContext="#pop" fallthroughContext="#pop!error">
 				<DetectSpaces />
 			</context>
 
-			<context name="SQStringOptionValue" attribute="deprecatedQuotedOptionValue" lineEndContext="#pop!error">
-				<DetectChar char="'" attribute="deprecatedQuotedOptionValue" context="#pop" />
+			<context name="SQStringOptionValue" attribute="Deprecated Quoted Option Value" lineEndContext="#pop!error">
+				<DetectChar char="'" attribute="Deprecated Quoted Option Value" context="#pop" />
 				<DetectChar char="\" lookAhead="true" context="escapeInDeprecatedString" />
 			</context>
 
-			<context name="DQStringOptionValue" attribute="deprecatedQuotedOptionValue" lineEndContext="#pop!error">
-				<DetectChar char="&quot;" attribute="deprecatedQuotedOptionValue" context="#pop" />
+			<context name="DQStringOptionValue" attribute="Deprecated Quoted Option Value" lineEndContext="#pop!error">
+				<DetectChar char="&quot;" attribute="Deprecated Quoted Option Value" context="#pop" />
 				<DetectChar char="\" lookAhead="true" context="escapeInDeprecatedString" />
 			</context>
 
-			<context name="optionValue" attribute="plain" lineEndContext="#pop" fallthroughContext="#pop!error">
+			<context name="optionValue" attribute="Plain" lineEndContext="#pop" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
-				<DetectChar char="'" attribute="deprecatedQuotedOptionValue" context="#pop!SQStringOptionValue" />
-				<DetectChar char="&quot;" attribute="deprecatedQuotedOptionValue" context="#pop!DQStringOptionValue" />
-				<RegExpr String="&n;+(?!&n1;)" attribute="deprecatedUnquotedOptionValue" context="#pop" />
-				<RegExpr String="&n1;+" attribute="deprecatedUnquotedOptionValueString" context="#pop" />
+				<DetectChar char="'" attribute="Deprecated Quoted Option Value" context="#pop!SQStringOptionValue" />
+				<DetectChar char="&quot;" attribute="Deprecated Quoted Option Value" context="#pop!DQStringOptionValue" />
+				<RegExpr String="&n;+(?!&n1;)" attribute="Deprecated Unquoted Option Value" context="#pop" />
+				<RegExpr String="&n1;+" attribute="Deprecated Unquoted Option Value String" context="#pop" />
 			</context>
 
-			<context name="ifOpt.expandableIdentifier" attribute="symbolVar" lineEndContext="#pop" fallthroughContext="#pop!ifOpt">
+			<context name="ifOpt.expandableIdentifier" attribute="Variable Symbol" lineEndContext="#pop" fallthroughContext="#pop!ifOpt">
 				<IncludeRules context="expandableIdentifier" />
 			</context>
 
-			<context name="ifOpt.symbolVar" attribute="plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
+			<context name="ifOpt.symbolVar" attribute="Plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
-				<RegExpr String="&tristateConst;" attribute="badTristateConst" context="#pop!ifOpt.binOpOrEnd" />
+				<RegExpr String="&tristateConst;" attribute="Bad Tristate Constant" context="#pop!ifOpt.binOpOrEnd" />
 				<RegExpr String="(&n;|\$)" lookAhead="true" context="#pop!ifOpt.expandableIdentifier" />
 			</context>
 
-			<context name="range" attribute="plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
+			<context name="range" attribute="Plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
-				<DetectChar char="'" attribute="symbolConst" context="#pop!ifOpt.sym.SQSymbolConst" />
-				<DetectChar char="&quot;" attribute="symbolConst" context="#pop!ifOpt.sym.DQSymbolConst" />
-				<RegExpr String="&n;+(?!&n1;)" attribute="symbolVar" context="#pop!ifOpt.sym" />
-				<RegExpr String="&n1;+" attribute="deprecatedSymbolVar" context="#pop!ifOpt.sym" />
+				<DetectChar char="'" attribute="Constant Symbol" context="#pop!ifOpt.sym.SQSymbolConst" />
+				<DetectChar char="&quot;" attribute="Constant Symbol" context="#pop!ifOpt.sym.DQSymbolConst" />
+				<RegExpr String="&n;+(?!&n1;)" attribute="Variable Symbol" context="#pop!ifOpt.sym" />
+				<RegExpr String="&n1;+" attribute="Deprecated Variable Symbol" context="#pop!ifOpt.sym" />
 			</context>
 
-			<context name="ifOpt.sym" attribute="plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
+			<context name="ifOpt.sym" attribute="Plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
-				<DetectChar char="'" attribute="symbolConst" context="#pop!ifOpt.SQSymbolConst" />
-				<DetectChar char="&quot;" attribute="symbolConst" context="#pop!ifOpt.DQSymbolConst" />
-				<RegExpr String="&n;+(?!&n1;)" attribute="symbolVar" context="#pop!ifOpt" />
-				<RegExpr String="&n1;+" attribute="deprecatedSymbolVar" context="#pop!ifOpt" />
+				<DetectChar char="'" attribute="Constant Symbol" context="#pop!ifOpt.SQSymbolConst" />
+				<DetectChar char="&quot;" attribute="Constant Symbol" context="#pop!ifOpt.DQSymbolConst" />
+				<RegExpr String="&n;+(?!&n1;)" attribute="Variable Symbol" context="#pop!ifOpt" />
+				<RegExpr String="&n1;+" attribute="Deprecated Variable Symbol" context="#pop!ifOpt" />
 			</context>
 
-			<context name="ifOpt.sym.SQSymbolConst" attribute="symbolConst" lineEndContext="#pop!error">
-				<DetectChar char="'" attribute="symbolConst" context="#pop!ifOpt.sym" />
+			<context name="ifOpt.sym.SQSymbolConst" attribute="Constant Symbol" lineEndContext="#pop!error">
+				<DetectChar char="'" attribute="Constant Symbol" context="#pop!ifOpt.sym" />
 				<IncludeRules context="expansionAndEscape" />
 			</context>
 
-			<context name="ifOpt.sym.DQSymbolConst" attribute="symbolConst" lineEndContext="#pop!error">
-				<DetectChar char="&quot;" attribute="symbolConst" context="#pop!ifOpt.sym" />
+			<context name="ifOpt.sym.DQSymbolConst" attribute="Constant Symbol" lineEndContext="#pop!error">
+				<DetectChar char="&quot;" attribute="Constant Symbol" context="#pop!ifOpt.sym" />
 				<IncludeRules context="expansionAndEscape" />
 			</context>
 
-			<context name="ifOpt.SQSymbolConst" attribute="symbolConst" lineEndContext="#pop!error">
-				<DetectChar char="'" attribute="symbolConst" context="#pop!ifOpt" />
+			<context name="ifOpt.SQSymbolConst" attribute="Constant Symbol" lineEndContext="#pop!error">
+				<DetectChar char="'" attribute="Constant Symbol" context="#pop!ifOpt" />
 				<IncludeRules context="expansionAndEscape" />
 			</context>
 
-			<context name="ifOpt.DQSymbolConst" attribute="symbolConst" lineEndContext="#pop!error">
-				<DetectChar char="&quot;" attribute="symbolConst" context="#pop!ifOpt" />
+			<context name="ifOpt.DQSymbolConst" attribute="Constant Symbol" lineEndContext="#pop!error">
+				<DetectChar char="&quot;" attribute="Constant Symbol" context="#pop!ifOpt" />
 				<IncludeRules context="expansionAndEscape" />
 			</context>
 
-			<context name="menu_entry" attribute="plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
+			<context name="menu_entry" attribute="Plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
-				<DetectChar char="'" attribute="quotedPrompt" context="#pop!menu_visList.nl.SQPrompt" />
-				<DetectChar char="&quot;" attribute="quotedPrompt" context="#pop!menu_visList.nl.DQPrompt" />
-				<RegExpr String="&n1;+" attribute="deprecatedUnquotedPrompt" context="#pop!menu_visList.nl" />
+				<DetectChar char="'" attribute="Quoted Prompt" context="#pop!menu_visList.nl.SQPrompt" />
+				<DetectChar char="&quot;" attribute="Quoted Prompt" context="#pop!menu_visList.nl.DQPrompt" />
+				<RegExpr String="&n1;+" attribute="Deprecated Unquoted Prompt" context="#pop!menu_visList.nl" />
 			</context>
 
-			<context name="menu_visList.nl" attribute="plain" lineEndContext="#pop!menu_visList" fallthroughContext="#pop!error">
+			<context name="menu_visList.nl" attribute="Plain" lineEndContext="#pop!menu_visList" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
 				<IncludeRules context="ignoreBadParamChars" />
 			</context>
 
-			<context name="menu_visList" attribute="plain" lineEndContext="#stay" fallthroughContext="#pop!menu_depList">
+			<context name="menu_visList" attribute="Plain" lineEndContext="#stay" fallthroughContext="#pop!menu_depList">
 				<IncludeRules context="wsOrComment" />
-				<WordDetect String="visible" attribute="property" context="visible" />
+				<WordDetect String="visible" attribute="Property" context="visible" />
 				<IncludeRules context="ignoreBadComChars" />
 			</context>
 
-			<context name="visible" attribute="plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
+			<context name="visible" attribute="Plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
-				<WordDetect String="if" attribute="property" context="#pop!nl.expr" />
+				<WordDetect String="if" attribute="Property" context="#pop!nl.expr" />
 				<IncludeRules context="ignoreBadParamChars" />
 			</context>
 
-			<context name="menu_depList" attribute="plain" lineEndContext="#stay" fallthroughContext="#pop!menu_stmt">
+			<context name="menu_depList" attribute="Plain" lineEndContext="#stay" fallthroughContext="#pop!menu_stmt">
 				<IncludeRules context="wsOrComment" />
-				<WordDetect String="depends" attribute="property" context="depends" />
+				<WordDetect String="depends" attribute="Property" context="depends" />
 				<IncludeRules context="ignoreBadComChars" />
 			</context>
 
-			<context name="menu_stmt" attribute="plain" lineEndContext="#stay" fallthroughContext="error">
-				<WordDetect String="endmenu" attribute="keyword" endRegion="menu_stmt" context="#pop!nl" />
+			<context name="menu_stmt" attribute="Plain" lineEndContext="#stay" fallthroughContext="error">
+				<WordDetect String="endmenu" attribute="Keyword" endRegion="menu_stmt" context="#pop!nl" />
 				<IncludeRules context="stmt_list" />
 			</context>
 
-			<context name="if_stmt" attribute="plain" lineEndContext="#stay">
+			<context name="if_stmt" attribute="Plain" lineEndContext="#stay">
 				<IncludeRules context="wsOrComment" />
-				<WordDetect String="endif" attribute="keyword" endRegion="if_stmt" context="#pop" />
+				<WordDetect String="endif" attribute="Keyword" endRegion="if_stmt" context="#pop" />
 				<IncludeRules context="stmt_list" />
 			</context>
 
-			<context name="nl.assign_val" attribute="assignmentValue" lineEndContext="#pop">
+			<context name="nl.assign_val" attribute="Assignment Value" lineEndContext="#pop">
 				<IncludeRules context="expansion" />
 				<RegExpr String="(&n;|(\$(?!\()))+" context="#stay" />
 			</context>
 
-			<context name="nl.assign_val.wsOpt" attribute="plain" lineEndContext="#pop" fallthroughContext="#pop!nl.assign_val">
+			<context name="nl.assign_val.wsOpt" attribute="Plain" lineEndContext="#pop" fallthroughContext="#pop!nl.assign_val">
 				<DetectSpaces />
 			</context>
 
-			<context name="nl.assign_val.wsOpt.assign_op" attribute="plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
+			<context name="nl.assign_val.wsOpt.assign_op" attribute="Plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
-				<RegExpr String="[+:]?=" attribute="assignmentOperator" context="#pop!nl.assign_val.wsOpt" />
+				<RegExpr String="[+:]?=" attribute="Assignment Operator" context="#pop!nl.assign_val.wsOpt" />
 			</context>
 
-			<context name="assignment" attribute="variable" lineEndContext="#pop" fallthroughContext="#pop!nl.assign_val.wsOpt.assign_op">
-				<WordDetect String="boolean" attribute="deprecatedIdentifier" context="#pop!nl.assign_val.wsOpt.assign_op" />
+			<context name="assignment" attribute="Variable" lineEndContext="#pop" fallthroughContext="#pop!nl.assign_val.wsOpt.assign_op">
+				<keyword String="questionable_identifier" attribute="Deprecated Identifier" context="#pop!nl.assign_val.wsOpt.assign_op" />
 				<IncludeRules context="expandableIdentifier" includeAttrib="false" />
 			</context>
 
-			<context name="stmt_list" attribute="plain" lineEndContext="#stay" fallthroughContext="error">
+			<context name="stmt_list" attribute="Plain" lineEndContext="#stay" fallthroughContext="error">
 				<IncludeRules context="common_stmt" />
-				<WordDetect String="choice" attribute="keyword" beginRegion="choice_stmt" context="choice_entry" />
-				<WordDetect String="menu" attribute="keyword" beginRegion="menu_stmt" context="menu_entry" />
+				<WordDetect String="choice" attribute="Keyword" beginRegion="choice_stmt" context="choice_entry" />
+				<WordDetect String="menu" attribute="Keyword" beginRegion="menu_stmt" context="menu_entry" />
 				<keyword String="keyword" context="error" />
 				<IncludeRules context="ignoreBadComChars" />
 				<RegExpr String="(&n;|\$)" lookAhead="true" context="assignment" />
 			</context>
 
-			<context name="choice_option_list.error" attribute="error" lineEndContext="#pop!choice_option_list" />
-			<context name="config_option_list.error" attribute="error" lineEndContext="#pop!config_option_list" />
-			<context name="stmt_list.error" attribute="error" lineEndContext="#pop!stmt_list" />
-			<context name="error" attribute="error" lineEndContext="#pop" />
+			<context name="choice_option_list.error" attribute="Error" lineEndContext="#pop!choice_option_list" />
+			<context name="config_option_list.error" attribute="Error" lineEndContext="#pop!config_option_list" />
+			<context name="stmt_list.error" attribute="Error" lineEndContext="#pop!stmt_list" />
+			<context name="error" attribute="Error" lineEndContext="#pop" />
 
 			<!-- expressions -->
-			<context name="nl.expr" attribute="plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
+			<context name="nl.expr" attribute="Plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
 				<LineContinue context="#stay" />
 				<Detect2Chars char="(" char1=")" lookAhead="true" context="#pop!nl.emptyParenthesesInstance" />
-				<DetectChar char="(" attribute="exprOp" beginRegion="parentheses" context="#pop!nl.parenthesesInstance" />
-				<DetectChar char="!" attribute="exprOp" context="#stay" />
-				<DetectChar char="'" attribute="symbolConst" context="#pop!nl.binOpOrEnd.SQSymbolConst" />
-				<DetectChar char="&quot;" attribute="symbolConst" context="#pop!nl.binOpOrEnd.DQSymbolConst" />
+				<DetectChar char="(" attribute="Expression Operator" beginRegion="parentheses" context="#pop!nl.parenthesesInstance" />
+				<DetectChar char="!" attribute="Expression Operator" context="#stay" />
+				<DetectChar char="'" attribute="Constant Symbol" context="#pop!nl.binOpOrEnd.SQSymbolConst" />
+				<DetectChar char="&quot;" attribute="Constant Symbol" context="#pop!nl.binOpOrEnd.DQSymbolConst" />
 				<keyword String="keyword" context="#pop!error" />
-				<keyword String="tristate_const" attribute="tristateConst" context="#pop!nl.binOpOrEnd" />
+				<keyword String="tristate_const" attribute="Tristate Constant" context="#pop!nl.binOpOrEnd" />
 				<RegExpr String="(&n;|\$)+(?!&n1;)" lookAhead="true" context="#pop!nl.binOpOrEnd.expandableIdentifier" />
-				<RegExpr String="&n1;+" attribute="deprecatedSymbolVar" context="#pop!nl.binOpOrEnd" />
+				<RegExpr String="&n1;+" attribute="Deprecated Variable Symbol" context="#pop!nl.binOpOrEnd" />
 			</context>
 
-			<context name="nl.binOpOrEnd.expandableIdentifier" attribute="symbolVar" lineEndContext="#pop" fallthroughContext="#pop!nl.binOpOrEnd">
+			<context name="nl.binOpOrEnd.expandableIdentifier" attribute="Variable Symbol" lineEndContext="#pop" fallthroughContext="#pop!nl.binOpOrEnd">
 				<IncludeRules context="expandableIdentifier" />
 			</context>
 
-			<context name="nl.emptyParenthesesInstance" attribute="plain" lineEndContext="#stay">
-				<DetectChar char="(" attribute="exprOp" context="#pop!error" />
+			<context name="nl.emptyParenthesesInstance" attribute="Plain" lineEndContext="#stay">
+				<DetectChar char="(" attribute="Expression Operator" context="#pop!error" />
 			</context>
 
-			<context name="nl.binOpOrEnd" attribute="plain" lineEndContext="#pop" fallthroughContext="#pop!error">
+			<context name="nl.binOpOrEnd" attribute="Plain" lineEndContext="#pop" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
 				<LineContinue context="#stay" />
 				<DetectChar char=")" lookAhead="true" context="#pop" />
-				<Detect2Chars char="&amp;" char1="&amp;" attribute="exprOp" context="#pop!nl.expr" />
-				<Detect2Chars char="|" char1="|" attribute="exprOp" context="#pop!nl.expr" />
-				<Detect2Chars char="!" char1="=" attribute="exprOp" context="#pop!nl.expr" />
-				<Detect2Chars char="&lt;" char1="=" attribute="exprOp" context="#pop!nl.expr" />
-				<Detect2Chars char="&gt;" char1="=" attribute="exprOp" context="#pop!nl.expr" />
-				<AnyChar String="=&lt;&gt;" attribute="exprOp" context="#pop!nl.expr" />
+				<Detect2Chars char="&amp;" char1="&amp;" attribute="Expression Operator" context="#pop!nl.expr" />
+				<Detect2Chars char="|" char1="|" attribute="Expression Operator" context="#pop!nl.expr" />
+				<Detect2Chars char="!" char1="=" attribute="Expression Operator" context="#pop!nl.expr" />
+				<Detect2Chars char="&lt;" char1="=" attribute="Expression Operator" context="#pop!nl.expr" />
+				<Detect2Chars char="&gt;" char1="=" attribute="Expression Operator" context="#pop!nl.expr" />
+				<AnyChar String="=&lt;&gt;" attribute="Expression Operator" context="#pop!nl.expr" />
 				<IncludeRules context="ignoreBadParamChars" />
 			</context>
 
-			<context name="nl.binOpOrEnd.SQSymbolConst" attribute="symbolConst" lineEndContext="#pop!error">
-				<DetectChar char="'" attribute="symbolConst" context="#pop!nl.binOpOrEnd" />
+			<context name="nl.binOpOrEnd.SQSymbolConst" attribute="Constant Symbol" lineEndContext="#pop!error">
+				<DetectChar char="'" attribute="Constant Symbol" context="#pop!nl.binOpOrEnd" />
 				<IncludeRules context="expansionAndEscape" />
 			</context>
 
-			<context name="nl.binOpOrEnd.DQSymbolConst" attribute="symbolConst" lineEndContext="#pop!error">
-				<DetectChar char="&quot;" attribute="symbolConst" context="#pop!nl.binOpOrEnd" />
+			<context name="nl.binOpOrEnd.DQSymbolConst" attribute="Constant Symbol" lineEndContext="#pop!error">
+				<DetectChar char="&quot;" attribute="Constant Symbol" context="#pop!nl.binOpOrEnd" />
 				<IncludeRules context="expansionAndEscape" />
 			</context>
 
-			<context name="ifOpt.expr" attribute="plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
+			<context name="ifOpt.expr" attribute="Plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
 				<LineContinue context="#stay" />
 				<Detect2Chars char="(" char1=")" lookAhead="true" context="#pop!nl.emptyParenthesesInstance" />
-				<DetectChar char="(" attribute="exprOp" beginRegion="parentheses" context="#pop!ifOpt.parenthesesInstance" />
+				<DetectChar char="(" attribute="Expression Operator" beginRegion="parentheses" context="#pop!ifOpt.parenthesesInstance" />
 				<DetectChar char="!" context="#stay" />
-				<DetectChar char="'" attribute="symbolConst" context="#pop!ifOpt.binOpOrEnd.SQSymbolConst" />
-				<DetectChar char="&quot;" attribute="symbolConst" context="#pop!ifOpt.binOpOrEnd.DQSymbolConst" />
-				<keyword String="keyword" attribute="error" context="#pop!error" />
-				<RegExpr String="&tristateConst;" attribute="tristateConst" context="#pop!ifOpt.binOpOrEnd" />
+				<DetectChar char="'" attribute="Constant Symbol" context="#pop!ifOpt.binOpOrEnd.SQSymbolConst" />
+				<DetectChar char="&quot;" attribute="Constant Symbol" context="#pop!ifOpt.binOpOrEnd.DQSymbolConst" />
+				<keyword String="keyword" attribute="Error" context="#pop!error" />
+				<RegExpr String="&tristateConst;" attribute="Tristate Constant" context="#pop!ifOpt.binOpOrEnd" />
 				<RegExpr String="(&n;|\$)" lookAhead="true" context="#pop!ifOpt.binOpOrEnd.expandableIdentifier" />
 			</context>
 
-			<context name="ifOpt.binOpOrEnd.expandableIdentifier" attribute="symbolVar" lineEndContext="#pop" fallthroughContext="#pop!ifOpt.binOpOrEnd">
+			<context name="ifOpt.binOpOrEnd.expandableIdentifier" attribute="Variable Symbol" lineEndContext="#pop" fallthroughContext="#pop!ifOpt.binOpOrEnd">
 				<IncludeRules context="expandableIdentifier" />
 			</context>
 
-			<context name="ifOpt.binOpOrEnd" attribute="plain" lineEndContext="#pop" fallthroughContext="#pop!ifOpt">
+			<context name="ifOpt.binOpOrEnd" attribute="Plain" lineEndContext="#pop" fallthroughContext="#pop!ifOpt">
 				<IncludeRules context="wsOrComment" />
 				<LineContinue context="#stay" />
 				<DetectChar char=")" lookAhead="true" context="#pop" />
-				<Detect2Chars char="&amp;" char1="&amp;" attribute="exprOp" context="#pop!ifOpt.expr" />
-				<Detect2Chars char="|" char1="|" attribute="exprOp" context="#pop!ifOpt.expr" />
-				<Detect2Chars char="!" char1="=" attribute="exprOp" context="#pop!ifOpt.expr" />
-				<Detect2Chars char="&lt;" char1="=" attribute="exprOp" context="#pop!ifOpt.expr" />
-				<Detect2Chars char="&gt;" char1="=" attribute="exprOp" context="#pop!ifOpt.expr" />
-				<AnyChar String="=&lt;&gt;" attribute="exprOp" context="#pop!ifOpt.expr" />
+				<Detect2Chars char="&amp;" char1="&amp;" attribute="Expression Operator" context="#pop!ifOpt.expr" />
+				<Detect2Chars char="|" char1="|" attribute="Expression Operator" context="#pop!ifOpt.expr" />
+				<Detect2Chars char="!" char1="=" attribute="Expression Operator" context="#pop!ifOpt.expr" />
+				<Detect2Chars char="&lt;" char1="=" attribute="Expression Operator" context="#pop!ifOpt.expr" />
+				<Detect2Chars char="&gt;" char1="=" attribute="Expression Operator" context="#pop!ifOpt.expr" />
+				<AnyChar String="=&lt;&gt;" attribute="Expression Operator" context="#pop!ifOpt.expr" />
 				<IncludeRules context="ignoreBadParamChars" />
 			</context>
 
-			<context name="ifOpt.binOpOrEnd.SQSymbolConst" attribute="symbolConst" lineEndContext="#pop!error">
-				<DetectChar char="'" attribute="symbolConst" context="#pop!ifOpt.binOpOrEnd" />
+			<context name="ifOpt.binOpOrEnd.SQSymbolConst" attribute="Constant Symbol" lineEndContext="#pop!error">
+				<DetectChar char="'" attribute="Constant Symbol" context="#pop!ifOpt.binOpOrEnd" />
 				<IncludeRules context="expansionAndEscape" />
 			</context>
 
-			<context name="ifOpt.binOpOrEnd.DQSymbolConst" attribute="symbolConst" lineEndContext="#pop!error">
-				<DetectChar char="&quot;" attribute="symbolConst" context="#pop!ifOpt.binOpOrEnd" />
+			<context name="ifOpt.binOpOrEnd.DQSymbolConst" attribute="Constant Symbol" lineEndContext="#pop!error">
+				<DetectChar char="&quot;" attribute="Constant Symbol" context="#pop!ifOpt.binOpOrEnd" />
 				<IncludeRules context="expansionAndEscape" />
 			</context>
 
-			<context name="if_stmt.nl.expr" attribute="plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
+			<context name="if_stmt.nl.expr" attribute="Plain" lineEndContext="#pop!error" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
 				<LineContinue context="#stay" />
 				<Detect2Chars char="(" char1=")" lookAhead="true" context="#pop!nl.emptyParenthesesInstance" />
-				<DetectChar char="(" attribute="exprOp" beginRegion="parentheses" context="#pop!if_stmt.nl.parenthesesInstance" />
+				<DetectChar char="(" attribute="Expression Operator" beginRegion="parentheses" context="#pop!if_stmt.nl.parenthesesInstance" />
 				<DetectChar char="!" context="#stay" />
-				<DetectChar char="'" attribute="symbolConst" context="#pop!if_stmt.nl.binOpOrEnd.SQSymbolConst" />
-				<DetectChar char="&quot;" attribute="symbolConst" context="#pop!if_stmt.nl.binOpOrEnd.DQSymbolConst" />
+				<DetectChar char="'" attribute="Constant Symbol" context="#pop!if_stmt.nl.binOpOrEnd.SQSymbolConst" />
+				<DetectChar char="&quot;" attribute="Constant Symbol" context="#pop!if_stmt.nl.binOpOrEnd.DQSymbolConst" />
 				<keyword String="keyword" context="#pop!error" />
-				<RegExpr String="&tristateConst;" attribute="tristateConst" context="#pop!if_stmt.nl.binOpOrEnd" />
+				<RegExpr String="&tristateConst;" attribute="Tristate Constant" context="#pop!if_stmt.nl.binOpOrEnd" />
 				<RegExpr String="(&n;|\$)" lookAhead="true" context="#pop!if_stmt.nl.binOpOrEnd.expandableIdentifier" />
 			</context>
 
-			<context name="if_stmt.nl.binOpOrEnd.expandableIdentifier" attribute="symbolVar" lineEndContext="#pop!if_stmt" fallthroughContext="#pop!if_stmt.nl.binOpOrEnd">
+			<context name="if_stmt.nl.binOpOrEnd.expandableIdentifier" attribute="Variable Symbol" lineEndContext="#pop!if_stmt" fallthroughContext="#pop!if_stmt.nl.binOpOrEnd">
 				<IncludeRules context="expandableIdentifier" />
 			</context>
 
-			<context name="if_stmt.nl.binOpOrEnd" attribute="plain" lineEndContext="#pop!if_stmt" fallthroughContext="#pop!nl">
+			<context name="if_stmt.nl.binOpOrEnd" attribute="Plain" lineEndContext="#pop!if_stmt" fallthroughContext="#pop!nl">
 				<IncludeRules context="wsOrComment" />
 				<LineContinue context="#stay" />
 				<DetectChar char=")" lookAhead="true" context="#pop" />
-				<Detect2Chars char="&amp;" char1="&amp;" attribute="exprOp" context="#pop!if_stmt.nl.expr" />
-				<Detect2Chars char="|" char1="|" attribute="exprOp" context="#pop!if_stmt.nl.expr" />
-				<DetectChar char="=" attribute="exprOp" context="#pop!if_stmt.nl.expr" />
-				<Detect2Chars char="!" char1="=" attribute="exprOp" context="#pop!if_stmt.nl.expr" />
+				<Detect2Chars char="&amp;" char1="&amp;" attribute="Expression Operator" context="#pop!if_stmt.nl.expr" />
+				<Detect2Chars char="|" char1="|" attribute="Expression Operator" context="#pop!if_stmt.nl.expr" />
+				<DetectChar char="=" attribute="Expression Operator" context="#pop!if_stmt.nl.expr" />
+				<Detect2Chars char="!" char1="=" attribute="Expression Operator" context="#pop!if_stmt.nl.expr" />
 				<IncludeRules context="ignoreBadParamChars" />
 			</context>
 
-			<context name="escapeInDeprecatedString" attribute="plain" lineEndContext="#pop" fallthroughContext="#pop">
-				<RegExpr String="\\." attribute="deprecatedEscapedCharacter" context="#pop" />
+			<context name="escapeInDeprecatedString" attribute="Plain" lineEndContext="#pop" fallthroughContext="#pop">
+				<RegExpr String="\\." attribute="Deprecated Escaped Character" context="#pop" />
 			</context>
 
-			<context name="escape" attribute="plain" lineEndContext="#pop" fallthroughContext="#pop">
-				<RegExpr String="\\." attribute="escapedCharacter" context="#pop" />
+			<context name="escape" attribute="Plain" lineEndContext="#pop" fallthroughContext="#pop">
+				<RegExpr String="\\." attribute="Escaped Character" context="#pop" />
 			</context>
 
-			<context name="if_stmt.nl.binOpOrEnd.SQSymbolConst" attribute="symbolConst" lineEndContext="#pop!error">
-				<DetectChar char="'" attribute="symbolConst" context="#pop!if_stmt.nl.binOpOrEnd" />
+			<context name="if_stmt.nl.binOpOrEnd.SQSymbolConst" attribute="Constant Symbol" lineEndContext="#pop!error">
+				<DetectChar char="'" attribute="Constant Symbol" context="#pop!if_stmt.nl.binOpOrEnd" />
 				<IncludeRules context="expansionAndEscape" />
 			</context>
 
-			<context name="if_stmt.nl.binOpOrEnd.DQSymbolConst" attribute="symbolConst" lineEndContext="#pop!error">
-				<DetectChar char="&quot;" attribute="symbolConst" context="#pop!if_stmt.nl.binOpOrEnd" />
+			<context name="if_stmt.nl.binOpOrEnd.DQSymbolConst" attribute="Constant Symbol" lineEndContext="#pop!error">
+				<DetectChar char="&quot;" attribute="Constant Symbol" context="#pop!if_stmt.nl.binOpOrEnd" />
 				<IncludeRules context="expansionAndEscape" />
 			</context>
 
-			<context name="nl.parenthesesInstance" attribute="plain" lineEndContext="#stay" fallthroughContext="nl.expr">
-				<DetectChar char=")" attribute="exprOp" endRegion="parentheses" context="#pop!nl.binOpOrEnd" />
+			<context name="nl.parenthesesInstance" attribute="Plain" lineEndContext="#stay" fallthroughContext="nl.expr">
+				<DetectChar char=")" attribute="Expression Operator" endRegion="parentheses" context="#pop!nl.binOpOrEnd" />
 			</context>
 
-			<context name="ifOpt.parenthesesInstance" attribute="plain" lineEndContext="#stay" fallthroughContext="ifOpt.expr">
-				<DetectChar char=")" attribute="exprOp" endRegion="parentheses" context="#pop!ifOpt.binOpOrEnd" />
+			<context name="ifOpt.parenthesesInstance" attribute="Plain" lineEndContext="#stay" fallthroughContext="ifOpt.expr">
+				<DetectChar char=")" attribute="Expression Operator" endRegion="parentheses" context="#pop!ifOpt.binOpOrEnd" />
 			</context>
 
-			<context name="if_stmt.nl.parenthesesInstance" attribute="plain" lineEndContext="#stay" fallthroughContext="nl.expr">
-				<DetectChar char=")" attribute="exprOp" endRegion="parentheses" context="#pop!if_stmt.nl.binOpOrEnd" />
+			<context name="if_stmt.nl.parenthesesInstance" attribute="Plain" lineEndContext="#stay" fallthroughContext="nl.expr">
+				<DetectChar char=")" attribute="Expression Operator" endRegion="parentheses" context="#pop!if_stmt.nl.binOpOrEnd" />
 			</context>
 
-			<context name="parenthesesInExpansion" attribute="expansion" lineEndContext="#pop">
+			<context name="parenthesesInExpansion" attribute="Expansion" lineEndContext="#pop">
 				<IncludeRules context="expansion" />
-				<DetectChar char="(" attribute="expansion" context="parenthesesInExpansion" />
-				<DetectChar char=")" attribute="expansion" context="#pop" />
+				<DetectChar char="(" attribute="Expansion" context="parenthesesInExpansion" />
+				<DetectChar char=")" attribute="Expansion" context="#pop" />
 			</context>
 
-			<context name="expansionArgumentsAndEnd" attribute="expansion" lineEndContext="#pop!error">
+			<context name="expansionArgumentsAndEnd" attribute="Expansion" lineEndContext="#pop!error">
 				<IncludeRules context="expansion" />
-				<DetectChar char="(" attribute="expansion" context="parenthesesInExpansion" />
-				<DetectChar char="," attribute="argumentSeparator" context="#stay" />
-				<DetectChar char=")" attribute="expansionDelimiter" context="#pop" />
+				<DetectChar char="(" attribute="Expansion" context="parenthesesInExpansion" />
+				<DetectChar char="," attribute="Argument Separator" context="#stay" />
+				<DetectChar char=")" attribute="Expansion Delimiter" context="#pop" />
 			</context>
 
-			<context name="expansionArgumentsAndEnd.functionOrVariableName" attribute="expansion" lineEndContext="#pop!error" fallthroughContext="#pop!expansionArgumentsAndEnd">
-				<keyword String="builtin_function" attribute="builtinFunction" context="#pop!expansionArgumentsAndEnd" />
+			<context name="expansionArgumentsAndEnd.functionOrVariableName" attribute="Expansion" lineEndContext="#pop!error" fallthroughContext="#pop!expansionArgumentsAndEnd">
+				<keyword String="builtin_function" attribute="Builtin Function" context="#pop!expansionArgumentsAndEnd" />
 				<IncludeRules context="expansion" />
 				<RegExpr String="(&n;|(\$(?!\()))+" context="#pop!expansionArgumentsAndEnd" />
 			</context>
@@ -767,17 +781,17 @@ Newer changes in the configuration language:
 				can be summarized as
 				"do not exceed 80 chars without a good reason"
 			-->
-			<context name="helpEntry" attribute="helpText" lineEndContext="#pop!helpTextFirstLine" fallthroughContext="#pop!error">
+			<context name="helpEntry" attribute="Help Text" lineEndContext="#pop!helpTextFirstLine" fallthroughContext="#pop!error">
 				<IncludeRules context="wsOrComment" />
 				<IncludeRules context="ignoreBadParamChars" />
 			</context>
 
-			<context name="helpTextFirstLine" attribute="helpText" lineEmptyContext="#pop!helpDetectIndentation" lineEndContext="#stay" fallthroughContext="#pop!error">
-				<RegExpr String="^([^ \t].*|[ \t]*)$" column="0" attribute="helpText" context="#pop!helpDetectIndentation" />
+			<context name="helpTextFirstLine" attribute="Help Text" lineEmptyContext="#pop!helpDetectIndentation" lineEndContext="#stay" fallthroughContext="#pop!error">
+				<RegExpr String="^([^ \t].*|[ \t]*)$" column="0" attribute="Help Text" context="#pop!helpDetectIndentation" />
 				<IncludeRules context="helpDetectIndentation" />
 			</context>
 
-			<context name="helpDetectIndentation" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpDetectIndentation" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<RegExpr String="^[ \t]*$" column="0" context="#stay" />
 				<RegExpr String="^(&tab;){10}(?![ \t])" column="0" lookAhead="true" context="#pop!helpIndent80" />
 				<RegExpr String="^(&tab;){9}       (?![ \t])" column="0" lookAhead="true" context="#pop!helpIndent79" />
@@ -861,511 +875,512 @@ Newer changes in the configuration language:
 				<RegExpr String="^ (?![ \t])" column="0" lookAhead="true" context="#pop!helpIndent1" />
 			</context>
 
-			<context name="endHelp" attribute="helpText" lineEndContext="#stay">
-				<DetectSpaces attribute="helpText" context="#stay" />
+			<context name="endHelp" attribute="Help Text" lineEndContext="#stay">
+				<DetectSpaces attribute="Help Text" context="#stay" />
 				<DetectChar char="#" lookAhead="true" endRegion="help" context="#pop!lineComment" />
 				<keyword String="keyword" lookAhead="true" endRegion="help" context="#pop" />
 				<RegExpr String="." lookAhead="true" endRegion="help" context="#pop!error" />
 			</context>
 
-			<context name="helpText" attribute="helpText" lineEndContext="#pop">
-				<DetectChar char="&lt;" attribute="helpText" context="maybeLink" />
+			<context name="helpText" attribute="Help Text" lineEndContext="#pop">
+				<DetectChar char="&lt;" attribute="Help Text" context="maybeLink" />
 			</context>
 
-			<context name="maybeLink" attribute="link" lineEndContext="#pop" fallthroughContext="#pop">
-				<RegExpr String="[^&gt;]+:[^&gt;]+(?&gt;)" attribute="link" context="#pop" />
+			<context name="maybeLink" attribute="Link" lineEndContext="#pop" fallthroughContext="#pop">
+				<RegExpr String="[^&gt;]+:[^&gt;]+(?&gt;)" attribute="Link" context="#pop" />
 			</context>
 
-			<context name="helpEatWsLine" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop">
-				<RegExpr String="^( |\t)*$" column="0" attribute="helpText" context="#stay" />
+			<context name="helpEatWsLine" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop">
+				<RegExpr String="^( |\t)*$" column="0" attribute="Help Text" context="#stay" />
 			</context>
 
-			<context name="helpIndent1" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent1" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^( |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^( |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent2" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent2" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(  |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(  |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent3" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent3" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(   |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(   |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent4" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent4" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(    |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(    |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent5" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent5" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(     |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(     |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent6" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent6" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(      |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(      |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent7" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent7" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(       |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(       |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent8" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent8" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^&tab;" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^&tab;" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent9" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent9" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^&tab;( |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^&tab;( |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent10" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent10" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^&tab;(  |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^&tab;(  |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent11" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent11" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^&tab;(   |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^&tab;(   |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent12" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent12" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^&tab;(    |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^&tab;(    |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent13" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent13" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^&tab;(     |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^&tab;(     |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent14" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent14" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^&tab;(      |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^&tab;(      |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent15" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent15" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^&tab;(       |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^&tab;(       |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent16" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent16" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){2}" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){2}" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent17" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent17" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){2}( |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){2}( |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent18" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent18" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){2}(  |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){2}(  |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent19" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent19" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){2}(   |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){2}(   |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent20" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent20" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){2}(    |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){2}(    |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent21" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent21" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){2}(     |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){2}(     |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent22" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent22" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){2}(      |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){2}(      |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent23" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent23" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){2}(       |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){2}(       |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent24" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent24" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){3}" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){3}" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent25" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent25" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){3}( |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){3}( |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent26" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent26" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){3}(  |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){3}(  |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent27" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent27" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){3}(   |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){3}(   |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent28" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent28" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){3}(    |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){3}(    |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent29" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent29" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){3}(     |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){3}(     |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent30" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent30" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){3}(      |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){3}(      |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent31" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent31" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){3}(       |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){3}(       |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent32" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent32" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){4}" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){4}" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent33" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent33" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){4}( |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){4}( |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent34" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent34" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){4}(  |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){4}(  |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent35" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent35" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){4}(   |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){4}(   |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent36" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent36" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){4}(    |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){4}(    |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent37" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent37" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){4}(     |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){4}(     |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent38" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent38" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){4}(      |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){4}(      |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent39" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent39" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){4}(       |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){4}(       |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent40" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent40" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){5}" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){5}" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent41" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent41" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){5}( |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){5}( |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent42" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent42" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){5}(  |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){5}(  |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent43" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent43" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){5}(   |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){5}(   |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent44" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent44" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){5}(    |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){5}(    |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent45" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent45" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){5}(     |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){5}(     |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent46" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent46" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){5}(      |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){5}(      |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent47" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent47" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){5}(       |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){5}(       |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent48" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent48" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){6}" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){6}" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent49" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent49" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){6}( |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){6}( |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent50" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent50" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){6}(  |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){6}(  |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent51" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent51" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){6}(   |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){6}(   |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent52" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent52" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){6}(    |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){6}(    |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent53" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent53" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){6}(     |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){6}(     |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent54" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent54" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){6}(      |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){6}(      |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent55" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent55" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){6}(       |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){6}(       |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent56" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent56" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){7}" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){7}" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent57" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent57" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){7}( |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){7}( |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent58" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent58" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){7}(  |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){7}(  |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent59" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent59" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){7}(   |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){7}(   |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent60" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent60" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){7}(    |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){7}(    |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent61" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent61" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){7}(     |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){7}(     |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent62" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent62" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){7}(      |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){7}(      |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent63" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent63" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){7}(       |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){7}(       |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent64" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent64" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){8}" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){8}" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent65" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent65" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){8}( |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){8}( |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent66" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent66" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){8}(  |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){8}(  |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent67" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent67" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){8}(   |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){8}(   |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent68" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent68" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){8}(    |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){8}(    |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent69" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent69" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){8}(     |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){8}(     |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent70" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent70" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){8}(      |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){8}(      |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent71" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent71" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){8}(       |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){8}(       |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent72" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent72" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){9}" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){9}" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent73" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent73" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){9}( |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){9}( |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent74" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent74" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){9}(  |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){9}(  |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent75" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent75" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){9}(   |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){9}(   |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent76" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent76" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){9}(    |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){9}(    |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent77" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent77" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){9}(     |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){9}(     |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent78" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent78" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){9}(      |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){9}(      |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent79" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent79" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){9}(       |\t)" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){9}(       |\t)" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
-			<context name="helpIndent80" attribute="helpText" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
+			<context name="helpIndent80" attribute="Help Text" lineEndContext="#stay" fallthroughContext="#pop!endHelp">
 				<IncludeRules context="helpEatWsLine" />
-				<RegExpr String="^(&tab;){10}" column="0" attribute="helpText" context="helpText" />
+				<RegExpr String="^(&tab;){10}" column="0" attribute="Help Text" context="helpText" />
 			</context>
 
 			<!-- only as included rules -->
-			<context name="common_stmt" attribute="plain" lineEndContext="#pop!error" fallthroughContext="#pop">
+			<context name="common_stmt" attribute="Plain" lineEndContext="#pop!error" fallthroughContext="#pop">
 				<IncludeRules context="wsOrComment" />
-				<WordDetect String="if" attribute="keyword" beginRegion="if_stmt" context="if_stmt.nl.expr" />
-				<WordDetect String="comment" attribute="keyword" beginRegion="comment_stmt" context="comment_stmt.nl.prompt" />
-				<keyword String="config" attribute="keyword" beginRegion="config_stmt" context="config_entry_start" />
-				<WordDetect String="source" attribute="source" context="source_stmt" />
+				<WordDetect String="if" attribute="Keyword" beginRegion="if_stmt" context="if_stmt.nl.expr" />
+				<WordDetect String="comment" attribute="Keyword" beginRegion="comment_stmt" context="comment_stmt.nl.prompt" />
+				<keyword String="config" attribute="Keyword" beginRegion="config_stmt" context="config_entry_start" />
+				<WordDetect String="source" attribute="Source" context="source_stmt" />
 			</context>
 
-			<context name="expandableIdentifier" attribute="symbolVar" lineEndContext="#pop" fallthroughContext="#pop">
+			<context name="expandableIdentifier" attribute="Variable Symbol" lineEndContext="#pop" fallthroughContext="#pop">
 				<IncludeRules context="expansion" />
 				<RegExpr String="(&n;|(\$(?!\()))+" context="#stay" />
 			</context>
 
-			<context name="expansion" attribute="expansion" lineEndContext="#pop!error" fallthroughContext="#pop!error">
-				<Detect2Chars char="$" char1="(" attribute="expansionDelimiter" context="expansionArgumentsAndEnd.functionOrVariableName" />
+			<context name="expansion" attribute="Expansion" lineEndContext="#pop!error" fallthroughContext="#pop!error">
+				<Detect2Chars char="$" char1="(" attribute="Expansion Delimiter" context="expansionArgumentsAndEnd.functionOrVariableName" />
 			</context>
 
-			<context name="expansionAndEscape" attribute="expansion" lineEndContext="#pop!error" fallthroughContext="#pop!error">
+			<context name="expansionAndEscape" attribute="Expansion" lineEndContext="#pop!error" fallthroughContext="#pop!error">
 				<DetectChar char="\" lookAhead="true" context="escape" />
-				<Detect2Chars char="$" char1="(" attribute="expansionDelimiter" context="expansionArgumentsAndEnd.functionOrVariableName" />
+				<Detect2Chars char="$" char1="(" attribute="Expansion Delimiter" context="expansionArgumentsAndEnd.functionOrVariableName" />
 			</context>
 
-			<context name="wsOrComment" attribute="plain" lineEndContext="#stay">
+			<context name="wsOrComment" attribute="Plain" lineEndContext="#stay">
 				<DetectSpaces />
 				<DetectChar char="#" lookAhead="true" context="lineComment" />
 			</context>
 
-			<context name="ignoreBadComChars" attribute="badChar" lineEndContext="#stay">
-				<RegExpr String="&badCom;+" attribute="badChar" context="#stay" />
+			<context name="ignoreBadComChars" attribute="Bad Character" lineEndContext="#stay">
+				<RegExpr String="&badCom;+" attribute="Bad Character" context="#stay" />
 			</context>
 
-			<context name="ignoreBadParamChars" attribute="badChar" lineEndContext="#stay">
-				<RegExpr String="&badParam;+" attribute="badChar" context="#stay" />
+			<context name="ignoreBadParamChars" attribute="Bad Character" lineEndContext="#stay">
+				<RegExpr String="&badParam;+" attribute="Bad Character" context="#stay" />
 			</context>
 
-			<context name="lineComment" attribute="comment" lineEndContext="#pop">
+			<context name="lineComment" attribute="Comment" lineEndContext="#pop">
 				<DetectSpaces />
 				<IncludeRules context="##Comments" />
 			</context>
 		</contexts>
 		<itemDatas>
-			<itemData name="argumentSeparator" defStyleNum="dsKeyword" spellChecking="false" />
-			<itemData name="assignmentOperator" defStyleNum="dsChar" spellChecking="false" />
-			<itemData name="assignmentValue" defStyleNum="dsString" spellChecking="false" />
-			<itemData name="badChar" defStyleNum="dsAlert" spellChecking="false" />
-			<itemData name="badTristateConst" defStyleNum="dsAlert" spellChecking="false" />
-			<itemData name="builtinFunction" defStyleNum="dsBuiltIn" spellChecking="false" />
-			<itemData name="comment" defStyleNum="dsComment" spellChecking="true" />
-			<itemData name="deprecatedBadChoiceType" defStyleNum="dsAlert" spellChecking="false" strikeOut="true" />
-			<itemData name="deprecatedEscapedCharacter" defStyleNum="dsSpecialChar" spellChecking="false" strikeOut="true" />
-			<itemData name="deprecatedExpansion" defStyleNum="dsVariable" spellChecking="false" strikeOut="true" />
-			<itemData name="deprecatedIdentifier" defStyleNum="dsDataType" spellChecking="false" strikeOut="true" />
-			<itemData name="deprecatedOption" defStyleNum="dsOthers" spellChecking="false" strikeOut="true" />
-			<itemData name="deprecatedOptionEq" defStyleNum="dsOperator" spellChecking="false" strikeOut="true" />
-			<itemData name="deprecatedProperty" defStyleNum="dsOthers" spellChecking="false" strikeOut="true" />
-			<itemData name="deprecatedQuotedOptionValue" defStyleNum="dsString" spellChecking="false" strikeOut="true" />
-			<itemData name="deprecatedSymbolVar" defStyleNum="dsNormal" spellChecking="false" strikeOut="true" />
-			<itemData name="deprecatedType" defStyleNum="dsDataType" spellChecking="false" strikeOut="true" />
-			<itemData name="deprecatedUnknownOptionString" defStyleNum="dsAlert" italic="true" spellChecking="false" strikeOut="true" />
-			<itemData name="deprecatedUnquotedMainmenuPrompt" defStyleNum="dsString" spellChecking="false" strikeOut="true" />
-			<itemData name="deprecatedUnquotedOptionValue" defStyleNum="dsString" spellChecking="false" strikeOut="true" />
-			<itemData name="deprecatedUnquotedOptionValueString" defStyleNum="dsString" spellChecking="false" strikeOut="true" />
-			<itemData name="deprecatedUnquotedPrompt" defStyleNum="dsNormal" spellChecking="true" strikeOut="true" />
-			<itemData name="deprecatedUnquotedSourceString" defStyleNum="dsString" spellChecking="false" strikeOut="true" />
-			<itemData name="error" defStyleNum="dsError" spellChecking="false" />
-			<itemData name="escapedCharacter" defStyleNum="dsSpecialChar" spellChecking="false" />
-			<itemData name="expansion" defStyleNum="dsDataType" spellChecking="false" />
-			<itemData name="expansionDelimiter" defStyleNum="dsChar" spellChecking="false" />
-			<itemData name="exprOp" defStyleNum="dsOperator" spellChecking="false" />
-			<itemData name="helpText" defStyleNum="dsVerbatimString" spellChecking="true" />
-			<itemData name="keyword" defStyleNum="dsKeyword" spellChecking="false" />
-			<itemData name="link" defStyleNum="dsOthers" spellChecking="false" underline="false" />
-			<itemData name="option" defStyleNum="dsOthers" spellChecking="false" />
-			<itemData name="plain" defStyleNum="dsNormal" spellChecking="true" />
-			<itemData name="property" defStyleNum="dsOthers" spellChecking="false" />
-			<itemData name="quotedMainmenuPrompt" defStyleNum="dsString" spellChecking="true" />
-			<itemData name="quotedPrompt" defStyleNum="dsString" spellChecking="true" />
-			<itemData name="quotedSourceString" defStyleNum="dsString" spellChecking="false" />
-			<itemData name="source" defStyleNum="dsPreprocessor" spellChecking="false" />
-			<itemData name="symbolConst" defStyleNum="dsString" spellChecking="false" />
-			<itemData name="symbolVar" defStyleNum="dsNormal" spellChecking="false" />
-			<itemData name="tristateConst" defStyleNum="dsConstant" spellChecking="false" />
-			<itemData name="type" defStyleNum="dsDataType" spellChecking="false" />
-			<itemData name="unknownOption" defStyleNum="dsAlert" italic="true" spellChecking="false" />
-			<itemData name="variable" defStyleNum="dsDataType" spellChecking="false" />
+			<itemData name="Argument Separator" defStyleNum="dsKeyword" spellChecking="false" />
+			<itemData name="Assignment Operator" defStyleNum="dsChar" spellChecking="false" />
+			<itemData name="Assignment Value" defStyleNum="dsString" spellChecking="false" />
+			<itemData name="Bad Character" defStyleNum="dsAlert" spellChecking="false" />
+			<itemData name="Bad Tristate Constant" defStyleNum="dsAlert" spellChecking="false" />
+			<itemData name="Builtin Function" defStyleNum="dsBuiltIn" spellChecking="false" />
+			<itemData name="Comment" defStyleNum="dsComment" spellChecking="true" />
+			<itemData name="Constant Symbol" defStyleNum="dsString" spellChecking="false" />
+			<itemData name="Deprecated Bad Choice Type" defStyleNum="dsAlert" spellChecking="false" strikeOut="true" />
+			<itemData name="Deprecated Escaped Character" defStyleNum="dsSpecialChar" spellChecking="false" strikeOut="true" />
+			<itemData name="Deprecated Expansion" defStyleNum="dsVariable" spellChecking="false" strikeOut="true" />
+			<itemData name="Deprecated Identifier" defStyleNum="dsDataType" spellChecking="false" strikeOut="true" />
+			<itemData name="Deprecated Keyword" defStyleNum="dsKeyword" spellChecking="false" strikeOut="true" />
+			<itemData name="Deprecated Option" defStyleNum="dsOthers" spellChecking="false" strikeOut="true" />
+			<itemData name="Deprecated Option: Equals Sign" defStyleNum="dsOperator" spellChecking="false" strikeOut="true" />
+			<itemData name="Deprecated Property" defStyleNum="dsOthers" spellChecking="false" strikeOut="true" />
+			<itemData name="Deprecated Quoted Option Value" defStyleNum="dsString" spellChecking="false" strikeOut="true" />
+			<itemData name="Deprecated Type" defStyleNum="dsDataType" spellChecking="false" strikeOut="true" />
+			<itemData name="Deprecated Unknown Option String" defStyleNum="dsAlert" italic="true" spellChecking="false" strikeOut="true" />
+			<itemData name="Deprecated Unquoted Mainmenu Prompt" defStyleNum="dsString" spellChecking="false" strikeOut="true" />
+			<itemData name="Deprecated Unquoted Option Value String" defStyleNum="dsString" spellChecking="false" strikeOut="true" />
+			<itemData name="Deprecated Unquoted Option Value" defStyleNum="dsString" spellChecking="false" strikeOut="true" />
+			<itemData name="Deprecated Unquoted Prompt" defStyleNum="dsNormal" spellChecking="true" strikeOut="true" />
+			<itemData name="Deprecated Unquoted Source String" defStyleNum="dsString" spellChecking="false" strikeOut="true" />
+			<itemData name="Deprecated Variable Symbol" defStyleNum="dsNormal" spellChecking="false" strikeOut="true" />
+			<itemData name="Error" defStyleNum="dsError" spellChecking="false" />
+			<itemData name="Escaped Character" defStyleNum="dsSpecialChar" spellChecking="false" />
+			<itemData name="Expansion Delimiter" defStyleNum="dsChar" spellChecking="false" />
+			<itemData name="Expansion" defStyleNum="dsDataType" spellChecking="false" />
+			<itemData name="Expression Operator" defStyleNum="dsOperator" spellChecking="false" />
+			<itemData name="Help Text" defStyleNum="dsVerbatimString" spellChecking="true" />
+			<itemData name="Keyword" defStyleNum="dsKeyword" spellChecking="false" />
+			<itemData name="Link" defStyleNum="dsOthers" spellChecking="false" underline="false" />
+			<itemData name="Option" defStyleNum="dsOthers" spellChecking="false" />
+			<itemData name="Plain" defStyleNum="dsNormal" spellChecking="true" />
+			<itemData name="Property" defStyleNum="dsOthers" spellChecking="false" />
+			<itemData name="Quoted Mainmenu Prompt" defStyleNum="dsString" spellChecking="true" />
+			<itemData name="Quoted Prompt" defStyleNum="dsString" spellChecking="true" />
+			<itemData name="Quoted Source String" defStyleNum="dsString" spellChecking="false" />
+			<itemData name="Source" defStyleNum="dsPreprocessor" spellChecking="false" />
+			<itemData name="Tristate Constant" defStyleNum="dsConstant" spellChecking="false" />
+			<itemData name="Type" defStyleNum="dsDataType" spellChecking="false" />
+			<itemData name="Unknown Option" defStyleNum="dsAlert" italic="true" spellChecking="false" />
+			<itemData name="Variable Symbol" defStyleNum="dsNormal" spellChecking="false" />
+			<itemData name="Variable" defStyleNum="dsDataType" spellChecking="false" />
 		</itemDatas>
 	</highlighting>
 	<general>

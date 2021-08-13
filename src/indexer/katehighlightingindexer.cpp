@@ -112,8 +112,9 @@ public:
                 for (auto &rule : context.rules) {
                     rule.parentContext = &context;
                     resolveContextName(definition, context, rule.context, rule.line);
-                    if (rule.type != Context::Rule::Type::IncludeRules)
+                    if (rule.type != Context::Rule::Type::IncludeRules) {
                         markAsUsedContext(rule.context);
+                    }
                 }
             }
 
@@ -184,8 +185,9 @@ public:
                 unreachableBy.erase(std::remove_if(unreachableBy.begin(),
                                                    unreachableBy.end(),
                                                    [&](const RuleAndInclude &ruleAndInclude) {
-                                                       if (rules.contains(ruleAndInclude.rule))
+                                                       if (rules.contains(ruleAndInclude.rule)) {
                                                            return true;
+                                                       }
                                                        rules.insert(ruleAndInclude.rule);
                                                        return false;
                                                    }),
@@ -246,8 +248,9 @@ private:
         //! \return \c true when attr.name() == attrName, otherwise false
         bool extractString(QString &str, const QString &attrName)
         {
-            if (attr.name() != attrName)
+            if (attr.name() != attrName) {
                 return false;
+            }
 
             str = attr.value().toString();
             if (str.isEmpty()) {
@@ -262,8 +265,9 @@ private:
         //! \return \c true when attr.name() == attrName, otherwise false
         bool extractXmlBool(XmlBool &xmlBool, const QString &attrName)
         {
-            if (attr.name() != attrName)
+            if (attr.name() != attrName) {
                 return false;
+            }
 
             xmlBool = attr.value().isNull() ? XmlBool::Unspecified : attrToBool(attr.value()) ? XmlBool::True : XmlBool::False;
 
@@ -274,8 +278,9 @@ private:
         //! \return \c true when attr.name() == attrName, otherwise false
         bool extractPositive(int &positive, const QString &attrName)
         {
-            if (attr.name() != attrName)
+            if (attr.name() != attrName) {
                 return false;
+            }
 
             bool ok = true;
             positive = attr.value().toInt(&ok);
@@ -292,8 +297,9 @@ private:
         //! \return \c true when attr.name() == attrName, otherwise false
         bool checkColor(const QString &attrName)
         {
-            if (attr.name() != attrName)
+            if (attr.name() != attrName) {
                 return false;
+            }
 
             const auto value = attr.value().toString();
             if (value.isEmpty() /*|| QColor(value).isValid()*/) {
@@ -308,12 +314,13 @@ private:
         //! \return \c true when attr.name() == attrName, otherwise false
         bool extractChar(QChar &c, const QString &attrName)
         {
-            if (attr.name() != attrName)
+            if (attr.name() != attrName) {
                 return false;
+            }
 
-            if (attr.value().size() == 1)
+            if (attr.value().size() == 1) {
                 c = attr.value()[0];
-            else {
+            } else {
                 c = QLatin1Char('_');
                 qWarning() << filename << "line" << xml.lineNumber() << attrName << "must contain exactly one char:" << attr.value();
                 success = false;
@@ -325,8 +332,9 @@ private:
         //! \return parsing status when \p isExtracted is \c true, otherwise \c false
         bool checkIfExtracted(bool isExtracted)
         {
-            if (isExtracted)
+            if (isExtracted) {
                 return success;
+            }
 
             qWarning() << filename << "line" << xml.lineNumber() << "unknown attribute:" << attr.name();
             return false;
@@ -783,8 +791,9 @@ private:
     {
         Context context;
         m_success = context.parseElement(m_currentDefinition->filename, xml) && m_success;
-        if (m_currentDefinition->firstContextName.isEmpty())
+        if (m_currentDefinition->firstContextName.isEmpty()) {
             m_currentDefinition->firstContextName = context.name;
+        }
         if (m_currentDefinition->contexts.contains(context.name)) {
             qWarning() << m_currentDefinition->filename << "line" << xml.lineNumber() << "duplicate context:" << context.name;
             m_success = false;
@@ -971,16 +980,18 @@ private:
                 success = false;
             }
 
-            if (!context.attribute.isEmpty())
+            if (!context.attribute.isEmpty()) {
                 usedAttributeNames.insert({context.attribute, context.line});
+            }
 
             success = checkfallthrough(definition, context) && success;
             success = checkUreachableRules(definition.filename, context, unreachableIncludedRules) && success;
             success = suggestRuleMerger(definition.filename, context) && success;
 
             for (const auto &rule : context.rules) {
-                if (!rule.attribute.isEmpty())
+                if (!rule.attribute.isEmpty()) {
                     usedAttributeNames.insert({rule.attribute, rule.line});
+                }
                 success = checkLookAhead(rule) && success;
                 success = checkStringDetect(rule) && success;
                 success = checkAnyChar(rule) && success;
@@ -1102,8 +1113,9 @@ private:
                 char const *extraMsg = rule.string.contains(QLatin1Char('^')) ? "+ column=\"0\" or firstNonSpace=\"1\"" : "";
                 qWarning() << rule.filename << "line" << rule.line << "RegExpr should be replaced by StringDetect / Detect2Chars / DetectChar" << extraMsg
                            << ":" << rule.string;
-                if (len != reg.size())
+                if (len != reg.size()) {
                     qWarning() << rule.filename << "line" << rule.line << "insensitive=\"1\" missing:" << rule.string;
+                }
                 return false;
             }
 
@@ -1400,8 +1412,9 @@ private:
     //! Search for additionalDeliminator/weakDeliminator which has no effect.
     bool checkDelimiters(const Definition &definition, const Context::Rule &rule) const
     {
-        if (rule.additionalDeliminator.isEmpty() && rule.weakDeliminator.isEmpty())
+        if (rule.additionalDeliminator.isEmpty() && rule.weakDeliminator.isEmpty()) {
             return true;
+        }
 
         bool success = true;
 
@@ -1583,14 +1596,15 @@ private:
                     return old;
                 };
 
-                if (rule.firstNonSpace == XmlBool::True)
+                if (rule.firstNonSpace == XmlBool::True) {
                     return set(firstNonSpace);
-                else if (rule.column == 0)
+                } else if (rule.column == 0) {
                     return set(column0);
-                else if (rule.column > 0)
+                } else if (rule.column > 0) {
                     return set(columnGreaterThan0[rule.column]);
-                else
+                } else {
                     return set(normal);
+                }
             }
 
         private:
@@ -1605,8 +1619,9 @@ private:
             /// Search RuleAndInclude associated with @p c.
             RuleAndInclude find(QChar c) const
             {
-                if (c.unicode() < 128)
+                if (c.unicode() < 128) {
                     return m_asciiMap[c.unicode()];
+                }
                 auto it = m_utf8Map.find(c);
                 return it == m_utf8Map.end() ? RuleAndInclude{nullptr, nullptr} : it.value();
             }
@@ -1633,10 +1648,11 @@ private:
             /// Associates @p c with a rule.
             void append(QChar c, const Context::Rule &rule, const Context::Rule *includeRule = nullptr)
             {
-                if (c.unicode() < 128)
+                if (c.unicode() < 128) {
                     m_asciiMap[c.unicode()] = {&rule, includeRule};
-                else
+                } else {
                     m_utf8Map[c] = {&rule, includeRule};
+                }
             }
 
             /// Associates each character of @p s with a rule.
@@ -1665,13 +1681,15 @@ private:
             // Char4Tables::char is always added.
             CharTableArray(Char4Tables &tables, const Context::Rule &rule)
             {
-                if (rule.firstNonSpace == XmlBool::True)
+                if (rule.firstNonSpace == XmlBool::True) {
                     appendTable(tables.charsFirstNonSpace);
+                }
 
-                if (rule.column == 0)
+                if (rule.column == 0) {
                     appendTable(tables.charsColumn0);
-                else if (rule.column > 0)
+                } else if (rule.column > 0) {
                     appendTable(tables.charsColumnGreaterThan0[rule.column]);
+                }
 
                 appendTable(tables.chars);
             }
@@ -1688,8 +1706,9 @@ private:
             RuleAndInclude find(QChar c) const
             {
                 for (int i = 0; i < m_size; ++i) {
-                    if (auto ruleAndInclude = m_charTables[i]->find(c))
+                    if (auto ruleAndInclude = m_charTables[i]->find(c)) {
                         return ruleAndInclude;
+                    }
                 }
                 return RuleAndInclude{nullptr, nullptr};
             }
@@ -1806,20 +1825,24 @@ private:
             void append(const Context::Rule &rule, const Context::Rule *includedRule)
             {
                 auto array = extractDotRegexes(rule);
-                if (array[0])
+                if (array[0]) {
                     *array[0] = {&rule, includedRule};
-                if (array[1])
+                }
+                if (array[1]) {
                     *array[1] = {&rule, includedRule};
+                }
             }
 
             /// Search dot regex which hides @p rule
             RuleAndInclude find(const Context::Rule &rule)
             {
                 auto array = extractDotRegexes(rule);
-                if (array[0])
+                if (array[0]) {
                     return *array[0];
-                if (array[1])
+                }
+                if (array[1]) {
                     return *array[1];
+                }
                 return RuleAndInclude{};
             }
 
@@ -1833,13 +1856,15 @@ private:
                 if (rule.firstNonSpace != XmlBool::True && rule.column == -1) {
                     ret[0] = &dotRegex;
                 } else {
-                    if (rule.firstNonSpace == XmlBool::True)
+                    if (rule.firstNonSpace == XmlBool::True) {
                         ret[0] = &dotRegexFirstNonSpace;
+                    }
 
-                    if (rule.column == 0)
+                    if (rule.column == 0) {
                         ret[1] = &dotRegexColumn0;
-                    else if (rule.column > 0)
+                    } else if (rule.column > 0) {
                         ret[1] = &dotRegexColumnGreaterThan0[rule.column];
+                    }
                 }
 
                 return ret;
@@ -2013,8 +2038,9 @@ private:
                 if (!isUnreachable) {
                     RuleIterator ruleIterator(observedRules, observedRule);
                     while (const auto *rulePtr = ruleIterator.next()) {
-                        if (isUnreachable)
+                        if (isUnreachable) {
                             break;
+                        }
                         const auto &rule2 = *rulePtr;
                         if (rule2.type == rule.type && isCompatible(rule2) && rule.char0 == rule2.char0 && rule.char1 == rule2.char1) {
                             updateUnreachable1({&rule2, ruleIterator.currentIncludeRules()});
@@ -2032,8 +2058,9 @@ private:
                 // check that `rule` does not have another RegExpr as a prefix
                 RuleIterator ruleIterator(observedRules, observedRule);
                 while (const auto *rulePtr = ruleIterator.next()) {
-                    if (isUnreachable)
+                    if (isUnreachable) {
                         break;
+                    }
                     const auto &rule2 = *rulePtr;
                     if (rule2.type == Context::Rule::Type::RegExpr && isCompatible(rule2) && rule.insensitive == rule2.insensitive
                         && rule.dynamic == rule2.dynamic && rule.string.startsWith(rule2.string)) {
@@ -2050,8 +2077,9 @@ private:
                 if (rule.type == Context::Rule::Type::StringDetect && rule.dynamic == XmlBool::True) {
                     RuleIterator ruleIterator(observedRules, observedRule);
                     while (const auto *rulePtr = ruleIterator.next()) {
-                        if (isUnreachable)
+                        if (isUnreachable) {
                             break;
+                        }
 
                         const auto &rule2 = *rulePtr;
                         if (rule2.type != Context::Rule::Type::StringDetect || rule2.dynamic != XmlBool::True || !isCompatible(rule2)) {
@@ -2111,8 +2139,9 @@ private:
 
                     RuleIterator ruleIterator(observedRules, observedRule);
                     while (const auto *rulePtr = ruleIterator.next()) {
-                        if (isUnreachable)
+                        if (isUnreachable) {
                             break;
+                        }
                         const auto &rule2 = *rulePtr;
                         const bool isSensitive = (rule2.insensitive == XmlBool::True);
                         const auto caseSensitivity = isSensitive ? Qt::CaseInsensitive : Qt::CaseSensitive;
@@ -2178,8 +2207,9 @@ private:
             case Context::Rule::Type::keyword: {
                 RuleIterator ruleIterator(observedRules, observedRule);
                 while (const auto *rulePtr = ruleIterator.next()) {
-                    if (isUnreachable)
+                    if (isUnreachable) {
                         break;
+                    }
                     const auto &rule2 = *rulePtr;
                     if (rule2.type == Context::Rule::Type::keyword && isCompatible(rule2) && rule.string == rule2.string) {
                         updateUnreachable1({&rule2, ruleIterator.currentIncludeRules()});
@@ -2339,8 +2369,9 @@ private:
     {
         bool success = true;
 
-        if (context.rules.isEmpty())
+        if (context.rules.isEmpty()) {
             return success;
+        }
 
         auto it = context.rules.begin();
         const auto end = context.rules.end() - 1;
@@ -2441,8 +2472,9 @@ private:
                 const int idx = name.indexOf(QStringLiteral("##"));
                 if (idx == -1) {
                     auto it = definition.contexts.find(name);
-                    if (it != definition.contexts.end())
+                    if (it != definition.contexts.end()) {
                         contextName.context = &*it;
+                    }
                 } else {
                     auto defName = name.mid(idx + 2);
                     auto listName = name.left(idx);
@@ -2552,14 +2584,16 @@ int main(int argc, char *argv[])
     QCoreApplication app(argc, argv);
 
     // ensure enough arguments are passed
-    if (app.arguments().size() < 3)
+    if (app.arguments().size() < 3) {
         return 1;
+    }
 
 #ifdef QT_XMLPATTERNS_LIB
     // open schema
     QXmlSchema schema;
-    if (!schema.load(QUrl::fromLocalFile(app.arguments().at(2))))
+    if (!schema.load(QUrl::fromLocalFile(app.arguments().at(2)))) {
         return 2;
+    }
 #endif
 
     const QString hlFilenamesListing = app.arguments().value(3);
@@ -2649,17 +2683,20 @@ int main(int argc, char *argv[])
 
     filesChecker.resolveContexts();
 
-    if (!filesChecker.check())
+    if (!filesChecker.check()) {
         anyError = 7;
+    }
 
     // bail out if any problem was seen
-    if (anyError)
+    if (anyError) {
         return anyError;
+    }
 
     // create outfile, after all has worked!
     QFile outFile(app.arguments().at(1));
-    if (!outFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    if (!outFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         return 9;
+    }
 
     // write out json
     outFile.write(QCborValue::fromVariant(QVariant(hls)).toCbor());

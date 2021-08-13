@@ -384,10 +384,11 @@ CieLab rgbToLab(QRgb rgb)
     // Perform the inverse gamma companding for a sRGB color
     // http://www.brucelindbloom.com/index.html?Eqn_RGB_to_XYZ.html
     auto inverseGammaCompanding = [](int c) {
-        if (c <= 10)
+        if (c <= 10) {
             return c / (255.0 * 12.92);
-        else
+        } else {
             return std::pow((c / 255.0 + 0.055) / 1.055, 2.4);
+        }
     };
 
     const double r = inverseGammaCompanding(qRed(rgb));
@@ -400,10 +401,11 @@ CieLab rgbToLab(QRgb rgb)
 
     // http://www.brucelindbloom.com/index.html?Eqn_XYZ_to_Lab.html
     auto f = [](double t) {
-        if (t > 216.0 / 24389.0)
+        if (t > 216.0 / 24389.0) {
             return std::cbrt(t);
-        else
+        } else {
             return t * (24389.0 / (27.0 * 116.0)) + 4.0 / 29.0;
+        }
     };
 
     const double f_x = f(x / illuminant_D65[0]);
@@ -436,8 +438,9 @@ inline double pow2(double x)
 
 inline double computeHPrime(double a_prime, double b)
 {
-    if (std::abs(a_prime) < epsilon && std::abs(b) < epsilon)
+    if (std::abs(a_prime) < epsilon && std::abs(b) < epsilon) {
         return 0.0;
+    }
 
     const double value = std::atan2(b, a_prime) * 180.0 / M_PI;
     return (value < 0.0) ? value + 360.0 : value;
@@ -445,34 +448,38 @@ inline double computeHPrime(double a_prime, double b)
 
 inline double computeDeltaHPrime(double C1_prime, double C2_prime, double h1_prime, double h2_prime)
 {
-    if (C1_prime * C2_prime < epsilon)
+    if (C1_prime * C2_prime < epsilon) {
         return 0.0;
+    }
 
     const double diff = h2_prime - h1_prime;
 
-    if (std::abs(diff) <= 180.0)
+    if (std::abs(diff) <= 180.0) {
         return diff;
-    else if (diff > 180.0)
+    } else if (diff > 180.0) {
         return diff - 360.0;
-    else
+    } else {
         return diff + 360.0;
+    }
 }
 
 inline double computeHPrimeBar(double C1_prime, double C2_prime, double h1_prime, double h2_prime)
 {
     const double sum = h1_prime + h2_prime;
 
-    if (C1_prime * C2_prime < epsilon)
+    if (C1_prime * C2_prime < epsilon) {
         return sum;
+    }
 
     const double dist = std::abs(h1_prime - h2_prime);
 
-    if (dist <= 180.0)
+    if (dist <= 180.0) {
         return 0.5 * sum;
-    else if (sum < 360.0)
+    } else if (sum < 360.0) {
         return 0.5 * (sum + 360.0);
-    else
+    } else {
         return 0.5 * (sum - 360.0);
+    }
 }
 
 /// Calculate the perceptual color difference based on CIEDE2000.
@@ -777,8 +784,9 @@ public:
             state = highlightLine(currentLine, state);
 
             if (hasSeparator) {
-                if (!firstLine)
+                if (!firstLine) {
                     out << QStringLiteral("\x1b[0m────────────────────────────────────────────────────\x1b[K\n");
+                }
                 firstLine = false;
             }
 
@@ -795,8 +803,9 @@ public:
             out << QStringLiteral("\x1b[K\n");
 
             if (hasFormatOrContextTrace && !m_highlightedFragments.empty()) {
-                if (m_hasContextTrace || m_hasStackSizeTrace)
+                if (m_hasContextTrace || m_hasStackSizeTrace) {
                     appendContextNames(oldState, currentLine);
+                }
 
                 printFormats(out, infoStyle, ansiStyles);
                 out << resetBgColor;
@@ -813,8 +822,9 @@ public:
 
     void applyFolding(int offset, int /*length*/, FoldingRegion region) override
     {
-        if (!m_hasRegionTrace)
+        if (!m_hasRegionTrace) {
             return;
+        }
 
         const auto id = region.id();
 
@@ -825,8 +835,9 @@ public:
                 auto &previousRegion = m_regions[m_regions.size() - 2];
                 if (previousRegion.state == Region::State::Close && previousRegion.offset == offset) {
                     std::swap(previousRegion, m_regions.back());
-                    if (previousRegion.bindIndex != -1)
+                    if (previousRegion.bindIndex != -1) {
                         m_regions[previousRegion.bindIndex].bindIndex = m_regions.size() - 1;
+                    }
                 }
             }
             ++m_regionDepth;
@@ -836,10 +847,11 @@ public:
             auto eit = m_regions.rend();
             for (int depth = 0; it != eit; ++it) {
                 if (it->regionId == id && it->bindIndex < 0) {
-                    if (it->state == Region::State::Close)
+                    if (it->state == Region::State::Close) {
                         ++depth;
-                    else if (--depth < 0)
+                    } else if (--depth < 0) {
                         break;
+                    }
                 }
             }
 
@@ -864,8 +876,9 @@ private:
     void initRegionStyles(const std::vector<QPair<QString, QString>> &ansiStyles)
     {
         m_regionStyles.resize(ansiStyles.size());
-        for (std::size_t i = 0; i < m_regionStyles.size(); ++i)
+        for (std::size_t i = 0; i < m_regionStyles.size(); ++i) {
             m_regionStyles[i] = ansiStyles[i].first;
+        }
 
         std::sort(m_regionStyles.begin(), m_regionStyles.end());
         m_regionStyles.erase(std::unique(m_regionStyles.begin(), m_regionStyles.end()), m_regionStyles.end());
@@ -1232,20 +1245,26 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
             const bool hasUnderline = format.isUnderline(theme);
             const bool hasStrikeThrough = format.isStrikeThrough(theme);
 
-            if (hasFg)
+            if (hasFg) {
                 buffer.appendForeground(format.textColor(theme).rgb(), is256Colors, colorCache);
-            else
+            } else {
                 buffer.append(foregroundDefaultColor);
-            if (hasBg)
+            }
+            if (hasBg) {
                 buffer.appendBackground(format.backgroundColor(theme).rgb(), is256Colors, colorCache);
-            if (hasBold)
+            }
+            if (hasBold) {
                 buffer.append(QLatin1String("1;"));
-            if (hasItalic)
+            }
+            if (hasItalic) {
                 buffer.append(QLatin1String("3;"));
-            if (hasUnderline)
+            }
+            if (hasUnderline) {
                 buffer.append(QLatin1String("4;"));
-            if (hasStrikeThrough)
+            }
+            if (hasStrikeThrough) {
                 buffer.append(QLatin1String("9;"));
+            }
 
             // if there is ANSI style
             if (buffer.latin1().size() > 2) {
@@ -1262,14 +1281,18 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
                         d->ansiStyles[id].second = buffer.latin1();
                     } else if (hasEffect) {
                         buffer.append(QLatin1String("\x1b["));
-                        if (hasBold)
+                        if (hasBold) {
                             buffer.append(QLatin1String("21;"));
-                        if (hasItalic)
+                        }
+                        if (hasItalic) {
                             buffer.append(QLatin1String("23;"));
-                        if (hasUnderline)
+                        }
+                        if (hasUnderline) {
                             buffer.append(QLatin1String("24;"));
-                        if (hasStrikeThrough)
+                        }
+                        if (hasStrikeThrough) {
                             buffer.append(QLatin1String("29;"));
+                        }
                         buffer.setFinalStyle();
                         d->ansiStyles[id].second = buffer.latin1();
                     }
@@ -1297,10 +1320,11 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
             d->currentLine = in.readLine();
             state = highlightLine(d->currentLine, state);
 
-            if (useEditorBackground)
+            if (useEditorBackground) {
                 d->out << QStringLiteral("\x1b[K\n");
-            else
+            } else {
                 d->out << QLatin1Char('\n');
+            }
         }
     } else {
         AnsiBuffer buffer;

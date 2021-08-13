@@ -50,18 +50,20 @@ public:
 #endif
         State state;
         bool indentationFoldEnabled = definition().indentationBasedFoldingEnabled();
-        if (indentationFoldEnabled)
+        if (indentationFoldEnabled) {
             m_out << "<indentfold>";
+        }
         while (!in.atEnd()) {
             const auto currentLine = in.readLine();
             state = highlightLine(currentLine, state);
 
             if (indentationFoldEnabled != state.indentationBasedFoldingEnabled()) {
                 indentationFoldEnabled = state.indentationBasedFoldingEnabled();
-                if (indentationFoldEnabled)
+                if (indentationFoldEnabled) {
                     m_out << "<indentfold>";
-                else
+                } else {
                     m_out << "</indentfold>";
+                }
             }
 
             int offset = 0;
@@ -69,15 +71,17 @@ public:
                 // use stable ids for output, see below docs for m_stableFoldingIds
                 const auto stableId = m_stableFoldingIds[fold.region.id()];
                 m_out << currentLine.mid(offset, fold.offset - offset);
-                if (fold.region.type() == FoldingRegion::Begin)
+                if (fold.region.type() == FoldingRegion::Begin) {
                     m_out << "<beginfold id='" << stableId << "'>";
-                else
+                } else {
                     m_out << "<endfold id='" << stableId << "'>";
+                }
                 m_out << currentLine.mid(fold.offset, fold.length);
-                if (fold.region.type() == FoldingRegion::Begin)
+                if (fold.region.type() == FoldingRegion::Begin) {
                     m_out << "</beginfold id='" << stableId << "'>";
-                else
+                } else {
                     m_out << "</endfold id='" << stableId << "'>";
+                }
                 offset = fold.offset + fold.length;
             }
             m_out << currentLine.mid(offset) << '\n';
@@ -162,13 +166,15 @@ private Q_SLOTS:
             }
 
             const auto inFile = dir.absoluteFilePath(fileName);
-            if (inFile.endsWith(QLatin1String(".syntax")))
+            if (inFile.endsWith(QLatin1String(".syntax"))) {
                 continue;
+            }
 
             QString syntax;
             QFile syntaxOverride(inFile + QStringLiteral(".syntax"));
-            if (syntaxOverride.exists() && syntaxOverride.open(QFile::ReadOnly))
+            if (syntaxOverride.exists() && syntaxOverride.open(QFile::ReadOnly)) {
                 syntax = QString::fromUtf8(syntaxOverride.readAll()).trimmed();
+            }
 
             QTest::newRow(fileName.toUtf8().constData()) << inFile << (QStringLiteral(TESTBUILDDIR "/folding.out/") + fileName + QStringLiteral(".fold"))
                                                          << (QStringLiteral(TESTSRCDIR "/folding/") + fileName + QStringLiteral(".fold")) << syntax;
@@ -188,8 +194,9 @@ private Q_SLOTS:
         QVERIFY(m_repo);
 
         auto def = m_repo->definitionForFileName(inFile);
-        if (!syntax.isEmpty())
+        if (!syntax.isEmpty()) {
             def = m_repo->definitionForName(syntax);
+        }
 
         FoldingHighlighter highlighter;
         QVERIFY(def.isValid());

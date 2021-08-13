@@ -37,8 +37,9 @@ public:
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         in.setCodec("UTF-8");
 #endif
-        while (!in.atEnd())
+        while (!in.atEnd()) {
             m_fileContents.append(in.readLine());
+        }
     }
 
     /**
@@ -48,8 +49,9 @@ public:
     int highlightFile()
     {
         State state;
-        for (const auto &line : qAsConst(m_fileContents))
+        for (const auto &line : qAsConst(m_fileContents)) {
             state = highlightLine(line, state);
+        }
         return m_fileContents.size();
     }
 
@@ -89,17 +91,20 @@ private Q_SLOTS:
 
         const QDir dir(QStringLiteral(TESTSRCDIR "/input"));
         for (const auto &fileName : dir.entryList(QDir::Files | QDir::NoSymLinks | QDir::Readable | QDir::Hidden, QDir::Name)) {
-            if (fileName == QLatin1String(".clang-format"))
+            if (fileName == QLatin1String(".clang-format")) {
                 continue;
+            }
 
             const auto inFile = dir.absoluteFilePath(fileName);
-            if (inFile.endsWith(QLatin1String(".syntax")))
+            if (inFile.endsWith(QLatin1String(".syntax"))) {
                 continue;
+            }
 
             QString syntax;
             QFile syntaxOverride(inFile + QStringLiteral(".syntax"));
-            if (syntaxOverride.exists() && syntaxOverride.open(QFile::ReadOnly))
+            if (syntaxOverride.exists() && syntaxOverride.open(QFile::ReadOnly)) {
                 syntax = QString::fromUtf8(syntaxOverride.readAll()).trimmed();
+            }
 
             QTest::newRow(fileName.toUtf8().constData()) << inFile << syntax;
         }
@@ -112,8 +117,9 @@ private Q_SLOTS:
 
         NullHighlighter highlighter(inFile);
         auto def = m_repo.definitionForFileName(inFile);
-        if (!syntax.isEmpty())
+        if (!syntax.isEmpty()) {
             def = m_repo.definitionForName(syntax);
+        }
         QVERIFY(def.isValid());
         highlighter.setDefinition(def);
 
@@ -125,8 +131,9 @@ private Q_SLOTS:
         // bail out, if file is empty, else we are stuck
         for (int i = 0; i <= 20000;) {
             int lines = highlighter.highlightFile();
-            if (lines <= 0)
+            if (lines <= 0) {
                 break;
+            }
             i += lines;
         }
     }

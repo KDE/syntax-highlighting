@@ -52,8 +52,9 @@ Repository::~Repository()
 {
     // reset repo so we can detect in still alive definition instances
     // that the repo was deleted
-    for (const auto &def : qAsConst(d->m_sortedDefs))
+    for (const auto &def : qAsConst(d->m_sortedDefs)) {
         DefinitionData::get(def)->repo = nullptr;
+    }
 }
 
 Definition Repository::definitionForName(const QString &defName) const
@@ -138,8 +139,9 @@ Theme Repository::theme(const QString &themeName) const
 
 Theme Repository::defaultTheme(Repository::DefaultTheme t) const
 {
-    if (t == DarkTheme)
+    if (t == DarkTheme) {
         return theme(QLatin1String("Breeze Dark"));
+    }
     return theme(QLatin1String("Breeze Light"));
 }
 
@@ -189,29 +191,36 @@ void RepositoryPrivate::load(Repository *repo)
 
     // do lookup in standard paths, if not disabled
 #ifndef NO_STANDARD_PATHS
-    for (const auto &dir :
-         QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("org.kde.syntax-highlighting/syntax"), QStandardPaths::LocateDirectory))
+    for (const auto &dir : QStandardPaths::locateAll(QStandardPaths::GenericDataLocation,
+                                                     QStringLiteral("org.kde.syntax-highlighting/syntax"),
+                                                     QStandardPaths::LocateDirectory)) {
         loadSyntaxFolder(repo, dir);
+    }
 
     // backward compatibility with Kate
-    for (const auto &dir : QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("katepart5/syntax"), QStandardPaths::LocateDirectory))
+    for (const auto &dir :
+         QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("katepart5/syntax"), QStandardPaths::LocateDirectory)) {
         loadSyntaxFolder(repo, dir);
+    }
 #endif
 
     // default resources are always used
     loadSyntaxFolder(repo, QStringLiteral(":/org.kde.syntax-highlighting/syntax"));
 
     // user given extra paths
-    for (const auto &path : qAsConst(m_customSearchPaths))
+    for (const auto &path : qAsConst(m_customSearchPaths)) {
         loadSyntaxFolder(repo, path + QStringLiteral("/syntax"));
+    }
 
     m_sortedDefs.reserve(m_defs.size());
-    for (auto it = m_defs.constBegin(); it != m_defs.constEnd(); ++it)
+    for (auto it = m_defs.constBegin(); it != m_defs.constEnd(); ++it) {
         m_sortedDefs.push_back(it.value());
+    }
     std::sort(m_sortedDefs.begin(), m_sortedDefs.end(), [](const Definition &left, const Definition &right) {
         auto comparison = left.translatedSection().compare(right.translatedSection(), Qt::CaseInsensitive);
-        if (comparison == 0)
+        if (comparison == 0) {
             comparison = left.translatedName().compare(right.translatedName(), Qt::CaseInsensitive);
+        }
         return comparison < 0;
     });
 
@@ -219,52 +228,60 @@ void RepositoryPrivate::load(Repository *repo)
 
     // do lookup in standard paths, if not disabled
 #ifndef NO_STANDARD_PATHS
-    for (const auto &dir :
-         QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("org.kde.syntax-highlighting/themes"), QStandardPaths::LocateDirectory))
+    for (const auto &dir : QStandardPaths::locateAll(QStandardPaths::GenericDataLocation,
+                                                     QStringLiteral("org.kde.syntax-highlighting/themes"),
+                                                     QStandardPaths::LocateDirectory)) {
         loadThemeFolder(dir);
+    }
 #endif
 
     // default resources are always used
     loadThemeFolder(QStringLiteral(":/org.kde.syntax-highlighting/themes"));
 
     // user given extra paths
-    for (const auto &path : qAsConst(m_customSearchPaths))
+    for (const auto &path : qAsConst(m_customSearchPaths)) {
         loadThemeFolder(path + QStringLiteral("/themes"));
+    }
 }
 
 void RepositoryPrivate::loadSyntaxFolder(Repository *repo, const QString &path)
 {
-    if (loadSyntaxFolderFromIndex(repo, path))
+    if (loadSyntaxFolderFromIndex(repo, path)) {
         return;
+    }
 
     QDirIterator it(path, QStringList() << QLatin1String("*.xml"), QDir::Files);
     while (it.hasNext()) {
         Definition def;
         auto defData = DefinitionData::get(def);
         defData->repo = repo;
-        if (defData->loadMetaData(it.next()))
+        if (defData->loadMetaData(it.next())) {
             addDefinition(def);
+        }
     }
 }
 
 bool RepositoryPrivate::loadSyntaxFolderFromIndex(Repository *repo, const QString &path)
 {
     QFile indexFile(path + QLatin1String("/index.katesyntax"));
-    if (!indexFile.open(QFile::ReadOnly))
+    if (!indexFile.open(QFile::ReadOnly)) {
         return false;
+    }
 
     const auto indexDoc(QCborValue::fromCbor(indexFile.readAll()));
     const auto index = indexDoc.toMap();
     for (auto it = index.begin(); it != index.end(); ++it) {
-        if (!it.value().isMap())
+        if (!it.value().isMap()) {
             continue;
+        }
         const auto fileName = QString(path + QLatin1Char('/') + it.key().toString());
         const auto defMap = it.value().toMap();
         Definition def;
         auto defData = DefinitionData::get(def);
         defData->repo = repo;
-        if (defData->loadMetaData(fileName, defMap))
+        if (defData->loadMetaData(fileName, defMap)) {
             addDefinition(def);
+        }
     }
     return true;
 }
@@ -277,8 +294,9 @@ void RepositoryPrivate::addDefinition(const Definition &def)
         return;
     }
 
-    if (it.value().version() >= def.version())
+    if (it.value().version() >= def.version()) {
         return;
+    }
     m_defs.insert(def.name(), def);
 }
 
@@ -287,8 +305,9 @@ void RepositoryPrivate::loadThemeFolder(const QString &path)
     QDirIterator it(path, QStringList() << QLatin1String("*.theme"), QDir::Files);
     while (it.hasNext()) {
         auto themeData = std::unique_ptr<ThemeData>(new ThemeData);
-        if (themeData->load(it.next()))
+        if (themeData->load(it.next())) {
             addTheme(Theme(themeData.release()));
+        }
     }
 }
 
@@ -307,15 +326,17 @@ void RepositoryPrivate::addTheme(const Theme &theme)
         m_themes.insert(it, theme);
         return;
     }
-    if (themeRevision(*it) < themeRevision(theme))
+    if (themeRevision(*it) < themeRevision(theme)) {
         *it = theme;
+    }
 }
 
 quint16 RepositoryPrivate::foldingRegionId(const QString &defName, const QString &foldName)
 {
     const auto it = m_foldingRegionIds.constFind(qMakePair(defName, foldName));
-    if (it != m_foldingRegionIds.constEnd())
+    if (it != m_foldingRegionIds.constEnd()) {
         return it.value();
+    }
     m_foldingRegionIds.insert(qMakePair(defName, foldName), ++m_foldingRegionId);
     return m_foldingRegionId;
 }
@@ -329,8 +350,9 @@ quint16 RepositoryPrivate::nextFormatId()
 void Repository::reload()
 {
     qCDebug(Log) << "Reloading syntax definitions!";
-    for (const auto &def : qAsConst(d->m_sortedDefs))
+    for (const auto &def : qAsConst(d->m_sortedDefs)) {
         DefinitionData::get(def)->clear();
+    }
     d->m_defs.clear();
     d->m_sortedDefs.clear();
 

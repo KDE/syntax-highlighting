@@ -384,13 +384,15 @@ private Q_SLOTS:
         QVERIFY(def.isValid());
 
         // check that backslash '\' and '*' are removed
-        for (QChar c : QStringLiteral("\t !%&()+,-./:;<=>?[]^{|}~"))
+        for (QChar c : QStringLiteral("\t !%&()+,-./:;<=>?[]^{|}~")) {
             QVERIFY(def.isWordDelimiter(c));
+        }
         QVERIFY(!def.isWordDelimiter(QLatin1Char('\\')));
 
         // check where breaking a line is valid
-        for (QChar c : QStringLiteral(",{}[]"))
+        for (QChar c : QStringLiteral(",{}[]")) {
             QVERIFY(def.isWordWrapDelimiter(c));
+        }
     }
 
     void testFoldingEnabled()

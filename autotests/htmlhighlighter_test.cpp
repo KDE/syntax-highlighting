@@ -62,13 +62,15 @@ private Q_SLOTS:
             }
 
             const auto inFile = dir.absoluteFilePath(fileName);
-            if (inFile.endsWith(QLatin1String(".syntax")))
+            if (inFile.endsWith(QLatin1String(".syntax"))) {
                 continue;
+            }
 
             QString syntax;
             QFile syntaxOverride(inFile + QStringLiteral(".syntax"));
-            if (syntaxOverride.exists() && syntaxOverride.open(QFile::ReadOnly))
+            if (syntaxOverride.exists() && syntaxOverride.open(QFile::ReadOnly)) {
                 syntax = QString::fromUtf8(syntaxOverride.readAll()).trimmed();
+            }
 
             QTest::newRow(fileName.toUtf8().constData()) << inFile << (QStringLiteral(TESTBUILDDIR "/html.output/") + fileName + QStringLiteral(".html"))
                                                          << (QStringLiteral(TESTSRCDIR "/html/") + fileName + QStringLiteral(".html"))

@@ -36,11 +36,13 @@ void AbstractHighlighterPrivate::ensureDefinitionLoaded()
         defData = DefinitionData::get(m_definition);
     }
 
-    if (Q_UNLIKELY(!defData->repo && !defData->fileName.isEmpty()))
+    if (Q_UNLIKELY(!defData->repo && !defData->fileName.isEmpty())) {
         qCCritical(Log) << "Repository got deleted while a highlighter is still active!";
+    }
 
-    if (m_definition.isValid())
+    if (m_definition.isValid()) {
         defData->load();
+    }
 }
 
 AbstractHighlighter::AbstractHighlighter()
@@ -145,8 +147,9 @@ State AbstractHighlighter::highlightLine(const QString &text, const State &state
                  * skipping empty lines after a line continuation character (see bug 405903)
                  */
             } else if (!stateData->topContext()->lineEndContext().isStay()
-                       && !d->switchContext(stateData, stateData->topContext()->lineEndContext(), QStringList()))
+                       && !d->switchContext(stateData, stateData->topContext()->lineEndContext(), QStringList())) {
                 break;
+            }
 
             // guard against endless loops
             ++endlessLoopingCounter;
@@ -160,7 +163,8 @@ State AbstractHighlighter::highlightLine(const QString &text, const State &state
         return newState;
     }
 
-    int offset = 0, beginOffset = 0;
+    int offset = 0;
+    int beginOffset = 0;
     bool lineContinuation = false;
 
     /**
@@ -247,8 +251,9 @@ State AbstractHighlighter::highlightLine(const QString &text, const State &state
                 skipOffsets.clear();
             }
             const auto currentSkipOffset = skipOffsets.value(rule.get());
-            if (currentSkipOffset < 0 || currentSkipOffset > offset)
+            if (currentSkipOffset < 0 || currentSkipOffset > offset) {
                 continue;
+            }
 
             const auto newResult = rule->doMatch(text, offset, stateData->topCaptures());
             newOffset = newResult.offset();
@@ -265,8 +270,9 @@ State AbstractHighlighter::highlightLine(const QString &text, const State &state
                 }
             }
 
-            if (newOffset <= offset)
+            if (newOffset <= offset) {
                 continue;
+            }
 
             /**
              * apply folding.
@@ -274,12 +280,14 @@ State AbstractHighlighter::highlightLine(const QString &text, const State &state
              *   - rule with endRegion + beginRegion: in endRegion, the length is 0
              *   - rule with lookAhead: length is 0
              */
-            if (rule->endRegion().isValid() && rule->beginRegion().isValid())
+            if (rule->endRegion().isValid() && rule->beginRegion().isValid()) {
                 applyFolding(offset, 0, rule->endRegion());
-            else if (rule->endRegion().isValid())
+            } else if (rule->endRegion().isValid()) {
                 applyFolding(offset, rule->isLookAhead() ? 0 : newOffset - offset, rule->endRegion());
-            if (rule->beginRegion().isValid())
+            }
+            if (rule->beginRegion().isValid()) {
                 applyFolding(offset, rule->isLookAhead() ? 0 : newOffset - offset, rule->beginRegion());
+            }
 
             if (rule->isLookAhead()) {
                 Q_ASSERT(!rule->context().isStay());
@@ -290,12 +298,14 @@ State AbstractHighlighter::highlightLine(const QString &text, const State &state
 
             d->switchContext(stateData, rule->context(), newResult.captures());
             newFormat = rule->attributeFormat().isValid() ? &rule->attributeFormat() : &stateData->topContext()->attributeFormat();
-            if (newOffset == text.size() && std::dynamic_pointer_cast<LineContinue>(rule))
+            if (newOffset == text.size() && std::dynamic_pointer_cast<LineContinue>(rule)) {
                 lineContinuation = true;
+            }
             break;
         }
-        if (isLookAhead)
+        if (isLookAhead) {
             continue;
+        }
 
         if (newOffset <= offset) { // no matching rule
             if (stateData->topContext()->fallthrough()) {
@@ -316,8 +326,9 @@ State AbstractHighlighter::highlightLine(const QString &text, const State &state
          * on format change, apply the last one and switch to new one
          */
         if (newFormat != currentFormat && newFormat->id() != currentFormat->id()) {
-            if (offset > 0)
+            if (offset > 0) {
                 applyFormat(beginOffset, offset - beginOffset, *currentFormat);
+            }
             beginOffset = offset;
             currentFormat = newFormat;
         }
@@ -333,8 +344,9 @@ State AbstractHighlighter::highlightLine(const QString &text, const State &state
     /**
      * apply format for remaining text, if any
      */
-    if (beginOffset < offset)
+    if (beginOffset < offset) {
         applyFormat(beginOffset, text.size() - beginOffset, *currentFormat);
+    }
 
     /**
      * handle line end context switches
@@ -344,8 +356,9 @@ State AbstractHighlighter::highlightLine(const QString &text, const State &state
     {
         int endlessLoopingCounter = 0;
         while (!stateData->topContext()->lineEndContext().isStay() && !lineContinuation) {
-            if (!d->switchContext(stateData, stateData->topContext()->lineEndContext(), QStringList()))
+            if (!d->switchContext(stateData, stateData->topContext()->lineEndContext(), QStringList())) {
                 break;
+            }
 
             // guard against endless loops
             ++endlessLoopingCounter;

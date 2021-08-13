@@ -56,8 +56,9 @@ void CodeEditorSidebar::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->x() >= width() - m_codeEditor->fontMetrics().lineSpacing()) {
         auto block = m_codeEditor->blockAtPosition(event->y());
-        if (!block.isValid() || !m_codeEditor->isFoldable(block))
+        if (!block.isValid() || !m_codeEditor->isFoldable(block)) {
             return;
+        }
         m_codeEditor->toggleFold(block);
     }
     QWidget::mouseReleaseEvent(event);
@@ -109,8 +110,9 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *event)
     auto openAction = menu->addAction(QStringLiteral("Open File..."));
     connect(openAction, &QAction::triggered, this, [this]() {
         const auto fileName = QFileDialog::getOpenFileName(this, QStringLiteral("Open File"));
-        if (!fileName.isEmpty())
+        if (!fileName.isEmpty()) {
             openFile(fileName);
+        }
     });
 
     // syntax selection
@@ -120,8 +122,9 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *event)
     QMenu *hlSubMenu = hlGroupMenu;
     QString currentGroup;
     for (const auto &def : m_repository.definitions()) {
-        if (def.isHidden())
+        if (def.isHidden()) {
             continue;
+        }
         if (currentGroup != def.section()) {
             currentGroup = def.section();
             hlSubMenu = hlGroupMenu->addMenu(def.translatedSection());
@@ -132,8 +135,9 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *event)
         action->setCheckable(true);
         action->setData(def.name());
         hlActionGroup->addAction(action);
-        if (def.name() == m_highlighter->definition().name())
+        if (def.name() == m_highlighter->definition().name()) {
             action->setChecked(true);
+        }
     }
     connect(hlActionGroup, &QActionGroup::triggered, this, [this](QAction *action) {
         const auto defName = action->data().toString();
@@ -150,8 +154,9 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *event)
         action->setCheckable(true);
         action->setData(theme.name());
         themeGroup->addAction(action);
-        if (theme.name() == m_highlighter->theme().name())
+        if (theme.name() == m_highlighter->theme().name()) {
             action->setChecked(true);
+        }
     }
     connect(themeGroup, &QActionGroup::triggered, this, [this](QAction *action) {
         const auto themeName = action->data().toString();
@@ -252,10 +257,11 @@ void CodeEditor::updateSidebarGeometry()
 
 void CodeEditor::updateSidebarArea(const QRect &rect, int dy)
 {
-    if (dy)
+    if (dy) {
         m_sideBar->scroll(0, dy);
-    else
+    } else {
         m_sideBar->update(0, rect.y(), m_sideBar->width(), rect.height());
+    }
 }
 
 void CodeEditor::highlightCurrentLine()
@@ -274,14 +280,16 @@ void CodeEditor::highlightCurrentLine()
 QTextBlock CodeEditor::blockAtPosition(int y) const
 {
     auto block = firstVisibleBlock();
-    if (!block.isValid())
+    if (!block.isValid()) {
         return QTextBlock();
+    }
 
     int top = blockBoundingGeometry(block).translated(contentOffset()).top();
     int bottom = top + blockBoundingRect(block).height();
     do {
-        if (top <= y && y <= bottom)
+        if (top <= y && y <= bottom) {
             return block;
+        }
         block = block.next();
         top = bottom;
         bottom = top + blockBoundingRect(block).height();
@@ -296,11 +304,13 @@ bool CodeEditor::isFoldable(const QTextBlock &block) const
 
 bool CodeEditor::isFolded(const QTextBlock &block) const
 {
-    if (!block.isValid())
+    if (!block.isValid()) {
         return false;
+    }
     const auto nextBlock = block.next();
-    if (!nextBlock.isValid())
+    if (!nextBlock.isValid()) {
         return false;
+    }
     return !nextBlock.isVisible();
 }
 

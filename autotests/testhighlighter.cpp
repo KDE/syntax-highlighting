@@ -61,10 +61,11 @@ public:
 protected:
     void applyFormat(int offset, int length, const Format &format) Q_DECL_OVERRIDE
     {
-        if (format.name().isEmpty())
+        if (format.name().isEmpty()) {
             m_out << "<dsNormal>" << m_currentLine.midRef(offset, length) << "</dsNormal>";
-        else
+        } else {
             m_out << "<" << format.name() << ">" << m_currentLine.midRef(offset, length) << "</" << format.name() << ">";
+        }
     }
 
 private:
@@ -103,13 +104,15 @@ private Q_SLOTS:
 
         int count = 0;
         for (const auto &def : m_repo->definitions()) {
-            if (!def.isValid())
+            if (!def.isValid()) {
                 continue;
+            }
             ++count;
-            if (m_coveredDefinitions.find(def.name()) != m_coveredDefinitions.end())
+            if (m_coveredDefinitions.find(def.name()) != m_coveredDefinitions.end()) {
                 coveredList.write(def.name().toUtf8() + '\n');
-            else
+            } else {
                 uncoveredList.write(def.name().toUtf8() + '\n');
+            }
         }
 
         qDebug() << "Syntax definitions with test coverage:" << ((float)m_coveredDefinitions.size() * 100.0f / (float)count) << "%";
@@ -153,13 +156,15 @@ private Q_SLOTS:
             }
 
             const auto inFile = dir.absoluteFilePath(fileName);
-            if (inFile.endsWith(QLatin1String(".syntax")))
+            if (inFile.endsWith(QLatin1String(".syntax"))) {
                 continue;
+            }
 
             QString syntax;
             QFile syntaxOverride(inFile + QStringLiteral(".syntax"));
-            if (syntaxOverride.exists() && syntaxOverride.open(QFile::ReadOnly))
+            if (syntaxOverride.exists() && syntaxOverride.open(QFile::ReadOnly)) {
                 syntax = QString::fromUtf8(syntaxOverride.readAll()).trimmed();
+            }
 
             QTest::newRow(fileName.toUtf8().constData()) << inFile << (QStringLiteral(TESTBUILDDIR "/output/") + fileName + QStringLiteral(".ref"))
                                                          << (QStringLiteral(TESTSRCDIR "/reference/") + fileName + QStringLiteral(".ref")) << syntax;
@@ -179,8 +184,9 @@ private Q_SLOTS:
         QVERIFY(m_repo);
 
         auto def = m_repo->definitionForFileName(inFile);
-        if (!syntax.isEmpty())
+        if (!syntax.isEmpty()) {
             def = m_repo->definitionForName(syntax);
+        }
 
         TestHighlighter highlighter;
         highlighter.setTheme(m_repo->defaultTheme());

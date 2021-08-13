@@ -21,7 +21,8 @@ int main(int argc, char **argv)
     CodeEditor edit;
     edit.resize(1024, 1024);
     edit.show();
-    if (parser.positionalArguments().size() == 1)
+    if (parser.positionalArguments().size() == 1) {
         edit.openFile(parser.positionalArguments().at(0));
+    }
     return app.exec();
 }

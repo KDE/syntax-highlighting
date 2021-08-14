@@ -52,27 +52,16 @@ DefinitionData *DefinitionData::get(const Definition &def)
 Definition::Definition()
     : d(new DefinitionData)
 {
-}
-
-Definition::Definition(const Definition &other)
-    : d(other.d)
-{
     d->q = *this;
 }
+
+Definition::Definition(const Definition &) = default;
+Definition::~Definition() = default;
+Definition &Definition::operator=(const Definition &) = default;
 
 Definition::Definition(std::shared_ptr<DefinitionData> &&dd)
     : d(std::move(dd))
 {
-}
-
-Definition::~Definition()
-{
-}
-
-Definition &Definition::operator=(const Definition &rhs)
-{
-    d = rhs.d;
-    return *this;
 }
 
 bool Definition::operator==(const Definition &other) const

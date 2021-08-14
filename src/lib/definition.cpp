@@ -55,8 +55,10 @@ Definition::Definition()
     d->q = *this;
 }
 
+Definition::Definition(Definition &&other) noexcept = default;
 Definition::Definition(const Definition &) = default;
 Definition::~Definition() = default;
+Definition &Definition::operator=(Definition &&other) noexcept = default;
 Definition &Definition::operator=(const Definition &) = default;
 
 Definition::Definition(std::shared_ptr<DefinitionData> &&dd)

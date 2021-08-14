@@ -102,6 +102,14 @@ public:
     Definition();
 
     /**
+     * Move constructor.
+     * This definition takes the Definition data from @p other.
+     * @note @p other may only be assigned to or destroyed afterwards.
+     * @since 5.86
+     */
+    Definition(Definition &&other) noexcept;
+
+    /**
      * Copy constructor.
      * Both this definition as well as @p other share the Definition data.
      */
@@ -113,7 +121,15 @@ public:
     ~Definition();
 
     /**
-     * Assignment operator.
+     * Move assignment operator.
+     * This definition takes the Definition data from @p other.
+     * @note @p other may only be assigned to or destroyed afterwards.
+     * @since 5.86
+     */
+    Definition &operator=(Definition &&other) noexcept;
+
+    /**
+     * Copy assignment operator.
      * Both this definition as well as @p rhs share the Definition data.
      */
     Definition &operator=(const Definition &rhs);

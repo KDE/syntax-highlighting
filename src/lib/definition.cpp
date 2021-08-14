@@ -812,10 +812,6 @@ DefinitionRef::DefinitionRef(const Definition &def)
 {
 }
 
-DefinitionRef::~DefinitionRef()
-{
-}
-
 DefinitionRef &DefinitionRef::operator=(const Definition &def)
 {
     d = def.d;

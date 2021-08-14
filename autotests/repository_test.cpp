@@ -199,6 +199,7 @@ private Q_SLOTS:
 
         QStringList expectedDefinitionNames = {QStringLiteral("PHP/PHP"),
                                                QStringLiteral("Alerts"),
+                                               QStringLiteral("Comments"),
                                                QStringLiteral("CSS/PHP"),
                                                QStringLiteral("JavaScript/PHP"),
                                                QStringLiteral("JavaScript React (JSX)/PHP"),

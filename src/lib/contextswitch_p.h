@@ -12,7 +12,7 @@
 namespace KSyntaxHighlighting
 {
 class Context;
-class Definition;
+class DefinitionData;
 
 class ContextSwitch
 {
@@ -25,14 +25,12 @@ public:
     int popCount() const;
     Context *context() const;
 
-    void parse(QStringView contextInstr);
-    void resolve(const Definition &def);
+    void resolve(DefinitionData &def, QStringView contextInstr);
 
 private:
-    QString m_defName;
-    QString m_contextName;
     Context *m_context = nullptr;
     int m_popCount = 0;
+    bool m_isStay = true;
 };
 }
 

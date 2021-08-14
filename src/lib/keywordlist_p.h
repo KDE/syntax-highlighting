@@ -44,6 +44,11 @@ public:
         return m_keywords;
     }
 
+    Qt::CaseSensitivity caseSensitivity() const
+    {
+        return m_caseSensitive;
+    }
+
     void setKeywordList(const QStringList &keywords)
     {
         m_keywords = keywords;

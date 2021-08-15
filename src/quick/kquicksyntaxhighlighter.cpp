@@ -11,6 +11,8 @@
 #include <syntaxhighlighter.h>
 #include <theme.h>
 
+#include <QGuiApplication>
+#include <QPalette>
 #include <QQuickTextDocument>
 #include <QTextDocument>
 
@@ -62,7 +64,7 @@ void KQuickSyntaxHighlighter::setFormatName(const QString &formatName)
             m_repository = new KSyntaxHighlighting::Repository();
         }
 
-        m_highlighter->setTheme(m_repository->defaultTheme(KSyntaxHighlighting::Repository::LightTheme));
+        m_highlighter->setTheme(m_repository->themeForPalette(QGuiApplication::palette()));
 
         m_highlighter->setDefinition(m_repository->definitionForName(m_formatName));
     }

@@ -35,16 +35,16 @@ ApplicationWindow {
                 model: Repository.themes
                 textRole: "translatedName"
                 onCurrentIndexChanged: {
-                    console.log(Repository.themes[currentIndex].name);
+                    highlighter.theme = Repository.themes[currentIndex];
                 }
             }
             Button {
                 text: "Light"
-                onClicked: console.log(Repository.defaultTheme(Repository.LightTheme))
+                onClicked: highlighter.theme = Repository.defaultTheme(Repository.LightTheme).name
             }
             Button {
                 text: "Dark"
-                onClicked: console.log(Repository.defaultTheme(Repository.DarkTheme).name)
+                onClicked: highlighter.theme = Repository.DarkTheme
             }
         }
         TextArea {

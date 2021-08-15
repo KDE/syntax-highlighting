@@ -9,7 +9,6 @@
 
 #include <repository.h>
 #include <syntaxhighlighter.h>
-#include <theme.h>
 
 #include <QGuiApplication>
 #include <QPalette>
@@ -59,10 +58,34 @@ void KQuickSyntaxHighlighter::setDefinition(const QVariant &definition)
     if (m_definition != def) {
         m_definition = def;
 
-        m_highlighter->setTheme(unwrappedRepository()->themeForPalette(QGuiApplication::palette()));
+        m_highlighter->setTheme(m_theme.isValid() ? m_theme : unwrappedRepository()->themeForPalette(QGuiApplication::palette()));
         m_highlighter->setDefinition(def);
 
         Q_EMIT definitionChanged();
+    }
+}
+
+QVariant KQuickSyntaxHighlighter::theme() const
+{
+    return QVariant::fromValue(m_theme);
+}
+
+void KQuickSyntaxHighlighter::setTheme(const QVariant &theme)
+{
+    Theme t;
+    if (theme.type() == QVariant::String) {
+        t = unwrappedRepository()->theme(theme.toString());
+    } else if (theme.type() == QVariant::Int) {
+        t = unwrappedRepository()->defaultTheme(static_cast<Repository::DefaultTheme>(theme.toInt()));
+    } else {
+        t = theme.value<Theme>();
+    }
+
+    if (m_theme.name() != t.name()) {
+        m_theme = t;
+        m_highlighter->setTheme(m_theme);
+        m_highlighter->rehighlight();
+        Q_EMIT themeChanged();
     }
 }
 

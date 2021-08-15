@@ -11,6 +11,7 @@
 #include "repositorywrapper.h"
 
 #include <definition.h>
+#include <theme.h>
 
 #include <QObject>
 #include <QVariant>
@@ -27,6 +28,7 @@ class KQuickSyntaxHighlighter : public QObject
 
     Q_PROPERTY(QObject *textEdit READ textEdit WRITE setTextEdit NOTIFY textEditChanged)
     Q_PROPERTY(QVariant definition READ definition WRITE setDefinition NOTIFY definitionChanged)
+    Q_PROPERTY(QVariant theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(RepositoryWrapper *repository READ repository WRITE setRepository NOTIFY repositoryChanged)
 
 public:
@@ -39,12 +41,16 @@ public:
     QVariant definition() const;
     void setDefinition(const QVariant &definition);
 
+    QVariant theme() const;
+    void setTheme(const QVariant &theme);
+
     RepositoryWrapper *repository() const;
     void setRepository(RepositoryWrapper *repository);
 
 Q_SIGNALS:
     void textEditChanged() const;
     void definitionChanged() const;
+    void themeChanged();
     void repositoryChanged();
 
 private:
@@ -52,6 +58,7 @@ private:
 
     QObject *m_textEdit;
     KSyntaxHighlighting::Definition m_definition;
+    KSyntaxHighlighting::Theme m_theme;
     RepositoryWrapper *m_repository = nullptr;
     KSyntaxHighlighting::SyntaxHighlighter *m_highlighter = nullptr;
 };

@@ -21,11 +21,9 @@ ApplicationWindow {
             ComboBox {
                 Layout.fillWidth: true
                 model: Repository.definitions
+                displayText: currentValue.translatedName + " (" + currentValue.translatedSection + ")"
                 textRole: "translatedName"
-                onCurrentIndexChanged: {
-                    console.log(highlighter.definition, Repository.definitions[currentIndex].name);
-                    highlighter.definition = Repository.definitions[currentIndex];
-                }
+                onCurrentIndexChanged: highlighter.definition = currentValue
             }
         }
         RowLayout {
@@ -33,10 +31,9 @@ ApplicationWindow {
             ComboBox {
                 Layout.fillWidth: true
                 model: Repository.themes
+                displayText: currentValue.translatedName
                 textRole: "translatedName"
-                onCurrentIndexChanged: {
-                    highlighter.theme = Repository.themes[currentIndex];
-                }
+                onCurrentIndexChanged: highlighter.theme = currentValue
             }
             Button {
                 text: "Light"
@@ -58,7 +55,13 @@ ApplicationWindow {
                 id: highlighter
                 textEdit: myText
                 repository: Repository
+                // work around for QML not repainting a re-highlighted document...
+                onDefinitionChanged: { myText.selectAll(); myText.deselect(); }
+                onThemeChanged: { myText.selectAll(); myText.deselect(); }
             }
+        }
+        Label {
+            text: "Syntax: " + highlighter.definition.translatedSection + "/" + highlighter.definition.translatedName + "  Theme: " + highlighter.theme.translatedName
         }
     }
 

@@ -3,6 +3,9 @@ if(TARGET Qt5::Gui)
     add_subdirectory(lib)
     add_subdirectory(cli)
 endif()
+if(TARGET Qt5::Quick)
+    add_subdirectory(quick)
+endif()
 
 ecm_qt_install_logging_categories(
     EXPORT KSYNTAXHIGHLIGHTING

@@ -6,6 +6,7 @@ add_library(kquicksyntaxhighlightingplugin)
 target_sources(kquicksyntaxhighlightingplugin PRIVATE
     kquicksyntaxhighlightingplugin.cpp
     kquicksyntaxhighlighter.cpp
+    repositorywrapper.cpp
 )
 target_link_libraries(kquicksyntaxhighlightingplugin PRIVATE
     KF5SyntaxHighlighting

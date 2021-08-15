@@ -13,6 +13,7 @@
 #include <QPair>
 #include <QVector>
 #include <memory>
+#include <qobjectdefs.h>
 
 QT_BEGIN_NAMESPACE
 class QChar;
@@ -84,6 +85,13 @@ enum class CommentPosition {
  */
 class KSYNTAXHIGHLIGHTING_EXPORT Definition
 {
+    Q_GADGET
+    Q_PROPERTY(QString name READ name)
+    Q_PROPERTY(QString translatedName READ translatedName)
+    Q_PROPERTY(QString section READ section)
+    Q_PROPERTY(QString translatedSection READ translatedSection)
+    Q_PROPERTY(QString author READ author)
+    Q_PROPERTY(QString license READ license)
 public:
     /**
      * Default constructor, creating an empty (invalid) Definition instance.

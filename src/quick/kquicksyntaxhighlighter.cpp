@@ -1,5 +1,6 @@
 /*
     SPDX-FileCopyrightText: 2018 Eike Hein <hein@kde.org>
+    SPDX-FileCopyrightText: 2021 Volker Krause <vkrause@kde.org>
 
     SPDX-License-Identifier: MIT
 */
@@ -16,26 +17,18 @@
 #include <QQuickTextDocument>
 #include <QTextDocument>
 
-int KQuickSyntaxHighlighter::m_instanceCount = 0;
-KSyntaxHighlighting::Repository *KQuickSyntaxHighlighter::m_repository = nullptr;
+using namespace KSyntaxHighlighting;
+
+extern Repository *defaultRepository();
 
 KQuickSyntaxHighlighter::KQuickSyntaxHighlighter(QObject *parent)
     : QObject(parent)
     , m_textEdit(nullptr)
     , m_highlighter(new KSyntaxHighlighting::SyntaxHighlighter(this))
 {
-    ++m_instanceCount;
 }
 
-KQuickSyntaxHighlighter::~KQuickSyntaxHighlighter()
-{
-    --m_instanceCount;
-
-    if (!m_instanceCount) {
-        delete m_repository;
-        m_repository = nullptr;
-    }
-}
+KQuickSyntaxHighlighter::~KQuickSyntaxHighlighter() = default;
 
 QObject *KQuickSyntaxHighlighter::textEdit() const
 {
@@ -60,12 +53,29 @@ void KQuickSyntaxHighlighter::setFormatName(const QString &formatName)
     if (m_formatName != formatName) {
         m_formatName = formatName;
 
-        if (!m_repository) {
-            m_repository = new KSyntaxHighlighting::Repository();
-        }
-
-        m_highlighter->setTheme(m_repository->themeForPalette(QGuiApplication::palette()));
-
-        m_highlighter->setDefinition(m_repository->definitionForName(m_formatName));
+        m_highlighter->setTheme(unwrappedRepository()->themeForPalette(QGuiApplication::palette()));
+        m_highlighter->setDefinition(unwrappedRepository()->definitionForName(m_formatName));
     }
+}
+
+RepositoryWrapper *KQuickSyntaxHighlighter::repository() const
+{
+    return m_repository;
+}
+
+void KQuickSyntaxHighlighter::setRepository(RepositoryWrapper *repository)
+{
+    if (m_repository == repository) {
+        return;
+    }
+    m_repository = repository;
+    Q_EMIT repositoryChanged();
+}
+
+Repository *KQuickSyntaxHighlighter::unwrappedRepository() const
+{
+    if (m_repository) {
+        return m_repository->m_repository;
+    }
+    return defaultRepository();
 }

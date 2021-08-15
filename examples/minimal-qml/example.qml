@@ -18,6 +18,6 @@ TextArea {
 
     SyntaxHighlighter {
         textEdit: myText
-        formatName: "C++"
+        definition: "C++"
     }
 }

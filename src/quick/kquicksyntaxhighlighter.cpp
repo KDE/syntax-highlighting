@@ -7,7 +7,6 @@
 
 #include "kquicksyntaxhighlighter.h"
 
-#include <definition.h>
 #include <repository.h>
 #include <syntaxhighlighter.h>
 #include <theme.h>
@@ -43,18 +42,27 @@ void KQuickSyntaxHighlighter::setTextEdit(QObject *textEdit)
     }
 }
 
-QString KQuickSyntaxHighlighter::formatName() const
+QVariant KQuickSyntaxHighlighter::definition() const
 {
-    return m_formatName;
+    return QVariant::fromValue(m_definition);
 }
 
-void KQuickSyntaxHighlighter::setFormatName(const QString &formatName)
+void KQuickSyntaxHighlighter::setDefinition(const QVariant &definition)
 {
-    if (m_formatName != formatName) {
-        m_formatName = formatName;
+    Definition def;
+    if (definition.type() == QVariant::String) {
+        def = unwrappedRepository()->definitionForName(definition.toString());
+    } else {
+        def = definition.value<Definition>();
+    }
+
+    if (m_definition != def) {
+        m_definition = def;
 
         m_highlighter->setTheme(unwrappedRepository()->themeForPalette(QGuiApplication::palette()));
-        m_highlighter->setDefinition(unwrappedRepository()->definitionForName(m_formatName));
+        m_highlighter->setDefinition(def);
+
+        Q_EMIT definitionChanged();
     }
 }
 

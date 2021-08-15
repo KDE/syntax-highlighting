@@ -10,7 +10,10 @@
 
 #include "repositorywrapper.h"
 
+#include <definition.h>
+
 #include <QObject>
+#include <QVariant>
 
 namespace KSyntaxHighlighting
 {
@@ -23,7 +26,7 @@ class KQuickSyntaxHighlighter : public QObject
     Q_OBJECT
 
     Q_PROPERTY(QObject *textEdit READ textEdit WRITE setTextEdit NOTIFY textEditChanged)
-    Q_PROPERTY(QString formatName READ formatName WRITE setFormatName NOTIFY formatNameChanged)
+    Q_PROPERTY(QVariant definition READ definition WRITE setDefinition NOTIFY definitionChanged)
     Q_PROPERTY(RepositoryWrapper *repository READ repository WRITE setRepository NOTIFY repositoryChanged)
 
 public:
@@ -33,22 +36,22 @@ public:
     QObject *textEdit() const;
     void setTextEdit(QObject *textEdit);
 
-    QString formatName() const;
-    void setFormatName(const QString &formatName);
+    QVariant definition() const;
+    void setDefinition(const QVariant &definition);
 
     RepositoryWrapper *repository() const;
     void setRepository(RepositoryWrapper *repository);
 
 Q_SIGNALS:
     void textEditChanged() const;
-    void formatNameChanged() const;
+    void definitionChanged() const;
     void repositoryChanged();
 
 private:
     KSyntaxHighlighting::Repository *unwrappedRepository() const;
 
     QObject *m_textEdit;
-    QString m_formatName;
+    KSyntaxHighlighting::Definition m_definition;
     RepositoryWrapper *m_repository = nullptr;
     KSyntaxHighlighting::SyntaxHighlighter *m_highlighter = nullptr;
 };

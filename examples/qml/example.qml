@@ -23,8 +23,8 @@ ApplicationWindow {
                 model: Repository.definitions
                 textRole: "translatedName"
                 onCurrentIndexChanged: {
-                    console.log(highlighter.formatName, Repository.definitions[currentIndex].name);
-                    highlighter.formatName = Repository.definitions[currentIndex].name;
+                    console.log(highlighter.definition, Repository.definitions[currentIndex].name);
+                    highlighter.definition = Repository.definitions[currentIndex];
                 }
             }
         }
@@ -63,6 +63,6 @@ ApplicationWindow {
     }
 
     Component.onCompleted: {
-        highlighter.formatName = Repository.definitionForFileName("example.qml").name
+        highlighter.definition = Repository.definitionForFileName("example.qml")
     }
 }

@@ -62,9 +62,9 @@ protected:
     void applyFormat(int offset, int length, const Format &format) Q_DECL_OVERRIDE
     {
         if (format.name().isEmpty()) {
-            m_out << "<dsNormal>" << m_currentLine.midRef(offset, length) << "</dsNormal>";
+            m_out << "<dsNormal>" << QStringView(m_currentLine).mid(offset, length) << "</dsNormal>";
         } else {
-            m_out << "<" << format.name() << ">" << m_currentLine.midRef(offset, length) << "</" << format.name() << ">";
+            m_out << "<" << format.name() << ">" << QStringView(m_currentLine).mid(offset, length) << "</" << format.name() << ">";
         }
     }
 

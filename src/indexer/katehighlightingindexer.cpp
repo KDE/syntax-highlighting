@@ -31,7 +31,8 @@ using KSyntaxHighlighting::Xml::attrToBool;
 class HlFilesChecker
 {
 public:
-    void setDefinition(const QStringRef &verStr, const QString &filename, const QString &name)
+    template<typename T>
+    void setDefinition(const T &verStr, const QString &filename, const QString &name)
     {
         m_currentDefinition = &*m_definitions.insert(name, Definition{});
         m_currentDefinition->languageName = name;

@@ -705,7 +705,7 @@ struct GraphLine {
             const int n2 = offset - labelLineLength;
             labelLineLength += n2 + 1;
             fillLine(labelLine, n2);
-            labelLine += graphLine.rightRef(graphLine.size() - ps1);
+            labelLine += QStringView(graphLine).right(graphLine.size() - ps1);
         }
     }
 
@@ -797,7 +797,7 @@ public:
 
             for (const auto &fragment : m_highlightedFragments) {
                 auto const &ansiStyle = ansiStyles[fragment.formatId];
-                out << ansiStyle.first << currentLine.midRef(fragment.offset, fragment.length) << ansiStyle.second;
+                out << ansiStyle.first << QStringView(currentLine).mid(fragment.offset, fragment.length) << ansiStyle.second;
             }
 
             out << QStringLiteral("\x1b[K\n");
@@ -1348,5 +1348,5 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
 void AnsiHighlighter::applyFormat(int offset, int length, const Format &format)
 {
     auto const &ansiStyle = d->ansiStyles[format.id()];
-    d->out << ansiStyle.first << d->currentLine.midRef(offset, length) << ansiStyle.second;
+    d->out << ansiStyle.first << QStringView(d->currentLine).mid(offset, length) << ansiStyle.second;
 }

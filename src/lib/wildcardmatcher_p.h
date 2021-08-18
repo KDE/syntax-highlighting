@@ -7,11 +7,7 @@
 #ifndef KSYNTAXHIGHLIGHTING_WILDCARDMATCHER_P_H
 #define KSYNTAXHIGHLIGHTING_WILDCARDMATCHER_P_H
 
-#include <QtGlobal>
-
-QT_BEGIN_NAMESPACE
-class QString;
-QT_END_NAMESPACE
+#include <QStringView>
 
 namespace KSyntaxHighlighting
 {
@@ -26,7 +22,7 @@ namespace WildcardMatcher
  * @param caseSensitive   Case-sensitivity flag
  * @return                True for an exact match, false otherwise
  */
-bool exactMatch(const QString &candidate, const QString &wildcard, bool caseSensitive = true);
+bool exactMatch(QStringView candidate, QStringView wildcard, bool caseSensitive = true);
 }
 
 }

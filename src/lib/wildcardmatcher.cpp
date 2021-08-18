@@ -55,7 +55,7 @@ static bool exactMatch(QStringView candidate, QStringView wildcard, int candidat
             }
         }
     }
-    return true;
+    return candidatePosFromRight == -1;
 }
 
 bool WildcardMatcher::exactMatch(QStringView candidate, QStringView wildcard, bool caseSensitive)

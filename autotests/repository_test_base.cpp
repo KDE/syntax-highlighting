@@ -66,7 +66,7 @@ constexpr DefinitionDataRow definitionsForFileNames[] = {
     {"*_makefile.mm", "bench_makefile.mm", "Objective-C++\nMetamath"},
 
     {"xorg.conf", "/etc/literal-pattern/xorg.conf", "x.org Configuration"},
-    {"SConscript", "2-literal-patterns/SConscript", "Python\nPython-Kig"},
+    {".profile", "2-literal-patterns/.profile", "Bash\nZsh"},
 
     {"Config.*", "Config.beginning", "Kconfig"},
     {"usr.libexec.*", "usr.libexec.", "AppArmor Security Profile"},

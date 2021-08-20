@@ -38,7 +38,9 @@ void KQuickSyntaxHighlightingPlugin::registerTypes(const char *uri)
     qmlRegisterType<KQuickSyntaxHighlighter>(uri, 1, 0, "SyntaxHighlighter");
     qmlRegisterUncreatableType<Definition>(uri, 1, 0, "Definition", {});
     qmlRegisterUncreatableType<Theme>(uri, 1, 0, "Theme", {});
-    qmlRegisterSingletonType<RepositoryWrapper>(uri, 1, 0, "Repository", []([[maybe_unused]] auto engine, [[maybe_unused]] auto scriptEngine) {
+    qmlRegisterSingletonType<RepositoryWrapper>(uri, 1, 0, "Repository", [](auto engine, auto scriptEngine) {
+        (void) engine;
+        (void) scriptEngine;
         auto repo = new RepositoryWrapper;
         repo->m_repository = defaultRepository();
         return repo;

@@ -82,7 +82,8 @@ QVector<Definition> Repository::definitionsForFileName(const QString &fileName) 
     // use d->m_defs, sorted map by highlighting name, to be deterministic and independent of translations
     QVector<Definition> candidates;
     for (const Definition &def : qAsConst(d->m_defs)) {
-        for (const auto &pattern : def.extensions()) {
+        const auto patterns = def.extensions();
+        for (const auto &pattern : patterns) {
             if (WildcardMatcher::exactMatch(name, pattern)) {
                 candidates.push_back(def);
                 break;

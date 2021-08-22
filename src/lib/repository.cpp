@@ -105,7 +105,8 @@ QVector<Definition> Repository::definitionsForMimeType(const QString &mimeType) 
     // use d->m_defs, sorted map by highlighting name, to be deterministic and independent of translations
     QVector<Definition> candidates;
     for (const Definition &def : qAsConst(d->m_defs)) {
-        for (const auto &matchType : def.mimeTypes()) {
+        const auto mimeTypes = def.mimeTypes();
+        for (const auto &matchType : mimeTypes) {
             if (mimeType == matchType) {
                 candidates.push_back(def);
                 break;

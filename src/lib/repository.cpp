@@ -206,8 +206,11 @@ void RepositoryPrivate::load(Repository *repo)
     }
 #endif
 
-    // default resources are always used
-    loadSyntaxFolder(repo, QStringLiteral(":/org.kde.syntax-highlighting/syntax"));
+    // default resources are always used, this is the one location that has a index cbor file
+    loadSyntaxFolderFromIndex(repo, QStringLiteral(":/org.kde.syntax-highlighting/syntax"));
+
+    // extra resources provided by 3rdparty libraries/applications
+    loadSyntaxFolder(repo, QStringLiteral(":/org.kde.syntax-highlighting/syntax-addons"));
 
     // user given extra paths
     for (const auto &path : qAsConst(m_customSearchPaths)) {
@@ -240,6 +243,9 @@ void RepositoryPrivate::load(Repository *repo)
     // default resources are always used
     loadThemeFolder(QStringLiteral(":/org.kde.syntax-highlighting/themes"));
 
+    // extra resources provided by 3rdparty libraries/applications
+    loadThemeFolder(QStringLiteral(":/org.kde.syntax-highlighting/themes-addons"));
+
     // user given extra paths
     for (const auto &path : qAsConst(m_customSearchPaths)) {
         loadThemeFolder(path + QStringLiteral("/themes"));
@@ -248,10 +254,6 @@ void RepositoryPrivate::load(Repository *repo)
 
 void RepositoryPrivate::loadSyntaxFolder(Repository *repo, const QString &path)
 {
-    if (loadSyntaxFolderFromIndex(repo, path)) {
-        return;
-    }
-
     QDirIterator it(path, QStringList() << QLatin1String("*.xml"), QDir::Files);
     while (it.hasNext()) {
         Definition def;
@@ -263,11 +265,11 @@ void RepositoryPrivate::loadSyntaxFolder(Repository *repo, const QString &path)
     }
 }
 
-bool RepositoryPrivate::loadSyntaxFolderFromIndex(Repository *repo, const QString &path)
+void RepositoryPrivate::loadSyntaxFolderFromIndex(Repository *repo, const QString &path)
 {
     QFile indexFile(path + QLatin1String("/index.katesyntax"));
     if (!indexFile.open(QFile::ReadOnly)) {
-        return false;
+        return;
     }
 
     const auto indexDoc(QCborValue::fromCbor(indexFile.readAll()));
@@ -285,7 +287,6 @@ bool RepositoryPrivate::loadSyntaxFolderFromIndex(Repository *repo, const QStrin
             addDefinition(def);
         }
     }
-    return true;
 }
 
 void RepositoryPrivate::addDefinition(const Definition &def)

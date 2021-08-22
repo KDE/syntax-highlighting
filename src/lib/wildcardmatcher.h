@@ -16,15 +16,22 @@ namespace KSyntaxHighlighting
 namespace WildcardMatcher
 {
 /**
- * Matches a string against a given wildcard.
+ * Matches a string against a given wildcard case-sensitively.
  * The wildcard supports '*' (".*" in regex) and '?' ("." in regex), not more.
  *
  * @param candidate       Text to match
  * @param wildcard        Wildcard to use
- * @param caseSensitive   Case-sensitivity flag
  * @return                True for an exact match, false otherwise
+ *
+ * @since 5.86
  */
-KSYNTAXHIGHLIGHTING_EXPORT bool exactMatch(QStringView candidate, QStringView wildcard, bool caseSensitive = true);
+KSYNTAXHIGHLIGHTING_EXPORT bool exactMatch(QStringView candidate, QStringView wildcard);
+
+/**
+ * Same as exactMatch() but case-insensitive.
+ * @since 5.86
+ */
+KSYNTAXHIGHLIGHTING_EXPORT bool caseInsensitiveMatch(QStringView candidate, QStringView wildcard);
 }
 
 }

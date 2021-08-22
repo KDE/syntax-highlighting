@@ -59,6 +59,7 @@ ecm_generate_headers(SyntaxHighlighting_HEADERS
         State
         SyntaxHighlighter
         Theme
+        WildcardMatcher
     REQUIRED_HEADERS SyntaxHighlighting_HEADERS
 )
 

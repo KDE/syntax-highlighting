@@ -12,7 +12,7 @@ configure_file(update-reference-data.sh.in ${CMAKE_CURRENT_BINARY_DIR}/update-re
 # unit tests
 # always executed during testing, required to pass, else stuff is in a bad shape ;=)
 #
-add_executable(wildcardmatcher_test wildcardmatcher_test.cpp ${CMAKE_SOURCE_DIR}/src/lib/wildcardmatcher.cpp)
+add_executable(wildcardmatcher_test wildcardmatcher_test.cpp)
 ecm_mark_nongui_executable(wildcardmatcher_test)
 add_test(NAME wildcardmatcher_test COMMAND wildcardmatcher_test)
 target_link_libraries(wildcardmatcher_test KF5SyntaxHighlighting Qt5::Test)

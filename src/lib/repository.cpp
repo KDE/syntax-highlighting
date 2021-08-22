@@ -11,7 +11,7 @@
 #include "repository_p.h"
 #include "theme.h"
 #include "themedata_p.h"
-#include "wildcardmatcher_p.h"
+#include "wildcardmatcher.h"
 
 #include <QCborMap>
 #include <QCborValue>

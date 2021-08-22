@@ -4,8 +4,10 @@
     SPDX-License-Identifier: MIT
 */
 
-#ifndef KSYNTAXHIGHLIGHTING_WILDCARDMATCHER_P_H
-#define KSYNTAXHIGHLIGHTING_WILDCARDMATCHER_P_H
+#ifndef KSYNTAXHIGHLIGHTING_WILDCARDMATCHER_H
+#define KSYNTAXHIGHLIGHTING_WILDCARDMATCHER_H
+
+#include "ksyntaxhighlighting_export.h"
 
 #include <QStringView>
 
@@ -22,9 +24,9 @@ namespace WildcardMatcher
  * @param caseSensitive   Case-sensitivity flag
  * @return                True for an exact match, false otherwise
  */
-bool exactMatch(QStringView candidate, QStringView wildcard, bool caseSensitive = true);
+KSYNTAXHIGHLIGHTING_EXPORT bool exactMatch(QStringView candidate, QStringView wildcard, bool caseSensitive = true);
 }
 
 }
 
-#endif // KSYNTAXHIGHLIGHTING_WILDCARDMATCHER_P_H
+#endif // KSYNTAXHIGHLIGHTING_WILDCARDMATCHER_H

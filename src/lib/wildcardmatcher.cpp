@@ -13,7 +13,6 @@ using namespace KSyntaxHighlighting;
 
 namespace
 {
-template<bool caseSensitive>
 bool wildcardMatch(QStringView candidate, QStringView wildcard, int candidatePosFromRight, int wildcardPosFromRight)
 {
     for (; wildcardPosFromRight >= 0; wildcardPosFromRight--) {
@@ -30,7 +29,7 @@ bool wildcardMatch(QStringView candidate, QStringView wildcard, int candidatePos
 
             // Eat all we can and go back as far as we have to
             for (int j = -1; j <= candidatePosFromRight; j++) {
-                if (wildcardMatch<caseSensitive>(candidate, wildcard, j, wildcardPosFromRight - 1)) {
+                if (wildcardMatch(candidate, wildcard, j, wildcardPosFromRight - 1)) {
                     return true;
                 }
             }
@@ -50,13 +49,7 @@ bool wildcardMatch(QStringView candidate, QStringView wildcard, int candidatePos
             }
 
             const auto candidateCh = candidate.at(candidatePosFromRight).unicode();
-            bool match;
-            if constexpr (caseSensitive) {
-                match = candidateCh == ch;
-            } else {
-                match = QChar::toLower(candidateCh) == QChar::toLower(ch);
-            }
-            if (match) {
+            if (candidateCh == ch) {
                 candidatePosFromRight--;
             } else {
                 return false;
@@ -66,20 +59,9 @@ bool wildcardMatch(QStringView candidate, QStringView wildcard, int candidatePos
     return candidatePosFromRight == -1;
 }
 
-template<bool caseSensitive>
-bool wildcardMatch(QStringView candidate, QStringView wildcard)
-{
-    return ::wildcardMatch<caseSensitive>(candidate, wildcard, candidate.length() - 1, wildcard.length() - 1);
-}
-
 } // unnamed namespace
 
 bool WildcardMatcher::exactMatch(QStringView candidate, QStringView wildcard)
 {
-    return ::wildcardMatch<true>(candidate, wildcard);
-}
-
-bool WildcardMatcher::caseInsensitiveMatch(QStringView candidate, QStringView wildcard)
-{
-    return ::wildcardMatch<false>(candidate, wildcard);
+    return ::wildcardMatch(candidate, wildcard, candidate.length() - 1, wildcard.length() - 1);
 }

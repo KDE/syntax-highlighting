@@ -26,12 +26,6 @@ namespace WildcardMatcher
  * @since 5.86
  */
 KSYNTAXHIGHLIGHTING_EXPORT bool exactMatch(QStringView candidate, QStringView wildcard);
-
-/**
- * Same as exactMatch() but case-insensitive.
- * @since 5.86
- */
-KSYNTAXHIGHLIGHTING_EXPORT bool caseInsensitiveMatch(QStringView candidate, QStringView wildcard);
 }
 
 }

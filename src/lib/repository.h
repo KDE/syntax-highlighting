@@ -88,7 +88,7 @@ class Theme;
  *
  * -# Then, all custom files compiled into resources are loaded.
  *    The resource path is ":/org.kde.syntax-highlighting/syntax-addons".
- *    This path can be used by other libraries/applications to bundle specialied definitions.
+ *    This path can be used by other libraries/applications to bundle specialized definitions.
  *    Per default this path isn't used by the framework itself.
  *
  * -# Finally, the search path can be extended by calling addCustomSearchPath().

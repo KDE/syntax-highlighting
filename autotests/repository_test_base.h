@@ -25,6 +25,11 @@ protected:
     void definitionsForFileNameTestData();
     void definitionsForFileNameTest(const QString &fileName, const QStringList &definitionNames);
 
+    void definitionForMimeTypeTestData();
+    void definitionForMimeTypeTest(const QString &mimeTypeName, const QString &definitionName);
+    void definitionsForMimeTypeTestData();
+    void definitionsForMimeTypeTest(const QString &mimeTypeName, const QStringList &definitionNames);
+
     KSyntaxHighlighting::Repository m_repo;
 };
 

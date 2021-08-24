@@ -21,12 +21,12 @@ constexpr const QChar definitionSeparator = QLatin1Char{'\n'};
 struct DefinitionDataRow {
     const char *dataTag;
 
-    const char *m_fileName;
+    const char *m_inputString;
     const char *m_definitionName;
 
-    QString fileName() const
+    QString inputString() const
     {
-        return QString::fromUtf8(m_fileName);
+        return QString::fromUtf8(m_inputString);
     }
     QString firstDefinitionName() const
     {
@@ -37,8 +37,10 @@ struct DefinitionDataRow {
         return m_definitionName[0] == 0 ? QStringList{} : QString::fromUtf8(m_definitionName).split(definitionSeparator);
     }
 };
-// This table has been copied to ktexteditor:autotests/src/katemodemanager_test_base.cpp and adjusted.
-// The two versions of the table should be kept in sync.
+
+// The two tables below have been copied to ktexteditor:autotests/src/katemodemanager_test_base.cpp and adjusted.
+// The two versions of the tables should be kept in sync.
+
 constexpr DefinitionDataRow definitionsForFileNames[] = {
     {"empty", "", ""},
 
@@ -93,6 +95,52 @@ constexpr DefinitionDataRow definitionsForFileNames[] = {
     {"qrpg*.cl", "qrpg$heterogenous~pattern&match.cl", "OpenCL\nCommon Lisp\nILERPG"},
     {".gitignore*.tt*.textile", ".gitignoreHeterogenous3.tt.textile", "Textile\nGit Ignore\nTT2"},
 };
+
+constexpr DefinitionDataRow definitionsForMimeTypeNames[] = {
+    {"empty", "", ""},
+
+    {"Nonexistent MIME type", "text/nonexistent-mt", ""},
+    {"No match", "application/x-bzip-compressed-tar", ""},
+
+    {"High priority", "text/rust", "Rust"},
+    {"Negative priority", "text/octave", "Octave"},
+
+    {"Multiple types match", "text/x-chdr", "C++\nISO C++\nC\nGCCExtensions\nANSI C89\nSystemC"},
+};
+
+template<std::size_t size>
+void addFirstDefinitionDataRows(const DefinitionDataRow (&array)[size])
+{
+    for (const auto &row : array) {
+        QTest::newRow(row.dataTag) << row.inputString() << row.firstDefinitionName();
+    }
+}
+template<std::size_t size>
+void addDefinitionsDataRows(const DefinitionDataRow (&array)[size])
+{
+    for (const auto &row : array) {
+        QTest::newRow(row.dataTag) << row.inputString() << row.definitionNames();
+    }
+}
+
+void verifyDefinition(const KSyntaxHighlighting::Definition &definition, const QString &definitionName)
+{
+    if (definitionName.isEmpty()) {
+        QVERIFY(!definition.isValid());
+    } else {
+        QVERIFY(definition.isValid());
+        QCOMPARE(definition.name(), definitionName);
+    }
+}
+
+void verifyDefinitionList(const QVector<KSyntaxHighlighting::Definition> &definitionList, const QStringList &definitionNames)
+{
+    QStringList names;
+    for (const auto &definition : definitionList) {
+        names.push_back(definition.name());
+    }
+    QCOMPARE(names, definitionNames);
+}
 } // unnamed namespace
 
 void RepositoryTestBase::initTestCase()
@@ -105,39 +153,46 @@ void RepositoryTestBase::definitionByExtensionTestData()
 {
     QTest::addColumn<QString>("fileName");
     QTest::addColumn<QString>("definitionName");
-
-    for (const auto &row : definitionsForFileNames) {
-        QTest::newRow(row.dataTag) << row.fileName() << row.firstDefinitionName();
-    }
+    addFirstDefinitionDataRows(definitionsForFileNames);
 }
 
 void RepositoryTestBase::definitionByExtensionTest(const QString &fileName, const QString &definitionName)
 {
-    const auto definition = m_repo.definitionForFileName(fileName);
-    if (definitionName.isEmpty()) {
-        QVERIFY(!definition.isValid());
-    } else {
-        QVERIFY(definition.isValid());
-        QCOMPARE(definition.name(), definitionName);
-    }
+    verifyDefinition(m_repo.definitionForFileName(fileName), definitionName);
 }
 
 void RepositoryTestBase::definitionsForFileNameTestData()
 {
     QTest::addColumn<QString>("fileName");
     QTest::addColumn<QStringList>("definitionNames");
-
-    for (const auto &row : definitionsForFileNames) {
-        QTest::newRow(row.dataTag) << row.fileName() << row.definitionNames();
-    }
+    addDefinitionsDataRows(definitionsForFileNames);
 }
 
 void RepositoryTestBase::definitionsForFileNameTest(const QString &fileName, const QStringList &definitionNames)
 {
-    const auto definitions = m_repo.definitionsForFileName(fileName);
-    QStringList names;
-    for (const auto &definition : definitions) {
-        names.push_back(definition.name());
-    }
-    QCOMPARE(names, definitionNames);
+    verifyDefinitionList(m_repo.definitionsForFileName(fileName), definitionNames);
+}
+
+void RepositoryTestBase::definitionForMimeTypeTestData()
+{
+    QTest::addColumn<QString>("mimeTypeName");
+    QTest::addColumn<QString>("definitionName");
+    addFirstDefinitionDataRows(definitionsForMimeTypeNames);
+}
+
+void RepositoryTestBase::definitionForMimeTypeTest(const QString &mimeTypeName, const QString &definitionName)
+{
+    verifyDefinition(m_repo.definitionForMimeType(mimeTypeName), definitionName);
+}
+
+void RepositoryTestBase::definitionsForMimeTypeTestData()
+{
+    QTest::addColumn<QString>("mimeTypeName");
+    QTest::addColumn<QStringList>("definitionNames");
+    addDefinitionsDataRows(definitionsForMimeTypeNames);
+}
+
+void RepositoryTestBase::definitionsForMimeTypeTest(const QString &mimeTypeName, const QStringList &definitionNames)
+{
+    verifyDefinitionList(m_repo.definitionsForMimeType(mimeTypeName), definitionNames);
 }

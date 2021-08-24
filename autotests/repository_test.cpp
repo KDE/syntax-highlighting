@@ -66,27 +66,30 @@ private Q_SLOTS:
         definitionsForFileNameTest(fileName, definitionNames);
     }
 
+    void testDefinitionForMimeType_data()
+    {
+        definitionForMimeTypeTestData();
+    }
+
+    void testDefinitionForMimeType()
+    {
+        QFETCH(QString, mimeTypeName);
+        QFETCH(QString, definitionName);
+
+        definitionForMimeTypeTest(mimeTypeName, definitionName);
+    }
+
     void testDefinitionsForMimeType_data()
     {
-        QTest::addColumn<QString>("mimeType");
-        QTest::addColumn<QStringList>("expectedNames");
-
-        QTest::newRow("C Header") << QStringLiteral("text/x-chdr")
-                                  << (QStringList() << QStringLiteral("C++") << QStringLiteral("ISO C++") << QStringLiteral("C")
-                                                    << QStringLiteral("GCCExtensions") << QStringLiteral("ANSI C89") << QStringLiteral("SystemC"));
+        definitionsForMimeTypeTestData();
     }
 
     void testDefinitionsForMimeType()
     {
-        QFETCH(QString, mimeType);
-        QFETCH(QStringList, expectedNames);
+        QFETCH(QString, mimeTypeName);
+        QFETCH(QStringList, definitionNames);
 
-        const auto defs = m_repo.definitionsForMimeType(mimeType);
-        QStringList names;
-        for (auto def : defs) {
-            names.push_back(def.name());
-        }
-        QCOMPARE(names, expectedNames);
+        definitionsForMimeTypeTest(mimeTypeName, definitionNames);
     }
 
     void testLoadAll()

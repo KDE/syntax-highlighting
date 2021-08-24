@@ -64,6 +64,46 @@ private Q_SLOTS:
             m_repo.definitionsForFileName(fileName);
         }
     }
+
+    void benchmarkDefinitionForMimeType_data()
+    {
+        definitionForMimeTypeTestData();
+    }
+
+    void benchmarkDefinitionForMimeType()
+    {
+        QFETCH(QString, mimeTypeName);
+        QFETCH(QString, definitionName);
+
+        // Warm up and check correctness.
+        definitionForMimeTypeTest(mimeTypeName, definitionName);
+        if (QTest::currentTestFailed())
+            return;
+
+        QBENCHMARK {
+            m_repo.definitionForMimeType(mimeTypeName);
+        }
+    }
+
+    void benchmarkDefinitionsForMimeType_data()
+    {
+        definitionsForMimeTypeTestData();
+    }
+
+    void benchmarkDefinitionsForMimeType()
+    {
+        QFETCH(QString, mimeTypeName);
+        QFETCH(QStringList, definitionNames);
+
+        // Warm up and check correctness.
+        definitionsForMimeTypeTest(mimeTypeName, definitionNames);
+        if (QTest::currentTestFailed())
+            return;
+
+        QBENCHMARK {
+            m_repo.definitionsForMimeType(mimeTypeName);
+        }
+    }
 };
 
 QTEST_GUILESS_MAIN(RepositoryBenchmark)

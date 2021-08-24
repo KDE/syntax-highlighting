@@ -19,14 +19,38 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QPalette>
+#include <QString>
+#include <QStringView>
 
 #ifndef NO_STANDARD_PATHS
 #include <QStandardPaths>
 #endif
 
+#include <algorithm>
+#include <iterator>
 #include <limits>
 
 using namespace KSyntaxHighlighting;
+
+namespace
+{
+using DefinitionListFuncPtr = QVector<QString> (Definition::*)() const;
+
+/// Take defs - a map sorted by highlighting name - to be deterministic and independent of translations.
+template<typename UnaryStringPredicate>
+QVector<Definition> findDefinitionsIf(const QMap<QString, Definition> &defs, DefinitionListFuncPtr list, UnaryStringPredicate anyOfCondition)
+{
+    QVector<Definition> matches;
+    std::copy_if(defs.cbegin(), defs.cend(), std::back_inserter(matches), [list, anyOfCondition](const Definition &def) {
+        const auto strings = (def.*list)();
+        return std::any_of(strings.cbegin(), strings.cend(), anyOfCondition);
+    });
+    std::stable_sort(matches.begin(), matches.end(), [](const Definition &lhs, const Definition &rhs) {
+        return lhs.priority() > rhs.priority();
+    });
+    return matches;
+}
+} // unnamed namespace
 
 static void initResource()
 {
@@ -62,13 +86,6 @@ Definition Repository::definitionForName(const QString &defName) const
     return d->m_defs.value(defName);
 }
 
-static void sortDefinitions(QVector<Definition> &definitions)
-{
-    std::stable_sort(definitions.begin(), definitions.end(), [](const Definition &lhs, const Definition &rhs) {
-        return lhs.priority() > rhs.priority();
-    });
-}
-
 Definition Repository::definitionForFileName(const QString &fileName) const
 {
     return definitionsForFileName(fileName).value(0);
@@ -76,23 +93,10 @@ Definition Repository::definitionForFileName(const QString &fileName) const
 
 QVector<Definition> Repository::definitionsForFileName(const QString &fileName) const
 {
-    QFileInfo fi(fileName);
-    const auto name = fi.fileName();
-
-    // use d->m_defs, sorted map by highlighting name, to be deterministic and independent of translations
-    QVector<Definition> candidates;
-    for (const Definition &def : qAsConst(d->m_defs)) {
-        const auto patterns = def.extensions();
-        for (const auto &pattern : patterns) {
-            if (WildcardMatcher::exactMatch(name, pattern)) {
-                candidates.push_back(def);
-                break;
-            }
-        }
-    }
-
-    sortDefinitions(candidates);
-    return candidates;
+    const auto fileNameNoPath = QFileInfo{fileName}.fileName();
+    return findDefinitionsIf(d->m_defs, &Definition::extensions, [&fileNameNoPath](QStringView wildcard) {
+        return WildcardMatcher::exactMatch(fileNameNoPath, wildcard);
+    });
 }
 
 Definition Repository::definitionForMimeType(const QString &mimeType) const
@@ -102,20 +106,9 @@ Definition Repository::definitionForMimeType(const QString &mimeType) const
 
 QVector<Definition> Repository::definitionsForMimeType(const QString &mimeType) const
 {
-    // use d->m_defs, sorted map by highlighting name, to be deterministic and independent of translations
-    QVector<Definition> candidates;
-    for (const Definition &def : qAsConst(d->m_defs)) {
-        const auto mimeTypes = def.mimeTypes();
-        for (const auto &matchType : mimeTypes) {
-            if (mimeType == matchType) {
-                candidates.push_back(def);
-                break;
-            }
-        }
-    }
-
-    sortDefinitions(candidates);
-    return candidates;
+    return findDefinitionsIf(d->m_defs, &Definition::mimeTypes, [&mimeType](QStringView name) {
+        return mimeType == name;
+    });
 }
 
 QVector<Definition> Repository::definitions() const

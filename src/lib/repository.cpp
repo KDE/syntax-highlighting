@@ -34,17 +34,69 @@ using namespace KSyntaxHighlighting;
 
 namespace
 {
-using DefinitionListFuncPtr = QVector<QString> (Definition::*)() const;
+QString fileNameFromFilePath(const QString &filePath)
+{
+    return QFileInfo{filePath}.fileName();
+}
 
-/// Take defs - a map sorted by highlighting name - to be deterministic and independent of translations.
 template<typename UnaryStringPredicate>
-QVector<Definition> findDefinitionsIf(const QMap<QString, Definition> &defs, DefinitionListFuncPtr list, UnaryStringPredicate anyOfCondition)
+struct AnyOf {
+    using DefinitionListFuncPtr = QVector<QString> (Definition::*)() const;
+
+    explicit AnyOf(DefinitionListFuncPtr list, UnaryStringPredicate condition)
+        : m_list{list}
+        , m_condition{condition}
+    {
+    }
+    bool operator()(const Definition &def) const
+    {
+        const auto strings = (def.*m_list)();
+        return std::any_of(strings.cbegin(), strings.cend(), m_condition);
+    }
+
+private:
+    DefinitionListFuncPtr m_list;
+    UnaryStringPredicate m_condition;
+};
+
+auto anyWildcardMatches(QStringView str)
+{
+    return AnyOf(&Definition::extensions, [str](QStringView wildcard) {
+        return WildcardMatcher::exactMatch(str, wildcard);
+    });
+}
+
+auto anyMimeTypeEquals(QStringView mimeTypeName)
+{
+    // For some reason, different types of mimeTypeName and name (rather than
+    // both const QString & or both QStringView) measurably improves performance.
+    return AnyOf(&Definition::mimeTypes, [mimeTypeName](const QString &name) {
+        return mimeTypeName == name;
+    });
+}
+
+// The two function templates below take defs - a map sorted by highlighting name - to be deterministic and independent of translations.
+
+template<typename UnaryPredicate>
+Definition findHighestPriorityDefinitionIf(const QMap<QString, Definition> &defs, UnaryPredicate predicate)
+{
+    const Definition *match = nullptr;
+    auto matchPriority = std::numeric_limits<int>::lowest();
+    for (const Definition &def : defs) {
+        const auto defPriority = def.priority();
+        if (defPriority > matchPriority && predicate(def)) {
+            match = &def;
+            matchPriority = defPriority;
+        }
+    }
+    return match == nullptr ? Definition{} : *match;
+}
+
+template<typename UnaryPredicate>
+QVector<Definition> findDefinitionsIf(const QMap<QString, Definition> &defs, UnaryPredicate predicate)
 {
     QVector<Definition> matches;
-    std::copy_if(defs.cbegin(), defs.cend(), std::back_inserter(matches), [list, anyOfCondition](const Definition &def) {
-        const auto strings = (def.*list)();
-        return std::any_of(strings.cbegin(), strings.cend(), anyOfCondition);
-    });
+    std::copy_if(defs.cbegin(), defs.cend(), std::back_inserter(matches), predicate);
     std::stable_sort(matches.begin(), matches.end(), [](const Definition &lhs, const Definition &rhs) {
         return lhs.priority() > rhs.priority();
     });
@@ -88,27 +140,22 @@ Definition Repository::definitionForName(const QString &defName) const
 
 Definition Repository::definitionForFileName(const QString &fileName) const
 {
-    return definitionsForFileName(fileName).value(0);
+    return findHighestPriorityDefinitionIf(d->m_defs, anyWildcardMatches(fileNameFromFilePath(fileName)));
 }
 
 QVector<Definition> Repository::definitionsForFileName(const QString &fileName) const
 {
-    const auto fileNameNoPath = QFileInfo{fileName}.fileName();
-    return findDefinitionsIf(d->m_defs, &Definition::extensions, [&fileNameNoPath](QStringView wildcard) {
-        return WildcardMatcher::exactMatch(fileNameNoPath, wildcard);
-    });
+    return findDefinitionsIf(d->m_defs, anyWildcardMatches(fileNameFromFilePath(fileName)));
 }
 
 Definition Repository::definitionForMimeType(const QString &mimeType) const
 {
-    return definitionsForMimeType(mimeType).value(0);
+    return findHighestPriorityDefinitionIf(d->m_defs, anyMimeTypeEquals(mimeType));
 }
 
 QVector<Definition> Repository::definitionsForMimeType(const QString &mimeType) const
 {
-    return findDefinitionsIf(d->m_defs, &Definition::mimeTypes, [&mimeType](QStringView name) {
-        return mimeType == name;
-    });
+    return findDefinitionsIf(d->m_defs, anyMimeTypeEquals(mimeType));
 }
 
 QVector<Definition> Repository::definitions() const

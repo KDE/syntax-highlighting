@@ -39,40 +39,24 @@ QString fileNameFromFilePath(const QString &filePath)
     return QFileInfo{filePath}.fileName();
 }
 
-template<typename UnaryStringPredicate>
-struct AnyOf {
-    using DefinitionListFuncPtr = QVector<QString> (Definition::*)() const;
-
-    explicit AnyOf(DefinitionListFuncPtr list, UnaryStringPredicate condition)
-        : m_list{list}
-        , m_condition{condition}
-    {
-    }
-    bool operator()(const Definition &def) const
-    {
-        const auto strings = (def.*m_list)();
-        return std::any_of(strings.cbegin(), strings.cend(), m_condition);
-    }
-
-private:
-    DefinitionListFuncPtr m_list;
-    UnaryStringPredicate m_condition;
-};
-
 auto anyWildcardMatches(QStringView str)
 {
-    return AnyOf(&Definition::extensions, [str](QStringView wildcard) {
-        return WildcardMatcher::exactMatch(str, wildcard);
-    });
+    return [str](const Definition &def) {
+        const auto strings = def.extensions();
+        return std::any_of(strings.cbegin(), strings.cend(), [str](QStringView wildcard) {
+            return WildcardMatcher::exactMatch(str, wildcard);
+        });
+    };
 }
 
 auto anyMimeTypeEquals(QStringView mimeTypeName)
 {
-    // For some reason, different types of mimeTypeName and name (rather than
-    // both const QString & or both QStringView) measurably improves performance.
-    return AnyOf(&Definition::mimeTypes, [mimeTypeName](const QString &name) {
-        return mimeTypeName == name;
-    });
+    return [mimeTypeName](const Definition &def) {
+        const auto strings = def.mimeTypes();
+        return std::any_of(strings.cbegin(), strings.cend(), [mimeTypeName](QStringView name) {
+            return mimeTypeName == name;
+        });
+    };
 }
 
 // The two function templates below take defs - a map sorted by highlighting name - to be deterministic and independent of translations.

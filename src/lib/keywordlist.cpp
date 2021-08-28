@@ -85,7 +85,7 @@ void KeywordList::initLookupForCaseSensitivity(Qt::CaseSensitivity caseSensitive
      * fill vector with refs to keywords
      */
     vectorToSort.reserve(m_keywords.size());
-    for (const auto &keyword : qAsConst(m_keywords)) {
+    for (const auto &keyword : std::as_const(m_keywords)) {
         vectorToSort.push_back(keyword);
     }
 

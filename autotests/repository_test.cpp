@@ -179,7 +179,7 @@ private Q_SLOTS:
 
         // check all names are listed
         QStringList formatNames;
-        for (const auto &format : qAsConst(formats)) {
+        for (const auto &format : std::as_const(formats)) {
             formatNames.append(format.name());
         }
 
@@ -240,7 +240,7 @@ private Q_SLOTS:
 
         // collect all formats, shall be numbered from 1..
         QSet<int> formatIds;
-        for (const auto &d : qAsConst(includedDefs)) {
+        for (const auto &d : std::as_const(includedDefs)) {
             const auto formats = d.formats();
             for (const auto &format : formats) {
                 // no duplicates

@@ -121,7 +121,7 @@ private Q_SLOTS:
         // tests should be consolidated into one useful file per highlighting
         // the update script for https://kate-editor.org/syntax/ will check that no duplicated output is there, too
         bool duplicates = false;
-        for (const auto &entry : qAsConst(m_coveredDefinitions)) {
+        for (const auto &entry : std::as_const(m_coveredDefinitions)) {
             if (entry.second.size() <= 1) {
                 continue;
             }

@@ -112,7 +112,7 @@ Repository::~Repository()
 {
     // reset repo so we can detect in still alive definition instances
     // that the repo was deleted
-    for (const auto &def : qAsConst(d->m_sortedDefs)) {
+    for (const auto &def : std::as_const(d->m_sortedDefs)) {
         DefinitionData::get(def)->repo = nullptr;
     }
 }
@@ -154,7 +154,7 @@ QVector<Theme> Repository::themes() const
 
 Theme Repository::theme(const QString &themeName) const
 {
-    for (const auto &theme : qAsConst(d->m_themes)) {
+    for (const auto &theme : std::as_const(d->m_themes)) {
         if (theme.name() == themeName) {
             return theme;
         }
@@ -173,7 +173,7 @@ Theme Repository::defaultTheme(Repository::DefaultTheme t) const
 
 Theme Repository::defaultTheme(Repository::DefaultTheme t)
 {
-    return qAsConst(*this).defaultTheme(t);
+    return std::as_const(*this).defaultTheme(t);
 }
 
 Theme Repository::themeForPalette(const QPalette &palette) const
@@ -192,7 +192,7 @@ Theme Repository::themeForPalette(const QPalette &palette) const
     if (!matchingThemes.empty()) {
         // if there's multiple, search for one with a matching highlight color
         const auto highlight = palette.color(QPalette::Highlight);
-        for (const auto &theme : qAsConst(matchingThemes)) {
+        for (const auto &theme : std::as_const(matchingThemes)) {
             auto selection = theme.editorColor(KSyntaxHighlighting::Theme::EditorColorRole::TextSelection);
             if (selection == highlight.rgb()) {
                 return theme;
@@ -207,7 +207,7 @@ Theme Repository::themeForPalette(const QPalette &palette) const
 
 Theme Repository::themeForPalette(const QPalette &palette)
 {
-    return qAsConst(*this).themeForPalette(palette);
+    return std::as_const(*this).themeForPalette(palette);
 }
 
 void RepositoryPrivate::load(Repository *repo)
@@ -237,7 +237,7 @@ void RepositoryPrivate::load(Repository *repo)
     loadSyntaxFolder(repo, QStringLiteral(":/org.kde.syntax-highlighting/syntax-addons"));
 
     // user given extra paths
-    for (const auto &path : qAsConst(m_customSearchPaths)) {
+    for (const auto &path : std::as_const(m_customSearchPaths)) {
         loadSyntaxFolder(repo, path + QStringLiteral("/syntax"));
     }
 
@@ -271,7 +271,7 @@ void RepositoryPrivate::load(Repository *repo)
     loadThemeFolder(QStringLiteral(":/org.kde.syntax-highlighting/themes-addons"));
 
     // user given extra paths
-    for (const auto &path : qAsConst(m_customSearchPaths)) {
+    for (const auto &path : std::as_const(m_customSearchPaths)) {
         loadThemeFolder(path + QStringLiteral("/themes"));
     }
 }
@@ -377,7 +377,7 @@ quint16 RepositoryPrivate::nextFormatId()
 void Repository::reload()
 {
     qCDebug(Log) << "Reloading syntax definitions!";
-    for (const auto &def : qAsConst(d->m_sortedDefs)) {
+    for (const auto &def : std::as_const(d->m_sortedDefs)) {
         DefinitionData::get(def)->clear();
     }
     d->m_defs.clear();

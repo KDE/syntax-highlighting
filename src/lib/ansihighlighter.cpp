@@ -1225,7 +1225,7 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
     }
 
     // initialize ansiStyles
-    for (auto &&definition : qAsConst(definitions)) {
+    for (auto &&definition : std::as_const(definitions)) {
         const auto formats = definition.formats();
         for (auto &&format : formats) {
             const auto id = format.id();

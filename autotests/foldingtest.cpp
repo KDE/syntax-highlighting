@@ -67,7 +67,7 @@ public:
             }
 
             int offset = 0;
-            for (const auto &fold : qAsConst(m_folds)) {
+            for (const auto &fold : std::as_const(m_folds)) {
                 // use stable ids for output, see below docs for m_stableFoldingIds
                 const auto stableId = m_stableFoldingIds[fold.region.id()];
                 m_out << currentLine.mid(offset, fold.offset - offset);

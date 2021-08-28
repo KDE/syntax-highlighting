@@ -243,7 +243,7 @@ QVector<Definition> Definition::includedDefinitions() const
         // Iterate all context rules to find associated Definitions. This will
         // automatically catch other Definitions referenced with IncludeRuldes or ContextSwitch.
         const auto definition = queue.takeLast();
-        for (const auto &context : qAsConst(definition.d->contexts)) {
+        for (const auto &context : std::as_const(definition.d->contexts)) {
             // handle context switch attributes of this context itself
             for (const auto switchContext :
                  {context->lineEndContext().context(), context->lineEmptyContext().context(), context->fallthroughContext().context()}) {
@@ -383,13 +383,13 @@ bool DefinitionData::load(OnlyKeywords onlyKeywords)
         it->setCaseSensitivity(caseSensitive);
     }
 
-    for (const auto context : qAsConst(contexts)) {
+    for (const auto context : std::as_const(contexts)) {
         context->resolveContexts();
         context->resolveIncludes();
         context->resolveAttributeFormat();
     }
 
-    for (const auto context : qAsConst(contexts)) {
+    for (const auto context : std::as_const(contexts)) {
         for (const auto &rule : context->rules()) {
             rule->resolvePostProcessing();
         }

@@ -49,7 +49,7 @@ public:
     int highlightFile()
     {
         State state;
-        for (const auto &line : qAsConst(m_fileContents)) {
+        for (const auto &line : std::as_const(m_fileContents)) {
             state = highlightLine(line, state);
         }
         return m_fileContents.size();

@@ -196,7 +196,7 @@ public:
 
                 QString message;
                 message.reserve(128);
-                for (auto &ruleAndInclude : qAsConst(unreachableBy)) {
+                for (auto &ruleAndInclude : std::as_const(unreachableBy)) {
                     message += QStringLiteral("line ");
                     message += QString::number(ruleAndInclude.rule->line);
                     message += QStringLiteral(" [");
@@ -1126,8 +1126,8 @@ private:
                 // (^sas*) -> ok
                 // (^sa|s*) -> ko
                 // (^(sa|s*)) -> ok
-                auto first = qAsConst(reg).begin();
-                auto last = qAsConst(reg).end();
+                auto first = std::as_const(reg).begin();
+                auto last = std::as_const(reg).end();
                 int depth = 0;
 
                 while (QLatin1Char('(') == *first) {
@@ -1173,8 +1173,8 @@ private:
             // add ^ with column=0
             if (rule.column == 0 && !rule.isDotRegex) {
                 bool hasStartOfLine = false;
-                auto first = qAsConst(reg).begin();
-                auto last = qAsConst(reg).end();
+                auto first = std::as_const(reg).begin();
+                auto last = std::as_const(reg).end();
                 for (; first != last; ++first) {
                     if (*first == QLatin1Char('^')) {
                         hasStartOfLine = true;
@@ -2617,7 +2617,7 @@ int main(int argc, char *argv[])
     HlFilesChecker filesChecker;
     QVariantMap hls;
     int anyError = 0;
-    for (const QString &hlFilename : qAsConst(hlFilenames)) {
+    for (const QString &hlFilename : std::as_const(hlFilenames)) {
         QFile hlFile(hlFilename);
         if (!hlFile.open(QIODevice::ReadOnly)) {
             qWarning("Failed to open %s", qPrintable(hlFilename));
@@ -2651,7 +2651,7 @@ int main(int argc, char *argv[])
         QVariantMap hl;
 
         // transfer text attributes
-        for (const QString &attribute : qAsConst(textAttributes)) {
+        for (const QString &attribute : std::as_const(textAttributes)) {
             hl[attribute] = xml.attributes().value(attribute).toString();
         }
 

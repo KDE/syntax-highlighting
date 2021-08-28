@@ -179,7 +179,7 @@ void HtmlHighlighter::applyFormat(int offset, int length, const Format &format)
 
     if (!formatOutput.isEmpty()) {
         *d->out << "<span style=\"";
-        for (const auto &out : qAsConst(formatOutput)) {
+        for (const auto &out : std::as_const(formatOutput)) {
             *d->out << out;
         }
         *d->out << "\">";

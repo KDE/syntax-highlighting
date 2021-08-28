@@ -118,6 +118,15 @@ match(command.split()):
     case ["quit"]:
         print("Goodbye!")
 
+def func1():
+    yield 1
+    yield  from [func(), 1, 2, "3"]
+    # invalid, "from" no longer part of "yield from"
+    yield, from 1
+
+async def func2():
+    await asyncio.sleep(1)
+
 "\\\\\\\\\\ENSURE THAT THIS AND THE FOLLOWING LINES ARE AT THE END OF THE FILE\\\\\\\\\\ \
 "
 a = 'otherwise all succeeding lines will be

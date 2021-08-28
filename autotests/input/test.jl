@@ -9,6 +9,25 @@
 
 #END
 
+using Random, LinearAlgebra
+x = 1 + 1
+using DataFrames, Tables,   
+    HDF5, # this is a comment
+    Plots
+using DataFrames, Tables,
+    
+    # this is a comment
+    Plots
+x = x ± 2
+using SparseArrays: SparseMatrixCSC
+using Sockets: Sockets, connect,
+    listen,
+    getaddrinfo
+x = x^3
+using Statistics:
+    std,
+    stdm
+
 """
  Multi-line string
 """
@@ -16,6 +35,11 @@
  Multi-line command
 ```
 raw"string\a\\a"
+
+"string $testvar interpolation"
+"string \$testvar interpolation"
+"string $(collect(1:10) .^ 3) interpolation"
+"string \$(collect(1:10) .^ 3) interpolation"
 
 let z = zip(1:2, 3:4, 5:6)
     @test size(z) == (2,)
@@ -81,8 +105,9 @@ function ∇abc∇def(a::Int,
                  f::AbstractVector{<:Number},
                  g::T,
                  h::T) where {T <: Number}
-    x::String = 1
-    return x
+    x::Int = 1
+    z = collect(1:10)
+    return z[3:end] .+ x .- a
 end
 
 mutable struct TestType <: AbstractVector{Number}

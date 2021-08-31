@@ -598,3 +598,15 @@ _normal text\_
 **italic text\**
 ***only bold\***
 **bold\** bold**
+
+<!-- Folding regions for nested headers should also be closed when the parent header is closed -->
+# 1
+## 2
+### 3
+#### 4
+##### 5
+###### 6
+# 11; 1-6 should close here
+## 22
+###  33
+## 222; 22 and 33 should close here

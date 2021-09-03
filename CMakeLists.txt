@@ -25,6 +25,7 @@ include(ECMQtDeclareLoggingCategory)
 include(ECMMarkNonGuiExecutable)
 include(ECMAddQch)
 include(ECMOptionalAddSubdirectory)
+include(ECMGenerateExportHeader)
 
 
 ecm_setup_version(PROJECT
@@ -32,6 +33,8 @@ ecm_setup_version(PROJECT
     VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/ksyntaxhighlighting_version.h"
     PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KF5SyntaxHighlightingConfigVersion.cmake"
 )
+
+set(EXCLUDE_DEPRECATED_BEFORE_AND_AT 0 CACHE STRING "Control the range of deprecated API excluded from the build [default=0].")
 
 #
 # Dependencies

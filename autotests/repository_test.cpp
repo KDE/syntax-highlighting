@@ -104,7 +104,7 @@ private Q_SLOTS:
             NullHighlighter hl;
             State initialState;
             hl.setDefinition(def);
-            const auto state = hl.highlightLine(QLatin1String("This should not crash } ] ) !"), initialState);
+            const auto state = hl.highlightLine(u"This should not crash } ] ) !", initialState);
             QVERIFY(!def.isValid() || state != initialState || def.name() == QLatin1String("Broken Syntax"));
         }
     }
@@ -266,14 +266,14 @@ private Q_SLOTS:
 
         NullHighlighter hl;
         hl.setDefinition(def);
-        auto oldState = hl.highlightLine(QLatin1String("/* TODO this should not crash */"), State());
+        auto oldState = hl.highlightLine(u"/* TODO this should not crash */", State());
 
         m_repo.reload();
         QVERIFY(!m_repo.definitions().isEmpty());
         QVERIFY(!def.isValid());
 
-        hl.highlightLine(QLatin1String("/* TODO this should not crash */"), State());
-        hl.highlightLine(QLatin1String("/* FIXME neither should this crash */"), oldState);
+        hl.highlightLine(u"/* TODO this should not crash */", State());
+        hl.highlightLine(u"/* FIXME neither should this crash */", oldState);
         QVERIFY(hl.definition().isValid());
         QCOMPARE(hl.definition().name(), QLatin1String("QML"));
     }
@@ -287,7 +287,7 @@ private Q_SLOTS:
             hl.setDefinition(repo.definitionForName(QLatin1String("C++")));
             hl.setTheme(repo.defaultTheme());
         }
-        hl.highlightLine(QLatin1String("/**! @todo this should not crash .*/"), State());
+        hl.highlightLine(u"/**! @todo this should not crash .*/", State());
     }
 
     void testCustomPath()

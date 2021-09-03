@@ -33,7 +33,14 @@ ecm_qt_declare_logging_category(KF5SyntaxHighlighting
     EXPORT KSYNTAXHIGHLIGHTING
 )
 
-generate_export_header(KF5SyntaxHighlighting BASE_NAME KSyntaxHighlighting)
+ecm_generate_export_header(KF5SyntaxHighlighting
+    BASE_NAME KSyntaxHighlighting
+    GROUP_BASE_NAME KF
+    VERSION ${KF_VERSION}
+    DEPRECATED_BASE_VERSION 0
+    DEPRECATION_VERSIONS 5.87
+    EXCLUDE_DEPRECATED_BEFORE_AND_AT ${EXCLUDE_DEPRECATED_BEFORE_AND_AT}
+)
 set_target_properties(KF5SyntaxHighlighting PROPERTIES
     VERSION ${SyntaxHighlighting_VERSION}
     SOVERSION ${SyntaxHighlighting_SOVERSION}

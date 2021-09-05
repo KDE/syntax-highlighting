@@ -1,4 +1,14 @@
 # this is a comment
+terraform {
+  required_providers {
+    local = {
+      source = "hashicorp/local"
+    }
+  }
+  backend "http" {
+  }
+}
+
 variable "variable" {
   type    = list(string)
   default = ["a", "b", "c"]
@@ -10,10 +20,6 @@ locals {
   c = true
 }
 
-terraform {
-  backend "http" {
-  }
-}
 
 provider "aws" {
 }

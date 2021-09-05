@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>test.tf</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (Terraform) - Theme (Breeze Dark)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="color:#7a7c7d;">#</span><span style="color:#7a7c7d;"> this is a comment</span>
+<span style="font-weight:bold;">variable</span> <span style="color:#f44f4f;">&quot;variable&quot;</span> {
+  type    = <span style="color:#7f8c8d;">list</span>(<span style="color:#2980b9;">string</span>)
+  default = [<span style="color:#f44f4f;">&quot;a&quot;</span>, <span style="color:#f44f4f;">&quot;b&quot;</span>, <span style="color:#f44f4f;">&quot;c&quot;</span>]
+}
+
+<span style="font-weight:bold;">locals</span> {
+  a = <span style="color:#f67400;">1</span>
+  b = <span style="color:#f44f4f;">&quot;aaaa&quot;</span>
+  c = true
+}
+
+<span style="font-weight:bold;">terraform</span> {
+  backend <span style="color:#f44f4f;">&quot;http&quot;</span> {
+  }
+}
+
+<span style="font-weight:bold;">provider</span> <span style="color:#f44f4f;">&quot;aws&quot;</span> {
+}
+
+<span style="font-weight:bold;">module</span> <span style="color:#f44f4f;">&quot;module_each&quot;</span> {
+  <span style="color:#2980b9;">for_each</span> = <span style="color:#7f8c8d;">toset</span>(<span style="color:#27aeae;">local</span>.a)
+  <span style="font-weight:bold;">source</span>   = <span style="color:#f44f4f;">&quot;module/</span><span style="color:#da4453;">${</span><span style="color:#27aeae;">var.interpolation</span><span style="color:#da4453;">}</span><span style="color:#f44f4f;">/end&quot;</span>
+}
+
+<span style="font-weight:bold;">module</span> <span style="color:#f44f4f;">&quot;module_count&quot;</span> {
+  <span style="color:#2980b9;">depends_on</span> = [<span style="font-weight:bold;">module</span>.module_each]
+  <span style="color:#2980b9;">count</span>      = <span style="color:#f67400;">1</span>
+  <span style="font-weight:bold;">source</span>     = <span style="color:#f44f4f;">&quot;module/path&quot;</span>
+  something  = <span style="color:#2980b9;">count</span>.<span style="color:#7f8c8d;">index</span>
+}
+
+<span style="font-weight:bold;">output</span> <span style="color:#f44f4f;">&quot;output&quot;</span> {
+  value = [<span style="color:#27aeae;">local</span>.a, <span style="color:#27aeae;">var</span>.a]
+}
+</pre></body></html>

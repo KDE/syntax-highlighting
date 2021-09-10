@@ -14,9 +14,9 @@
 #include "context_p.h"
 #include "format.h"
 #include "format_p.h"
+#include "highlightingdata_p.hpp"
 #include "ksyntaxhighlighting_logging.h"
 #include "ksyntaxhighlighting_version.h"
-#include "loadhighlightingdata_p.hpp"
 #include "repository.h"
 #include "repository_p.h"
 #include "rule_p.h"
@@ -545,7 +545,8 @@ void DefinitionData::loadContexts(QXmlStreamReader &reader)
         switch (reader.tokenType()) {
         case QXmlStreamReader::StartElement:
             if (reader.name() == QLatin1String("context")) {
-                contextDatas.push_back(loadContextData(name, reader));
+                contextDatas.push_back(HighlightingContextData());
+                contextDatas.back().load(name, reader);
             }
             reader.readNext();
             break;

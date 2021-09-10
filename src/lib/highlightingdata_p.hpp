@@ -12,6 +12,10 @@
 
 #include <vector>
 
+QT_BEGIN_NAMESPACE
+class QXmlStreamReader;
+QT_END_NAMESPACE
+
 namespace KSyntaxHighlighting
 {
 /**
@@ -19,7 +23,11 @@ namespace KSyntaxHighlighting
  * After resolving contexts, members of this class are no longer
  * use and the instance can be freed to recover used memory.
  */
-struct HighlightingContextData {
+class HighlightingContextData
+{
+public:
+    void load(const QString &defName, QXmlStreamReader &reader);
+
     struct ContextSwitch {
         ContextSwitch() = default;
         ContextSwitch(QStringView str);
@@ -202,7 +210,6 @@ struct HighlightingContextData {
 
     bool noIndentationBasedFolding = false;
 };
-
 }
 
 #endif

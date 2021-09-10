@@ -20,10 +20,20 @@ public:
     ContextSwitch() = default;
     ~ContextSwitch() = default;
 
-    bool isStay() const;
+    bool isStay() const
+    {
+        return m_isStay;
+    }
 
-    int popCount() const;
-    Context *context() const;
+    int popCount() const
+    {
+        return m_popCount;
+    }
+
+    Context *context() const
+    {
+        return m_context;
+    }
 
     void resolve(DefinitionData &def, QStringView contextInstr);
 

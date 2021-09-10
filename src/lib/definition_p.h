@@ -78,7 +78,9 @@ public:
     QHash<QString, KeywordList> keywordLists;
     std::vector<Context> contexts;
     QHash<QString, Format> formats;
+    // data loaded from xml file and emptied after loading contexts
     QVector<HighlightingContextData> contextDatas;
+    // Definition referenced by IncludeRules and ContextSwitch
     QVector<DefinitionRef> immediateIncludedDefinitions;
     WordDelimiters wordDelimiters;
     WordDelimiters wordWrapDelimiters;

@@ -13,21 +13,6 @@
 
 using namespace KSyntaxHighlighting;
 
-bool ContextSwitch::isStay() const
-{
-    return m_isStay;
-}
-
-int ContextSwitch::popCount() const
-{
-    return m_popCount;
-}
-
-Context *ContextSwitch::context() const
-{
-    return m_context;
-}
-
 void ContextSwitch::resolve(DefinitionData &def, QStringView contextInstr)
 {
     HighlightingContextData::ContextSwitch ctx(contextInstr);

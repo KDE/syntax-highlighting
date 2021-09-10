@@ -90,6 +90,9 @@ private:
     ContextSwitch m_lineEmptyContext;
     ContextSwitch m_fallthroughContext;
 
+    /**
+     * resolved format for our attribute, done in constructor and resolveIncludes
+     */
     Format m_attributeFormat;
 
     ResolveState m_resolveState = Unresolved;

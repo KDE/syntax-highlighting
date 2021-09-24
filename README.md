@@ -23,6 +23,8 @@ It's meant as a building block for text editors as well as for simple highlighte
 text rendering (e.g. as HTML), supporting both integration with a custom editor
 as well as a ready-to-use QSyntaxHighlighter sub-class.
 
+Besides a C++ API, a [QML API](@ref qml_api) is also provided.
+
 ## Out of scope
 
 To not turn this into yet another text editor, the following things are considered

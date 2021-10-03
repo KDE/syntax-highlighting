@@ -7,6 +7,7 @@ target_sources(KF5SyntaxHighlighting PRIVATE
     context.cpp
     contextswitch.cpp
     definitiondownloader.cpp
+    highlightingdata.cpp
     foldingregion.cpp
     format.cpp
     htmlhighlighter.cpp

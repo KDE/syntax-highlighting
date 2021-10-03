@@ -683,7 +683,8 @@ struct GraphLine {
     int labelLineLength = 0;
     int nextLabelOffset = 0;
 
-    template<class String> void pushLabel(int offset, String const &s, int charCounter)
+    template<class String>
+    void pushLabel(int offset, String const &s, int charCounter)
     {
         Q_ASSERT(offset >= labelLineLength);
         const int n = offset - labelLineLength;
@@ -693,7 +694,8 @@ struct GraphLine {
         nextLabelOffset = labelLineLength;
     }
 
-    template<class String> void pushGraph(int offset, String const &s, int charCounter)
+    template<class String>
+    void pushGraph(int offset, String const &s, int charCounter)
     {
         Q_ASSERT(offset >= graphLineLength);
         const int n = offset - graphLineLength;

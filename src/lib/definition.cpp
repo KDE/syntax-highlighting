@@ -655,8 +655,7 @@ void DefinitionData::loadGeneral(QXmlStreamReader &reader)
                 wordDelimiters.remove(reader.attributes().value(QLatin1String("weakDeliminator")));
 
                 // adapt WordWrapDelimiters
-                auto wordWrapDeliminatorAttr = reader.attributes().value(
-                    QLatin1String("wordWrapDeliminator"));
+                auto wordWrapDeliminatorAttr = reader.attributes().value(QLatin1String("wordWrapDeliminator"));
                 if (wordWrapDeliminatorAttr.isEmpty()) {
                     wordWrapDelimiters = wordDelimiters;
                 } else {

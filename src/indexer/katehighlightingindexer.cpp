@@ -1053,12 +1053,9 @@ private:
                                                                    "\\.\\*[?*]?" REG_CHAR "|"
                                                                    "\\[\\^(" REG_ESCAPE_CHAR "|.)\\]\\*[?*]?\\1"
                                                                    ")$"));
-            if (( rule.lookAhead == XmlBool::True
-               || rule.minimal == XmlBool::True
-               || rule.string.contains(QStringLiteral(".*?"))
-               || rule.string.contains(QStringLiteral("[^"))
-                ) && reg.contains(isRange)
-            ) {
+            if ((rule.lookAhead == XmlBool::True || rule.minimal == XmlBool::True || rule.string.contains(QStringLiteral(".*?"))
+                 || rule.string.contains(QStringLiteral("[^")))
+                && reg.contains(isRange)) {
                 qWarning() << filename << "line" << rule.line << "RegExpr should be replaced by RangeDetect:" << rule.string;
                 return false;
             }
@@ -1079,13 +1076,10 @@ private:
 #undef REG_ESCAPE_CHAR
 
             // use minimal or lazy operator
-            static const QRegularExpression isMinimal(QStringLiteral(
-                R"([.][*+][^][?+*()|$]*$)"));
-            if (rule.lookAhead == XmlBool::True
-             && rule.minimal != XmlBool::True
-             && reg.contains(isMinimal)
-            ) {
-                qWarning() << filename << "line" << rule.line << "RegExpr should be have minimal=\"1\" or use lazy operator (i.g, '.*' -> '.*?'):" << rule.string;
+            static const QRegularExpression isMinimal(QStringLiteral(R"([.][*+][^][?+*()|$]*$)"));
+            if (rule.lookAhead == XmlBool::True && rule.minimal != XmlBool::True && reg.contains(isMinimal)) {
+                qWarning() << filename << "line" << rule.line
+                           << "RegExpr should be have minimal=\"1\" or use lazy operator (i.g, '.*' -> '.*?'):" << rule.string;
                 return false;
             }
 
@@ -1179,19 +1173,18 @@ private:
                     if (*first == QLatin1Char('^')) {
                         hasStartOfLine = true;
                         break;
-                    }
-                    else if (*first == QLatin1Char('(')) {
+                    } else if (*first == QLatin1Char('(')) {
                         if (last - first >= 3 && first[1] == QLatin1Char('?') && first[2] == QLatin1Char(':')) {
                             first += 2;
                         }
-                    }
-                    else {
+                    } else {
                         break;
                     }
                 }
 
                 if (!hasStartOfLine) {
-                    qWarning() << rule.filename << "line" << rule.line << "start of line missing in the pattern with column=\"0\" (i.e. abc -> ^abc):" << rule.string;
+                    qWarning() << rule.filename << "line" << rule.line
+                               << "start of line missing in the pattern with column=\"0\" (i.e. abc -> ^abc):" << rule.string;
                     return false;
                 }
             }
@@ -1314,14 +1307,12 @@ private:
                 }
 
                 // unnecessary quantifier
-                static const QRegularExpression unnecessaryQuantifier1(QStringLiteral(
-                    R"([*+?]([.][*+?]{0,2})?$)"));
-                static const QRegularExpression unnecessaryQuantifier2(QStringLiteral(
-                    R"([*+?]([.][*+?]{0,2})?[)]*$)"));
+                static const QRegularExpression unnecessaryQuantifier1(QStringLiteral(R"([*+?]([.][*+?]{0,2})?$)"));
+                static const QRegularExpression unnecessaryQuantifier2(QStringLiteral(R"([*+?]([.][*+?]{0,2})?[)]*$)"));
                 auto &unnecessaryQuantifier = useCapture ? unnecessaryQuantifier1 : unnecessaryQuantifier2;
                 if (rule.lookAhead == XmlBool::True && rule.minimal != XmlBool::True && reg.contains(unnecessaryQuantifier)) {
-                    qWarning() << filename << "line" << rule.line << "Last quantifier is not necessary (i.g., 'xyz*' -> 'xy', 'xyz+.' -> 'xyz.'):"
-                               << rule.string;
+                    qWarning() << filename << "line" << rule.line
+                               << "Last quantifier is not necessary (i.g., 'xyz*' -> 'xy', 'xyz+.' -> 'xyz.'):" << rule.string;
                     return false;
                 }
             }
@@ -1895,7 +1886,7 @@ private:
         Rule4 detectIdentifierRule{};
 
         // Contains includedRules and included includedRules
-        QMap<Context const*, RuleAndInclude> includeContexts;
+        QMap<Context const *, RuleAndInclude> includeContexts;
 
         DotRegex dotRegex;
 
@@ -2232,8 +2223,7 @@ private:
 
                 if (auto &ruleAndInclude = includeContexts[rule.context.context]) {
                     updateUnreachable1(ruleAndInclude);
-                }
-                else {
+                } else {
                     ruleAndInclude.rule = &rule;
                 }
 
@@ -2378,55 +2368,52 @@ private:
         const auto end = context.rules.end() - 1;
 
         for (; it < end; ++it) {
-            auto& rule1 = *it;
-            auto& rule2 = it[1];
+            auto &rule1 = *it;
+            auto &rule2 = it[1];
 
-            auto isCommonCompatible = [&]{
-                return rule1.attribute == rule2.attribute
-                    && rule1.beginRegion == rule2.beginRegion
-                    && rule1.endRegion == rule2.endRegion
-                    && rule1.lookAhead == rule2.lookAhead
-                    && rule1.firstNonSpace == rule2.firstNonSpace
-                    && rule1.context.context == rule2.context.context
-                    && rule1.context.popCount == rule2.context.popCount
-                    ;
+            auto isCommonCompatible = [&] {
+                return rule1.attribute == rule2.attribute && rule1.beginRegion == rule2.beginRegion && rule1.endRegion == rule2.endRegion
+                    && rule1.lookAhead == rule2.lookAhead && rule1.firstNonSpace == rule2.firstNonSpace && rule1.context.context == rule2.context.context
+                    && rule1.context.popCount == rule2.context.popCount;
             };
 
             switch (rule1.type) {
-                // request to merge AnyChar/DetectChar
-                case Context::Rule::Type::AnyChar:
-                case Context::Rule::Type::DetectChar:
-                    if ((rule2.type == Context::Rule::Type::AnyChar || rule2.type == Context::Rule::Type::DetectChar) && isCommonCompatible() && rule1.column == rule2.column) {
-                        qWarning() << filename << "line" << rule2.line << "can be merged as AnyChar with the previous rule";
-                        success = false;
-                    }
-                    break;
+            // request to merge AnyChar/DetectChar
+            case Context::Rule::Type::AnyChar:
+            case Context::Rule::Type::DetectChar:
+                if ((rule2.type == Context::Rule::Type::AnyChar || rule2.type == Context::Rule::Type::DetectChar) && isCommonCompatible()
+                    && rule1.column == rule2.column) {
+                    qWarning() << filename << "line" << rule2.line << "can be merged as AnyChar with the previous rule";
+                    success = false;
+                }
+                break;
 
-                // request to merge multiple RegExpr
-                case Context::Rule::Type::RegExpr:
-                    if (rule2.type == Context::Rule::Type::RegExpr && isCommonCompatible() && rule1.dynamic == rule2.dynamic && (rule1.column == rule2.column || (rule1.column <= 0 && rule2.column <= 0))) {
-                        qWarning() << filename << "line" << rule2.line << "can be merged with the previous rule";
-                        success = false;
-                    }
-                    break;
+            // request to merge multiple RegExpr
+            case Context::Rule::Type::RegExpr:
+                if (rule2.type == Context::Rule::Type::RegExpr && isCommonCompatible() && rule1.dynamic == rule2.dynamic
+                    && (rule1.column == rule2.column || (rule1.column <= 0 && rule2.column <= 0))) {
+                    qWarning() << filename << "line" << rule2.line << "can be merged with the previous rule";
+                    success = false;
+                }
+                break;
 
-                case Context::Rule::Type::DetectSpaces:
-                case Context::Rule::Type::HlCChar:
-                case Context::Rule::Type::HlCHex:
-                case Context::Rule::Type::HlCOct:
-                case Context::Rule::Type::HlCStringChar:
-                case Context::Rule::Type::Int:
-                case Context::Rule::Type::Float:
-                case Context::Rule::Type::LineContinue:
-                case Context::Rule::Type::WordDetect:
-                case Context::Rule::Type::StringDetect:
-                case Context::Rule::Type::Detect2Chars:
-                case Context::Rule::Type::IncludeRules:
-                case Context::Rule::Type::DetectIdentifier:
-                case Context::Rule::Type::keyword:
-                case Context::Rule::Type::Unknown:
-                case Context::Rule::Type::RangeDetect:
-                    break;
+            case Context::Rule::Type::DetectSpaces:
+            case Context::Rule::Type::HlCChar:
+            case Context::Rule::Type::HlCHex:
+            case Context::Rule::Type::HlCOct:
+            case Context::Rule::Type::HlCStringChar:
+            case Context::Rule::Type::Int:
+            case Context::Rule::Type::Float:
+            case Context::Rule::Type::LineContinue:
+            case Context::Rule::Type::WordDetect:
+            case Context::Rule::Type::StringDetect:
+            case Context::Rule::Type::Detect2Chars:
+            case Context::Rule::Type::IncludeRules:
+            case Context::Rule::Type::DetectIdentifier:
+            case Context::Rule::Type::keyword:
+            case Context::Rule::Type::Unknown:
+            case Context::Rule::Type::RangeDetect:
+                break;
             }
         }
 

@@ -57,7 +57,7 @@ def try_transform_placeholder_string_to_regex(name):
     if 'ARGV' in m:
         return 'ARGV[0-9]+'
 
-    return '&id_re;'.join(m) if 1 < len(m) else name
+    return '&var_ref_re;'.join(m) if 1 < len(m) else name
 
 
 def try_placeholders_to_regex(names):
@@ -108,6 +108,26 @@ def transform_command(cmd):
         can_be_nulary = False
 
     cmd['nested_parentheses'] = cmd['nested-parentheses?'] if 'nested-parentheses?' in cmd else False
+
+    if 'first-arg-is-target?' in cmd:
+        cmd['first_arg_is_target'] = cmd['first-arg-is-target?']
+        can_be_nulary = False
+
+    if 'first-args-are-targets?' in cmd:
+        cmd['first_args_are_targets'] = cmd['first-args-are-targets?']
+        can_be_nulary = False
+
+    if 'has-target-name-after-kw' in cmd:
+        cmd['has_target_name_after_kw'] = cmd['has-target-name-after-kw']
+        can_be_nulary = False
+
+    if 'has-target-names-after-kw' in cmd:
+        cmd['has_target_names_after_kw'] = cmd['has-target-names-after-kw']
+        can_be_nulary = False
+
+    if 'second-arg-is-target?' in cmd:
+        cmd['second_arg_is_target'] = cmd['second-arg-is-target?']
+        can_be_nulary = False
 
     if 'nulary?' in cmd and cmd['nulary?'] and not can_be_nulary:
         raise RuntimeError('Command `{}` w/ args declared nulary!?'.format(cmd['name']))

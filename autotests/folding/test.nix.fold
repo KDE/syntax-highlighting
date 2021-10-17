@@ -1,0 +1,48 @@
+# Sample Nix file
+# ---------------
+let
+    bool = true && false;
+    var1 = if 3 < 4 then "a" else "b";
+in <beginfold id='1'>{</beginfold id='1'>
+    <beginfold id='2'>/*</beginfold id='2'>
+       Multi-line comments
+    <endfold id='2'>*/</endfold id='2'>
+    inherit var1;
+
+    var2 = with builtins; <beginfold id='3'>[</beginfold id='3'>
+        0 1 2 (-3) (-4)
+        123.456 .12e34
+        (12 + 345 * 6789 / 321)
+    <endfold id='3'>]</endfold id='3'>;
+
+    var3 = <beginfold id='3'>[</beginfold id='3'>
+        "Single-line string"
+        "
+          Multi-line string
+        "
+        ''
+          Indented string.
+        ''
+    <endfold id='3'>]</endfold id='3'>;
+    nested.var4 = <beginfold id='3'>[</beginfold id='3'>
+        "String with ${var1}"
+        "Another one with escaped \${var1}"
+        ''
+          Document with ${var1}
+          which is ''${var1}
+        ''
+        ''
+          My home: ${builtins.getEnv "HOME"}
+          Escaped tab: ''\\t
+        ''
+    <endfold id='3'>]</endfold id='3'>;
+
+    nested.a.imported = (import ./example.nix);
+
+    fn = (x: y: x + y);
+
+    fn1 = <beginfold id='1'>{</beginfold id='1'> a, b ? import ./file.nix, c ? <beginfold id='1'>{</beginfold id='1'> a = 1; b = 2; <endfold id='1'>}</endfold id='1'>, ... <endfold id='1'>}</endfold id='1'>: rec <beginfold id='1'>{</beginfold id='1'>
+        inherit (import ./.);
+        x = a;
+    <endfold id='1'>}</endfold id='1'>;
+<endfold id='1'>}</endfold id='1'>

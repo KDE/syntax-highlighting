@@ -20,6 +20,7 @@ elseif(CMAKE_CROSSCOMPILING)
                             -DECM_DIR=${ECM_DIR} -DCMAKE_PREFIX_PATH=${NATIVE_PREFIX}
                             -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}
                         INSTALL_COMMAND ""
+                        BUILD_BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/native_katehighlightingindexer-prefix/src/native_katehighlightingindexer-build/bin/katehighlightingindexer
                     )
     add_executable(katehighlightingindexer IMPORTED GLOBAL)
     add_dependencies(katehighlightingindexer native_katehighlightingindexer)

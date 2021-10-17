@@ -42,6 +42,7 @@
     <!--[- endfor ]-->
     </list>
 
+    <!--[- macro render_command_arg_lists(commands) ]-->
     <!--[- for command in commands -]-->
       <!--[- if command.named_args and command.named_args.kw ]-->
     <list name="<!--{command.name}-->_nargs">
@@ -58,6 +59,9 @@
     </list>
       <!--[- endif ]-->
     <!--[- endfor ]-->
+    <!--[- endmacro ]-->
+    <!--{- render_command_arg_lists(commands) }-->
+    <!--{- render_command_arg_lists(standard_module_commands) }-->
 
     <list name="variables">
     <!--[- for var in variables.kw ]-->
@@ -91,6 +95,24 @@
       <!--[- endfor ]-->
     </list>
 
+    <list name="standard-modules">
+      <!--[- for module in modules.utility ]-->
+      <item><!--{ module }--></item>
+      <!--[- endfor ]-->
+    </list>
+
+    <list name="standard-finder-modules">
+      <!--[- for module in modules.finder ]-->
+      <item><!--{ module | replace('Find', '') }--></item>
+      <!--[- endfor ]-->
+    </list>
+
+    <list name="deprecated-modules">
+      <!--[- for module in modules.deprecated ]-->
+      <item><!--{ module }--></item>
+      <!--[- endfor ]-->
+    </list>
+
     <contexts>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="Normal Text">
@@ -98,12 +120,15 @@
         <!--[ for command in commands -]-->
         <WordDetect String="<!--{command.name}-->" insensitive="true" attribute="Command" context="<!--{command.name}-->_ctx"<!--[ if command.start_region ]--> beginRegion="<!--{command.start_region}-->"<!--[ endif -]--> <!--[- if command.end_region ]--> endRegion="<!--{command.end_region}-->"<!--[ endif ]--> />
         <!--[ endfor -]-->
+        <!--[ for command in standard_module_commands -]-->
+        <WordDetect String="<!--{command.name}-->" insensitive="true" attribute="CMake Provided Function/Macro" context="<!--{command.name}-->_ctx" />
+        <!--[ endfor -]-->
         <DetectChar attribute="Comment" context="Match Comments and Docs" char="#" lookAhead="true" />
         <DetectIdentifier attribute="User Function/Macro" context="User Function" />
         <RegExpr attribute="@Variable Substitution" context="@VarSubst" String="@&var_ref_re;@" lookAhead="true" />
         <RegExpr attribute="Error" context="#stay" String=".*" />
       </context>
-
+      <!--[- macro render_command_parsers(commands) ]-->
       <!--[ for command in commands -]-->
       <context attribute="Normal Text" lineEndContext="#stay" name="<!--{command.name}-->_ctx">
         <DetectChar attribute="Normal Text" context="<!--{command.name}-->_ctx_op<!--{'_tgt_first' if command.first_arg_is_target else '_tgts_first' if command.first_args_are_targets else ''}-->" char="(" />
@@ -149,6 +174,13 @@
         <WordDetect String="<!--{command.has_target_names_after_kw}-->" attribute="Named Args" context="<!--{command.name}-->_tgts" />
           <!--[- endif ]-->
         <keyword attribute="Named Args" context="#stay" String="<!--{command.name}-->_nargs" />
+        <!--[- endif ]-->
+        <!--[- if command.name == 'include' ]-->
+        <keyword attribute="Standard Module" context="#stay" String="standard-modules" />
+        <keyword attribute="Deprecated Module" context="#stay" String="deprecated-modules" />
+        <!--[- endif ]-->
+        <!--[- if command.name == 'find_package' ]-->
+        <keyword attribute="Standard Module" context="#stay" String="standard-finder-modules" />
         <!--[- endif ]-->
         <!--[- if command.special_args and command.special_args.kw ]-->
         <keyword attribute="Special Args" context="#stay" String="<!--{command.name}-->_sargs" />
@@ -202,7 +234,9 @@
       </context>
         <!--[- endif ]-->
       <!--[ endfor -]-->
-
+      <!--[- endmacro -]-->
+      <!--{- render_command_parsers(commands) -}-->
+      <!--{- render_command_parsers(standard_module_commands) -}-->
       <!--[ for kind in properties.kinds if properties[kind].re -]-->
       <context attribute="Normal Text" lineEndContext="#stay" name="Detect More <!--{ kind|replace('_', '-') }-->">
         <RegExpr attribute="Property" context="#stay" String="<!--{properties[kind].re}-->" />
@@ -380,7 +414,9 @@
 
     <itemDatas>
       <itemData name="Normal Text" defStyleNum="dsNormal" spellChecking="false" />
+      <itemData name="Comment" defStyleNum="dsComment" spellChecking="true" />
       <itemData name="Command" defStyleNum="dsKeyword" spellChecking="false" />
+      <itemData name="CMake Provided Function/Macro" defStyleNum="dsFunction" bold="true" spellChecking="false" />
       <itemData name="User Function/Macro"  defStyleNum="dsFunction" spellChecking="false" />
       <itemData name="Property" defStyleNum="dsOthers" spellChecking="false" />
       <itemData name="Targets" defStyleNum="dsBaseN" spellChecking="false" />
@@ -402,7 +438,8 @@
       <itemData name="Standard Environment Variable" defStyleNum="dsFloat" spellChecking="false" />
       <itemData name="Generator Expression Keyword" defStyleNum="dsKeyword" color="#b84040" selColor="#b84040" spellChecking="false" />
       <itemData name="Generator Expression" defStyleNum="dsOthers" color="#b86050" selColor="#b86050" spellChecking="false" />
-      <itemData name="Comment" defStyleNum="dsComment" spellChecking="true" />
+      <itemData name="Standard Module" defStyleNum="dsImport" spellChecking="false" />
+      <itemData name="Deprecated Module" defStyleNum="dsImport" spellChecking="false" />
       <itemData name="Region Marker" defStyleNum="dsRegionMarker" spellChecking="false" />
       <itemData name="Error" defStyleNum="dsError" spellChecking="false" />
     </itemDatas>

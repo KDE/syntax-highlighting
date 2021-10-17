@@ -144,8 +144,7 @@ def transform_command(cmd):
 #BEGIN Jinja filters
 
 def cmd_is_nulary(cmd):
-    assert not ('named-args' in cmd or 'special-args' in cmd or 'property-args' in cmd)
-    return 'nulary?' in cmd and cmd['nulary?']
+    return cmd.setdefault('nulary?', False)
 
 #END Jinja filters
 
@@ -184,8 +183,16 @@ def cli(input_yaml, template):
     data['commands'] = list(
         map(
             transform_command
-          , data['scripting-commands'] + data['project-commands'] + data['ctest-commands'])
+          , data['scripting-commands'] + data['project-commands'] + data['ctest-commands']
+          )
       )
+    data['standard_module_commands'] = list(
+        map(
+            transform_command
+          , data['standard-module-commands']
+          )
+      )
+    del data['standard-module-commands']
 
     # Fix node names to be accessible from Jinja template
     data['generator_expressions'] = data['generator-expressions']

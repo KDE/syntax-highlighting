@@ -23,7 +23,7 @@ class CodeEditor : public QPlainTextEdit
     Q_OBJECT
 public:
     explicit CodeEditor(QWidget *parent = nullptr);
-    ~CodeEditor();
+    ~CodeEditor() override;
 
     void openFile(const QString &fileName);
 

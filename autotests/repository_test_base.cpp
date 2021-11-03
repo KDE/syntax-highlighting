@@ -10,7 +10,6 @@
 #include "test-config.h"
 
 #include <definition.h>
-#include <repository.h>
 
 #include <QStandardPaths>
 #include <QTest>

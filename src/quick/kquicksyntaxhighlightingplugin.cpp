@@ -13,7 +13,6 @@
 #include <repository.h>
 #include <theme.h>
 
-#include <QQmlEngine>
 
 #include <memory>
 

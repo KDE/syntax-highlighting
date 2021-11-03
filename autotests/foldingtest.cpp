@@ -92,14 +92,14 @@ public:
     }
 
 protected:
-    void applyFormat(int offset, int length, const Format &format) Q_DECL_OVERRIDE
+    void applyFormat(int offset, int length, const Format &format) override
     {
         Q_UNUSED(offset);
         Q_UNUSED(length);
         Q_UNUSED(format);
     }
 
-    void applyFolding(int offset, int length, FoldingRegion region) Q_DECL_OVERRIDE
+    void applyFolding(int offset, int length, FoldingRegion region) override
     {
         Q_ASSERT(region.isValid());
         m_folds.push_back({offset, length, region});

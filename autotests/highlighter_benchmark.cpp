@@ -56,7 +56,7 @@ public:
     }
 
 protected:
-    void applyFormat(int, int, const Format &) Q_DECL_OVERRIDE
+    void applyFormat(int, int, const Format &) override
     {
     }
     QStringList m_fileContents;

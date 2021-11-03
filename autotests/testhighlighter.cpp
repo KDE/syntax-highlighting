@@ -59,7 +59,7 @@ public:
     }
 
 protected:
-    void applyFormat(int offset, int length, const Format &format) Q_DECL_OVERRIDE
+    void applyFormat(int offset, int length, const Format &format) override
     {
         if (format.name().isEmpty()) {
             m_out << "<dsNormal>" << QStringView(m_currentLine).mid(offset, length) << "</dsNormal>";

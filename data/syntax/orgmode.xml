@@ -28,6 +28,8 @@
       <context name="Normal Text" attribute="Normal Text" lineEndContext="#stay">
         <DetectChar context="find-header" char="*" column="0" lookAhead="true"/>
         <RegExpr attribute="List" context="list" String="^(\s*)&listbullet;(\s+)" column="0"/>
+        <RegExpr attribute="Number List" context="numlist" String="^(\s*)\d+\.(\s+)" column="0"/>
+        <RegExpr attribute="Block" context="find-block" String="^#\+BEGIN(_\w+|:).*" beginRegion="RegionBlock" column="0"/>
         <DetectChar context="find-bold-normal" char="*" lookAhead="true"/>
         <DetectChar context="find-underline-normal" char="_" lookAhead="true"/>
         <DetectChar context="find-italic-normal" char="/" lookAhead="true"/>
@@ -45,6 +47,13 @@
       <context name="list" attribute="List: Normal Text" lineEndContext="#stay">
         <RegExpr context="#pop" String="^\s*\S" column="0" lookAhead="true"/>
         <RegExpr attribute="List: Checkbox" String="\s*&checkbox;"/>
+      </context>
+      <context name="numlist" attribute="List: Normal Text" lineEndContext="#stay">
+        <RegExpr context="#pop" String="^\s*\S" column="0" lookAhead="true"/>
+        <RegExpr attribute="List: Checkbox" String="\s*&checkbox;"/>
+      </context>
+      <context name="find-block" attribute="Block" lineEndContext="#stay">
+        <StringDetect context="#pop" attribute="Block" String="#+END%1" dynamic="true" endRegion="RegionBlock" column="0"/>
       </context>
       <context name="find-bold-normal" attribute="Normal Text" lineEndContext="#pop">
         <RegExpr attribute="Bold Text" context="#pop" minimal="true" String="&bold_regex;"/>
@@ -75,8 +84,10 @@
       <itemData name="Info" defStyleNum="dsInformation" spellChecking="false"/>
       <itemData name="Heading" defStyleNum="dsFunction"/>
       <itemData name="List" defStyleNum="dsSpecialString" bold="1" spellChecking="false"/>
+      <itemData name="Number List" defStyleNum="dsSpecialString" spellChecking="false"/>
       <itemData name="List: Normal Text" defStyleNum="dsNormal"/>
       <itemData name="List: Checkbox" defStyleNum="dsVariable" spellChecking="false"/>
+      <itemData name="Block" defStyleNum="dsInformation"/>
     </itemDatas>
   </highlighting>
 </language>

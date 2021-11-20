@@ -1,4 +1,4 @@
-version: 36
+version: 37
 
 global-properties:
     - ALLOW_DUPLICATE_CUSTOM_TARGETS
@@ -415,6 +415,7 @@ test-properties:
     - DEPENDS
     - DISABLED
     - ENVIRONMENT
+    - ENVIRONMENT_MODIFICATION                              # Since 3.22
     - FAIL_REGULAR_EXPRESSION
     - FIXTURES_CLEANUP
     - FIXTURES_REQUIRED
@@ -790,6 +791,7 @@ variables:
     - CMAKE_PROJECT_INCLUDE                                 # Since 3.15
     - CMAKE_PROJECT_INCLUDE_BEFORE                          # Since 3.15
     - CMAKE_PROJECT_<PROJECT-NAME>_INCLUDE
+    - CMAKE_REQUIRE_FIND_PACKAGE_<PackageName>              # Since 3.22
     - CMAKE_SKIP_INSTALL_ALL_DEPENDENCY
     - CMAKE_STAGING_PREFIX
     - CMAKE_SUBLIME_TEXT_2_ENV_SETTINGS
@@ -967,6 +969,7 @@ variables:
     - CMAKE_<LANG>_LINKER_LAUNCHER                          # Sine 3.21
     - CMAKE_<LANG>_LINK_LIBRARY_FILE_FLAG                   # Sine 3.16
     - CMAKE_<LANG>_LINK_LIBRARY_FLAG                        # Sine 3.16
+    - CMAKE_<LANG>_LINK_WHAT_YOU_USE_FLAG                   # Since 3.22
     - CMAKE_<LANG>_VISIBILITY_PRESET
     - CMAKE_LIBRARY_OUTPUT_DIRECTORY
     - CMAKE_LIBRARY_OUTPUT_DIRECTORY_<CONFIG>
@@ -977,6 +980,7 @@ variables:
     - CMAKE_LINK_LIBRARY_FILE_FLAG
     - CMAKE_LINK_LIBRARY_FLAG
     - CMAKE_LINK_WHAT_YOU_USE
+    - CMAKE_LINK_WHAT_YOU_USE_CHECK                         # Since 3.22
     - CMAKE_MACOSX_BUNDLE
     - CMAKE_MACOSX_RPATH
     - CMAKE_MAP_IMPORTED_CONFIG_<CONFIG>
@@ -1055,6 +1059,10 @@ variables:
     - CMAKE_Fortran_MODDIR_DEFAULT
     - CMAKE_Fortran_MODDIR_FLAG
     - CMAKE_Fortran_MODOUT_FLAG
+    - CMAKE_HIP_ARCHITECTURES                               # Since 3.21
+    - CMAKE_HIP_EXTENSIONS                                  # Since 3.21
+    - CMAKE_HIP_STANDARD                                    # Since 3.21
+    - CMAKE_HIP_STANDARD_REQUIRED                           # Since 3.21
     - CMAKE_ISPC_HEADER_DIRECTORY                           # Since 3.19
     - CMAKE_ISPC_HEADER_SUFFIX                              # Since 3.19.2
     - CMAKE_ISPC_INSTRUCTION_SETS                           # Since 3.19
@@ -1075,6 +1083,8 @@ variables:
     - CMAKE_<LANG>_CREATE_SHARED_LIBRARY
     - CMAKE_<LANG>_CREATE_SHARED_MODULE
     - CMAKE_<LANG>_CREATE_STATIC_LIBRARY
+    - CMAKE_<LANG>_EXTENSIONS
+    - CMAKE_<LANG>_EXTENSIONS_DEFAULT                       # Since 3.22
     - CMAKE_<LANG>_FLAGS
     - CMAKE_<LANG>_FLAGS_DEBUG
     - CMAKE_<LANG>_FLAGS_DEBUG_INIT
@@ -1269,6 +1279,11 @@ variables:
     - CMAKE_GET_RUNTIME_DEPENDENCIES_PLATFORM
     - CMAKE_GET_RUNTIME_DEPENDENCIES_TOOL
     - CMAKE_GET_RUNTIME_DEPENDENCIES_COMMAND
+    # Fallback Interface Variables for `cmake_host_system_information`
+    # Since CMake 3.22
+    - CMAKE_GET_OS_RELEASE_FALLBACK_SCRIPTS
+    - CMAKE_GET_OS_RELEASE_FALLBACK_RESULT_<varname>
+    - CMAKE_GET_OS_RELEASE_FALLBACK_RESULT
     # Well known CMake's official module's variables
     # - BundleUtilities
     - BU_CHMOD_BUNDLE_ITEMS
@@ -1507,6 +1522,7 @@ variables:
     - CPACK_NSIS_BRANDING_TEXT                              # Since 3.20
     - CPACK_NSIS_BRANDING_TEXT_TRIM_POSITION                # Since 3.20
     - CPACK_NSIS_EXECUTABLE                                 # Since 3.21
+    - CPACK_NSIS_IGNORE_LICENSE_PAGE                        # Since 3.22
     # - CPackNuGet (since 3.12)
     - CPACK_NUGET_COMPONENT_INSTALL
     - CPACK_NUGET_PACKAGE_NAME
@@ -1664,6 +1680,7 @@ variables:
     - CPACK_RPM_SOURCE_PKG_BUILD_PARAMS
     - CPACK_RPM_SOURCE_PKG_PACKAGING_INSTALL_PREFIX
     - CPACK_RPM_BUILDREQUIRES
+    - CPACK_RPM_REQUIRES_EXCLUDE_FROM                       # Since 3.22
     # - CPack
     - CPACK_PACKAGE_NAME
     - CPACK_PACKAGE_VENDOR
@@ -1794,6 +1811,7 @@ variables:
     - BLA_F95
     - BLA_PREFER_PKGCONFIG
     - BLAS_LINKER_FLAGS
+    - BLA_SIZEOF_INTEGER                                    # Since 3.22
     # - FindBoost
     - Boost_<COMPONENT>_LIBRARY
     - Boost_VERSION_MACRO
@@ -1975,6 +1993,8 @@ variables:
     - Intl_IS_BUILT_IN
     # - FindITK
     # - FindJasper
+    - JASPER_LIBRARY_RELEASE
+    - JASPER_LIBARRY_DEBUG
     # - FindJava
     - Java_JAVA_EXECUTABLE
     - Java_JAVAC_EXECUTABLE
@@ -2464,12 +2484,15 @@ environment-variables:
     # Environment Variables that Control the Build
     - CMAKE_APPLE_SILICON_PROCESSOR                         # Since 3.19.2
     - CMAKE_BUILD_PARALLEL_LEVEL
+    - CMAKE_BUILD_TYPE                                      # Since 3.22
+    - CMAKE_CONFIGURATION_TYPES                             # Since 3.22
     - CMAKE_CONFIG_TYPE
     - CMAKE_EXPORT_COMPILE_COMMANDS                         # Since 3.17
     - CMAKE_GENERATOR
     - CMAKE_GENERATOR_INSTANCE
     - CMAKE_GENERATOR_PLATFORM
     - CMAKE_GENERATOR_TOOLSET
+    - CMAKE_INSTALL_MODE                                    # Since 3.22
     - CMAKE_<LANG>_COMPILER_LAUNCHER                        # Since 3.17
     - CMAKE_MSVCIDE_RUN_PATH
     - CMAKE_NO_VERBOSE
@@ -2549,6 +2572,9 @@ scripting-commands:
           , OS_RELEASE
           , OS_VERSION
           , OS_PLATFORM
+          # Since 3.22
+          , DISTRIB_INFO
+          , DISTRIB_<name>
           ]
     -
         name: cmake_language
@@ -4738,12 +4764,13 @@ standard-module-commands:
             - TEST_LIST
         has-target-name-after-kw: TARGET
     -
-        name: gtest_discover_tests
+        name: gtest_discover_tests                          # Since 3.10
         named-args:
             - EXTRA_ARGS
             - WORKING_DIRECTORY
             - TEST_PREFIX
             - TEST_SUFFIX
+            - TEST_FILTER                                   # Since 3.22
             - NO_PRETTY_TYPES
             - NO_PRETTY_VALUES
             - PROPERTIES

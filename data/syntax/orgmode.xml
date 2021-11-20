@@ -9,11 +9,13 @@
 <!ENTITY contentregex_itl "(?:(?:[^/\s\\]|\\.)(?:[^\\]|\\.)*)?(?:[^/\s\\]|\\\S)">
 <!ENTITY contentregex_stk "(?:(?:[^+\s\\]|\\.)(?:[^\\]|\\.)*)?(?:[^+\s\\]|\\\S)">
 <!ENTITY contentregex_cod "(?:(?:[^~\s\\]|\\.)(?:[^\\]|\\.)*)?(?:[^~\s\\]|\\\S)">
+<!ENTITY contentregex_vbt "(?:(?:[^=\s\\]|\\.)(?:[^\\]|\\.)*)?(?:[^=\s\\]|\\\S)">
 <!ENTITY bold_regex "\*{1}(?:&contentregex_ast;\*{1})">
 <!ENTITY underline_regex "\b_{1}(?:&contentregex_und;_{1})">
 <!ENTITY italic_regex "[/]{1}(?:&contentregex_itl;[/]{1})">
 <!ENTITY strike_regex "\+{1}(?:&contentregex_stk;\+{1})">
 <!ENTITY inlinecode_regex "\~{1}(?:&contentregex_cod;\~{1})">
+<!ENTITY verbatim_regex "\={1}(?:&contentregex_vbt;\={1})">
 ]>
 
 <!-- org syntax spec: https://orgmode.org/worg/dev/org-syntax.html -->
@@ -39,6 +41,7 @@
         <DetectChar context="find-italic-normal" char="/" lookAhead="true"/>
         <DetectChar context="find-strike-normal" char="+" lookAhead="true"/>
         <DetectChar context="find-inlinecode-normal" char="~" lookAhead="true"/>
+        <DetectChar context="find-verbatim-normal" char="=" lookAhead="true"/>
       </context>
       <context name="find-header" attribute="Normal Text" lineEndContext="#pop">
         <RegExpr attribute="Keyword" context="parse-header" String="^(?:\*){1,}\s+(?:([A-Z]+)\s+){0,1}(?:(\[#(?:[a-zA-Z]|\d{1,2})\])\s+){0,1}(.*)\s*(\[[\d/%]+\]){0,1}\s*$" column="0" lookAhead="true"/>
@@ -77,6 +80,10 @@
         <RegExpr attribute="Strikethrough Text" context="#pop" minimal="true" String="&strike_regex;"/>
         <DetectChar attribute="Normal Text" context="#pop" char="+"/>
       </context>
+      <context name="find-verbatim-normal" attribute="Normal Text" lineEndContext="#pop">
+        <RegExpr attribute="Verbatim" context="#pop" minimal="true" String="&verbatim_regex;"/>
+        <DetectChar attribute="Normal Text" context="#pop" char="~"/>
+      </context>
       <context name="find-inlinecode-normal" attribute="Normal Text" lineEndContext="#pop">
         <RegExpr attribute="Code" context="#pop" minimal="true" String="&inlinecode_regex;"/>
         <DetectChar attribute="Normal Text" context="#pop" char="~"/>
@@ -99,6 +106,7 @@
       <itemData name="Number List" defStyleNum="dsSpecialString" spellChecking="false"/>
       <itemData name="Comment" defStyleNum="dsComment"/>
       <itemData name="Babel" defStyleNum="dsPreprocessor"/>
+      <itemData name="Verbatim" defStyleNum="dsExtension" spellChecking="false"/>
       <itemData name="Code" defStyleNum="dsInformation" spellChecking="false"/>
       <itemData name="Block" defStyleNum="dsInformation"/>
     </itemDatas>

@@ -31,7 +31,9 @@
         <DetectChar context="find-header" char="*" column="0" lookAhead="true"/>
         <RegExpr attribute="List" context="list" String="^(\s*)&listbullet;(\s+)" column="0"/>
         <RegExpr attribute="Number List" context="numlist" String="^(\s*)\d+(?:\.|\))(\s+)" column="0"/>
+        <RegExpr attribute="Comment" String="^(\s*)# .*" column="0"/>
         <RegExpr attribute="Block" context="find-block" String="^#\+BEGIN(_\w+|:).*" beginRegion="RegionBlock" column="0"/>
+        <RegExpr attribute="Babel" String="^(\s*)#\+[A-Z]+(?:\[[A-Z]+\])?:.*" column="0"/>
         <DetectChar context="find-bold-normal" char="*" lookAhead="true"/>
         <DetectChar context="find-underline-normal" char="_" lookAhead="true"/>
         <DetectChar context="find-italic-normal" char="/" lookAhead="true"/>
@@ -39,12 +41,13 @@
         <DetectChar context="find-inlinecode-normal" char="~" lookAhead="true"/>
       </context>
       <context name="find-header" attribute="Normal Text" lineEndContext="#pop">
-        <RegExpr attribute="Keyword" context="parse-header" String="^(?:\*){1,}\s+(?:([A-Z]+)\s+){0,1}(.*)\s*(\[[\d/%]+\]){0,1}\s*$" column="0" lookAhead="true"/>
+        <RegExpr attribute="Keyword" context="parse-header" String="^(?:\*){1,}\s+(?:([A-Z]+)\s+){0,1}(?:(\[#(?:[a-zA-Z]|\d{1,2})\])\s+){0,1}(.*)\s*(\[[\d/%]+\]){0,1}\s*$" column="0" lookAhead="true"/>
       </context>
       <context name="parse-header" attribute="Heading" lineEndContext="#pop">
         <RegExpr attribute="Heading" String="(?:\*){1,}\s+" lookAhead="false"/>
         <keyword String="org-todo-keywords-todo" attribute="Keyword Todo" context="#stay" />
         <keyword String="org-todo-keywords-done" attribute="Keyword Done" context="#stay" />
+        <RegExpr attribute="Info" String="\[#(?:[a-zA-Z]|\d{1,2})\]" lookAhead="false"/>
         <RegExpr attribute="Info" String="\[[\d/%]+\]" lookAhead="false"/>
       </context>
       <context name="list" attribute="List: Normal Text" lineEndContext="#stay">
@@ -94,9 +97,17 @@
       <itemData name="List: Normal Text" defStyleNum="dsNormal"/>
       <itemData name="List: Checkbox" defStyleNum="dsVariable" spellChecking="false"/>
       <itemData name="Number List" defStyleNum="dsSpecialString" spellChecking="false"/>
+      <itemData name="Comment" defStyleNum="dsComment"/>
+      <itemData name="Babel" defStyleNum="dsPreprocessor"/>
       <itemData name="Code" defStyleNum="dsInformation" spellChecking="false"/>
       <itemData name="Block" defStyleNum="dsInformation"/>
     </itemDatas>
   </highlighting>
+  <general>
+    <comments>
+      <!-- Kate will add a space after the char so it's just a "#" here -->
+      <comment name="singleLine" start="#"/>
+    </comments>
+  </general>
 </language>
 <!-- kate: replace-tabs on; indent-width 2; tab-width 2; -->

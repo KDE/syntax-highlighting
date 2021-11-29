@@ -3,6 +3,13 @@
 [
 <!ENTITY listbullet "[\+\-]">
 <!ENTITY checkbox "\[[ \-X]\](?=\s)">
+<!-- links. -->
+<!ENTITY startlink "(?:(?:https?|ftp)\://|(?:file|docview|mailto|mhe|rmail|bbdb|irc|info)\:)">
+<!ENTITY link "&startlink;[^&quot;&gt;\s]+">
+<!-- link in normal text.
+     Using the implicitlink entity in markdown.xml for now.
+     Actual doc: https://orgmode.org/guide/Hyperlinks.html -->
+<!ENTITY implicitlink "\b&startlink;[^&quot;&gt;\s`\)]*[^\s!&quot;&apos;`\(\)\*,\.:;&lt;&gt;\?~\]\}\\](?=[[:punct:]]*(?:[\s\]]|$))">
 <!-- org-emphasis-alist -->
 <!ENTITY contentregex_ast "(?:(?:[^\*\s\\]|\\.)(?:[^\\]|\\.)*)?(?:[^\*\s\\]|\\\S)">
 <!ENTITY contentregex_und "(?:(?:[^_\s\\]|\\.)(?:[^\\]|\\.)*)?(?:[^_\s\\]|\\\S)">
@@ -20,7 +27,7 @@
 
 <!-- org syntax spec: https://orgmode.org/worg/dev/org-syntax.html -->
 <!-- syntax highlight: https://docs.kde.org/stable5/en/kate/katepart/highlight.html -->
-<language name="Org Mode" version="2" kateversion="5.79" section="Markup" extensions="*.org" priority="15" author="Gary Wang" license="MIT">
+<language name="Org Mode" version="3" kateversion="5.79" section="Markup" extensions="*.org" priority="15" author="Gary Wang" license="MIT">
   <highlighting>
     <list name="org-todo-keywords-todo">
       <item>TODO</item>
@@ -42,6 +49,7 @@
         <DetectChar context="find-strike-normal" char="+" lookAhead="true"/>
         <DetectChar context="find-inlinecode-normal" char="~" lookAhead="true"/>
         <DetectChar context="find-verbatim-normal" char="=" lookAhead="true"/>
+        <RegExpr attribute="Normal Text: Link" String="&implicitlink;"/>
       </context>
       <context name="find-header" attribute="Normal Text" lineEndContext="#pop">
         <RegExpr attribute="Keyword" context="parse-header" String="^(?:\*){1,}\s+(?:([A-Z]+)\s+){0,1}(?:(\[#(?:[A-Z\d]+)\])\s+){0,1}(.*)\s*(\[[\d/%]+\]){0,1}\s*$" column="0" lookAhead="true"/>
@@ -91,6 +99,7 @@
     </contexts>
     <itemDatas>
       <itemData name="Normal Text" defStyleNum="dsNormal"/>
+      <itemData name="Normal Text: Link" defStyleNum="dsNormal" underline="true" spellChecking="false"/>
       <itemData name="Bold Text" defStyleNum="dsNormal" bold="true"/>
       <itemData name="Underline Text" defStyleNum="dsNormal" underline="true"/>
       <itemData name="Italic Text" defStyleNum="dsNormal" italic="true"/>

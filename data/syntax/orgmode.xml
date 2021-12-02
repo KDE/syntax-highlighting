@@ -23,6 +23,10 @@
 <!ENTITY strike_regex "\+{1}(?:&contentregex_stk;\+{1})">
 <!ENTITY inlinecode_regex "\~{1}(?:&contentregex_cod;\~{1})">
 <!ENTITY verbatim_regex "\={1}(?:&contentregex_vbt;\={1})">
+<!-- [[plain-link]] -->
+<!ENTITY link_plain_regex "\[\[(?:[^\[\]]+)\]\]">
+<!-- [[link][description]] -->
+<!ENTITY link_desc_regex "\[\[(?:[^\[\]]+)\]\[(?:[^\[\]]+)\]\]">
 ]>
 
 <!-- org syntax spec: https://orgmode.org/worg/dev/org-syntax.html -->
@@ -49,6 +53,7 @@
         <DetectChar context="find-strike-normal" char="+" lookAhead="true"/>
         <DetectChar context="find-inlinecode-normal" char="~" lookAhead="true"/>
         <DetectChar context="find-verbatim-normal" char="=" lookAhead="true"/>
+        <DetectChar context="find-link-normal" char="[" lookAhead="true"/>
         <RegExpr attribute="Normal Text: Link" String="&implicitlink;"/>
       </context>
       <context name="find-header" attribute="Normal Text" lineEndContext="#pop">
@@ -92,6 +97,12 @@
         <RegExpr attribute="Verbatim" context="#pop" minimal="true" String="&verbatim_regex;"/>
         <DetectChar attribute="Normal Text" context="#pop" char="~"/>
       </context>
+      <context name="find-link-normal" attribute="Link" lineEndContext="#pop">
+        <RegExpr attribute="Link" context="#pop" minimal="true" String="&link_plain_regex;"/>
+        <!-- FIXME: currently, link and description are using the same style -->
+        <RegExpr attribute="Link" context="#pop" minimal="true" String="&link_desc_regex;"/>
+        <DetectChar attribute="Normal Text" context="#pop" char="]"/>
+      </context>
       <context name="find-inlinecode-normal" attribute="Normal Text" lineEndContext="#pop">
         <RegExpr attribute="Code" context="#pop" minimal="true" String="&inlinecode_regex;"/>
         <DetectChar attribute="Normal Text" context="#pop" char="~"/>
@@ -114,6 +125,7 @@
       <itemData name="List: Normal Text" defStyleNum="dsNormal"/>
       <itemData name="List: Checkbox" defStyleNum="dsVariable" spellChecking="false"/>
       <itemData name="Number List" defStyleNum="dsSpecialString" spellChecking="false"/>
+      <itemData name="Link" defStyleNum="dsOthers" underline="true" spellChecking="false"/>
       <itemData name="Comment" defStyleNum="dsComment"/>
       <itemData name="Babel" defStyleNum="dsPreprocessor"/>
       <itemData name="Verbatim" defStyleNum="dsExtension" spellChecking="false"/>

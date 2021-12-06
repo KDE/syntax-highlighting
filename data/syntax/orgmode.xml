@@ -17,12 +17,14 @@
 <!ENTITY contentregex_stk "(?:(?:[^+\s\\]|\\.)(?:[^\\]|\\.)*)?(?:[^+\s\\]|\\\S)">
 <!ENTITY contentregex_cod "(?:(?:[^~\s\\]|\\.)(?:[^\\]|\\.)*)?(?:[^~\s\\]|\\\S)">
 <!ENTITY contentregex_vbt "(?:(?:[^=\s\\]|\\.)(?:[^\\]|\\.)*)?(?:[^=\s\\]|\\\S)">
+<!ENTITY contentregex_mco "(?:(?:[^\{\}\s\\]|\\.)(?:[^\\]|\\.)*)?(?:[^\{\}\s\\]|\\\S)">
 <!ENTITY bold_regex "\*{1}(?:&contentregex_ast;\*{1})">
 <!ENTITY underline_regex "\b_{1}(?:&contentregex_und;_{1})">
 <!ENTITY italic_regex "[/]{1}(?:&contentregex_itl;[/]{1})">
 <!ENTITY strike_regex "\+{1}(?:&contentregex_stk;\+{1})">
 <!ENTITY inlinecode_regex "\~{1}(?:&contentregex_cod;\~{1})">
 <!ENTITY verbatim_regex "\={1}(?:&contentregex_vbt;\={1})">
+<!ENTITY macroreplacement_regex "\{{3}(?:&contentregex_mco;\}{3})">
 <!-- [[plain-link]] -->
 <!ENTITY link_plain_regex "\[\[(?:[^\[\]]+)\]\]">
 <!-- [[link][description]] -->
@@ -54,6 +56,7 @@
         <DetectChar context="find-inlinecode-normal" char="~" lookAhead="true"/>
         <DetectChar context="find-verbatim-normal" char="=" lookAhead="true"/>
         <DetectChar context="find-link-normal" char="[" lookAhead="true"/>
+        <StringDetect context="find-macro-replacement" String="{{{" lookAhead="true"/>
         <RegExpr attribute="Normal Text: Link" String="&implicitlink;"/>
       </context>
       <context name="find-header" attribute="Normal Text" lineEndContext="#pop">
@@ -98,10 +101,14 @@
         <DetectChar attribute="Normal Text" context="#pop" char="~"/>
       </context>
       <context name="find-link-normal" attribute="Link" lineEndContext="#pop">
-        <RegExpr attribute="Link" context="#pop" minimal="true" String="&link_plain_regex;"/>
+        <RegExpr attribute="Plain Link" context="#pop" minimal="true" String="&link_plain_regex;"/>
         <!-- FIXME: currently, link and description are using the same style -->
         <RegExpr attribute="Link" context="#pop" minimal="true" String="&link_desc_regex;"/>
         <DetectChar attribute="Normal Text" context="#pop" char="]"/>
+      </context>
+      <context name="find-macro-replacement" attribute="Normal Text" lineEndContext="#pop">
+        <RegExpr attribute="Macro" context="#pop" minimal="true" String="&macroreplacement_regex;"/>
+        <DetectChar attribute="Normal Text" context="#pop" char="}"/>
       </context>
       <context name="find-inlinecode-normal" attribute="Normal Text" lineEndContext="#pop">
         <RegExpr attribute="Code" context="#pop" minimal="true" String="&inlinecode_regex;"/>
@@ -125,8 +132,10 @@
       <itemData name="List: Normal Text" defStyleNum="dsNormal"/>
       <itemData name="List: Checkbox" defStyleNum="dsVariable" spellChecking="false"/>
       <itemData name="Number List" defStyleNum="dsSpecialString" spellChecking="false"/>
+      <itemData name="Plain Link" defStyleNum="dsOthers" underline="true" spellChecking="false"/>
       <itemData name="Link" defStyleNum="dsOthers" underline="true" spellChecking="false"/>
       <itemData name="Comment" defStyleNum="dsComment"/>
+      <itemData name="Macro" defStyleNum="dsPreprocessor"/>
       <itemData name="Babel" defStyleNum="dsPreprocessor"/>
       <itemData name="Verbatim" defStyleNum="dsExtension" spellChecking="false"/>
       <itemData name="Code" defStyleNum="dsInformation" spellChecking="false"/>

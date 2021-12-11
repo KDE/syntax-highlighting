@@ -335,9 +335,7 @@ foreach my $lcName (sort keys %themeToHTMLSnippet) {
     my $name = $themeToHTMLSnippet{$lcName}{"name"};
     my $file = $themeToHTMLSnippet{$lcName}{"file"};
     print $themes_page "<h3>$name</h3>\n";
-    print $themes_page "{{< rawhtml >}}\n";
     print $themes_page "{{% include \"/static/themes/$file\" %}}\n";
-    print $themes_page "{{< /rawhtml >}}\n\n";
 }
 close($themes_page);
 

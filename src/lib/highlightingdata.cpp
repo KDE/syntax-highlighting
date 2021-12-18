@@ -9,6 +9,7 @@
 #include "xml_p.h"
 
 #include <QXmlStreamReader>
+#include <QStringView>
 
 using namespace KSyntaxHighlighting;
 
@@ -31,7 +32,7 @@ static HighlightingContextData::Rule::WordDelimiters loadAdditionalWordDelimiter
     };
 }
 
-static bool checkIsNotEmpty(const QStringRef &str, const char *attrName, const QString &defName, QXmlStreamReader &reader)
+static bool checkIsNotEmpty(QStringView str, const char *attrName, const QString &defName, QXmlStreamReader &reader)
 {
     if (!str.isEmpty()) {
         return true;
@@ -41,7 +42,7 @@ static bool checkIsNotEmpty(const QStringRef &str, const char *attrName, const Q
     return false;
 }
 
-static bool checkIsChar(const QStringRef &str, const char *attrName, const QString &defName, QXmlStreamReader &reader)
+static bool checkIsChar(QStringView str, const char *attrName, const QString &defName, QXmlStreamReader &reader)
 {
     if (!str.isEmpty()) {
         return true;

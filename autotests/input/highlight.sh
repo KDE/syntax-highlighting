@@ -48,7 +48,7 @@ echo ${filename}_ext
 echo text${array[$subscript]}.text
 echo text${array["string"]}.text
 echo ${!prefix*}
-echo ${!redir}
+echo ${!redir} ${!3}
 echo short are $_, $$, $?, ${@}, etc.
 echo ${variable/a/d}
 echo ${1:-default}

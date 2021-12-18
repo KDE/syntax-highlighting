@@ -479,7 +479,7 @@ echo '' 'a' '\' "" "a" "\\" "$a" "a""a"'a''a' a'b'c a"b"c a$'\n'c
 echo a!bc a{a}b a{b,c}d a{b,{d,e}}d a\ b
 echo a$bc a$b/c a${b}c a$((b-3))c a$(b)c a$(a b c)c
 echo ${a[*]} ${a[@]} ${a[${b}]} ${a:-x$z} ${a/g} ${a//f/f} ${a//f*/f*}
-echo ${!a} ${#a[1]} ${a:1:$b} $((++i,i--))
+echo ${!} ${!a} ${#a[1]} ${a:1:$b} $((++i,i--))
 echo ${a:^v} ${=a:/#%a#?*/bla} ${x#??(#i)} ${das:-{}<a.zsh}
 echo ${(f)"$(<$1)"} ${${(Az)l}[$2]} ${(f)"$(eval ${(q)@[2,$]})"}
 echo ${(@)foo} ${(@)foo[1,2]} ${${(A)name}[1]} ${(AA)=name=...} ${(Q)${(z)foo}}

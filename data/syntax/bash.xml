@@ -39,7 +39,7 @@
         <!ENTITY arithmetic_as_subshell "\(((?:[^`'&quot;()$]++|\$\{[^`'&quot;(){}$]+\}|\$(?=[^{`'&quot;()])|`[^`]*+`|\((?1)(?:[)]|(?=['&quot;])))++)(?:[)](?=$|[^)])|[&quot;'])">
 ]>
 
-<language name="Bash" version="33" kateversion="5.79" section="Scripts" extensions="*.sh;*.bash;*.ebuild;*.eclass;*.exlib;*.exheres-0;.bashrc;.bash_profile;.bash_login;.profile;PKGBUILD;APKBUILD" mimetype="application/x-shellscript" casesensitive="1" author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL">
+<language name="Bash" version="34" kateversion="5.79" section="Scripts" extensions="*.sh;*.bash;*.ebuild;*.eclass;*.exlib;*.exheres-0;.bashrc;.bash_profile;.bash_login;.profile;PKGBUILD;APKBUILD" mimetype="application/x-shellscript" casesensitive="1" author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL">
 
 <!-- (c) 2004 by Wilbert Berendsen (wilbert@kde.nl)
     Changes by Matthew Woehlke (mw_triad@users.sourceforge.net)
@@ -499,6 +499,15 @@
     <contexts>
       <context attribute="Normal Text" lineEndContext="#stay" name="Start" fallthroughContext="Command">
           <IncludeRules context="BashOneLine"/>
+      </context>
+
+      <!-- used by other syntaxes -->
+      <context attribute="Normal Text" lineEndContext="#pop" name="FindOneLineBackq" fallthroughContext="#pop">
+        <DetectChar attribute="Backquote" context="OneLineBackq" char="`"/>
+      </context>
+      <context attribute="Normal Text" lineEndContext="#stay" name="OneLineBackq" fallthroughContext="Command">
+        <DetectChar attribute="Backquote" context="#pop" char="`"/>
+        <IncludeRules context="Start"/>
       </context>
 
       <context attribute="Normal Text" lineEndContext="#pop" name="BashOneLine" fallthroughContext="Command">

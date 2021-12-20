@@ -10,7 +10,7 @@ target_sources(kquicksyntaxhighlightingplugin PRIVATE
 )
 target_link_libraries(kquicksyntaxhighlightingplugin PRIVATE
     KF5SyntaxHighlighting
-    Qt5::Quick
+    Qt${QT_MAJOR_VERSION}::Quick
 )
 
 install(TARGETS kquicksyntaxhighlightingplugin DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/syntaxhighlighting)

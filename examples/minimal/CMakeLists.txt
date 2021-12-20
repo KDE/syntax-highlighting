@@ -1,4 +1,4 @@
-if(Qt5Widgets_FOUND)
+if(TARGET Qt${QT_MAJOR_VERSION}::Widgets)
     add_executable(minimal main.cpp)
-    target_link_libraries(minimal Qt5::Widgets KF5SyntaxHighlighting)
+    target_link_libraries(minimal Qt${QT_MAJOR_VERSION}::Widgets KF5SyntaxHighlighting)
 endif()

@@ -1,9 +1,9 @@
 add_subdirectory(indexer)
-if(TARGET Qt5::Gui)
+if(TARGET Qt${QT_MAJOR_VERSION}::Gui)
     add_subdirectory(lib)
     add_subdirectory(cli)
 endif()
-if(TARGET Qt5::Quick)
+if(TARGET Qt${QT_MAJOR_VERSION}::Quick)
     add_subdirectory(quick)
 endif()
 

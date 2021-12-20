@@ -40,17 +40,22 @@ set(EXCLUDE_DEPRECATED_BEFORE_AND_AT 0 CACHE STRING "Control the range of deprec
 # Dependencies
 #
 set(REQUIRED_QT_VERSION 5.15.2)
-find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED COMPONENTS Core Network Test)
-option(KSYNTAXHIGHLIGHTING_USE_GUI "Build components depending on Qt5Gui" ON)
+find_package(Qt${QT_MAJOR_VERSION} ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED COMPONENTS Core Network Test)
+option(KSYNTAXHIGHLIGHTING_USE_GUI "Build components depending on QtGui" ON)
 if(KSYNTAXHIGHLIGHTING_USE_GUI)
-    find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED COMPONENTS Gui)
+    find_package(Qt${QT_MAJOR_VERSION} ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED COMPONENTS Gui)
 endif()
-find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE QUIET OPTIONAL_COMPONENTS PrintSupport Widgets XmlPatterns Quick)
-set_package_properties(Qt5 PROPERTIES URL "http://qt-project.org/")
-set_package_properties(Qt5Widgets PROPERTIES PURPOSE "Example application.")
-set_package_properties(Qt5PrintSupport PROPERTIES PURPOSE "Example application.")
-set_package_properties(Qt5XmlPatterns PROPERTIES PURPOSE "Compile-time validation of syntax definition files.")
-set_package_properties(Qt5Quick PROPERTIES PURPOSE "QtQuick bindings.")
+find_package(Qt${QT_MAJOR_VERSION} ${REQUIRED_QT_VERSION} NO_MODULE QUIET OPTIONAL_COMPONENTS PrintSupport Widgets Quick)
+set_package_properties(Qt${QT_MAJOR_VERSION} PROPERTIES URL "http://qt-project.org/")
+set_package_properties(Qt${QT_MAJOR_VERSION}Widgets PROPERTIES PURPOSE "Example application.")
+set_package_properties(Qt${QT_MAJOR_VERSION}PrintSupport PROPERTIES PURPOSE "Example application.")
+set_package_properties(Qt${QT_MAJOR_VERSION}Quick PROPERTIES PURPOSE "QtQuick bindings.")
+
+# QXmlPatters was removed in Qt6
+if (QT_MAJOR_VERSION STREQUAL "5")
+    find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE QUIET OPTIONAL_COMPONENTS XmlPatterns)
+    set_package_properties(Qt5XmlPatterns PROPERTIES PURPOSE "Compile-time validation of syntax definition files.")
+endif()
 
 find_package(Perl REQUIRED)
 set_package_properties(Perl PROPERTIES PURPOSE "Auto-generate PHP syntax definition files.")
@@ -95,7 +100,7 @@ add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0x050f02)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_subdirectory(data)
 add_subdirectory(src)
-if(TARGET Qt5::Gui)
+if(TARGET Qt${QT_MAJOR_VERSION}::Gui)
     add_subdirectory(examples)
     if (BUILD_TESTING)
         add_subdirectory(autotests)
@@ -137,7 +142,7 @@ if(TARGET KF5SyntaxHighlighting)
 endif()
 
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ksyntaxhighlighting_version.h"
-        DESTINATION "${KDE_INSTALL_INCLUDEDIR_KF5}"
+        DESTINATION "${KDE_INSTALL_INCLUDEDIR_KF}"
         COMPONENT Devel)
 
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)

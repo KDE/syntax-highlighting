@@ -63,3 +63,5 @@ end
 /
  /
 / u
+
+/* nested /* comments */ for */ PostgreSQL

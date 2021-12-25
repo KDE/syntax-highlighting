@@ -513,7 +513,7 @@ private:
                             static const QRegularExpression isDot(QStringLiteral(R"(^\(?\.(?:[*+][*+?]?|[*+]|\{1\})?\$?$)"));
                             // remove "(?:" and ")"
                             static const QRegularExpression removeParentheses(QStringLiteral(R"(\((?:\?:)?|\))"));
-                            // remove parentheses on a double from the string
+                            // remove parentheses on a copy of string
                             auto reg = QString(string).replace(removeParentheses, QString());
                             isDotRegex = reg.contains(isDot);
                         }
@@ -995,7 +995,6 @@ private:
                 }
                 success = checkLookAhead(rule) && success;
                 success = checkStringDetect(rule) && success;
-                success = checkAnyChar(rule) && success;
                 success = checkKeyword(definition, rule, referencedKeywords) && success;
                 success = checkRegExpr(filename, rule, context) && success;
                 success = checkDelimiters(definition, rule) && success;
@@ -1475,28 +1474,7 @@ private:
                     qWarning() << rule.filename << "line" << rule.line << "broken regex:" << rule.string << "problem: dynamic=true but no %\\d+ placeholder";
                     return false;
                 }
-            } else {
-                if (rule.string.size() <= 1) {
-                    const auto replacement = rule.insensitive == XmlBool::True ? QStringLiteral("AnyChar") : QStringLiteral("DetectChar");
-                    qWarning() << rule.filename << "line" << rule.line << "StringDetect should be replaced by" << replacement;
-                    return false;
-                }
-
-                if (rule.string.size() <= 2 && rule.insensitive != XmlBool::True) {
-                    qWarning() << rule.filename << "line" << rule.line << "StringDetect should be replaced by Detect2Chars";
-                    return false;
-                }
             }
-        }
-        return true;
-    }
-
-    //! Check that AnyChar contains more that 1 character
-    bool checkAnyChar(const Context::Rule &rule) const
-    {
-        if (rule.type == Context::Rule::Type::AnyChar && rule.string.size() <= 1) {
-            qWarning() << rule.filename << "line" << rule.line << "AnyChar should be replaced by DetectChar";
-            return false;
         }
         return true;
     }

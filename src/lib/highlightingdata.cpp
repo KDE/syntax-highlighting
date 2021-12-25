@@ -44,7 +44,7 @@ static bool checkIsNotEmpty(QStringView str, const char *attrName, const QString
 
 static bool checkIsChar(QStringView str, const char *attrName, const QString &defName, QXmlStreamReader &reader)
 {
-    if (!str.isEmpty()) {
+    if (str.size() == 1) {
         return true;
     }
 
@@ -133,9 +133,27 @@ static void loadRule(const QString &defName, std::vector<HighlightingContextData
         }
         const auto caseSensitivity = attrToCaseSensitivity(attrs.value(QLatin1String("insensitive")));
         const auto dynamic = Xml::attrToBool(attrs.value(QLatin1String("dynamic")));
+        const bool isSensitive = (caseSensitivity == Qt::CaseSensitive);
 
-        initRuleData(rule.data.stringDetect, string.toString(), caseSensitivity, dynamic);
-        rule.type = Rule::Type::StringDetect;
+        // String can be replaced with DetectChar or AnyChar
+        if (!dynamic && string.size() == 1) {
+            QChar c = string.at(0);
+            if (isSensitive || c.toLower() == c.toUpper()) {
+                initRuleData(rule.data.detectChar, c, dynamic);
+                rule.type = Rule::Type::DetectChar;
+            } else {
+                initRuleData(rule.data.anyChar, c.toLower() + c.toUpper());
+                rule.type = Rule::Type::AnyChar;
+            }
+        }
+        // String can be replaced with Detect2Chars
+        else if (isSensitive && !dynamic && string.size() == 2) {
+            initRuleData(rule.data.detect2Chars, string.at(0), string.at(1));
+            rule.type = Rule::Type::Detect2Chars;
+        } else {
+            initRuleData(rule.data.stringDetect, string.toString(), caseSensitivity, dynamic);
+            rule.type = Rule::Type::StringDetect;
+        }
     } else if (name == QLatin1String("WordDetect")) {
         const auto word = attrs.value(QLatin1String("String"));
         if (!checkIsNotEmpty(word, "String", defName, reader)) {
@@ -151,8 +169,14 @@ static void loadRule(const QString &defName, std::vector<HighlightingContextData
             return;
         }
 
-        initRuleData(rule.data.anyChar, chars.toString());
-        rule.type = Rule::Type::AnyChar;
+        // AnyChar can be replaced with DetectChar
+        if (chars.size() == 1) {
+            initRuleData(rule.data.detectChar, chars.at(0), false);
+            rule.type = Rule::Type::DetectChar;
+        } else {
+            initRuleData(rule.data.anyChar, chars.toString());
+            rule.type = Rule::Type::AnyChar;
+        }
     } else if (name == QLatin1String("DetectIdentifier")) {
         rule.type = Rule::Type::DetectIdentifier;
     } else if (name == QLatin1String("LineContinue")) {

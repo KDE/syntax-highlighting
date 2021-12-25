@@ -866,9 +866,5 @@ Definition DefinitionRef::definition() const
 
 bool DefinitionRef::operator==(const DefinitionRef &other) const
 {
-    if (d.expired() != other.d.expired()) {
-        return false;
-    }
-
-    return d.expired() || d.lock().get() == other.d.lock().get();
+    return !d.owner_before(other.d) && !other.d.owner_before(d);
 }

@@ -52,10 +52,9 @@ static bool checkIsChar(QStringView str, const char *attrName, const QString &de
     return false;
 }
 
-static void loadRule(const QString &defName, std::vector<HighlightingContextData::Rule> &rules, QXmlStreamReader &reader)
+static bool loadRule(const QString &defName, HighlightingContextData::Rule &rule, QXmlStreamReader &reader)
 {
     using Rule = HighlightingContextData::Rule;
-    Rule rule;
 
     QStringView name = reader.name();
     const auto attrs = reader.attributes();
@@ -64,7 +63,7 @@ static void loadRule(const QString &defName, std::vector<HighlightingContextData
     if (name == QLatin1String("DetectChar")) {
         const auto s = attrs.value(QLatin1String("char"));
         if (!checkIsChar(s, "char", defName, reader)) {
-            return;
+            return false;
         }
         const QChar c = s.at(0);
         const bool dynamic = Xml::attrToBool(attrs.value(QLatin1String("dynamic")));
@@ -74,7 +73,7 @@ static void loadRule(const QString &defName, std::vector<HighlightingContextData
     } else if (name == QLatin1String("RegExpr")) {
         const auto pattern = attrs.value(QLatin1String("String"));
         if (!checkIsNotEmpty(pattern, "String", defName, reader)) {
-            return;
+            return false;
         }
 
         const auto isCaseInsensitive = attrToCaseSensitivity(attrs.value(QLatin1String("insensitive")));
@@ -86,7 +85,7 @@ static void loadRule(const QString &defName, std::vector<HighlightingContextData
     } else if (name == QLatin1String("IncludeRules")) {
         const auto context = attrs.value(QLatin1String("context"));
         if (!checkIsNotEmpty(context, "context", defName, reader)) {
-            return;
+            return false;
         }
         const bool includeAttribute = Xml::attrToBool(attrs.value(QLatin1String("includeAttrib")));
 
@@ -97,10 +96,10 @@ static void loadRule(const QString &defName, std::vector<HighlightingContextData
         const auto s1 = attrs.value(QLatin1String("char"));
         const auto s2 = attrs.value(QLatin1String("char1"));
         if (!checkIsChar(s1, "char", defName, reader)) {
-            return;
+            return false;
         }
         if (!checkIsChar(s2, "char1", defName, reader)) {
-            return;
+            return false;
         }
 
         initRuleData(rule.data.detect2Chars, s1.at(0), s2.at(0));
@@ -108,7 +107,7 @@ static void loadRule(const QString &defName, std::vector<HighlightingContextData
     } else if (name == QLatin1String("keyword")) {
         const auto s = attrs.value(QLatin1String("String"));
         if (!checkIsNotEmpty(s, "String", defName, reader)) {
-            return;
+            return false;
         }
         Qt::CaseSensitivity caseSensitivityOverride = Qt::CaseInsensitive;
         bool hasCaseSensitivityOverride = false;
@@ -129,7 +128,7 @@ static void loadRule(const QString &defName, std::vector<HighlightingContextData
     } else if (name == QLatin1String("StringDetect")) {
         const auto string = attrs.value(QLatin1String("String"));
         if (!checkIsNotEmpty(string, "String", defName, reader)) {
-            return;
+            return false;
         }
         const auto caseSensitivity = attrToCaseSensitivity(attrs.value(QLatin1String("insensitive")));
         const auto dynamic = Xml::attrToBool(attrs.value(QLatin1String("dynamic")));
@@ -157,7 +156,7 @@ static void loadRule(const QString &defName, std::vector<HighlightingContextData
     } else if (name == QLatin1String("WordDetect")) {
         const auto word = attrs.value(QLatin1String("String"));
         if (!checkIsNotEmpty(word, "String", defName, reader)) {
-            return;
+            return false;
         }
         const auto caseSensitivity = attrToCaseSensitivity(attrs.value(QLatin1String("insensitive")));
 
@@ -166,7 +165,7 @@ static void loadRule(const QString &defName, std::vector<HighlightingContextData
     } else if (name == QLatin1String("AnyChar")) {
         const auto chars = attrs.value(QLatin1String("String"));
         if (!checkIsNotEmpty(chars, "String", defName, reader)) {
-            return;
+            return false;
         }
 
         // AnyChar can be replaced with DetectChar
@@ -197,10 +196,10 @@ static void loadRule(const QString &defName, std::vector<HighlightingContextData
         const auto s1 = attrs.value(QLatin1String("char"));
         const auto s2 = attrs.value(QLatin1String("char1"));
         if (!checkIsChar(s1, "char", defName, reader)) {
-            return;
+            return false;
         }
         if (!checkIsChar(s2, "char1", defName, reader)) {
-            return;
+            return false;
         }
 
         initRuleData(rule.data.rangeDetect, s1.at(0), s2.at(0));
@@ -215,7 +214,7 @@ static void loadRule(const QString &defName, std::vector<HighlightingContextData
         rule.type = Rule::Type::HlCOct;
     } else {
         qCWarning(Log) << "Unknown rule type:" << name;
-        return;
+        return false;
     }
 
     if (!isIncludeRules) {
@@ -232,7 +231,7 @@ static void loadRule(const QString &defName, std::vector<HighlightingContextData
         }
     }
 
-    rules.push_back(std::move(rule));
+    return true;
 }
 
 template<class Data1, class Data2, class Visitor>
@@ -384,7 +383,10 @@ void HighlightingContextData::load(const QString &defName, QXmlStreamReader &rea
     while (!reader.atEnd()) {
         switch (reader.tokenType()) {
         case QXmlStreamReader::StartElement: {
-            loadRule(defName, rules, reader);
+            auto &rule = rules.emplace_back();
+            if (!loadRule(defName, rule, reader)) {
+                rules.pop_back();
+            }
             // be done with this rule, skip all subelements, e.g. no longer supported sub-rules
             reader.skipCurrentElement();
             reader.readNext();

@@ -7,6 +7,7 @@
 <Normal></Normal><br/>
 <Section Header>[Automount]</Section Header><br/>
 <Option Name>Where</Option Name><Normal> = /the/mount/directory</Normal><br/>
+<Option Name>ExtraOptions</Option Name><Normal> = some,extra, mount , options, </Normal><Specifier>%I</Specifier><br/>
 <Option Name>DirectoryMode</Option Name><Normal> = </Normal><File Mode>0755</File Mode><br/>
 <Option Name>TimeoutIdleSec</Option Name><Normal> = </Normal><Number>5</Number><Measurement Unit>min</Measurement Unit><Normal> </Normal><Number>5</Number><Measurement Unit>s</Measurement Unit><br/>
 <Normal></Normal><br/>
@@ -41,6 +42,8 @@
 <Option Name>Unit</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Instance>@instance</Unit Instance><Unit Extension>.service</Unit Extension><br/>
 <Option Name>MakeDirectory</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
 <Option Name>DirectoryMode</Option Name><Normal> = </Normal><File Mode>0700</File Mode><br/>
+<Option Name>TriggerLimitIntervalSec</Option Name><Normal> = </Normal><Number>1</Number><Measurement Unit>min</Measurement Unit><Normal> </Normal><Number>10</Number><Measurement Unit>sec</Measurement Unit><br/>
+<Option Name>TriggerLimitBurst</Option Name><Normal> = </Normal><Number>15</Number><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Section Header>[Service]</Section Header><br/>
@@ -68,6 +71,7 @@
 <Option Name>TimeoutStartFailureMode</Option Name><Normal> = </Normal><Constant>abort</Constant><br/>
 <Option Name>TimeoutStopFailureMode</Option Name><Normal> = </Normal><Constant>kill</Constant><br/>
 <Option Name>RuntimeMaxSec</Option Name><Normal> = </Normal><Number>1</Number><Measurement Unit>min</Measurement Unit><Normal> </Normal><Number>20 </Number><Measurement Unit>seconds</Measurement Unit><br/>
+<Option Name>RuntimeRandomizedExtraSec</Option Name><Normal> = </Normal><Number>12</Number><br/>
 <Option Name>WatchdogSec</Option Name><Normal> = </Normal><Number>90</Number><br/>
 <Option Name>Restart</Option Name><Normal> = </Normal><Constant>on-watchdog</Constant><br/>
 <Option Name>SuccessExitStatus</Option Name><Normal> = </Normal><Constant>PROTOCOL</Constant><Normal> </Normal><Constant>RUNTIME_DIRECTORY</Constant><Normal> </Normal><Continuation>\</Continuation><br/>
@@ -92,6 +96,7 @@
 <Option Name>NoExecPaths</Option Name><Normal> = some/path some/other/path</Normal><br/>
 <Option Name>PrivateIPC</Option Name><Normal> = </Normal><Constant>false</Constant><br/>
 <Comment>## from systemd.exec Paths</Comment><br/>
+<Option Name>ExecSearchPath</Option Name><Normal> = /some/path:/some/other/path</Normal><br/>
 <Option Name>WorkingDirectory</Option Name><Normal> = </Normal><Specifier>~</Specifier><br/>
 <Option Name>RootDirectory</Option Name><Normal> = /some/path</Normal><br/>
 <Option Name>RootImage</Option Name><Normal> = /some/path</Normal><br/>
@@ -116,8 +121,10 @@
 <Option Name>SupplementaryGroups</Option Name><Normal> = group1 group-two </Normal><Number>100</Number><Normal> </Normal><Continuation>\</Continuation><br/>
 <Normal>  one-more-group</Normal><br/>
 <Option Name>PAMName</Option Name><Normal> =</Normal><br/>
-<Option Name>LoadCredential</Option Name><Normal> = some_id /path/to/credential/data</Normal><br/>
-<Option Name>SetCredential</Option Name><Normal> = some_visible_credential</Normal><br/>
+<Option Name>LoadCredential</Option Name><Normal> = some_id:/path/to/credential/data</Normal><br/>
+<Option Name>LoadCredentialEncrypted</Option Name><Normal> = some_id:/path/to/credential/data</Normal><br/>
+<Option Name>SetCredential</Option Name><Normal> = some_id:some_credential</Normal><br/>
+<Option Name>SetCredentialEncrypted</Option Name><Normal> =  some_id:some_encrypted_credential</Normal><br/>
 <Comment>## from systemd.exec Capabilities</Comment><br/>
 <Option Name>CapabilityBoundingSet</Option Name><Normal> = </Normal><Prefix>~</Prefix><Normal> </Normal><Constant>CAP_SYS_ADMIN</Constant><Normal> </Normal><Constant>CAP_DAC_OVERRIDE</Constant><Normal>   </Normal><Constant>CAP_SYS_PTRACE</Constant><Normal> </Normal><Continuation>\</Continuation><br/>
 <Normal>  </Normal><Constant>CAP_NET_ADMIN</Constant><Normal>  </Normal><Constant>CAP_SYS_BOOT</Constant><br/>
@@ -170,7 +177,7 @@
 <Comment>## from systemd.exec Sandboxing</Comment><br/>
 <Option Name>ProtectSystem</Option Name><Normal> = </Normal><Constant>strict</Constant><br/>
 <Option Name>ProtectHome</Option Name><Normal> = </Normal><Constant>read-only</Constant><br/>
-<Option Name>RuntimeDirectory</Option Name><Normal> = some/dir</Normal><br/>
+<Option Name>RuntimeDirectory</Option Name><Normal> = some/dir:some_symlink</Normal><br/>
 <Option Name>StateDirectory</Option Name><Normal> = some/dir</Normal><br/>
 <Option Name>CacheDirectory</Option Name><Normal> = some/dir</Normal><br/>
 <Option Name>LogsDirectory</Option Name><Normal> = some/dir</Normal><br/>
@@ -198,6 +205,8 @@
 <Option Name>ProtectKernelLogs</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
 <Option Name>ProtectControlGroups</Option Name><Normal> = </Normal><Constant>y</Constant><br/>
 <Option Name>RestrictAddressFamilies</Option Name><Normal> = </Normal><Prefix>~</Prefix><Normal> </Normal><Constant>AF_INET</Constant><Normal> </Normal><Constant>AF_VSOCK</Constant><br/>
+<Option Name>RestrictFileSystems</Option Name><Normal> = </Normal><Prefix>~</Prefix><Constant>btrfs</Constant><Normal> </Normal><Constant>ntfs3</Constant><Normal> </Normal><Continuation>\</Continuation><br/>
+<Normal>  </Normal><Constant>@temporary</Constant><br/>
 <Option Name>RestrictNamespaces</Option Name><Normal> = </Normal><Constant>cgroup</Constant><Normal> </Normal><Constant>net</Constant><Normal> </Normal><Continuation>\</Continuation><br/>
 <Normal>  </Normal><Constant>ipc</Constant><br/>
 <Option Name>LockPersonality</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
@@ -240,6 +249,8 @@
 <Option Name>TTYPath</Option Name><Normal> = /dev/console</Normal><br/>
 <Option Name>TTYReset</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
 <Option Name>TTYVHangup</Option Name><Normal> = </Normal><Constant>on</Constant><br/>
+<Option Name>TTYRows</Option Name><Normal> = </Normal><Number>24</Number><br/>
+<Option Name>TTYColumns</Option Name><Normal> = </Normal><Number>80</Number><br/>
 <Option Name>TTYVTDisallocate</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
 <Comment>## from systemd.exec System V Compatibility</Comment><br/>
 <Option Name>UtmpIdentifier</Option Name><Normal> = utid</Normal><br/>
@@ -261,7 +272,9 @@
 <Option Name>CPUQuota</Option Name><Normal> = </Normal><Number>123.4</Number><Measurement Unit>%</Measurement Unit><br/>
 <Option Name>CPUQuotaPeriodSec</Option Name><Normal> = </Normal><Number>1</Number><Measurement Unit>s</Measurement Unit><Normal> </Normal><Number>23</Number><Measurement Unit>ms</Measurement Unit><Normal> </Normal><Number>45</Number><Measurement Unit>us</Measurement Unit><br/>
 <Option Name>AllowedCPUs</Option Name><Normal> = </Normal><Number>0-8</Number><Normal>, </Normal><Number>12</Number><br/>
+<Option Name>StartupAllowedCPUs</Option Name><Normal> = </Normal><Number>0-24</Number><br/>
 <Option Name>AllowedMemoryNodes</Option Name><Normal> = </Normal><Number>5-8</Number><Normal>, </Normal><Number>12</Number><br/>
+<Option Name>StartupAllowedMemoryNodes</Option Name><Normal> = </Normal><Number>5-10</Number><Normal>, </Normal><Number>12</Number><br/>
 <Option Name>MemoryAccounting</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
 <Option Name>MemoryMin</Option Name><Normal> = </Normal><Number>10</Number><Measurement Unit>G</Measurement Unit><br/>
 <Option Name>MemoryLow</Option Name><Normal> = </Normal><Number>20</Number><Measurement Unit>%</Measurement Unit><br/>
@@ -289,6 +302,8 @@
 <Option Name>ManagedOOMMemoryPressure</Option Name><Normal> = </Normal><Constant>kill</Constant><br/>
 <Option Name>ManagedOOMMemoryPressureLimit</Option Name><Normal> = </Normal><Number>50</Number><Measurement Unit>%</Measurement Unit><br/>
 <Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>bind6</Constant><Normal>:/sys/fs/bpf/sock-addr-hook</Normal><br/>
+<Option Name>RestrictNetworkInterfaces</Option Name><Normal> = </Normal><Prefix>~</Prefix><Normal>eth1 eth2</Normal><br/>
+<Normal></Normal><br/>
 <Normal></Normal><br/>
 <Section Header>[Slice]</Section Header><br/>
 <Option Name>CPUAccounting</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
@@ -457,6 +472,9 @@
 <Option Name>ConditionMemory</Option Name><Normal> = </Normal><Prefix>| </Prefix><Normal>>= </Normal><Number>1500000</Number><br/>
 <Option Name>ConditionCPUs</Option Name><Normal> = </Normal><Prefix>| </Prefix><Normal>< </Normal><Number>8</Number><br/>
 <Option Name>ConditionOSRelease</Option Name><Normal> = ID=some-id</Normal><br/>
+<Option Name>ConditionMemoryPressure</Option Name><Normal> = </Normal><Number>20</Number><Normal>%</Normal><Separator>/</Separator><Threshold Time Span>5min</Threshold Time Span><br/>
+<Option Name>ConditionCPUPressure</Option Name><Normal> = </Normal><Number>12</Number><Normal>%</Normal><Separator>/</Separator><Threshold Time Span>10sec</Threshold Time Span><br/>
+<Option Name>ConditionIOPressure</Option Name><Normal> = </Normal><Number>30</Number><Normal>% </Normal><Separator>/</Separator><Normal> </Normal><Threshold Time Span>1min</Threshold Time Span><br/>
 <Option Name>AssertArchitecture</Option Name><Normal> = </Normal><Constant>x86</Constant><br/>
 <Option Name>AssertVirtualization</Option Name><Normal> = </Normal><Prefix>|</Prefix><Constant>vmware</Constant><br/>
 <Option Name>AssertHost</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>shodan</Normal><Wildcard>*</Wildcard><br/>
@@ -482,6 +500,9 @@
 <Option Name>AssertGroup</Option Name><Normal> = </Normal><Prefix>|</Prefix><Normal>groupname</Normal><br/>
 <Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>memory</Constant><br/>
 <Option Name>AssertOSRelease</Option Name><Normal> = ID=some-id</Normal><br/>
+<Option Name>AssertMemoryPressure</Option Name><Normal> = </Normal><Number>20</Number><Normal>%</Normal><Separator>/</Separator><Threshold Time Span>5min</Threshold Time Span><br/>
+<Option Name>AssertCPUPressure</Option Name><Normal> = </Normal><Number>12</Number><Normal>%</Normal><Separator>/</Separator><Threshold Time Span>10sec</Threshold Time Span><br/>
+<Option Name>AssertIOPressure</Option Name><Normal> = </Normal><Number>30</Number><Normal>% </Normal><Separator>/</Separator><Normal> </Normal><Threshold Time Span>1min</Threshold Time Span><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### invalid sections</Comment><br/>
@@ -721,6 +742,21 @@
 <Option Name>AssertPathExistsGlob</Option Name><Normal> = </Normal><Prefix>|!</Prefix><Normal>/s</Normal><Wildcard>[ao]</Wildcard><Normal>me/path</Normal><Wildcard>*</Wildcard><br/>
 <Comment>## invalid values</Comment><br/>
 <Option Name>ConditionPathExistsGlob</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>! /s</Normal><Wildcard>?</Wildcard><Normal>me/path</Normal><Wildcard>*</Wildcard><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Comment>###### AC threshold</Comment><br/>
+<Section Header>[Unit]</Section Header><br/>
+<Comment># there is only a fixed set of time spans to choose from</Comment><br/>
+<Option Name>ConditionMemoryPressure</Option Name><Normal> = </Normal><Number>10</Number><Normal>%</Normal><Separator>/</Separator><Threshold Time Span>10sec</Threshold Time Span><br/>
+<Option Name>ConditionMemoryPressure</Option Name><Normal> = </Normal><Number>20</Number><Normal>%</Normal><Separator>/</Separator><Threshold Time Span>1min</Threshold Time Span><br/>
+<Option Name>ConditionMemoryPressure</Option Name><Normal> = </Normal><Prefix>| !</Prefix><Normal> </Normal><Number>30</Number><Normal> % </Normal><Separator>/</Separator><Normal> </Normal><Threshold Time Span>5min</Threshold Time Span><br/>
+<Comment>## invalid values</Comment><br/>
+<Comment># invalid time span</Comment><br/>
+<Option Name>ConditionMemoryPressure</Option Name><Normal> = </Normal><Number>30</Number><Normal>%</Normal><Separator>/</Separator><Normal>5sec</Normal><br/>
+<Comment># no %</Comment><br/>
+<Option Name>ConditionMemoryPressure</Option Name><Normal> = 30 / 10sec</Normal><br/>
+<Comment># no separator before time span</Comment><br/>
+<Option Name>ConditionMemoryPressure</Option Name><Normal> = </Normal><Number>30</Number><Normal>% 10sec</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### AC user</Comment><br/>
@@ -1370,7 +1406,7 @@
 <Option Name>ExecStart</Option Name><Normal> = cmd1 </Normal><Specifier>%h</Specifier><Normal> arg1_1 </Normal><Environment Variable>$var1</Environment Variable><Normal>, cmd2 </Normal><Specifier>%u</Specifier><Normal> arg2_1 </Normal><Environment Variable>$var2_1</Environment Variable><Continuation>\</Continuation><br/>
 <Normal>  </Normal><Environment Variable>$var2_2</Environment Variable><br/>
 <Comment># escapes (not exactly the same as detected by HlCStringChar)</Comment><br/>
-<Option Name>ExecStart</Option Name><Normal> = cmd </Normal><Escape>\,</Escape><Normal> </Normal><Escape>\'</Escape><Normal> </Normal><Escape>\"</Escape><Normal> </Normal><Escape>\\</Escape><Normal> </Normal><Escape>\a</Escape><Normal> </Normal><Escape>\b</Escape><Normal> </Normal><Escape>\f</Escape><Normal> </Normal><Escape>\n</Escape><Normal> </Normal><Escape>\r</Escape><Normal> </Normal><Escape>\s</Escape><Normal> </Normal><Escape>\t</Escape><Normal> </Normal><Escape>\v</Escape><Normal> </Normal><Escape>\x0A</Escape><Normal> </Normal><Escape>\012</Escape><Normal> </Normal><Escape>\u1234</Escape><Normal> </Normal><Escape>\U12abcdef</Escape><br/>
+<Option Name>ExecStart</Option Name><Normal> = cmd \, </Normal><Escape>\'</Escape><Normal> </Normal><Escape>\"</Escape><Normal> \\ \a </Normal><Escape>\b</Escape><Normal> </Normal><Escape>\f</Escape><Normal> </Normal><Escape>\n</Escape><Normal> </Normal><Escape>\r</Escape><Normal> </Normal><Escape>\s</Escape><Normal> </Normal><Escape>\t</Escape><Normal> </Normal><Escape>\v</Escape><Normal> </Normal><Escape>\x0A</Escape><Normal> </Normal><Escape>\012</Escape><Normal> </Normal><Escape>\u1234</Escape><Normal> </Normal><Escape>\U12abcdef</Escape><br/>
 <Comment># prefix</Comment><br/>
 <Option Name>ExecStart</Option Name><Normal> = </Normal><Prefix>@</Prefix><Normal>/some/cmd arg "@!+-:"</Normal><br/>
 <Option Name>ExecStart</Option Name><Normal> = </Normal><Prefix>-</Prefix><Normal>/some/cmd-1 -option arg</Normal><br/>
@@ -1469,6 +1505,16 @@
 <Option Name>SuccessExitStatus</Option Name><Normal> = -23</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
+<Comment>###### exit type</Comment><br/>
+<Section Header>[Service]</Section Header><br/>
+<Option Name>ExitType</Option Name><Normal> = </Normal><Constant>main</Constant><br/>
+<Option Name>ExitType</Option Name><Normal> = </Normal><Constant>cgroup</Constant><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>ExitType</Option Name><Normal> = invalid</Normal><br/>
+<Comment># multiple values</Comment><br/>
+<Option Name>ExitType</Option Name><Normal> = </Normal><Constant>main</Constant><Normal> cgroup</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
 <Comment>###### failure mode</Comment><br/>
 <Section Header>[Service]</Section Header><br/>
 <Option Name>TimeoutStartFailureMode</Option Name><Normal> = </Normal><Constant>abort</Constant><br/>
@@ -1478,6 +1524,20 @@
 <Option Name>TimeoutStartFailureMode</Option Name><Normal> = invalid</Normal><br/>
 <Comment># multiple values</Comment><br/>
 <Option Name>TimeoutStartFailureMode</Option Name><Normal> = </Normal><Constant>abort</Constant><Normal> kill</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Comment>###### file mode</Comment><br/>
+<Section Header>[Automount]</Section Header><br/>
+<Option Name>DirectoryMode</Option Name><Normal> = </Normal><File Mode>755</File Mode><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>DirectoryMode</Option Name><Normal> = invalid</Normal><br/>
+<Comment># need octal digits</Comment><br/>
+<Option Name>DirectoryMode</Option Name><Normal> = </Normal><File Mode>075</File Mode><Normal>8</Normal><br/>
+<Option Name>DirectoryMode</Option Name><Normal> = </Normal><File Mode>075</File Mode><Normal>A</Normal><br/>
+<Comment># need 3 to 4 octal digits</Comment><br/>
+<Option Name>DirectoryMode</Option Name><Normal> = 07</Normal><br/>
+<Comment># multiple values</Comment><br/>
+<Option Name>DirectoryMode</Option Name><Normal> = </Normal><File Mode>0755</File Mode><Normal> 0755</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### firmware type</Comment><br/>
@@ -1494,6 +1554,21 @@
 <Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Constant>device-tree</Constant><Normal>-compatible()</Normal><br/>
 <Comment># multiple values</Comment><br/>
 <Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Constant>uefi</Constant><Normal> device-tree</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Comment>###### fs set</Comment><br/>
+<Section Header>[Service]</Section Header><br/>
+<Option Name>RestrictFileSystems</Option Name><Normal> = </Normal><Constant>@auxiliary-api</Constant><br/>
+<Option Name>RestrictFileSystems</Option Name><Normal> = </Normal><Constant>@basic-api</Constant><br/>
+<Option Name>RestrictFileSystems</Option Name><Normal> = </Normal><Constant>@common-block</Constant><br/>
+<Option Name>RestrictFileSystems</Option Name><Normal> = </Normal><Constant>@historical-block</Constant><br/>
+<Option Name>RestrictFileSystems</Option Name><Normal> = </Normal><Constant>@known</Constant><br/>
+<Option Name>RestrictFileSystems</Option Name><Normal> = </Normal><Constant>@network</Constant><br/>
+<Option Name>RestrictFileSystems</Option Name><Normal> = </Normal><Constant>@privileged-api</Constant><br/>
+<Option Name>RestrictFileSystems</Option Name><Normal> = </Normal><Constant>@temporary</Constant><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>RestrictFileSystems</Option Name><Normal> = invalid</Normal><br/>
+<Option Name>RestrictFileSystems</Option Name><Normal> = temporary</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### fs type</Comment><br/>
@@ -1521,6 +1596,7 @@
 <Option Name>Type</Option Name><Normal> = </Normal><Constant>nfs</Constant><br/>
 <Option Name>Type</Option Name><Normal> = </Normal><Constant>nilfs2</Constant><br/>
 <Option Name>Type</Option Name><Normal> = </Normal><Constant>ntfs</Constant><br/>
+<Option Name>Type</Option Name><Normal> = </Normal><Constant>ntfs3</Constant><br/>
 <Option Name>Type</Option Name><Normal> = </Normal><Constant>ocfs2</Constant><br/>
 <Option Name>Type</Option Name><Normal> = </Normal><Constant>overlay</Constant><br/>
 <Option Name>Type</Option Name><Normal> = </Normal><Constant>proc</Constant><br/>
@@ -1538,18 +1614,11 @@
 <Option Name>Type</Option Name><Normal> = </Normal><Constant>btrfs</Constant><Normal> ext4</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
-<Comment>###### file mode</Comment><br/>
-<Section Header>[Automount]</Section Header><br/>
-<Option Name>DirectoryMode</Option Name><Normal> = </Normal><File Mode>755</File Mode><br/>
-<Comment>## invalid values</Comment><br/>
-<Option Name>DirectoryMode</Option Name><Normal> = invalid</Normal><br/>
-<Comment># need octal digits</Comment><br/>
-<Option Name>DirectoryMode</Option Name><Normal> = </Normal><File Mode>075</File Mode><Normal>8</Normal><br/>
-<Option Name>DirectoryMode</Option Name><Normal> = </Normal><File Mode>075</File Mode><Normal>A</Normal><br/>
-<Comment># need 3 to 4 octal digits</Comment><br/>
-<Option Name>DirectoryMode</Option Name><Normal> = 07</Normal><br/>
-<Comment># multiple values</Comment><br/>
-<Option Name>DirectoryMode</Option Name><Normal> = </Normal><File Mode>0755</File Mode><Normal> 0755</Normal><br/>
+<Comment>###### fs type set list</Comment><br/>
+<Comment>## list of fs type names and fs set names</Comment><br/>
+<Section Header>[Service]</Section Header><br/>
+<Option Name>RestrictFileSystems</Option Name><Normal> = </Normal><Constant>@auxiliary-api</Constant><Normal> </Normal><Constant>btrfs</Constant><Normal> </Normal><Continuation>\</Continuation><br/>
+<Normal>  </Normal><Constant>nfs</Constant><Normal> </Normal><Constant>@temporary</Constant><Normal> unknown</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### group and user</Comment><br/>
@@ -1586,6 +1655,7 @@
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### io scheduling class</Comment><br/>
+<Comment># see systemd.exec</Comment><br/>
 <Section Header>[Service]</Section Header><br/>
 <Option Name>IOSchedulingClass</Option Name><Normal> = </Normal><Number>0</Number><br/>
 <Option Name>IOSchedulingClass</Option Name><Normal> = </Normal><Number>1</Number><br/>
@@ -1593,16 +1663,17 @@
 <Option Name>IOSchedulingClass</Option Name><Normal> = </Normal><Number>3</Number><br/>
 <Option Name>IOSchedulingClass</Option Name><Normal> = </Normal><Constant>best-effort</Constant><br/>
 <Option Name>IOSchedulingClass</Option Name><Normal> = </Normal><Constant>idle</Constant><br/>
-<Option Name>IOSchedulingClass</Option Name><Normal> = </Normal><Constant>none</Constant><br/>
 <Option Name>IOSchedulingClass</Option Name><Normal> = </Normal><Constant>realtime</Constant><br/>
 <Comment>## invalid values</Comment><br/>
 <Option Name>IOSchedulingClass</Option Name><Normal> = invalid</Normal><br/>
+<Option Name>IOSchedulingClass</Option Name><Normal> = none</Normal><br/>
 <Option Name>IOSchedulingClass</Option Name><Normal> = 4</Normal><br/>
 <Option Name>IOSchedulingClass</Option Name><Normal> = </Normal><Number>1</Number><Normal>23</Normal><br/>
 <Option Name>IOSchedulingClass</Option Name><Normal> = -</Normal><Number>1</Number><br/>
 <Comment># multiple values</Comment><br/>
 <Option Name>IOSchedulingClass</Option Name><Normal> = </Normal><Number>1</Number><Normal> idle</Normal><br/>
-<Option Name>IOSchedulingClass</Option Name><Normal> = </Normal><Constant>idle</Constant><Normal> none</Normal><br/>
+<Option Name>IOSchedulingClass</Option Name><Normal> = </Normal><Constant>idle</Constant><Normal> idle</Normal><br/>
+<Option Name>IOSchedulingClass</Option Name><Normal> = </Normal><Constant>idle</Constant><Normal> 1</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### ip address list</Comment><br/>
@@ -2123,16 +2194,11 @@
 <Option Name>KillSignal</Option Name><Normal> = </Normal><Constant>SIGIOT</Constant><br/>
 <Option Name>KillSignal</Option Name><Normal> = </Normal><Constant>SIGKILL</Constant><br/>
 <Option Name>KillSignal</Option Name><Normal> = </Normal><Constant>SIGLOST</Constant><br/>
-<Option Name>KillSignal</Option Name><Normal> = </Normal><Constant>SIGNAL</Constant><br/>
-<Option Name>KillSignal</Option Name><Normal> = </Normal><Constant>SIGPENDING</Constant><br/>
 <Option Name>KillSignal</Option Name><Normal> = </Normal><Constant>SIGPIPE</Constant><br/>
 <Option Name>KillSignal</Option Name><Normal> = </Normal><Constant>SIGPOLL</Constant><br/>
 <Option Name>KillSignal</Option Name><Normal> = </Normal><Constant>SIGPROF</Constant><br/>
 <Option Name>KillSignal</Option Name><Normal> = </Normal><Constant>SIGPWR</Constant><br/>
-<Option Name>KillSignal</Option Name><Normal> = </Normal><Constant>SIGQUEUE_MAX</Constant><br/>
 <Option Name>KillSignal</Option Name><Normal> = </Normal><Constant>SIGQUIT</Constant><br/>
-<Option Name>KillSignal</Option Name><Normal> = </Normal><Constant>SIGRTMAX</Constant><br/>
-<Option Name>KillSignal</Option Name><Normal> = </Normal><Constant>SIGRTMIN</Constant><br/>
 <Option Name>KillSignal</Option Name><Normal> = </Normal><Constant>SIGSEGV</Constant><br/>
 <Option Name>KillSignal</Option Name><Normal> = </Normal><Constant>SIGSTKFLT</Constant><br/>
 <Option Name>KillSignal</Option Name><Normal> = </Normal><Constant>SIGSTOP</Constant><br/>
@@ -2150,7 +2216,6 @@
 <Option Name>KillSignal</Option Name><Normal> = </Normal><Constant>SIGWINCH</Constant><br/>
 <Option Name>KillSignal</Option Name><Normal> = </Normal><Constant>SIGXCPU</Constant><br/>
 <Option Name>KillSignal</Option Name><Normal> = </Normal><Constant>SIGXFSZ</Constant><br/>
-<Option Name>KillSignal</Option Name><Normal> = </Normal><Constant>SIG_MAX</Constant><br/>
 <Comment>## invalid values</Comment><br/>
 <Option Name>KillSignal</Option Name><Normal> = SIG_INVALID</Normal><br/>
 <Normal></Normal><br/>

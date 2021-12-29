@@ -7,6 +7,7 @@
 
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Automount]</beginfold id='1'>
 Where = /the/mount/directory
+ExtraOptions = some,extra, mount , options, %I
 DirectoryMode = 0755
 TimeoutIdleSec = 5min 5s
 
@@ -41,6 +42,8 @@ DirectoryNotEmpty = /some/absolute/path
 Unit = some@instance.service
 MakeDirectory = yes
 DirectoryMode = 0700
+TriggerLimitIntervalSec = 1min 10sec
+TriggerLimitBurst = 15
 
 
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
@@ -68,6 +71,7 @@ TimeoutSec = 10
 TimeoutStartFailureMode = abort
 TimeoutStopFailureMode = kill
 RuntimeMaxSec = 1min 20 seconds
+RuntimeRandomizedExtraSec = 12
 WatchdogSec = 90
 Restart = on-watchdog
 SuccessExitStatus = PROTOCOL RUNTIME_DIRECTORY \
@@ -92,6 +96,7 @@ IPCNamespacePath = /some/absolute/path
 NoExecPaths = some/path some/other/path
 PrivateIPC = false
 ## from systemd.exec Paths
+ExecSearchPath = /some/path:/some/other/path
 WorkingDirectory = ~
 RootDirectory = /some/path
 RootImage = /some/path
@@ -116,8 +121,10 @@ DynamicUser = true
 SupplementaryGroups = group1 group-two 100 \
   one-more-group
 PAMName =
-LoadCredential = some_id /path/to/credential/data
-SetCredential = some_visible_credential
+LoadCredential = some_id:/path/to/credential/data
+LoadCredentialEncrypted = some_id:/path/to/credential/data
+SetCredential = some_id:some_credential
+SetCredentialEncrypted =  some_id:some_encrypted_credential
 ## from systemd.exec Capabilities
 CapabilityBoundingSet = ~ CAP_SYS_ADMIN CAP_DAC_OVERRIDE   CAP_SYS_PTRACE \
   CAP_NET_ADMIN  CAP_SYS_BOOT
@@ -170,7 +177,7 @@ IOSchedulingPriority = 5
 ## from systemd.exec Sandboxing
 ProtectSystem = strict
 ProtectHome = read-only
-RuntimeDirectory = some/dir
+RuntimeDirectory = some/dir:some_symlink
 StateDirectory = some/dir
 CacheDirectory = some/dir
 LogsDirectory = some/dir
@@ -198,6 +205,8 @@ ProtectKernelModules = true
 ProtectKernelLogs = yes
 ProtectControlGroups = y
 RestrictAddressFamilies = ~ AF_INET AF_VSOCK
+RestrictFileSystems = ~btrfs ntfs3 \
+  @temporary
 RestrictNamespaces = cgroup net \
   ipc
 LockPersonality = yes
@@ -240,6 +249,8 @@ SyslogLevelPrefix = true
 TTYPath = /dev/console
 TTYReset = yes
 TTYVHangup = on
+TTYRows = 24
+TTYColumns = 80
 TTYVTDisallocate = true
 ## from systemd.exec System V Compatibility
 UtmpIdentifier = utid
@@ -261,7 +272,9 @@ StartupCPUWeight = 321
 CPUQuota = 123.4%
 CPUQuotaPeriodSec = 1s 23ms 45us
 AllowedCPUs = 0-8, 12
+StartupAllowedCPUs = 0-24
 AllowedMemoryNodes = 5-8, 12
+StartupAllowedMemoryNodes = 5-10, 12
 MemoryAccounting = yes
 MemoryMin = 10G
 MemoryLow = 20%
@@ -289,6 +302,8 @@ ManagedOOMSwap = auto
 ManagedOOMMemoryPressure = kill
 ManagedOOMMemoryPressureLimit = 50%
 BPFProgram = bind6:/sys/fs/bpf/sock-addr-hook
+RestrictNetworkInterfaces = ~eth1 eth2
+
 
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Slice]</beginfold id='1'>
 CPUAccounting = yes
@@ -457,6 +472,9 @@ ConditionControlGroupController = memory
 ConditionMemory = | >= 1500000
 ConditionCPUs = | < 8
 ConditionOSRelease = ID=some-id
+ConditionMemoryPressure = 20%/5min
+ConditionCPUPressure = 12%/10sec
+ConditionIOPressure = 30% / 1min
 AssertArchitecture = x86
 AssertVirtualization = |vmware
 AssertHost = !shodan*
@@ -482,6 +500,9 @@ AssertUser = |@system
 AssertGroup = |groupname
 AssertControlGroupController = memory
 AssertOSRelease = ID=some-id
+AssertMemoryPressure = 20%/5min
+AssertCPUPressure = 12%/10sec
+AssertIOPressure = 30% / 1min
 
 
 ###### invalid sections
@@ -721,6 +742,21 @@ AssertHost = !! hostname*
 AssertPathExistsGlob = |!/s[ao]me/path*
 ## invalid values
 ConditionPathExistsGlob = !! /s?me/path*
+
+
+###### AC threshold
+<endfold id='1'></endfold id='1'><beginfold id='1'>[Unit]</beginfold id='1'>
+# there is only a fixed set of time spans to choose from
+ConditionMemoryPressure = 10%/10sec
+ConditionMemoryPressure = 20%/1min
+ConditionMemoryPressure = | ! 30 % / 5min
+## invalid values
+# invalid time span
+ConditionMemoryPressure = 30%/5sec
+# no %
+ConditionMemoryPressure = 30 / 10sec
+# no separator before time span
+ConditionMemoryPressure = 30% 10sec
 
 
 ###### AC user
@@ -1469,6 +1505,16 @@ SuccessExitStatus = invalid
 SuccessExitStatus = -23
 
 
+###### exit type
+<endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
+ExitType = main
+ExitType = cgroup
+## invalid values
+ExitType = invalid
+# multiple values
+ExitType = main cgroup
+
+
 ###### failure mode
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
 TimeoutStartFailureMode = abort
@@ -1478,6 +1524,20 @@ TimeoutStartFailureMode = terminate
 TimeoutStartFailureMode = invalid
 # multiple values
 TimeoutStartFailureMode = abort kill
+
+
+###### file mode
+<endfold id='1'></endfold id='1'><beginfold id='1'>[Automount]</beginfold id='1'>
+DirectoryMode = 755
+## invalid values
+DirectoryMode = invalid
+# need octal digits
+DirectoryMode = 0758
+DirectoryMode = 075A
+# need 3 to 4 octal digits
+DirectoryMode = 07
+# multiple values
+DirectoryMode = 0755 0755
 
 
 ###### firmware type
@@ -1494,6 +1554,21 @@ ConditionFirmware = device-tree-compatible
 ConditionFirmware = device-tree-compatible()
 # multiple values
 ConditionFirmware = uefi device-tree
+
+
+###### fs set
+<endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
+RestrictFileSystems = @auxiliary-api
+RestrictFileSystems = @basic-api
+RestrictFileSystems = @common-block
+RestrictFileSystems = @historical-block
+RestrictFileSystems = @known
+RestrictFileSystems = @network
+RestrictFileSystems = @privileged-api
+RestrictFileSystems = @temporary
+## invalid values
+RestrictFileSystems = invalid
+RestrictFileSystems = temporary
 
 
 ###### fs type
@@ -1521,6 +1596,7 @@ Type = msdos
 Type = nfs
 Type = nilfs2
 Type = ntfs
+Type = ntfs3
 Type = ocfs2
 Type = overlay
 Type = proc
@@ -1538,18 +1614,11 @@ Type = invalid ext4
 Type = btrfs ext4
 
 
-###### file mode
-<endfold id='1'></endfold id='1'><beginfold id='1'>[Automount]</beginfold id='1'>
-DirectoryMode = 755
-## invalid values
-DirectoryMode = invalid
-# need octal digits
-DirectoryMode = 0758
-DirectoryMode = 075A
-# need 3 to 4 octal digits
-DirectoryMode = 07
-# multiple values
-DirectoryMode = 0755 0755
+###### fs type set list
+## list of fs type names and fs set names
+<endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
+RestrictFileSystems = @auxiliary-api btrfs \
+  nfs @temporary unknown
 
 
 ###### group and user
@@ -1586,6 +1655,7 @@ SupplementaryGroups = some-name %U some%iname \
 
 
 ###### io scheduling class
+# see systemd.exec
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
 IOSchedulingClass = 0
 IOSchedulingClass = 1
@@ -1593,16 +1663,17 @@ IOSchedulingClass = 2
 IOSchedulingClass = 3
 IOSchedulingClass = best-effort
 IOSchedulingClass = idle
-IOSchedulingClass = none
 IOSchedulingClass = realtime
 ## invalid values
 IOSchedulingClass = invalid
+IOSchedulingClass = none
 IOSchedulingClass = 4
 IOSchedulingClass = 123
 IOSchedulingClass = -1
 # multiple values
 IOSchedulingClass = 1 idle
-IOSchedulingClass = idle none
+IOSchedulingClass = idle idle
+IOSchedulingClass = idle 1
 
 
 ###### ip address list
@@ -2123,16 +2194,11 @@ KillSignal = SIGIO
 KillSignal = SIGIOT
 KillSignal = SIGKILL
 KillSignal = SIGLOST
-KillSignal = SIGNAL
-KillSignal = SIGPENDING
 KillSignal = SIGPIPE
 KillSignal = SIGPOLL
 KillSignal = SIGPROF
 KillSignal = SIGPWR
-KillSignal = SIGQUEUE_MAX
 KillSignal = SIGQUIT
-KillSignal = SIGRTMAX
-KillSignal = SIGRTMIN
 KillSignal = SIGSEGV
 KillSignal = SIGSTKFLT
 KillSignal = SIGSTOP
@@ -2150,7 +2216,6 @@ KillSignal = SIGVTALRM
 KillSignal = SIGWINCH
 KillSignal = SIGXCPU
 KillSignal = SIGXFSZ
-KillSignal = SIG_MAX
 ## invalid values
 KillSignal = SIG_INVALID
 

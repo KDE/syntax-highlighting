@@ -13,6 +13,7 @@
 
 <span style="font-weight:bold;">[Automount]</span>
 <span style="color:#2980b9;">Where</span> = /the/mount/directory
+<span style="color:#2980b9;">ExtraOptions</span> = some,extra, mount , options, <span style="color:#3daee9;">%I</span>
 <span style="color:#2980b9;">DirectoryMode</span> = <span style="color:#f67400;">0755</span>
 <span style="color:#2980b9;">TimeoutIdleSec</span> = <span style="color:#f67400;">5</span><span style="font-style:italic;">min</span> <span style="color:#f67400;">5</span><span style="font-style:italic;">s</span>
 
@@ -47,6 +48,8 @@
 <span style="color:#2980b9;">Unit</span> = <span style="color:#27ae60;">some</span><span style="color:#27ae60;font-weight:bold;">@instance</span><span style="color:#27ae60;font-style:italic;">.service</span>
 <span style="color:#2980b9;">MakeDirectory</span> = <span style="color:#27aeae;font-weight:bold;">yes</span>
 <span style="color:#2980b9;">DirectoryMode</span> = <span style="color:#f67400;">0700</span>
+<span style="color:#2980b9;">TriggerLimitIntervalSec</span> = <span style="color:#f67400;">1</span><span style="font-style:italic;">min</span> <span style="color:#f67400;">10</span><span style="font-style:italic;">sec</span>
+<span style="color:#2980b9;">TriggerLimitBurst</span> = <span style="color:#f67400;">15</span>
 
 
 <span style="font-weight:bold;">[Service]</span>
@@ -74,6 +77,7 @@
 <span style="color:#2980b9;">TimeoutStartFailureMode</span> = <span style="color:#27aeae;font-weight:bold;">abort</span>
 <span style="color:#2980b9;">TimeoutStopFailureMode</span> = <span style="color:#27aeae;font-weight:bold;">kill</span>
 <span style="color:#2980b9;">RuntimeMaxSec</span> = <span style="color:#f67400;">1</span><span style="font-style:italic;">min</span> <span style="color:#f67400;">20 </span><span style="font-style:italic;">seconds</span>
+<span style="color:#2980b9;">RuntimeRandomizedExtraSec</span> = <span style="color:#f67400;">12</span>
 <span style="color:#2980b9;">WatchdogSec</span> = <span style="color:#f67400;">90</span>
 <span style="color:#2980b9;">Restart</span> = <span style="color:#27aeae;font-weight:bold;">on-watchdog</span>
 <span style="color:#2980b9;">SuccessExitStatus</span> = <span style="color:#27aeae;font-weight:bold;">PROTOCOL</span> <span style="color:#27aeae;font-weight:bold;">RUNTIME_DIRECTORY</span> <span style="color:#fdbc4b;font-weight:bold;">\</span>
@@ -98,6 +102,7 @@
 <span style="color:#2980b9;">NoExecPaths</span> = some/path some/other/path
 <span style="color:#2980b9;">PrivateIPC</span> = <span style="color:#27aeae;font-weight:bold;">false</span>
 <span style="color:#7a7c7d;">## from systemd.exec Paths</span>
+<span style="color:#2980b9;">ExecSearchPath</span> = /some/path:/some/other/path
 <span style="color:#2980b9;">WorkingDirectory</span> = <span style="color:#3daee9;">~</span>
 <span style="color:#2980b9;">RootDirectory</span> = /some/path
 <span style="color:#2980b9;">RootImage</span> = /some/path
@@ -122,8 +127,10 @@
 <span style="color:#2980b9;">SupplementaryGroups</span> = group1 group-two <span style="color:#f67400;">100</span> <span style="color:#fdbc4b;font-weight:bold;">\</span>
   one-more-group
 <span style="color:#2980b9;">PAMName</span> =
-<span style="color:#2980b9;">LoadCredential</span> = some_id /path/to/credential/data
-<span style="color:#2980b9;">SetCredential</span> = some_visible_credential
+<span style="color:#2980b9;">LoadCredential</span> = some_id:/path/to/credential/data
+<span style="color:#2980b9;">LoadCredentialEncrypted</span> = some_id:/path/to/credential/data
+<span style="color:#2980b9;">SetCredential</span> = some_id:some_credential
+<span style="color:#2980b9;">SetCredentialEncrypted</span> =  some_id:some_encrypted_credential
 <span style="color:#7a7c7d;">## from systemd.exec Capabilities</span>
 <span style="color:#2980b9;">CapabilityBoundingSet</span> = <span style="color:#da4453;">~</span> <span style="color:#27aeae;font-weight:bold;">CAP_SYS_ADMIN</span> <span style="color:#27aeae;font-weight:bold;">CAP_DAC_OVERRIDE</span>   <span style="color:#27aeae;font-weight:bold;">CAP_SYS_PTRACE</span> <span style="color:#fdbc4b;font-weight:bold;">\</span>
   <span style="color:#27aeae;font-weight:bold;">CAP_NET_ADMIN</span>  <span style="color:#27aeae;font-weight:bold;">CAP_SYS_BOOT</span>
@@ -176,7 +183,7 @@
 <span style="color:#7a7c7d;">## from systemd.exec Sandboxing</span>
 <span style="color:#2980b9;">ProtectSystem</span> = <span style="color:#27aeae;font-weight:bold;">strict</span>
 <span style="color:#2980b9;">ProtectHome</span> = <span style="color:#27aeae;font-weight:bold;">read-only</span>
-<span style="color:#2980b9;">RuntimeDirectory</span> = some/dir
+<span style="color:#2980b9;">RuntimeDirectory</span> = some/dir:some_symlink
 <span style="color:#2980b9;">StateDirectory</span> = some/dir
 <span style="color:#2980b9;">CacheDirectory</span> = some/dir
 <span style="color:#2980b9;">LogsDirectory</span> = some/dir
@@ -204,6 +211,8 @@
 <span style="color:#2980b9;">ProtectKernelLogs</span> = <span style="color:#27aeae;font-weight:bold;">yes</span>
 <span style="color:#2980b9;">ProtectControlGroups</span> = <span style="color:#27aeae;font-weight:bold;">y</span>
 <span style="color:#2980b9;">RestrictAddressFamilies</span> = <span style="color:#da4453;">~</span> <span style="color:#27aeae;font-weight:bold;">AF_INET</span> <span style="color:#27aeae;font-weight:bold;">AF_VSOCK</span>
+<span style="color:#2980b9;">RestrictFileSystems</span> = <span style="color:#da4453;">~</span><span style="color:#27aeae;font-weight:bold;">btrfs</span> <span style="color:#27aeae;font-weight:bold;">ntfs3</span> <span style="color:#fdbc4b;font-weight:bold;">\</span>
+  <span style="color:#27aeae;font-weight:bold;">@temporary</span>
 <span style="color:#2980b9;">RestrictNamespaces</span> = <span style="color:#27aeae;font-weight:bold;">cgroup</span> <span style="color:#27aeae;font-weight:bold;">net</span> <span style="color:#fdbc4b;font-weight:bold;">\</span>
   <span style="color:#27aeae;font-weight:bold;">ipc</span>
 <span style="color:#2980b9;">LockPersonality</span> = <span style="color:#27aeae;font-weight:bold;">yes</span>
@@ -246,6 +255,8 @@
 <span style="color:#2980b9;">TTYPath</span> = /dev/console
 <span style="color:#2980b9;">TTYReset</span> = <span style="color:#27aeae;font-weight:bold;">yes</span>
 <span style="color:#2980b9;">TTYVHangup</span> = <span style="color:#27aeae;font-weight:bold;">on</span>
+<span style="color:#2980b9;">TTYRows</span> = <span style="color:#f67400;">24</span>
+<span style="color:#2980b9;">TTYColumns</span> = <span style="color:#f67400;">80</span>
 <span style="color:#2980b9;">TTYVTDisallocate</span> = <span style="color:#27aeae;font-weight:bold;">true</span>
 <span style="color:#7a7c7d;">## from systemd.exec System V Compatibility</span>
 <span style="color:#2980b9;">UtmpIdentifier</span> = utid
@@ -267,7 +278,9 @@
 <span style="color:#2980b9;">CPUQuota</span> = <span style="color:#f67400;">123.4</span><span style="font-style:italic;">%</span>
 <span style="color:#2980b9;">CPUQuotaPeriodSec</span> = <span style="color:#f67400;">1</span><span style="font-style:italic;">s</span> <span style="color:#f67400;">23</span><span style="font-style:italic;">ms</span> <span style="color:#f67400;">45</span><span style="font-style:italic;">us</span>
 <span style="color:#2980b9;">AllowedCPUs</span> = <span style="color:#f67400;">0-8</span>, <span style="color:#f67400;">12</span>
+<span style="color:#2980b9;">StartupAllowedCPUs</span> = <span style="color:#f67400;">0-24</span>
 <span style="color:#2980b9;">AllowedMemoryNodes</span> = <span style="color:#f67400;">5-8</span>, <span style="color:#f67400;">12</span>
+<span style="color:#2980b9;">StartupAllowedMemoryNodes</span> = <span style="color:#f67400;">5-10</span>, <span style="color:#f67400;">12</span>
 <span style="color:#2980b9;">MemoryAccounting</span> = <span style="color:#27aeae;font-weight:bold;">yes</span>
 <span style="color:#2980b9;">MemoryMin</span> = <span style="color:#f67400;">10</span><span style="font-style:italic;">G</span>
 <span style="color:#2980b9;">MemoryLow</span> = <span style="color:#f67400;">20</span><span style="font-style:italic;">%</span>
@@ -295,6 +308,8 @@
 <span style="color:#2980b9;">ManagedOOMMemoryPressure</span> = <span style="color:#27aeae;font-weight:bold;">kill</span>
 <span style="color:#2980b9;">ManagedOOMMemoryPressureLimit</span> = <span style="color:#f67400;">50</span><span style="font-style:italic;">%</span>
 <span style="color:#2980b9;">BPFProgram</span> = <span style="color:#27aeae;font-weight:bold;">bind6</span>:/sys/fs/bpf/sock-addr-hook
+<span style="color:#2980b9;">RestrictNetworkInterfaces</span> = <span style="color:#da4453;">~</span>eth1 eth2
+
 
 <span style="font-weight:bold;">[Slice]</span>
 <span style="color:#2980b9;">CPUAccounting</span> = <span style="color:#27aeae;font-weight:bold;">yes</span>
@@ -463,6 +478,9 @@
 <span style="color:#2980b9;">ConditionMemory</span> = <span style="color:#da4453;">| </span>&gt;= <span style="color:#f67400;">1500000</span>
 <span style="color:#2980b9;">ConditionCPUs</span> = <span style="color:#da4453;">| </span>&lt; <span style="color:#f67400;">8</span>
 <span style="color:#2980b9;">ConditionOSRelease</span> = ID=some-id
+<span style="color:#2980b9;">ConditionMemoryPressure</span> = <span style="color:#f67400;">20</span>%<span style="color:#da4453;">/</span><span style="color:#27aeae;font-weight:bold;font-style:italic;">5min</span>
+<span style="color:#2980b9;">ConditionCPUPressure</span> = <span style="color:#f67400;">12</span>%<span style="color:#da4453;">/</span><span style="color:#27aeae;font-weight:bold;font-style:italic;">10sec</span>
+<span style="color:#2980b9;">ConditionIOPressure</span> = <span style="color:#f67400;">30</span>% <span style="color:#da4453;">/</span> <span style="color:#27aeae;font-weight:bold;font-style:italic;">1min</span>
 <span style="color:#2980b9;">AssertArchitecture</span> = <span style="color:#27aeae;font-weight:bold;">x86</span>
 <span style="color:#2980b9;">AssertVirtualization</span> = <span style="color:#da4453;">|</span><span style="color:#27aeae;font-weight:bold;">vmware</span>
 <span style="color:#2980b9;">AssertHost</span> = <span style="color:#da4453;">!</span>shodan<span style="color:#3daee9;">*</span>
@@ -488,6 +506,9 @@
 <span style="color:#2980b9;">AssertGroup</span> = <span style="color:#da4453;">|</span>groupname
 <span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">memory</span>
 <span style="color:#2980b9;">AssertOSRelease</span> = ID=some-id
+<span style="color:#2980b9;">AssertMemoryPressure</span> = <span style="color:#f67400;">20</span>%<span style="color:#da4453;">/</span><span style="color:#27aeae;font-weight:bold;font-style:italic;">5min</span>
+<span style="color:#2980b9;">AssertCPUPressure</span> = <span style="color:#f67400;">12</span>%<span style="color:#da4453;">/</span><span style="color:#27aeae;font-weight:bold;font-style:italic;">10sec</span>
+<span style="color:#2980b9;">AssertIOPressure</span> = <span style="color:#f67400;">30</span>% <span style="color:#da4453;">/</span> <span style="color:#27aeae;font-weight:bold;font-style:italic;">1min</span>
 
 
 <span style="color:#7a7c7d;">###### invalid sections</span>
@@ -727,6 +748,21 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">AssertPathExistsGlob</span> = <span style="color:#da4453;">|!</span>/s<span style="color:#3daee9;">[ao]</span>me/path<span style="color:#3daee9;">*</span>
 <span style="color:#7a7c7d;">## invalid values</span>
 <span style="color:#2980b9;">ConditionPathExistsGlob</span> = <span style="color:#da4453;">!</span>! /s<span style="color:#3daee9;">?</span>me/path<span style="color:#3daee9;">*</span>
+
+
+<span style="color:#7a7c7d;">###### AC threshold</span>
+<span style="font-weight:bold;">[Unit]</span>
+<span style="color:#7a7c7d;"># there is only a fixed set of time spans to choose from</span>
+<span style="color:#2980b9;">ConditionMemoryPressure</span> = <span style="color:#f67400;">10</span>%<span style="color:#da4453;">/</span><span style="color:#27aeae;font-weight:bold;font-style:italic;">10sec</span>
+<span style="color:#2980b9;">ConditionMemoryPressure</span> = <span style="color:#f67400;">20</span>%<span style="color:#da4453;">/</span><span style="color:#27aeae;font-weight:bold;font-style:italic;">1min</span>
+<span style="color:#2980b9;">ConditionMemoryPressure</span> = <span style="color:#da4453;">| !</span> <span style="color:#f67400;">30</span> % <span style="color:#da4453;">/</span> <span style="color:#27aeae;font-weight:bold;font-style:italic;">5min</span>
+<span style="color:#7a7c7d;">## invalid values</span>
+<span style="color:#7a7c7d;"># invalid time span</span>
+<span style="color:#2980b9;">ConditionMemoryPressure</span> = <span style="color:#f67400;">30</span>%<span style="color:#da4453;">/</span>5sec
+<span style="color:#7a7c7d;"># no %</span>
+<span style="color:#2980b9;">ConditionMemoryPressure</span> = 30 / 10sec
+<span style="color:#7a7c7d;"># no separator before time span</span>
+<span style="color:#2980b9;">ConditionMemoryPressure</span> = <span style="color:#f67400;">30</span>% 10sec
 
 
 <span style="color:#7a7c7d;">###### AC user</span>
@@ -1376,7 +1412,7 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">ExecStart</span> = cmd1 <span style="color:#3daee9;">%h</span> arg1_1 <span style="color:#27aeae;">$var1</span>, cmd2 <span style="color:#3daee9;">%u</span> arg2_1 <span style="color:#27aeae;">$var2_1</span><span style="color:#fdbc4b;font-weight:bold;">\</span>
   <span style="color:#27aeae;">$var2_2</span>
 <span style="color:#7a7c7d;"># escapes (not exactly the same as detected by HlCStringChar)</span>
-<span style="color:#2980b9;">ExecStart</span> = cmd <span style="color:#3daee9;">\,</span> <span style="color:#3daee9;">\'</span> <span style="color:#3daee9;">\&quot;</span> <span style="color:#3daee9;">\\</span> <span style="color:#3daee9;">\a</span> <span style="color:#3daee9;">\b</span> <span style="color:#3daee9;">\f</span> <span style="color:#3daee9;">\n</span> <span style="color:#3daee9;">\r</span> <span style="color:#3daee9;">\s</span> <span style="color:#3daee9;">\t</span> <span style="color:#3daee9;">\v</span> <span style="color:#3daee9;">\x0A</span> <span style="color:#3daee9;">\012</span> <span style="color:#3daee9;">\u1234</span> <span style="color:#3daee9;">\U12abcdef</span>
+<span style="color:#2980b9;">ExecStart</span> = cmd \, <span style="color:#3daee9;">\'</span> <span style="color:#3daee9;">\&quot;</span> \\ \a <span style="color:#3daee9;">\b</span> <span style="color:#3daee9;">\f</span> <span style="color:#3daee9;">\n</span> <span style="color:#3daee9;">\r</span> <span style="color:#3daee9;">\s</span> <span style="color:#3daee9;">\t</span> <span style="color:#3daee9;">\v</span> <span style="color:#3daee9;">\x0A</span> <span style="color:#3daee9;">\012</span> <span style="color:#3daee9;">\u1234</span> <span style="color:#3daee9;">\U12abcdef</span>
 <span style="color:#7a7c7d;"># prefix</span>
 <span style="color:#2980b9;">ExecStart</span> = <span style="color:#da4453;">@</span>/some/cmd arg &quot;@!+-:&quot;
 <span style="color:#2980b9;">ExecStart</span> = <span style="color:#da4453;">-</span>/some/cmd-1 -option arg
@@ -1475,6 +1511,16 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">SuccessExitStatus</span> = -23
 
 
+<span style="color:#7a7c7d;">###### exit type</span>
+<span style="font-weight:bold;">[Service]</span>
+<span style="color:#2980b9;">ExitType</span> = <span style="color:#27aeae;font-weight:bold;">main</span>
+<span style="color:#2980b9;">ExitType</span> = <span style="color:#27aeae;font-weight:bold;">cgroup</span>
+<span style="color:#7a7c7d;">## invalid values</span>
+<span style="color:#2980b9;">ExitType</span> = invalid
+<span style="color:#7a7c7d;"># multiple values</span>
+<span style="color:#2980b9;">ExitType</span> = <span style="color:#27aeae;font-weight:bold;">main</span> cgroup
+
+
 <span style="color:#7a7c7d;">###### failure mode</span>
 <span style="font-weight:bold;">[Service]</span>
 <span style="color:#2980b9;">TimeoutStartFailureMode</span> = <span style="color:#27aeae;font-weight:bold;">abort</span>
@@ -1484,6 +1530,20 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">TimeoutStartFailureMode</span> = invalid
 <span style="color:#7a7c7d;"># multiple values</span>
 <span style="color:#2980b9;">TimeoutStartFailureMode</span> = <span style="color:#27aeae;font-weight:bold;">abort</span> kill
+
+
+<span style="color:#7a7c7d;">###### file mode</span>
+<span style="font-weight:bold;">[Automount]</span>
+<span style="color:#2980b9;">DirectoryMode</span> = <span style="color:#f67400;">755</span>
+<span style="color:#7a7c7d;">## invalid values</span>
+<span style="color:#2980b9;">DirectoryMode</span> = invalid
+<span style="color:#7a7c7d;"># need octal digits</span>
+<span style="color:#2980b9;">DirectoryMode</span> = <span style="color:#f67400;">075</span>8
+<span style="color:#2980b9;">DirectoryMode</span> = <span style="color:#f67400;">075</span>A
+<span style="color:#7a7c7d;"># need 3 to 4 octal digits</span>
+<span style="color:#2980b9;">DirectoryMode</span> = 07
+<span style="color:#7a7c7d;"># multiple values</span>
+<span style="color:#2980b9;">DirectoryMode</span> = <span style="color:#f67400;">0755</span> 0755
 
 
 <span style="color:#7a7c7d;">###### firmware type</span>
@@ -1500,6 +1560,21 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">ConditionFirmware</span> = <span style="color:#27aeae;font-weight:bold;">device-tree</span>-compatible()
 <span style="color:#7a7c7d;"># multiple values</span>
 <span style="color:#2980b9;">ConditionFirmware</span> = <span style="color:#27aeae;font-weight:bold;">uefi</span> device-tree
+
+
+<span style="color:#7a7c7d;">###### fs set</span>
+<span style="font-weight:bold;">[Service]</span>
+<span style="color:#2980b9;">RestrictFileSystems</span> = <span style="color:#27aeae;font-weight:bold;">@auxiliary-api</span>
+<span style="color:#2980b9;">RestrictFileSystems</span> = <span style="color:#27aeae;font-weight:bold;">@basic-api</span>
+<span style="color:#2980b9;">RestrictFileSystems</span> = <span style="color:#27aeae;font-weight:bold;">@common-block</span>
+<span style="color:#2980b9;">RestrictFileSystems</span> = <span style="color:#27aeae;font-weight:bold;">@historical-block</span>
+<span style="color:#2980b9;">RestrictFileSystems</span> = <span style="color:#27aeae;font-weight:bold;">@known</span>
+<span style="color:#2980b9;">RestrictFileSystems</span> = <span style="color:#27aeae;font-weight:bold;">@network</span>
+<span style="color:#2980b9;">RestrictFileSystems</span> = <span style="color:#27aeae;font-weight:bold;">@privileged-api</span>
+<span style="color:#2980b9;">RestrictFileSystems</span> = <span style="color:#27aeae;font-weight:bold;">@temporary</span>
+<span style="color:#7a7c7d;">## invalid values</span>
+<span style="color:#2980b9;">RestrictFileSystems</span> = invalid
+<span style="color:#2980b9;">RestrictFileSystems</span> = temporary
 
 
 <span style="color:#7a7c7d;">###### fs type</span>
@@ -1527,6 +1602,7 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">Type</span> = <span style="color:#27aeae;font-weight:bold;">nfs</span>
 <span style="color:#2980b9;">Type</span> = <span style="color:#27aeae;font-weight:bold;">nilfs2</span>
 <span style="color:#2980b9;">Type</span> = <span style="color:#27aeae;font-weight:bold;">ntfs</span>
+<span style="color:#2980b9;">Type</span> = <span style="color:#27aeae;font-weight:bold;">ntfs3</span>
 <span style="color:#2980b9;">Type</span> = <span style="color:#27aeae;font-weight:bold;">ocfs2</span>
 <span style="color:#2980b9;">Type</span> = <span style="color:#27aeae;font-weight:bold;">overlay</span>
 <span style="color:#2980b9;">Type</span> = <span style="color:#27aeae;font-weight:bold;">proc</span>
@@ -1544,18 +1620,11 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">Type</span> = <span style="color:#27aeae;font-weight:bold;">btrfs</span> ext4
 
 
-<span style="color:#7a7c7d;">###### file mode</span>
-<span style="font-weight:bold;">[Automount]</span>
-<span style="color:#2980b9;">DirectoryMode</span> = <span style="color:#f67400;">755</span>
-<span style="color:#7a7c7d;">## invalid values</span>
-<span style="color:#2980b9;">DirectoryMode</span> = invalid
-<span style="color:#7a7c7d;"># need octal digits</span>
-<span style="color:#2980b9;">DirectoryMode</span> = <span style="color:#f67400;">075</span>8
-<span style="color:#2980b9;">DirectoryMode</span> = <span style="color:#f67400;">075</span>A
-<span style="color:#7a7c7d;"># need 3 to 4 octal digits</span>
-<span style="color:#2980b9;">DirectoryMode</span> = 07
-<span style="color:#7a7c7d;"># multiple values</span>
-<span style="color:#2980b9;">DirectoryMode</span> = <span style="color:#f67400;">0755</span> 0755
+<span style="color:#7a7c7d;">###### fs type set list</span>
+<span style="color:#7a7c7d;">## list of fs type names and fs set names</span>
+<span style="font-weight:bold;">[Service]</span>
+<span style="color:#2980b9;">RestrictFileSystems</span> = <span style="color:#27aeae;font-weight:bold;">@auxiliary-api</span> <span style="color:#27aeae;font-weight:bold;">btrfs</span> <span style="color:#fdbc4b;font-weight:bold;">\</span>
+  <span style="color:#27aeae;font-weight:bold;">nfs</span> <span style="color:#27aeae;font-weight:bold;">@temporary</span> unknown
 
 
 <span style="color:#7a7c7d;">###### group and user</span>
@@ -1592,6 +1661,7 @@ WantedBy = some.service some.socket
 
 
 <span style="color:#7a7c7d;">###### io scheduling class</span>
+<span style="color:#7a7c7d;"># see systemd.exec</span>
 <span style="font-weight:bold;">[Service]</span>
 <span style="color:#2980b9;">IOSchedulingClass</span> = <span style="color:#f67400;">0</span>
 <span style="color:#2980b9;">IOSchedulingClass</span> = <span style="color:#f67400;">1</span>
@@ -1599,16 +1669,17 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">IOSchedulingClass</span> = <span style="color:#f67400;">3</span>
 <span style="color:#2980b9;">IOSchedulingClass</span> = <span style="color:#27aeae;font-weight:bold;">best-effort</span>
 <span style="color:#2980b9;">IOSchedulingClass</span> = <span style="color:#27aeae;font-weight:bold;">idle</span>
-<span style="color:#2980b9;">IOSchedulingClass</span> = <span style="color:#27aeae;font-weight:bold;">none</span>
 <span style="color:#2980b9;">IOSchedulingClass</span> = <span style="color:#27aeae;font-weight:bold;">realtime</span>
 <span style="color:#7a7c7d;">## invalid values</span>
 <span style="color:#2980b9;">IOSchedulingClass</span> = invalid
+<span style="color:#2980b9;">IOSchedulingClass</span> = none
 <span style="color:#2980b9;">IOSchedulingClass</span> = 4
 <span style="color:#2980b9;">IOSchedulingClass</span> = <span style="color:#f67400;">1</span>23
 <span style="color:#2980b9;">IOSchedulingClass</span> = -<span style="color:#f67400;">1</span>
 <span style="color:#7a7c7d;"># multiple values</span>
 <span style="color:#2980b9;">IOSchedulingClass</span> = <span style="color:#f67400;">1</span> idle
-<span style="color:#2980b9;">IOSchedulingClass</span> = <span style="color:#27aeae;font-weight:bold;">idle</span> none
+<span style="color:#2980b9;">IOSchedulingClass</span> = <span style="color:#27aeae;font-weight:bold;">idle</span> idle
+<span style="color:#2980b9;">IOSchedulingClass</span> = <span style="color:#27aeae;font-weight:bold;">idle</span> 1
 
 
 <span style="color:#7a7c7d;">###### ip address list</span>
@@ -2129,16 +2200,11 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">KillSignal</span> = <span style="color:#27aeae;font-weight:bold;">SIGIOT</span>
 <span style="color:#2980b9;">KillSignal</span> = <span style="color:#27aeae;font-weight:bold;">SIGKILL</span>
 <span style="color:#2980b9;">KillSignal</span> = <span style="color:#27aeae;font-weight:bold;">SIGLOST</span>
-<span style="color:#2980b9;">KillSignal</span> = <span style="color:#27aeae;font-weight:bold;">SIGNAL</span>
-<span style="color:#2980b9;">KillSignal</span> = <span style="color:#27aeae;font-weight:bold;">SIGPENDING</span>
 <span style="color:#2980b9;">KillSignal</span> = <span style="color:#27aeae;font-weight:bold;">SIGPIPE</span>
 <span style="color:#2980b9;">KillSignal</span> = <span style="color:#27aeae;font-weight:bold;">SIGPOLL</span>
 <span style="color:#2980b9;">KillSignal</span> = <span style="color:#27aeae;font-weight:bold;">SIGPROF</span>
 <span style="color:#2980b9;">KillSignal</span> = <span style="color:#27aeae;font-weight:bold;">SIGPWR</span>
-<span style="color:#2980b9;">KillSignal</span> = <span style="color:#27aeae;font-weight:bold;">SIGQUEUE_MAX</span>
 <span style="color:#2980b9;">KillSignal</span> = <span style="color:#27aeae;font-weight:bold;">SIGQUIT</span>
-<span style="color:#2980b9;">KillSignal</span> = <span style="color:#27aeae;font-weight:bold;">SIGRTMAX</span>
-<span style="color:#2980b9;">KillSignal</span> = <span style="color:#27aeae;font-weight:bold;">SIGRTMIN</span>
 <span style="color:#2980b9;">KillSignal</span> = <span style="color:#27aeae;font-weight:bold;">SIGSEGV</span>
 <span style="color:#2980b9;">KillSignal</span> = <span style="color:#27aeae;font-weight:bold;">SIGSTKFLT</span>
 <span style="color:#2980b9;">KillSignal</span> = <span style="color:#27aeae;font-weight:bold;">SIGSTOP</span>
@@ -2156,7 +2222,6 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">KillSignal</span> = <span style="color:#27aeae;font-weight:bold;">SIGWINCH</span>
 <span style="color:#2980b9;">KillSignal</span> = <span style="color:#27aeae;font-weight:bold;">SIGXCPU</span>
 <span style="color:#2980b9;">KillSignal</span> = <span style="color:#27aeae;font-weight:bold;">SIGXFSZ</span>
-<span style="color:#2980b9;">KillSignal</span> = <span style="color:#27aeae;font-weight:bold;">SIG_MAX</span>
 <span style="color:#7a7c7d;">## invalid values</span>
 <span style="color:#2980b9;">KillSignal</span> = SIG_INVALID
 

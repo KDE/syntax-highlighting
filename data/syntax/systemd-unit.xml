@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created for systemd version 249. -->
+<!-- Created for systemd version 250. -->
 <!DOCTYPE language SYSTEM "language.dtd" [
 <!ENTITY alp "A-Za-z">
 <!ENTITY aln "&alp;0-9">
@@ -22,7 +22,7 @@
 <!ENTITY tsp_unit "&tsp_year;|&tsp_month;|&tsp_week;|&tsp_day;|&tsp_hour;|&tsp_sec;|&tsp_msec;|&tsp_usec;|&tsp_min;">
 <!ENTITY tsp "\d+(?:\.\d+)?\h*(?=(&tsp_unit;)?)">
 ]>
-<language author="Andreas Gratzer" extensions="*.automount;*.device;*.mount;*.path;*.service;*.slice;*.socket;*.swap;*.target;*.timer" kateversion="5.0" license="MIT" mimetype="text/x-systemd-unit" name="systemd unit" section="Configuration" version="7">
+<language author="Andreas Gratzer" extensions="*.automount;*.device;*.mount;*.path;*.service;*.slice;*.socket;*.swap;*.target;*.timer" kateversion="5.0" license="MIT" mimetype="text/x-systemd-unit" name="systemd unit" section="Configuration" version="8">
   <highlighting>
     <list name="boolean">
       <!-- 0, 1, t, f, y, n are also valid, but handled using AnyChar. -->
@@ -491,10 +491,24 @@
       <item>APPARMOR</item>
       <item>ADDRESS_FAMILIES</item>
     </list>
+    <list name="exit type">
+      <item>main</item>
+      <item>cgroup</item>
+    </list>
     <list name="failure mode">
       <item>terminate</item>
       <item>kill</item>
       <item>abort</item>
+    </list>
+    <list name="fs set">
+      <item>@temporary</item>
+      <item>@privileged-api</item>
+      <item>@network</item>
+      <item>@known</item>
+      <item>@historical-block</item>
+      <item>@common-block</item>
+      <item>@basic-api</item>
+      <item>@auxiliary-api</item>
     </list>
     <list name="fs type">
       <item>xfs</item>
@@ -507,6 +521,7 @@
       <item>proc</item>
       <item>overlay</item>
       <item>ocfs2</item>
+      <item>ntfs3</item>
       <item>ntfs</item>
       <item>nilfs2</item>
       <item>nfs</item>
@@ -530,6 +545,11 @@
       <item>btrfs</item>
       <item>binfmt_misc</item>
     </list>
+    <list name="io scheduling class">
+      <item>realtime</item>
+      <item>idle</item>
+      <item>best-effort</item>
+    </list>
     <list name="ip address name">
       <item>multicast</item>
       <item>localhost</item>
@@ -540,12 +560,6 @@
       <item>ipv6-only</item>
       <item>default</item>
       <item>both</item>
-    </list>
-    <list name="io scheduling class">
-      <item>realtime</item>
-      <item>none</item>
-      <item>idle</item>
-      <item>best-effort</item>
     </list>
     <list name="ip tos">
       <item>throughput</item>
@@ -721,7 +735,6 @@
       <item>dbus</item>
     </list>
     <list name="signal">
-      <item>SIG_MAX</item>
       <item>SIGXFSZ</item>
       <item>SIGXCPU</item>
       <item>SIGWINCH</item>
@@ -739,16 +752,11 @@
       <item>SIGSTOP</item>
       <item>SIGSTKFLT</item>
       <item>SIGSEGV</item>
-      <item>SIGRTMIN</item>
-      <item>SIGRTMAX</item>
       <item>SIGQUIT</item>
-      <item>SIGQUEUE_MAX</item>
       <item>SIGPWR</item>
       <item>SIGPROF</item>
       <item>SIGPOLL</item>
       <item>SIGPIPE</item>
-      <item>SIGPENDING</item>
-      <item>SIGNAL</item>
       <item>SIGLOST</item>
       <item>SIGKILL</item>
       <item>SIGIOT</item>
@@ -796,6 +804,7 @@
     </list>
     <list name="system call filter set">
       <item>@timer</item>
+      <item>@temporary</item>
       <item>@system-service</item>
       <item>@sync</item>
       <item>@swap</item>
@@ -805,9 +814,11 @@
       <item>@reboot</item>
       <item>@raw-io</item>
       <item>@process</item>
+      <item>@privileged-api</item>
       <item>@privileged</item>
       <item>@obsolete</item>
       <item>@network-io</item>
+      <item>@network</item>
       <item>@mount</item>
       <item>@module</item>
       <item>@memlock</item>
@@ -815,14 +826,23 @@
       <item>@keyring</item>
       <item>@ipc</item>
       <item>@io-event</item>
+      <item>@historical-block</item>
       <item>@file-system</item>
       <item>@default</item>
       <item>@debug</item>
       <item>@cpu-emulation</item>
+      <item>@common-block</item>
       <item>@clock</item>
       <item>@chown</item>
       <item>@basic-io</item>
+      <item>@basic-api</item>
+      <item>@auxiliary-api</item>
       <item>@aio</item>
+    </list>
+    <list name="threshold time span">
+      <item>5min</item>
+      <item>1min</item>
+      <item>10sec</item>
     </list>
     <list name="timestamping">
       <item>µs</item>
@@ -867,14 +887,21 @@
       <item>amazon</item>
       <item>acrn</item>
     </list>
+    <list name="options automount">
+      <!-- Only options of type "text". Others are handled separately. -->
+      <item>ExtraOptions</item>
+      <item>Where</item>
+    </list>
     <list name="options exec">
       <!-- Only options of type "text". Others are handled separately. -->
       <item>CacheDirectory</item>
       <item>ConfigurationDirectory</item>
+      <item>ExecSearchPath</item>
       <item>ExtensionImages</item>
       <item>IPCNamespacePath</item>
       <item>InaccessiblePaths</item>
       <item>LoadCredential</item>
+      <item>LoadCredentialEncrypted</item>
       <item>LogNamespace</item>
       <item>LogsDirectory</item>
       <item>MountImages</item>
@@ -890,6 +917,7 @@
       <item>RootVerity</item>
       <item>RuntimeDirectory</item>
       <item>SetCredential</item>
+      <item>SetCredentialEncrypted</item>
       <item>StandardInputData</item>
       <item>StandardInputText</item>
       <item>StateDirectory</item>
@@ -1027,6 +1055,11 @@
         <DetectChar char="="/>
         <RegExpr String="\|?\h*(?:!(?!=))?" attribute="Prefix" context="#pop!text glob"/>
       </context>
+      <context name="AC threshold" attribute="Normal" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!threshold">
+        <DetectSpaces/>
+        <DetectChar char="="/>
+        <RegExpr String="\|?\h*(?:!(?!=))?" attribute="Prefix" context="#pop!threshold"/>
+      </context>
       <context name="AC user" attribute="Normal" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!user @system">
         <DetectSpaces/>
         <DetectChar char="="/>
@@ -1057,6 +1090,11 @@
         <DetectSpaces/>
         <DetectChar char="="/>
         <DetectChar char="~" attribute="Prefix" context="#pop!capability list"/>
+      </context>
+      <context name="~ fs type set list" attribute="Normal" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!fs type set list">
+        <DetectSpaces/>
+        <DetectChar char="="/>
+        <DetectChar char="~" attribute="Prefix" context="#pop!fs type set list"/>
       </context>
       <context name="~ namespace list" attribute="Normal" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!namespace list">
         <DetectSpaces/>
@@ -1204,7 +1242,7 @@
       <context name="exec command" attribute="Normal" lineEndContext="#pop">
         <DetectChar char="," context="#pop!exec prefix"/>
         <!-- Escapes (not exactly the same as detected by HlCStringChar). -->
-        <RegExpr String="\\(?:['&quot;,\\abfnrstv]|[0-7]{3}|u[&hex;]{4}|U[&hex;]{8}|x[&hex;]{2})" attribute="Escape"/>
+        <RegExpr String="\\(?:[&quot;'\abfnrstv]|[0-7]{3}|u[&hex;]{4}|U[&hex;]{8}|x[&hex;]{2})" attribute="Escape"/>
         <!-- Environment variable as a separate word. | Environment variable within word. -->
         <RegExpr String="(?&lt;=\h)\$\w+(?=\h|,|\\|$)|\${\w+}" attribute="Environment Variable"/>
         <IncludeRules context="text"/>
@@ -1222,6 +1260,9 @@
         <keyword String="signal" attribute="Constant"/>
         <Int attribute="Number"/>
         <IncludeRules context="list"/>
+      </context>
+      <context name="exit type" attribute="Normal" lineEndContext="#pop">
+        <keyword String="exit type" attribute="Constant" context="#pop"/>
       </context>
       <context name="extension option" attribute="Extension" lineEndContext="#pop">
         <LineContinue attribute="Continuation"/>
@@ -1241,6 +1282,11 @@
       </context>
       <context name="fs type" attribute="Normal" lineEndContext="#pop">
         <keyword String="fs type" attribute="Constant" context="#pop"/>
+      </context>
+      <context name="fs type set list" attribute="Normal" lineEndContext="#pop">
+        <keyword String="fs set" attribute="Constant"/>
+        <keyword String="fs type" attribute="Constant"/>
+        <IncludeRules context="list"/>
       </context>
       <context name="group list" attribute="Normal" lineEndContext="#pop">
         <Int attribute="Number"/>
@@ -1469,6 +1515,16 @@
         <AnyChar String="*?" attribute="Wildcard"/>
         <RangeDetect char="[" char1="]" attribute="Wildcard"/>
       </context>
+      <context name="threshold" attribute="Normal" lineEndContext="#pop">
+        <RegExpr String="\d+(?:\.\d+)?(?=\h*%)" attribute="Number" context="#pop!threshold %"/>
+      </context>
+      <context name="threshold %" attribute="Normal" lineEndContext="#pop">
+        <DetectChar char="/" attribute="Separator" context="#pop!threshold time span"/>
+      </context>
+      <context name="threshold time span" attribute="Normal" lineEndContext="#pop">
+        <!-- There is only a fixed set of possible time spans to choose from. -->
+        <keyword String="threshold time span" attribute="Threshold Time Span"/>
+      </context>
       <context name="time span" attribute="Normal" lineEndContext="#pop">
         <RegExpr String="&tsp;" attribute="Number" context="measurement unit"/>
         <IncludeRules context="list"/>
@@ -1540,9 +1596,9 @@
       </context>
       <!-- Contexts for option groups. -->
       <context name="options automount" attribute="Normal" lineEndContext="#stay">
+        <keyword String="options automount" firstNonSpace="true" attribute="Option Name" context="text"/>
         <WordDetect String="DirectoryMode" firstNonSpace="true" attribute="Option Name" context="file mode"/>
         <WordDetect String="TimeoutIdleSec" firstNonSpace="true" attribute="Option Name" context="timeout"/>
-        <WordDetect String="Where" firstNonSpace="true" attribute="Option Name" context="text"/>
       </context>
       <context name="options exec" attribute="Normal" lineEndContext="#stay">
         <keyword String="options exec" firstNonSpace="true" attribute="Option Name" context="text"/>
@@ -1617,6 +1673,7 @@
         <WordDetect String="ReadWritePaths" firstNonSpace="true" attribute="Option Name" context="-+/path list"/>
         <WordDetect String="RemoveIPC" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="RestrictAddressFamilies" firstNonSpace="true" attribute="Option Name" context="~ address family list"/>
+        <WordDetect String="RestrictFileSystems" firstNonSpace="true" attribute="Option Name" context="~ fs type set list"/>
         <WordDetect String="RestrictNamespaces" firstNonSpace="true" attribute="Option Name" context="~ namespace list"/>
         <WordDetect String="RestrictRealtime" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="RestrictSUIDSGID" firstNonSpace="true" attribute="Option Name" context="boolean"/>
@@ -1638,7 +1695,9 @@
         <WordDetect String="SystemCallErrorNumber" firstNonSpace="true" attribute="Option Name" context="system call errno"/>
         <WordDetect String="SystemCallFilter" firstNonSpace="true" attribute="Option Name" context="~ system call filter list"/>
         <WordDetect String="SystemCallLog" firstNonSpace="true" attribute="Option Name" context="~ text"/>
+        <WordDetect String="TTYColumns" firstNonSpace="true" attribute="Option Name" context="cardinal"/>
         <WordDetect String="TTYReset" firstNonSpace="true" attribute="Option Name" context="boolean"/>
+        <WordDetect String="TTYRows" firstNonSpace="true" attribute="Option Name" context="cardinal"/>
         <WordDetect String="TTYVHangup" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="TTYVTDisallocate" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="TimeoutCleanSec" firstNonSpace="true" attribute="Option Name" context="timeout"/>
@@ -1678,6 +1737,8 @@
         <keyword String="options path" firstNonSpace="true" attribute="Option Name" context="text"/>
         <WordDetect String="DirectoryMode" firstNonSpace="true" attribute="Option Name" context="file mode"/>
         <WordDetect String="MakeDirectory" firstNonSpace="true" attribute="Option Name" context="boolean"/>
+        <WordDetect String="TriggerLimitBurst" firstNonSpace="true" attribute="Option Name" context="cardinal"/>
+        <WordDetect String="TriggerLimitIntervalSec" firstNonSpace="true" attribute="Option Name" context="time span"/>
         <WordDetect String="Unit" firstNonSpace="true" attribute="Option Name" context="unit"/>
       </context>
       <context name="options resource-control" attribute="Normal" lineEndContext="#stay">
@@ -1713,9 +1774,12 @@
         <WordDetect String="MemoryMax" firstNonSpace="true" attribute="Option Name" context="cardinal %KMGT infinity"/>
         <WordDetect String="MemoryMin" firstNonSpace="true" attribute="Option Name" context="cardinal %KMGT infinity"/>
         <WordDetect String="MemorySwapMax" firstNonSpace="true" attribute="Option Name" context="cardinal KMGT infinity"/>
+        <WordDetect String="RestrictNetworkInterfaces" firstNonSpace="true" attribute="Option Name" context="~ text"/>
         <WordDetect String="Slice" firstNonSpace="true" attribute="Option Name" context="unit slice"/>
         <WordDetect String="SocketBindAllow" firstNonSpace="true" attribute="Option Name" context="socket bind rule"/>
         <WordDetect String="SocketBindDeny" firstNonSpace="true" attribute="Option Name" context="socket bind rule"/>
+        <WordDetect String="StartupAllowedCPUs" firstNonSpace="true" attribute="Option Name" context="cpu index list"/>
+        <WordDetect String="StartupAllowedMemoryNodes" firstNonSpace="true" attribute="Option Name" context="cpu index list"/>
         <WordDetect String="StartupCPUWeight" firstNonSpace="true" attribute="Option Name" context="weight"/>
         <WordDetect String="StartupIOWeight" firstNonSpace="true" attribute="Option Name" context="weight"/>
         <WordDetect String="TasksAccounting" firstNonSpace="true" attribute="Option Name" context="boolean"/>
@@ -1730,6 +1794,7 @@
         <WordDetect String="ExecStartPre" firstNonSpace="true" attribute="Option Name" context="exec"/>
         <WordDetect String="ExecStop" firstNonSpace="true" attribute="Option Name" context="exec"/>
         <WordDetect String="ExecStopPost" firstNonSpace="true" attribute="Option Name" context="exec"/>
+        <WordDetect String="ExitType" firstNonSpace="true" attribute="Option Name" context="exit type"/>
         <WordDetect String="FileDescriptorStoreMax" firstNonSpace="true" attribute="Option Name" context="cardinal"/>
         <WordDetect String="GuessMainPID" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="NonBlocking" firstNonSpace="true" attribute="Option Name" context="boolean"/>
@@ -1742,6 +1807,7 @@
         <WordDetect String="RestartSec" firstNonSpace="true" attribute="Option Name" context="time span"/>
         <WordDetect String="RootDirectoryStartOnly" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="RuntimeMaxSec" firstNonSpace="true" attribute="Option Name" context="timeout"/>
+        <WordDetect String="RuntimeRandomizedExtraSec" firstNonSpace="true" attribute="Option Name" context="cardinal"/>
         <WordDetect String="Sockets" firstNonSpace="true" attribute="Option Name" context="unit list socket"/>
         <WordDetect String="SuccessExitStatus" firstNonSpace="true" attribute="Option Name" context="exit status"/>
         <WordDetect String="TimeoutAbortSec" firstNonSpace="true" attribute="Option Name" context="timeout"/>
@@ -1829,6 +1895,7 @@
         <WordDetect String="AllowIsolate" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="AssertACPower" firstNonSpace="true" attribute="Option Name" context="AC boolean"/>
         <WordDetect String="AssertArchitecture" firstNonSpace="true" attribute="Option Name" context="AC architecture"/>
+        <WordDetect String="AssertCPUPressure" firstNonSpace="true" attribute="Option Name" context="AC threshold"/>
         <WordDetect String="AssertCPUs" firstNonSpace="true" attribute="Option Name" context="AC cardinal"/>
         <WordDetect String="AssertCapability" firstNonSpace="true" attribute="Option Name" context="AC capability"/>
         <WordDetect String="AssertControlGroupController" firstNonSpace="true" attribute="Option Name" context="AC controller cg"/>
@@ -1839,9 +1906,11 @@
         <WordDetect String="AssertFirstBoot" firstNonSpace="true" attribute="Option Name" context="AC boolean"/>
         <WordDetect String="AssertGroup" firstNonSpace="true" attribute="Option Name" context="AC group"/>
         <WordDetect String="AssertHost" firstNonSpace="true" attribute="Option Name" context="AC text *"/>
+        <WordDetect String="AssertIOPressure" firstNonSpace="true" attribute="Option Name" context="AC threshold"/>
         <WordDetect String="AssertKernelCommandLine" firstNonSpace="true" attribute="Option Name" context="AC text"/>
         <WordDetect String="AssertKernelVersion" firstNonSpace="true" attribute="Option Name" context="AC text *"/>
         <WordDetect String="AssertMemory" firstNonSpace="true" attribute="Option Name" context="AC cardinal"/>
+        <WordDetect String="AssertMemoryPressure" firstNonSpace="true" attribute="Option Name" context="AC threshold"/>
         <WordDetect String="AssertNeedsUpdate" firstNonSpace="true" attribute="Option Name" context="AC text"/>
         <WordDetect String="AssertOSRelease" firstNonSpace="true" attribute="Option Name" context="AC text"/>
         <WordDetect String="AssertPathExists" firstNonSpace="true" attribute="Option Name" context="AC text"/>
@@ -1860,6 +1929,7 @@
         <WordDetect String="ConditionACPower" firstNonSpace="true" attribute="Option Name" context="AC boolean"/>
         <WordDetect String="ConditionArchitecture" firstNonSpace="true" attribute="Option Name" context="AC architecture"/>
         <WordDetect String="ConditionCPUFeature" firstNonSpace="true" attribute="Option Name" context="cpu feature"/>
+        <WordDetect String="ConditionCPUPressure" firstNonSpace="true" attribute="Option Name" context="AC threshold"/>
         <WordDetect String="ConditionCPUs" firstNonSpace="true" attribute="Option Name" context="AC cardinal"/>
         <WordDetect String="ConditionCapability" firstNonSpace="true" attribute="Option Name" context="AC capability"/>
         <WordDetect String="ConditionControlGroupController" firstNonSpace="true" attribute="Option Name" context="AC controller cg"/>
@@ -1871,9 +1941,11 @@
         <WordDetect String="ConditionFirstBoot" firstNonSpace="true" attribute="Option Name" context="AC boolean"/>
         <WordDetect String="ConditionGroup" firstNonSpace="true" attribute="Option Name" context="AC group"/>
         <WordDetect String="ConditionHost" firstNonSpace="true" attribute="Option Name" context="AC text *"/>
+        <WordDetect String="ConditionIOPressure" firstNonSpace="true" attribute="Option Name" context="AC threshold"/>
         <WordDetect String="ConditionKernelCommandLine" firstNonSpace="true" attribute="Option Name" context="AC text"/>
         <WordDetect String="ConditionKernelVersion" firstNonSpace="true" attribute="Option Name" context="AC text *"/>
         <WordDetect String="ConditionMemory" firstNonSpace="true" attribute="Option Name" context="AC cardinal"/>
+        <WordDetect String="ConditionMemoryPressure" firstNonSpace="true" attribute="Option Name" context="AC threshold"/>
         <WordDetect String="ConditionNeedsUpdate" firstNonSpace="true" attribute="Option Name" context="AC text"/>
         <WordDetect String="ConditionOSRelease" firstNonSpace="true" attribute="Option Name" context="AC text"/>
         <WordDetect String="ConditionPathExists" firstNonSpace="true" attribute="Option Name" context="AC text"/>
@@ -1984,7 +2056,9 @@
       <itemData name="Prefix" defStyleNum="dsSpecialString"/>
       <!-- Styling identical to INI-files. -->
       <itemData name="Section Header" defStyleNum="dsKeyword"/>
+      <itemData name="Separator" defStyleNum="dsSpecialString"/>
       <itemData name="Specifier" defStyleNum="dsSpecialChar"/>
+      <itemData name="Threshold Time Span" defStyleNum="dsConstant" italic="true"/>
       <itemData name="Unit Extension" defStyleNum="dsPreprocessor" italic="true"/>
       <itemData name="Unit Instance" defStyleNum="dsPreprocessor" bold="true"/>
       <itemData name="Unit Name" defStyleNum="dsPreprocessor"/>

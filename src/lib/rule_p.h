@@ -316,6 +316,19 @@ private:
     Qt::CaseSensitivity m_caseSensitivity;
 };
 
+class DynamicStringDetect final : public Rule
+{
+public:
+    DynamicStringDetect(const HighlightingContextData::Rule::StringDetect &data);
+
+protected:
+    MatchResult doMatch(QStringView text, int offset, const QStringList &) const override;
+
+private:
+    QString m_string;
+    Qt::CaseSensitivity m_caseSensitivity;
+};
+
 class WordDetect final : public Rule
 {
 public:

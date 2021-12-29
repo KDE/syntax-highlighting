@@ -96,6 +96,14 @@ static QString replaceCaptures(const QString &pattern, const QStringList &captur
     return result;
 }
 
+static MatchResult matchString(QStringView pattern, QStringView text, int offset, Qt::CaseSensitivity caseSensitivity)
+{
+    if (offset + pattern.size() <= text.size() && text.mid(offset, pattern.size()).compare(pattern, caseSensitivity) == 0) {
+        return offset + pattern.size();
+    }
+    return offset;
+}
+
 static void resolveAdditionalWordDelimiters(WordDelimiters &wordDelimiters, const HighlightingContextData::Rule::WordDelimiters &delimiters)
 {
     // cache for DefinitionData::wordDelimiters, is accessed VERY often
@@ -180,6 +188,9 @@ static Rule::Ptr createRule(DefinitionData &def, const HighlightingContextData::
     case Type::RegExpr:
         return std::make_shared<RegExpr>(ruleData.data.regExpr);
     case Type::StringDetect:
+        if (ruleData.data.stringDetect.dynamic) {
+            return std::make_shared<DynamicStringDetect>(ruleData.data.stringDetect);
+        }
         return std::make_shared<StringDetect>(ruleData.data.stringDetect);
     case Type::WordDetect:
         return std::make_shared<WordDetect>(def, ruleData.data.wordDetect);
@@ -654,20 +665,27 @@ StringDetect::StringDetect(const HighlightingContextData::Rule::StringDetect &da
     : m_string(data.string)
     , m_caseSensitivity(data.caseSensitivity)
 {
-    m_dynamic = data.dynamic;
 }
 
-MatchResult StringDetect::doMatch(QStringView text, int offset, const QStringList &captures) const
+MatchResult StringDetect::doMatch(QStringView text, int offset, const QStringList &) const
+{
+    return matchString(m_string, text, offset, m_caseSensitivity);
+}
+
+DynamicStringDetect::DynamicStringDetect(const HighlightingContextData::Rule::StringDetect &data)
+    : m_string(data.string)
+    , m_caseSensitivity(data.caseSensitivity)
+{
+    m_dynamic = true;
+}
+
+MatchResult DynamicStringDetect::doMatch(QStringView text, int offset, const QStringList &captures) const
 {
     /**
      * for dynamic case: create new pattern with right instantiation
      */
-    const auto &pattern = m_dynamic ? replaceCaptures(m_string, captures, false) : m_string;
-
-    if (offset + pattern.size() <= text.size() && text.mid(offset, pattern.size()).compare(pattern, m_caseSensitivity) == 0) {
-        return offset + pattern.size();
-    }
-    return offset;
+    const auto pattern = replaceCaptures(m_string, captures, false);
+    return matchString(pattern, text, offset, m_caseSensitivity);
 }
 
 WordDetect::WordDetect(DefinitionData &def, const HighlightingContextData::Rule::WordDetect &data)

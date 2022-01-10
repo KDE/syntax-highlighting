@@ -121,7 +121,11 @@ data {
   real whilest;
   // name ending with truncation
   real fooT;
+
+  // new array syntax
+  array [N] real foo_new;
 }
+
 transformed data {
   // declaration and assignment
   int india = 1;
@@ -129,9 +133,11 @@ transformed data {
   row_vector[2] victor = [1, 2];
   matrix[2, 2] mike = [[1, 2], [3, 4]];
   real sierra[2] = {1., 2.};
+  complex zulu = 3+4.1i;
 }
 parameters {
   real hotel;
+  real<offset = 0., multiplier = 1.> alpha;
 }
 transformed parameters {
   real juliette;
@@ -265,6 +271,12 @@ model {
   x = -.1e+34;
   x = -.1E+34;
 
+  // imaginary literals
+  complex z = 3 + 3i;
+  z = 2.3i;
+  z = 3.4e10i;
+  z = 0i;
+
   // assignment statements
   x = 1;
   x += 1.;
@@ -306,6 +318,10 @@ model {
     z = 1.;
   }
 
+  profile("profile-test") {
+    real z;
+    z = 1.;
+  }
   // built-in functions
   x = log(1.);
   x = exp(1.);

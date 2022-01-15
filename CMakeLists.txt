@@ -142,7 +142,7 @@ if(TARGET KF5SyntaxHighlighting)
 endif()
 
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ksyntaxhighlighting_version.h"
-        DESTINATION "${KDE_INSTALL_INCLUDEDIR_KF}"
+        DESTINATION "${KDE_INSTALL_INCLUDEDIR_KF}/KSyntaxHighlighting"
         COMPONENT Devel)
 
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)

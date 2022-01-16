@@ -47,7 +47,7 @@ set_target_properties(KF5SyntaxHighlighting PROPERTIES
     SOVERSION ${SyntaxHighlighting_SOVERSION}
     EXPORT_NAME SyntaxHighlighting
 )
-target_include_directories(KF5SyntaxHighlighting INTERFACE "$<INSTALL_INTERFACE:${KDE_INSTALL_INCLUDEDIR_KF}/KSyntaxHighlighting;${KDE_INSTALL_INCLUDEDIR_KF}>")
+target_include_directories(KF5SyntaxHighlighting INTERFACE "$<INSTALL_INTERFACE:${KDE_INSTALL_INCLUDEDIR_KF}/KSyntaxHighlighting>")
 target_include_directories(KF5SyntaxHighlighting PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR};${CMAKE_CURRENT_BINARY_DIR};>")
 target_link_libraries(KF5SyntaxHighlighting
     PUBLIC
@@ -56,26 +56,50 @@ target_link_libraries(KF5SyntaxHighlighting
         Qt${QT_MAJOR_VERSION}::Network
 )
 
-ecm_generate_headers(SyntaxHighlighting_HEADERS
-    HEADER_NAMES
-        AbstractHighlighter
-        Definition
-        DefinitionDownloader
-        FoldingRegion
-        Format
-        Repository
-        State
-        SyntaxHighlighter
-        Theme
-        WildcardMatcher
+set(Forwarding_Header_Names
+    AbstractHighlighter
+    Definition
+    DefinitionDownloader
+    FoldingRegion
+    Format
+    Repository
+    State
+    SyntaxHighlighter
+    Theme
+    WildcardMatcher
+)
+
+ecm_generate_headers(CamelCase_HEADERS
+    HEADER_NAMES ${Forwarding_Header_Names}
     REQUIRED_HEADERS SyntaxHighlighting_HEADERS
+    PREFIX KSyntaxHighlighting
 )
 
 install(TARGETS KF5SyntaxHighlighting EXPORT KF5SyntaxHighlightingTargets ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
+
+install(FILES
+    ${CamelCase_HEADERS}
+    DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF}/KSyntaxHighlighting/KSyntaxHighlighting
+)
 install(FILES
     ${SyntaxHighlighting_HEADERS}
     ${CMAKE_CURRENT_BINARY_DIR}/ksyntaxhighlighting_export.h
-    DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF}/KSyntaxHighlighting)
+    DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF}/KSyntaxHighlighting/ksyntaxhighlighting
+)
+
+# TODO KF6: remove this, backward compatible headers location
+if(QT_MAJOR_VERSION STREQUAL "5")
+    ecm_generate_headers(Compat_CamelCase_HEADERS
+        HEADER_NAMES ${Forwarding_Header_Names}
+        REQUIRED_HEADERS Compat_SyntaxHighlighting_HEADERS
+    )
+    install(FILES
+        ${Compat_CamelCase_HEADERS}
+        ${Compat_SyntaxHighlighting_HEADERS}
+        ${CMAKE_CURRENT_BINARY_DIR}/ksyntaxhighlighting_export.h
+        DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF}/KSyntaxHighlighting
+    )
+endif()
 
 if(BUILD_QCH)
     ecm_add_qch(

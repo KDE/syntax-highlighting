@@ -101,7 +101,7 @@ c(1,6,4,9)*2
 something <- c(1,4,letters[2])  # indices start at one, you get (1,4,"b")
 length(something)
 
-## Pipe
+## margrittr's pipe
 diamonds %>%
   filter(price > 1000) %>%
   group_by(cut) %>%
@@ -109,6 +109,10 @@ diamonds %>%
   rename(tally = n) %>% 
   arrange(-tally) %>% 
   mutate(pct = tally / sum(tally)) -> df
+
+## R native pipes (R > 4.1)
+Sys.setenv("_R_USE_PIPEBIND_"= TRUE)
+mtcars |> x => lm(mpg ~ cyl, data = x)
 
 ## ggplot2 
 plot = ggplot(diamonds, aes(x = price, y = carat)) +

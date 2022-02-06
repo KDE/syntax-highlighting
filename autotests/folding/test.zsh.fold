@@ -420,6 +420,7 @@ ls [[[[]]x*
 !a -f
 'a' -f
 $a -f
+! cmd
 
 # redirections (prefix)
 <<<s cat

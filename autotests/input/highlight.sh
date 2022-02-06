@@ -314,6 +314,7 @@ subs f! f!! f!s 'a'!s \( $v {a,b} {a} {a}/d {a\,} {a,} {a,\},b} ds/{a,b}sa/s
 !a -f
 'a' -f
 $a -f
+! cmd
 
 # redirections (prefix)
 <<<s cat

@@ -787,16 +787,30 @@
 
       <!-- FindPathThenPopInAlternateValue consumes path in ${xx:here}-->
       <context attribute="Normal Text" lineEndContext="#pop" name="FindPathThenPopInAlternateValue">
-        <IncludeRules context="FindExtGlobAndPopInAlternateValue"/>
+        <Detect2Chars context="#pop!PathThenPopInAlternateValue" char="?" char1="(" lookAhead="1"/>
+        <Detect2Chars context="#pop!PathThenPopInAlternateValue" char="*" char1="(" lookAhead="1"/>
+        <Detect2Chars context="#pop!PathThenPopInAlternateValue" char="+" char1="(" lookAhead="1"/>
+        <Detect2Chars context="#pop!PathThenPopInAlternateValue" char="@" char1="(" lookAhead="1"/>
+        <Detect2Chars context="#pop!PathThenPopInAlternateValue" char="!" char1="(" lookAhead="1"/>
         <AnyChar attribute="Glob" context="#pop!PathThenPopInAlternateValue" String="?*"/>
         <RegExpr attribute="Path" context="#pop!PathThenPopInAlternateValue" String="&pathpart_alt;"/>
       </context>
-      <context attribute="Path" lineEndContext="#stay" name="FindExtGlobAndPopInAlternateValue">
+      <context attribute="Path" lineEndContext="#pop#pop" name="PathThenPopInAlternateValue">
+        <DetectChar attribute="Parameter Expansion" context="#pop" char="}"/>
+        <IncludeRules context="FindWord"/>
         <Detect2Chars attribute="Glob" context="ExtGlobAndPopInAlternateValue" char="?" char1="("/>
         <Detect2Chars attribute="Glob" context="ExtGlobAndPopInAlternateValue" char="*" char1="("/>
         <Detect2Chars attribute="Glob" context="ExtGlobAndPopInAlternateValue" char="+" char1="("/>
         <Detect2Chars attribute="Glob" context="ExtGlobAndPopInAlternateValue" char="@" char1="("/>
         <Detect2Chars attribute="Glob" context="ExtGlobAndPopInAlternateValue" char="!" char1="("/>
+        <AnyChar attribute="Glob" context="#stay" String="?*"/>
+        <RegExpr attribute="Path" context="#stay" String="&path_alt;"/>
+      </context>
+      <context attribute="Path" lineEndContext="#stay" name="ExtGlobAndPopInAlternateValue">
+        <DetectChar attribute="Glob" context="#pop" char=")"/>
+        <DetectChar attribute="Error" context="#pop#pop" char="}"/>
+        <IncludeRules context="FindWord"/>
+        <IncludeRules context="FindExtGlobInAlternateValue"/>
       </context>
       <context attribute="Path" lineEndContext="#stay" name="FindExtGlobInAlternateValue">
         <Detect2Chars attribute="Glob" context="RecursiveExtGlobInAlternateValue" char="?" char1="("/>
@@ -811,19 +825,6 @@
         <DetectChar context="#pop" char="}" lookAhead="1"/>
         <IncludeRules context="FindWord"/>
         <IncludeRules context="FindExtGlobInAlternateValue"/>
-      </context>
-      <context attribute="Path" lineEndContext="#stay" name="ExtGlobAndPopInAlternateValue">
-        <DetectChar attribute="Glob" context="#pop!PathThenPopInAlternateValue" char=")"/>
-        <DetectChar attribute="Error" context="#pop#pop" char="}"/>
-        <IncludeRules context="FindWord"/>
-        <IncludeRules context="FindExtGlobInAlternateValue"/>
-      </context>
-      <context attribute="Path" lineEndContext="#pop#pop" name="PathThenPopInAlternateValue">
-        <DetectChar attribute="Parameter Expansion" context="#pop#pop" char="}"/>
-        <IncludeRules context="FindWord"/>
-        <IncludeRules context="FindExtGlobAndPopInAlternateValue"/>
-        <AnyChar attribute="Glob" context="#stay" String="?*"/>
-        <RegExpr attribute="Path" context="#stay" String="&path_alt;"/>
       </context>
 
       <context attribute="Pattern" lineEndContext="#stay" name="FindPattern">

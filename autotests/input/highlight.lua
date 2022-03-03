@@ -156,6 +156,9 @@ for i=1,10 do
   a[i] = function () y=y+1; return x+y end
 end
 
+local function foo()
+end
+
 --! \brief gfind is deprecated
 string.gfind('s')
 string.gmatch('f')

@@ -248,6 +248,12 @@ pacman -syu --needed intel-ucode grub
 # Braces (bug ##387915)
 [[ $line_name =~ \{([0-9]{1,})\}\{([0-9]{1,})\}(.*) ]]
 [[ $name =~ (.*)_(S[0-9]{2})(E[0-9]{2,3}[a-z]{0,1})_(.*) ]]
+# Comments in Braces (bug 450878)
+[[ # comment 1
+   1 == 1 # comment 2
+   # comment 3
+]]
+
 rm /data/{hello1,hello2}/input/{bye1,$bye2}/si{a,${b},c{k,p{e,a}}}/*.non
 rm /data/{aa,{e,i}t{b,c} # Not closed
 rm /data/{aa,{e,i}t{b,c}}

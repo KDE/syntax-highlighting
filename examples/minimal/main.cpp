@@ -9,11 +9,11 @@
 #include <QDebug>
 #include <QPlainTextEdit>
 
-#include <definition.h>
-#include <foldingregion.h>
-#include <repository.h>
-#include <syntaxhighlighter.h>
-#include <theme.h>
+#include <KSyntaxHighlighting/Definition>
+#include <KSyntaxHighlighting/FoldingRegion>
+#include <KSyntaxHighlighting/Repository>
+#include <KSyntaxHighlighting/SyntaxHighlighter>
+#include <KSyntaxHighlighting/Theme>
 
 int main(int argc, char **argv)
 {

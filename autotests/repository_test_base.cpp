@@ -9,7 +9,7 @@
 
 #include "test-config.h"
 
-#include <definition.h>
+#include <KSyntaxHighlighting/Definition>
 
 #include <QStandardPaths>
 #include <QTest>

@@ -7,12 +7,12 @@
 #include "repository_test_base.h"
 #include "test-config.h"
 
-#include <abstracthighlighter.h>
-#include <definition.h>
-#include <format.h>
-#include <repository.h>
-#include <state.h>
-#include <theme.h>
+#include <KSyntaxHighlighting/AbstractHighlighter>
+#include <KSyntaxHighlighting/Definition>
+#include <KSyntaxHighlighting/Format>
+#include <KSyntaxHighlighting/Repository>
+#include <KSyntaxHighlighting/State>
+#include <KSyntaxHighlighting/Theme>
 
 #include <QFileInfo>
 #include <QPalette>

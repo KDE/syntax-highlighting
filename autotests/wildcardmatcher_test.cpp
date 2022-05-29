@@ -4,7 +4,7 @@
     SPDX-License-Identifier: MIT
 */
 
-#include <wildcardmatcher.h>
+#include <KSyntaxHighlighting/WildcardMatcher>
 
 #include <QObject>
 #include <QTest>

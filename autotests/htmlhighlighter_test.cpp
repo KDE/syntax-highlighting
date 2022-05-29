@@ -6,10 +6,10 @@
 
 #include "test-config.h"
 
-#include <definition.h>
+#include <KSyntaxHighlighting/Definition>
+#include <KSyntaxHighlighting/Repository>
+#include <KSyntaxHighlighting/Theme>
 #include <htmlhighlighter.h>
-#include <repository.h>
-#include <theme.h>
 
 #include <QDir>
 #include <QObject>

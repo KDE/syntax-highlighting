@@ -7,7 +7,7 @@
 #ifndef REPOSITORY_TEST_BASE_H
 #define REPOSITORY_TEST_BASE_H
 
-#include <repository.h>
+#include <KSyntaxHighlighting/Repository>
 
 #include <QObject>
 #include <QString>

@@ -6,11 +6,11 @@
 
 #include "test-config.h"
 
-#include <abstracthighlighter.h>
-#include <definition.h>
-#include <foldingregion.h>
-#include <repository.h>
-#include <state.h>
+#include <KSyntaxHighlighting/AbstractHighlighter>
+#include <KSyntaxHighlighting/Definition>
+#include <KSyntaxHighlighting/FoldingRegion>
+#include <KSyntaxHighlighting/Repository>
+#include <KSyntaxHighlighting/State>
 
 #include <QDir>
 #include <QFile>

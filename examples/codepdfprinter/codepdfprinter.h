@@ -7,7 +7,7 @@
 #ifndef CODEPDFPRINTER_H
 #define CODEPDFPRINTER_H
 
-#include <repository.h>
+#include <KSyntaxHighlighting/Repository>
 
 #include <QTextDocument>
 

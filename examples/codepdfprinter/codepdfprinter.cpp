@@ -6,9 +6,9 @@
 
 #include "codepdfprinter.h"
 
-#include <definition.h>
-#include <syntaxhighlighter.h>
-#include <theme.h>
+#include <KSyntaxHighlighting/Definition>
+#include <KSyntaxHighlighting/SyntaxHighlighter>
+#include <KSyntaxHighlighting/Theme>
 
 #include <QDebug>
 #include <QFile>

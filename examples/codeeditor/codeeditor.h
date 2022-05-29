@@ -7,7 +7,7 @@
 #ifndef CODEEDITOR_H
 #define CODEEDITOR_H
 
-#include <repository.h>
+#include <KSyntaxHighlighting/Repository>
 
 #include <QPlainTextEdit>
 

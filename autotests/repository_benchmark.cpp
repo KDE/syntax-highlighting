@@ -8,8 +8,8 @@
 #include "repository_test_base.h"
 #include "test-config.h"
 
-#include <definition.h>
-#include <repository.h>
+#include <KSyntaxHighlighting/Definition>
+#include <KSyntaxHighlighting/Repository>
 
 #include <QTest>
 

@@ -107,10 +107,13 @@ echo <<<'HTML'
 HTML;
 echo <<<DOC
 <p>bla $var \$var bla\'</p>
- DOC
- DOC;
-DOC;blah
 DOC;
+echo <<<DOC
+		<p>bla $var \$var bla\'</p>
+	DOC;
+echo <<<DOC
+    <p>bla $var \$var bla\'</p>
+  DOC;
 
 echo 123456 1_2_34_5 1__2 1_;
 echo 0x12345af 0x1_2_3_45_a_f 0x1__2 0x_1 0x1_ 0x1g 0xg;

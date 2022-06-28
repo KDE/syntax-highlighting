@@ -26,7 +26,7 @@ include(ECMMarkNonGuiExecutable)
 include(ECMAddQch)
 include(ECMOptionalAddSubdirectory)
 include(ECMGenerateExportHeader)
-
+include(ECMDeprecationSettings)
 
 ecm_setup_version(PROJECT
     VARIABLE_PREFIX SyntaxHighlighting
@@ -92,7 +92,10 @@ endif()
 if (NO_STANDARD_PATHS)
     add_definitions(-DNO_STANDARD_PATHS)
 endif()
-add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0x050f02)
+
+ecm_set_disabled_deprecation_versions(
+    QT 5.15.2
+)
 
 #
 # Actually build the stuff

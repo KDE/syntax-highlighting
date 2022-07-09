@@ -25,9 +25,7 @@ static Theme::TextStyle stringToDefaultFormat(QStringView str)
         return Theme::Normal;
     }
 
-    static const auto idx = Theme::staticMetaObject.indexOfEnumerator("TextStyle");
-    Q_ASSERT(idx >= 0);
-    const auto metaEnum = Theme::staticMetaObject.enumerator(idx);
+    const auto metaEnum = QMetaEnum::fromType<Theme::TextStyle>();
 
     bool ok = false;
     const auto value = metaEnum.keyToValue(str.mid(2).toLatin1().constData(), &ok);

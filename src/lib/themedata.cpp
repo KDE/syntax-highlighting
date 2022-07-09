@@ -105,9 +105,7 @@ bool ThemeData::load(const QString &filePath)
     m_revision = metadata.value(QLatin1String("revision")).toInt();
 
     // read text styles
-    static const auto styleIdx = Theme::staticMetaObject.indexOfEnumerator("TextStyle");
-    Q_ASSERT(styleIdx >= 0);
-    const auto metaEnumStyle = Theme::staticMetaObject.enumerator(styleIdx);
+    const auto metaEnumStyle = QMetaEnum::fromType<Theme::TextStyle>();
     const QJsonObject textStyles = obj.value(QLatin1String("text-styles")).toObject();
     for (int i = 0; i < metaEnumStyle.keyCount(); ++i) {
         Q_ASSERT(i == metaEnumStyle.value(i));
@@ -115,9 +113,7 @@ bool ThemeData::load(const QString &filePath)
     }
 
     // read editor colors
-    static const auto colorIdx = Theme::staticMetaObject.indexOfEnumerator("EditorColorRole");
-    Q_ASSERT(colorIdx >= 0);
-    const auto metaEnumColor = Theme::staticMetaObject.enumerator(colorIdx);
+    const auto metaEnumColor = QMetaEnum::fromType<Theme::EditorColorRole>();
     const QJsonObject editorColors = obj.value(QLatin1String("editor-colors")).toObject();
     for (int i = 0; i < metaEnumColor.keyCount(); ++i) {
         Q_ASSERT(i == metaEnumColor.value(i));

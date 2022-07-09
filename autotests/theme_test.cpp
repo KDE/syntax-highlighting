@@ -272,9 +272,7 @@ private Q_SLOTS:
         QVERIFY(metadata.value(QLatin1String("license")).toString() == QLatin1String("SPDX-License-Identifier: MIT"));
 
         // verify completeness of text styles
-        static const auto idx = Theme::staticMetaObject.indexOfEnumerator("TextStyle");
-        QVERIFY(idx >= 0);
-        const auto metaEnum = Theme::staticMetaObject.enumerator(idx);
+        const auto metaEnum = QMetaEnum::fromType<Theme::TextStyle>();
         QVERIFY(obj.contains(QLatin1String("text-styles")));
         const QJsonObject textStyles = obj.value(QLatin1String("text-styles")).toObject();
         for (int i = 0; i < metaEnum.keyCount(); ++i) {
@@ -294,9 +292,7 @@ private Q_SLOTS:
         }
 
         // editor area colors
-        static const auto colorIdx = Theme::staticMetaObject.indexOfEnumerator("EditorColorRole");
-        Q_ASSERT(colorIdx >= 0);
-        const auto metaEnumColor = Theme::staticMetaObject.enumerator(colorIdx);
+        const auto metaEnumColor = QMetaEnum::fromType<Theme::EditorColorRole>();
         QStringList requiredEditorColors;
         for (int i = 0; i < metaEnumColor.keyCount(); ++i) {
             Q_ASSERT(i == metaEnumColor.value(i));

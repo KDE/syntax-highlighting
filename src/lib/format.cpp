@@ -52,6 +52,22 @@ TextStyleData FormatPrivate::styleOverride(const Theme &theme) const
     return TextStyleData();
 }
 
+QColor FormatPrivate::color(const Theme &theme, StyleColor styleColor, ThemeColor themeColor) const
+{
+    const auto overrideStyle = styleOverride(theme);
+    if (overrideStyle.*styleColor) {
+        return QColor::fromRgb(overrideStyle.*styleColor);
+    }
+    // use QColor::fromRgba for QRgb => QColor conversion to avoid unset colors == black!
+    return QColor::fromRgba(style.*styleColor ? style.*styleColor : (theme.*themeColor)(defaultStyle));
+}
+
+bool FormatPrivate::hasColor(const Theme &theme, StyleColor styleColor, ThemeColor themeColor) const
+{
+    // use QColor::fromRgba for background QRgb => QColor conversion to avoid unset colors == black!
+    return color(theme, styleColor, themeColor) != QColor::fromRgba((theme.*themeColor)(Theme::Normal)) && (style.*styleColor || (theme.*themeColor)(defaultStyle) || styleOverride(theme).*styleColor);
+}
+
 static QExplicitlySharedDataPointer<FormatPrivate> &sharedDefaultPrivate()
 {
     static QExplicitlySharedDataPointer<FormatPrivate> def(new FormatPrivate);
@@ -109,56 +125,32 @@ bool Format::isDefaultTextStyle(const Theme &theme) const
 
 bool Format::hasTextColor(const Theme &theme) const
 {
-    return textColor(theme) != QColor::fromRgba(theme.textColor(Theme::Normal))
-        && (d->style.textColor || theme.textColor(d->defaultStyle) || d->styleOverride(theme).textColor);
+    return d->hasColor(theme, &TextStyleData::textColor, &Theme::textColor);
 }
 
 QColor Format::textColor(const Theme &theme) const
 {
-    const auto overrideStyle = d->styleOverride(theme);
-    if (overrideStyle.textColor) {
-        return overrideStyle.textColor;
-    }
-    return d->style.textColor ? QColor::fromRgba(d->style.textColor) : QColor::fromRgba(theme.textColor(d->defaultStyle));
+    return d->color(theme, &TextStyleData::textColor, &Theme::textColor);
 }
 
 QColor Format::selectedTextColor(const Theme &theme) const
 {
-    const auto overrideStyle = d->styleOverride(theme);
-    if (overrideStyle.selectedTextColor) {
-        return overrideStyle.selectedTextColor;
-    }
-    return d->style.selectedTextColor ? QColor::fromRgba(d->style.selectedTextColor) : QColor::fromRgba(theme.selectedTextColor(d->defaultStyle));
+    return d->color(theme, &TextStyleData::selectedTextColor, &Theme::selectedTextColor);
 }
 
 bool Format::hasBackgroundColor(const Theme &theme) const
 {
-    // use QColor::fromRgba for background QRgb => QColor conversion to avoid unset colors == black!
-    return backgroundColor(theme) != QColor::fromRgba(theme.backgroundColor(Theme::Normal))
-        && (d->style.backgroundColor || theme.backgroundColor(d->defaultStyle) || d->styleOverride(theme).backgroundColor);
+    return d->hasColor(theme, &TextStyleData::backgroundColor, &Theme::backgroundColor);
 }
 
 QColor Format::backgroundColor(const Theme &theme) const
 {
-    const auto overrideStyle = d->styleOverride(theme);
-    if (overrideStyle.backgroundColor) {
-        return overrideStyle.backgroundColor;
-    }
-
-    // use QColor::fromRgba for background QRgb => QColor conversion to avoid unset colors == black!
-    return d->style.backgroundColor ? QColor::fromRgba(d->style.backgroundColor) : QColor::fromRgba(theme.backgroundColor(d->defaultStyle));
+    return d->color(theme, &TextStyleData::backgroundColor, &Theme::backgroundColor);
 }
 
 QColor Format::selectedBackgroundColor(const Theme &theme) const
 {
-    const auto overrideStyle = d->styleOverride(theme);
-    if (overrideStyle.selectedBackgroundColor) {
-        return overrideStyle.selectedBackgroundColor;
-    }
-
-    // use QColor::fromRgba for background QRgb => QColor conversion to avoid unset colors == black!
-    return d->style.selectedBackgroundColor ? QColor::fromRgba(d->style.selectedBackgroundColor)
-                                            : QColor::fromRgba(theme.selectedBackgroundColor(d->defaultStyle));
+    return d->color(theme, &TextStyleData::selectedBackgroundColor, &Theme::selectedBackgroundColor);
 }
 
 bool Format::isBold(const Theme &theme) const

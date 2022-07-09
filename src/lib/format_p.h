@@ -25,6 +25,11 @@ public:
     TextStyleData styleOverride(const Theme &theme) const;
     void load(QXmlStreamReader &reader);
 
+    using StyleColor = QRgb(TextStyleData::*);
+    using ThemeColor = QRgb (Theme::*)(Theme::TextStyle) const;
+    bool hasColor(const Theme &theme, StyleColor styleColor, ThemeColor themeColor) const;
+    QColor color(const Theme &theme, StyleColor styleColor, ThemeColor themeColor) const;
+
     DefinitionRef definition;
     QString name;
     TextStyleData style;

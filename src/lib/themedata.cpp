@@ -188,52 +188,50 @@ QString ThemeData::filePath() const
     return m_filePath;
 }
 
-QRgb ThemeData::textColor(Theme::TextStyle style) const
+TextStyleData ThemeData::textStyle(Theme::TextStyle style) const
 {
     Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Theme::Others));
-    return m_textStyles[style].textColor;
+    return m_textStyles[style];
+}
+
+QRgb ThemeData::textColor(Theme::TextStyle style) const
+{
+    return textStyle(style).textColor;
 }
 
 QRgb ThemeData::selectedTextColor(Theme::TextStyle style) const
 {
-    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Theme::Others));
-    return m_textStyles[style].selectedTextColor;
+    return textStyle(style).selectedTextColor;
 }
 
 QRgb ThemeData::backgroundColor(Theme::TextStyle style) const
 {
-    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Theme::Others));
-    return m_textStyles[style].backgroundColor;
+    return textStyle(style).backgroundColor;
 }
 
 QRgb ThemeData::selectedBackgroundColor(Theme::TextStyle style) const
 {
-    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Theme::Others));
-    return m_textStyles[style].selectedBackgroundColor;
+    return textStyle(style).selectedBackgroundColor;
 }
 
 bool ThemeData::isBold(Theme::TextStyle style) const
 {
-    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Theme::Others));
-    return m_textStyles[style].bold;
+    return textStyle(style).bold;
 }
 
 bool ThemeData::isItalic(Theme::TextStyle style) const
 {
-    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Theme::Others));
-    return m_textStyles[style].italic;
+    return textStyle(style).italic;
 }
 
 bool ThemeData::isUnderline(Theme::TextStyle style) const
 {
-    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Theme::Others));
-    return m_textStyles[style].underline;
+    return textStyle(style).underline;
 }
 
 bool ThemeData::isStrikeThrough(Theme::TextStyle style) const
 {
-    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Theme::Others));
-    return m_textStyles[style].strikeThrough;
+    return textStyle(style).strikeThrough;
 }
 
 QRgb ThemeData::editorColor(Theme::EditorColorRole role) const

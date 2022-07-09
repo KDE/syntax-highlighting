@@ -124,6 +124,11 @@ public:
      */
     TextStyleData textStyleOverride(const QString &definitionName, const QString &attributeName) const;
 
+    /**
+     * Returns the TextStyle data for the given @p style.
+     */
+    TextStyleData textStyle(Theme::TextStyle style) const;
+
 private:
     int m_revision = 0;
     QString m_name;

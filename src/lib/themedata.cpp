@@ -26,6 +26,7 @@ ThemeData *ThemeData::get(const Theme &theme)
 ThemeData::ThemeData()
 {
     memset(m_editorColors, 0, sizeof(m_editorColors));
+    m_textStyles.resize(QMetaEnum::fromType<Theme::TextStyle>().keyCount());
 }
 
 /**
@@ -190,7 +191,6 @@ QString ThemeData::filePath() const
 
 TextStyleData ThemeData::textStyle(Theme::TextStyle style) const
 {
-    Q_ASSERT(static_cast<int>(style) >= 0 && static_cast<int>(style) <= static_cast<int>(Theme::Others));
     return m_textStyles[style];
 }
 

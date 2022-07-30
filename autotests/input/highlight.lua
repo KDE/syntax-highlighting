@@ -118,6 +118,8 @@ xyz()
 ]]
 xyz()
 
+-- TODO bla bla
+--[[ TODO bla bla ]]
 
 a = { [f(1)] = g; "x", "y"; x = 1, f(x), [30] = 23; 45 }
 
@@ -157,6 +159,15 @@ for i=1,10 do
 end
 
 local function foo()
+end
+
+function obj:foo()
+  print(self:bar())
+end
+
+function obj.bar(self)
+  print(self)
+  print(self.value)
 end
 
 --! \brief gfind is deprecated

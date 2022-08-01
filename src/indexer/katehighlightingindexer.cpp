@@ -302,9 +302,9 @@ private:
                 return false;
             }
 
-            const auto value = attr.value().toString();
+            const auto value = attr.value();
             if (value.isEmpty() /*|| QColor(value).isValid()*/) {
-                qWarning() << filename << "line" << xml.lineNumber() << attrName << "should be a color:" << attr.value();
+                qWarning() << filename << "line" << xml.lineNumber() << attrName << "should be a color:" << value;
                 success = false;
             }
 
@@ -2408,7 +2408,7 @@ private:
     //! - "Comment##ISO C++"-> "Comment" in ISO C++
     void resolveContextName(Definition &definition, Context &context, ContextName &contextName, int line)
     {
-        QString name = contextName.name;
+        QStringView name = contextName.name;
         if (name.isEmpty()) {
             contextName.stay = true;
         } else if (name.startsWith(QStringLiteral("#stay"))) {
@@ -2437,15 +2437,15 @@ private:
             if (!name.isEmpty()) {
                 const int idx = name.indexOf(QStringLiteral("##"));
                 if (idx == -1) {
-                    auto it = definition.contexts.find(name);
+                    auto it = definition.contexts.find(name.toString());
                     if (it != definition.contexts.end()) {
                         contextName.context = &*it;
                     }
                 } else {
                     auto defName = name.mid(idx + 2);
-                    auto listName = name.left(idx);
-                    auto it = m_definitions.find(defName);
+                    auto it = m_definitions.find(defName.toString());
                     if (it != m_definitions.end()) {
+                        auto listName = name.left(idx).toString();
                         definition.referencedDefinitions.insert(&*it);
                         auto ctxIt = it->contexts.find(listName.isEmpty() ? it->firstContextName : listName);
                         if (ctxIt != it->contexts.end()) {
@@ -2505,10 +2505,10 @@ QStringList readListing(const QString &fileName)
  * @param extensions extensions string to check
  * @return valid?
  */
-bool checkExtensions(const QString &extensions)
+bool checkExtensions(QStringView extensions)
 {
     // get list of extensions
-    const QStringList extensionParts = extensions.split(QLatin1Char(';'), Qt::SkipEmptyParts);
+    const QList<QStringView> extensionParts = extensions.split(QLatin1Char(';'), Qt::SkipEmptyParts);
 
     // ok if empty
     if (extensionParts.isEmpty()) {

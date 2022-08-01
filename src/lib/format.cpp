@@ -239,22 +239,22 @@ void FormatPrivate::load(QXmlStreamReader &reader)
 
     QStringView attribute = reader.attributes().value(QLatin1String("color"));
     if (!attribute.isEmpty()) {
-        style.textColor = QColor(attribute.toString()).rgba();
+        style.textColor = QColor(attribute).rgba();
     }
 
     attribute = reader.attributes().value(QLatin1String("selColor"));
     if (!attribute.isEmpty()) {
-        style.selectedTextColor = QColor(attribute.toString()).rgba();
+        style.selectedTextColor = QColor(attribute).rgba();
     }
 
     attribute = reader.attributes().value(QLatin1String("backgroundColor"));
     if (!attribute.isEmpty()) {
-        style.backgroundColor = QColor(attribute.toString()).rgba();
+        style.backgroundColor = QColor(attribute).rgba();
     }
 
     attribute = reader.attributes().value(QLatin1String("selBackgroundColor"));
     if (!attribute.isEmpty()) {
-        style.selectedBackgroundColor = QColor(attribute.toString()).rgba();
+        style.selectedBackgroundColor = QColor(attribute).rgba();
     }
 
     attribute = reader.attributes().value(QLatin1String("italic"));

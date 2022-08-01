@@ -666,7 +666,7 @@ private:
     }
 };
 
-void fillString(QString &s, int n, const QString &fill)
+void fillString(QString &s, int n, QStringView fill)
 {
     if (n > 0) {
         for (; n > fill.size(); n -= fill.size()) {
@@ -896,7 +896,7 @@ private:
     /**
      * Append the context name in front of the format name.
      */
-    void appendContextNames(State &state, const QString &currentLine)
+    void appendContextNames(State &state, QStringView currentLine)
     {
         auto newState = state;
         for (auto &fragment : m_highlightedFragments) {

@@ -64,7 +64,7 @@ public:
     KeywordList *keywordList(const QString &name);
 
     Context *initialContext();
-    Context *contextByName(const QString &name);
+    Context *contextByName(QStringView name);
 
     Format formatByName(const QString &name) const;
 

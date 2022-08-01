@@ -330,6 +330,8 @@ ls *(^/,f44?,f.gu+w.,oL+rand,oe:"$cmd -x":P:echo::h)
 ls *(m4)
 ls *(mh0)
 ls *(mw3)
+ls *(${globqualifiers}N)
+ls *(\^'/')
 ls **.php
 ls **/*(#ia2)readme
 ls **/*(-@)

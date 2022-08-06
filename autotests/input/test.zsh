@@ -653,7 +653,14 @@ a) ]]
   2
 ]]
 [[ -""(#i)* == $x ]]
+[[ ]]
+[[ -f ]]
+[[ -f <0-99> ]]
 [[ $1 == <-> ]]
+[[ ?*<0-99> = <0-99> ]]
+[[ -f = ?*<0-99> ]]
+[[ a/sa[s = dsad?*<0-9>dsa$ds ]]
+[[ a/sa[s = dsad?*<0-9>ds/a$ds ]]
 [[ a =~ <1-2>a<->a<-2>a<2->a([!d]a?s[x[:alnum:]]|d?)p ]]
 [[ -n file*(#qN) ]]
 [[ ( -f foo || -f bar ) && $report = y* ]] && print File exists.
@@ -663,6 +670,24 @@ a) ]]
 ( [[ a = b ]] )
 ([[ a = b ]])
 
+[[ #comm1
+ #comm2
+ ! #comm3
+ p[1] #comm4
+ == #comm5
+ p[2] #comm6
+ #comm7
+ #comm8
+]]
+
+[[ #comm1
+ #comm2
+ -f #comme3
+ #comm4
+ p[2] #comm5
+ #comm6
+ #comm7
+]]
 
 [ a -eq 2 ] || [ a -eq 2] ] && [[ a -eq 2 ]] || [[ a != b ]];
 [ a -eq 2 ]||[ a -eq 2] ]&&[[ a -eq 2 ]]||[[ a != b ]];

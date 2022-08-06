@@ -405,6 +405,9 @@ echo "${var#refs/heads}" x "${var#refs}" x
 [[ (a =~ a) ]]
 [[ a =~ a || a -eq 2 ]]
 [[ (a =~ a) || a -eq 2 ]]
+[[ (0 -le $b) ]]
+[[ ( 0 -le $b ) ]]
+[[ ( 0 -le $b || $b -le 100 ) ]]
 [[ a<b ]]
 [[ a <b ]]
 [[ a< b ]]
@@ -422,6 +425,29 @@ echo "${var#refs/heads}" x "${var#refs}" x
   1 -eq 2
 ]]
 [[ -&&- ]]
+[[ ]]
+[[ -f ]]
+[[ -f [0-9a] ]]
+[[ ?*[0-9] = [^0-9] ]]
+[[ -f = ?*[0-9] ]]
+[[ ?*[0-9] = ?*[0-9] ]]
+[[ a/sa[s = dsad?*[0-9]dsa$ds ]]
+[[ a/sa[s = dsad?*[0-9]ds/a$ds ]]
+[[ a =~ [12]a([!d]a?s[x[:alnum:]]|d?)p ]]
+
+[[ #comm1
+ #comm2
+ p[1] == p[2]
+ #comm3
+ #comm4
+]]
+
+[[ #comm1
+ #comm2
+ -f p[2]
+ #comm3
+ #comm4
+]]
 
 ((3+1+a+$c*(x) & 0x43422fd+03-085/23#D9a@_^8))
 ((1/(2-(a-4))))

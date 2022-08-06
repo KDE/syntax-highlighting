@@ -4,6 +4,11 @@
     <!ENTITY ident "([^\t $&quot;\\]+|\$(?!\()|\\.)+">
 ]>
 <!--
+  Documentation:
+  https://www.bfgroup.xyz/b2/manual/release/index.html
+-->
+
+<!--
 Copyright (C) 2006 Mildred <silkensedai@online.fr>.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,7 +29,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 -->
-<language name="Jam" version="11" kateversion="5.79" section="Other" extensions="Jam*;*.jam" mimetype="text/x-jam;text/x-Jamfile;text/x-Jamrules;text/x-Jambase" author="Mildred (silkensedai@online.fr)" license="MIT">
+<language name="Jam" version="12" kateversion="5.79" section="Other" extensions="Jam*;*.jam" mimetype="text/x-jam;text/x-Jamfile;text/x-Jamrules;text/x-Jambase" author="Mildred (silkensedai@online.fr)" license="MIT">
   <!--
   Changelog
     0.2
@@ -235,6 +240,13 @@ IN THE SOFTWARE.
         <RegExpr attribute="Rule" context="Rule" String="([^\t ][^\t ]+|[^{}\t ])"/>
       </context>
 
+      <context attribute="Normal" lineEndContext="#stay" name="FindBlank">
+        <DetectSpaces attribute="Normal"/>
+        <Detect2Chars attribute="CommentTitle" context="CommentTitle" char="#" char1="#"/>
+        <Detect2Chars attribute="Comment" context="CommentBlock" char="#" char1="|"/>
+        <DetectChar attribute="Comment" context="Comment" char="#"/>
+      </context>
+
       <!-- General instructions -->
 
       <context attribute="Normal" lineEndContext="#stay" name="Rule">
@@ -298,9 +310,7 @@ IN THE SOFTWARE.
       </context>
 
       <context attribute="Normal" lineEndContext="#stay" name="ClassStatement2">
-        <DetectSpaces attribute="Normal"/>
-        <Detect2Chars attribute="CommentTitle" context="CommentTitle" char="#" char1="#"/>
-        <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <IncludeRules context="FindBlank"/>
         <WordDetect attribute="Operator" context="#pop" String="}" endRegion="block"/>
         <keyword attribute="Keyword" context="MethodDefinition" String="keywordRule"/>
         <RegExpr attribute="Error" context="#stay" String="&ident;"/>
@@ -461,18 +471,14 @@ IN THE SOFTWARE.
       </context>
 
       <context attribute="Normal" lineEndContext="#stay" name="SwitchStatement2">
-        <DetectSpaces attribute="Normal"/>
-        <Detect2Chars attribute="CommentTitle" context="CommentTitle" char="#" char1="#"/>
-        <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <IncludeRules context="FindBlank"/>
         <WordDetect attribute="Operator" context="#pop" String="}" endRegion="block"/>
         <keyword attribute="Operator" context="CaseCond" String="keywordCase"/>
         <RegExpr attribute="Error" context="#stay" String="&ident;"/>
       </context>
 
       <context attribute="Normal" lineEndContext="#stay" name="CaseCond">
-        <DetectSpaces attribute="Normal"/>
-        <Detect2Chars attribute="CommentTitle" context="CommentTitle" char="#" char1="#"/>
-        <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <IncludeRules context="FindBlank"/>
         <WordDetect attribute="Operator" context="#pop!CaseStatement" String=":"/>
         <WordDetect attribute="Error" context="#pop" String=";"/>
         <RegExpr attribute="Normal" context="#stay" String="&ident;"/>
@@ -503,9 +509,7 @@ IN THE SOFTWARE.
       <!-- Variables, Strings, Comments -->
 
       <context attribute="Normal" lineEndContext="#stay" name="Preprocess">
-        <DetectSpaces attribute="Normal"/>
-        <Detect2Chars attribute="CommentTitle" context="CommentTitle" char="#" char1="#"/>
-        <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <IncludeRules context="FindBlank"/>
         <Detect2Chars attribute="VariableDelimiter" context="Variable" char="$" char1="("/>
         <DetectChar attribute="String" context="String" char="&quot;"/>
         <WordDetect attribute="Operator" context="SubStatement" String="["/>
@@ -532,6 +536,11 @@ IN THE SOFTWARE.
         <DetectSpaces/>
         <IncludeRules context="##Comments" />
         <DetectIdentifier/>
+      </context>
+
+      <context attribute="Comment" lineEndContext="#stay" name="CommentBlock">
+        <Detect2Chars attribute="Comment" context="#pop" char="|" char1="#"/>
+        <IncludeRules context="Comment"/>
       </context>
 
       <context attribute="CommentTitle" lineEndContext="#pop" name="CommentTitle">

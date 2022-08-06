@@ -83,10 +83,6 @@ public:
         return m_type == Type::LineContinue;
     }
 
-    virtual void resolvePostProcessing()
-    {
-    }
-
     virtual MatchResult doMatch(QStringView text, int offset, const QStringList &captures) const = 0;
 
     static Rule::Ptr create(DefinitionData &def, const HighlightingContextData::Rule &ruleData, QStringView lookupContextName);
@@ -296,9 +292,9 @@ public:
 
 protected:
     MatchResult doMatch(QStringView text, int offset, const QStringList &) const override;
-    void resolvePostProcessing() override;
 
 private:
+    void resolve();
     QRegularExpression m_regexp;
     bool m_isResolved = false;
 };

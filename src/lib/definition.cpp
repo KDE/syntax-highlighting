@@ -592,15 +592,6 @@ void DefinitionData::resolveContexts()
     for (auto &context : contexts) {
         context.resolveIncludes(*this);
     }
-
-    /**
-     * Post-processing on rules.
-     */
-    for (const auto &context : contexts) {
-        for (auto &rule : context.rules()) {
-            rule->resolvePostProcessing();
-        }
-    }
 }
 
 void DefinitionData::loadItemData(QXmlStreamReader &reader)

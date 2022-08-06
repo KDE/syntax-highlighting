@@ -580,7 +580,7 @@ RegExpr::RegExpr(const HighlightingContextData::Rule::RegExpr &data)
     m_regexp.setPattern(data.pattern);
     m_regexp.setPatternOptions((data.isMinimal ? QRegularExpression::InvertedGreedinessOption : QRegularExpression::NoPatternOption)
                                | (data.caseSensitivity == Qt::CaseInsensitive ? QRegularExpression::CaseInsensitiveOption : QRegularExpression::NoPatternOption)
-                               // DontCaptureOption is removed by resolvePostProcessing() when necessary
+                               // DontCaptureOption is removed by resolve() when necessary
                                | QRegularExpression::DontCaptureOption
                                // ensure Unicode support is enabled
                                | QRegularExpression::UseUnicodePropertiesOption);
@@ -588,7 +588,7 @@ RegExpr::RegExpr(const HighlightingContextData::Rule::RegExpr &data)
     m_dynamic = data.dynamic;
 }
 
-void RegExpr::resolvePostProcessing()
+void RegExpr::resolve()
 {
     if (m_isResolved) {
         return;
@@ -608,11 +608,6 @@ void RegExpr::resolvePostProcessing()
         }
     }
 
-    // optimize the pattern for the non-dynamic case, we use them OFTEN
-    if (!m_dynamic) {
-        m_regexp.optimize();
-    }
-
     bool isValid = m_regexp.isValid();
     if (!isValid) {
         // DontCaptureOption with back reference capture is an error, remove this option then try again
@@ -629,6 +624,10 @@ void RegExpr::resolvePostProcessing()
 
 MatchResult RegExpr::doMatch(QStringView text, int offset, const QStringList &captures) const
 {
+    if (!m_isResolved) {
+        const_cast<RegExpr *>(this)->resolve();
+    }
+
     /**
      * for dynamic case: create new pattern with right instantiation
      */

@@ -421,14 +421,15 @@
 
       <context name="IntSuffix" attribute="Error" lineEndContext="#pop#pop" fallthrough="true" fallthroughContext="NumericSuffixError">
         <DetectChar attribute="Error" context="#stay" char="'" />
-        <AnyChar attribute="Error" context="#pop!IntSuffixPattern" String="uUlLimunshyd_" lookAhead="true" />
+        <AnyChar context="#pop!IntSuffixPattern" String="uUlLimunshydzZ_" lookAhead="1"/>
       </context>
 
       <context name="IntSuffixPattern" attribute="Error" lineEndContext="#pop#pop" fallthrough="true" fallthroughContext="NumericSuffixError">
-        <RegExpr attribute="Standard Suffix" context="NumericSuffixError" String="([Uu][Ll]{0,2}|[Ll]{0,2}[Uu]?)\b" />
+        <!-- https://en.cppreference.com/w/cpp/language/integer_literal#The_type_of_the_literal -->
+        <RegExpr attribute="Standard Suffix" context="NumericSuffixError" String="([Uu](LL?|ll?|[Zz])?|(LL?|ll?|[Zz])[Uu]?)\b|"/>
         <!-- https://en.cppreference.com/w/cpp/language/user_literal#Standard_library -->
-        <RegExpr attribute="Standard Classes" context="NumericSuffixError" String="(?:i[fl]?|min|[mun]?s|[hyd])\b" />
-        <DetectChar attribute="Error" context="#pop!NumericUserSuffixPattern" char="_" lookAhead="true" />
+        <RegExpr attribute="Standard Classes" context="NumericSuffixError" String="(?:i[fl]?|min|[mun]?s|[hyd])\b|"/>
+        <DetectChar context="#pop!NumericUserSuffixPattern" char="_" lookAhead="1"/>
       </context>
 
       <context name="FloatSuffix" attribute="Error" lineEndContext="#pop#pop" fallthrough="true" fallthroughContext="NumericSuffixError">

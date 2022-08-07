@@ -252,6 +252,8 @@
       <item>ifdef</item>
       <item>ifndef</item>
       <item>elif</item>
+      <item>elifdef</item> <!--C++23-->
+      <item>elifndef</item> <!--C++23-->
       <item>else</item>
       <item>endif</item>
       <item>cmakedefine01</item>
@@ -264,20 +266,16 @@
       <item>undef</item>
       <item>warning</item>
     </list>
-    <list name="preprocessorIfDef">
-      <item>ifdef</item>
-      <item>ifndef</item>
-    </list>
     <list name="preprocessorDefine">
       <item>cmakedefine01</item>
       <item>cmakedefine</item>
       <item>define</item>
+      <item>undef</item>
     </list>
     <list name="preprocessorOther">
       <item>error</item>
       <item>line</item>
       <item>pragma</item>
-      <item>undef</item>
       <item>warning</item>
     </list>
 
@@ -299,7 +297,7 @@
         <!-- Match keywords -->
         <IncludeRules context="match keywords" />
         <!-- Match string literals -->
-        <IncludeRules context="match string" />
+        <IncludeRules context="FindStrings"/>
         <!-- Match GCC extensions -->
         <IncludeRules context="DetectGccExtensions##GCCExtensions" />
         <!-- Match most used namespaces and styles -->
@@ -348,22 +346,51 @@
         <keyword attribute="Keyword" context="#stay" String="keywords" />
       </context>
 
-      <context name="match string" attribute="Normal Text" lineEndContext="#pop">
-        <DetectChar attribute="String" context="String" char="&quot;" />
-        <Detect2Chars attribute="String" context="String" char="U" char1="&quot;" />
-        <Detect2Chars attribute="String" context="String16" char="u" char1="&quot;" />
-        <Detect2Chars attribute="String" context="String16" char="L" char1="&quot;" />
-        <StringDetect attribute="String" context="String8" String="u8&quot;" />
-        <Detect2Chars attribute="Raw String Delimiter" context="RawString" char="R" char1="&quot;" />
-        <StringDetect attribute="Raw String Delimiter" context="RawString" String="uR&quot;" />
-        <StringDetect attribute="Raw String Delimiter" context="RawString" String="UR&quot;" />
-        <StringDetect attribute="Raw String Delimiter" context="RawString" String="LR&quot;" />
-        <StringDetect attribute="Raw String Delimiter" context="RawString" String="u8R&quot;" />
-        <DetectChar attribute="Char" context="Char8 Literal" char="'" />
-        <Detect2Chars attribute="Char" context="Char16 Literal" char="L" char1="'" />
-        <Detect2Chars attribute="Char" context="Char16 Literal" char="u" char1="'" />
-        <Detect2Chars attribute="Char" context="Char32 Literal" char="U" char1="'" />
-        <StringDetect attribute="Char" context="Char8 Literal" String="u8'" />
+      <context name="FindStrings" attribute="Normal Text" lineEndContext="#pop">
+        <RegExpr context="SelectString" String="([UL]|u8?)?(R?&quot;|')" lookAhead="1"/>
+      </context>
+
+
+      <context name="SelectString" attribute="String" lineEndContext="#pop">
+        <DetectChar attribute="String" context="#pop!String8" char="&quot;"/>
+        <DetectChar attribute="Char" context="#pop!Char8" char="'"/>
+        <Detect2Chars context="#pop!SelectStringPrefix" char="U" char1="&quot;" lookAhead="1"/>
+        <Detect2Chars context="#pop!SelectStringPrefix" char="u" char1="&quot;" lookAhead="1"/>
+        <Detect2Chars context="#pop!SelectStringPrefix" char="L" char1="&quot;" lookAhead="1"/>
+        <StringDetect context="#pop!SelectStringPrefix" String="u8&quot;" lookAhead="1"/>
+        <Detect2Chars attribute="Raw String Delimiter" context="#pop!RawString" char="R" char1="&quot;" />
+        <StringDetect attribute="Raw String Delimiter" context="#pop!RawString" String="uR&quot;"/>
+        <StringDetect attribute="Raw String Delimiter" context="#pop!RawString" String="UR&quot;"/>
+        <StringDetect attribute="Raw String Delimiter" context="#pop!RawString" String="LR&quot;"/>
+        <StringDetect attribute="Raw String Delimiter" context="#pop!RawString" String="u8R&quot;"/>
+        <Detect2Chars attribute="Char Literal Prefix" context="#pop!CharPrefix8" char="u" char1="8"/>
+        <AnyChar      attribute="Char Literal Prefix" context="#pop!CharPrefix16" String="Lu"/>
+        <DetectChar   attribute="Char Literal Prefix" context="#pop!CharPrefix32" char="U"/>
+      </context>
+
+      <context name="SelectStringPrefix" attribute="String" lineEndContext="#pop">
+        <Detect2Chars attribute="String Literal Prefix" context="#pop!StringPrefix8" char="u" char1="8"/>
+        <AnyChar attribute="String Literal Prefix" context="#pop!StringPrefix16" String="uL"/>
+        <DetectChar attribute="String Literal Prefix" context="#pop!StringPrefix32" char="U"/>
+      </context>
+      <context name="StringPrefix8" attribute="String" lineEndContext="#pop">
+        <DetectChar attribute="String" context="#pop!String8" char="&quot;"/>
+      </context>
+      <context name="StringPrefix16" attribute="String" lineEndContext="#pop">
+        <DetectChar attribute="String" context="#pop!String16" char="&quot;"/>
+      </context>
+      <context name="StringPrefix32" attribute="String" lineEndContext="#pop">
+        <DetectChar attribute="String" context="#pop!String32" char="&quot;"/>
+      </context>
+
+      <context name="CharPrefix8" attribute="Char" lineEndContext="#pop">
+        <DetectChar attribute="Char" context="#pop!Char8" char="'"/>
+      </context>
+      <context name="CharPrefix16" attribute="Char" lineEndContext="#pop">
+        <DetectChar attribute="Char" context="#pop!Char16" char="'"/>
+      </context>
+      <context name="CharPrefix32" attribute="Char" lineEndContext="#pop">
+        <DetectChar attribute="Char" context="#pop!Char32" char="'"/>
       </context>
 
       <context name="match identifier" attribute="Normal Text" lineEndContext="#pop">
@@ -441,45 +468,59 @@
       </context>
 
 
-      <context name="Char8 Literal" attribute="Char" lineEndContext="#pop" fallthrough="true" fallthroughContext="Char Literal Close">
-        <RegExpr attribute="String Char" context="Char Literal Close" String="\\(?:[tnvbrfa'&quot;\\?]|[0-7]{1,3}|x[0-9A-Fa-f]{1,2})" />
-        <DetectChar attribute="Error" context="#pop" char="'" />
-        <RegExpr attribute="Char" context="Char Literal Close" String="." />
+      <context name="Char8" attribute="Char" lineEndContext="#pop" fallthrough="true" fallthroughContext="CharClose">
+        <HlCStringChar attribute="String Char" context="CharClose"/>
+        <IncludeRules context="FindSingleChar"/>
       </context>
 
-      <context name="Char16 Literal" attribute="Char" lineEndContext="#pop" fallthrough="true" fallthroughContext="Char Literal Close">
-        <RegExpr attribute="String Char" context="Char Literal Close" String="\\(?:[tnvbrfa'&quot;\\?]|[0-7]{1,3}|x[0-9A-Fa-f]{1,4}|u[0-9A-Fa-f]{4})" />
-        <DetectChar attribute="Error" context="#pop" char="'" />
-        <RegExpr attribute="Char" context="Char Literal Close" String="." />
+      <context name="Char16" attribute="Char" lineEndContext="#pop" fallthrough="true" fallthroughContext="CharClose">
+        <RegExpr attribute="String Char" context="CharClose" String="\\(?:[tnvbrfa'&quot;\\?]|[0-7]{1,3}|x[0-9A-Fa-f]{1,4}|u[0-9A-Fa-f]{4})|" />
+        <IncludeRules context="FindSingleChar"/>
       </context>
 
-      <context name="Char32 Literal" attribute="Char" lineEndContext="#pop" fallthrough="true" fallthroughContext="Char Literal Close">
-        <RegExpr attribute="String Char" context="Char Literal Close" String="\\(?:[tnvbrfa'&quot;\\?]|[0-7]{1,3}|x[0-9A-Fa-f]{1,8}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})" />
-        <DetectChar attribute="Error" context="#pop" char="'" />
-        <RegExpr attribute="Char" context="Char Literal Close" String="." />
+      <context name="Char32" attribute="Char" lineEndContext="#pop" fallthrough="true" fallthroughContext="CharClose">
+        <RegExpr attribute="String Char" context="CharClose" String="\\(?:[tnvbrfa'&quot;\\?]|[0-7]{1,3}|x[0-9A-Fa-f]{1,8}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})|" />
+        <IncludeRules context="FindSingleChar"/>
       </context>
 
-      <context name="Char Literal Close" attribute="Error" lineEndContext="#pop#pop">
+      <context name="FindSingleChar" attribute="Char" lineEndContext="#pop">
+        <DetectChar attribute="Error" context="#pop" char="'" />
+        <RegExpr attribute="Char" context="CharClose" String="." />
+      </context>
+
+      <context name="CharClose" attribute="Error" lineEndContext="#pop#pop">
         <DetectChar attribute="Char" context="#pop#pop" char="'" />
       </context>
 
 
-      <context name="String" attribute="String" lineEndContext="#pop">
-        <IncludeRules context="string normal char" />
-        <RegExpr attribute="String Char" context="StringNoHex" String="\\x[0-9A-Fa-f]{1,8}" />
-        <IncludeRules context="string special char" />
-      </context>
-
       <context name="String8" attribute="String" lineEndContext="#pop">
         <IncludeRules context="string normal char" />
-        <RegExpr attribute="String Char" context="StringNoHex" String="\\x[0-9A-Fa-f]{1,2}" />
+        <Detect2Chars context="String8EscapeX" char="\" char1="x" lookAhead="1"/>
         <IncludeRules context="string special char" />
+      </context>
+      <context name="String8EscapeX" attribute="String" lineEndContext="#pop">
+        <HlCStringChar attribute="String Char" context="#pop!StringNoHex"/>
+        <Detect2Chars context="#pop" attribute="Error" char="\" char1="x"/>
       </context>
 
       <context name="String16" attribute="String" lineEndContext="#pop">
         <IncludeRules context="string normal char" />
-        <RegExpr attribute="String Char" context="StringNoHex" String="\\x[0-9A-Fa-f]{1,4}" />
+        <Detect2Chars context="String16EscapeX" char="\" char1="x" lookAhead="1"/>
         <IncludeRules context="string special char" />
+      </context>
+      <context name="String16EscapeX" attribute="String" lineEndContext="#pop">
+        <RegExpr attribute="String Char" context="#pop!StringNoHex" String="\\x[0-9A-Fa-f]{1,4}" />
+        <Detect2Chars context="#pop" attribute="Error" char="\" char1="x"/>
+      </context>
+
+      <context name="String32" attribute="String" lineEndContext="#pop">
+        <IncludeRules context="string normal char" />
+        <Detect2Chars context="String32EscapeX" char="\" char1="x" lookAhead="1"/>
+        <IncludeRules context="string special char" />
+      </context>
+      <context name="String32EscapeX" attribute="String" lineEndContext="#pop">
+        <RegExpr attribute="String Char" context="#pop!StringNoHex" String="\\x[0-9A-Fa-f]{1,8}" />
+        <Detect2Chars context="#pop" attribute="Error" char="\" char1="x"/>
       </context>
 
       <context name="StringNoHex" attribute="Error" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
@@ -487,9 +528,11 @@
       </context>
 
       <context name="string special char" attribute="String" lineEndContext="#pop">
-        <RegExpr attribute="String Char" context="#stay" String="\\(?:[tnvbrfa'&quot;\\?]|[0-7]{1,3}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})|&printf_like;|&format_like;" />
-        <RegExpr attribute="Error" context="#stay" String="\\(?:u[^&quot;]{0,3}|U[^&quot;]{0,7}|.)" />
-        <LineContinue attribute="String" context="#stay" />
+        <HlCStringChar attribute="String Char"/>
+        <RegExpr attribute="String Char" String="\\(?:u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})|&printf_like;|&format_like;"/>
+        <AnyChar attribute="String" String="%{}"/>
+        <RegExpr attribute="Error" String="\\(?:u[^&quot;]{0,3}|U[^&quot;]{0,7}|.)"/>
+        <LineContinue attribute="String"/>
       </context>
 
       <context name="string normal char" attribute="String" lineEndContext="#pop">
@@ -514,7 +557,7 @@
         <DetectChar attribute="Separator Symbol" context="#stay" char="," />
         <AnyChar attribute="Symbol" context="#stay" String="&punctuators;" />
         <!-- Attributes may contain some text: [[deprecated("Reason text")]] -->
-        <DetectChar attribute="String" context="String" char="&quot;" />
+        <DetectChar attribute="String" context="String32" char="&quot;" />
         <AnyChar attribute="Decimal" context="Integer" String="0123456789" lookAhead="true" />
         <!-- This keyword may appear in Attribute context. For example in code:
         [[using CC: opt(1), debug]]
@@ -543,7 +586,7 @@
 
       <context name="InRawString" attribute="Raw String" lineEndContext="#stay" dynamic="true">
         <!-- fast way, can be replaced by a `UntilChars` rule if it exists -->
-        <RegExpr attribute="Raw String" context="#stay" String="[^%)]+" />
+        <RegExpr attribute="Raw String" context="#stay" String="[^%){}]+" />
         <RegExpr attribute="String Char" context="#stay" String="&printf_like;|&format_like;" />
         <StringDetect attribute="Raw String Delimiter" context="#pop" String=")%1&quot;" dynamic="true" endRegion="Raw String" />
       </context>
@@ -603,28 +646,28 @@
         <DetectIdentifier />
       </context>
 
-      <context name="AfterHash" attribute="Error" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!AfterHashLineError">
-        <RegExpr attribute="Preprocessor" context="#pop!PreprocessorCmd" String="&pphash;(?=.)" firstNonSpace="true" />
-      </context>
-
-      <context name="AfterHashLineError" attribute="Region Marker" lineEndContext="#pop">
-        <LineContinue attribute="Error" context="#stay" />
-        <RegExpr attribute="Error" context="#pop!LineError" String="[^\\]+" />
+      <context name="AfterHash" attribute="Error" lineEndContext="#pop" fallthroughContext="#pop!LineError">
+        <RegExpr attribute="Preprocessor" context="#pop!PreprocessorCmd" String="&pphash;(?=.)|" firstNonSpace="true" />
       </context>
 
       <context name="LineError" attribute="Error" lineEndContext="#pop">
         <LineContinue attribute="Error" context="#stay" />
+        <RegExpr attribute="Error" context="#stay" String="[^\\]+" />
       </context>
 
-      <context name="PreprocessorCmd" attribute="Error" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!AfterHashLineError">
+
+      <context name="PreprocessorCmd" attribute="Error" lineEndContext="#pop" fallthroughContext="#pop!LineError">
         <WordDetect attribute="Preprocessor" context="#pop!Include" String="include" />
-        <keyword attribute="Preprocessor" context="#pop!PreprocessorIfDef" String="preprocessorIfDef" beginRegion="PP" lookAhead="true" />
+        <WordDetect attribute="Preprocessor" context="#pop!PreprocessorIfDef" String="ifdef" beginRegion="PP" lookAhead="true" />
+        <WordDetect attribute="Preprocessor" context="#pop!PreprocessorIfDef" String="ifndef" beginRegion="PP" lookAhead="true" />
         <WordDetect attribute="Preprocessor" context="#pop!PreprocessorIf" String="if" beginRegion="PP" lookAhead="true" />
         <WordDetect attribute="Preprocessor" context="#pop!PreprocessorIf" String="elif" endRegion="PP" beginRegion="PP" lookAhead="true" />
         <WordDetect attribute="Preprocessor" context="PreprocessorEndOfLineSpace" String="else" endRegion="PP" beginRegion="PP" />
         <WordDetect attribute="Preprocessor" context="PreprocessorEndOfLineSpace" String="endif" endRegion="PP" />
-        <keyword attribute="Preprocessor" context="#pop!Preprocessor" String="preprocessorOther" />
+        <WordDetect attribute="Preprocessor" context="#pop!PreprocessorIfDef" String="elifdef" endRegion="PP" beginRegion="PP" lookAhead="true" />
+        <WordDetect attribute="Preprocessor" context="#pop!PreprocessorIfDef" String="elifndef" endRegion="PP" beginRegion="PP" lookAhead="true" />
         <keyword attribute="Preprocessor" context="#pop!Define" String="preprocessorDefine" />
+        <keyword attribute="Preprocessor" context="#pop!Preprocessor" String="preprocessorOther" />
         <!-- GCC extension -->
         <WordDetect attribute="Preprocessor" context="#pop!Include" String="include_next" />
         <Int attribute="Preprocessor" context="#pop!Preprocessor"/>
@@ -695,7 +738,7 @@
         <!-- Match keywords -->
         <IncludeRules context="match keywords" />
         <!-- Match string literals -->
-        <IncludeRules context="match string" />
+        <IncludeRules context="FindStrings"/>
         <!-- Match GCC extensions -->
         <IncludeRules context="DetectGccExtensionsInPP##GCCExtensions" />
         <!-- Match most used namespaces and styles -->
@@ -726,13 +769,13 @@
         <!-- prevent incorrect highlighting in case of not closed properly comment block -->
         <Detect2Chars attribute="Comment" context="#stay" char="*" char1="/" />
         <IncludeRules context="match comments" />
-        <RegExpr attribute="Comment" context="Outscoped intern" String="&pphash;if" beginRegion="PP" firstNonSpace="true" />
+        <RegExpr attribute="Comment" context="Outscoped intern" String="&pphash;if|" beginRegion="PP" firstNonSpace="true" />
         <LineContinue context="#stay" />
       </context>
 
       <context name="Outscoped" attribute="Comment" lineEndContext="#stay">
         <DetectSpaces />
-        <RegExpr attribute="Preprocessor" context="Outscoped AfterHash" String="&ispphash;" firstNonSpace="true" lookAhead="true" />
+        <RegExpr attribute="Preprocessor" context="Outscoped AfterHash" String="&ispphash;|" firstNonSpace="true" lookAhead="true" />
         <IncludeRules context="Outscoped Common" />
       </context>
 
@@ -748,18 +791,18 @@
 
       <context name="Outscoped 2" attribute="Comment" lineEndContext="#stay">
         <IncludeRules context="Outscoped Common" />
-        <RegExpr attribute="Preprocessor" context="#pop!PreprocessorEndOfLineSpace" String="&pphash;endif" endRegion="PP" firstNonSpace="true" />
+        <RegExpr attribute="Preprocessor" context="#pop!PreprocessorEndOfLineSpace" String="&pphash;endif|" endRegion="PP" firstNonSpace="true" />
       </context>
 
       <context name="Inscoped" attribute="Normal Text" lineEndContext="#stay">
         <DetectSpaces />
-        <RegExpr attribute="Preprocessor" context="Inscoped AfterHash" String="&ispphash;" firstNonSpace="true" lookAhead="true" />
+        <RegExpr attribute="Preprocessor" context="Inscoped AfterHash" String="&ispphash;|" firstNonSpace="true" lookAhead="true" />
         <IncludeRules context="Main" />
       </context>
 
       <context name="Inscoped AfterHash" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!AfterHash">
         <DetectSpaces />
-        <RegExpr attribute="Preprocessor" context="#pop!Outscoped 2" String="&pphash;el(?:se|if)" endRegion="PP" beginRegion="PP"/>
+        <RegExpr attribute="Preprocessor" context="#pop!Outscoped 2" String="&pphash;el(?:se|if(n?def))" endRegion="PP" beginRegion="PP"/>
         <RegExpr attribute="Preprocessor" context="#pop#pop!PreprocessorEndOfLineSpace" String="&pphash;endif\b" endRegion="PP" />
       </context>
 
@@ -770,9 +813,9 @@
         <!-- prevent incorrect highlighting in case of not closed properly comment block -->
         <Detect2Chars attribute="Comment" context="#stay" char="*" char1="/" />
         <IncludeRules context="match comments" />
-        <RegExpr attribute="Comment" context="Outscoped intern" String="&pphash;if" beginRegion="PP" firstNonSpace="true" />
-        <RegExpr attribute="Comment" context="#stay" String="&pphash;el(se|if)" beginRegion="PP" endRegion="PP" firstNonSpace="true" />
-        <RegExpr attribute="Comment" context="PreprocessorEndOfLineSpace" String="&pphash;endif" endRegion="PP" firstNonSpace="true" />
+        <RegExpr attribute="Comment" context="Outscoped intern" String="&pphash;if|" beginRegion="PP" firstNonSpace="true" />
+        <RegExpr attribute="Comment" context="#stay" String="&pphash;el(se|if(n?def))|" beginRegion="PP" endRegion="PP" firstNonSpace="true" />
+        <RegExpr attribute="Comment" context="PreprocessorEndOfLineSpace" String="&pphash;endif|" endRegion="PP" firstNonSpace="true" />
       </context>
     </contexts>
 
@@ -790,10 +833,12 @@
       <itemData name="Binary"             defStyleNum="dsBaseN"     spellChecking="false" />
       <itemData name="Float"              defStyleNum="dsFloat"     spellChecking="false" />
       <itemData name="Char"               defStyleNum="dsChar"      spellChecking="false" />
+      <itemData name="Char Literal Prefix" defStyleNum="dsChar"     spellChecking="false" />
       <itemData name="String"             defStyleNum="dsString"    spellChecking="true"  />
       <itemData name="String Char"        defStyleNum="dsSpecialChar" spellChecking="false" />
-      <itemData name="Raw String"         defStyleNum="dsVerbatimString" spellChecking="true"  />
-      <itemData name="Raw String Delimiter" defStyleNum="dsString"  spellChecking="false"  />
+      <itemData name="String Literal Prefix" defStyleNum="dsString" spellChecking="true" />
+      <itemData name="Raw String"         defStyleNum="dsVerbatimString" spellChecking="true" />
+      <itemData name="Raw String Delimiter" defStyleNum="dsString"  spellChecking="false" />
       <itemData name="Comment"            defStyleNum="dsComment"   spellChecking="true"  />
       <itemData name="Symbol"             defStyleNum="dsOperator"  spellChecking="false" />
       <itemData name="Separator Symbol"   defStyleNum="dsOperator"  spellChecking="false" />

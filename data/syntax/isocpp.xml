@@ -583,7 +583,7 @@
         <RegExpr attribute="String Char" String="\\(?:u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})|&printf_like;|&format_like;"/>
         <AnyChar attribute="String" String="%{}"/>
         <RegExpr attribute="Error" String="\\(?:u[^&quot;]{0,3}|U[^&quot;]{0,7}|.)"/>
-        <LineContinue attribute="String"/>
+        <LineContinue attribute="Separator Symbol"/>
       </context>
 
       <context name="string normal char" attribute="String" lineEndContext="#pop">
@@ -776,7 +776,7 @@
         <DetectSpaces/>
         <LineContinue attribute="Separator Symbol" context="#stay" />
         <!-- Match scope regions and punctuators (partial for fast path) -->
-        <AnyChar attribute="Symbol" context="#stay" String=":(){}]+-*%=&gt;!|&amp;~^" />
+        <AnyChar attribute="Symbol" context="#stay" String="#:(){}]+-*%=&gt;!|&amp;~^" />
         <!-- Detect attributes -->
         <Detect2Chars attribute="Symbol" context="Attribute In PP" char="[" char1="[" />
         <StringDetect attribute="Symbol" context="Attribute In PP" String="&lt;:&lt;:" /> <!-- Digraph: [[ -->
@@ -797,8 +797,6 @@
         <RegExpr context="DispatchNamespacePP" String="(std::)|(boost::|BOOST_)|details?::|aux::|internals::" lookAhead="1"/>
         <keyword attribute="Standard Macros" context="#stay" String="InMacro" />
         <IncludeRules context="match identifier" />
-        <!-- Match preprocessor directives -->
-        <DetectChar attribute="Preprocessor" context="#stay" char="#" />
         <!-- Match invalid symbols -->
         <AnyChar attribute="Error" context="#stay" String="$@`\" />
       </context>
@@ -848,7 +846,7 @@
 
       <context name="Inscoped AfterHash" attribute="Normal Text" lineEndContext="#pop" fallthroughContext="#pop!AfterHash">
         <DetectSpaces />
-        <RegExpr attribute="Preprocessor" context="#pop!Outscoped 2" String="&pphash;el(?:se|if(n?def))" endRegion="PP" beginRegion="PP"/>
+        <RegExpr attribute="Preprocessor" context="#pop!Outscoped 2" String="&pphash;el(?:se|if(n?def)?)" endRegion="PP" beginRegion="PP"/>
         <RegExpr attribute="Preprocessor" context="#pop#pop!PreprocessorEndOfLineSpace" String="&pphash;endif\b" endRegion="PP" />
       </context>
 
@@ -860,7 +858,7 @@
         <Detect2Chars attribute="Comment" context="#stay" char="*" char1="/" />
         <IncludeRules context="match comments" />
         <RegExpr attribute="Comment" context="Outscoped intern" String="&pphash;if|" beginRegion="PP" firstNonSpace="true" />
-        <RegExpr attribute="Comment" context="#stay" String="&pphash;el(se|if(n?def))|" beginRegion="PP" endRegion="PP" firstNonSpace="true" />
+        <RegExpr attribute="Comment" context="#stay" String="&pphash;el(se|if(n?def)?)|" beginRegion="PP" endRegion="PP" firstNonSpace="true" />
         <RegExpr attribute="Comment" context="PreprocessorEndOfLineSpace" String="&pphash;endif|" endRegion="PP" firstNonSpace="true" />
       </context>
     </contexts>

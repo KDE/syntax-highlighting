@@ -273,3 +273,8 @@ a multiline comment.
     }
   }
 }
+
+[zoom >= 17] {
+  text-repeat-distance: 10
+}
+[zoom >= 19] { text-size: 11; }

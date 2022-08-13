@@ -374,6 +374,19 @@ begin
 
     subtype addr_int is integer range 0 to 65535;
     subtype sub_enum_type is enum_type range a to m;
+
+    inst1: entity work.counter1(rtl)
+        generic map (BITS1 => 8)
+        port map (clk1 => Clock);
+
+    inst2: component counter2
+        generic map (BITS1 => 8)
+        port map (clk1 => Clock);
+
+    inst3: configuration counter3
+        generic map (BITS1 => 8)
+        port map (clk1 => Clock);
+
 end architecture;
 
 architecture a2 of e is

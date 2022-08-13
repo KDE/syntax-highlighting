@@ -5,7 +5,8 @@
   <!ENTITY identifier "\b(?:[A-Za-z_][A-Za-z0-9_]*)\b|/(?:[^/]++(?://)?+)*+/">
   <!ENTITY bos      "\b">                        <!-- bol or space following -->
 ]>
-<language name="VHDL" version="13" kateversion="5.62" section="Hardware" extensions="*.vhdl;*.vhd" mimetype="text/x-vhdl" author="Rocky Scaletta (rocky@purdue.edu), Stefan Endrullis (stefan@endrullis.de), Florent Ouchet (outchy@users.sourceforge.net), Chris Higgs (chiggs.99@gmail.com), Jan Michel (jan@mueschelsoft.de), Luigi Calligaris (luigi.calligaris@stfc.ac.uk)">
+<language name="VHDL" version="14" kateversion="5.62" section="Hardware" extensions="*.vhdl;*.vhd" mimetype="text/x-vhdl" author="Rocky Scaletta (rocky@purdue.edu), Stefan Endrullis (stefan@endrullis.de), Florent Ouchet (outchy@users.sourceforge.net), Chris Higgs (chiggs.99@gmail.com), Jan Michel (jan@mueschelsoft.de), Luigi Calligaris (luigi.calligaris@stfc.ac.uk)">
+  <!-- BNF: https://github.com/antlr/grammars-v4/blob/master/vhdl/vhdl.g4 -->
   <highlighting>
     <list name="keywordsToplevel">
       <item>file</item>
@@ -480,8 +481,15 @@
       </context>
 
       <context name="after_label" attribute="Normal Text" lineEndContext="#stay">
-        <DetectChar attribute="Operator" context="#pop" char=":"/>
+        <DetectChar attribute="Operator" context="#pop!instantiation_statement" char=":"/>
         <DetectSpaces attribute="Normal Text"/>
+      </context>
+
+      <context name="instantiation_statement" attribute="Normal Text" lineEndContext="#stay" fallthroughContext="#pop">
+        <DetectSpaces attribute="Normal Text"/>
+        <WordDetect attribute="Keyword" context="#pop!instantiated" insensitive="1" String="component"/>
+        <WordDetect attribute="Keyword" context="#pop!instantiated" insensitive="1" String="entity"/>
+        <WordDetect attribute="Keyword" context="#pop!instantiated" insensitive="1" String="configuration"/>
       </context>
 
 <!-- parallel statement -->
@@ -755,6 +763,20 @@
         <WordDetect attribute="Keyword" context="#stay" insensitive="true" String="port"/>
         <WordDetect attribute="Control" context="#pop" insensitive="true" String="end" lookAhead="1"/>
         <IncludeRules context="postExpression"/>
+      </context>
+
+<!-- label: component -->
+<!-- label: entity -->
+<!-- label: configuration -->
+      <context name="instantiated" attribute="Normal Text" lineEndContext="#stay" fallthroughContext="#pop">
+        <IncludeRules context="blank"/>
+        <RegExpr attribute="Name" context="instantiated_body" beginRegion="InstantiationRegion1"
+                 String="&identifier;"/>
+      </context>
+
+      <context name="instantiated_body" attribute="Normal Text" lineEndContext="#stay">
+        <DetectChar attribute="Normal Text" context="#pop#pop" char=";" endRegion="InstantiationRegion1"/>
+        <IncludeRules context="component_body"/>
       </context>
 
     </contexts>

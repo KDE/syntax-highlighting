@@ -68,7 +68,7 @@
 <span style="color:#898887;"># error:</span>
  <span style="font-weight:bold;">%if</span>
 <span style="color:#bf0303;text-decoration:underline;">something</span> <span style="color:#bf0303;text-decoration:underline;">%if</span>
-<span style="color:#bf0303;text-decoration:underline;">%{if</span>}
+<span style="color:#644a9b;">%{if}</span>
 <span style="color:#bf0303;text-decoration:underline;">%if</span>(some options)
 <span style="color:#898887;"># However, this are different macros and therefore correct:</span>
 <span style="color:#644a9b;">%ifx</span>
@@ -82,11 +82,39 @@
 <span style="font-weight:bold;">%define</span> <span style="color:#006e28;">name</span><span style="color:#bf0303;"> value</span>
 <span style="font-weight:bold;">%define</span> <span style="color:#bf0303;text-decoration:underline;">invalid_näme</span><span style="color:#bf0303;"> value</span>
 <span style="font-weight:bold;">%define</span> <span style="color:#006e28;">macroname</span><span style="color:#bf0303;"> multi</span><span style="font-weight:bold;">\</span>
-<span style="color:#bf0303;">line content with references like %0 %* %# %{-f} %{-f*} %1 %2 and so on</span>
+<span style="color:#bf0303;">line content with references like </span><span style="color:#644a9b;">%0</span><span style="color:#bf0303;"> </span><span style="color:#644a9b;">%*</span><span style="color:#bf0303;"> </span><span style="color:#644a9b;">%#</span><span style="color:#bf0303;"> </span><span style="color:#644a9b;">%{-f}</span><span style="color:#bf0303;"> </span><span style="color:#644a9b;">%{-f*}</span><span style="color:#bf0303;"> </span><span style="color:#644a9b;">%1</span><span style="color:#bf0303;"> </span><span style="color:#644a9b;">%2</span><span style="color:#bf0303;"> and so on</span>
 <span style="font-weight:bold;">%global</span> <span style="color:#006e28;">name</span><span style="color:#bf0303;"> value</span>
 <span style="font-weight:bold;">%global</span> <span style="color:#bf0303;text-decoration:underline;">invalid_näme</span><span style="color:#bf0303;"> value</span>
 <span style="font-weight:bold;">%undefine</span> <span style="color:#006e28;">name</span>
 <span style="font-weight:bold;">%undefine</span> <span style="color:#006e28;">name</span> <span style="color:#bf0303;text-decoration:underline;">too-many-parameters</span>
+
+<span style="color:#898887;"># shell command</span>
+<span style="font-weight:bold;">%define</span> <span style="color:#006e28;">buildoutputdir</span><span style="color:#bf0303;"> </span><span style="color:#644a9b;">%{expand:</span>build/jdk<span style="color:#644a9b;">%{featurever}</span>.build<span style="color:#644a9b;">%{?1}}</span>
+<span style="font-weight:bold;">%define</span> <span style="color:#006e28;">buildoutputdir()</span><span style="color:#bf0303;"> </span><span style="color:#644a9b;">%{expand:</span>build/jdk<span style="color:#644a9b;">%{featurever}</span>.build<span style="color:#644a9b;">%{?1}}</span>
+<span style="font-weight:bold;">%define</span> <span style="color:#006e28;">save_alternatives()</span><span style="color:#bf0303;"> </span><span style="color:#644a9b;">%{expand:</span>
+  <span style="color:#898887;"># bash comment</span>
+  <span style="font-weight:bold;">function</span> foo <span style="font-weight:bold;">{</span>
+    LANG=en_US.UTF-8 alternatives --display <span style="color:#bf0303;">&quot;</span><span style="color:#0057ae;">$MASTER</span><span style="color:#bf0303;">&quot;</span>
+  <span style="font-weight:bold;">}</span>
+  MASTER=<span style="color:#bf0303;">&quot;</span><span style="color:#644a9b;">%{?1}</span><span style="color:#bf0303;">&quot;</span>
+  rm -f <span style="color:#644a9b;">%{_localstatedir}</span>/lib/rpm-state/<span style="color:#bf0303;">&quot;</span><span style="color:#0057ae;">$MASTER</span><span style="color:#bf0303;">&quot;</span>_<span style="color:#0057ae;">$FAMILY</span> <span style="color:#0057ae;">&gt; /dev/null</span>
+  <span style="font-weight:bold;">if</span> foo <span style="color:#0057ae;">&gt; /dev/null</span> <span style="color:#ca60ca;">|</span> bar -q <span style="color:#ca60ca;">;</span> <span style="font-weight:bold;">then</span>
+    zeta 2  <span style="color:#0057ae;">&gt;</span> <span style="color:#644a9b;">%{_localstatedir}</span>/lib/rpm-state/<span style="color:#bf0303;">&quot;</span><span style="color:#0057ae;">$MASTER</span><span style="color:#bf0303;">&quot;</span>_<span style="color:#bf0303;">&quot;</span><span style="color:#0057ae;">$FAMILY</span><span style="color:#bf0303;">&quot;</span>
+  <span style="font-weight:bold;">fi</span>
+<span style="color:#644a9b;">}</span>
+
+<span style="color:#898887;"># lua command</span>
+<span style="font-weight:bold;">%define</span> <span style="color:#006e28;">save_alternatives()</span><span style="color:#bf0303;"> </span><span style="color:#644a9b;">%{lua:</span>
+  <span style="color:#898887;">-- a lua code</span>
+  <span style="font-weight:bold;">local</span> <span style="color:#0057ae;">posix</span> <span style="color:#ca60ca;">=</span> <span style="color:#644a9b;">require</span> <span style="color:#bf0303;">&quot;posix&quot;</span>
+  <span style="font-weight:bold;">if</span> <span style="color:#ca60ca;">(</span><span style="color:#644a9b;">os.getenv</span><span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;debug&quot;</span><span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">==</span> <span style="color:#bf0303;">&quot;true&quot;</span><span style="color:#ca60ca;">)</span> <span style="font-weight:bold;">then</span>
+    <span style="color:#0057ae;">debug</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">true</span><span style="color:#ca60ca;">;</span>
+    <span style="color:#644a9b;">print</span><span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;debug&quot;</span><span style="color:#ca60ca;">)</span>
+  <span style="font-weight:bold;">else</span>
+    <span style="color:#0057ae;">debug</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">false</span><span style="color:#ca60ca;">;</span>
+  <span style="font-weight:bold;">end</span>
+<span style="color:#644a9b;">}</span>
+
 
 <span style="color:#898887;"># This special comment is treated and highlighted like a tag:</span>
 <span style="color:#0057ae;"># norootforbuild</span>  
@@ -114,7 +142,7 @@
 <span style="color:#bf0303;">  </span>
 <span style="color:#898887;"># These sections starts are errors:</span>
 <span style="color:#bf0303;"> </span><span style="color:#bf0303;text-decoration:underline;">%description</span><span style="color:#bf0303;"> not at the first line</span>
-<span style="color:#bf0303;text-decoration:underline;">%{description</span><span style="color:#bf0303;">} wrong form</span>
+<span style="color:#644a9b;">%{description}</span><span style="color:#bf0303;"> wrong form</span>
 <span style="color:#bf0303;text-decoration:underline;">%description</span><span style="color:#bf0303;">(no options allowed, only parameters!)</span>
 <span style="color:#bf0303;">  </span>
 <span style="color:#bf0303;">  </span>
@@ -130,14 +158,14 @@ echo Test
 <span style="color:#644a9b;">%{abc}</span>EndOfMacro
 <span style="color:#644a9b;">%{something but no single </span><span style="color:#bf0303;text-decoration:underline;">%</span><span style="color:#644a9b;">}</span>EndOfMacro
 <span style="color:#644a9b;">%{abc:def}</span>EndOfMacro
-<span style="color:#644a9b;">%(abc)</span>
+<span style="color:#644a9b;">%(</span>abc<span style="color:#644a9b;">)</span>
 <span style="color:#898887;"># Invalid:</span>
 <span style="color:#bf0303;text-decoration:underline;">%</span>ÄInvalidChar
 <span style="color:#bf0303;text-decoration:underline;">%</span>
 <span style="color:#bf0303;text-decoration:underline;">%</span>)
 <span style="color:#bf0303;text-decoration:underline;">%</span>}
 <span style="color:#898887;"># You can use macros inside of macro calls: Fine:</span>
-<span style="color:#644a9b;">%{something %but no %{sin%(fine)gle} }</span>EndOfMacro
+<span style="color:#644a9b;">%{something %but no %{sin%(</span>fine<span style="color:#644a9b;">)gle} }</span>EndOfMacro
 <span style="color:#898887;"># Bad:</span>
 <span style="color:#644a9b;">%{No closing paranthesis </span><span style="color:#bf0303;text-decoration:underline;">(</span><span style="color:#644a9b;">No syntax highlightig for this error available</span><span style="color:#bf0303;text-decoration:underline;">)</span>
   
@@ -145,14 +173,15 @@ echo Test
 <span style="color:#0057ae;background-color:#e0e9f8;">%build</span>  
 cmake ./ -DCMAKE_INSTALL_PREFIX=<span style="color:#644a9b;">%{_prefix}</span>  
 <span style="color:#644a9b;">%__make</span> <span style="color:#644a9b;">%{?jobs:-j %jobs}</span>  
-  
+<span style="color:#644a9b;">%{!?_licensedir:%global license </span><span style="color:#924c9d;">%%</span><span style="color:#644a9b;">doc}</span>
+
   
 <span style="color:#0057ae;background-color:#e0e9f8;">%install</span>  
 <span style="font-weight:bold;">%if</span> <span style="color:#b08000;">0</span><span style="color:#644a9b;">%{?suse_version}</span>  
 <span style="color:#644a9b;">%makeinstall</span>  
 <span style="color:#644a9b;">%suse_update_desktop_file</span> kradioripper  
 <span style="font-weight:bold;">%endif</span>  
-<span style="font-weight:bold;">%if</span> <span style="color:#b08000;">0</span><span style="color:#644a9b;">%{?fedora_version}</span> <span style="font-weight:bold;">||</span> <span style="color:#b08000;">0</span><span style="color:#644a9b;">%{?rhel_version}</span> <span style="font-weight:bold;">||</span> <span style="color:#b08000;">0</span><span style="color:#644a9b;">%{?centos_version}</span>  
+<span style="font-weight:bold;">%if</span> <span style="color:#b08000;">0</span><span style="color:#644a9b;">%{?fedora_version}</span> <span style="font-weight:bold;">||</span> <span style="color:#b08000;">0</span><span style="color:#644a9b;">%{?rhel_version}</span> <span style="font-weight:bold;">||</span> <span style="font-weight:bold;">!</span><span style="color:#b08000;">0</span><span style="color:#644a9b;">%{?centos_version}</span>
 make install DESTDIR=<span style="color:#644a9b;">%{buildroot}</span>  
 desktop-file-install --delete-original --vendor fedora --dir=<span style="color:#644a9b;">%{buildroot}</span>/<span style="color:#644a9b;">%{_datadir}</span>/applications/kde4 <span style="color:#644a9b;">%{buildroot}</span>/<span style="color:#644a9b;">%{_datadir}</span>/applications/kde4/kradioripper.desktop  
 <span style="font-weight:bold;">%endif</span>  
@@ -162,8 +191,8 @@ desktop-file-install --delete-original --vendor fedora --dir=<span style="color:
   
   
 <span style="color:#0057ae;background-color:#e0e9f8;">%clean</span>  
-rm -rf &quot;<span style="color:#644a9b;">%{buildroot}</span>&quot;  
-  
+rm -rf <span style="color:#bf0303;">&quot;</span><span style="color:#644a9b;">%{buildroot}</span><span style="color:#bf0303;">&quot;</span>  
+
   
 <span style="color:#0057ae;background-color:#e0e9f8;">%files</span>  
 <span style="color:#644a9b;">%defattr(-,root,root)</span>  
@@ -183,7 +212,17 @@ rm -rf &quot;<span style="color:#644a9b;">%{buildroot}</span>&quot;
 <span style="color:#644a9b;">%dir</span> <span style="color:#644a9b;">%{_datadir}</span>/kde4/apps/kradioripper  
 <span style="color:#644a9b;">%{_datadir}</span>/kde4/apps/kradioripper/*  
 <span style="font-weight:bold;">%endif</span>  
-  
+
+<span style="color:#898887;"># lua section</span>
+<span style="color:#0057ae;background-color:#e0e9f8;">%pretrans</span> headless -p &lt;lua&gt;
+<span style="color:#898887;">-- a lua code</span>
+<span style="font-weight:bold;">local</span> <span style="color:#0057ae;">posix</span> <span style="color:#ca60ca;">=</span> <span style="color:#644a9b;">require</span> <span style="color:#bf0303;">&quot;posix&quot;</span>
+<span style="font-weight:bold;">if</span> <span style="color:#ca60ca;">(</span><span style="color:#644a9b;">os.getenv</span><span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;debug&quot;</span><span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">==</span> <span style="color:#bf0303;">&quot;true&quot;</span><span style="color:#ca60ca;">)</span> <span style="font-weight:bold;">then</span>
+  <span style="color:#0057ae;">debug</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">true</span><span style="color:#ca60ca;">;</span>
+  <span style="color:#644a9b;">print</span><span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;debug&quot;</span><span style="color:#ca60ca;">)</span>
+<span style="font-weight:bold;">else</span>
+  <span style="color:#0057ae;">debug</span> <span style="color:#ca60ca;">=</span> <span style="font-weight:bold;">false</span><span style="color:#ca60ca;">;</span>
+<span style="font-weight:bold;">end</span>
   
 <span style="color:#0057ae;background-color:#e0e9f8;">%changelog</span><span style="color:#bf0303;">  </span>
 <span style="color:#0057ae;">* Sun May 04 2008 email@email.com</span>
@@ -215,5 +254,4 @@ rm -rf &quot;<span style="color:#644a9b;">%{buildroot}</span>&quot;
 <span style="color:#bf0303;">        - indeeded</span>
 <span style="color:#bf0303;">        - without</span>
 <span style="color:#bf0303;">    - problems</span>
-
 </pre></body></html>

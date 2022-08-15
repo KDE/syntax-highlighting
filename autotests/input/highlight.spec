@@ -82,6 +82,34 @@ line content with references like %0 %* %# %{-f} %{-f*} %1 %2 and so on
 %undefine name
 %undefine name too-many-parameters
 
+# shell command
+%define buildoutputdir %{expand:build/jdk%{featurever}.build%{?1}}
+%define buildoutputdir() %{expand:build/jdk%{featurever}.build%{?1}}
+%define save_alternatives() %{expand:
+  # bash comment
+  function foo {
+    LANG=en_US.UTF-8 alternatives --display "$MASTER"
+  }
+  MASTER="%{?1}"
+  rm -f %{_localstatedir}/lib/rpm-state/"$MASTER"_$FAMILY > /dev/null
+  if foo > /dev/null | bar -q ; then
+    zeta 2  > %{_localstatedir}/lib/rpm-state/"$MASTER"_"$FAMILY"
+  fi
+}
+
+# lua command
+%define save_alternatives() %{lua:
+  -- a lua code
+  local posix = require "posix"
+  if (os.getenv("debug") == "true") then
+    debug = true;
+    print("debug")
+  else
+    debug = false;
+  end
+}
+
+
 # This special comment is treated and highlighted like a tag:
 # norootforbuild  
 # It can't have parameters, so every following non-whitespace character is not good:
@@ -139,14 +167,15 @@ echo Test
 %build  
 cmake ./ -DCMAKE_INSTALL_PREFIX=%{_prefix}  
 %__make %{?jobs:-j %jobs}  
-  
+%{!?_licensedir:%global license %%doc}
+
   
 %install  
 %if 0%{?suse_version}  
 %makeinstall  
 %suse_update_desktop_file kradioripper  
 %endif  
-%if 0%{?fedora_version} || 0%{?rhel_version} || 0%{?centos_version}  
+%if 0%{?fedora_version} || 0%{?rhel_version} || !0%{?centos_version}
 make install DESTDIR=%{buildroot}  
 desktop-file-install --delete-original --vendor fedora --dir=%{buildroot}/%{_datadir}/applications/kde4 %{buildroot}/%{_datadir}/applications/kde4/kradioripper.desktop  
 %endif  
@@ -157,7 +186,7 @@ desktop-file-install --delete-original --vendor fedora --dir=%{buildroot}/%{_dat
   
 %clean  
 rm -rf "%{buildroot}"  
-  
+
   
 %files  
 %defattr(-,root,root)  
@@ -177,7 +206,17 @@ rm -rf "%{buildroot}"
 %dir %{_datadir}/kde4/apps/kradioripper  
 %{_datadir}/kde4/apps/kradioripper/*  
 %endif  
-  
+
+# lua section
+%pretrans headless -p <lua>
+-- a lua code
+local posix = require "posix"
+if (os.getenv("debug") == "true") then
+  debug = true;
+  print("debug")
+else
+  debug = false;
+end
   
 %changelog  
 * Sun May 04 2008 email@email.com
@@ -209,4 +248,3 @@ rm -rf "%{buildroot}"
         - indeeded
         - without
     - problems
-

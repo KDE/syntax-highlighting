@@ -618,6 +618,8 @@ print root@192.168.168.157:${PWD/test/live}v
 [ 1+2 -eq 1+2 ]
 [[ 1+2 -eq 1+2 ]]
 [ a = b c ]
+[ -z 1 -a 1 -eq 1 ]
+[ 2 -eq 1 -o 1 -eq 1 ]
 ( [ a = b ] )
 ([ a = b ])
 [[ a = b c ]]

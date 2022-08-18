@@ -397,6 +397,8 @@ echo "${var#refs/heads}" x "${var#refs}" x
 [[ 1+2 -eq 1+2 ]]
 [ a = b c ]
 [[ a = b c ]]
+[ -z 1 -a 1 -eq 1 ]
+[ 2 -eq 1 -o 1 -eq 1 ]
 [[ x =~ a(b c|$)' '{1,}[a[.digit.]] ]]
 [[ x =~ [ ] ]]
 [[ x =~ ([ ]) ]]

@@ -147,7 +147,7 @@ private Q_SLOTS:
 
         // comment markers
         QCOMPARE(def.singleLineCommentMarker(), QLatin1String("//"));
-        QCOMPARE(def.singleLineCommentPosition(), KSyntaxHighlighting::CommentPosition::StartOfLine);
+        QCOMPARE(def.singleLineCommentPosition(), KSyntaxHighlighting::CommentPosition::AfterWhitespace);
         const auto cppMultiLineCommentMarker = QPair<QString, QString>(QLatin1String("/*"), QLatin1String("*/"));
         QCOMPARE(def.multiLineCommentMarker(), cppMultiLineCommentMarker);
 

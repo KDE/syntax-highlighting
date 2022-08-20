@@ -42,16 +42,8 @@
     <!ENTITY quoted "\S(?:.*?\S)??">
     <!-- postfix/trailing part -->
     <!ENTITY quoted_post "(?=\W|$)">
-
-    <!-- section (title) -->
-    <!ENTITY sectionL0 "^(?:=|#)\s+(?=\S)">
-    <!ENTITY sectionL1 "^(?:={2}|#{2})\s+(?=\S)">
-    <!ENTITY sectionL2 "^(?:={3}|#{3})\s+(?=\S)">
-    <!ENTITY sectionL3 "^(?:={4}|#{4})\s+(?=\S)">
-    <!ENTITY sectionL4 "^(?:={5}|#{5})\s+(?=\S)">
-    <!ENTITY sectionL5 "^(?:={6}|#{6})\s+(?=\S)">
 ]>
-<language author="Andreas Gratzer" extensions="*.ad;*.adoc;*.asciidoc" kateversion="5.0" mimetype="text/asciidoc" name="AsciiDoc" license="MIT" section="Markup" version="8">
+<language author="Andreas Gratzer" extensions="*.ad;*.adoc;*.asciidoc" kateversion="5.0" mimetype="text/asciidoc" name="AsciiDoc" license="MIT" section="Markup" version="9">
     <highlighting>
         <list name="macro">
             <item>anchor</item>
@@ -71,8 +63,8 @@
 
         <contexts>
             <context name="start" attribute="Normal" lineEndContext="#stay">
-                <!-- main title, first level 0 section title -->
-                <RegExpr String="&sectionL0;" attribute="Main Title" context="main title" beginRegion="section" column="0"/>
+                <!-- section title level 0 to 5 -->
+                <RegExpr String="^(?:={1,6}|#{1,6})\s+(?=\S)" lookAhead="1" context="dispatch section main title" column="0"/>
                 <IncludeRules context="R section"/>
             </context>
 
@@ -172,52 +164,72 @@
                 <IncludeRules context="R include"/>
             </context>
 
+            <context name="dispatch section main title" attribute="Normal" lineEndContext="#stay">
+                <IncludeRules context="dispatch section title L1-5"/>
+                <!-- main title, first level 0 section title -->
+                <AnyChar String="=#" attribute="Main Title" context="#pop!main title" beginRegion="section" column="0"/>
+            </context>
+
+            <context name="dispatch section title L0-5" attribute="Normal" lineEndContext="#stay">
+                <IncludeRules context="dispatch section title L1-5"/>
+                <AnyChar String="=#" attribute="Section Title" context="#pop!section title L0" beginRegion="section" endRegion="section" column="0"/>
+            </context>
+            <context name="dispatch section title L1-5" attribute="Normal" lineEndContext="#stay">
+                <IncludeRules context="dispatch section title L2-5"/>
+                <Detect2Chars char="=" char1="=" attribute="Section Title" context="#pop!section title L1" beginRegion="section" column="0"/>
+                <Detect2Chars char="#" char1="#" attribute="Section Title" context="#pop!section title L1" beginRegion="section" column="0"/>
+            </context>
+            <context name="dispatch section title L2-5" attribute="Normal" lineEndContext="#stay">
+                <IncludeRules context="dispatch section title L3-5"/>
+                <StringDetect String="===" attribute="Section Title" context="#pop!section title L2" beginRegion="section" column="0"/>
+                <StringDetect String="###" attribute="Section Title" context="#pop!section title L2" beginRegion="section" column="0"/>
+            </context>
+            <context name="dispatch section title L3-5" attribute="Normal" lineEndContext="#stay">
+                <IncludeRules context="dispatch section title L4-5"/>
+                <StringDetect String="====" attribute="Section Title" context="#pop!section title L3" beginRegion="section" column="0"/>
+                <StringDetect String="####" attribute="Section Title" context="#pop!section title L3" beginRegion="section" column="0"/>
+            </context>
+            <context name="dispatch section title L4-5" attribute="Normal" lineEndContext="#stay">
+                <IncludeRules context="dispatch section title L5"/>
+                <StringDetect String="=====" attribute="Section Title" context="#pop!section title L4" beginRegion="section" column="0"/>
+                <StringDetect String="#####" attribute="Section Title" context="#pop!section title L4" beginRegion="section" column="0"/>
+            </context>
+            <context name="dispatch section title L5" attribute="Normal" lineEndContext="#stay">
+                <StringDetect String="======" attribute="Section Title" context="#pop!section title L5" beginRegion="section" column="0"/>
+                <StringDetect String="######" attribute="Section Title" context="#pop!section title L5" beginRegion="section" column="0"/>
+            </context>
+
             <context name="section L0" attribute="Normal" lineEndContext="#stay">
-                <RegExpr String="&sectionL5;" attribute="Section Title" context="section title L5" beginRegion="section" column="0"/>
-                <RegExpr String="&sectionL4;" attribute="Section Title" context="section title L4" beginRegion="section" column="0"/>
-                <RegExpr String="&sectionL3;" attribute="Section Title" context="section title L3" beginRegion="section" column="0"/>
-                <RegExpr String="&sectionL2;" attribute="Section Title" context="section title L2" beginRegion="section" column="0"/>
-                <RegExpr String="&sectionL1;" attribute="Section Title" context="section title L1" beginRegion="section" column="0"/>
-                <RegExpr String="&sectionL0;" lookAhead="true" attribute="Section Title" context="section title L0" endRegion="section" beginRegion="section" column="0"/>
-                <IncludeRules context="R section"/>
+                <RegExpr String="^(?:={1,6}|#{1,6})\s+(?=\S)" lookAhead="1" context="dispatch section title L0-5" column="0"/>
+                <IncludeRules context="section L5"/>
             </context>
 
             <context name="section L1" attribute="Normal" lineEndContext="#stay">
-                <RegExpr String="&sectionL5;" attribute="Section Title" context="section title L5" beginRegion="section" column="0"/>
-                <RegExpr String="&sectionL4;" attribute="Section Title" context="section title L4" beginRegion="section" column="0"/>
-                <RegExpr String="&sectionL3;" attribute="Section Title" context="section title L3" beginRegion="section" column="0"/>
-                <RegExpr String="&sectionL2;" attribute="Section Title" context="section title L2" beginRegion="section" column="0"/>
-                <RegExpr String="^(?:={1,2}|#{1,2})\s+\S" lookAhead="true" attribute="Section Title" context="#pop" endRegion="section" column="0"/>
-                <IncludeRules context="R section"/>
+                <RegExpr String="^(?:={3,6}|#{3,6})\s+(?=\S)" lookAhead="1" context="dispatch section title L2-5" column="0"/>
+                <IncludeRules context="section L5"/>
             </context>
 
             <context name="section L2" attribute="Normal" lineEndContext="#stay">
-                <RegExpr String="&sectionL5;" attribute="Section Title" context="section title L5" beginRegion="section" column="0"/>
-                <RegExpr String="&sectionL4;" attribute="Section Title" context="section title L4" beginRegion="section" column="0"/>
-                <RegExpr String="&sectionL3;" attribute="Section Title" context="section title L3" beginRegion="section" column="0"/>
-                <RegExpr String="^(?:={1,3}|#{1,3})\s+\S" lookAhead="true" attribute="Section Title" context="#pop" endRegion="section" column="0"/>
-                <IncludeRules context="R section"/>
+                <RegExpr String="^(?:={4,6}|#{4,6})\s+(?=\S)" lookAhead="1" context="dispatch section title L3-5" column="0"/>
+                <IncludeRules context="section L5"/>
             </context>
 
             <context name="section L3" attribute="Normal" lineEndContext="#stay">
-                <RegExpr String="&sectionL5;" attribute="Section Title" context="section title L5" beginRegion="section" column="0"/>
-                <RegExpr String="&sectionL4;" attribute="Section Title" context="section title L4" beginRegion="section" column="0"/>
-                <RegExpr String="^(?:={1,4}|#{1,4})\s+\S" lookAhead="true" attribute="Section Title" context="#pop" endRegion="section" column="0"/>
-                <IncludeRules context="R section"/>
+                <RegExpr String="^(?:={5,6}|#{5,6})\s+(?=\S)" lookAhead="1" context="dispatch section title L4-5" column="0"/>
+                <IncludeRules context="section L5"/>
             </context>
 
             <context name="section L4" attribute="Normal" lineEndContext="#stay">
-                <RegExpr String="&sectionL5;" attribute="Section Title" context="section title L5" beginRegion="section" column="0"/>
-                <RegExpr String="^(?:={1,5}|#{1,5})\s+\S" lookAhead="true" attribute="Section Title" context="#pop" endRegion="section" column="0"/>
-                <IncludeRules context="R section"/>
+                <RegExpr String="^(?:={6}|#{6})\s+(?=\S)" lookAhead="1" context="dispatch section title L5" column="0"/>
+                <IncludeRules context="section L5"/>
             </context>
 
             <context name="section L5" attribute="Normal" lineEndContext="#stay">
-                <RegExpr String="^(?:={1,6}|#{1,6})\s+\S" lookAhead="true" attribute="Section Title" context="#pop" endRegion="section" column="0"/>
+                <RegExpr String="^(?:={1,6}|#{1,6})\s+\S" lookAhead="1" context="#pop" endRegion="section" column="0"/>
                 <IncludeRules context="R section"/>
             </context>
 
-            <context name="section title L0" attribute="Section Title" lineEndContext="#pop!section L0">
+            <context name="section title L0" attribute="Section Title" lineEndContext="#pop">
                 <IncludeRules context="R title"/>
             </context>
 

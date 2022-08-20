@@ -33,6 +33,11 @@
     <!-- link macro and mailto: -->
     <!ENTITY link_mailto "(?:link|mailto):[^:\s\[][^\s\[]*\[(?:\]|.*?[^\\]\])">
 
+    <!-- macro -->
+    <!ENTITY macro "(?:anchor|xref):&id;\[.*?\]|(?:btn|footnote(?:ref)?|kbd):\[.*?\]|pass:\w*\[.*?\]|(?:icon|image|menu):[^:].*?\[.*?\]|toc::\[\]">
+
+    <!ENTITY table_option_delimiter "(?:(?:\d*\.)?\d+\+|\d+\*)?(?:[&lt;&gt;^]?\.?[&lt;&gt;^])?[adehlmsv]?\|">
+
     <!-- parts to build regular expressions to identify quoted (formatted) text
          E.g. emphasized, marked, strong. -->
     <!-- prefix/leading part -->
@@ -115,17 +120,23 @@
             </context>
 
             <context name="comment" attribute="Comment" lineEndContext="#stay" lineEmptyContext="#pop">
+                <DetectSpaces attribute="Comment"/>
                 <RegExpr String="^(&block_dels_comment;)\s*$" attribute="Comment" context="#pop!comment delimited" beginRegion="comment" column="0"/>
                 <IncludeRules context="R anchor"/>
                 <IncludeRules context="R block title"/>
-                <IncludeRules context="##Comments" />
+                <IncludeRules context="##Comments"/>
+                <DetectIdentifier attribute="Comment"/>
             </context>
             <context name="comment delimited" attribute="Comment" lineEndContext="#stay">
+                <DetectSpaces attribute="Comment"/>
                 <RegExpr String="&block_end_del;" dynamic="true" attribute="Comment" context="#pop" endRegion="comment" column="0"/>
                 <IncludeRules context="##Comments" />
+                <DetectIdentifier attribute="Comment"/>
             </context>
             <context name="comment single-line" attribute="Comment" lineEndContext="#pop">
+                <DetectSpaces attribute="Comment"/>
                 <IncludeRules context="##Comments" />
+                <DetectIdentifier attribute="Comment"/>
             </context>
 
             <!-- continuation, both for normal text and attribute value definition
@@ -144,6 +155,7 @@
                 <IncludeRules context="R block title"/>
                 <!-- shared rules includes anchor rules, so we do not need to include that separately -->
                 <IncludeRules context="R shared"/>
+                <IncludeRules context="R normal"/>
             </context>
             <context name="normal delimited" attribute="Normal" lineEndContext="#stay">
                 <RegExpr String="&block_end_del;" dynamic="true" attribute="Delimiter" context="#pop" endRegion="block" column="0"/>
@@ -151,13 +163,16 @@
                 <IncludeRules context="R block"/>
                 <!-- shared rules includes anchor rules, so we do not need to include that separately -->
                 <IncludeRules context="R shared"/>
+                <IncludeRules context="R normal"/>
             </context>
 
             <context name="passthrough" attribute="Passthrough" lineEndContext="#stay" lineEmptyContext="#pop">
+                <DetectSpaces attribute="Passthrough"/>
+                <IncludeRules context="R include"/>
+                <DetectIdentifier attribute="Passthrough"/>
                 <RegExpr String="^(&block_dels_pass;)\s*$" attribute="Delimiter" context="#pop!passthrough delimited" beginRegion="block" column="0"/>
                 <IncludeRules context="R anchor"/>
                 <IncludeRules context="R block title"/>
-                <IncludeRules context="R include"/>
             </context>
             <context name="passthrough delimited" attribute="Passthrough" lineEndContext="#stay">
                 <RegExpr String="&block_end_del;" dynamic="true" attribute="Delimiter" context="#pop" endRegion="block" column="0"/>
@@ -256,10 +271,11 @@
             <context name="table" attribute="Normal" lineEndContext="#stay">
                 <RegExpr String="&block_end_del;" dynamic="true" attribute="Delimiter" context="#pop" endRegion="block" column="0"/>
                 <!-- `|` with prefix for alignment, style etc. -->
-                <RegExpr String="(?&lt;=^|\s)(?:(?:\d*\.)?\d+\+|\d+\*)?(?:[&lt;&gt;^]?\.?[&lt;&gt;^])?[adehlmsv]?\|" attribute="Delimiter"/>
+                <RegExpr String="(?&lt;=^|\s)&table_option_delimiter;" attribute="Delimiter"/>
                 <!-- simple `|` without alignment, style etc. -->
                 <DetectChar char="|" attribute="Delimiter"/>
                 <IncludeRules context="R shared"/>
+                <IncludeRules context="R normal"/>
             </context>
 
             <context name="verbatim" attribute="Verbatim" lineEndContext="#stay">
@@ -268,7 +284,7 @@
                 <IncludeRules context="R block title"/>
                 <IncludeRules context="R comment"/>
                 <IncludeRules context="R include"/>
-                <RegExpr String="^." attribute="Verbatim" context="#pop!verbatim paragraph" column="0"/>
+                <RegExpr String="^.*" attribute="Verbatim" context="#pop!verbatim paragraph" column="0"/>
             </context>
             <context name="verbatim delimited" attribute="Verbatim" lineEndContext="#stay">
                 <RegExpr String="&block_end_del;" dynamic="true" attribute="Delimiter" context="#pop" endRegion="block" column="0"/>
@@ -279,6 +295,37 @@
             </context>
 
             <!-- contexts to be used for IncludeRules only -->
+
+            <context name="R normal" attribute="Normal" lineEndContext="#stay">
+                <!-- Regex which allows to quickly consume text that is not
+                    - macro
+                    - continuation
+                    - index term
+                    - link
+                    - replacement
+                    - preprocessor
+                    - formatted text
+                    - table delimiter
+
+                maanchor:anchor-id[Macro Anchor]
+                ^ Normal
+                  ^ Macro
+
+                bla__bla__bla
+                ^ Normal
+                   ^ Emphasized
+                          ^ Normal
+
+                For some reason, Asciidoctor recognizes emails with leading : or / but does not render them as link
+
+                /example@mail.com
+                ^ Normal
+
+                example@mail.com
+                ^ Link
+                -->
+                <RegExpr String="([:/]&email;|(?!&macro;|link:|mailto:|(?:ftp|https?|irc)://|&char_ref;|indexterm2?:\[.+?\]|[\\+|\[{~^]|__|##|\([CR]\)|\(TM\)|\.\.\.|&lt;[-=&lt;]|--|->|=>|``\*?_?|\*\*_?|\(\(|\s+[[+]|\s&table_option_delimiter;|(?&lt;=[^&alp;;:}])_|&quoted_pre;(`\*?_?|\*_?|#)|(?&lt;=[&alp;])'(?=[&alp;])|&email;).)++" attribute="Normal"/>
+            </context>
 
             <context name="R admonition" attribute="Normal" lineEndContext="#stay">
                 <!-- admonition - simple form, block form is part of block rules -->
@@ -381,8 +428,7 @@
             </context>
 
             <context name="R macro" attribute="Normal" lineEndContext="#stay">
-                <RegExpr String="(?:anchor|xref):&id;\[.*?\]|(?:btn|footnote(?:ref)?|kbd):\[.*?\]|pass:\w*\[.*?\]|(?:icon|image|menu):[^:].*?\[.*?\]" attribute="Preprocessor"/>
-                <StringDetect String="toc::[]" attribute="Preprocessor"/>
+                <RegExpr String="&macro;" attribute="Preprocessor"/>
             </context>
 
             <context name="R marked" attribute="Normal" lineEndContext="#stay">
@@ -432,6 +478,7 @@
                 <!-- literal paragraph started by a line with leading spaces
                      This must be ordered after lists, as list items may be indented -->
                 <RegExpr String="^\s+\S" attribute="Verbatim" context="verbatim paragraph" column="0"/>
+                <IncludeRules context="R normal"/>
             </context>
 
             <context name="R shared" attribute="Normal" lineEndContext="#stay">
@@ -474,9 +521,6 @@
 
                 <!-- links -->
                 <RegExpr String="(?&lt;=^|[\s\[\]();&lt;&gt;])(?:ftp|https?|irc)://[^\s\[]*?(?:\[\]|\[.*?[^\\]\]|(?=(?:[\[\]]|[\.,;:]??(?:\s|$))))|&link_mailto;|&email;" attribute="Link"/>
-                <!-- email - inline,  needs to be ordered after mailto:
-                     For some reason, Asciidoctor recognizes emails with leading : or / but does not render them as link -->
-                <RegExpr String="[:/]&email;" attribute="Normal"/>
 
                 <!-- preprocessor -->
                 <!-- general meta data attribute list - must be ordered after other rules matching for lines of the form of [some content] -->
@@ -493,6 +537,8 @@
 
             <!-- common rules for main title, section title, block title -->
             <context name="R title" attribute="Normal" lineEndContext="#stay">
+                <DetectSpaces/>
+                <DetectIdentifier/>
                 <!-- the escaped forms must be ordered before the not escaped forms -->
                 <DetectChar char="\" attribute="Section Title" context="backlash"/>
                 <IncludeRules context="R anchor"/>

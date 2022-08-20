@@ -36,6 +36,8 @@
     <!-- macro -->
     <!ENTITY macro "(?:anchor|xref):&id;\[.*?\]|(?:btn|footnote(?:ref)?|kbd):\[.*?\]|pass:\w*\[.*?\]|(?:icon|image|menu):[^:].*?\[.*?\]|toc::\[\]">
 
+    <!ENTITY list_marker "(?:\S.+::(?=\s|$)|(?:(?:\.+|\d+\.)|(?:-|\*+)(?:\s+\[[*x ]\])?)(?=\s+\S))">
+
     <!ENTITY table_option_delimiter "(?:(?:\d*\.)?\d+\+|\d+\*)?(?:[&lt;&gt;^]?\.?[&lt;&gt;^])?[adehlmsv]?\|">
 
     <!-- parts to build regular expressions to identify quoted (formatted) text
@@ -67,10 +69,10 @@
         </list>
 
         <contexts>
-            <context name="start" attribute="Normal" lineEndContext="#stay">
+            <context name="start" attribute="Normal" lineEndContext="#stay" fallthrough="1" fallthroughContext="R section block">
                 <!-- section title level 0 to 5 -->
                 <RegExpr String="^(?:={1,6}|#{1,6})\s+(?=\S)" lookAhead="1" context="dispatch section main title" column="0"/>
-                <IncludeRules context="R section"/>
+                <IncludeRules context="R section inline"/>
             </context>
 
             <!-- attribute value definition, may span multiple lines -->
@@ -214,34 +216,34 @@
                 <StringDetect String="######" attribute="Section Title" context="#pop!section title L5" beginRegion="section" column="0"/>
             </context>
 
-            <context name="section L0" attribute="Normal" lineEndContext="#stay">
+            <context name="section L0" attribute="Normal" lineEndContext="#stay" fallthrough="1" fallthroughContext="R section block">
                 <RegExpr String="^(?:={1,6}|#{1,6})\s+(?=\S)" lookAhead="1" context="dispatch section title L0-5" column="0"/>
                 <IncludeRules context="section L5"/>
             </context>
 
-            <context name="section L1" attribute="Normal" lineEndContext="#stay">
+            <context name="section L1" attribute="Normal" lineEndContext="#stay" fallthrough="1" fallthroughContext="R section block">
                 <RegExpr String="^(?:={3,6}|#{3,6})\s+(?=\S)" lookAhead="1" context="dispatch section title L2-5" column="0"/>
                 <IncludeRules context="section L5"/>
             </context>
 
-            <context name="section L2" attribute="Normal" lineEndContext="#stay">
+            <context name="section L2" attribute="Normal" lineEndContext="#stay" fallthrough="1" fallthroughContext="R section block">
                 <RegExpr String="^(?:={4,6}|#{4,6})\s+(?=\S)" lookAhead="1" context="dispatch section title L3-5" column="0"/>
                 <IncludeRules context="section L5"/>
             </context>
 
-            <context name="section L3" attribute="Normal" lineEndContext="#stay">
+            <context name="section L3" attribute="Normal" lineEndContext="#stay" fallthrough="1" fallthroughContext="R section block">
                 <RegExpr String="^(?:={5,6}|#{5,6})\s+(?=\S)" lookAhead="1" context="dispatch section title L4-5" column="0"/>
                 <IncludeRules context="section L5"/>
             </context>
 
-            <context name="section L4" attribute="Normal" lineEndContext="#stay">
+            <context name="section L4" attribute="Normal" lineEndContext="#stay" fallthrough="1" fallthroughContext="R section block">
                 <RegExpr String="^(?:={6}|#{6})\s+(?=\S)" lookAhead="1" context="dispatch section title L5" column="0"/>
                 <IncludeRules context="section L5"/>
             </context>
 
-            <context name="section L5" attribute="Normal" lineEndContext="#stay">
+            <context name="section L5" attribute="Normal" lineEndContext="#stay" fallthrough="1" fallthroughContext="R section block">
                 <RegExpr String="^(?:={1,6}|#{1,6})\s+\S" lookAhead="1" context="#pop" endRegion="section" column="0"/>
-                <IncludeRules context="R section"/>
+                <IncludeRules context="R section inline"/>
             </context>
 
             <context name="section title L0" attribute="Section Title" lineEndContext="#pop">
@@ -281,6 +283,7 @@
             <context name="verbatim" attribute="Verbatim" lineEndContext="#stay">
                 <RegExpr String="^(-{2}|&block_dels_verbatim;)\s*$" attribute="Delimiter" context="#pop!verbatim delimited" beginRegion="block" column="0"/>
                 <IncludeRules context="R anchor"/>
+                <RegExpr String="^(\[\w+[^,\]]*(,[^,\]]*)*\]\s*)+$" attribute="Preprocessor" column="0"/>
                 <IncludeRules context="R block title"/>
                 <IncludeRules context="R comment"/>
                 <IncludeRules context="R include"/>
@@ -356,7 +359,10 @@
 
             <context name="R block" attribute="Normal" lineEndContext="#stay">
                 <IncludeRules context="R block title"/>
+                <IncludeRules context="R block without title"/>
+            </context>
 
+            <context name="R block without title" attribute="Normal" lineEndContext="#stay">
                 <!-- name matching -->
                 <RegExpr String="^\[(?:&admonition_names;)&block_name_post;|^\[(?:example|quote|sidebar|verse)&block_name_post;" attribute="Preprocessor" context="normal" column="0"/>
                 <RegExpr String="^\[(?:pass|stem)&block_name_post;" attribute="Preprocessor" context="passthrough" column="0"/>
@@ -469,16 +475,48 @@
                 <RegExpr String="&char_ref;" attribute="Replacement"/>
             </context>
 
-            <context name="R section" attribute="Normal" lineEndContext="#stay">
-                <!-- callout as being used below a source code block -->
-                <RegExpr String="^&lt;(?:\.|\d+)&gt;(?=\s+\S)" attribute="Callout" column="0"/>
+            <context name="R section inline" attribute="Normal" lineEndContext="#stay">
+                <!-- literal paragraph started by a line with leading spaces -->
+                <RegExpr String="^\s+(?!&list_marker;)\S.*" attribute="Verbatim" context="verbatim paragraph" column="0"/>
+                <IncludeRules context="R block"/>
+                <IncludeRules context="R anchor"/>
+                <IncludeRules context="R comment"/>
+                <IncludeRules context="R media"/>
+                <IncludeRules context="R preprocessor"/>
+                <IncludeRules context="R horizontal rules and page break"/>
+            </context>
+
+            <!-- first line of a section block -->
+            <context name="R section block" attribute="Normal" lineEndContext="#pop!section block continuation" lineEmptyContext="#pop">
+                <IncludeRules context="R callout"/>
+                <RegExpr String="^\+\s*$" attribute="Control" context="#pop" column="0"/>
                 <IncludeRules context="R admonition"/>
                 <IncludeRules context="R block"/>
                 <IncludeRules context="R shared"/>
-                <!-- literal paragraph started by a line with leading spaces
-                     This must be ordered after lists, as list items may be indented -->
-                <RegExpr String="^\s+\S" attribute="Verbatim" context="verbatim paragraph" column="0"/>
+                <IncludeRules context="R empty"/>
                 <IncludeRules context="R normal"/>
+            </context>
+
+            <!-- callout as being used below a source code block -->
+            <context name="R callout" attribute="Normal" lineEndContext="#stay" lineEmptyContext="#pop">
+                <RegExpr String="^&lt;(?:\.|\d+)&gt;(?=\s+\S)" attribute="Callout" context="#pop!callout" column="0"/>
+            </context>
+            <context name="callout" attribute="Normal" lineEndContext="#stay" lineEmptyContext="#pop">
+                <IncludeRules context="R callout"/>
+                <IncludeRules context="section block continuation"/>
+            </context>
+
+            <!-- line 2 and following of a section block -->
+            <context name="section block continuation" attribute="Normal" lineEndContext="#stay" lineEmptyContext="#pop">
+                <RegExpr String="^\+\s*$" attribute="Control" context="#pop" column="0"/>
+                <IncludeRules context="R block without title"/>
+                <IncludeRules context="R shared"/>
+                <IncludeRules context="R empty"/>
+                <IncludeRules context="R normal"/>
+            </context>
+
+            <context name="R empty" attribute="Normal" lineEndContext="#stay">
+                <RegExpr String="^\s+$" attribute="Normal" context="#pop" column="0"/>
             </context>
 
             <context name="R shared" attribute="Normal" lineEndContext="#stay">
@@ -501,7 +539,7 @@
                 <!-- horizontal rules and page break -->
                 <!-- to enable highlighting of the horizontal rules using "- - -" or "* * *",
                      keep this before the checklist and unnumbered list definition -->
-                <RegExpr String="^(?:'{3}|-{3}|\*{3}|- - -|\* \* \*|&lt;{3})\s*$" attribute="Control" column="0"/>
+                <IncludeRules context="R horizontal rules and page break"/>
 
                 <!-- cross reference -->
                 <RegExpr String="&lt;&lt;[^&lt;\s].*?&gt;&gt;" attribute="Link"/>
@@ -514,17 +552,17 @@
                 <!-- marker for checklist and bulleted/unnumbered list
                      To enable highlighting of the horizontal rules using "- - -" or "* * *",
                      keep this after the horizontal rules definition -->
-                <RegExpr String="^\s*(?:\S.+::(?=\s|$)|(?:(?:\.+|\d+\.)|(?:-|\*+)(?:\s+\[[*x ]\])?)(?=\s+\S))" attribute="List Marker" column="0"/>
+                <RegExpr String="^\s*&list_marker;" attribute="List Marker" column="0"/>
 
                 <!-- media - block format -->
-                <RegExpr String="^(?:audio|image|video)::.*\[.*?\](?=\s*$)" attribute="Preprocessor" column="0"/>
+                <IncludeRules context="R media"/>
 
                 <!-- links -->
                 <RegExpr String="(?&lt;=^|[\s\[\]();&lt;&gt;])(?:ftp|https?|irc)://[^\s\[]*?(?:\[\]|\[.*?[^\\]\]|(?=(?:[\[\]]|[\.,;:]??(?:\s|$))))|&link_mailto;|&email;" attribute="Link"/>
 
                 <!-- preprocessor -->
                 <!-- general meta data attribute list - must be ordered after other rules matching for lines of the form of [some content] -->
-                <RegExpr String="^ifn?def::&id;(?:[,\+]&id;)*\[.*\]|^ifeval::\[.*\]|^endif::(?:&id;)?\[\]|^\[[^\s\[].*\](?=\s*$)" attribute="Preprocessor" column="0"/>
+                <IncludeRules context="R preprocessor"/>
 
                 <!-- continuation `+`, both at end of line and on a line on its own -->
                 <RegExpr String="(?:^|\s)\s*\+\s*$" lookAhead="true" attribute="Normal" context="continuation"/>
@@ -533,6 +571,18 @@
                 <IncludeRules context="R formatted"/>
                 <!-- replacements are done only if nothing else matched -->
                 <IncludeRules context="R replacement"/>
+            </context>
+
+            <context name="R media" attribute="Normal" lineEndContext="#stay">
+                <RegExpr String="^(?:audio|image|video)::.*\[.*?\](?=\s*$)" attribute="Preprocessor" column="0"/>
+            </context>
+
+            <context name="R preprocessor" attribute="Normal" lineEndContext="#stay">
+                <RegExpr String="^ifn?def::&id;(?:[,\+]&id;)*\[.*\]|^ifeval::\[.*\]|^endif::(?:&id;)?\[\]|^\[[^\s\[].*\](?=\s*$)" attribute="Preprocessor" column="0"/>
+            </context>
+
+            <context name="R horizontal rules and page break" attribute="Normal" lineEndContext="#stay">
+                <RegExpr String="^(?:'{3}|-{3}|\*{3}|- - -|\* \* \*|&lt;{3})\s*$" attribute="Control" column="0"/>
             </context>
 
             <!-- common rules for main title, section title, block title -->

@@ -10,4 +10,47 @@ X0. Y-0.5 I-0.5 J0.
 X-0.5 Y0. I0. J0.5
 G01 Z0.1 F5.
 G00 X0. Y0. Z0.25
+#3 = 15 (message)
+G 0 0 0 *71
+G91 @.5 ^90
+o100 if [#5399 EQ -1]
+    (MSG, Arc Timeout)
+    G0 Z0.5
+    X0 Y0
+    M2 (stop processing here)
+o100
+M1
+M10
+M100
+M1000
+M20
+M200
+N2 G0
+O<>
+O< >
+O<a>
+O12
+#12 #<_a> #<a> ##
+#<>
+###
+M84 E0:1:2:3:4
+M587 S"MYROUTER" P"ABC'X'Y'Z;"" 123" 123
+G1 X{move.axes[0].max-5} Y{move.axes[1].min+5} F6000 ; move to 5mm short of the X and Y axis limits
+exists(global.defaultSpeed)
+o1001 while [#11 LE #5]
+    #10 = [#14 * #11 / #5]
+    #12 = [#1 + [#3 * cos[#10]]]
+    #13 = [#2 + [#4 * sin[#10]]]
+    g1 x#12 y#13
+    #11 = [#11 + 1]
+o1001 endwhile
+g0 z#7
+o1000 endsub
+(call it like this)
+f10
+o1000 call [0] [0] [1] [2] [200] [-1] [2]
+; RepRapFirmware Programming constructs
+while true
+  if iterations = 5
+    abort "Too many auto calibration attempts"
 ds

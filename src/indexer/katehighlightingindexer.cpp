@@ -94,9 +94,9 @@ public:
                 continue;
             }
 
-            auto markAsUsedContext = [](ContextName &ContextName) {
-                if (!ContextName.stay && ContextName.context) {
-                    ContextName.context->isOnlyIncluded = false;
+            auto markAsUsedContext = [](ContextName &contextName) {
+                if (!contextName.stay && contextName.context) {
+                    contextName.context->isOnlyIncluded = false;
                 }
             };
 
@@ -115,6 +115,8 @@ public:
                     resolveContextName(definition, context, rule.context, rule.line);
                     if (rule.type != Context::Rule::Type::IncludeRules) {
                         markAsUsedContext(rule.context);
+                    } else if (rule.includeAttrib == XmlBool::True && rule.context.context) {
+                        rule.context.context->referencedWithIncludeAttrib = true;
                     }
                 }
             }
@@ -151,8 +153,10 @@ public:
 
             QSet<const Keywords *> referencedKeywords;
             QSet<ItemDatas::Style> usedAttributeNames;
+            QSet<ItemDatas::Style> ignoredAttributeNames;
             success = checkKeywordsList(definition, referencedKeywords) && success;
-            success = checkContexts(definition, referencedKeywords, usedAttributeNames, usedContexts, unreachableIncludedRules) && success;
+            success =
+                checkContexts(definition, referencedKeywords, usedAttributeNames, ignoredAttributeNames, usedContexts, unreachableIncludedRules) && success;
 
             // search for non-existing itemDatas.
             const auto invalidNames = usedAttributeNames - definition.itemDatas.styleNames;
@@ -161,9 +165,18 @@ public:
                 success = false;
             }
 
+            // search for existing itemDatas, but unusable.
+            const auto ignoredNames = ignoredAttributeNames - usedAttributeNames;
+            for (const auto &styleName : ignoredNames) {
+                qWarning() << filename << "line" << styleName.line << "attribute" << styleName.name
+                           << "is never used. All uses are with lookAhead=true or <IncludeRules/>";
+                success = false;
+            }
+
             // search for unused itemDatas.
-            const auto unusedNames = definition.itemDatas.styleNames - usedAttributeNames;
-            for (const auto &styleName : unusedNames) {
+            auto unusedNames = definition.itemDatas.styleNames - usedAttributeNames;
+            unusedNames -= ignoredNames;
+            for (const auto &styleName : std::as_const(unusedNames)) {
                 qWarning() << filename << "line" << styleName.line << "unused itemData:" << styleName.name;
                 success = false;
             }
@@ -454,6 +467,9 @@ private:
             // Regex
             XmlBool minimal{};
 
+            // IncludeRule
+            XmlBool includeAttrib{};
+
             // DetectChar, Detect2Chars, LineContinue, RangeDetect
             QChar char0;
             // Detect2Chars, RangeDetect
@@ -532,7 +548,6 @@ private:
 
                 for (auto &attr : xml.attributes()) {
                     Parser parser{filename, xml, attr, success};
-                    XmlBool includeAttrib{};
 
                     // clang-format off
                     const bool isExtracted
@@ -646,8 +661,10 @@ private:
         };
 
         int line;
-        // becomes false when a context refers to it
+        // becomes false when a context (except includeRule) refers to it
         bool isOnlyIncluded = true;
+        // becomes true when an includedRule refers to it with includeAttrib=true
+        bool referencedWithIncludeAttrib = false;
         QString name;
         QString attribute;
         ContextName lineEndContext;
@@ -958,6 +975,7 @@ private:
     bool checkContexts(const Definition &definition,
                        QSet<const Keywords *> &referencedKeywords,
                        QSet<ItemDatas::Style> &usedAttributeNames,
+                       QSet<ItemDatas::Style> &ignoredAttributeNames,
                        const QSet<const Context *> &usedContexts,
                        QMap<const Context::Rule *, IncludedRuleUnreachableBy> &unreachableIncludedRules) const
     {
@@ -981,7 +999,7 @@ private:
                 success = false;
             }
 
-            if (!context.attribute.isEmpty()) {
+            if (!context.attribute.isEmpty() && (!context.isOnlyIncluded || context.referencedWithIncludeAttrib)) {
                 usedAttributeNames.insert({context.attribute, context.line});
             }
 
@@ -991,7 +1009,11 @@ private:
 
             for (const auto &rule : context.rules) {
                 if (!rule.attribute.isEmpty()) {
-                    usedAttributeNames.insert({rule.attribute, rule.line});
+                    if (rule.lookAhead != XmlBool::True) {
+                        usedAttributeNames.insert({rule.attribute, rule.line});
+                    } else {
+                        ignoredAttributeNames.insert({rule.attribute, rule.line});
+                    }
                 }
                 success = checkLookAhead(rule) && success;
                 success = checkStringDetect(rule) && success;
@@ -2350,9 +2372,20 @@ private:
             auto &rule2 = it[1];
 
             auto isCommonCompatible = [&] {
-                return rule1.attribute == rule2.attribute && rule1.beginRegion == rule2.beginRegion && rule1.endRegion == rule2.endRegion
-                    && rule1.lookAhead == rule2.lookAhead && rule1.firstNonSpace == rule2.firstNonSpace && rule1.context.context == rule2.context.context
+                if (rule1.lookAhead != rule2.lookAhead) {
+                    return false;
+                }
+                // ignore attribute when lookAhead is true
+                if (rule1.lookAhead != XmlBool::True && rule1.attribute != rule2.attribute) {
+                    return false;
+                }
+                // clang-format off
+                return rule1.beginRegion == rule2.beginRegion
+                    && rule1.endRegion == rule2.endRegion
+                    && rule1.firstNonSpace == rule2.firstNonSpace
+                    && rule1.context.context == rule2.context.context
                     && rule1.context.popCount == rule2.context.popCount;
+                // clang-format on
             };
 
             switch (rule1.type) {

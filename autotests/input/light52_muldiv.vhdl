@@ -245,6 +245,8 @@ with Files_Map;
 package p is
     type int_ptr is access integer;
     type rec is record
+        data  : std_logic_vector(31 downto 0);
+        ack   : std_logic;
         value : integer;
         link  : rec_ptr;
     end record;
@@ -341,6 +343,7 @@ end entity;
 
 architecture t of concat is
     type int_array is array (integer range <>) of integer;
+    type small is range 1 to 3;
 begin
     process
         variable s : string(1 to 5);
@@ -377,7 +380,12 @@ begin
 
     inst1: entity work.counter1(rtl)
         generic map (BITS1 => 8)
-        port map (clk1 => Clock);
+        port map (
+            clk1 => Clock,
+            DATA_OUT   => pwm_data_o(3 downto 5),
+            COMP_IN(1 downto 0)  => compensate_i,
+            WRITE_IN   => (others => '0')
+        );
 
     inst2: component counter2
         generic map (BITS1 => 8)
@@ -386,6 +394,18 @@ begin
     inst3: configuration counter3
         generic map (BITS1 => 8)
         port map (clk1 => Clock);
+
+    THE_PWM_GEN : pwm_generator
+        generic map(
+            dsfds => ds
+        )
+        port map(
+            CLK        => clk_i,
+            DATA_IN    => pwm_data_i,
+            DATA_OUT   => pwm_data_o(3 downto 5),
+            COMP_IN(1 downto 0)  => compensate_i,
+            WRITE_IN   => (others => '0')
+        );
 
 end architecture;
 
@@ -406,3 +426,92 @@ begin
     begin
     end block;
 end architecture;
+
+architecture arch of ent is
+begin
+  LL: if test=10 generate
+   begin
+   end;
+  elsif test=5 generate
+   begin
+   end;
+  end generate;
+
+  LL: if l1: SPEED = "fast" generate
+  elsif test=5 generate
+  end generate;
+end architecture arch;
+
+
+architecture thing_arch of designthing is
+
+component pwm_generator
+  port(
+    CLK        : in std_logic;
+    DATA_IN    : in  std_logic_vector(15 downto 0);
+    );
+end component pwm_generator;
+
+attribute NOM_FREQ : string;
+attribute NOM_FREQ of clk_source : label is "133.00";
+signal clk_i  : std_logic;
+
+begin
+
+gen_no_comp: if TEMP = 0 generate
+  compensate_i <= (others => '0');
+end generate;
+
+gen_no_comp: for i in 0 to TEMP generate
+  compensate_i <= (others => '0') after 10 ns;
+  compensate_i <= (others => '0') ;
+end generate;
+
+---------------------------------------------------------------------------
+-- LED blinking when activity on inputs
+---------------------------------------------------------------------------
+PROC_TIMER : process begin
+  wait until rising_edge(clk_i);
+  timer <= timer + 1;
+  wait for 10 ns;
+  leds <= (last_inp xor inp_status(3 downto 0)) or leds or last_leds;
+  if timer = 0 then
+    leds <= not inp_status(3 downto 0);
+    last_leds <= x"0";
+  elsif gf then
+    fdsa <= '1';
+  end if;
+
+  xz: for x in 0 to 7 loop
+    dsadf;
+  end loop;
+
+  case c is
+    when XXX =>
+      c <= 1;
+      d <= 21321;
+    when YYYY =>
+      c <= 2;
+  end case; 
+end process;
+
+
+generate_with_begin: if TEMP = 0 generate
+  signal : test : std_logic;
+begin
+  compensate_i <= (others => '0');
+  if timer = 0 then
+    leds <= not inp_status(3 downto 0);
+    last_leds <= x"0";
+  elsif gf then
+    fdsa <= '1';
+  end if;  
+end generate_with_begin;
+
+PROC_TIMER : process
+  variable x : std_logic;
+begin
+  x := '0';
+end process PROC_TIMER;
+
+end architecture thing_arc;   --this is not correct (wrong name)

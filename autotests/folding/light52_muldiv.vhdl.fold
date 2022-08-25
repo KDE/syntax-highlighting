@@ -208,7 +208,7 @@ div_ready <= ready;
 ---- Multiplier logic ----------------------------------------------------------
 
 ---- Combinational multiplier -----------------------------
-multiplier_combinational: <beginfold id='5'>if</beginfold id='5'> not SEQUENTIAL_MULTIPLIER generate
+multiplier_combinational: if not SEQUENTIAL_MULTIPLIER <beginfold id='5'>generate</beginfold id='5'>
 
 registered_combinational_multiplier:<beginfold id='3'>process</beginfold id='3'>(clk)
 begin
@@ -227,7 +227,7 @@ prod_out <= prod_reg;
 <endfold id='5'>end generate multiplier_combinational;</endfold id='5'>
 
 ---- Sequential multiplier --------------------------------
-multiplier_sequential: <beginfold id='5'>if</beginfold id='5'> SEQUENTIAL_MULTIPLIER generate
+multiplier_sequential: if SEQUENTIAL_MULTIPLIER <beginfold id='5'>generate</beginfold id='5'>
 
 assert false
 report "Sequential multiplier implementation not done yet."&
@@ -245,19 +245,21 @@ with Files_Map;
 package <beginfold id='6'>p</beginfold id='6'> is
     type int_ptr is access integer;
     type rec is <beginfold id='7'>record</beginfold id='7'>
+        data  : std_logic_vector(31 downto 0);
+        ack   : std_logic;
         value : integer;
         link  : rec_ptr;
     <endfold id='7'>end record;</endfold id='7'>
     type int_vec is array (integer range <>) of integer;
     type int_vec_ptr is access int_vec;
     constant def_arr : t_int_array := (0 to 2 => 10);
-<endfold id='1'>end package;</endfold id='1'>
+<endfold id='6'>end package;</endfold id='6'>
 
 package body <beginfold id='8'>p</beginfold id='8'> is
-    procedure test is
+    <beginfold id='9'>procedure</beginfold id='9'> test is
         variable v : int_ptr;
         variable i : integer;
-    <endfold id='9'>begin</endfold id='9'>
+    <endfold id='9'></endfold id='9'><beginfold id='9'>begin</beginfold id='9'>
         v := null;
         deallocate(v);
         v := new integer;
@@ -270,28 +272,28 @@ package body <beginfold id='8'>p</beginfold id='8'> is
         s := new string'("");
     <endfold id='9'>end procedure;</endfold id='9'>
 
-    procedure test2(x : inout rec_ptr) is
-    <endfold id='9'>begin</endfold id='9'>
+    <beginfold id='9'>procedure</beginfold id='9'> test2(x : inout rec_ptr) is
+    <endfold id='9'></endfold id='9'><beginfold id='9'>begin</beginfold id='9'>
         x.value := x.value + 1;
     <endfold id='9'>end procedure;</endfold id='9'>
 
-    procedure test3 is
+    <beginfold id='9'>procedure</beginfold id='9'> test3 is
         type a;
         type a is access integer;
         variable v : a;
-    <endfold id='9'>begin</endfold id='9'>
+    <endfold id='9'></endfold id='9'><beginfold id='9'>begin</beginfold id='9'>
     <endfold id='9'>end procedure;</endfold id='9'>
 
     type int_ptr_array is array (integer range <>) of int_ptr;
 
-    procedure tets4 is
+    <beginfold id='9'>procedure</beginfold id='9'> tets4 is
         type bvp is access bit_vector;
         variable y : int_ptr(1 to 3) := int_ptr'(null);
-    <endfold id='9'>begin</endfold id='9'>
+    <endfold id='9'></endfold id='9'><beginfold id='9'>begin</beginfold id='9'>
     <endfold id='9'>end procedure;</endfold id='9'>
 
-    procedure Restore_Origin (Mark : Instance_Index_Type) is
-    <endfold id='9'>begin</endfold id='9'>
+    <beginfold id='9'>procedure</beginfold id='9'> Restore_Origin (Mark : Instance_Index_Type) is
+    <endfold id='9'></endfold id='9'><beginfold id='9'>begin</beginfold id='9'>
         for I in reverse Mark + 1 .. Prev_Instance_Table.Last <beginfold id='10'>loop</beginfold id='10'>
             <beginfold id='11'>declare</beginfold id='11'>
                 El : Instance_Entry_Type renames Prev_Instance_Table.Table (I);
@@ -309,7 +311,7 @@ package body <beginfold id='8'>p</beginfold id='8'> is
     <beginfold id='12'>is</beginfold id='12'>
         Res : Iir_List;
         El : Iir;
-    <beginfold id='12'>begin</beginfold id='12'>
+    begin
         <beginfold id='13'>case</beginfold id='13'> L is
             when Null_Iir_List
             | Iir_List_All <beginfold id='14'>=></beginfold id='14'>
@@ -326,7 +328,7 @@ package body <beginfold id='8'>p</beginfold id='8'> is
                 return Res;
         <endfold id='14'></endfold id='14'><endfold id='13'>end case;</endfold id='13'>
     <endfold id='12'>end Instantiate_Iir_List;</endfold id='12'>
-<endfold id='1'>end package body;</endfold id='1'>
+<endfold id='8'>end package body;</endfold id='8'>
 
 -- Library bar
 context foo.test_context;
@@ -341,6 +343,7 @@ entity <beginfold id='1'>foo</beginfold id='1'> is
 
 architecture <beginfold id='2'>t</beginfold id='2'> of concat is
     type int_array is array (integer range <>) of integer;
+    type small is range 1 to 3;
 begin
     <beginfold id='3'>process</beginfold id='3'>
         variable s : string(1 to 5);
@@ -357,7 +360,7 @@ begin
 
     function CounterVal(Seconds : integer := 0) return integer <beginfold id='12'>is</beginfold id='12'>
         variable TotalSeconds : interger;
-    <beginfold id='12'>begin</beginfold id='12'>
+    begin
         TotalSeconds := Seconds + Minutes * 60;
         return TotalSeconds * ClockFrequencyHz -1;
     <endfold id='12'>end function;</endfold id='12'>
@@ -375,17 +378,34 @@ begin
     subtype addr_int is integer range 0 to 65535;
     subtype sub_enum_type is enum_type range a to m;
 
-    inst1: entity <beginfold id='16'>work</beginfold id='16'>.counter1(rtl)
-        generic map (BITS1 => 8)
-        port map (clk1 => Clock)<endfold id='16'>;</endfold id='16'>
+    inst1: entity <beginfold id='16'>work.counter1</beginfold id='16'>(rtl)
+        <beginfold id='17'>generic map </beginfold id='17'>(BITS1 => 8<endfold id='17'>)</endfold id='17'>
+        <beginfold id='17'>port map </beginfold id='17'>(
+            clk1 => Clock,
+            DATA_OUT   => pwm_data_o(3 downto 5),
+            COMP_IN(1 downto 0)  => compensate_i,
+            WRITE_IN   => (others => '0')
+        <endfold id='17'>)</endfold id='17'><endfold id='16'>;</endfold id='16'>
 
     inst2: component <beginfold id='16'>counter2</beginfold id='16'>
-        generic map (BITS1 => 8)
-        port map (clk1 => Clock)<endfold id='16'>;</endfold id='16'>
+        <beginfold id='17'>generic map </beginfold id='17'>(BITS1 => 8<endfold id='17'>)</endfold id='17'>
+        <beginfold id='17'>port map </beginfold id='17'>(clk1 => Clock<endfold id='17'>)</endfold id='17'><endfold id='16'>;</endfold id='16'>
 
     inst3: configuration <beginfold id='16'>counter3</beginfold id='16'>
-        generic map (BITS1 => 8)
-        port map (clk1 => Clock)<endfold id='16'>;</endfold id='16'>
+        <beginfold id='17'>generic map </beginfold id='17'>(BITS1 => 8<endfold id='17'>)</endfold id='17'>
+        <beginfold id='17'>port map </beginfold id='17'>(clk1 => Clock<endfold id='17'>)</endfold id='17'><endfold id='16'>;</endfold id='16'>
+
+    THE_PWM_GEN : <beginfold id='16'>pwm_generator</beginfold id='16'>
+        <beginfold id='17'>generic map</beginfold id='17'>(
+            dsfds => ds
+        <endfold id='17'>)</endfold id='17'>
+        <beginfold id='17'>port map</beginfold id='17'>(
+            CLK        => clk_i,
+            DATA_IN    => pwm_data_i,
+            DATA_OUT   => pwm_data_o(3 downto 5),
+            COMP_IN(1 downto 0)  => compensate_i,
+            WRITE_IN   => (others => '0')
+        <endfold id='17'>)</endfold id='17'><endfold id='16'>;</endfold id='16'>
 
 <endfold id='2'>end architecture;</endfold id='2'>
 
@@ -399,10 +419,99 @@ begin
         assert x < y;                   -- Error
     <endfold id='3'>end process;</endfold id='3'>
 
-    billowitch_tc586: <beginfold id='17'>block</beginfold id='17'> is
+    billowitch_tc586: <beginfold id='18'>block</beginfold id='18'> is
         type real_cons_vector  is array (15 downto 0) of real;
         type real_cons_vector_file is file of real_cons_vector;
         constant C19 : real_cons_vector := (others => 3.0);
     begin
-    <endfold id='17'>end block;</endfold id='17'>
+    <endfold id='18'>end block;</endfold id='18'>
 <endfold id='2'>end architecture;</endfold id='2'>
+
+architecture <beginfold id='2'>arch</beginfold id='2'> of ent is
+begin
+  LL: if test=10 <beginfold id='5'>generate</beginfold id='5'>
+   begin
+   end;
+  elsif test=5 generate
+   begin
+   end;
+  <endfold id='5'>end generate;</endfold id='5'>
+
+  LL: if l1: SPEED = "fast" <beginfold id='5'>generate</beginfold id='5'>
+  elsif test=5 generate
+  <endfold id='5'>end generate;</endfold id='5'>
+<endfold id='2'>end architecture arch;</endfold id='2'>
+
+
+architecture <beginfold id='2'>thing_arch</beginfold id='2'> of designthing is
+
+component <beginfold id='15'>pwm_generator</beginfold id='15'>
+  port(
+    CLK        : in std_logic;
+    DATA_IN    : in  std_logic_vector(15 downto 0);
+    );
+<endfold id='15'>end component pwm_generator;</endfold id='15'>
+
+attribute NOM_FREQ : string;
+attribute NOM_FREQ of clk_source : label is "133.00";
+signal clk_i  : std_logic;
+
+begin
+
+gen_no_comp: if TEMP = 0 <beginfold id='5'>generate</beginfold id='5'>
+  compensate_i <= (others => '0');
+<endfold id='5'>end generate;</endfold id='5'>
+
+gen_no_comp: for i in 0 to TEMP <beginfold id='5'>generate</beginfold id='5'>
+  compensate_i <= (others => '0') after 10 ns;
+  compensate_i <= (others => '0') ;
+<endfold id='5'>end generate;</endfold id='5'>
+
+---------------------------------------------------------------------------
+-- LED blinking when activity on inputs
+---------------------------------------------------------------------------
+PROC_TIMER : <beginfold id='3'>process</beginfold id='3'> begin
+  wait until rising_edge(clk_i);
+  timer <= timer + 1;
+  wait for 10 ns;
+  leds <= (last_inp xor inp_status(3 downto 0)) or leds or last_leds;
+  <beginfold id='4'>if</beginfold id='4'> timer = 0 then
+    leds <= not inp_status(3 downto 0);
+    last_leds <= x"0";
+  elsif gf then
+    fdsa <= '1';
+  <endfold id='4'>end if;</endfold id='4'>
+
+  xz: for x in 0 to 7 <beginfold id='10'>loop</beginfold id='10'>
+    dsadf;
+  <endfold id='10'>end loop;</endfold id='10'>
+
+  <beginfold id='13'>case</beginfold id='13'> c is
+    when XXX <beginfold id='14'>=></beginfold id='14'>
+      c <= 1;
+      d <= 21321;
+    <endfold id='14'>when</endfold id='14'> YYYY <beginfold id='14'>=></beginfold id='14'>
+      c <= 2;
+  <endfold id='14'></endfold id='14'><endfold id='13'>end case;</endfold id='13'> 
+<endfold id='3'>end process;</endfold id='3'>
+
+
+generate_with_begin: if TEMP = 0 <beginfold id='5'>generate</beginfold id='5'>
+  signal : test : std_logic;
+begin
+  compensate_i <= (others => '0');
+  <beginfold id='4'>if</beginfold id='4'> timer = 0 then
+    leds <= not inp_status(3 downto 0);
+    last_leds <= x"0";
+  elsif gf then
+    fdsa <= '1';
+  <endfold id='4'>end if;</endfold id='4'>  
+<endfold id='5'>end generate_with_begin;</endfold id='5'>
+
+PROC_TIMER : <beginfold id='3'>process</beginfold id='3'>
+  variable x : std_logic;
+begin
+  x := '0';
+<endfold id='3'>end process PROC_TIMER;</endfold id='3'>
+
+<endfold id='2'>end</endfold id='2'> architecture thing_arc;   --this is not correct (wrong name)

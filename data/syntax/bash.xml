@@ -66,7 +66,7 @@
 
 <language
     name="Bash"
-    version="42"
+    version="43"
     kateversion="5.79"
     section="Scripts"
     extensions="*.sh;*.bash;*.ebuild;*.eclass;*.exlib;*.exheres-0;.bashrc;.bash_profile;.bash_login;.profile;PKGBUILD;APKBUILD"
@@ -1013,6 +1013,7 @@
 
       <!-- HereDoc consumes Here-documents. It is called at the beginning of the "<<" construct. -->
       <context attribute="Normal Text" lineEndContext="#stay" name="HereDoc">
+        <RegExpr attribute="Redirection" context="HereDocMLComment" String="^[ &tab;]*&lt;&lt;[ &tab;]*'#([^']+)'$" column="0"/>
         <RegExpr attribute="Redirection" context="HereDocIQ"  String="&lt;&lt;-[ &tab;]*&heredocq;(?=[ &tab;]*$)"/>
         <RegExpr attribute="Redirection" context="HereDocINQ" String="&lt;&lt;-[ &tab;]*([^&wordseps;]+)(?=[ &tab;]*$)"/>
         <RegExpr attribute="Redirection" context="HereDocQ"   String="&lt;&lt;[ &tab;]*&heredocq;(?=[ &tab;]*$)"/>
@@ -1028,6 +1029,18 @@
 
       <context attribute="Normal Text" lineEndContext="#pop" name="HereDocRemainder" fallthroughContext="Command">
         <IncludeRules context="Start"/>
+      </context>
+
+      <context attribute="Comment" lineEndContext="#stay" name="HereDocMLComment" dynamic="true" fallthroughContext="Comment">
+        <RegExpr attribute="Redirection" context="#pop#pop" String="^#%1$" column="0" dynamic="true"/>
+        <RegExpr attribute="Region Marker" context="RST Documentation" String="^#?\[(=*)\[\.rst:" column="0" beginRegion="RSTDocumentation" />
+        <IncludeRules context="Comment"/>
+      </context>
+
+      <context attribute="Comment" lineEndContext="#stay" name="RST Documentation" dynamic="true">
+        <RegExpr attribute="Redirection" context="#pop#pop#pop" String="^#BLOCK-COMMENT$" column="0"/>
+        <RegExpr attribute="Region Marker" context="#pop" String="^#?\]%1\]" dynamic="true" column="0" endRegion="RSTDocumentation" />
+        <IncludeRules context="##reStructuredText" />
       </context>
 
       <context attribute="Here Doc" lineEndContext="#stay" name="HereDocQ" dynamic="true" fallthroughContext="HereDocText">
@@ -1841,6 +1854,7 @@
       <itemData name="Parameter Expansion Operator" defStyleNum="dsOperator" spellChecking="false"/>
       <itemData name="Operator"       defStyleNum="dsOperator"      spellChecking="false"/>
       <itemData name="Error"          defStyleNum="dsError"         spellChecking="false"/>
+      <itemData name="Region Marker"  defStyleNum="dsRegionMarker"  spellChecking="false" />
     </itemDatas>
   </highlighting>
   <general>

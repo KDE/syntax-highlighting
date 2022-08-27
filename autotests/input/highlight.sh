@@ -29,6 +29,19 @@ mkdir this\ isnt\ #a\ comment
 mkdir this\ isnt\\\;#a\ comment
 mkdir this\\ #is a comment
 
+<<'#BLOCK-COMMENT'
+NOTE This is the "miltiline" comment.
+
+[===[.rst:
+
+Docs
+----
+
+Documentation block in ``RST`` format **starts** *here*.
+
+]===]
+#BLOCK-COMMENT
+
 # brace expansion
 mv my_file.{JPG,jpg}
 echo f.{01..100..3} f.{Z..a..-3}

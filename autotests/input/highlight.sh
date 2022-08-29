@@ -42,6 +42,16 @@ Documentation block in ``RST`` format **starts** *here*.
 ]===]
 #BLOCK-COMMENT
 
+: << '#SC2188'
+[====[.rst:
+The *multiline* comment does not trigger the SC2188_ warning of `shellcheck`.
+
+.. _SC2188: https://www.shellcheck.net/wiki/SC2188
+]====]
+
+... continue with _normal_ Bash comment.
+#SC2188
+
 # brace expansion
 mv my_file.{JPG,jpg}
 echo f.{01..100..3} f.{Z..a..-3}

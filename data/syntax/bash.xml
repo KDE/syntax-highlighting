@@ -66,7 +66,7 @@
 
 <language
     name="Bash"
-    version="43"
+    version="44"
     kateversion="5.79"
     section="Scripts"
     extensions="*.sh;*.bash;*.ebuild;*.eclass;*.exlib;*.exheres-0;.bashrc;.bash_profile;.bash_login;.profile;PKGBUILD;APKBUILD"
@@ -579,6 +579,8 @@
         <keyword attribute="Builtin" context="VarName" String="builtins_var" lookAhead="1"/>
         <!-- mark function definitions without function keyword -->
         <RegExpr attribute="Function" context="#stay" String="&funcname;[ &tab;]*\(\)"/>
+        <!-- Special case for `: << '#BLOCK-COMMENT' form of "multiline" comments-->
+        <RegExpr attribute="Normal Text" context="PreHereDocMLComment" String="^:[ &tab;]+&lt;&lt;[ &tab;]*'#([^']+)'$" lookAhead="1" column="0"/>
         <keyword attribute="Builtin" context="CommandArgs" String="builtins"/>
         <keyword attribute="Command" context="CommandArgs" String="unixcommands"/>
 
@@ -1029,6 +1031,12 @@
 
       <context attribute="Normal Text" lineEndContext="#pop" name="HereDocRemainder" fallthroughContext="Command">
         <IncludeRules context="Start"/>
+      </context>
+
+      <!-- Highlight the builtin `:` (true) and the followed redirection, then fall into `HereDocMLComment` -->
+      <context attribute="Comment" lineEndContext="#stay" name="PreHereDocMLComment">
+        <DetectChar attribute="Builtin" context="#stay" char=":" column="0"/>
+        <RegExpr attribute="Redirection" context="HereDocMLComment" String="&lt;&lt;[ &tab;]*'#([^']+)'$"/>
       </context>
 
       <context attribute="Comment" lineEndContext="#stay" name="HereDocMLComment" dynamic="true" fallthroughContext="Comment">

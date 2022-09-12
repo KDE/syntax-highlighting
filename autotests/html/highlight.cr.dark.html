@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>highlight.cr</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (Crystal) - Theme (Breeze Dark)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="color:#7a7c7d;"># This file is a testcase for the highlighting of Crystal code</span>
+<span style="color:#7a7c7d;"># It's not executable code, but a collection of code snippets</span>
+<span style="color:#7a7c7d;">#</span>
+
+<span style="color:#8e44ad;font-weight:bold;">require</span> <span style="color:#f44f4f;">&quot;lib_z&quot;</span>
+<span style="color:#8e44ad;font-weight:bold;">require</span> <span style="color:#f44f4f;">&quot;./digest&quot;</span>
+
+<span style="color:#fdbc4b;font-weight:bold;">module</span> <span style="color:#2980b9;">Digest</span><span style="font-weight:bold;">::</span><span style="color:#2980b9;">Adler32</span>
+  <span style="color:#fdbc4b;font-weight:bold;">def</span> <span style="color:#f67400;">self</span><span style="color:#2980b9;">.initial</span> : <span style="color:#2980b9;">UInt32</span>
+    <span style="color:#2980b9;">LibZ</span><span style="color:#2980b9;">.adler32</span>(<span style="color:#f67400;">0</span>, <span style="color:#f67400;">nil</span>, <span style="color:#f67400;">0</span>)<span style="color:#2980b9;">.to_u32</span>
+  <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+  <span style="color:#fdbc4b;font-weight:bold;">def</span> <span style="color:#f67400;">self</span><span style="color:#2980b9;">.checksum</span>(data) : <span style="color:#2980b9;">UInt32</span>
+    update(data, initial)
+  <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+  <span style="color:#fdbc4b;font-weight:bold;">def</span> <span style="color:#f67400;">self</span><span style="color:#2980b9;">.update</span>(data, adler32 : <span style="color:#2980b9;">UInt32</span>) : <span style="color:#2980b9;">UInt32</span>
+    slice <span style="font-weight:bold;">=</span> data<span style="color:#2980b9;">.to_slice</span>
+    <span style="color:#2980b9;">LibZ</span><span style="color:#2980b9;">.adler32</span>(adler32, slice, slice<span style="color:#2980b9;">.size</span>)<span style="color:#2980b9;">.to_u32</span>
+  <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+  <span style="color:#fdbc4b;font-weight:bold;">def</span> <span style="color:#f67400;">self</span><span style="color:#2980b9;">.combine</span>(adler1 : <span style="color:#2980b9;">UInt32</span>, adler2 : <span style="color:#2980b9;">UInt32</span>, len) : <span style="color:#2980b9;">UInt32</span>
+    <span style="color:#2980b9;">LibZ</span><span style="color:#2980b9;">.adler32_combine</span>(adler1, adler2, len)<span style="color:#2980b9;">.to_u32</span>
+  <span style="color:#fdbc4b;font-weight:bold;">end</span>
+<span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+<span style="color:#fdbc4b;font-weight:bold;">struct</span> <span style="color:#2980b9;">BigRational</span>
+  <span style="color:#2980b9;">Number</span><span style="color:#2980b9;">.expand_div</span> <span style="font-weight:bold;">[</span><span style="color:#2980b9;">Int8</span>, <span style="color:#2980b9;">UInt8</span>, <span style="color:#2980b9;">Int16</span>, <span style="color:#2980b9;">UInt16</span>, <span style="color:#2980b9;">Int32</span>, <span style="color:#2980b9;">UInt32</span>, <span style="color:#2980b9;">Int64</span>, <span style="color:#2980b9;">UInt64</span>, <span style="color:#2980b9;">Int128</span>, <span style="color:#2980b9;">UInt128</span><span style="font-weight:bold;">]</span>, <span style="color:#2980b9;">BigRational</span>
+  <span style="color:#2980b9;">Number</span><span style="color:#2980b9;">.expand_div</span> <span style="font-weight:bold;">[</span><span style="color:#2980b9;">Float32</span>, <span style="color:#2980b9;">Float64</span><span style="font-weight:bold;">]</span>, <span style="color:#2980b9;">BigRational</span>
+<span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+<span style="color:#fdbc4b;font-weight:bold;">module</span> <span style="color:#2980b9;">Crystal</span><span style="font-weight:bold;">::</span><span style="color:#2980b9;">Repl</span><span style="font-weight:bold;">::</span><span style="color:#2980b9;">Closure</span>
+  <span style="color:#27aeae;font-weight:bold;">VAR_NAME</span> <span style="font-weight:bold;">=</span> <span style="color:#f44f4f;">&quot;.closure_var&quot;</span>
+  <span style="color:#27aeae;font-weight:bold;">ARG_NAME</span> <span style="font-weight:bold;">=</span> <span style="color:#f44f4f;">&quot;.closure_arg&quot;</span>
+<span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+<span style="color:#fdbc4b;font-weight:bold;">class</span> <span style="color:#2980b9;">FunctionType</span>
+  <span style="color:#27ae60;">getter</span> arg_types : <span style="color:#2980b9;">Array</span>(<span style="color:#2980b9;">ArgType</span>)
+  <span style="color:#27ae60;">getter</span> return_type : <span style="color:#2980b9;">ArgType</span>
+
+  <span style="color:#27ae60;">@@cvar</span> <span style="font-weight:bold;">=</span> <span style="color:#f67400;">3</span>
+  <span style="color:#27ae60;">@ivar</span> <span style="font-weight:bold;">=</span> <span style="color:#f67400;">7</span>
+
+  <span style="color:#fdbc4b;font-weight:bold;">def</span> initialize(<span style="color:#27ae60;">@arg_types</span>, <span style="color:#27ae60;">@return_type</span>)
+  <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+  <span style="color:#fdbc4b;font-weight:bold;">def</span> /<span style="color:#da4453;">/(other : Int::Unsigned) : BigInt</span>
+<span style="color:#da4453;">    check_division_by_zero other</span>
+<span style="color:#da4453;">    unsafe_floored_div(other)</span>
+<span style="color:#da4453;">  end</span>
+
+<span style="color:#da4453;">  def /</span><span style="font-weight:bold;">/</span>(other : <span style="color:#2980b9;">Int</span>) : <span style="color:#2980b9;">BigInt</span>
+    check_division_by_zero other
+
+    <span style="color:#fdbc4b;font-weight:bold;">if</span> other <span style="font-weight:bold;">&lt;</span> <span style="color:#f67400;">0</span>
+      (<span style="font-weight:bold;">-</span><span style="color:#f67400;">self</span>)<span style="color:#2980b9;">.unsafe_floored_div</span>(<span style="font-weight:bold;">-</span>other)
+      <span style="color:#27ae60;">@cvar</span> <span style="font-weight:bold;">+=</span> <span style="color:#f67400;">1</span>
+    <span style="color:#fdbc4b;font-weight:bold;">else</span>
+      unsafe_floored_div(other)
+     <span style="color:#27ae60;">@ivar</span> <span style="font-weight:bold;">+=</span> <span style="color:#f67400;">10</span>
+    <span style="color:#fdbc4b;font-weight:bold;">end</span>
+  <span style="color:#fdbc4b;font-weight:bold;">end</span>
+<span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+<span style="color:#8e44ad;font-weight:bold;">require</span> <span style="color:#f44f4f;">&quot;llvm/enums/atomic&quot;</span>
+<span style="color:#fdbc4b;font-weight:bold;">struct</span> <span style="color:#2980b9;">Atomic</span>(T)
+  <span style="color:#7a7c7d;"># Creates an Atomic with the given initial value.</span>
+  <span style="color:#fdbc4b;font-weight:bold;">def</span> compare_and_set(cmp : T, new : T) : <span style="font-weight:bold;">{</span>T, <span style="color:#2980b9;">Bool</span><span style="font-weight:bold;">}</span>
+    <span style="font-weight:bold;">{%</span> <span style="color:#fdbc4b;font-weight:bold;">if</span> T<span style="color:#2980b9;">.union?</span> <span style="font-weight:bold;">&amp;&amp;</span> T<span style="color:#2980b9;">.union_types.all?</span> <span style="font-weight:bold;">{</span> <span style="font-weight:bold;">|</span>t<span style="font-weight:bold;">|</span> t <span style="font-weight:bold;">==</span> <span style="color:#2980b9;">Nil</span> <span style="font-weight:bold;">||</span> t <span style="font-weight:bold;">&lt;</span> <span style="color:#2980b9;">Reference</span> <span style="font-weight:bold;">}</span> <span style="font-weight:bold;">%}</span>
+      address, success <span style="font-weight:bold;">=</span> <span style="color:#2980b9;">Ops</span><span style="color:#2980b9;">.cmpxchg</span>(pointerof(<span style="color:#27ae60;">@value</span>)<span style="color:#2980b9;">.as</span>(<span style="color:#2980b9;">LibC</span><span style="font-weight:bold;">::</span><span style="color:#2980b9;">SizeT</span><span style="font-weight:bold;">*</span>), <span style="color:#2980b9;">LibC</span><span style="font-weight:bold;">::</span><span style="color:#2980b9;">SizeT</span><span style="color:#2980b9;">.new</span>(cmp<span style="color:#2980b9;">.as</span>(T)<span style="color:#2980b9;">.object_id</span>), <span style="color:#2980b9;">LibC</span><span style="font-weight:bold;">::</span><span style="color:#2980b9;">SizeT</span><span style="color:#2980b9;">.new</span>(new<span style="color:#2980b9;">.as</span>(T)<span style="color:#2980b9;">.object_id</span>), <span style="color:#da4453;">:sequentially_consistent</span>, <span style="color:#da4453;">:sequentially_consistent</span>)
+      <span style="font-weight:bold;">{</span>address <span style="font-weight:bold;">==</span> <span style="color:#f67400;">0</span> ? <span style="color:#f67400;">nil</span> : <span style="color:#2980b9;">Pointer</span>(T)<span style="color:#2980b9;">.new</span>(address)<span style="color:#2980b9;">.as</span>(T), success<span style="font-weight:bold;">}</span>
+    <span style="font-weight:bold;">{%</span> <span style="color:#fdbc4b;font-weight:bold;">elsif</span> T <span style="font-weight:bold;">&lt;</span> <span style="color:#2980b9;">Reference</span> <span style="font-weight:bold;">%}</span>
+      <span style="color:#7a7c7d;"># Use addresses again (but this can't return nil)</span>
+      address, success <span style="font-weight:bold;">=</span> <span style="color:#2980b9;">Ops</span><span style="color:#2980b9;">.cmpxchg</span>(pointerof(<span style="color:#27ae60;">@value</span>)<span style="color:#2980b9;">.as</span>(<span style="color:#2980b9;">LibC</span><span style="font-weight:bold;">::</span><span style="color:#2980b9;">SizeT</span><span style="font-weight:bold;">*</span>), <span style="color:#2980b9;">LibC</span><span style="font-weight:bold;">::</span><span style="color:#2980b9;">SizeT</span><span style="color:#2980b9;">.new</span>(cmp<span style="color:#2980b9;">.as</span>(T)<span style="color:#2980b9;">.object_id</span>), <span style="color:#2980b9;">LibC</span><span style="font-weight:bold;">::</span><span style="color:#2980b9;">SizeT</span><span style="color:#2980b9;">.new</span>(new<span style="color:#2980b9;">.as</span>(T)<span style="color:#2980b9;">.object_id</span>), <span style="color:#da4453;">:sequentially_consistent</span>, <span style="color:#da4453;">:sequentially_consistent</span>)
+      <span style="font-weight:bold;">{</span><span style="color:#2980b9;">Pointer</span>(T)<span style="color:#2980b9;">.new</span>(address)<span style="color:#2980b9;">.as</span>(T), success<span style="font-weight:bold;">}</span>
+    <span style="font-weight:bold;">{%</span> <span style="color:#fdbc4b;font-weight:bold;">else</span> <span style="font-weight:bold;">%}</span>
+      <span style="color:#2980b9;">Ops</span><span style="color:#2980b9;">.cmpxchg</span>(pointerof(<span style="color:#27ae60;">@value</span>), cmp, new, <span style="color:#da4453;">:sequentially_consistent</span>, <span style="color:#da4453;">:sequentially_consistent</span>)
+    <span style="font-weight:bold;">{%</span> <span style="color:#fdbc4b;font-weight:bold;">end</span> <span style="font-weight:bold;">%}</span>
+  <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+  <span style="color:#fdbc4b;font-weight:bold;">def</span> swap(value : T)
+    <span style="font-weight:bold;">{%</span> <span style="color:#fdbc4b;font-weight:bold;">if</span> T<span style="color:#2980b9;">.union?</span> <span style="font-weight:bold;">&amp;&amp;</span> T<span style="color:#2980b9;">.union_types.all?</span> <span style="font-weight:bold;">{</span> <span style="font-weight:bold;">|</span>t<span style="font-weight:bold;">|</span> t <span style="font-weight:bold;">==</span> <span style="color:#2980b9;">Nil</span> <span style="font-weight:bold;">||</span> t <span style="font-weight:bold;">&lt;</span> <span style="color:#2980b9;">Reference</span> <span style="font-weight:bold;">}</span> <span style="font-weight:bold;">||</span> T <span style="font-weight:bold;">&lt;</span> <span style="color:#2980b9;">Reference</span> <span style="font-weight:bold;">%}</span>
+      address <span style="font-weight:bold;">=</span> <span style="color:#2980b9;">Ops</span><span style="color:#2980b9;">.atomicrmw</span>(<span style="color:#da4453;">:xchg</span>, pointerof(<span style="color:#27ae60;">@value</span>)<span style="color:#2980b9;">.as</span>(<span style="color:#2980b9;">LibC</span><span style="font-weight:bold;">::</span><span style="color:#2980b9;">SizeT</span><span style="font-weight:bold;">*</span>), <span style="color:#2980b9;">LibC</span><span style="font-weight:bold;">::</span><span style="color:#2980b9;">SizeT</span><span style="color:#2980b9;">.new</span>(value<span style="color:#2980b9;">.as</span>(T)<span style="color:#2980b9;">.object_id</span>), <span style="color:#da4453;">:sequentially_consistent</span>, <span style="color:#f67400;">false</span>)
+      <span style="color:#2980b9;">Pointer</span>(T)<span style="color:#2980b9;">.new</span>(address)<span style="color:#2980b9;">.as</span>(T)
+    <span style="font-weight:bold;">{%</span> <span style="color:#fdbc4b;font-weight:bold;">else</span> <span style="font-weight:bold;">%}</span>
+      <span style="color:#2980b9;">Ops</span><span style="color:#2980b9;">.atomicrmw</span>(<span style="color:#da4453;">:xchg</span>, pointerof(<span style="color:#27ae60;">@value</span>), value, <span style="color:#da4453;">:sequentially_consistent</span>, <span style="color:#f67400;">false</span>)
+    <span style="font-weight:bold;">{%</span> <span style="color:#fdbc4b;font-weight:bold;">end</span> <span style="font-weight:bold;">%}</span>
+  <span style="color:#fdbc4b;font-weight:bold;">end</span>
+<span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+<span style="color:#fdbc4b;font-weight:bold;">class</span> <span style="color:#2980b9;">Deque</span>(T)
+  <span style="color:#8e44ad;font-weight:bold;">include</span> <span style="color:#2980b9;">Indexable</span><span style="font-weight:bold;">::</span><span style="color:#2980b9;">Mutable</span>(T)
+
+  <span style="color:#27ae60;">@start</span> <span style="font-weight:bold;">=</span> <span style="color:#f67400;">0</span>
+  <span style="color:#2980b9;font-weight:bold;">protected</span> <span style="color:#27ae60;">setter</span> size
+  <span style="color:#2980b9;font-weight:bold;">private</span> <span style="color:#27ae60;">getter</span> buffer
+
+  <span style="color:#fdbc4b;font-weight:bold;">def</span> initialize(size : <span style="color:#2980b9;">Int</span>, value : T)
+    <span style="color:#fdbc4b;font-weight:bold;">if</span> size <span style="font-weight:bold;">&lt;</span> <span style="color:#f67400;">0</span>
+      <span style="color:#8e44ad;font-weight:bold;">raise</span> <span style="color:#2980b9;">ArgumentError</span><span style="color:#2980b9;">.new</span>(<span style="color:#f44f4f;">&quot;Negative deque size: </span><span style="color:#3daee9;">#{</span>size<span style="color:#3daee9;">}</span><span style="color:#f44f4f;">&quot;</span>)
+    <span style="color:#fdbc4b;font-weight:bold;">end</span>
+    <span style="color:#27ae60;">@size</span> <span style="font-weight:bold;">=</span> size<span style="color:#2980b9;">.to_i</span>
+    <span style="color:#27ae60;">@capacity</span> <span style="font-weight:bold;">=</span> size<span style="color:#2980b9;">.to_i</span>
+
+    <span style="color:#fdbc4b;font-weight:bold;">unless</span> <span style="color:#27ae60;">@capacity</span> <span style="font-weight:bold;">==</span> <span style="color:#f67400;">0</span>
+      <span style="color:#27ae60;">@buffer</span> <span style="font-weight:bold;">=</span> <span style="color:#2980b9;">Pointer</span>(T)<span style="color:#2980b9;">.malloc</span>(<span style="color:#27ae60;">@capacity</span>, value)
+    <span style="color:#fdbc4b;font-weight:bold;">end</span>
+  <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+  <span style="color:#7a7c7d;"># Returns a new `Deque` that has this deque's elements cloned.</span>
+  <span style="color:#7a7c7d;"># That is, it returns a deep copy of this deque.</span>
+  <span style="color:#7a7c7d;">#</span>
+  <span style="color:#7a7c7d;"># Use `#dup` if you want a shallow copy.</span>
+  <span style="color:#fdbc4b;font-weight:bold;">def</span> clone
+    <span style="font-weight:bold;">{%</span> <span style="color:#fdbc4b;font-weight:bold;">if</span> T <span style="font-weight:bold;">==</span> <span style="font-weight:bold;">::</span><span style="color:#2980b9;">Bool</span> <span style="font-weight:bold;">||</span> T <span style="font-weight:bold;">==</span> <span style="font-weight:bold;">::</span><span style="color:#2980b9;">Char</span> <span style="font-weight:bold;">||</span> T <span style="font-weight:bold;">==</span> <span style="font-weight:bold;">::</span><span style="color:#2980b9;">String</span> <span style="font-weight:bold;">||</span> T <span style="font-weight:bold;">==</span> <span style="font-weight:bold;">::</span><span style="color:#2980b9;">Symbol</span> <span style="font-weight:bold;">||</span> T <span style="font-weight:bold;">&lt;</span> <span style="font-weight:bold;">::</span><span style="color:#2980b9;">Number</span><span style="font-weight:bold;">::</span><span style="color:#2980b9;">Primitive</span> <span style="font-weight:bold;">%</span><span style="font-weight:bold;">}</span>
+      <span style="color:#2980b9;">Deque</span>(T)<span style="color:#2980b9;">.new</span>(size) <span style="font-weight:bold;">{</span> <span style="font-weight:bold;">|</span>i<span style="font-weight:bold;">|</span> <span style="color:#f67400;">self</span><span style="font-weight:bold;">[</span>i<span style="font-weight:bold;">]</span><span style="color:#2980b9;">.clone.as</span>(T) <span style="font-weight:bold;">}</span>
+    <span style="font-weight:bold;">{</span>% <span style="color:#fdbc4b;font-weight:bold;">else</span> %<span style="font-weight:bold;">}</span>
+      exec_recursive_clone <span style="color:#fdbc4b;font-weight:bold;">do</span> <span style="font-weight:bold;">|</span>hash<span style="font-weight:bold;">|</span>
+        clone <span style="font-weight:bold;">=</span> <span style="color:#2980b9;">Deque</span>(T)<span style="color:#2980b9;">.new</span>(size)
+        each <span style="color:#fdbc4b;font-weight:bold;">do</span> <span style="font-weight:bold;">|</span>element<span style="font-weight:bold;">|</span>
+          clone <span style="font-weight:bold;">&lt;&lt;</span> element<span style="color:#2980b9;">.clone</span>
+        <span style="color:#fdbc4b;font-weight:bold;">end</span>
+        clone
+      <span style="color:#fdbc4b;font-weight:bold;">end</span>
+    <span style="font-weight:bold;">{</span>% <span style="color:#fdbc4b;font-weight:bold;">end</span> %<span style="font-weight:bold;">}</span>
+  <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+  <span style="color:#fdbc4b;font-weight:bold;">def</span> delete_at(index : <span style="color:#2980b9;">Int</span>) : T
+    <span style="color:#fdbc4b;font-weight:bold;">unless</span> <span style="color:#f67400;">0</span> <span style="font-weight:bold;">&lt;=</span> index <span style="font-weight:bold;">&lt;</span> @size
+      raise <span style="color:#2980b9;">IndexError</span><span style="color:#2980b9;">.new</span>
+    <span style="color:#fdbc4b;font-weight:bold;">end</span>
+    <span style="color:#fdbc4b;font-weight:bold;">return</span> shift <span style="color:#fdbc4b;font-weight:bold;">if</span> index <span style="font-weight:bold;">==</span> <span style="color:#f67400;">0</span>
+
+    <span style="color:#fdbc4b;font-weight:bold;">if</span> index <span style="font-weight:bold;">&gt;</span> @size <span style="font-weight:bold;">//</span> <span style="color:#f67400;">2</span>
+      <span style="color:#7a7c7d;"># Move following items to the left, starting with the first one</span>
+      <span style="color:#7a7c7d;"># [56-01234] -&gt; [6x-01235]</span>
+      dst <span style="font-weight:bold;">=</span> rindex
+      finish <span style="font-weight:bold;">=</span> (@start <span style="font-weight:bold;">+</span> @size <span style="font-weight:bold;">-</span> <span style="color:#f67400;">1</span>) <span style="font-weight:bold;">%</span> @capacity
+      loop <span style="color:#fdbc4b;font-weight:bold;">do</span>
+        src <span style="font-weight:bold;">=</span> dst <span style="font-weight:bold;">+</span> <span style="color:#f67400;">1</span>
+        src <span style="font-weight:bold;">-=</span> @capacity <span style="color:#fdbc4b;font-weight:bold;">if</span> src <span style="font-weight:bold;">&gt;=</span> @capacity
+        @buffer<span style="font-weight:bold;">[</span>dst<span style="font-weight:bold;">]</span> <span style="font-weight:bold;">=</span> @buffer<span style="font-weight:bold;">[</span>src<span style="font-weight:bold;">]</span>
+        <span style="color:#fdbc4b;font-weight:bold;">break</span> <span style="color:#fdbc4b;font-weight:bold;">if</span> src <span style="font-weight:bold;">==</span> finish
+        dst <span style="font-weight:bold;">=</span> src
+      <span style="color:#fdbc4b;font-weight:bold;">end</span>
+      (@buffer <span style="font-weight:bold;">+</span> finish)<span style="color:#2980b9;">.clear</span>
+    <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+  <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+  <span style="color:#fdbc4b;font-weight:bold;">def</span> each(<span style="font-weight:bold;">&amp; : </span>T <span style="font-weight:bold;">-&gt;</span>) : <span style="color:#2980b9;">Nil</span>
+    halfs <span style="color:#fdbc4b;font-weight:bold;">do</span> <span style="font-weight:bold;">|</span>r<span style="font-weight:bold;">|</span>
+      r<span style="color:#2980b9;">.each</span> <span style="color:#fdbc4b;font-weight:bold;">do</span> <span style="font-weight:bold;">|</span>i<span style="font-weight:bold;">|</span>
+        <span style="color:#fdbc4b;font-weight:bold;">yield</span> @buffer<span style="font-weight:bold;">[</span>i<span style="font-weight:bold;">]</span>
+      <span style="color:#fdbc4b;font-weight:bold;">end</span>
+    <span style="color:#fdbc4b;font-weight:bold;">end</span>
+  <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+  <span style="color:#fdbc4b;font-weight:bold;">def</span> pop : T
+    pop <span style="font-weight:bold;">{</span> <span style="color:#8e44ad;font-weight:bold;">raise</span> <span style="color:#2980b9;">IndexError</span><span style="color:#2980b9;">.new</span> <span style="font-weight:bold;">}</span>
+  <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+
+  <span style="font-weight:bold;">macro</span> <span style="font-weight:bold;">[]</span>(<span style="font-weight:bold;">*</span>args)
+    array <span style="font-weight:bold;">=</span> uninitialized <span style="color:#2980b9;">Array</span>(<span style="color:#2980b9;">Int32</span>)
+    <span style="font-weight:bold;">{</span>% <span style="color:#fdbc4b;font-weight:bold;">for</span> arg, i <span style="color:#fdbc4b;font-weight:bold;">in</span> args %<span style="font-weight:bold;">}</span>
+      array<span style="color:#2980b9;">.to_unsafe</span><span style="font-weight:bold;">[</span><span style="font-weight:bold;">{{</span>i<span style="font-weight:bold;">}}</span><span style="font-weight:bold;">]</span> <span style="font-weight:bold;">=</span> <span style="font-weight:bold;">{{</span>arg<span style="font-weight:bold;">}}</span>
+    <span style="font-weight:bold;">{</span>% <span style="color:#fdbc4b;font-weight:bold;">end</span> %<span style="font-weight:bold;">}</span>
+    array
+  <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+    <span style="color:#fdbc4b;font-weight:bold;">def</span> message : <span style="color:#2980b9;">String</span>
+        <span style="color:#fdbc4b;font-weight:bold;">case</span> <span style="color:#f67400;">self</span>
+        <span style="color:#fdbc4b;font-weight:bold;">when</span> <span style="color:#27aeae;font-weight:bold;">SUCCESS</span>        <span style="color:#fdbc4b;font-weight:bold;">then</span> <span style="color:#f44f4f;">&quot;No error occurred. System call completed successfully.&quot;</span>
+        <span style="color:#fdbc4b;font-weight:bold;">when</span> <span style="color:#27aeae;font-weight:bold;">TXTBSY</span>         <span style="color:#fdbc4b;font-weight:bold;">then</span> <span style="color:#2980b9;">Errno</span><span style="font-weight:bold;">::</span><span style="color:#27aeae;">ETXTBSY</span>
+        <span style="color:#fdbc4b;font-weight:bold;">when</span> <span style="color:#27aeae;font-weight:bold;">NOTCAPABLE</span>     <span style="color:#fdbc4b;font-weight:bold;">then</span> <span style="color:#2980b9;">Errno</span><span style="font-weight:bold;">::</span><span style="color:#27aeae;">ENOTCAPABLE</span>
+        <span style="color:#fdbc4b;font-weight:bold;">else</span>                     <span style="color:#2980b9;">Errno</span><span style="font-weight:bold;">::</span><span style="color:#27aeae;">EINVAL</span>
+        <span style="color:#fdbc4b;font-weight:bold;">end</span>
+    <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+    enum <span style="color:#2980b9;">Signal</span>
+        <span style="color:#27aeae;font-weight:bold;">KILL</span> <span style="font-weight:bold;">=</span> <span style="color:#f67400;">0</span>
+        <span style="color:#27aeae;font-weight:bold;">BILL</span> <span style="font-weight:bold;">=</span> <span style="color:#f67400;">101</span>
+    <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+<span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+
+  <span style="color:#7a7c7d;"># :nodoc:</span>
+<span style="font-weight:bold;">module</span> <span style="color:#2980b9;">Ops</span>
+    <span style="color:#7a7c7d;"># Defines methods that directly map to LLVM instructions related to atomic operations.</span>
+
+    @<span style="font-weight:bold;">[</span><span style="color:#2980b9;">Primitive</span>(<span style="color:#da4453;">:cmpxchg</span>)<span style="font-weight:bold;">]</span>
+    <span style="color:#fdbc4b;font-weight:bold;">def</span> <span style="color:#f67400;">self</span><span style="color:#2980b9;">.cmpxchg</span>(ptr : T<span style="font-weight:bold;">*</span>, cmp : T, new : T, success_ordering : <span style="color:#27aeae;font-weight:bold;">LLVM</span><span style="font-weight:bold;">::</span><span style="color:#2980b9;">AtomicOrdering</span>, failure_ordering : <span style="color:#27aeae;font-weight:bold;">LLVM</span><span style="font-weight:bold;">::</span><span style="color:#2980b9;">AtomicOrdering</span>) : <span style="font-weight:bold;">{</span>T, <span style="color:#2980b9;">Bool</span><span style="font-weight:bold;">}</span> forall T
+    <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+    @<span style="font-weight:bold;">[</span><span style="color:#2980b9;">Primitive</span>(<span style="color:#da4453;">:atomicrmw</span>)<span style="font-weight:bold;">]</span>
+    <span style="color:#fdbc4b;font-weight:bold;">def</span> <span style="color:#f67400;">self</span><span style="color:#2980b9;">.atomicrmw</span>(op : <span style="color:#27aeae;font-weight:bold;">LLVM</span><span style="font-weight:bold;">::</span><span style="color:#2980b9;">AtomicRMWBinOp</span>, ptr : T<span style="font-weight:bold;">*</span>, val : T, ordering : <span style="color:#27aeae;font-weight:bold;">LLVM</span><span style="font-weight:bold;">::</span><span style="color:#2980b9;">AtomicOrdering</span>, singlethread : <span style="color:#2980b9;">Bool</span>) : T forall T
+    <span style="color:#fdbc4b;font-weight:bold;">end</span>
+<span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+
+@<span style="font-weight:bold;">[</span><span style="color:#2980b9;">Link</span>(<span style="color:#f44f4f;">&quot;z&quot;</span>)<span style="font-weight:bold;">]</span>
+lib <span style="color:#2980b9;">LibZ</span>
+  <span style="font-weight:bold;">alias</span> <span style="color:#2980b9;">Char</span> <span style="font-weight:bold;">=</span> <span style="color:#2980b9;">LibC</span><span style="font-weight:bold;">::</span><span style="color:#2980b9;">Char</span>
+  <span style="font-weight:bold;">alias</span> <span style="color:#2980b9;">SizeT</span> <span style="font-weight:bold;">=</span> <span style="color:#2980b9;">LibC</span><span style="font-weight:bold;">::</span><span style="color:#2980b9;">SizeT</span>
+
+  fun zlibVersion : <span style="color:#2980b9;">Char</span><span style="font-weight:bold;">*</span>
+  fun crc32_combine(crc1 : <span style="color:#2980b9;">ULong</span>, crc2 : <span style="color:#2980b9;">ULong</span>, len : <span style="color:#2980b9;">Long</span>) : <span style="color:#2980b9;">ULong</span>
+
+  <span style="font-weight:bold;">alias</span> <span style="color:#2980b9;">AllocFunc</span> <span style="font-weight:bold;">=</span> <span style="color:#2980b9;">Void</span><span style="font-weight:bold;">*</span>, <span style="color:#2980b9;">UInt</span>, <span style="color:#2980b9;">UInt</span> <span style="font-weight:bold;">-&gt;</span> <span style="color:#2980b9;">Void</span><span style="font-weight:bold;">*</span>
+  <span style="font-weight:bold;">alias</span> <span style="color:#2980b9;">FreeFunc</span> <span style="font-weight:bold;">=</span> (<span style="color:#2980b9;">Void</span><span style="font-weight:bold;">*</span>, <span style="color:#2980b9;">Void</span><span style="font-weight:bold;">*</span>) <span style="font-weight:bold;">-&gt;</span>
+
+  <span style="font-weight:bold;">struct</span> <span style="color:#2980b9;">ZStream</span>
+    next_in : <span style="color:#2980b9;">Bytef</span><span style="font-weight:bold;">*</span>
+    avail_in : <span style="color:#2980b9;">UInt</span>
+    next_out : <span style="color:#2980b9;">Bytef</span><span style="font-weight:bold;">*</span>
+    total_out : <span style="color:#2980b9;">ULong</span>
+    msg : <span style="color:#2980b9;">Char</span><span style="font-weight:bold;">*</span>
+    state : <span style="color:#2980b9;">Void</span><span style="font-weight:bold;">*</span>
+    zalloc : <span style="color:#2980b9;">AllocFunc</span>
+    zfree : <span style="color:#2980b9;">FreeFunc</span>
+    opaque : <span style="color:#2980b9;">Void</span><span style="font-weight:bold;">*</span>
+    data_type : <span style="color:#2980b9;">Int</span>
+    adler : <span style="color:#2980b9;">Long</span>
+  <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+  <span style="color:#7a7c7d;"># error codes</span>
+  enum <span style="color:#2980b9;">Error</span>
+    <span style="color:#27aeae;font-weight:bold;">OK</span>            <span style="font-weight:bold;">=</span>  <span style="color:#f67400;">0</span>
+    <span style="color:#27aeae;font-weight:bold;">VERSION_ERROR</span> <span style="font-weight:bold;">=</span> <span style="font-weight:bold;">-</span><span style="color:#f67400;">6</span>
+  <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+  enum <span style="color:#2980b9;">Flush</span>
+    <span style="color:#27aeae;font-weight:bold;">NO_FLUSH</span>      <span style="font-weight:bold;">=</span> <span style="color:#f67400;">0</span>
+    <span style="color:#27aeae;font-weight:bold;">TREES</span>         <span style="font-weight:bold;">=</span> <span style="color:#f67400;">6</span>
+  <span style="color:#fdbc4b;font-weight:bold;">end</span>
+
+  <span style="color:#27aeae;font-weight:bold;">MAX_BITS</span>      <span style="font-weight:bold;">=</span> <span style="color:#f67400;">15</span>
+
+  fun deflateInit2 <span style="font-weight:bold;">=</span> deflateInit2_(stream : <span style="color:#2980b9;">ZStream</span><span style="font-weight:bold;">*</span>, level : <span style="color:#2980b9;">Int32</span>, method : <span style="color:#2980b9;">Int32</span>,
+                                   window_bits : <span style="color:#2980b9;">Int32</span>, mem_level : <span style="color:#2980b9;">Int32</span>, strategy : <span style="color:#2980b9;">Int32</span>,
+                                   version : <span style="color:#2980b9;">UInt8</span><span style="font-weight:bold;">*</span>, stream_size : <span style="color:#2980b9;">Int32</span>) : <span style="color:#2980b9;">Error</span>
+  fun deflate(stream : <span style="color:#2980b9;">ZStream</span><span style="font-weight:bold;">*</span>, flush : <span style="color:#2980b9;">Flush</span>) : <span style="color:#2980b9;">Error</span>
+  fun deflateSetDictionary(stream : <span style="color:#2980b9;">ZStream</span><span style="font-weight:bold;">*</span>, dictionary : <span style="color:#2980b9;">UInt8</span><span style="font-weight:bold;">*</span>, len : <span style="color:#2980b9;">UInt</span>) : <span style="color:#2980b9;">Int</span>
+
+  fun inflateInit2 <span style="font-weight:bold;">=</span> inflateInit2_(stream : <span style="color:#2980b9;">ZStream</span><span style="font-weight:bold;">*</span>, window_bits : <span style="color:#2980b9;">Int32</span>, version : <span style="color:#2980b9;">UInt8</span><span style="font-weight:bold;">*</span>, stream_size : <span style="color:#2980b9;">Int32</span>) : <span style="color:#2980b9;">Error</span>
+  fun inflate(stream : <span style="color:#2980b9;">ZStream</span><span style="font-weight:bold;">*</span>, flush : <span style="color:#2980b9;">Flush</span>) : <span style="color:#2980b9;">Error</span>
+  fun inflateSetDictionary(stream : <span style="color:#2980b9;">ZStream</span><span style="font-weight:bold;">*</span>, dictionary : <span style="color:#2980b9;">UInt8</span><span style="font-weight:bold;">*</span>, len : <span style="color:#2980b9;">UInt</span>) : <span style="color:#2980b9;">Error</span>
+<span style="color:#fdbc4b;font-weight:bold;">end</span>
+</pre></body></html>

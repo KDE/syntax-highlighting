@@ -1,0 +1,250 @@
+# This file is a testcase for the highlighting of Crystal code
+# It's not executable code, but a collection of code snippets
+#
+
+require "lib_z"
+require "./digest"
+
+<beginfold id='1'>module</beginfold id='1'> Digest::Adler32
+  <beginfold id='1'>def</beginfold id='1'> self.initial : UInt32
+    LibZ.adler32(0, nil, 0).to_u32
+  <endfold id='1'>end</endfold id='1'>
+
+  <beginfold id='1'>def</beginfold id='1'> self.checksum(data) : UInt32
+    update(data, initial)
+  <endfold id='1'>end</endfold id='1'>
+
+  <beginfold id='1'>def</beginfold id='1'> self.update(data, adler32 : UInt32) : UInt32
+    slice = data.to_slice
+    LibZ.adler32(adler32, slice, slice.size).to_u32
+  <endfold id='1'>end</endfold id='1'>
+
+  <beginfold id='1'>def</beginfold id='1'> self.combine(adler1 : UInt32, adler2 : UInt32, len) : UInt32
+    LibZ.adler32_combine(adler1, adler2, len).to_u32
+  <endfold id='1'>end</endfold id='1'>
+<endfold id='1'>end</endfold id='1'>
+
+<beginfold id='1'>struct</beginfold id='1'> BigRational
+  Number.expand_div [Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Int128, UInt128], BigRational
+  Number.expand_div [Float32, Float64], BigRational
+<endfold id='1'>end</endfold id='1'>
+
+<beginfold id='1'>module</beginfold id='1'> Crystal::Repl::Closure
+  VAR_NAME = ".closure_var"
+  ARG_NAME = ".closure_arg"
+<endfold id='1'>end</endfold id='1'>
+
+<beginfold id='1'>class</beginfold id='1'> FunctionType
+  getter arg_types : Array(ArgType)
+  getter return_type : ArgType
+
+  @@cvar = 3
+  @ivar = 7
+
+  <beginfold id='1'>def</beginfold id='1'> initialize(@arg_types, @return_type)
+  <endfold id='1'>end</endfold id='1'>
+
+  <beginfold id='1'>def</beginfold id='1'> //(other : Int::Unsigned) : BigInt
+    check_division_by_zero other
+    unsafe_floored_div(other)
+  end
+
+  def //(other : Int) : BigInt
+    check_division_by_zero other
+
+    <beginfold id='1'>if</beginfold id='1'> other < 0
+      (-self).unsafe_floored_div(-other)
+      @cvar += 1
+    <endfold id='1'></endfold id='1'><beginfold id='1'>else</beginfold id='1'>
+      unsafe_floored_div(other)
+     @ivar += 10
+    <endfold id='1'>end</endfold id='1'>
+  <endfold id='1'>end</endfold id='1'>
+<endfold id='1'>end</endfold id='1'>
+
+require "llvm/enums/atomic"
+<beginfold id='1'>struct</beginfold id='1'> Atomic(T)
+  # Creates an Atomic with the given initial value.
+  <beginfold id='1'>def</beginfold id='1'> compare_and_set(cmp : T, new : T) : <beginfold id='1'>{</beginfold id='1'>T, Bool<endfold id='1'>}</endfold id='1'>
+    <beginfold id='1'>{%</beginfold id='1'> if T.union? && T.union_types.all? <beginfold id='1'>{</beginfold id='1'> |t| t == Nil || t < Reference <endfold id='1'>}</endfold id='1'> %}
+      address, success = Ops.cmpxchg(pointerof(@value).as(LibC::SizeT*), LibC::SizeT.new(cmp.as(T).object_id), LibC::SizeT.new(new.as(T).object_id), :sequentially_consistent, :sequentially_consistent)
+      <beginfold id='1'>{</beginfold id='1'>address == 0 ? nil : Pointer(T).new(address).as(T), success<endfold id='1'>}</endfold id='1'>
+    <beginfold id='1'>{%</beginfold id='1'> <endfold id='1'></endfold id='1'><beginfold id='1'>elsif</beginfold id='1'> T < Reference <endfold id='1'>%}</endfold id='1'>
+      # Use addresses again (but this can't return nil)
+      address, success = Ops.cmpxchg(pointerof(@value).as(LibC::SizeT*), LibC::SizeT.new(cmp.as(T).object_id), LibC::SizeT.new(new.as(T).object_id), :sequentially_consistent, :sequentially_consistent)
+      <beginfold id='1'>{</beginfold id='1'>Pointer(T).new(address).as(T), success<endfold id='1'>}</endfold id='1'>
+    <beginfold id='1'>{%</beginfold id='1'> <endfold id='1'></endfold id='1'><beginfold id='1'>else</beginfold id='1'> <endfold id='1'>%}</endfold id='1'>
+      Ops.cmpxchg(pointerof(@value), cmp, new, :sequentially_consistent, :sequentially_consistent)
+    <beginfold id='1'>{%</beginfold id='1'> <endfold id='1'>end</endfold id='1'> <endfold id='1'>%}</endfold id='1'>
+  <endfold id='1'>end</endfold id='1'>
+
+  <beginfold id='1'>def</beginfold id='1'> swap(value : T)
+    <beginfold id='1'>{%</beginfold id='1'> if T.union? && T.union_types.all? <beginfold id='1'>{</beginfold id='1'> |t| t == Nil || t < Reference <endfold id='1'>}</endfold id='1'> || T < Reference <endfold id='1'>%}</endfold id='1'>
+      address = Ops.atomicrmw(:xchg, pointerof(@value).as(LibC::SizeT*), LibC::SizeT.new(value.as(T).object_id), :sequentially_consistent, false)
+      Pointer(T).new(address).as(T)
+    <beginfold id='1'>{%</beginfold id='1'> <endfold id='1'></endfold id='1'><beginfold id='1'>else</beginfold id='1'> <endfold id='1'>%}</endfold id='1'>
+      Ops.atomicrmw(:xchg, pointerof(@value), value, :sequentially_consistent, false)
+    <beginfold id='1'>{%</beginfold id='1'> <endfold id='1'>end</endfold id='1'> <endfold id='1'>%}</endfold id='1'>
+  <endfold id='1'>end</endfold id='1'>
+<endfold id='1'>end</endfold id='1'>
+
+<beginfold id='1'>class</beginfold id='1'> Deque(T)
+  include Indexable::Mutable(T)
+
+  @start = 0
+  protected setter size
+  private getter buffer
+
+  <beginfold id='1'>def</beginfold id='1'> initialize(size : Int, value : T)
+    <beginfold id='1'>if</beginfold id='1'> size < 0
+      raise ArgumentError.new("Negative deque size: #{size}")
+    <endfold id='1'>end</endfold id='1'>
+    @size = size.to_i
+    @capacity = size.to_i
+
+    <beginfold id='1'>unless</beginfold id='1'> @capacity == 0
+      @buffer = Pointer(T).malloc(@capacity, value)
+    <endfold id='1'>end</endfold id='1'>
+  <endfold id='1'>end</endfold id='1'>
+
+  # Returns a new `Deque` that has this deque's elements cloned.
+  # That is, it returns a deep copy of this deque.
+  #
+  # Use `#dup` if you want a shallow copy.
+  <beginfold id='1'>def</beginfold id='1'> clone
+    <beginfold id='1'>{%</beginfold id='1'> if T == ::Bool || T == ::Char || T == ::String || T == ::Symbol || T < ::Number::Primitive %<endfold id='1'>}</endfold id='1'>
+      Deque(T).new(size) <beginfold id='1'>{</beginfold id='1'> |i| self[i].clone.as(T) <endfold id='1'>}</endfold id='1'>
+    <beginfold id='1'>{</beginfold id='1'>% <endfold id='1'></endfold id='1'><beginfold id='1'>else</beginfold id='1'> %<endfold id='1'>}</endfold id='1'>
+      exec_recursive_clone <beginfold id='1'>do</beginfold id='1'> |hash|
+        clone = Deque(T).new(size)
+        each <beginfold id='1'>do</beginfold id='1'> |element|
+          clone << element.clone
+        <endfold id='1'>end</endfold id='1'>
+        clone
+      <endfold id='1'>end</endfold id='1'>
+    <beginfold id='1'>{</beginfold id='1'>% <endfold id='1'>end</endfold id='1'> %<endfold id='1'>}</endfold id='1'>
+  <endfold id='1'>end</endfold id='1'>
+
+  <beginfold id='1'>def</beginfold id='1'> delete_at(index : Int) : T
+    <beginfold id='1'>unless</beginfold id='1'> 0 <= index < @size
+      raise IndexError.new
+    <endfold id='1'>end</endfold id='1'>
+    return shift if index == 0
+
+    <beginfold id='1'>if</beginfold id='1'> index > @size // 2
+      # Move following items to the left, starting with the first one
+      # [56-01234] -> [6x-01235]
+      dst = rindex
+      finish = (@start + @size - 1) % @capacity
+      loop <beginfold id='1'>do</beginfold id='1'>
+        src = dst + 1
+        src -= @capacity if src >= @capacity
+        @buffer[dst] = @buffer[src]
+        break if src == finish
+        dst = src
+      <endfold id='1'>end</endfold id='1'>
+      (@buffer + finish).clear
+    <endfold id='1'>end</endfold id='1'>
+
+  <endfold id='1'>end</endfold id='1'>
+
+  <beginfold id='1'>def</beginfold id='1'> each(& : T ->) : Nil
+    halfs <beginfold id='1'>do</beginfold id='1'> |r|
+      r.each <beginfold id='1'>do</beginfold id='1'> |i|
+        yield @buffer[i]
+      <endfold id='1'>end</endfold id='1'>
+    <endfold id='1'>end</endfold id='1'>
+  <endfold id='1'>end</endfold id='1'>
+
+  <beginfold id='1'>def</beginfold id='1'> pop : T
+    pop <beginfold id='1'>{</beginfold id='1'> raise IndexError.new <endfold id='1'>}</endfold id='1'>
+  <endfold id='1'>end</endfold id='1'>
+
+
+  macro [](*args)
+    array = uninitialized Array(Int32)
+    <beginfold id='1'>{</beginfold id='1'>% for arg, i in args %<endfold id='1'>}</endfold id='1'>
+      array.to_unsafe[<beginfold id='1'>{</beginfold id='1'><beginfold id='1'>{</beginfold id='1'>i<endfold id='1'>}</endfold id='1'><endfold id='1'>}</endfold id='1'>] = <beginfold id='1'>{</beginfold id='1'><beginfold id='1'>{</beginfold id='1'>arg<endfold id='1'>}</endfold id='1'><endfold id='1'>}</endfold id='1'>
+    <beginfold id='1'>{</beginfold id='1'>% <endfold id='1'>end</endfold id='1'> %<endfold id='1'>}</endfold id='1'>
+    array
+  <endfold id='1'>end</endfold id='1'>
+
+    <beginfold id='1'>def</beginfold id='1'> message : String
+        case self
+        when SUCCESS        then "No error occurred. System call completed successfully."
+        when TXTBSY         then Errno::ETXTBSY
+        when NOTCAPABLE     then Errno::ENOTCAPABLE
+        <endfold id='1'></endfold id='1'><beginfold id='1'>else</beginfold id='1'>                     Errno::EINVAL
+        <endfold id='1'>end</endfold id='1'>
+    <endfold id='1'>end</endfold id='1'>
+
+    enum Signal
+        KILL = 0
+        BILL = 101
+    <endfold id='1'>end</endfold id='1'>
+
+<endfold id='1'>end</endfold id='1'>
+
+
+  # :nodoc:
+module Ops
+    # Defines methods that directly map to LLVM instructions related to atomic operations.
+
+    @[Primitive(:cmpxchg)]
+    <beginfold id='1'>def</beginfold id='1'> self.cmpxchg(ptr : T*, cmp : T, new : T, success_ordering : LLVM::AtomicOrdering, failure_ordering : LLVM::AtomicOrdering) : <beginfold id='1'>{</beginfold id='1'>T, Bool<endfold id='1'>}</endfold id='1'> forall T
+    <endfold id='1'>end</endfold id='1'>
+
+    @[Primitive(:atomicrmw)]
+    <beginfold id='1'>def</beginfold id='1'> self.atomicrmw(op : LLVM::AtomicRMWBinOp, ptr : T*, val : T, ordering : LLVM::AtomicOrdering, singlethread : Bool) : T forall T
+    <endfold id='1'>end</endfold id='1'>
+<endfold id='1'>end</endfold id='1'>
+
+
+@[Link("z")]
+lib LibZ
+  alias Char = LibC::Char
+  alias SizeT = LibC::SizeT
+
+  fun zlibVersion : Char*
+  fun crc32_combine(crc1 : ULong, crc2 : ULong, len : Long) : ULong
+
+  alias AllocFunc = Void*, UInt, UInt -> Void*
+  alias FreeFunc = (Void*, Void*) ->
+
+  struct ZStream
+    next_in : Bytef*
+    avail_in : UInt
+    next_out : Bytef*
+    total_out : ULong
+    msg : Char*
+    state : Void*
+    zalloc : AllocFunc
+    zfree : FreeFunc
+    opaque : Void*
+    data_type : Int
+    adler : Long
+  <endfold id='1'>end</endfold id='1'>
+
+  # error codes
+  enum Error
+    OK            =  0
+    VERSION_ERROR = -6
+  <endfold id='1'>end</endfold id='1'>
+
+  enum Flush
+    NO_FLUSH      = 0
+    TREES         = 6
+  <endfold id='1'>end</endfold id='1'>
+
+  MAX_BITS      = 15
+
+  fun deflateInit2 = deflateInit2_(stream : ZStream*, level : Int32, method : Int32,
+                                   window_bits : Int32, mem_level : Int32, strategy : Int32,
+                                   version : UInt8*, stream_size : Int32) : Error
+  fun deflate(stream : ZStream*, flush : Flush) : Error
+  fun deflateSetDictionary(stream : ZStream*, dictionary : UInt8*, len : UInt) : Int
+
+  fun inflateInit2 = inflateInit2_(stream : ZStream*, window_bits : Int32, version : UInt8*, stream_size : Int32) : Error
+  fun inflate(stream : ZStream*, flush : Flush) : Error
+  fun inflateSetDictionary(stream : ZStream*, dictionary : UInt8*, len : UInt) : Error
+<endfold id='1'>end</endfold id='1'>

@@ -32,6 +32,8 @@ def func(x):
         print("single \
                 continued line ")
         print('single line')
+    if y := x:
+        anext(a)
     return float(len(a2))
 
 

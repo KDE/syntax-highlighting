@@ -571,3 +571,24 @@ singleton_class = ( <beginfold id='1'>class</beginfold id='1'> <<foo; self; <end
 get 'files/:slug/:filename', to: 'files#download', slug: /^[a-z]+$/, filename: <beginfold id='2'>%</beginfold id='2'>r|^[/\s]+$<endfold id='2'>|</endfold id='2'>
 @@hello!: /regexp/
 []=: <beginfold id='2'>%</beginfold id='2'>r!regexp<endfold id='2'>!</endfold id='2'>
+
+# refinements and its usage
+<beginfold id='1'>module</beginfold id='1'> Constantize
+  refine String <beginfold id='1'>do</beginfold id='1'>
+    <beginfold id='1'>def</beginfold id='1'> constantize
+      ::Kernel.const_get(self)
+    <endfold id='1'>end</endfold id='1'>
+  <endfold id='1'>end</endfold id='1'>
+<endfold id='1'>end</endfold id='1'>
+
+<beginfold id='1'>class</beginfold id='1'> MyClass
+  using Constantize
+
+  SOME_CONST = "Kate is cool!"
+
+  <beginfold id='1'>def</beginfold id='1'> self.method_using_refinement
+    "MyClass::SOME_CONST".constantize
+  <endfold id='1'>end</endfold id='1'>
+<endfold id='1'>end</endfold id='1'>
+
+puts MyClass.method_using_refinement

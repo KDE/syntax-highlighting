@@ -577,4 +577,25 @@ singleton_class <span style="font-weight:bold;">=</span> ( <span style="font-wei
 get <span style="color:#e31616;">'files/:slug/:filename'</span>, <span style="color:#bf0303;">to: </span><span style="color:#e31616;">'files#download'</span>, <span style="color:#bf0303;">slug: </span><span style="color:#ff5500;">/^[a-z]+$/</span>, <span style="color:#bf0303;">filename: </span><span style="color:#006e28;">%r|</span><span style="color:#ff5500;">^[/\s]+$</span><span style="color:#006e28;">|</span>
 <span style="color:#bf0303;">@@hello!: </span><span style="color:#ff5500;">/regexp/</span>
 <span style="color:#bf0303;">[]=: </span><span style="color:#006e28;">%r!</span><span style="color:#ff5500;">regexp</span><span style="color:#006e28;">!</span>
+
+<span style="color:#898887;"># refinements and its usage</span>
+<span style="font-weight:bold;">module</span> <span style="color:#0057ae;">Constantize</span>
+  <span style="color:#644a9b;font-weight:bold;">refine</span> <span style="color:#0057ae;">String</span> <span style="font-weight:bold;">do</span>
+    <span style="font-weight:bold;">def</span> constantize
+      <span style="font-weight:bold;">::</span><span style="color:#0057ae;">Kernel</span><span style="color:#0057ae;">.const_get</span>(<span style="color:#b08000;">self</span>)
+    <span style="font-weight:bold;">end</span>
+  <span style="font-weight:bold;">end</span>
+<span style="font-weight:bold;">end</span>
+
+<span style="font-weight:bold;">class</span> <span style="color:#0057ae;">MyClass</span>
+  <span style="color:#644a9b;font-weight:bold;">using</span> <span style="color:#0057ae;">Constantize</span>
+
+  <span style="color:#aa5500;font-weight:bold;">SOME_CONST</span> <span style="font-weight:bold;">=</span> <span style="color:#bf0303;">&quot;Kate is cool!&quot;</span>
+
+  <span style="font-weight:bold;">def</span> <span style="color:#b08000;">self</span><span style="color:#0057ae;">.method_using_refinement</span>
+    <span style="color:#bf0303;">&quot;MyClass::SOME_CONST&quot;</span><span style="color:#0057ae;">.constantize</span>
+  <span style="font-weight:bold;">end</span>
+<span style="font-weight:bold;">end</span>
+
+<span style="color:#644a9b;font-weight:bold;">puts</span> <span style="color:#0057ae;">MyClass</span><span style="color:#0057ae;">.method_using_refinement</span>
 </pre></body></html>

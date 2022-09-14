@@ -571,3 +571,24 @@ singleton_class = ( class <<foo; self; end )
 get 'files/:slug/:filename', to: 'files#download', slug: /^[a-z]+$/, filename: %r|^[/\s]+$|
 @@hello!: /regexp/
 []=: %r!regexp!
+
+# refinements and its usage
+module Constantize
+  refine String do
+    def constantize
+      ::Kernel.const_get(self)
+    end
+  end
+end
+
+class MyClass
+  using Constantize
+
+  SOME_CONST = "Kate is cool!"
+
+  def self.method_using_refinement
+    "MyClass::SOME_CONST".constantize
+  end
+end
+
+puts MyClass.method_using_refinement

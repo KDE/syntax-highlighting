@@ -356,17 +356,12 @@
         <Detect2Chars attribute="String Transl." context="#pop!StringDQ" char="$" char1="&quot;"/>
       </context>
       <context attribute="Variable" lineEndContext="#pop" name="DispatchVarNameVariables">
-        <Detect2Chars context="#pop!VarNameSpe" char="$" char1="#" lookAhead="1"/>
-        <RegExpr attribute="Variable" context="#pop!AfterVarName" String="\$(?:&varname;|[0-9]+|[-*@?$!])"/>
-        <Detect2Chars context="#pop!VarNameSpe" char="$" char1="~" lookAhead="1"/>
-        <Detect2Chars context="#pop!VarNameSpe" char="$" char1="=" lookAhead="1"/>
-        <Detect2Chars context="#pop!VarNameSpe" char="$" char1="^" lookAhead="1"/>
-        <Detect2Chars context="#pop!VarNameSpe" char="$" char1="+" lookAhead="1"/>
+        <RegExpr attribute="Dollar Prefix" context="#pop!VarNamePrefixedWithDollar" String="\$(?=&varname;|[0-9]+|[-*@?$!#~=^+])"/>
       </context>
-      <context attribute="Variable" lineEndContext="#pop" name="VarNameSpe">
-        <DetectChar attribute="Variable" context="#pop!VarNameSpeParam" char="$"/>
-      </context>
-      <context attribute="Variable" lineEndContext="#pop" name="VarNameSpeParam">
+      <context attribute="Variable" lineEndContext="#pop" name="VarNamePrefixedWithDollar">
+        <DetectIdentifier attribute="Variable" context="#pop!AfterVarName"/>
+        <Int attribute="Variable" context="#pop!AfterVarName" additionalDeliminator="$"/>
+        <AnyChar attribute="Variable" context="#pop!AfterVarName" String="-*@?$!"/>
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarNameSubstLen" char="#"/>
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarNameParam+" char="+"/>
         <AnyChar attribute="Parameter Expansion Operator" context="#pop!VarNameParam" String="~=^"/>
@@ -2124,6 +2119,7 @@
       <itemData name="String Transl." defStyleNum="dsString"/>
       <itemData name="String Escape"  defStyleNum="dsDataType"/>
       <itemData name="Variable"       defStyleNum="dsVariable"      spellChecking="false"/>
+      <itemData name="Dollar Prefix"  defStyleNum="dsVariable"      spellChecking="false"/>
       <itemData name="Expression"     defStyleNum="dsOthers"        spellChecking="false"/>
       <itemData name="Function"       defStyleNum="dsFunction"      spellChecking="false"/>
       <itemData name="Pattern"        defStyleNum="dsSpecialString" spellChecking="false"/>

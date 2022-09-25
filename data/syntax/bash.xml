@@ -657,7 +657,11 @@
         <Detect2Chars attribute="String Transl." context="#pop!StringDQ" char="$" char1="&quot;"/>
       </context>
       <context attribute="Command" lineEndContext="#pop#pop" name="DispatchVarnameVariables">
-        <RegExpr attribute="Variable" context="#pop" String="\$(?:&varname;|[*@#?$!0-9-])"/>
+        <RegExpr attribute="Dollar Prefix" context="#pop!VarNamePrefixedWithDollar" String="\$(?=&varname;|[*@#?$!0-9-])"/>
+      </context>
+      <context attribute="Variable" lineEndContext="#pop" name="VarNamePrefixedWithDollar">
+        <DetectIdentifier attribute="Variable" context="#pop"/>
+        <AnyChar attribute="Variable" context="#pop" String="*@#?$!0123456789-"/>
       </context>
       <context attribute="OtherCommand" lineEndContext="#pop#pop" name="CommandName">
         <DetectSpaces attribute="Normal Text" context="#pop#pop!CommandArgs"/>
@@ -1846,6 +1850,7 @@
       <itemData name="String Transl." defStyleNum="dsString"/>
       <itemData name="String Escape"  defStyleNum="dsDataType"/>
       <itemData name="Variable"       defStyleNum="dsVariable"      spellChecking="false"/>
+      <itemData name="Dollar Prefix"  defStyleNum="dsVariable"      spellChecking="false"/>
       <itemData name="Expression"     defStyleNum="dsOthers"        spellChecking="false"/>
       <itemData name="Function"       defStyleNum="dsFunction"      spellChecking="false"/>
       <itemData name="Pattern"        defStyleNum="dsSpecialString" spellChecking="false"/>

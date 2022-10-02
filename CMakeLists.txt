@@ -81,7 +81,7 @@ add_feature_info(QCH ${BUILD_QCH} "API documentation in QCH format (for e.g. Qt 
 #
 # Translations
 #
-ecm_install_po_files_as_qm(po)
+ecm_install_po_files_as_qm(poqm)
 
 # tell the framework if it shall use the syntax files from the resource
 if (QRC_SYNTAX)

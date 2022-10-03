@@ -395,3 +395,7 @@ send pid, {:circle, 2}
 
 # The shell is also a process, you can use `self` to get the current pid
 self() #=> #PID<0.27.0>
+
+# Code not found in the original, but needed to test the full range of the syntax
+
+def function, do: {:ok, result}

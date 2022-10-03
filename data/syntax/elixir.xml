@@ -33,7 +33,7 @@
           name="Elixir"
           section="Sources"
           style="elixir"
-          version="11">
+          version="12">
   <highlighting>
     <list name="control-flow">
       <item>catch</item>
@@ -47,8 +47,6 @@
       <item>unless</item>
     </list>
     <list name="keywords">
-      <item>do</item>
-      <item>end</item>
       <item>case</item>
       <item>bc</item>
       <item>lc</item>
@@ -100,6 +98,11 @@
       <context attribute="Normal Text" lineEndContext="#stay" name="Normal">
         <!-- "shebang" line -->
         <RegExpr String="^#!\/.*" attribute="Keyword" column="0" context="#stay"/>
+
+        <!-- End terminated blocks -->
+        <!-- can be started by do or fn, but not by do: -->
+        <RegExpr String="((\bdo\b)|(\bfn\b))(?!:)" attribute="Keyword" beginRegion="doend_block"/>
+        <WordDetect String="end" attribute="Keyword" endRegion="doend_block"/>
 
         <!-- Defined words -->
         <keyword String="keywords" attribute="Keyword" context="#stay"/>

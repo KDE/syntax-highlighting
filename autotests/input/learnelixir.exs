@@ -399,3 +399,21 @@ self() #=> #PID<0.27.0>
 # Code not found in the original, but needed to test the full range of the syntax
 
 def function, do: {:ok, result}
+
+[
+  :a,
+  :b,
+  :c
+]
+
+%{
+  a: "a",
+  b: "b",
+  c: "c"
+}
+
+%A{
+  a: "a",
+  b: "b",
+  c: "c"
+}

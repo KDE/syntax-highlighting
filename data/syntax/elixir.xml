@@ -33,7 +33,7 @@
           name="Elixir"
           section="Sources"
           style="elixir"
-          version="12">
+          version="13">
   <highlighting>
     <list name="control-flow">
       <item>catch</item>
@@ -104,6 +104,19 @@
         <WordDetect String="fn" attribute="Keyword" beginRegion="doend_block"/>
         <WordDetect String="end" attribute="Keyword" endRegion="doend_block"/>
 
+        <!-- Lists -->
+        <DetectChar char="[" beginRegion="list" attribute="Separator Array"/>
+        <DetectChar char="]" endRegion="list" attribute="Separator Array"/>
+
+        <!-- Maps and Structs and tuples -->
+        <DetectChar char="{" beginRegion="map_or_struct_or_tuple" attribute="Separator Pair"/>
+        <DetectChar char="}" endRegion="map_or_struct_or_tuple" attribute="Separator Pair"/>
+
+        <!-- Function calls and definitions -->
+        <DetectChar char="(" beginRegion="parameters" attribute="Separator Pair"/>
+        <DetectChar char=")" endRegion="parameters" attribute="Separator Pair"/>
+
+
         <!-- Defined words -->
         <keyword String="keywords" attribute="Keyword" context="#stay"/>
         <keyword String="control-flow" attribute="Control Flow" context="#stay"/>
@@ -138,10 +151,8 @@
         <DetectChar attribute="Raw String" char="'" context="Apostrophed String"/>
         <Detect2Chars char="?" char1="#" attribute="Normal Text" context="#stay"/>
         <DetectChar attribute="Comment" char="#" context="General Comment"/>
-        <AnyChar attribute="Delimiter" String="[]" context="#stay"/>
         <RegExpr String="@[a-zA-Z_0-9]+" attribute="Attribute" context="#stay"/>
         <!-- handle the different regular expression formats -->
-        <DetectChar attribute="Normal Text" char=")" context="#stay"/>
         <DetectIdentifier attribute="Normal Text" context="#stay"/>
       </context>
       <context attribute="DocComment" lineEndContext="#stay" name="Documentation">
@@ -209,8 +220,9 @@
       <itemData defStyleNum="dsOthers" name="Attribute"/>
       <itemData defStyleNum="dsComment" name="Comment"/>
       <itemData defStyleNum="dsComment" name="DocComment"/>
+      <itemData defStyleNum="dsFunction" name="Separator Pair"/>
+      <itemData defStyleNum="dsOthers" name="Separator Array"/>
       <!-- use these to mark errors and alerts things -->
-      <itemData color="#FF9FEC" defStyleNum="dsNormal" name="Delimiter"/>
       <itemData defStyleNum="dsOperator" name="Operator"/>
       <itemData name="MarkdownHead" defStyleNum="dsFunction" bold="true"/>
       <itemData name="MarkdownBullet" defStyleNum="dsFunction"/>

@@ -1277,14 +1277,21 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
         backgroundDefaultColor = backgroundColorBuffer.latin1().mid(2);
     }
 
+    // ansiStyles must not be empty for applyFormat to work even with a definition without any context
+    if (d->ansiStyles.empty()) {
+        d->ansiStyles.resize(32);
+    } else {
+        d->ansiStyles[0].first.clear();
+        d->ansiStyles[0].second.clear();
+    }
+
     // initialize ansiStyles
     for (auto &&definition : std::as_const(definitions)) {
-        const auto formats = definition.formats();
-        for (auto &&format : formats) {
+        for (auto &&format : std::as_const(DefinitionData::get(definition)->formats)) {
             const auto id = format.id();
             if (id >= d->ansiStyles.size()) {
                 // better than id + 1 to avoid successive allocations
-                d->ansiStyles.resize(std::max(std::size_t(id * 2), std::size_t(32)));
+                d->ansiStyles.resize(id * 2);
             }
 
             AnsiBuffer buffer;

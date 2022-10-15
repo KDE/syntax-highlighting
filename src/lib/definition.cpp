@@ -240,7 +240,7 @@ QVector<Definition> Definition::includedDefinitions() const
     while (!queue.empty()) {
         const auto *def = queue.back();
         queue.pop_back();
-        for (const auto &defRef : def->immediateIncludedDefinitions) {
+        for (const auto &defRef : std::as_const(def->immediateIncludedDefinitions)) {
             const auto definition = defRef.definition();
             if (!definitions.contains(definition)) {
                 definitions.push_back(definition);

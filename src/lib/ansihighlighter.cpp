@@ -830,8 +830,8 @@ public:
 
         bool firstLine = true;
         State state;
-        while (!in.atEnd()) {
-            const QString currentLine = in.readLine();
+        QString currentLine;
+        while (in.readLineInto(&currentLine)) {
             auto oldState = state;
             state = highlightLine(currentLine, state);
 
@@ -1195,7 +1195,7 @@ class KSyntaxHighlighting::AnsiHighlighterPrivate
 public:
     QTextStream out;
     QFile file;
-    QString currentLine;
+    QStringView currentLine;
     // pairs of startColor / resetColor
     std::vector<QPair<QString, QString>> ansiStyles;
 };
@@ -1376,8 +1376,9 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
 
     if (!traceOptions) {
         State state;
-        while (!in.atEnd()) {
-            d->currentLine = in.readLine();
+        QString currentLine;
+        while (in.readLineInto(&currentLine)) {
+            d->currentLine = currentLine;
             state = highlightLine(d->currentLine, state);
 
             if (useEditorBackground) {
@@ -1408,5 +1409,5 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
 void AnsiHighlighter::applyFormat(int offset, int length, const Format &format)
 {
     auto const &ansiStyle = d->ansiStyles[format.id()];
-    d->out << ansiStyle.first << QStringView(d->currentLine).mid(offset, length) << ansiStyle.second;
+    d->out << ansiStyle.first << d->currentLine.mid(offset, length) << ansiStyle.second;
 }

@@ -234,7 +234,7 @@
         <!-- start expression in single/double brackets -->
         <DetectChar context="MaybeBracketExpression" char="[" lookAhead="1"/>
         <!-- start a group command or BraceExpansion with { -->
-        <DetectChar attribute="Keyword" context="Group" char="{"/>
+        <DetectChar attribute="Keyword" context="Group" char="{" beginRegion="group"/>
 
         <!-- handle ` -->
         <DetectChar attribute="Backquote" context="CommandBackq" char="`"/>
@@ -299,7 +299,7 @@
 
       <!-- Group is called after a { is encountered -->
       <context attribute="Normal Text" lineEndContext="#stay" name="Group" fallthroughContext="Command">
-        <DetectChar attribute="Keyword" context="#pop!GroupEnd" char="}"/>
+        <DetectChar attribute="Keyword" context="#pop!GroupEnd" char="}" endRegion="group"/>
         <IncludeRules context="Start"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#pop" name="GroupEnd" fallthroughContext="#pop!CommandArgs">
@@ -1874,11 +1874,11 @@
       </context>
       <context attribute="Function" lineEndContext="#pop" name="FunctionNameStartMaybeBraceExpansion">
         <IncludeRules context="DispatchBraceExpansion"/>
-        <DetectChar attribute="Keyword" context="#pop#pop#pop!Group" char="{"/>
+        <DetectChar attribute="Keyword" context="#pop#pop#pop!Group" char="{" beginRegion="group"/>
       </context>
       <context attribute="Function" lineEndContext="#pop" name="FunctionNameMaybeBraceExpansion">
         <IncludeRules context="DispatchBraceExpansion"/>
-        <DetectChar attribute="Function" context="#pop!FunctionNameRecBrace" char="{"/>
+        <DetectChar attribute="Function" context="#pop!FunctionNameRecBrace" char="{" beginRegion="group"/>
       </context>
 
       <!-- Case is called after the case keyword is encoutered. We handle this because of

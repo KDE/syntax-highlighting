@@ -424,6 +424,10 @@ ls [[[[]]x*
 $a -f
 ! cmd
 
+# coproc command (#460301)
+coproc ls thisfiledoesntexist 2>&1
+coproc { ls thisfiledoesntexist; read; } 2>&1
+
 # redirections (prefix)
 <<<s cat
 <<<'s' cat

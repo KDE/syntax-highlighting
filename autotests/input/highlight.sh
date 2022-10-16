@@ -345,6 +345,11 @@ subs f! f!! f!s 'a'!s \( $v {a,b} {a} {a}/d {a\,} {a,} {a,\},b} ds/{a,b}sa/s
 $a -f
 ! cmd
 
+# coproc command (#460301)
+coproc ls thisfiledoesntexist 2>&1
+coproc { ls thisfiledoesntexist; read; } 2>&1
+coproc mycoproc { awk '{print "foo" $0;fflush()}'; } >&3
+
 # redirections (prefix)
 <<<s cat
 <<<'s' cat

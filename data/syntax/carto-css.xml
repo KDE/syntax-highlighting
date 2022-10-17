@@ -6,8 +6,17 @@
   <!ENTITY regexpr_number "(\-?((\d+(\.\d+)?)|(\.\d+))&#x0025;?)">
   <!ENTITY regexpr_color "((#[\dabcdefABCDEF]{3}|#[\dabcdefABCDEF]{6})(?=(\W|$)))">
 ]>
-<!-- Kate syntax highlighting definition for Mapbox CartoCSS, see https://github.com/mapbox/carto -->
-<language name="CartoCSS" version="5" kateversion="5.0" section="Markup" extensions="*.mss" author="Lukas Sommer" license="CC0 Public Domain Dedication, version 1.0, as published by Creative Commons">
+<!-- Syntax highlighting definition for CartoCSS MSS, see https://github.com/mapbox/carto
+     CartoCSS defines two file formats: MML (Map Markup Language) and MSS (Map Stylesheet).
+     This file provides syntax highlighting for MSS. MSS is similar in syntax to CSS,
+     but completly different in its semantics. -->
+<language name="CartoCSS"
+          version="6"
+		  kateversion="5.0"
+		  section="Markup"
+		  extensions="*.mss"
+		  author="Lukas Sommer"
+		  license="CC0 Public Domain Dedication, version 1.0, as published by Creative Commons">
 
 
 	<highlighting>
@@ -183,24 +192,27 @@
 			</context>
 
 			<context attribute="Keyword" lineEndContext="#stay" name="context_expression">
-				<Detect2Chars attribute="Comment" context="context_comment_multiline" char="/" char1="*" lookAhead="true" beginRegion="region_comment"/>
-				<Detect2Chars attribute="Comment" context="context_comment_singleline" char="/" char1="/" lookAhead="true"/>
-				<DetectChar attribute="Operator" char="{" beginRegion="region_braces" context="context_expression"/>
-				<DetectChar attribute="Operator" char="}" endRegion="region_braces" context="#pop"/>
+				<DetectSpaces/>
 				<RangeDetect char="[" char1="]" attribute="Data Field"/> <!-- This rule must be _before_ the “Operator” rule to make sure it is working. -->
 				<RegExpr attribute="Number" String="&regexpr_number;"/> <!-- This rule must be _before_ the “Operator” rule to make sure it is working. -->
 				<AnyChar attribute="Operator" String="&anychar_operator;[]"/>
 				<RegExpr attribute="CartoCSS Variable" String="&regexpr_variable;"/>
+				<RegExpr attribute="Function" String="&regexpr_identifier;(?=\()"/>
 				<RegExpr attribute="Color" String="&regexpr_color;"/>
 				<keyword attribute="Color" context="#stay" String="list_colornames"/>
-				<DetectChar attribute="Expression String" char="&quot;" context="context_string_doublequote"/>
-				<DetectChar attribute="Expression String" char="'" context="context_string_singlequote"/>
+				<!-- The strings that might appear hear (both single-quoted and double-quoted strings)
+				 are either normal strings or expression strings: If they are the only content
+				 (like in “test: "mystring";”) than they are expression strings. If there is other
+				 content (like in “test: "mystring" + [myfield];” or “test: [myfield] + "mystring";”),
+				 than they are normal strings. This is however difficult to detect, therefore we default
+				 simply to expression strings.-->
+				<DetectChar attribute="Expression String" char="&quot;" context="context_expressionstring_doublequote"/>
+				<DetectChar attribute="Expression String" char="'" context="context_expressionstring_singlequote"/>
 				<DetectChar attribute="Operator" char=";" context="#pop"/>
 			</context>
 
 			<context attribute="Data Field" lineEndContext="#stay" name="context_filter_attribute">
-				<Detect2Chars attribute="Comment" context="context_comment_multiline" char="/" char1="*" lookAhead="true" beginRegion="region_comment"/>
-				<Detect2Chars attribute="Comment" context="context_comment_singleline" char="/" char1="/" lookAhead="true"/>
+				<DetectSpaces/>
 				<RegExpr attribute="CartoCSS Variable" String="&regexpr_variable;"/>
 				<AnyChar attribute="Operator" String="&anychar_operator;" context="context_filter_rule"/>
 				<WordDetect String="zoom" insensitive="true" attribute="Keyword"/>
@@ -218,16 +230,16 @@
 			</context>
 
 			<context attribute="Keyword" lineEndContext="#stay" name="context_filter_rule">
-				<Detect2Chars attribute="Comment" context="context_comment_multiline" char="/" char1="*" lookAhead="true" beginRegion="region_comment"/>
-				<Detect2Chars attribute="Comment" context="context_comment_singleline" char="/" char1="/" lookAhead="true"/>
+				<DetectSpaces/>
 				<RegExpr attribute="Number" String="&regexpr_number;"/> <!-- This rule must be _before_ the “Operator” rule to make sure it is working. -->
 				<AnyChar attribute="Operator" String="&anychar_operator;"/>
 				<RegExpr attribute="CartoCSS Variable" String="&regexpr_variable;"/>
 				<WordDetect String="zoom" insensitive="true" attribute="Keyword"/>
+				<RegExpr attribute="Function" String="&regexpr_identifier;(?=\()"/>
 				<RegExpr attribute="Color" String="&regexpr_color;"/>
 				<keyword attribute="Color" context="#stay" String="list_colornames"/>
-				<DetectChar attribute="Verbatim String" char="&quot;" context="context_verbatimstring_doublequote"/>
-				<DetectChar attribute="Verbatim String" char="'" context="context_verbatimstring_singlequote"/>
+				<DetectChar attribute="Normal String" char="&quot;" context="context_normalstring_doublequote"/>
+				<DetectChar attribute="Normal String" char="'" context="context_normalstring_singlequote"/>
 				<DetectChar attribute="Operator" char="]" context="#pop#pop"/>
 			</context>
 
@@ -240,50 +252,63 @@
 				<IncludeRules context="##Comments"/>
 			</context>
 
-			<context attribute="Expression String" lineEndContext="#pop" name="context_string_doublequote">
+			<context attribute="Expression String" lineEndContext="#pop" name="context_expressionstring_doublequote">
 				<DetectChar attribute="Expression String" char="&quot;" context="#pop"/>
-				<RangeDetect char="[" char1="]" attribute="Data Field within String"/>
+				<RangeDetect char="[" char1="]" attribute="Data Field"/>
 				<RegExpr attribute="Mapnik Render-Time Variable" String="&regexpr_variable;"/>
-				<DetectChar attribute="Verbatim String" char="'" context="context_verbatimstring_singlequote"/>
+				<DetectChar attribute="Normal String" char="'" context="context_normalstring_singlequote"/>
 			</context>
 
-			<context attribute="Expression String" lineEndContext="#pop" name="context_string_singlequote">
+			<context attribute="Expression String" lineEndContext="#pop" name="context_expressionstring_singlequote">
 				<DetectChar attribute="Expression String" char="'" context="#pop"/>
-				<RangeDetect char="[" char1="]" attribute="Data Field within String"/>
+				<RangeDetect char="[" char1="]" attribute="Data Field"/>
 				<RegExpr attribute="Mapnik Render-Time Variable" String="&regexpr_variable;"/>
-				<DetectChar attribute="Verbatim String" char="&quot;" context="context_verbatimstring_doublequote"/>
+				<DetectChar attribute="Normal String" char="&quot;" context="context_normalstring_doublequote"/>
 			</context>
 
-			<context attribute="Verbatim String" lineEndContext="#pop" name="context_verbatimstring_doublequote">
-				<DetectChar attribute="Verbatim String" char="&quot;" context="#pop"/>
-				<Detect2Chars attribute="Special Character" char="\" char1="n"/>
+			<context attribute="Normal String" lineEndContext="#pop" name="context_include_escape_characters">
+				<!-- Helper context. Can be included in other contexts to detect escape characters. -->
+				<RegExpr attribute="Escape Sequenze" String="(\\[abfnrtv&quot;'\\])|(\\u[0-9a-fA-F]{4})|(\\U[0-9a-fA-F]{8})"/>
+				<RegExpr attribute="Error" String="\\[uU]"/>
 			</context>
 
-			<context attribute="Verbatim String" lineEndContext="#pop" name="context_verbatimstring_singlequote">
-				<DetectChar attribute="Verbatim String" char="'" context="#pop"/>
-				<Detect2Chars attribute="Special Character" char="\" char1="n"/>
+			<context attribute="Normal String" lineEndContext="#pop" name="context_normalstring_doublequote">
+				<DetectChar attribute="Normal String" char="&quot;" context="#pop"/>
+				<IncludeRules context="context_include_escape_characters"/>
+			</context>
+
+			<context attribute="Normal String" lineEndContext="#pop" name="context_normalstring_singlequote">
+				<DetectChar attribute="Normal String" char="'" context="#pop"/>
+				<IncludeRules context="context_include_escape_characters"/>
 			</context>
 
 		</contexts>
 
 		<itemDatas>
-			<itemData name="Class" defStyleNum="dsNormal" spellChecking="false"/>
-			<itemData name="Layer ID" defStyleNum="dsNormal" spellChecking="false"/>
-			<itemData name="Attachment" defStyleNum="dsNormal" spellChecking="false"/>
-			<itemData name="Named instances" defStyleNum="dsNormal" spellChecking="false"/>
-			<itemData name="Mapnik Symbolizer Parameter" defStyleNum="dsBuiltIn" spellChecking="false"/>
-			<itemData name="Operator" defStyleNum="dsOperator" spellChecking="false"/>
-			<itemData name="Keyword" defStyleNum="dsKeyword" spellChecking="false"/>
-			<itemData name="Number" defStyleNum="dsFloat" spellChecking="false"/>
-			<itemData name="Color" defStyleNum="dsConstant" spellChecking="false"/>
-			<itemData name="Expression String" defStyleNum="dsSpecialString" spellChecking="false"/>
-			<itemData name="Mapnik Render-Time Variable" defStyleNum="dsChar" spellChecking="false"/>
-			<itemData name="Verbatim String" defStyleNum="dsString" spellChecking="false"/>
-			<itemData name="Special Character" defStyleNum="dsChar" spellChecking="false"/>
-			<itemData name="Data Field within String" defStyleNum="dsSpecialChar" spellChecking="false"/>
-			<itemData name="Data Field" defStyleNum="dsDataType" spellChecking="false"/>
-			<itemData name="CartoCSS Variable" defStyleNum="dsPreprocessor" spellChecking="false"/>
-			<itemData name="Comment" defStyleNum="dsComment" spellChecking="true"/>
+			<itemData name="Class"                       defStyleNum="dsNormal"        spellChecking="false"/>
+			<itemData name="Layer ID"                    defStyleNum="dsNormal"        spellChecking="false"/>
+			<itemData name="Attachment"                  defStyleNum="dsControlFlow"   spellChecking="false"/>
+			<itemData name="Named instances"             defStyleNum="dsDataType"      spellChecking="false"/>
+			<itemData name="Mapnik Symbolizer Parameter" defStyleNum="dsNormal"        spellChecking="false"/>
+			<itemData name="Operator"                    defStyleNum="dsOperator"      spellChecking="false"/>
+			<itemData name="Keyword"                     defStyleNum="dsKeyword"       spellChecking="false"/>
+			<itemData name="Function"                    defStyleNum="dsFunction"      spellChecking="false"/>
+			<itemData name="Number"                      defStyleNum="dsFloat"         spellChecking="false"/>
+			<itemData name="Color"                       defStyleNum="dsConstant"      spellChecking="false"/>
+			<itemData name="Expression String"           defStyleNum="dsSpecialString" spellChecking="false"/>
+			<!-- “Mapnik Render-Time Variable” work completly different from “CartoCSS Variable” and
+			     has therefore a completly different color. -->
+			<itemData name="Mapnik Render-Time Variable" defStyleNum="dsSpecialChar"   spellChecking="false"/>
+			<itemData name="Normal String"               defStyleNum="dsString"        spellChecking="false"/>
+			<itemData name="Escape Sequenze"             defStyleNum="dsSpecialChar"   spellChecking="false"/>
+			<itemData name="Data Field"                  defStyleNum="dsVariable"      spellChecking="false"/>
+			<!-- “CartoCSS Variable”, inspite of its name, uses “dsPreprocessor” as default color.
+			     This is appropriate because it actually behaves rather like a preprocessor: It is even
+			     possible to define strings, and if escape sequences like “\n” are treated as such
+			     is decided later, depending on the position of the actual usage of the variable. -->
+			<itemData name="CartoCSS Variable"           defStyleNum="dsPreprocessor"  spellChecking="false"/>
+			<itemData name="Comment"                     defStyleNum="dsComment"       spellChecking="true" />
+			<itemData name="Error"                       defStyleNum="dsError"         spellChecking="false"/>
 		</itemDatas>
 
 	</highlighting>

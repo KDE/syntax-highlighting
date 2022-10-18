@@ -127,6 +127,7 @@ begin
 -- Control logic ---------------------------------------------------------------
 
 control_counter: <beginfold id='3'>process</beginfold id='3'>(clk)
+    alias sig is <<signal g_test(0).i_test.sig : std_logic>>;
 begin
     <beginfold id='4'>if</beginfold id='4'> clk'event and clk='1' then
         <beginfold id='4'>if</beginfold id='4'> reset='1' then
@@ -208,7 +209,7 @@ div_ready <= ready;
 ---- Multiplier logic ----------------------------------------------------------
 
 ---- Combinational multiplier -----------------------------
-multiplier_combinational: if not SEQUENTIAL_MULTIPLIER <beginfold id='5'>generate</beginfold id='5'>
+multiplier_combinational: <beginfold id='4'>if</beginfold id='4'> not SEQUENTIAL_MULTIPLIER generate
 
 registered_combinational_multiplier:<beginfold id='3'>process</beginfold id='3'>(clk)
 begin
@@ -224,17 +225,17 @@ mul_ready <= '1';
 mul_ov_out <= '1' when prod_reg(15 downto 8)/=X"00" else '0';
 prod_out <= prod_reg;
 
-<endfold id='5'>end generate multiplier_combinational;</endfold id='5'>
+<endfold id='4'>end generate multiplier_combinational;</endfold id='4'>
 
 ---- Sequential multiplier --------------------------------
-multiplier_sequential: if SEQUENTIAL_MULTIPLIER <beginfold id='5'>generate</beginfold id='5'>
+multiplier_sequential: <beginfold id='4'>if</beginfold id='4'> SEQUENTIAL_MULTIPLIER generate
 
 assert false
 report "Sequential multiplier implementation not done yet."&
        " Use combinational implementation."
 severity failure;
 
-<endfold id='5'>end generate multiplier_sequential;</endfold id='5'>
+<endfold id='4'>end generate multiplier_sequential;</endfold id='4'>
 
 <endfold id='2'>end sequential;</endfold id='2'>
 
@@ -242,7 +243,14 @@ severity failure;
 with Types; use Types;
 with Files_Map;
 
-package <beginfold id='6'>p</beginfold id='6'> is
+package <beginfold id='5'>fixed_pkg</beginfold id='5'> is new IEEE.fixed_generic_pkg
+  generic map <beginfold id='6'>(</beginfold id='6'>
+    fixed_overflow_style => IEEE.fixed_float_types.fixed_saturate,
+    fixed_guard_bits     => 3,
+    no_warning           => false
+    <endfold id='6'>)</endfold id='6'><endfold id='5'>;</endfold id='5'>
+
+package <beginfold id='5'>p</beginfold id='5'> is
     type int_ptr is access integer;
     type rec is <beginfold id='7'>record</beginfold id='7'>
         data  : std_logic_vector(31 downto 0);
@@ -252,14 +260,50 @@ package <beginfold id='6'>p</beginfold id='6'> is
     <endfold id='7'>end record;</endfold id='7'>
     type int_vec is array (integer range <>) of integer;
     type int_vec_ptr is access int_vec;
+    <beginfold id='8'>procedure</beginfold id='8'> UNIFORM(variable SEED1, SEED2 : inout POSITIVE; variable X : out REAL)<endfold id='8'>;</endfold id='8'>
     constant def_arr : t_int_array := (0 to 2 => 10);
-<endfold id='6'>end package;</endfold id='6'>
 
-package body <beginfold id='8'>p</beginfold id='8'> is
-    <beginfold id='9'>procedure</beginfold id='9'> test is
+    -- type range
+    type newInt is range -4 to 3;
+    type CAPACITY is range 0 to 1E5 <beginfold id='9'>units</beginfold id='9'>
+        pF;
+        nF = 1000 pF;
+    <endfold id='9'>end units;</endfold id='9'>
+
+    -- type protected
+    type prot is <beginfold id='10'>protected</beginfold id='10'>
+        function meth(a : int) return bit;
+    <endfold id='10'>end protected;</endfold id='10'>
+
+    -- type protected body
+    type prot is <beginfold id='10'>protected</beginfold id='10'> body
+        variable var : positive;
+        constant const : boolean;
+
+        function meth(a : int) return bit <beginfold id='11'>is</beginfold id='11'>
+        begin
+        <endfold id='11'>end function;</endfold id='11'>
+    <endfold id='10'>end protected body;</endfold id='10'>
+
+    function \?=\ (L, R  : BOOLEAN) return BOOLEAN;
+
+<endfold id='5'>end package;</endfold id='5'>
+
+package body <beginfold id='12'>p</beginfold id='12'> is
+    function \?=\ (L, R : BOOLEAN) return BOOLEAN <beginfold id='11'>is</beginfold id='11'>
+    begin
+        <beginfold id='4'>if</beginfold id='4'> not (format(format'left) = '%') then
+            report "to_string: Illegal format string """ & format & '"'
+                severity error;
+            return "";
+        <endfold id='4'>end if;</endfold id='4'>
+        return L = R;
+    <endfold id='11'>end function \?=\;</endfold id='11'>
+
+    <beginfold id='8'>procedure</beginfold id='8'> test is
         variable v : int_ptr;
         variable i : integer;
-    <endfold id='9'></endfold id='9'><beginfold id='9'>begin</beginfold id='9'>
+    <endfold id='8'></endfold id='8'><beginfold id='8'>begin</beginfold id='8'>
         v := null;
         deallocate(v);
         v := new integer;
@@ -270,68 +314,72 @@ package body <beginfold id='8'>p</beginfold id='8'> is
         a.all(5) := 2;
         a(1 to 2) := (1, 2);
         s := new string'("");
-    <endfold id='9'>end procedure;</endfold id='9'>
+    <endfold id='8'>end procedure;</endfold id='8'>
 
-    <beginfold id='9'>procedure</beginfold id='9'> test2(x : inout rec_ptr) is
-    <endfold id='9'></endfold id='9'><beginfold id='9'>begin</beginfold id='9'>
+    <beginfold id='8'>procedure</beginfold id='8'> test2(x : inout rec_ptr) is
+    <endfold id='8'></endfold id='8'><beginfold id='8'>begin</beginfold id='8'>
         x.value := x.value + 1;
-    <endfold id='9'>end procedure;</endfold id='9'>
+    <endfold id='8'>end procedure;</endfold id='8'>
 
-    <beginfold id='9'>procedure</beginfold id='9'> test3 is
+    <beginfold id='8'>procedure</beginfold id='8'> test3 is
         type a;
         type a is access integer;
         variable v : a;
-    <endfold id='9'></endfold id='9'><beginfold id='9'>begin</beginfold id='9'>
-    <endfold id='9'>end procedure;</endfold id='9'>
+    <endfold id='8'></endfold id='8'><beginfold id='8'>begin</beginfold id='8'>
+    <endfold id='8'>end procedure;</endfold id='8'>
 
     type int_ptr_array is array (integer range <>) of int_ptr;
 
-    <beginfold id='9'>procedure</beginfold id='9'> tets4 is
+    <beginfold id='8'>procedure</beginfold id='8'> tets4 is
         type bvp is access bit_vector;
         variable y : int_ptr(1 to 3) := int_ptr'(null);
-    <endfold id='9'></endfold id='9'><beginfold id='9'>begin</beginfold id='9'>
-    <endfold id='9'>end procedure;</endfold id='9'>
+    <endfold id='8'></endfold id='8'><beginfold id='8'>begin</beginfold id='8'>
+    <endfold id='8'>end procedure;</endfold id='8'>
 
-    <beginfold id='9'>procedure</beginfold id='9'> Restore_Origin (Mark : Instance_Index_Type) is
-    <endfold id='9'></endfold id='9'><beginfold id='9'>begin</beginfold id='9'>
-        for I in reverse Mark + 1 .. Prev_Instance_Table.Last <beginfold id='10'>loop</beginfold id='10'>
-            <beginfold id='11'>declare</beginfold id='11'>
+    <beginfold id='8'>procedure</beginfold id='8'> Restore_Origin (Mark : Instance_Index_Type) is
+    <endfold id='8'></endfold id='8'><beginfold id='8'>begin</beginfold id='8'>
+        for I in reverse Mark + 1 .. Prev_Instance_Table.Last <beginfold id='13'>loop</beginfold id='13'>
+            <beginfold id='14'>declare</beginfold id='14'>
                 El : Instance_Entry_Type renames Prev_Instance_Table.Table (I);
             begin
                 Origin_Table.Table (El.N) := El.Old_Origin;
-            <endfold id='11'>end;</endfold id='11'>
-        <endfold id='10'>end loop;</endfold id='10'>
+            <endfold id='14'>end;</endfold id='14'>
+        <endfold id='13'>end loop;</endfold id='13'>
         Prev_Instance_Table.Set_Last (Mark);
-    <endfold id='9'>end Restore_Origin;</endfold id='9'>
+    <endfold id='8'>end Restore_Origin;</endfold id='8'>
 
     --  Instantiate a list.  Simply create a new list and instantiate nodes of
     --  that list.
     function Instantiate_Iir_List (L : Iir_List; Is_Ref : Boolean)
                                     return Iir_List
-    <beginfold id='12'>is</beginfold id='12'>
+    <beginfold id='11'>is</beginfold id='11'>
         Res : Iir_List;
         El : Iir;
     begin
-        <beginfold id='13'>case</beginfold id='13'> L is
+        <beginfold id='15'>case</beginfold id='15'> to_integer(unsigned(CTRL_REF(x*4+3 downto x*4))) is
             when Null_Iir_List
-            | Iir_List_All <beginfold id='14'>=></beginfold id='14'>
+            | Iir_List_All <beginfold id='16'>=></beginfold id='16'>
                 return L;
-            <endfold id='14'>when</endfold id='14'> others <beginfold id='14'>=></beginfold id='14'>
+            <endfold id='16'>when</endfold id='16'> others <beginfold id='16'>=></beginfold id='16'>
                 It := List_Iterate (L);
-                while Is_Valid (It) <beginfold id='10'>loop</beginfold id='10'>
+                while Is_Valid (It) <beginfold id='13'>loop</beginfold id='13'>
                     El := Get_Element (It);
                     Append_Element (Res, Instantiate_Iir (El, Is_Ref));
-                <endfold id='10'>end loop;</endfold id='10'>
-                for I in Flist_First .. Flist_Last (L) <beginfold id='10'>loop</beginfold id='10'>
+                <endfold id='13'>end loop;</endfold id='13'>
+                for I in Flist_First .. Flist_Last (L) <beginfold id='13'>loop</beginfold id='13'>
                     Set_Nth_Element (Res, I, Instantiate_Iir (El, Is_Ref));
-                <endfold id='10'>end loop;</endfold id='10'>
+                <endfold id='13'>end loop;</endfold id='13'>
                 return Res;
-        <endfold id='14'></endfold id='14'><endfold id='13'>end case;</endfold id='13'>
-    <endfold id='12'>end Instantiate_Iir_List;</endfold id='12'>
-<endfold id='8'>end package body;</endfold id='8'>
+        <endfold id='16'></endfold id='16'><endfold id='15'>end case;</endfold id='15'>
+    <endfold id='11'>end Instantiate_Iir_List;</endfold id='11'>
+<endfold id='12'>end package body;</endfold id='12'>
 
 -- Library bar
 context foo.test_context;
+
+context <beginfold id='17'>foo</beginfold id='17'> is
+    context foo.test_context;
+<endfold id='17'>end context foo;</endfold id='17'>
 
 entity <beginfold id='1'>concat</beginfold id='1'> is
 <endfold id='1'>end entity;</endfold id='1'>
@@ -344,6 +392,13 @@ entity <beginfold id='1'>foo</beginfold id='1'> is
 architecture <beginfold id='2'>t</beginfold id='2'> of concat is
     type int_array is array (integer range <>) of integer;
     type small is range 1 to 3;
+
+    component <beginfold id='18'>or_entity</beginfold id='18'> is
+    port(
+        input_1: in std_logic;
+        output: out std_logic
+        );
+    <endfold id='18'>end component;</endfold id='18'>
 begin
     <beginfold id='3'>process</beginfold id='3'>
         variable s : string(1 to 5);
@@ -358,19 +413,12 @@ begin
         wait;
     <endfold id='3'>end process;</endfold id='3'>
 
-    function CounterVal(Seconds : integer := 0) return integer <beginfold id='12'>is</beginfold id='12'>
+    function CounterVal(Seconds : integer := 0) return integer <beginfold id='11'>is</beginfold id='11'>
         variable TotalSeconds : interger;
     begin
         TotalSeconds := Seconds + Minutes * 60;
         return TotalSeconds * ClockFrequencyHz -1;
-    <endfold id='12'>end function;</endfold id='12'>
-
-    component <beginfold id='15'>or_entity</beginfold id='15'> is
-    port(
-        input_1: in std_logic;
-        output: out std_logic
-        );
-    <endfold id='15'>end component;</endfold id='15'>
+    <endfold id='11'>end function;</endfold id='11'>
 
     type enum_type is (a, b, c, ..., z);
     type int_array is array(3 downto 0) of integer;
@@ -378,34 +426,34 @@ begin
     subtype addr_int is integer range 0 to 65535;
     subtype sub_enum_type is enum_type range a to m;
 
-    inst1: entity <beginfold id='16'>work.counter1</beginfold id='16'>(rtl)
-        <beginfold id='17'>generic map </beginfold id='17'>(BITS1 => 8<endfold id='17'>)</endfold id='17'>
-        <beginfold id='17'>port map </beginfold id='17'>(
+    inst1: entity <beginfold id='19'>work.counter1</beginfold id='19'>(rtl)
+        generic map <beginfold id='6'>(</beginfold id='6'>BITS1 => 8<endfold id='6'>)</endfold id='6'>
+        port map <beginfold id='6'>(</beginfold id='6'>
             clk1 => Clock,
             DATA_OUT   => pwm_data_o(3 downto 5),
             COMP_IN(1 downto 0)  => compensate_i,
             WRITE_IN   => (others => '0')
-        <endfold id='17'>)</endfold id='17'><endfold id='16'>;</endfold id='16'>
+        <endfold id='6'>)</endfold id='6'><endfold id='19'>;</endfold id='19'>
 
-    inst2: component <beginfold id='16'>counter2</beginfold id='16'>
-        <beginfold id='17'>generic map </beginfold id='17'>(BITS1 => 8<endfold id='17'>)</endfold id='17'>
-        <beginfold id='17'>port map </beginfold id='17'>(clk1 => Clock<endfold id='17'>)</endfold id='17'><endfold id='16'>;</endfold id='16'>
+    inst2: component <beginfold id='19'>counter2</beginfold id='19'>
+        generic map <beginfold id='6'>(</beginfold id='6'>BITS1 => 8<endfold id='6'>)</endfold id='6'>
+        port map <beginfold id='6'>(</beginfold id='6'>clk1 => Clock<endfold id='6'>)</endfold id='6'><endfold id='19'>;</endfold id='19'>
 
-    inst3: configuration <beginfold id='16'>counter3</beginfold id='16'>
-        <beginfold id='17'>generic map </beginfold id='17'>(BITS1 => 8<endfold id='17'>)</endfold id='17'>
-        <beginfold id='17'>port map </beginfold id='17'>(clk1 => Clock<endfold id='17'>)</endfold id='17'><endfold id='16'>;</endfold id='16'>
+    inst3: configuration <beginfold id='19'>counter3</beginfold id='19'>
+        generic map <beginfold id='6'>(</beginfold id='6'>BITS1 => 8<endfold id='6'>)</endfold id='6'>
+        port map <beginfold id='6'>(</beginfold id='6'>clk1 => Clock<endfold id='6'>)</endfold id='6'><endfold id='19'>;</endfold id='19'>
 
-    THE_PWM_GEN : <beginfold id='16'>pwm_generator</beginfold id='16'>
-        <beginfold id='17'>generic map</beginfold id='17'>(
+    THE_PWM_GEN : <beginfold id='19'>pwm_generator</beginfold id='19'>
+        generic map<beginfold id='6'>(</beginfold id='6'>
             dsfds => ds
-        <endfold id='17'>)</endfold id='17'>
-        <beginfold id='17'>port map</beginfold id='17'>(
+        <endfold id='6'>)</endfold id='6'>
+        port map<beginfold id='6'>(</beginfold id='6'>
             CLK        => clk_i,
             DATA_IN    => pwm_data_i,
             DATA_OUT   => pwm_data_o(3 downto 5),
             COMP_IN(1 downto 0)  => compensate_i,
             WRITE_IN   => (others => '0')
-        <endfold id='17'>)</endfold id='17'><endfold id='16'>;</endfold id='16'>
+        <endfold id='6'>)</endfold id='6'><endfold id='19'>;</endfold id='19'>
 
 <endfold id='2'>end architecture;</endfold id='2'>
 
@@ -419,38 +467,38 @@ begin
         assert x < y;                   -- Error
     <endfold id='3'>end process;</endfold id='3'>
 
-    billowitch_tc586: <beginfold id='18'>block</beginfold id='18'> is
+    billowitch_tc586: <beginfold id='10'>block</beginfold id='10'> is
         type real_cons_vector  is array (15 downto 0) of real;
         type real_cons_vector_file is file of real_cons_vector;
         constant C19 : real_cons_vector := (others => 3.0);
     begin
-    <endfold id='18'>end block;</endfold id='18'>
+    <endfold id='10'>end block;</endfold id='10'>
 <endfold id='2'>end architecture;</endfold id='2'>
 
 architecture <beginfold id='2'>arch</beginfold id='2'> of ent is
 begin
-  LL: if test=10 <beginfold id='5'>generate</beginfold id='5'>
+  LL: <beginfold id='4'>if</beginfold id='4'> test=10 generate
    begin
    end;
   elsif test=5 generate
    begin
    end;
-  <endfold id='5'>end generate;</endfold id='5'>
+  <endfold id='4'>end generate;</endfold id='4'>
 
-  LL: if l1: SPEED = "fast" <beginfold id='5'>generate</beginfold id='5'>
+  LL: <beginfold id='4'>if</beginfold id='4'> l1: SPEED = "fast" generate
   elsif test=5 generate
-  <endfold id='5'>end generate;</endfold id='5'>
+  <endfold id='4'>end generate;</endfold id='4'>
 <endfold id='2'>end architecture arch;</endfold id='2'>
 
 
 architecture <beginfold id='2'>thing_arch</beginfold id='2'> of designthing is
 
-component <beginfold id='15'>pwm_generator</beginfold id='15'>
+component <beginfold id='18'>pwm_generator</beginfold id='18'>
   port(
     CLK        : in std_logic;
     DATA_IN    : in  std_logic_vector(15 downto 0);
     );
-<endfold id='15'>end component pwm_generator;</endfold id='15'>
+<endfold id='18'>end component pwm_generator;</endfold id='18'>
 
 attribute NOM_FREQ : string;
 attribute NOM_FREQ of clk_source : label is "133.00";
@@ -458,14 +506,14 @@ signal clk_i  : std_logic;
 
 begin
 
-gen_no_comp: if TEMP = 0 <beginfold id='5'>generate</beginfold id='5'>
+gen_no_comp: <beginfold id='4'>if</beginfold id='4'> TEMP = 0 generate
   compensate_i <= (others => '0');
-<endfold id='5'>end generate;</endfold id='5'>
+<endfold id='4'>end generate;</endfold id='4'>
 
-gen_no_comp: for i in 0 to TEMP <beginfold id='5'>generate</beginfold id='5'>
+gen_no_comp: <beginfold id='13'>for</beginfold id='13'> i in 0 to TEMP generate
   compensate_i <= (others => '0') after 10 ns;
   compensate_i <= (others => '0') ;
-<endfold id='5'>end generate;</endfold id='5'>
+<endfold id='13'>end generate;</endfold id='13'>
 
 ---------------------------------------------------------------------------
 -- LED blinking when activity on inputs
@@ -482,21 +530,21 @@ PROC_TIMER : <beginfold id='3'>process</beginfold id='3'> begin
     fdsa <= '1';
   <endfold id='4'>end if;</endfold id='4'>
 
-  xz: for x in 0 to 7 <beginfold id='10'>loop</beginfold id='10'>
+  xz: for x in 0 to 7 <beginfold id='13'>loop</beginfold id='13'>
     dsadf;
-  <endfold id='10'>end loop;</endfold id='10'>
+  <endfold id='13'>end loop;</endfold id='13'>
 
-  <beginfold id='13'>case</beginfold id='13'> c is
-    when XXX <beginfold id='14'>=></beginfold id='14'>
+  <beginfold id='15'>case</beginfold id='15'> c is
+    when XXX <beginfold id='16'>=></beginfold id='16'>
       c <= 1;
       d <= 21321;
-    <endfold id='14'>when</endfold id='14'> YYYY <beginfold id='14'>=></beginfold id='14'>
+    <endfold id='16'>when</endfold id='16'> YYYY <beginfold id='16'>=></beginfold id='16'>
       c <= 2;
-  <endfold id='14'></endfold id='14'><endfold id='13'>end case;</endfold id='13'> 
+  <endfold id='16'></endfold id='16'><endfold id='15'>end case;</endfold id='15'> 
 <endfold id='3'>end process;</endfold id='3'>
 
 
-generate_with_begin: if TEMP = 0 <beginfold id='5'>generate</beginfold id='5'>
+generate_with_begin: <beginfold id='4'>if</beginfold id='4'> TEMP = 0 generate
   signal : test : std_logic;
 begin
   compensate_i <= (others => '0');
@@ -506,7 +554,7 @@ begin
   elsif gf then
     fdsa <= '1';
   <endfold id='4'>end if;</endfold id='4'>  
-<endfold id='5'>end generate_with_begin;</endfold id='5'>
+<endfold id='4'>end generate generate_with_begin;</endfold id='4'>
 
 PROC_TIMER : <beginfold id='3'>process</beginfold id='3'>
   variable x : std_logic;
@@ -515,3 +563,50 @@ begin
 <endfold id='3'>end process PROC_TIMER;</endfold id='3'>
 
 <endfold id='2'>end</endfold id='2'> architecture thing_arc;   --this is not correct (wrong name)
+
+1+1
+2ns
+
+1_2_3
+12_3
+1.2
+1.2_3
+1_3.2_3
+12_3e+1
+12_3e-1
+12_3e1_1
+12_3.4e1_1
+12_3e1_
+12_3e
+
+2#1_2_3#E+8
+2#1_2.3#E+8
+2#1_f2.3#
+
+3.14159_26536 -- A literal of type universal_real.
+5280          -- A literal of type universal_integer.
+10.7 ns       -- A literal of a physical type.
+O"4777"       -- A bit string literal.
+"54LS281"     -- A string literal.
+""            -- A string literal representing a null array.
+B"1111_1111_1111" -- Equivalent to the string literal "111111111111".
+X"FFF"            -- Equivalent to B"1111_1111_1111".
+O"777"            -- Equivalent to B"111_111_111".
+X"777"            -- Equivalent to B"0111_0111_0111".
+B"XXXX_01LH" -- Equivalent to the string literal "XXXX01LH"
+UO"27"       -- Equivalent to B"010_111"
+UO"2C"       -- Equivalent to B"011_CCC"
+SX"3W"       -- Equivalent to B"0011_WWWW"
+D"35"        -- Equivalent to B"100011"
+12UB"X1" -- Equivalent to B"0000_0000_00X1"
+12SB"X1" -- Equivalent to B"XXXX_XXXX_XXX1"
+12UX"F-" -- Equivalent to B"0000_1111_----"
+12SX"F-" -- Equivalent to B"1111_1111_----"
+12D"13"  -- Equivalent to B"0000_0000_1101"
+12UX"000WWW" -- Equivalent to B"WWWW_WWWW_WWWW"
+12SX"FFFC00" -- Equivalent to B"1100_0000_0000"
+12SX"XXXX00" -- Equivalent to B"XXXX_0000_0000"
+8D"511"  -- Error
+8UO"477" -- Error
+8SX"0FF" -- Error
+8SX"FXX" -- Error

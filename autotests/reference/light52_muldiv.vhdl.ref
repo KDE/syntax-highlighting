@@ -83,7 +83,7 @@
 <Normal Text></Normal Text><br/>
 <Control>entity</Control><Normal Text> </Normal Text><Name>light52_muldiv</Name><Normal Text> </Normal Text><Keyword>is</Keyword><br/>
 <Normal Text>    </Normal Text><Control>generic</Control><Normal Text> (</Normal Text><br/>
-<Normal Text>        SEQUENTIAL_MULTIPLIER </Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Data Type>boolean</Data Type><Normal Text> </Normal Text><Operator>:=</Operator><Normal Text> false</Normal Text><br/>
+<Normal Text>        SEQUENTIAL_MULTIPLIER </Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Data Type>boolean</Data Type><Normal Text> </Normal Text><Operator>:=</Operator><Normal Text> </Normal Text><Keyword>false</Keyword><br/>
 <Normal Text>    );</Normal Text><br/>
 <Normal Text>    </Normal Text><Control>port</Control><Normal Text>(</Normal Text><br/>
 <Normal Text>        clk </Normal Text><Operator>:</Operator><Normal Text>                   </Normal Text><Keyword>in</Keyword><Normal Text> </Normal Text><Data Type>std_logic</Data Type><Normal Text>;</Normal Text><br/>
@@ -127,6 +127,7 @@
 <Comment>-- Control logic ---------------------------------------------------------------</Comment><br/>
 <Normal Text></Normal Text><br/>
 <Name>control_counter</Name><Operator>:</Operator><Normal Text> </Normal Text><Process>process</Process><Normal Text>(clk)</Normal Text><br/>
+<Normal Text>    </Normal Text><Keyword>alias</Keyword><Normal Text> sig </Normal Text><Keyword>is</Keyword><Normal Text> </Normal Text><Operator><<</Operator><Signal>signal</Signal><Normal Text> g_test(</Normal Text><Integer>0</Integer><Normal Text>)</Normal Text><Operator>.</Operator><Normal Text>i_test</Normal Text><Operator>.</Operator><Normal Text>sig </Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Data Type>std_logic</Data Type><Operator>>></Operator><Normal Text>;</Normal Text><br/>
 <Process>begin</Process><br/>
 <Normal Text>    </Normal Text><Control>if</Control><Normal Text> clk</Normal Text><Attribute>'event</Attribute><Normal Text> </Normal Text><Keyword>and</Keyword><Normal Text> clk</Normal Text><Operator>=</Operator><Attribute>'1'</Attribute><Normal Text> </Normal Text><Control>then</Control><br/>
 <Normal Text>        </Normal Text><Control>if</Control><Normal Text> reset</Normal Text><Operator>=</Operator><Attribute>'1'</Attribute><Normal Text> </Normal Text><Control>then</Control><br/>
@@ -229,7 +230,7 @@
 <Comment>---- Sequential multiplier --------------------------------</Comment><br/>
 <Name>multiplier_sequential</Name><Operator>:</Operator><Normal Text> </Normal Text><Control>if</Control><Normal Text> SEQUENTIAL_MULTIPLIER </Normal Text><Control>generate</Control><br/>
 <Normal Text></Normal Text><br/>
-<Keyword>assert</Keyword><Normal Text> false</Normal Text><br/>
+<Keyword>assert</Keyword><Normal Text> </Normal Text><Keyword>false</Keyword><br/>
 <Keyword>report</Keyword><Normal Text> </Normal Text><Vector>"Sequential multiplier implementation not done yet."</Vector><Operator>&</Operator><br/>
 <Normal Text>       </Normal Text><Vector>" Use combinational implementation."</Vector><br/>
 <Keyword>severity</Keyword><Normal Text> </Normal Text><Keyword>failure</Keyword><Normal Text>;</Normal Text><br/>
@@ -242,6 +243,13 @@
 <Keyword>with</Keyword><Normal Text> Types; </Normal Text><Keyword>use</Keyword><Normal Text> Types;</Normal Text><br/>
 <Keyword>with</Keyword><Normal Text> Files_Map;</Normal Text><br/>
 <Normal Text></Normal Text><br/>
+<Control>package</Control><Normal Text> </Normal Text><Name>fixed_pkg</Name><Normal Text> </Normal Text><Keyword>is</Keyword><Normal Text> </Normal Text><Keyword>new</Keyword><Normal Text> </Normal Text><Name>IEEE</Name><Operator>.</Operator><Normal Text>fixed_generic_pkg</Normal Text><br/>
+<Normal Text>  </Normal Text><Keyword>generic map </Keyword><Normal Text>(</Normal Text><br/>
+<Normal Text>    fixed_overflow_style </Normal Text><Operator>=></Operator><Normal Text> IEEE</Normal Text><Operator>.</Operator><Normal Text>fixed_float_types</Normal Text><Operator>.</Operator><Normal Text>fixed_saturate</Normal Text><Operator>,</Operator><br/>
+<Normal Text>    fixed_guard_bits     </Normal Text><Operator>=></Operator><Normal Text> </Normal Text><Integer>3</Integer><Operator>,</Operator><br/>
+<Normal Text>    no_warning           </Normal Text><Operator>=></Operator><Normal Text> </Normal Text><Keyword>false</Keyword><br/>
+<Normal Text>    );</Normal Text><br/>
+<Normal Text></Normal Text><br/>
 <Control>package</Control><Normal Text> </Normal Text><Name>p</Name><Normal Text> </Normal Text><Keyword>is</Keyword><br/>
 <Normal Text>    </Normal Text><Signal>type</Signal><Normal Text> int_ptr </Normal Text><Signal>is</Signal><Normal Text> </Normal Text><Keyword>access</Keyword><Normal Text> </Normal Text><Data Type>integer</Data Type><Normal Text>;</Normal Text><br/>
 <Normal Text>    </Normal Text><Signal>type</Signal><Normal Text> rec </Normal Text><Signal>is</Signal><Normal Text> </Normal Text><Keyword>record</Keyword><br/>
@@ -252,10 +260,46 @@
 <Normal Text>    </Normal Text><Keyword>end record;</Keyword><br/>
 <Normal Text>    </Normal Text><Signal>type</Signal><Normal Text> int_vec </Normal Text><Signal>is</Signal><Normal Text> </Normal Text><Keyword>array</Keyword><Normal Text> (</Normal Text><Data Type>integer</Data Type><Normal Text> </Normal Text><Keyword>range</Keyword><Normal Text> </Normal Text><Operator><></Operator><Normal Text>) </Normal Text><Keyword>of</Keyword><Normal Text> </Normal Text><Data Type>integer</Data Type><Normal Text>;</Normal Text><br/>
 <Normal Text>    </Normal Text><Signal>type</Signal><Normal Text> int_vec_ptr </Normal Text><Signal>is</Signal><Normal Text> </Normal Text><Keyword>access</Keyword><Normal Text> int_vec;</Normal Text><br/>
+<Normal Text>    </Normal Text><Keyword>procedure</Keyword><Normal Text> </Normal Text><Name>UNIFORM</Name><Normal Text>(</Normal Text><Signal>variable</Signal><Normal Text> SEED1</Normal Text><Operator>,</Operator><Normal Text> SEED2 </Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Keyword>inout</Keyword><Normal Text> </Normal Text><Data Type>POSITIVE</Data Type><Normal Text>; </Normal Text><Signal>variable</Signal><Normal Text> X </Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Keyword>out</Keyword><Normal Text> </Normal Text><Data Type>REAL</Data Type><Normal Text>);</Normal Text><br/>
 <Normal Text>    </Normal Text><Signal>constant</Signal><Normal Text> def_arr </Normal Text><Operator>:</Operator><Normal Text> t_int_array </Normal Text><Operator>:=</Operator><Normal Text> (</Normal Text><Integer>0</Integer><Normal Text> </Normal Text><Range>to</Range><Normal Text> </Normal Text><Integer>2</Integer><Normal Text> </Normal Text><Operator>=></Operator><Normal Text> </Normal Text><Integer>10</Integer><Normal Text>);</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Comment>-- type range</Comment><br/>
+<Normal Text>    </Normal Text><Signal>type</Signal><Normal Text> newInt </Normal Text><Signal>is</Signal><Normal Text> </Normal Text><Keyword>range</Keyword><Normal Text> </Normal Text><Operator>-</Operator><Integer>4</Integer><Normal Text> </Normal Text><Range>to</Range><Normal Text> </Normal Text><Integer>3</Integer><Normal Text>;</Normal Text><br/>
+<Normal Text>    </Normal Text><Signal>type</Signal><Normal Text> CAPACITY </Normal Text><Signal>is</Signal><Normal Text> </Normal Text><Keyword>range</Keyword><Normal Text> </Normal Text><Integer>0</Integer><Normal Text> </Normal Text><Range>to</Range><Normal Text> </Normal Text><Integer>1</Integer><Exponent>E5</Exponent><Normal Text> </Normal Text><Control>units</Control><br/>
+<Normal Text>        pF;</Normal Text><br/>
+<Normal Text>        nF </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Integer>1000</Integer><Normal Text> pF;</Normal Text><br/>
+<Normal Text>    </Normal Text><Control>end units;</Control><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Comment>-- type protected</Comment><br/>
+<Normal Text>    </Normal Text><Signal>type</Signal><Normal Text> prot </Normal Text><Signal>is</Signal><Normal Text> </Normal Text><Keyword>protected</Keyword><br/>
+<Normal Text>        </Normal Text><Redirection>function</Redirection><Normal Text> </Normal Text><Name>meth</Name><Normal Text>(a </Normal Text><Operator>:</Operator><Normal Text> int) </Normal Text><Control>return</Control><Normal Text> </Normal Text><Data Type>bit</Data Type><Normal Text>;</Normal Text><br/>
+<Normal Text>    </Normal Text><Keyword>end protected;</Keyword><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Comment>-- type protected body</Comment><br/>
+<Normal Text>    </Normal Text><Signal>type</Signal><Normal Text> prot </Normal Text><Signal>is</Signal><Normal Text> </Normal Text><Keyword>protected</Keyword><Normal Text> </Normal Text><Keyword>body</Keyword><br/>
+<Normal Text>        </Normal Text><Signal>variable</Signal><Normal Text> var </Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Data Type>positive</Data Type><Normal Text>;</Normal Text><br/>
+<Normal Text>        </Normal Text><Signal>constant</Signal><Normal Text> const </Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Data Type>boolean</Data Type><Normal Text>;</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Redirection>function</Redirection><Normal Text> </Normal Text><Name>meth</Name><Normal Text>(a </Normal Text><Operator>:</Operator><Normal Text> int) </Normal Text><Control>return</Control><Normal Text> </Normal Text><Data Type>bit</Data Type><Normal Text> </Normal Text><Keyword>is</Keyword><br/>
+<Normal Text>        </Normal Text><Redirection>begin</Redirection><br/>
+<Normal Text>        </Normal Text><Redirection>end function;</Redirection><br/>
+<Normal Text>    </Normal Text><Keyword>end protected body;</Keyword><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Redirection>function</Redirection><Normal Text> </Normal Text><Name>\?=\</Name><Normal Text> (L</Normal Text><Operator>,</Operator><Normal Text> R  </Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Data Type>BOOLEAN</Data Type><Normal Text>) </Normal Text><Control>return</Control><Normal Text> </Normal Text><Data Type>BOOLEAN</Data Type><Normal Text>;</Normal Text><br/>
+<Normal Text></Normal Text><br/>
 <Control>end package;</Control><br/>
 <Normal Text></Normal Text><br/>
 <Control>package</Control><Normal Text> </Normal Text><Control>body</Control><Normal Text> </Normal Text><Name>p</Name><Normal Text> </Normal Text><Keyword>is</Keyword><br/>
+<Normal Text>    </Normal Text><Redirection>function</Redirection><Normal Text> </Normal Text><Name>\?=\</Name><Normal Text> (L</Normal Text><Operator>,</Operator><Normal Text> R </Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Data Type>BOOLEAN</Data Type><Normal Text>) </Normal Text><Control>return</Control><Normal Text> </Normal Text><Data Type>BOOLEAN</Data Type><Normal Text> </Normal Text><Keyword>is</Keyword><br/>
+<Normal Text>    </Normal Text><Redirection>begin</Redirection><br/>
+<Normal Text>        </Normal Text><Control>if</Control><Normal Text> </Normal Text><Keyword>not</Keyword><Normal Text> (format(format</Normal Text><Attribute>'left</Attribute><Normal Text>) </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Attribute>'%'</Attribute><Normal Text>) </Normal Text><Control>then</Control><br/>
+<Normal Text>            </Normal Text><Keyword>report</Keyword><Normal Text> </Normal Text><Vector>"to_string: Illegal format string """</Vector><Normal Text> </Normal Text><Operator>&</Operator><Normal Text> format </Normal Text><Operator>&</Operator><Normal Text> </Normal Text><Attribute>'"'</Attribute><br/>
+<Normal Text>                </Normal Text><Keyword>severity</Keyword><Normal Text> </Normal Text><Keyword>error</Keyword><Normal Text>;</Normal Text><br/>
+<Normal Text>            </Normal Text><Control>return</Control><Normal Text> </Normal Text><Vector>""</Vector><Normal Text>;</Normal Text><br/>
+<Normal Text>        </Normal Text><Control>end if;</Control><br/>
+<Normal Text>        </Normal Text><Control>return</Control><Normal Text> L </Normal Text><Operator>=</Operator><Normal Text> R;</Normal Text><br/>
+<Normal Text>    </Normal Text><Redirection>end function \?=\;</Redirection><br/>
+<Normal Text></Normal Text><br/>
 <Normal Text>    </Normal Text><Keyword>procedure</Keyword><Normal Text> </Normal Text><Name>test</Name><Normal Text> </Normal Text><Control>is</Control><br/>
 <Normal Text>        </Normal Text><Signal>variable</Signal><Normal Text> v </Normal Text><Operator>:</Operator><Normal Text> int_ptr;</Normal Text><br/>
 <Normal Text>        </Normal Text><Signal>variable</Signal><Normal Text> i </Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Data Type>integer</Data Type><Normal Text>;</Normal Text><br/>
@@ -279,7 +323,7 @@
 <Normal Text></Normal Text><br/>
 <Normal Text>    </Normal Text><Keyword>procedure</Keyword><Normal Text> </Normal Text><Name>test3</Name><Normal Text> </Normal Text><Control>is</Control><br/>
 <Normal Text>        </Normal Text><Signal>type</Signal><Normal Text> a;</Normal Text><br/>
-<Normal Text>        </Normal Text><Signal>type</Signal><Normal Text> a </Normal Text><Keyword>is</Keyword><Normal Text> </Normal Text><Keyword>access</Keyword><Normal Text> </Normal Text><Data Type>integer</Data Type><Normal Text>;</Normal Text><br/>
+<Normal Text>        </Normal Text><Signal>type</Signal><Normal Text> a </Normal Text><Signal>is</Signal><Normal Text> </Normal Text><Keyword>access</Keyword><Normal Text> </Normal Text><Data Type>integer</Data Type><Normal Text>;</Normal Text><br/>
 <Normal Text>        </Normal Text><Signal>variable</Signal><Normal Text> v </Normal Text><Operator>:</Operator><Normal Text> a;</Normal Text><br/>
 <Normal Text>    </Normal Text><Keyword>begin</Keyword><br/>
 <Normal Text>    </Normal Text><Keyword>end procedure;</Keyword><br/>
@@ -287,7 +331,7 @@
 <Normal Text>    </Normal Text><Signal>type</Signal><Normal Text> int_ptr_array </Normal Text><Signal>is</Signal><Normal Text> </Normal Text><Keyword>array</Keyword><Normal Text> (</Normal Text><Data Type>integer</Data Type><Normal Text> </Normal Text><Keyword>range</Keyword><Normal Text> </Normal Text><Operator><></Operator><Normal Text>) </Normal Text><Keyword>of</Keyword><Normal Text> int_ptr;</Normal Text><br/>
 <Normal Text></Normal Text><br/>
 <Normal Text>    </Normal Text><Keyword>procedure</Keyword><Normal Text> </Normal Text><Name>tets4</Name><Normal Text> </Normal Text><Control>is</Control><br/>
-<Normal Text>        </Normal Text><Signal>type</Signal><Normal Text> bvp </Normal Text><Keyword>is</Keyword><Normal Text> </Normal Text><Keyword>access</Keyword><Normal Text> </Normal Text><Data Type>bit_vector</Data Type><Normal Text>;</Normal Text><br/>
+<Normal Text>        </Normal Text><Signal>type</Signal><Normal Text> bvp </Normal Text><Signal>is</Signal><Normal Text> </Normal Text><Keyword>access</Keyword><Normal Text> </Normal Text><Data Type>bit_vector</Data Type><Normal Text>;</Normal Text><br/>
 <Normal Text>        </Normal Text><Signal>variable</Signal><Normal Text> y </Normal Text><Operator>:</Operator><Normal Text> int_ptr(</Normal Text><Integer>1</Integer><Normal Text> </Normal Text><Range>to</Range><Normal Text> </Normal Text><Integer>3</Integer><Normal Text>) </Normal Text><Operator>:=</Operator><Normal Text> int_ptr</Normal Text><Attribute>'(null)</Attribute><Normal Text>;</Normal Text><br/>
 <Normal Text>    </Normal Text><Keyword>begin</Keyword><br/>
 <Normal Text>    </Normal Text><Keyword>end procedure;</Keyword><br/>
@@ -312,11 +356,11 @@
 <Normal Text>        Res </Normal Text><Operator>:</Operator><Normal Text> Iir_List;</Normal Text><br/>
 <Normal Text>        El </Normal Text><Operator>:</Operator><Normal Text> Iir;</Normal Text><br/>
 <Normal Text>    </Normal Text><Redirection>begin</Redirection><br/>
-<Normal Text>        </Normal Text><Control>case</Control><Normal Text> L </Normal Text><Keyword>is</Keyword><br/>
+<Normal Text>        </Normal Text><Control>case</Control><Normal Text> to_integer(</Normal Text><Data Type>unsigned</Data Type><Normal Text>(CTRL_REF(x</Normal Text><Operator>*</Operator><Integer>4</Integer><Operator>+</Operator><Integer>3</Integer><Normal Text> </Normal Text><Range>downto</Range><Normal Text> x</Normal Text><Operator>*</Operator><Integer>4</Integer><Normal Text>))) </Normal Text><Keyword>is</Keyword><br/>
 <Normal Text>            </Normal Text><Control>when</Control><Normal Text> </Normal Text><Name>Null_Iir_List</Name><br/>
-<Normal Text>            </Normal Text><Operator>|</Operator><Normal Text> Iir_List_All </Normal Text><Operator>=></Operator><br/>
+<Normal Text>            </Normal Text><Operator>|</Operator><Normal Text> </Normal Text><Name>Iir_List_All</Name><Normal Text> </Normal Text><Operator>=></Operator><br/>
 <Normal Text>                </Normal Text><Control>return</Control><Normal Text> L;</Normal Text><br/>
-<Normal Text>            </Normal Text><Control>when</Control><Normal Text> </Normal Text><Name>others</Name><Normal Text> </Normal Text><Operator>=></Operator><br/>
+<Normal Text>            </Normal Text><Control>when</Control><Normal Text> </Normal Text><Keyword>others</Keyword><Normal Text> </Normal Text><Operator>=></Operator><br/>
 <Normal Text>                It </Normal Text><Operator>:=</Operator><Normal Text> List_Iterate (L);</Normal Text><br/>
 <Normal Text>                </Normal Text><Control>while</Control><Normal Text> Is_Valid (It) </Normal Text><Control>loop</Control><br/>
 <Normal Text>                    El </Normal Text><Operator>:=</Operator><Normal Text> Get_Element (It);</Normal Text><br/>
@@ -333,6 +377,10 @@
 <Comment>-- Library bar</Comment><br/>
 <Keyword>context</Keyword><Normal Text> foo</Normal Text><Operator>.</Operator><Normal Text>test_context;</Normal Text><br/>
 <Normal Text></Normal Text><br/>
+<Keyword>context</Keyword><Normal Text> </Normal Text><Name>foo</Name><Normal Text> </Normal Text><Keyword>is</Keyword><br/>
+<Normal Text>    </Normal Text><Keyword>context</Keyword><Normal Text> foo</Normal Text><Operator>.</Operator><Normal Text>test_context;</Normal Text><br/>
+<Keyword>end context foo;</Keyword><br/>
+<Normal Text></Normal Text><br/>
 <Control>entity</Control><Normal Text> </Normal Text><Name>concat</Name><Normal Text> </Normal Text><Keyword>is</Keyword><br/>
 <Control>end entity;</Control><br/>
 <Normal Text></Normal Text><br/>
@@ -344,6 +392,13 @@
 <Control>architecture</Control><Normal Text> </Normal Text><Name>t</Name><Normal Text> </Normal Text><Keyword>of</Keyword><Normal Text> </Normal Text><Reference>concat</Reference><Normal Text> </Normal Text><Keyword>is</Keyword><br/>
 <Normal Text>    </Normal Text><Signal>type</Signal><Normal Text> int_array </Normal Text><Signal>is</Signal><Normal Text> </Normal Text><Keyword>array</Keyword><Normal Text> (</Normal Text><Data Type>integer</Data Type><Normal Text> </Normal Text><Keyword>range</Keyword><Normal Text> </Normal Text><Operator><></Operator><Normal Text>) </Normal Text><Keyword>of</Keyword><Normal Text> </Normal Text><Data Type>integer</Data Type><Normal Text>;</Normal Text><br/>
 <Normal Text>    </Normal Text><Signal>type</Signal><Normal Text> small </Normal Text><Signal>is</Signal><Normal Text> </Normal Text><Keyword>range</Keyword><Normal Text> </Normal Text><Integer>1</Integer><Normal Text> </Normal Text><Range>to</Range><Normal Text> </Normal Text><Integer>3</Integer><Normal Text>;</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Control>component</Control><Normal Text> </Normal Text><Name>or_entity</Name><Normal Text> </Normal Text><Keyword>is</Keyword><br/>
+<Normal Text>    </Normal Text><Control>port</Control><Normal Text>(</Normal Text><br/>
+<Normal Text>        input_1</Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Keyword>in</Keyword><Normal Text> </Normal Text><Data Type>std_logic</Data Type><Normal Text>;</Normal Text><br/>
+<Normal Text>        output</Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Keyword>out</Keyword><Normal Text> </Normal Text><Data Type>std_logic</Data Type><br/>
+<Normal Text>        );</Normal Text><br/>
+<Normal Text>    </Normal Text><Control>end component;</Control><br/>
 <Control>begin</Control><br/>
 <Normal Text>    </Normal Text><Process>process</Process><br/>
 <Normal Text>        </Normal Text><Signal>variable</Signal><Normal Text> s </Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Data Type>string</Data Type><Normal Text>(</Normal Text><Integer>1</Integer><Normal Text> </Normal Text><Range>to</Range><Normal Text> </Normal Text><Integer>5</Integer><Normal Text>);</Normal Text><br/>
@@ -364,13 +419,6 @@
 <Normal Text>        TotalSeconds </Normal Text><Operator>:=</Operator><Normal Text> Seconds </Normal Text><Operator>+</Operator><Normal Text> Minutes </Normal Text><Operator>*</Operator><Normal Text> </Normal Text><Integer>60</Integer><Normal Text>;</Normal Text><br/>
 <Normal Text>        </Normal Text><Control>return</Control><Normal Text> TotalSeconds </Normal Text><Operator>*</Operator><Normal Text> ClockFrequencyHz </Normal Text><Operator>-</Operator><Integer>1</Integer><Normal Text>;</Normal Text><br/>
 <Normal Text>    </Normal Text><Redirection>end function;</Redirection><br/>
-<Normal Text></Normal Text><br/>
-<Normal Text>    </Normal Text><Control>component</Control><Normal Text> </Normal Text><Name>or_entity</Name><Normal Text> </Normal Text><Keyword>is</Keyword><br/>
-<Normal Text>    </Normal Text><Control>port</Control><Normal Text>(</Normal Text><br/>
-<Normal Text>        input_1</Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Keyword>in</Keyword><Normal Text> </Normal Text><Data Type>std_logic</Data Type><Normal Text>;</Normal Text><br/>
-<Normal Text>        output</Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Keyword>out</Keyword><Normal Text> </Normal Text><Data Type>std_logic</Data Type><br/>
-<Normal Text>        );</Normal Text><br/>
-<Normal Text>    </Normal Text><Control>end component;</Control><br/>
 <Normal Text></Normal Text><br/>
 <Normal Text>    </Normal Text><Signal>type</Signal><Normal Text> enum_type </Normal Text><Signal>is</Signal><Normal Text> (a</Normal Text><Operator>,</Operator><Normal Text> b</Normal Text><Operator>,</Operator><Normal Text> c</Normal Text><Operator>,</Operator><Normal Text> </Normal Text><Operator>...,</Operator><Normal Text> z);</Normal Text><br/>
 <Normal Text>    </Normal Text><Signal>type</Signal><Normal Text> int_array </Normal Text><Signal>is</Signal><Normal Text> </Normal Text><Keyword>array</Keyword><Normal Text>(</Normal Text><Integer>3</Integer><Normal Text> </Normal Text><Range>downto</Range><Normal Text> </Normal Text><Integer>0</Integer><Normal Text>) </Normal Text><Keyword>of</Keyword><Normal Text> </Normal Text><Data Type>integer</Data Type><Normal Text>;</Normal Text><br/>
@@ -437,7 +485,7 @@
 <Normal Text>   </Normal Text><Control>end;</Control><br/>
 <Normal Text>  </Normal Text><Control>end generate;</Control><br/>
 <Normal Text></Normal Text><br/>
-<Normal Text>  </Normal Text><Name>LL</Name><Operator>:</Operator><Normal Text> </Normal Text><Control>if</Control><Normal Text> l1</Normal Text><Operator>:</Operator><Normal Text> SPEED </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Vector>"fast"</Vector><Normal Text> </Normal Text><Control>generate</Control><br/>
+<Normal Text>  </Normal Text><Name>LL</Name><Operator>:</Operator><Normal Text> </Normal Text><Control>if</Control><Normal Text> </Normal Text><Name>l1</Name><Operator>:</Operator><Normal Text> SPEED </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Vector>"fast"</Vector><Normal Text> </Normal Text><Control>generate</Control><br/>
 <Normal Text>  </Normal Text><Control>elsif</Control><Normal Text> test</Normal Text><Operator>=</Operator><Integer>5</Integer><Normal Text> </Normal Text><Control>generate</Control><br/>
 <Normal Text>  </Normal Text><Control>end generate;</Control><br/>
 <Control>end architecture arch;</Control><br/>
@@ -506,7 +554,7 @@
 <Normal Text>  </Normal Text><Control>elsif</Control><Normal Text> gf </Normal Text><Control>then</Control><br/>
 <Normal Text>    fdsa </Normal Text><Operator><=</Operator><Normal Text> </Normal Text><Attribute>'1'</Attribute><Normal Text>;</Normal Text><br/>
 <Normal Text>  </Normal Text><Control>end if;</Control><Normal Text>  </Normal Text><br/>
-<Control>end generate_with_begin;</Control><br/>
+<Control>end generate generate_with_begin;</Control><br/>
 <Normal Text></Normal Text><br/>
 <Name>PROC_TIMER</Name><Normal Text> </Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Process>process</Process><br/>
 <Normal Text>  </Normal Text><Signal>variable</Signal><Normal Text> x </Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Data Type>std_logic</Data Type><Normal Text>;</Normal Text><br/>
@@ -515,3 +563,50 @@
 <Process>end process PROC_TIMER;</Process><br/>
 <Normal Text></Normal Text><br/>
 <Error>end architecture thing_arc;</Error><Normal Text>   </Normal Text><Comment>--this is not correct (wrong name)</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Integer>1</Integer><Operator>+</Operator><Integer>1</Integer><br/>
+<Integer>2</Integer><Data Type>ns</Data Type><br/>
+<Normal Text></Normal Text><br/>
+<Integer>1_2_3</Integer><br/>
+<Integer>12_3</Integer><br/>
+<Integer>1</Integer><Operator>.</Operator><Integer>2</Integer><br/>
+<Integer>1</Integer><Operator>.</Operator><Integer>2_3</Integer><br/>
+<Integer>1_3</Integer><Operator>.</Operator><Integer>2_3</Integer><br/>
+<Integer>12_3</Integer><Exponent>e+1</Exponent><br/>
+<Integer>12_3</Integer><Exponent>e-1</Exponent><br/>
+<Integer>12_3</Integer><Exponent>e1_1</Exponent><br/>
+<Integer>12_3</Integer><Operator>.</Operator><Integer>4</Integer><Exponent>e1_1</Exponent><br/>
+<Integer>12_3</Integer><Exponent>e1</Exponent><Normal Text>_</Normal Text><br/>
+<Integer>12_3</Integer><Error>e</Error><br/>
+<Normal Text></Normal Text><br/>
+<Integer>2</Integer><Operator>#</Operator><Based Integer>1_2_3</Based Integer><Operator>#</Operator><Exponent>E+8</Exponent><br/>
+<Integer>2</Integer><Operator>#</Operator><Based Integer>1_2</Based Integer><Operator>.</Operator><Based Integer>3</Based Integer><Operator>#</Operator><Exponent>E+8</Exponent><br/>
+<Integer>2</Integer><Operator>#</Operator><Based Integer>1_f2</Based Integer><Operator>.</Operator><Based Integer>3</Based Integer><Operator>#</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Integer>3</Integer><Operator>.</Operator><Integer>14159_26536</Integer><Normal Text> </Normal Text><Comment>-- A literal of type universal_real.</Comment><br/>
+<Integer>5280</Integer><Normal Text>          </Normal Text><Comment>-- A literal of type universal_integer.</Comment><br/>
+<Integer>10</Integer><Operator>.</Operator><Integer>7</Integer><Normal Text> </Normal Text><Data Type>ns</Data Type><Normal Text>       </Normal Text><Comment>-- A literal of a physical type.</Comment><br/>
+<Normal Text>O</Normal Text><Vector>"4777"</Vector><Normal Text>       </Normal Text><Comment>-- A bit string literal.</Comment><br/>
+<Vector>"54LS281"</Vector><Normal Text>     </Normal Text><Comment>-- A string literal.</Comment><br/>
+<Vector>""</Vector><Normal Text>            </Normal Text><Comment>-- A string literal representing a null array.</Comment><br/>
+<Normal Text>B</Normal Text><Vector>"1111_1111_1111"</Vector><Normal Text> </Normal Text><Comment>-- Equivalent to the string literal "111111111111".</Comment><br/>
+<Normal Text>X</Normal Text><Vector>"FFF"</Vector><Normal Text>            </Normal Text><Comment>-- Equivalent to B"1111_1111_1111".</Comment><br/>
+<Normal Text>O</Normal Text><Vector>"777"</Vector><Normal Text>            </Normal Text><Comment>-- Equivalent to B"111_111_111".</Comment><br/>
+<Normal Text>X</Normal Text><Vector>"777"</Vector><Normal Text>            </Normal Text><Comment>-- Equivalent to B"0111_0111_0111".</Comment><br/>
+<Normal Text>B</Normal Text><Vector>"XXXX_01LH"</Vector><Normal Text> </Normal Text><Comment>-- Equivalent to the string literal "XXXX01LH"</Comment><br/>
+<Normal Text>UO</Normal Text><Vector>"27"</Vector><Normal Text>       </Normal Text><Comment>-- Equivalent to B"010_111"</Comment><br/>
+<Normal Text>UO</Normal Text><Vector>"2C"</Vector><Normal Text>       </Normal Text><Comment>-- Equivalent to B"011_CCC"</Comment><br/>
+<Normal Text>SX</Normal Text><Vector>"3W"</Vector><Normal Text>       </Normal Text><Comment>-- Equivalent to B"0011_WWWW"</Comment><br/>
+<Normal Text>D</Normal Text><Vector>"35"</Vector><Normal Text>        </Normal Text><Comment>-- Equivalent to B"100011"</Comment><br/>
+<Integer>12</Integer><Normal Text>UB</Normal Text><Vector>"X1"</Vector><Normal Text> </Normal Text><Comment>-- Equivalent to B"0000_0000_00X1"</Comment><br/>
+<Integer>12</Integer><Normal Text>SB</Normal Text><Vector>"X1"</Vector><Normal Text> </Normal Text><Comment>-- Equivalent to B"XXXX_XXXX_XXX1"</Comment><br/>
+<Integer>12</Integer><Normal Text>UX</Normal Text><Vector>"F-"</Vector><Normal Text> </Normal Text><Comment>-- Equivalent to B"0000_1111_----"</Comment><br/>
+<Integer>12</Integer><Normal Text>SX</Normal Text><Vector>"F-"</Vector><Normal Text> </Normal Text><Comment>-- Equivalent to B"1111_1111_----"</Comment><br/>
+<Integer>12</Integer><Normal Text>D</Normal Text><Vector>"13"</Vector><Normal Text>  </Normal Text><Comment>-- Equivalent to B"0000_0000_1101"</Comment><br/>
+<Integer>12</Integer><Normal Text>UX</Normal Text><Vector>"000WWW"</Vector><Normal Text> </Normal Text><Comment>-- Equivalent to B"WWWW_WWWW_WWWW"</Comment><br/>
+<Integer>12</Integer><Normal Text>SX</Normal Text><Vector>"FFFC00"</Vector><Normal Text> </Normal Text><Comment>-- Equivalent to B"1100_0000_0000"</Comment><br/>
+<Integer>12</Integer><Normal Text>SX</Normal Text><Vector>"XXXX00"</Vector><Normal Text> </Normal Text><Comment>-- Equivalent to B"XXXX_0000_0000"</Comment><br/>
+<Integer>8</Integer><Normal Text>D</Normal Text><Vector>"511"</Vector><Normal Text>  </Normal Text><Comment>-- Error</Comment><br/>
+<Integer>8</Integer><Normal Text>UO</Normal Text><Vector>"477"</Vector><Normal Text> </Normal Text><Comment>-- Error</Comment><br/>
+<Integer>8</Integer><Normal Text>SX</Normal Text><Vector>"0FF"</Vector><Normal Text> </Normal Text><Comment>-- Error</Comment><br/>
+<Integer>8</Integer><Normal Text>SX</Normal Text><Vector>"FXX"</Vector><Normal Text> </Normal Text><Comment>-- Error</Comment><br/>

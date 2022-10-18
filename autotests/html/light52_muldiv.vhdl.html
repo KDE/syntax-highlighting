@@ -89,7 +89,7 @@
 
 <span style="font-weight:bold;">entity</span> <span style="color:#b08000;font-weight:bold;">light52_muldiv</span> <span style="font-weight:bold;">is</span>
     <span style="font-weight:bold;">generic</span> (
-        SEQUENTIAL_MULTIPLIER <span style="color:#006e28;">:</span> <span style="color:#0057ae;">boolean</span> <span style="color:#006e28;">:=</span> false
+        SEQUENTIAL_MULTIPLIER <span style="color:#006e28;">:</span> <span style="color:#0057ae;">boolean</span> <span style="color:#006e28;">:=</span> <span style="font-weight:bold;">false</span>
     );
     <span style="font-weight:bold;">port</span>(
         clk <span style="color:#006e28;">:</span>                   <span style="font-weight:bold;">in</span> <span style="color:#0057ae;">std_logic</span>;
@@ -133,6 +133,7 @@
 <span style="color:#898887;">-- Control logic ---------------------------------------------------------------</span>
 
 <span style="color:#b08000;font-weight:bold;">control_counter</span><span style="color:#006e28;">:</span> <span style="color:#3daee9;font-weight:bold;">process</span>(clk)
+    <span style="font-weight:bold;">alias</span> sig <span style="font-weight:bold;">is</span> <span style="color:#006e28;">&lt;&lt;</span><span style="color:#006e28;">signal</span> g_test(<span style="color:#b08000;">0</span>)<span style="color:#006e28;">.</span>i_test<span style="color:#006e28;">.</span>sig <span style="color:#006e28;">:</span> <span style="color:#0057ae;">std_logic</span><span style="color:#006e28;">&gt;&gt;</span>;
 <span style="color:#3daee9;font-weight:bold;">begin</span>
     <span style="font-weight:bold;">if</span> clk<span style="color:#b08000;">'event</span> <span style="font-weight:bold;">and</span> clk<span style="color:#006e28;">=</span><span style="color:#b08000;">'1'</span> <span style="font-weight:bold;">then</span>
         <span style="font-weight:bold;">if</span> reset<span style="color:#006e28;">=</span><span style="color:#b08000;">'1'</span> <span style="font-weight:bold;">then</span>
@@ -235,7 +236,7 @@ prod_out <span style="color:#006e28;">&lt;=</span> prod_reg;
 <span style="color:#898887;">---- Sequential multiplier --------------------------------</span>
 <span style="color:#b08000;font-weight:bold;">multiplier_sequential</span><span style="color:#006e28;">:</span> <span style="font-weight:bold;">if</span> SEQUENTIAL_MULTIPLIER <span style="font-weight:bold;">generate</span>
 
-<span style="font-weight:bold;">assert</span> false
+<span style="font-weight:bold;">assert</span> <span style="font-weight:bold;">false</span>
 <span style="font-weight:bold;">report</span> <span style="color:#bf0303;">&quot;Sequential multiplier implementation not done yet.&quot;</span><span style="color:#006e28;">&amp;</span>
        <span style="color:#bf0303;">&quot; Use combinational implementation.&quot;</span>
 <span style="font-weight:bold;">severity</span> <span style="font-weight:bold;">failure</span>;
@@ -248,6 +249,13 @@ prod_out <span style="color:#006e28;">&lt;=</span> prod_reg;
 <span style="font-weight:bold;">with</span> Types; <span style="font-weight:bold;">use</span> Types;
 <span style="font-weight:bold;">with</span> Files_Map;
 
+<span style="font-weight:bold;">package</span> <span style="color:#b08000;font-weight:bold;">fixed_pkg</span> <span style="font-weight:bold;">is</span> <span style="font-weight:bold;">new</span> <span style="color:#b08000;font-weight:bold;">IEEE</span><span style="color:#006e28;">.</span>fixed_generic_pkg
+  <span style="font-weight:bold;">generic map </span>(
+    fixed_overflow_style <span style="color:#006e28;">=&gt;</span> IEEE<span style="color:#006e28;">.</span>fixed_float_types<span style="color:#006e28;">.</span>fixed_saturate<span style="color:#006e28;">,</span>
+    fixed_guard_bits     <span style="color:#006e28;">=&gt;</span> <span style="color:#b08000;">3</span><span style="color:#006e28;">,</span>
+    no_warning           <span style="color:#006e28;">=&gt;</span> <span style="font-weight:bold;">false</span>
+    );
+
 <span style="font-weight:bold;">package</span> <span style="color:#b08000;font-weight:bold;">p</span> <span style="font-weight:bold;">is</span>
     <span style="color:#006e28;">type</span> int_ptr <span style="color:#006e28;">is</span> <span style="font-weight:bold;">access</span> <span style="color:#0057ae;">integer</span>;
     <span style="color:#006e28;">type</span> rec <span style="color:#006e28;">is</span> <span style="font-weight:bold;">record</span>
@@ -258,10 +266,46 @@ prod_out <span style="color:#006e28;">&lt;=</span> prod_reg;
     <span style="font-weight:bold;">end record;</span>
     <span style="color:#006e28;">type</span> int_vec <span style="color:#006e28;">is</span> <span style="font-weight:bold;">array</span> (<span style="color:#0057ae;">integer</span> <span style="font-weight:bold;">range</span> <span style="color:#006e28;">&lt;&gt;</span>) <span style="font-weight:bold;">of</span> <span style="color:#0057ae;">integer</span>;
     <span style="color:#006e28;">type</span> int_vec_ptr <span style="color:#006e28;">is</span> <span style="font-weight:bold;">access</span> int_vec;
+    <span style="font-weight:bold;">procedure</span> <span style="color:#b08000;font-weight:bold;">UNIFORM</span>(<span style="color:#006e28;">variable</span> SEED1<span style="color:#006e28;">,</span> SEED2 <span style="color:#006e28;">:</span> <span style="font-weight:bold;">inout</span> <span style="color:#0057ae;">POSITIVE</span>; <span style="color:#006e28;">variable</span> X <span style="color:#006e28;">:</span> <span style="font-weight:bold;">out</span> <span style="color:#0057ae;">REAL</span>);
     <span style="color:#006e28;">constant</span> def_arr <span style="color:#006e28;">:</span> t_int_array <span style="color:#006e28;">:=</span> (<span style="color:#b08000;">0</span> <span style="color:#006e28;">to</span> <span style="color:#b08000;">2</span> <span style="color:#006e28;">=&gt;</span> <span style="color:#b08000;">10</span>);
+
+    <span style="color:#898887;">-- type range</span>
+    <span style="color:#006e28;">type</span> newInt <span style="color:#006e28;">is</span> <span style="font-weight:bold;">range</span> <span style="color:#006e28;">-</span><span style="color:#b08000;">4</span> <span style="color:#006e28;">to</span> <span style="color:#b08000;">3</span>;
+    <span style="color:#006e28;">type</span> CAPACITY <span style="color:#006e28;">is</span> <span style="font-weight:bold;">range</span> <span style="color:#b08000;">0</span> <span style="color:#006e28;">to</span> <span style="color:#b08000;">1</span><span style="color:#b08000;">E5</span> <span style="font-weight:bold;">units</span>
+        pF;
+        nF <span style="color:#006e28;">=</span> <span style="color:#b08000;">1000</span> pF;
+    <span style="font-weight:bold;">end units;</span>
+
+    <span style="color:#898887;">-- type protected</span>
+    <span style="color:#006e28;">type</span> prot <span style="color:#006e28;">is</span> <span style="font-weight:bold;">protected</span>
+        <span style="color:#0057ae;font-weight:bold;">function</span> <span style="color:#b08000;font-weight:bold;">meth</span>(a <span style="color:#006e28;">:</span> int) <span style="font-weight:bold;">return</span> <span style="color:#0057ae;">bit</span>;
+    <span style="font-weight:bold;">end protected;</span>
+
+    <span style="color:#898887;">-- type protected body</span>
+    <span style="color:#006e28;">type</span> prot <span style="color:#006e28;">is</span> <span style="font-weight:bold;">protected</span> <span style="font-weight:bold;">body</span>
+        <span style="color:#006e28;">variable</span> var <span style="color:#006e28;">:</span> <span style="color:#0057ae;">positive</span>;
+        <span style="color:#006e28;">constant</span> const <span style="color:#006e28;">:</span> <span style="color:#0057ae;">boolean</span>;
+
+        <span style="color:#0057ae;font-weight:bold;">function</span> <span style="color:#b08000;font-weight:bold;">meth</span>(a <span style="color:#006e28;">:</span> int) <span style="font-weight:bold;">return</span> <span style="color:#0057ae;">bit</span> <span style="font-weight:bold;">is</span>
+        <span style="color:#0057ae;font-weight:bold;">begin</span>
+        <span style="color:#0057ae;font-weight:bold;">end function;</span>
+    <span style="font-weight:bold;">end protected body;</span>
+
+    <span style="color:#0057ae;font-weight:bold;">function</span> <span style="color:#b08000;font-weight:bold;">\?=\</span> (L<span style="color:#006e28;">,</span> R  <span style="color:#006e28;">:</span> <span style="color:#0057ae;">BOOLEAN</span>) <span style="font-weight:bold;">return</span> <span style="color:#0057ae;">BOOLEAN</span>;
+
 <span style="font-weight:bold;">end package;</span>
 
 <span style="font-weight:bold;">package</span> <span style="font-weight:bold;">body</span> <span style="color:#b08000;font-weight:bold;">p</span> <span style="font-weight:bold;">is</span>
+    <span style="color:#0057ae;font-weight:bold;">function</span> <span style="color:#b08000;font-weight:bold;">\?=\</span> (L<span style="color:#006e28;">,</span> R <span style="color:#006e28;">:</span> <span style="color:#0057ae;">BOOLEAN</span>) <span style="font-weight:bold;">return</span> <span style="color:#0057ae;">BOOLEAN</span> <span style="font-weight:bold;">is</span>
+    <span style="color:#0057ae;font-weight:bold;">begin</span>
+        <span style="font-weight:bold;">if</span> <span style="font-weight:bold;">not</span> (format(format<span style="color:#b08000;">'left</span>) <span style="color:#006e28;">=</span> <span style="color:#b08000;">'%'</span>) <span style="font-weight:bold;">then</span>
+            <span style="font-weight:bold;">report</span> <span style="color:#bf0303;">&quot;to_string: Illegal format string &quot;&quot;&quot;</span> <span style="color:#006e28;">&amp;</span> format <span style="color:#006e28;">&amp;</span> <span style="color:#b08000;">'&quot;'</span>
+                <span style="font-weight:bold;">severity</span> <span style="font-weight:bold;">error</span>;
+            <span style="font-weight:bold;">return</span> <span style="color:#bf0303;">&quot;&quot;</span>;
+        <span style="font-weight:bold;">end if;</span>
+        <span style="font-weight:bold;">return</span> L <span style="color:#006e28;">=</span> R;
+    <span style="color:#0057ae;font-weight:bold;">end function \?=\;</span>
+
     <span style="font-weight:bold;">procedure</span> <span style="color:#b08000;font-weight:bold;">test</span> <span style="font-weight:bold;">is</span>
         <span style="color:#006e28;">variable</span> v <span style="color:#006e28;">:</span> int_ptr;
         <span style="color:#006e28;">variable</span> i <span style="color:#006e28;">:</span> <span style="color:#0057ae;">integer</span>;
@@ -285,7 +329,7 @@ prod_out <span style="color:#006e28;">&lt;=</span> prod_reg;
 
     <span style="font-weight:bold;">procedure</span> <span style="color:#b08000;font-weight:bold;">test3</span> <span style="font-weight:bold;">is</span>
         <span style="color:#006e28;">type</span> a;
-        <span style="color:#006e28;">type</span> a <span style="font-weight:bold;">is</span> <span style="font-weight:bold;">access</span> <span style="color:#0057ae;">integer</span>;
+        <span style="color:#006e28;">type</span> a <span style="color:#006e28;">is</span> <span style="font-weight:bold;">access</span> <span style="color:#0057ae;">integer</span>;
         <span style="color:#006e28;">variable</span> v <span style="color:#006e28;">:</span> a;
     <span style="font-weight:bold;">begin</span>
     <span style="font-weight:bold;">end procedure;</span>
@@ -293,7 +337,7 @@ prod_out <span style="color:#006e28;">&lt;=</span> prod_reg;
     <span style="color:#006e28;">type</span> int_ptr_array <span style="color:#006e28;">is</span> <span style="font-weight:bold;">array</span> (<span style="color:#0057ae;">integer</span> <span style="font-weight:bold;">range</span> <span style="color:#006e28;">&lt;&gt;</span>) <span style="font-weight:bold;">of</span> int_ptr;
 
     <span style="font-weight:bold;">procedure</span> <span style="color:#b08000;font-weight:bold;">tets4</span> <span style="font-weight:bold;">is</span>
-        <span style="color:#006e28;">type</span> bvp <span style="font-weight:bold;">is</span> <span style="font-weight:bold;">access</span> <span style="color:#0057ae;">bit_vector</span>;
+        <span style="color:#006e28;">type</span> bvp <span style="color:#006e28;">is</span> <span style="font-weight:bold;">access</span> <span style="color:#0057ae;">bit_vector</span>;
         <span style="color:#006e28;">variable</span> y <span style="color:#006e28;">:</span> int_ptr(<span style="color:#b08000;">1</span> <span style="color:#006e28;">to</span> <span style="color:#b08000;">3</span>) <span style="color:#006e28;">:=</span> int_ptr<span style="color:#b08000;">'(null)</span>;
     <span style="font-weight:bold;">begin</span>
     <span style="font-weight:bold;">end procedure;</span>
@@ -318,11 +362,11 @@ prod_out <span style="color:#006e28;">&lt;=</span> prod_reg;
         Res <span style="color:#006e28;">:</span> Iir_List;
         El <span style="color:#006e28;">:</span> Iir;
     <span style="color:#0057ae;font-weight:bold;">begin</span>
-        <span style="font-weight:bold;">case</span> L <span style="font-weight:bold;">is</span>
+        <span style="font-weight:bold;">case</span> to_integer(<span style="color:#0057ae;">unsigned</span>(CTRL_REF(x<span style="color:#006e28;">*</span><span style="color:#b08000;">4</span><span style="color:#006e28;">+</span><span style="color:#b08000;">3</span> <span style="color:#006e28;">downto</span> x<span style="color:#006e28;">*</span><span style="color:#b08000;">4</span>))) <span style="font-weight:bold;">is</span>
             <span style="font-weight:bold;">when</span> <span style="color:#b08000;font-weight:bold;">Null_Iir_List</span>
-            <span style="color:#006e28;">|</span> Iir_List_All <span style="color:#006e28;">=&gt;</span>
+            <span style="color:#006e28;">|</span> <span style="color:#b08000;font-weight:bold;">Iir_List_All</span> <span style="color:#006e28;">=&gt;</span>
                 <span style="font-weight:bold;">return</span> L;
-            <span style="font-weight:bold;">when</span> <span style="color:#b08000;font-weight:bold;">others</span> <span style="color:#006e28;">=&gt;</span>
+            <span style="font-weight:bold;">when</span> <span style="font-weight:bold;">others</span> <span style="color:#006e28;">=&gt;</span>
                 It <span style="color:#006e28;">:=</span> List_Iterate (L);
                 <span style="font-weight:bold;">while</span> Is_Valid (It) <span style="font-weight:bold;">loop</span>
                     El <span style="color:#006e28;">:=</span> Get_Element (It);
@@ -339,6 +383,10 @@ prod_out <span style="color:#006e28;">&lt;=</span> prod_reg;
 <span style="color:#898887;">-- Library bar</span>
 <span style="font-weight:bold;">context</span> foo<span style="color:#006e28;">.</span>test_context;
 
+<span style="font-weight:bold;">context</span> <span style="color:#b08000;font-weight:bold;">foo</span> <span style="font-weight:bold;">is</span>
+    <span style="font-weight:bold;">context</span> foo<span style="color:#006e28;">.</span>test_context;
+<span style="font-weight:bold;">end context foo;</span>
+
 <span style="font-weight:bold;">entity</span> <span style="color:#b08000;font-weight:bold;">concat</span> <span style="font-weight:bold;">is</span>
 <span style="font-weight:bold;">end entity;</span>
 
@@ -350,6 +398,13 @@ prod_out <span style="color:#006e28;">&lt;=</span> prod_reg;
 <span style="font-weight:bold;">architecture</span> <span style="color:#b08000;font-weight:bold;">t</span> <span style="font-weight:bold;">of</span> <span style="color:#644a9b;">concat</span> <span style="font-weight:bold;">is</span>
     <span style="color:#006e28;">type</span> int_array <span style="color:#006e28;">is</span> <span style="font-weight:bold;">array</span> (<span style="color:#0057ae;">integer</span> <span style="font-weight:bold;">range</span> <span style="color:#006e28;">&lt;&gt;</span>) <span style="font-weight:bold;">of</span> <span style="color:#0057ae;">integer</span>;
     <span style="color:#006e28;">type</span> small <span style="color:#006e28;">is</span> <span style="font-weight:bold;">range</span> <span style="color:#b08000;">1</span> <span style="color:#006e28;">to</span> <span style="color:#b08000;">3</span>;
+
+    <span style="font-weight:bold;">component</span> <span style="color:#b08000;font-weight:bold;">or_entity</span> <span style="font-weight:bold;">is</span>
+    <span style="font-weight:bold;">port</span>(
+        input_1<span style="color:#006e28;">:</span> <span style="font-weight:bold;">in</span> <span style="color:#0057ae;">std_logic</span>;
+        output<span style="color:#006e28;">:</span> <span style="font-weight:bold;">out</span> <span style="color:#0057ae;">std_logic</span>
+        );
+    <span style="font-weight:bold;">end component;</span>
 <span style="font-weight:bold;">begin</span>
     <span style="color:#3daee9;font-weight:bold;">process</span>
         <span style="color:#006e28;">variable</span> s <span style="color:#006e28;">:</span> <span style="color:#0057ae;">string</span>(<span style="color:#b08000;">1</span> <span style="color:#006e28;">to</span> <span style="color:#b08000;">5</span>);
@@ -370,13 +425,6 @@ prod_out <span style="color:#006e28;">&lt;=</span> prod_reg;
         TotalSeconds <span style="color:#006e28;">:=</span> Seconds <span style="color:#006e28;">+</span> Minutes <span style="color:#006e28;">*</span> <span style="color:#b08000;">60</span>;
         <span style="font-weight:bold;">return</span> TotalSeconds <span style="color:#006e28;">*</span> ClockFrequencyHz <span style="color:#006e28;">-</span><span style="color:#b08000;">1</span>;
     <span style="color:#0057ae;font-weight:bold;">end function;</span>
-
-    <span style="font-weight:bold;">component</span> <span style="color:#b08000;font-weight:bold;">or_entity</span> <span style="font-weight:bold;">is</span>
-    <span style="font-weight:bold;">port</span>(
-        input_1<span style="color:#006e28;">:</span> <span style="font-weight:bold;">in</span> <span style="color:#0057ae;">std_logic</span>;
-        output<span style="color:#006e28;">:</span> <span style="font-weight:bold;">out</span> <span style="color:#0057ae;">std_logic</span>
-        );
-    <span style="font-weight:bold;">end component;</span>
 
     <span style="color:#006e28;">type</span> enum_type <span style="color:#006e28;">is</span> (a<span style="color:#006e28;">,</span> b<span style="color:#006e28;">,</span> c<span style="color:#006e28;">,</span> <span style="color:#006e28;">...,</span> z);
     <span style="color:#006e28;">type</span> int_array <span style="color:#006e28;">is</span> <span style="font-weight:bold;">array</span>(<span style="color:#b08000;">3</span> <span style="color:#006e28;">downto</span> <span style="color:#b08000;">0</span>) <span style="font-weight:bold;">of</span> <span style="color:#0057ae;">integer</span>;
@@ -443,7 +491,7 @@ prod_out <span style="color:#006e28;">&lt;=</span> prod_reg;
    <span style="font-weight:bold;">end;</span>
   <span style="font-weight:bold;">end generate;</span>
 
-  <span style="color:#b08000;font-weight:bold;">LL</span><span style="color:#006e28;">:</span> <span style="font-weight:bold;">if</span> l1<span style="color:#006e28;">:</span> SPEED <span style="color:#006e28;">=</span> <span style="color:#bf0303;">&quot;fast&quot;</span> <span style="font-weight:bold;">generate</span>
+  <span style="color:#b08000;font-weight:bold;">LL</span><span style="color:#006e28;">:</span> <span style="font-weight:bold;">if</span> <span style="color:#b08000;font-weight:bold;">l1</span><span style="color:#006e28;">:</span> SPEED <span style="color:#006e28;">=</span> <span style="color:#bf0303;">&quot;fast&quot;</span> <span style="font-weight:bold;">generate</span>
   <span style="font-weight:bold;">elsif</span> test<span style="color:#006e28;">=</span><span style="color:#b08000;">5</span> <span style="font-weight:bold;">generate</span>
   <span style="font-weight:bold;">end generate;</span>
 <span style="font-weight:bold;">end architecture arch;</span>
@@ -512,7 +560,7 @@ prod_out <span style="color:#006e28;">&lt;=</span> prod_reg;
   <span style="font-weight:bold;">elsif</span> gf <span style="font-weight:bold;">then</span>
     fdsa <span style="color:#006e28;">&lt;=</span> <span style="color:#b08000;">'1'</span>;
   <span style="font-weight:bold;">end if;</span>  
-<span style="font-weight:bold;">end generate_with_begin;</span>
+<span style="font-weight:bold;">end generate generate_with_begin;</span>
 
 <span style="color:#b08000;font-weight:bold;">PROC_TIMER</span> <span style="color:#006e28;">:</span> <span style="color:#3daee9;font-weight:bold;">process</span>
   <span style="color:#006e28;">variable</span> x <span style="color:#006e28;">:</span> <span style="color:#0057ae;">std_logic</span>;
@@ -521,4 +569,51 @@ prod_out <span style="color:#006e28;">&lt;=</span> prod_reg;
 <span style="color:#3daee9;font-weight:bold;">end process PROC_TIMER;</span>
 
 <span style="color:#bf0303;font-weight:bold;text-decoration:underline;">end architecture thing_arc;</span>   <span style="color:#898887;">--this is not correct (wrong name)</span>
+
+<span style="color:#b08000;">1</span><span style="color:#006e28;">+</span><span style="color:#b08000;">1</span>
+<span style="color:#b08000;">2</span><span style="color:#0057ae;">ns</span>
+
+<span style="color:#b08000;">1_2_3</span>
+<span style="color:#b08000;">12_3</span>
+<span style="color:#b08000;">1</span><span style="color:#006e28;">.</span><span style="color:#b08000;">2</span>
+<span style="color:#b08000;">1</span><span style="color:#006e28;">.</span><span style="color:#b08000;">2_3</span>
+<span style="color:#b08000;">1_3</span><span style="color:#006e28;">.</span><span style="color:#b08000;">2_3</span>
+<span style="color:#b08000;">12_3</span><span style="color:#b08000;">e+1</span>
+<span style="color:#b08000;">12_3</span><span style="color:#b08000;">e-1</span>
+<span style="color:#b08000;">12_3</span><span style="color:#b08000;">e1_1</span>
+<span style="color:#b08000;">12_3</span><span style="color:#006e28;">.</span><span style="color:#b08000;">4</span><span style="color:#b08000;">e1_1</span>
+<span style="color:#b08000;">12_3</span><span style="color:#b08000;">e1</span>_
+<span style="color:#b08000;">12_3</span><span style="color:#bf0303;font-weight:bold;text-decoration:underline;">e</span>
+
+<span style="color:#b08000;">2</span><span style="color:#006e28;">#</span><span style="color:#b08000;">1_2_3</span><span style="color:#006e28;">#</span><span style="color:#b08000;">E+8</span>
+<span style="color:#b08000;">2</span><span style="color:#006e28;">#</span><span style="color:#b08000;">1_2</span><span style="color:#006e28;">.</span><span style="color:#b08000;">3</span><span style="color:#006e28;">#</span><span style="color:#b08000;">E+8</span>
+<span style="color:#b08000;">2</span><span style="color:#006e28;">#</span><span style="color:#b08000;">1_f2</span><span style="color:#006e28;">.</span><span style="color:#b08000;">3</span><span style="color:#006e28;">#</span>
+
+<span style="color:#b08000;">3</span><span style="color:#006e28;">.</span><span style="color:#b08000;">14159_26536</span> <span style="color:#898887;">-- A literal of type universal_real.</span>
+<span style="color:#b08000;">5280</span>          <span style="color:#898887;">-- A literal of type universal_integer.</span>
+<span style="color:#b08000;">10</span><span style="color:#006e28;">.</span><span style="color:#b08000;">7</span> <span style="color:#0057ae;">ns</span>       <span style="color:#898887;">-- A literal of a physical type.</span>
+O<span style="color:#bf0303;">&quot;4777&quot;</span>       <span style="color:#898887;">-- A bit string literal.</span>
+<span style="color:#bf0303;">&quot;54LS281&quot;</span>     <span style="color:#898887;">-- A string literal.</span>
+<span style="color:#bf0303;">&quot;&quot;</span>            <span style="color:#898887;">-- A string literal representing a null array.</span>
+B<span style="color:#bf0303;">&quot;1111_1111_1111&quot;</span> <span style="color:#898887;">-- Equivalent to the string literal &quot;111111111111&quot;.</span>
+X<span style="color:#bf0303;">&quot;FFF&quot;</span>            <span style="color:#898887;">-- Equivalent to B&quot;1111_1111_1111&quot;.</span>
+O<span style="color:#bf0303;">&quot;777&quot;</span>            <span style="color:#898887;">-- Equivalent to B&quot;111_111_111&quot;.</span>
+X<span style="color:#bf0303;">&quot;777&quot;</span>            <span style="color:#898887;">-- Equivalent to B&quot;0111_0111_0111&quot;.</span>
+B<span style="color:#bf0303;">&quot;XXXX_01LH&quot;</span> <span style="color:#898887;">-- Equivalent to the string literal &quot;XXXX01LH&quot;</span>
+UO<span style="color:#bf0303;">&quot;27&quot;</span>       <span style="color:#898887;">-- Equivalent to B&quot;010_111&quot;</span>
+UO<span style="color:#bf0303;">&quot;2C&quot;</span>       <span style="color:#898887;">-- Equivalent to B&quot;011_CCC&quot;</span>
+SX<span style="color:#bf0303;">&quot;3W&quot;</span>       <span style="color:#898887;">-- Equivalent to B&quot;0011_WWWW&quot;</span>
+D<span style="color:#bf0303;">&quot;35&quot;</span>        <span style="color:#898887;">-- Equivalent to B&quot;100011&quot;</span>
+<span style="color:#b08000;">12</span>UB<span style="color:#bf0303;">&quot;X1&quot;</span> <span style="color:#898887;">-- Equivalent to B&quot;0000_0000_00X1&quot;</span>
+<span style="color:#b08000;">12</span>SB<span style="color:#bf0303;">&quot;X1&quot;</span> <span style="color:#898887;">-- Equivalent to B&quot;XXXX_XXXX_XXX1&quot;</span>
+<span style="color:#b08000;">12</span>UX<span style="color:#bf0303;">&quot;F-&quot;</span> <span style="color:#898887;">-- Equivalent to B&quot;0000_1111_----&quot;</span>
+<span style="color:#b08000;">12</span>SX<span style="color:#bf0303;">&quot;F-&quot;</span> <span style="color:#898887;">-- Equivalent to B&quot;1111_1111_----&quot;</span>
+<span style="color:#b08000;">12</span>D<span style="color:#bf0303;">&quot;13&quot;</span>  <span style="color:#898887;">-- Equivalent to B&quot;0000_0000_1101&quot;</span>
+<span style="color:#b08000;">12</span>UX<span style="color:#bf0303;">&quot;000WWW&quot;</span> <span style="color:#898887;">-- Equivalent to B&quot;WWWW_WWWW_WWWW&quot;</span>
+<span style="color:#b08000;">12</span>SX<span style="color:#bf0303;">&quot;FFFC00&quot;</span> <span style="color:#898887;">-- Equivalent to B&quot;1100_0000_0000&quot;</span>
+<span style="color:#b08000;">12</span>SX<span style="color:#bf0303;">&quot;XXXX00&quot;</span> <span style="color:#898887;">-- Equivalent to B&quot;XXXX_0000_0000&quot;</span>
+<span style="color:#b08000;">8</span>D<span style="color:#bf0303;">&quot;511&quot;</span>  <span style="color:#898887;">-- Error</span>
+<span style="color:#b08000;">8</span>UO<span style="color:#bf0303;">&quot;477&quot;</span> <span style="color:#898887;">-- Error</span>
+<span style="color:#b08000;">8</span>SX<span style="color:#bf0303;">&quot;0FF&quot;</span> <span style="color:#898887;">-- Error</span>
+<span style="color:#b08000;">8</span>SX<span style="color:#bf0303;">&quot;FXX&quot;</span> <span style="color:#898887;">-- Error</span>
 </pre></body></html>

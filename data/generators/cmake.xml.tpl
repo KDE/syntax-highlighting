@@ -118,7 +118,7 @@
       <context attribute="Normal Text" lineEndContext="#stay" name="Normal Text">
         <DetectSpaces/>
         <!--[ for command in commands -]-->
-        <WordDetect String="<!--{command.name}-->" insensitive="true" attribute="Command" context="<!--{command.name}-->_ctx"<!--[ if command.start_region ]--> beginRegion="<!--{command.start_region}-->"<!--[ endif -]--> <!--[- if command.end_region ]--> endRegion="<!--{command.end_region}-->"<!--[ endif ]--> />
+        <WordDetect String="<!--{command.name}-->" insensitive="true" attribute="<!--{command.attribute}-->" context="<!--{command.name}-->_ctx"<!--[ if command.start_region ]--> beginRegion="<!--{command.start_region}-->"<!--[ endif -]--> <!--[- if command.end_region ]--> endRegion="<!--{command.end_region}-->"<!--[ endif ]--> />
         <!--[ endfor -]-->
         <!--[ for command in standard_module_commands -]-->
         <WordDetect String="<!--{command.name}-->" insensitive="true" attribute="CMake Provided Function/Macro" context="<!--{command.name}-->_ctx" />
@@ -416,6 +416,7 @@
       <itemData name="Normal Text" defStyleNum="dsNormal" spellChecking="false" />
       <itemData name="Comment" defStyleNum="dsComment" spellChecking="true" />
       <itemData name="Command" defStyleNum="dsKeyword" spellChecking="false" />
+      <itemData name="Control Flow" defStyleNum="dsControlFlow" spellChecking="false" />
       <itemData name="CMake Provided Function/Macro" defStyleNum="dsFunction" bold="true" spellChecking="false" />
       <itemData name="User Function/Macro"  defStyleNum="dsFunction" spellChecking="false" />
       <itemData name="Property" defStyleNum="dsOthers" spellChecking="false" />

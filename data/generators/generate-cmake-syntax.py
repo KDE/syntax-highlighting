@@ -44,6 +44,7 @@ _CONTROL_FLOW_LIST = set((
   , 'endwhile'
   , 'foreach'
   , 'if'
+  , 'return'
   , 'while'
 ))
 

@@ -1,0 +1,33 @@
+<indentfold># Normal YAML highlighting:
+_parts:
+  srid: &srid "3857"
+  # YAML comment
+  world: &world
+    - -180
+  extents: &extents
+    extent: *world
+    srs-name: *srid
+scale: 1
+interactivity: false
+
+Layer:
+  - id: water-lines-low-zoom
+    geometry: linestring
+    geometry2: <beginfold id='1'>"</beginfold id='1'>string<endfold id='1'>"</endfold id='1'>
+    Datasource:
+      <<: *osm2pgsql
+</indentfold>      table: <beginfold id='2'>|-</beginfold id='2'>
+        -- Highlighting the table SQL by including PostgreSQL highlighting:
+        (SELECT
+            way,
+            -- SQL comment
+            waterway,
+            CASE WHEN tags->'intermittent' IN ('yes')
+              OR tags->'seasonal' IN ('yes', 'spring', 'summer', 'autumn', 'winter', 'wet_season', 'dry_season')
+              THEN 'yes' ELSE 'no' END AS int_intermittent
+          FROM planet_osm_line
+          WHERE waterway = 'river'
+        ) AS water_lines_low_zoom
+<indentfold><endfold id='2'></endfold id='2'>    properties:
+      minzoom: 8 # number
+      maxzoom: 11 # number

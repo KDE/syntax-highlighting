@@ -5,7 +5,58 @@
 <meta name="generator" content="KF5::SyntaxHighlighting - Definition (SQL (PostgreSQL)) - Theme (Breeze Light)"/>
 </head><body style="background-color:#ffffff;color:#1f1c1b"><pre>
 <span style="color:#898887;">-- PostgreSQL doesn't use # as comment</span>
-<span style="font-weight:bold;">select</span> jsoncol <span style="color:#ca60ca;">#&gt;</span> <span style="font-weight:bold;">array</span>[<span style="color:#bf0303;">'p1'</span>, <span style="color:#bf0303;">'p2'</span>]
+<span style="font-weight:bold;">select</span> jsoncol <span style="color:#ca60ca;">#&gt;</span> <span style="font-weight:bold;">array</span>[<span style="color:#e31616;">'p1</span><span style="color:#bf0303;">'</span>, <span style="color:#e31616;">'p2</span><span style="color:#bf0303;">'</span>]
 <span style="font-weight:bold;">from</span> some_table
-<span style="font-weight:bold;">where</span> col<span style="color:#ca60ca;">#-</span><span style="color:#bf0303;">'{1, a}'</span> <span style="color:#ca60ca;">@</span>? <span style="color:#bf0303;">'$.b ? (@ &gt; 0)'</span>;
+<span style="font-weight:bold;">where</span> col<span style="color:#ca60ca;">#-</span><span style="color:#e31616;">'{1, a}</span><span style="color:#bf0303;">'</span> <span style="color:#ca60ca;">@</span>? <span style="color:#e31616;">'$.b ? (@ &gt; 0)</span><span style="color:#bf0303;">'</span>;
+
+<span style="font-weight:bold;">SELECT</span>
+
+  <span style="color:#e31616;">'Single quoted string</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">AS</span> test01,
+  <span style="color:#e31616;">'Backslashes in single-quoted strings are interpreted literally and get no highlighting: \ </span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">AS</span> test02,
+  <span style="color:#e31616;">'The single-quote character can be escaped by using two of them: </span><span style="color:#924c9d;">''</span><span style="color:#e31616;"> This is highlighted.</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">AS</span> test03,
+  <span style="color:#e31616;">'Line breaks</span>
+<span style="color:#e31616;">are allowed</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">AS</span> test04,
+
+  <span style="color:#bf0303;">E'</span><span style="color:#bf0303;">Escape strings are introduced with an uppercase E…</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">AS</span> test11,
+  <span style="color:#bf0303;">e'</span><span style="color:#bf0303;">or a lowercase e.</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">AS</span> test12,
+  <span style="color:#bf0303;">E'</span><span style="color:#bf0303;">Line breaks</span>
+<span style="color:#bf0303;">are allowed</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">AS</span> test13,
+  <span style="color:#bf0303;">E'</span><span style="color:#bf0303;">The single-quote character can be escaped by using two of them: </span><span style="color:#924c9d;">''</span><span style="color:#bf0303;"> This is highlighted.</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">AS</span> test14,
+  <span style="color:#bf0303;">E'</span><span style="color:#bf0303;">They can have escapes like </span><span style="color:#924c9d;">\t</span><span style="color:#bf0303;"> or three-digit octal </span><span style="color:#924c9d;">\011</span><span style="color:#bf0303;"> or two-digit hexadecimal </span><span style="color:#924c9d;">\x09</span><span style="color:#bf0303;">.</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">AS</span> test15,
+  <span style="color:#bf0303;">E'</span><span style="color:#bf0303;">Also the escape character itself and the single-quote can be escaped: </span><span style="color:#924c9d;">\\</span><span style="color:#bf0303;"> and </span><span style="color:#924c9d;">\'</span><span style="color:#bf0303;"> are highlighted.</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">AS</span> test16,
+  <span style="color:#bf0303;">E'</span><span style="color:#bf0303;">Non-defined combinations: Example: </span><span style="color:#924c9d;">\y</span><span style="color:#bf0303;"> is highlighted because it’s treated as escaped characters and substituted by “y”. Even before a line break</span><span style="color:#924c9d;">\</span>
+<span style="color:#bf0303;">this is possible.</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">AS</span> test17,
+  <span style="color:#bf0303;">E'</span><span style="color:#bf0303;">Higher Unicode code points: Hex: Four-digit </span><span style="color:#924c9d;">\u1234</span><span style="color:#bf0303;"> and eight-digit </span><span style="color:#924c9d;">\U00001234</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">AS</span> test18,
+  <span style="color:#bf0303;">E'</span><span style="color:#bf0303;">These escapes with “u” and “U” are the only one that are not error tolerant: </span><span style="color:#bf0303;text-decoration:underline;">\u</span><span style="color:#bf0303;">123 and </span><span style="color:#bf0303;text-decoration:underline;">\u</span><span style="color:#bf0303;">123 are highlighted as errors.</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">AS</span> test19,
+
+  <span style="color:#bf0303;">U&amp;'</span><span style="color:#bf0303;">Unicode escape strings are introduced with an uppercase U…</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">AS</span> test21,
+  <span style="color:#bf0303;">u&amp;'</span><span style="color:#bf0303;">or a lowercase u.</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">AS</span> test22,
+  <span style="color:#bf0303;">U&amp;'</span><span style="color:#bf0303;">The single-quote character can be escaped by using two of them: </span><span style="color:#924c9d;">''</span><span style="color:#bf0303;"> This is highlighted.</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">AS</span> test23,
+  <span style="color:#bf0303;">U&amp;'</span><span style="color:#bf0303;">Types of escape: </span><span style="color:#924c9d;">\0061</span><span style="color:#bf0303;"> and </span><span style="color:#924c9d;">\+000061</span><span style="color:#bf0303;"> and </span><span style="color:#924c9d;">\\</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">AS</span> test24,
+  <span style="color:#bf0303;">U&amp;'</span><span style="color:#bf0303;">All other usages of </span><span style="color:#bf0303;text-decoration:underline;">\</span><span style="color:#bf0303;"> are errors, including </span><span style="color:#bf0303;text-decoration:underline;">\</span><span style="color:#bf0303;">'</span> test25,
+  <span style="color:#bf0303;">U&amp;'</span><span style="color:#bf0303;">Line breaks</span>
+<span style="color:#bf0303;">are allowed</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">AS</span> test26,
+
+  <span style="color:#bf0303;">U&amp;'</span><span style="color:#bf0303;">User-defined escape characters can be used instead of \ by specifying</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">UESCAPE</span> <span style="color:#e31616;">'w</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">AS</span> test31,
+  <span style="color:#bf0303;">U&amp;'</span><span style="color:#bf0303;">Here, \ behaves as normal character. Escape sequences: </span><span style="color:#924c9d;">w0061</span><span style="color:#bf0303;"> and </span><span style="color:#924c9d;">w+000061</span><span style="color:#bf0303;"> and </span><span style="color:#924c9d;">ww</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">UESCAPE</span> <span style="color:#e31616;">'w</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">AS</span> test32,
+  <span style="color:#bf0303;">U&amp;'</span><span style="color:#bf0303;">Also work correctly for escape characters that have a special meaning in Regular Expressions: </span><span style="color:#924c9d;">.0061</span><span style="color:#bf0303;"> </span><span style="color:#924c9d;">.+000061</span><span style="color:#bf0303;"> and </span><span style="color:#924c9d;">..</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">UESCAPE</span> <span style="color:#e31616;">'.</span><span style="color:#bf0303;">'</span> <span style="font-weight:bold;">AS</span> test33,
+
+  <span style="color:#b08000;">0</span> <span style="font-weight:bold;">AS</span> <span style="color:#006e28;">U&amp;&quot;Unicode escape identifiers are introduces with an uppercase U…&quot;</span>,
+  <span style="color:#b08000;">0</span> <span style="font-weight:bold;">AS</span> <span style="color:#006e28;">u&amp;&quot;or a lowercase u.&quot;</span>,
+  <span style="color:#b08000;">0</span> <span style="font-weight:bold;">AS</span> <span style="color:#006e28;">U&amp;&quot;The double-quote character can be escaped by using two of them: </span><span style="color:#924c9d;">&quot;&quot;</span><span style="color:#006e28;"> This is highlighted.&quot;</span>,
+  <span style="color:#b08000;">0</span> <span style="font-weight:bold;">AS</span> <span style="color:#006e28;">U&amp;&quot;Types of escape: </span><span style="color:#924c9d;">\0061</span><span style="color:#006e28;"> and </span><span style="color:#924c9d;">\+000061</span><span style="color:#006e28;"> and </span><span style="color:#924c9d;">\\</span><span style="color:#006e28;">&quot;</span>,
+  <span style="color:#b08000;">0</span> <span style="font-weight:bold;">AS</span> <span style="color:#006e28;">U&amp;&quot;All other usages of </span><span style="color:#bf0303;text-decoration:underline;">\</span><span style="color:#006e28;"> are errors, including </span><span style="color:#bf0303;text-decoration:underline;">\</span><span style="color:#006e28;">&quot;</span>,
+  <span style="color:#b08000;">0</span> <span style="font-weight:bold;">AS</span> <span style="color:#006e28;">U&amp;&quot;Line breaks</span>
+<span style="color:#006e28;">are allowed&quot;</span>
+
+  <span style="color:#644a9b;">power</span>(<span style="color:#b08000;">2</span>, <span style="color:#b08000;">3</span>) <span style="font-weight:bold;">AS</span> test31,            <span style="color:#898887;">-- PostgreSQL Build-in functions (like “power”) are highlighted when followed by an opening parenthesis…</span>
+  power <span style="font-weight:bold;">AS</span> test32, <span style="color:#b08000;">0</span> <span style="font-weight:bold;">AS</span> power,      <span style="color:#898887;">-- …but not highlighted if used as identifier.</span>
+  <span style="color:#0095ff;font-weight:bold;">ST_PointOnSurface</span>(way) <span style="font-weight:bold;">AS</span> test33, <span style="color:#898887;">-- PostGIS functions are highlighted as extensions.</span>
+
+  <span style="color:#898887;">-- User-defined functions get no special highlighting:</span>
+  testpower(<span style="color:#b08000;">2</span>, <span style="color:#b08000;">3</span>) <span style="font-weight:bold;">AS</span> test34,
+
+  foo <span style="font-weight:bold;">AS</span> bar
+
+<span style="font-weight:bold;">FROM</span> mytable;
 </pre></body></html>

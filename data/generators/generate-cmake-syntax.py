@@ -120,7 +120,7 @@ def transform_command(cmd):
         assert new_cmd == cmd
         can_be_nulary = False
 
-    cmd['nested_parentheses'] = cmd['nested-parentheses?'] if 'nested-parentheses?' in cmd else False
+    cmd['nested_parentheses'] = cmd.get('nested-parentheses?', False)
 
     if 'first-arg-is-target?' in cmd:
         cmd['first_arg_is_target'] = cmd['first-arg-is-target?']

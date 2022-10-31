@@ -127,3 +127,7 @@ add_test(
     COMMAND (true)
     WORKING_DIRECTORY somedir
 )
+
+# nested parentheses
+if( true AND ( false OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") ) )
+endif()

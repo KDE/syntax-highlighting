@@ -216,6 +216,7 @@
         <!--[- if command.nested_parentheses ]-->
       <context attribute="Normal Text" lineEndContext="#stay" name="<!--{command.name}-->_ctx_op_nested">
         <DetectChar attribute="Normal Text" context="#pop" char=")" />
+        <DetectChar attribute="Normal Text" context="<!--{command.name}-->_ctx_op_nested" char="(" />
         <!--[- if command.named_args and command.named_args.kw ]-->
         <keyword attribute="Named Args" context="#stay" String="<!--{command.name}-->_nargs" />
         <!--[- endif ]-->

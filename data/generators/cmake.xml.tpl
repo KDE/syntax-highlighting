@@ -278,31 +278,30 @@
       </context>
 
       <context attribute="Environment Variable Substitution" lineEndContext="#pop" name="EnvVarSubst">
+        <DetectChar attribute="Environment Variable Substitution" context="#pop" char="}" />
         <keyword attribute="Standard Environment Variable" context="#stay" String="environment-variables" insensitive="false" />
         <!--[- if environment_variables.re ]-->
         <RegExpr attribute="Standard Environment Variable" context="#stay" String="<!--{environment_variables.re}-->" />
         <!--[- endif ]-->
         <DetectIdentifier />
         <IncludeRules context="Detect Variable Substitutions" />
-        <DetectChar attribute="Environment Variable Substitution" context="#pop" char="}" />
       </context>
 
       <context attribute="Variable Substitution" lineEndContext="#pop" name="VarSubst">
+        <DetectChar attribute="Variable Substitution" context="#pop" char="}" />
         <IncludeRules context="Detect Builtin Variables" />
         <DetectIdentifier />
-        <DetectChar attribute="Variable Substitution" context="#pop" char="}" />
         <IncludeRules context="Detect Variable Substitutions" />
       </context>
 
       <context attribute="@Variable Substitution" lineEndContext="#pop" name="@VarSubst">
-        <IncludeRules context="Detect Builtin Variables" />
         <DetectChar attribute="@Variable Substitution" context="VarSubst@" char="@" />
       </context>
 
       <context attribute="@Variable Substitution" lineEndContext="#pop#pop" name="VarSubst@">
+        <DetectChar attribute="@Variable Substitution" context="#pop#pop" char="@" />
         <IncludeRules context="Detect Builtin Variables" />
         <DetectIdentifier />
-        <DetectChar attribute="@Variable Substitution" context="#pop#pop" char="@" />
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="Target Name">

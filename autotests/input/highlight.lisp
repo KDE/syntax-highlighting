@@ -34,3 +34,5 @@ multilinecomment :)
 
 (define-modify-macro append1f (val)
   (lambda (lst val) (append lst (list val))))
+
+((lambda (a &optional (b 2)) (+ a (* b 3))) 4 5)

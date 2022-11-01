@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE language SYSTEM "language.dtd">
+<!DOCTYPE language SYSTEM "language.dtd" [
+    <!ENTITY identchar "[A-Za-z0-9-+&lt;&gt;/*]">
+]>
 <language version="11" kateversion="5.79" name="Common Lisp" section="Sources" extensions="*.lisp;*.cl;*.lsp;*.el" mimetype="" author="Dominik Haumann (dhaumann@kde.org)" license="MIT">
   <highlighting>
     <list name="symbols">
@@ -1127,6 +1129,7 @@
         <RegExpr attribute="Region Marker" context="#stay" String=";+\s*END.*$" endRegion="region"/>
         <DetectChar attribute="Comment" context="Comment" char=";"/>
         <Detect2Chars attribute="Comment" context="MultiLineComment" char="#" char1="|" beginRegion="BlockComment"/>
+        <Detect2Chars attribute="Function Operator" context="FunctionOperator" char="#" char1="'"/>
         <AnyChar attribute="Brackets" context="#stay" String="()"/>
         <keyword attribute="Keyword" context="#stay" String="keywords"/>
         <keyword attribute="Operator" context="#stay" String="symbols"/>
@@ -1134,6 +1137,7 @@
         <keyword attribute="Modifier" context="#stay" String="modifiers"/>
         <keyword attribute="Variable" context="#stay" String="variables"/>
         <keyword attribute="Definition" context="function_decl" String="definitions"/>
+        <RegExpr attribute="Type" context="#stay" String="'&identchar;+"/>
         <RegExpr attribute="Char" context="#stay" String="#\\."/>
         <DetectChar attribute="String" context="String" char="&quot;"/>
         <Detect2Chars attribute="Decimal" context="#stay" char="#" char1="t"/>
@@ -1142,12 +1146,15 @@
         <Float attribute="Float" context="#stay"/>
         <Int attribute="Decimal" context="#stay"/>
       </context>
+      <context name="FunctionOperator" attribute="Normal" lineEndContext="#pop" fallthroughContext="#pop">
+        <RegExpr attribute="Function By Name" context="#pop" String="&identchar;+"/>
+      </context>
       <context name="MultiLineComment" attribute="Comment" lineEndContext="#stay">
         <Detect2Chars attribute="Comment" context="#pop" char="|" char1="#" endRegion="BlockComment"/>
         <IncludeRules context="##Comments"/>
       </context>
       <context name="function_decl" attribute="Function" lineEndContext="#stay">
-        <RegExpr attribute="Function" context="#pop" String="\s*[A-Za-z0-9-+\&lt;\&gt;//\*]*\s*" />
+        <RegExpr attribute="Function" context="#pop" String="\s*&identchar;*\s*" />
       </context>
       <context name="SpecialNumber" attribute="Normal" lineEndContext="#pop">
         <Float attribute="Float" context="#pop"/>
@@ -1165,19 +1172,22 @@
       </context>
     </contexts>
     <itemDatas>
-      <itemData name="Normal"      defStyleNum="dsNormal"/>
-      <itemData name="Keyword"     defStyleNum="dsKeyword"/>
-      <itemData name="Operator"    defStyleNum="dsOperator"/>
-      <itemData name="Modifier"    defStyleNum="dsBuiltIn"/>
-      <itemData name="Variable"    defStyleNum="dsVariable"/>
-      <itemData name="Definition"  defStyleNum="dsKeyword"/>
-      <itemData name="Decimal"     defStyleNum="dsDecVal"/>
-      <itemData name="BaseN"       defStyleNum="dsBaseN"/>
-      <itemData name="Float"       defStyleNum="dsFloat"/>
-      <itemData name="Function"    defStyleNum="dsFunction"/>
-      <itemData name="Char"        defStyleNum="dsChar"/>
-      <itemData name="String"      defStyleNum="dsString"/>
-      <itemData name="String Char" defStyleNum="dsSpecialChar"/>
+      <itemData name="Normal"      defStyleNum="dsNormal" spellChecking="false"/>
+      <itemData name="Keyword"     defStyleNum="dsKeyword" spellChecking="false"/>
+      <itemData name="Operator"    defStyleNum="dsOperator" spellChecking="false"/>
+      <itemData name="Modifier"    defStyleNum="dsBuiltIn" spellChecking="false"/>
+      <itemData name="Variable"    defStyleNum="dsVariable" spellChecking="false"/>
+      <itemData name="Definition"  defStyleNum="dsKeyword" spellChecking="false"/>
+      <itemData name="Decimal"     defStyleNum="dsDecVal" spellChecking="false"/>
+      <itemData name="BaseN"       defStyleNum="dsBaseN" spellChecking="false"/>
+      <itemData name="Float"       defStyleNum="dsFloat" spellChecking="false"/>
+      <itemData name="Function"    defStyleNum="dsFunction" spellChecking="false"/>
+      <itemData name="Function Operator" defStyleNum="dsOperator" spellChecking="false"/>
+      <itemData name="Function By Name"  defStyleNum="dsNormal" spellChecking="false"/>
+      <itemData name="Type"        defStyleNum="dsDataType" spellChecking="false"/>
+      <itemData name="Char"        defStyleNum="dsChar" spellChecking="false"/>
+      <itemData name="String"      defStyleNum="dsString" spellChecking="false"/>
+      <itemData name="String Char" defStyleNum="dsSpecialChar" spellChecking="false"/>
       <itemData name="Comment"     defStyleNum="dsComment"/>
       <itemData name="Region Marker" defStyleNum="dsRegionMarker"/>
       <itemData name="Brackets"    defStyleNum="dsNormal" color="#0000ff" selColor="#00ff00" bold="1" italic="0"/>

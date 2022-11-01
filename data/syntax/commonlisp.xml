@@ -1125,53 +1125,73 @@
 
     <contexts>
       <context name="Normal" attribute="Normal" lineEndContext="#stay">
-        <RegExpr attribute="Region Marker" context="#stay" String=";+\s*BEGIN.*$" beginRegion="region"/>
-        <RegExpr attribute="Region Marker" context="#stay" String=";+\s*END.*$" endRegion="region"/>
-        <DetectChar attribute="Comment" context="Comment" char=";"/>
-        <Detect2Chars attribute="Comment" context="MultiLineComment" char="#" char1="|" beginRegion="BlockComment"/>
-        <Detect2Chars attribute="Function Operator" context="FunctionOperator" char="#" char1="'"/>
+        <DetectSpaces/>
+        <DetectChar context="StartSingleComment" char=";" lookAhead="1"/>
+        <DetectChar context="StartHash" char="#" lookAhead="1"/>
+        <DetectChar attribute="String" context="String" char="&quot;"/>
         <AnyChar attribute="Brackets" context="#stay" String="()"/>
         <keyword attribute="Keyword" context="#stay" String="keywords"/>
         <keyword attribute="Operator" context="#stay" String="symbols"/>
-        <keyword attribute="Operator" context="#stay" String="operators" weakDeliminator="&amp;"/>
         <keyword attribute="Modifier" context="#stay" String="modifiers"/>
         <keyword attribute="Variable" context="#stay" String="variables"/>
         <keyword attribute="Definition" context="function_decl" String="definitions"/>
+        <keyword attribute="Operator" context="#stay" String="operators" weakDeliminator="&amp;"/>
         <RegExpr attribute="Type" context="#stay" String="'&identchar;+"/>
-        <RegExpr attribute="Char" context="#stay" String="#\\."/>
-        <DetectChar attribute="String" context="String" char="&quot;"/>
-        <Detect2Chars attribute="Decimal" context="#stay" char="#" char1="t"/>
-        <Detect2Chars attribute="Decimal" context="#stay" char="#" char1="f"/>
-        <RegExpr attribute="Char" context="SpecialNumber" String="#[bodxei]"/>
         <Float attribute="Float" context="#stay" additionalDeliminator="-"/>
         <Int attribute="Decimal" context="#stay" additionalDeliminator="-"/>
         <WordDetect attribute="Operator" context="#stay" String="-" additionalDeliminator="0123456789"/>
         <RegExpr String="&identchar;+"/>
       </context>
+
+      <context name="StartHash" attribute="Normal" lineEndContext="#pop">
+        <Detect2Chars attribute="Comment" context="#pop!MultiLineComment" char="#" char1="|" beginRegion="BlockComment"/>
+        <Detect2Chars attribute="Function Operator" context="#pop!FunctionOperator" char="#" char1="'"/>
+        <Detect2Chars attribute="Decimal" context="#pop" char="#" char1="t"/>
+        <Detect2Chars attribute="Decimal" context="#pop" char="#" char1="f"/>
+        <RegExpr attribute="Char" context="#pop" String="#\\."/>
+        <RegExpr attribute="Char" context="#pop!SpecialNumber" String="#[bodxei]"/>
+        <DetectChar context="#pop" char="#"/>
+      </context>
+
       <context name="FunctionOperator" attribute="Normal" lineEndContext="#pop" fallthroughContext="#pop">
         <RegExpr attribute="Function By Name" context="#pop" String="&identchar;+"/>
       </context>
+
       <context name="MultiLineComment" attribute="Comment" lineEndContext="#stay">
         <Detect2Chars attribute="Comment" context="#pop" char="|" char1="#" endRegion="BlockComment"/>
         <IncludeRules context="##Comments"/>
       </context>
+
       <context name="function_decl" attribute="Function" lineEndContext="#stay">
         <RegExpr attribute="Function" context="#pop" String="\s*&identchar;*\s*" />
       </context>
+
       <context name="SpecialNumber" attribute="Normal" lineEndContext="#pop">
         <Float attribute="Float" context="#pop"/>
         <Int attribute="Decimal" context="#pop"/>
         <HlCOct attribute="BaseN" context="#pop"/>
         <HlCHex attribute="Float" context="#pop"/>
       </context>
+
       <context name="String" attribute="String" lineEndContext="#stay">
+        <DetectSpaces/>
+        <DetectIdentifier/>
         <RegExpr attribute="Char" context="#stay" String="#\\."/>
         <HlCStringChar attribute="String Char" context="#stay"/>
         <DetectChar attribute="String" context="#pop" char="&quot;"/>
       </context>
-      <context name="Comment" attribute="Comment" lineEndContext="#pop">
-        <IncludeRules context="##Comments"/>
+
+      <context name="StartSingleComment" attribute="Comment" lineEndContext="#pop">
+        <RegExpr attribute="Region Marker" context="#pop" String=";+\s*BEGIN.*$" beginRegion="region"/>
+        <RegExpr attribute="Region Marker" context="#pop" String=";+\s*END.*$" endRegion="region"/>
+        <DetectChar attribute="Comment" context="#pop!Comment" char=";"/>
       </context>
+      <context name="Comment" attribute="Comment" lineEndContext="#pop">
+        <DetectSpaces/>
+        <IncludeRules context="##Comments"/>
+        <DetectIdentifier/>
+      </context>
+
     </contexts>
     <itemDatas>
       <itemData name="Normal"      defStyleNum="dsNormal" spellChecking="false"/>

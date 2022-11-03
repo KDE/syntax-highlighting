@@ -35,7 +35,7 @@
 <Normal></Normal><br/>
 <Section Header>[Path]</Section Header><br/>
 <Option Name>PathExists</Option Name><Normal> = /some/absolute/path</Normal><br/>
-<Option Name>PathExistsGlob</Option Name><Normal> = /some/glob*</Normal><br/>
+<Option Name>PathExistsGlob</Option Name><Normal> = /some/g</Normal><Wildcard>[lo]</Wildcard><Normal>b</Normal><Wildcard>*</Wildcard><br/>
 <Option Name>PathChanged</Option Name><Normal> = /some/absolute/path</Normal><br/>
 <Option Name>PathModified</Option Name><Normal> = /some/absolute/path</Normal><br/>
 <Option Name>DirectoryNotEmpty</Option Name><Normal> = /some/absolute/path</Normal><br/>
@@ -306,15 +306,6 @@
 <Option Name>RestrictNetworkInterfaces</Option Name><Normal> = </Normal><Prefix>~</Prefix><Normal>eth1 eth2</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
-<Section Header>[Slice]</Section Header><br/>
-<Option Name>CPUAccounting</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
-<Option Name>CPUWeight</Option Name><Normal> = </Normal><Number>1234</Number><br/>
-<Option Name>StartupCPUWeight</Option Name><Normal> = </Normal><Number>321</Number><br/>
-<Option Name>CPUQuota</Option Name><Normal> = </Normal><Number>123.4</Number><Measurement Unit>%</Measurement Unit><br/>
-<Option Name>CPUQuotaPeriodSec</Option Name><Normal> = </Normal><Number>1</Number><Measurement Unit>s</Measurement Unit><Normal> </Normal><Number>23</Number><Measurement Unit>ms</Measurement Unit><Normal> </Normal><Number>45</Number><Measurement Unit>us</Measurement Unit><br/>
-<Option Name>MemoryAccounting</Option Name><Normal> = </Normal><Constant>no</Constant><br/>
-<Normal></Normal><br/>
-<Normal></Normal><br/>
 <Section Header>[Socket]</Section Header><br/>
 <Option Name>ListenStream</Option Name><Normal> = 0.0.0.0:4000</Normal><br/>
 <Option Name>ListenDatagram</Option Name><Normal> = /path/to/socket</Normal><br/>
@@ -451,6 +442,7 @@
 <Option Name>ConditionHost</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>shodan</Normal><Wildcard>*</Wildcard><br/>
 <Option Name>ConditionKernelCommandLine</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>kernel_option</Normal><br/>
 <Option Name>ConditionKernelVersion</Option Name><Normal> = </Normal><Prefix>| </Prefix><Normal>>= 4.</Normal><Wildcard>*</Wildcard><br/>
+<Option Name>ConditionCredential</Option Name><Normal> = name</Normal><br/>
 <Option Name>ConditionEnvironment</Option Name><Normal> = SOME_ENVIRONMENT_VARIABLE=some_value</Normal><br/>
 <Option Name>ConditionSecurity</Option Name><Normal> = </Normal><Prefix>| !</Prefix><Normal> </Normal><Constant>selinux</Constant><br/>
 <Option Name>ConditionCapability</Option Name><Normal> = </Normal><Prefix>!</Prefix><Constant>CAP_NET_ADMIN</Constant><br/>
@@ -470,8 +462,9 @@
 <Option Name>ConditionUser</Option Name><Normal> = </Normal><Prefix>|</Prefix><Constant>@system</Constant><br/>
 <Option Name>ConditionGroup</Option Name><Normal> = </Normal><Prefix>|</Prefix><Normal>groupname</Normal><br/>
 <Option Name>ConditionControlGroupController</Option Name><Normal> = </Normal><Constant>memory</Constant><br/>
-<Option Name>ConditionMemory</Option Name><Normal> = </Normal><Prefix>| </Prefix><Normal>>= </Normal><Number>1500000</Number><br/>
+<Option Name>ConditionMemory</Option Name><Normal> = </Normal><Prefix>| </Prefix><Normal>>= </Normal><Number>1</Number><Measurement Unit>G</Measurement Unit><br/>
 <Option Name>ConditionCPUs</Option Name><Normal> = </Normal><Prefix>| </Prefix><Normal>< </Normal><Number>8</Number><br/>
+<Option Name>ConditionCPUFeature</Option Name><Normal> = </Normal><Prefix>| </Prefix><Constant>sse2</Constant><br/>
 <Option Name>ConditionOSRelease</Option Name><Normal> = ID=some-id</Normal><br/>
 <Option Name>ConditionMemoryPressure</Option Name><Normal> = </Normal><Number>20</Number><Normal>%</Normal><Separator>/</Separator><Threshold Time Span>5min</Threshold Time Span><br/>
 <Option Name>ConditionCPUPressure</Option Name><Normal> = </Normal><Number>12</Number><Normal>%</Normal><Separator>/</Separator><Threshold Time Span>10sec</Threshold Time Span><br/>
@@ -481,6 +474,7 @@
 <Option Name>AssertHost</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>shodan</Normal><Wildcard>*</Wildcard><br/>
 <Option Name>AssertKernelCommandLine</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>kernel_option</Normal><br/>
 <Option Name>AssertKernelVersion</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>>=5.3</Normal><br/>
+<Option Name>AssertCredential</Option Name><Normal> = name</Normal><br/>
 <Option Name>AssertEnvironment</Option Name><Normal> = SOME_ENVIRONMENT_VARIABLE=some_value</Normal><br/>
 <Option Name>AssertSecurity</Option Name><Normal> = </Normal><Prefix>| !</Prefix><Normal> </Normal><Constant>selinux</Constant><br/>
 <Option Name>AssertCapability</Option Name><Normal> = </Normal><Prefix>!</Prefix><Constant>CAP_NET_ADMIN</Constant><br/>
@@ -500,6 +494,7 @@
 <Option Name>AssertUser</Option Name><Normal> = </Normal><Prefix>|</Prefix><Constant>@system</Constant><br/>
 <Option Name>AssertGroup</Option Name><Normal> = </Normal><Prefix>|</Prefix><Normal>groupname</Normal><br/>
 <Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>memory</Constant><br/>
+<Option Name>AssertCPUFeature</Option Name><Normal> = </Normal><Prefix>| </Prefix><Constant>sse4_2</Constant><br/>
 <Option Name>AssertOSRelease</Option Name><Normal> = ID=some-id</Normal><br/>
 <Option Name>AssertMemoryPressure</Option Name><Normal> = </Normal><Number>20</Number><Normal>%</Normal><Separator>/</Separator><Threshold Time Span>5min</Threshold Time Span><br/>
 <Option Name>AssertCPUPressure</Option Name><Normal> = </Normal><Number>12</Number><Normal>%</Normal><Separator>/</Separator><Threshold Time Span>10sec</Threshold Time Span><br/>
@@ -509,6 +504,7 @@
 <Comment>###### invalid sections</Comment><br/>
 <Normal>[Device]</Normal><br/>
 <Normal>[Invalid]</Normal><br/>
+<Normal>[Slice]</Normal><br/>
 <Normal>[Target]</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
@@ -617,44 +613,61 @@
 <Normal></Normal><br/>
 <Comment>###### AC cardinal</Comment><br/>
 <Section Header>[Unit]</Section Header><br/>
-<Option Name>ConditionMemory</Option Name><Normal> = < </Normal><Number>123456789</Number><br/>
-<Option Name>ConditionMemory</Option Name><Normal> = <= </Normal><Number>123456789</Number><br/>
-<Option Name>ConditionMemory</Option Name><Normal> = = </Normal><Number>123456789</Number><br/>
-<Option Name>ConditionMemory</Option Name><Normal> = != </Normal><Number>123456789</Number><br/>
-<Option Name>ConditionMemory</Option Name><Normal> = >=</Normal><Number>123456789</Number><br/>
-<Option Name>ConditionMemory</Option Name><Normal> = > </Normal><Number>123456789</Number><br/>
-<Option Name>ConditionMemory</Option Name><Normal> = </Normal><Prefix>|</Prefix><Normal>< </Normal><Number>123456789</Number><br/>
-<Option Name>ConditionMemory</Option Name><Normal> = </Normal><Prefix>|</Prefix><Normal><= </Normal><Number>123456789</Number><br/>
-<Option Name>ConditionMemory</Option Name><Normal> = </Normal><Prefix>|</Prefix><Normal>= </Normal><Number>123456789</Number><br/>
-<Option Name>ConditionMemory</Option Name><Normal> = </Normal><Prefix>| </Prefix><Normal>!= </Normal><Number>123456789</Number><br/>
-<Option Name>ConditionMemory</Option Name><Normal> = </Normal><Prefix>| </Prefix><Normal>>=</Normal><Number>123456789</Number><br/>
-<Option Name>ConditionMemory</Option Name><Normal> = </Normal><Prefix>| </Prefix><Normal>> </Normal><Number>123456789</Number><br/>
+<Option Name>ConditionCPUs</Option Name><Normal> = < </Normal><Number>123456789</Number><br/>
+<Option Name>ConditionCPUs</Option Name><Normal> = <= </Normal><Number>123456789</Number><br/>
+<Option Name>ConditionCPUs</Option Name><Normal> = = </Normal><Number>123456789</Number><br/>
+<Option Name>ConditionCPUs</Option Name><Normal> = != </Normal><Number>123456789</Number><br/>
+<Option Name>ConditionCPUs</Option Name><Normal> = >=</Normal><Number>123456789</Number><br/>
+<Option Name>ConditionCPUs</Option Name><Normal> = > </Normal><Number>123456789</Number><br/>
+<Option Name>ConditionCPUs</Option Name><Normal> = </Normal><Prefix>|</Prefix><Normal>< </Normal><Number>123456789</Number><br/>
+<Option Name>ConditionCPUs</Option Name><Normal> = </Normal><Prefix>|</Prefix><Normal><= </Normal><Number>123456789</Number><br/>
+<Option Name>ConditionCPUs</Option Name><Normal> = </Normal><Prefix>|</Prefix><Normal>= </Normal><Number>123456789</Number><br/>
+<Option Name>ConditionCPUs</Option Name><Normal> = </Normal><Prefix>| </Prefix><Normal>!= </Normal><Number>123456789</Number><br/>
+<Option Name>ConditionCPUs</Option Name><Normal> = </Normal><Prefix>| </Prefix><Normal>>=</Normal><Number>123456789</Number><br/>
+<Option Name>ConditionCPUs</Option Name><Normal> = </Normal><Prefix>| </Prefix><Normal>> </Normal><Number>123456789</Number><br/>
 <Comment>## other options</Comment><br/>
 <Option Name>ConditionCPUs</Option Name><Normal> = > </Normal><Number>4</Number><br/>
 <Comment>## invalid values</Comment><br/>
-<Option Name>ConditionMemory</Option Name><Normal> = == </Normal><Number>123456789</Number><br/>
-<Option Name>ConditionMemory</Option Name><Normal> = >> </Normal><Number>123456789</Number><br/>
-<Option Name>ConditionMemory</Option Name><Normal> = = </Normal><Number>123456789</Number><Normal>.987</Normal><br/>
-<Option Name>ConditionMemory</Option Name><Normal> = </Normal><Prefix>|</Prefix><Normal>| = </Normal><Number>123456789</Number><Normal>.987</Normal><br/>
+<Option Name>ConditionCPUs</Option Name><Normal> = == </Normal><Number>123456789</Number><br/>
+<Option Name>ConditionCPUs</Option Name><Normal> = >> </Normal><Number>123456789</Number><br/>
+<Option Name>ConditionCPUs</Option Name><Normal> = = </Normal><Number>123456789</Number><Normal>.987</Normal><br/>
+<Option Name>ConditionCPUs</Option Name><Normal> = </Normal><Prefix>|</Prefix><Normal>| = </Normal><Number>123456789</Number><Normal>.987</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Comment>###### AC cardinal KMGT</Comment><br/>
+<Section Header>[Unit]</Section Header><br/>
+<Option Name>ConditionMemory</Option Name><Normal> = > </Normal><Number>123456789</Number><br/>
+<Option Name>ConditionMemory</Option Name><Normal> = </Normal><Prefix>|</Prefix><Normal>< </Normal><Number>123456789</Number><br/>
+<Option Name>ConditionMemory</Option Name><Normal> = </Normal><Prefix>|!</Prefix><Normal> >= </Normal><Number>1</Number><Measurement Unit>G</Measurement Unit><br/>
+<Option Name>ConditionMemory</Option Name><Normal> = </Normal><Prefix>| </Prefix><Normal>!= </Normal><Number>512</Number><Measurement Unit>K</Measurement Unit><br/>
+<Comment>## invalid values</Comment><br/>
+<Comment># no exabyte (yet)</Comment><br/>
+<Option Name>ConditionMemory</Option Name><Normal> = = </Normal><Number>1</Number><Normal>E</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Comment>###### AC cpu feature</Comment><br/>
+<Section Header>[Unit]</Section Header><br/>
+<Comment># see "cpu feature" for all possible values</Comment><br/>
+<Option Name>ConditionCPUFeature</Option Name><Normal> = </Normal><Prefix>|!</Prefix><Normal> </Normal><Constant>sse2</Constant><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### AC controller cg (assert/condition for control group controller)</Comment><br/>
 <Section Header>[Unit]</Section Header><br/>
-<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>blkio</Constant><br/>
-<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Prefix>| </Prefix><Constant>blkio</Constant><br/>
-<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Prefix>|!</Prefix><Normal> </Normal><Constant>blkio</Constant><br/>
-<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal> </Normal><Constant>blkio</Constant><br/>
+<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>cpu</Constant><br/>
+<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Prefix>| </Prefix><Constant>cpu</Constant><br/>
+<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Prefix>|!</Prefix><Normal> </Normal><Constant>cpu</Constant><br/>
+<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal> </Normal><Constant>cpu</Constant><br/>
 <Comment># other options</Comment><br/>
-<Option Name>ConditionControlGroupController</Option Name><Normal> = </Normal><Prefix>|!</Prefix><Normal> </Normal><Constant>blkio</Constant><br/>
+<Option Name>ConditionControlGroupController</Option Name><Normal> = </Normal><Prefix>|!</Prefix><Normal> </Normal><Constant>cpu</Constant><br/>
 <Comment>## invalid values</Comment><br/>
-<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>| </Normal><Constant>blkio</Constant><br/>
-<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Prefix>|</Prefix><Normal>| </Normal><Constant>blkio</Constant><br/>
-<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>! </Normal><Constant>blkio</Constant><br/>
+<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>| </Normal><Constant>cpu</Constant><br/>
+<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Prefix>|</Prefix><Normal>| </Normal><Constant>cpu</Constant><br/>
+<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>! </Normal><Constant>cpu</Constant><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
-<Comment>###### AC firmware type</Comment><br/>
+<Comment>###### AC firmware</Comment><br/>
 <Section Header>[Unit]</Section Header><br/>
-<Comment># see "firmware type" for all possible values</Comment><br/>
+<Comment># see "firmware" for all possible values</Comment><br/>
 <Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Prefix>|!</Prefix><Normal> </Normal><Constant>uefi</Constant><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
@@ -954,7 +967,6 @@
 <Option Name>FailureAction</Option Name><Normal> = invalid </Normal><Constant>exit</Constant><br/>
 <Comment># multiple values</Comment><br/>
 <Option Name>FailureAction</Option Name><Normal> = </Normal><Constant>none</Constant><Normal> exit</Normal><br/>
-<Option Name>FailureActionExitStatus</Option Name><Normal> = </Normal><Number>123</Number><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### architecture</Comment><br/>
@@ -1115,8 +1127,8 @@
 <Option Name>MemoryMin</Option Name><Normal> = </Normal><Number>12</Number><Measurement Unit>G</Measurement Unit><br/>
 <Option Name>MemoryMin</Option Name><Normal> = </Normal><Number>12</Number><Measurement Unit>T</Measurement Unit><br/>
 <Option Name>MemoryMin</Option Name><Normal> = </Normal><Number>12 </Number><Measurement Unit>G</Measurement Unit><br/>
-<Option Name>MemoryMin</Option Name><Normal> = </Normal><Constant>infinity</Constant><br/>
 <Option Name>MemoryMin</Option Name><Normal> = </Normal><Number>20</Number><Measurement Unit>%</Measurement Unit><br/>
+<Option Name>MemoryMin</Option Name><Normal> = </Normal><Constant>infinity</Constant><br/>
 <Comment>## invalid values</Comment><br/>
 <Option Name>MemoryMin</Option Name><Normal> = invalid</Normal><br/>
 <Comment># invalid bytes suffix</Comment><br/>
@@ -1124,6 +1136,25 @@
 <Option Name>MemoryMin</Option Name><Normal> = </Normal><Number>12</Number><Normal>H</Normal><br/>
 <Option Name>MemoryMin</Option Name><Normal> = </Normal><Number>12 </Number><Normal>E</Normal><br/>
 <Option Name>MemoryMin</Option Name><Normal> = </Normal><Number>12</Number><Normal>P</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Comment>###### cardinal KGMT</Comment><br/>
+<Section Header>[Socket]</Section Header><br/>
+<Option Name>PipeSize</Option Name><Normal> = </Normal><Number>123</Number><br/>
+<Option Name>PipeSize</Option Name><Normal> = </Normal><Number>12</Number><Measurement Unit>K</Measurement Unit><br/>
+<Option Name>PipeSize</Option Name><Normal> = </Normal><Number>12</Number><Measurement Unit>M</Measurement Unit><br/>
+<Option Name>PipeSize</Option Name><Normal> = </Normal><Number>12</Number><Measurement Unit>G</Measurement Unit><br/>
+<Option Name>PipeSize</Option Name><Normal> = </Normal><Number>12</Number><Measurement Unit>T</Measurement Unit><br/>
+<Option Name>PipeSize</Option Name><Normal> = </Normal><Number>12 </Number><Measurement Unit>G</Measurement Unit><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>PipeSize</Option Name><Normal> = invalid</Normal><br/>
+<Option Name>PipeSize</Option Name><Normal> = infinity</Normal><br/>
+<Comment># invalid bytes suffix</Comment><br/>
+<Option Name>PipeSize</Option Name><Normal> = </Normal><Number>12</Number><Normal>g</Normal><br/>
+<Option Name>PipeSize</Option Name><Normal> = </Normal><Number>12</Number><Normal>H</Normal><br/>
+<Option Name>PipeSize</Option Name><Normal> = </Normal><Number>12 </Number><Normal>E</Normal><br/>
+<Option Name>PipeSize</Option Name><Normal> = </Normal><Number>12</Number><Normal>P</Normal><br/>
+<Option Name>PipeSize</Option Name><Normal> = </Normal><Number>20</Number><Normal>%</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### cardinal KGMT infinity</Comment><br/>
@@ -1137,12 +1168,12 @@
 <Option Name>MemorySwapMax</Option Name><Normal> = </Normal><Constant>infinity</Constant><br/>
 <Comment>## invalid values</Comment><br/>
 <Option Name>MemorySwapMax</Option Name><Normal> = invalid</Normal><br/>
-<Option Name>MemorySwapMax</Option Name><Normal> = </Normal><Number>20</Number><Normal>%</Normal><br/>
 <Comment># invalid bytes suffix</Comment><br/>
 <Option Name>MemorySwapMax</Option Name><Normal> = </Normal><Number>12</Number><Normal>g</Normal><br/>
 <Option Name>MemorySwapMax</Option Name><Normal> = </Normal><Number>12</Number><Normal>H</Normal><br/>
 <Option Name>MemorySwapMax</Option Name><Normal> = </Normal><Number>12 </Number><Normal>E</Normal><br/>
 <Option Name>MemorySwapMax</Option Name><Normal> = </Normal><Number>12</Number><Normal>P</Normal><br/>
+<Option Name>MemorySwapMax</Option Name><Normal> = </Normal><Number>20</Number><Normal>%</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### collect mode</Comment><br/>
@@ -1180,17 +1211,19 @@
 <Normal></Normal><br/>
 <Comment>###### controller cg (control group controller)</Comment><br/>
 <Section Header>[Unit]</Section Header><br/>
-<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>blkio</Constant><br/>
 <Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>cpu</Constant><br/>
-<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>cpuacct</Constant><br/>
-<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>devices</Constant><br/>
+<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>cpuset</Constant><br/>
 <Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>io</Constant><br/>
 <Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>memory</Constant><br/>
-<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>v1</Constant><br/>
-<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>v2</Constant><br/>
+<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>pids</Constant><br/>
 <Comment>## invalid values</Comment><br/>
 <Option Name>AssertControlGroupController</Option Name><Normal> = invalid</Normal><br/>
-<Option Name>AssertControlGroupController</Option Name><Normal> = bpf-firewall</Normal><br/>
+<Comment># removed as of v252</Comment><br/>
+<Option Name>AssertControlGroupController</Option Name><Normal> = blkio</Normal><br/>
+<Option Name>AssertControlGroupController</Option Name><Normal> = cpuacct</Normal><br/>
+<Option Name>AssertControlGroupController</Option Name><Normal> = devices</Normal><br/>
+<Option Name>AssertControlGroupController</Option Name><Normal> = v1</Normal><br/>
+<Option Name>AssertControlGroupController</Option Name><Normal> = v2</Normal><br/>
 <Comment># multiple values</Comment><br/>
 <Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>cpu</Constant><Normal> memory</Normal><br/>
 <Normal></Normal><br/>
@@ -1334,9 +1367,31 @@
 <Option Name>CPUSchedulingPriority</Option Name><Normal> = </Normal><Number>12</Number><Normal> 34</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
+<Comment>###### cpu weight</Comment><br/>
+<Section Header>[Service]</Section Header><br/>
+<Option Name>CPUWeight</Option Name><Normal> = </Normal><Constant>idle</Constant><br/>
+<Comment># integer 1..10000</Comment><br/>
+<Option Name>CPUWeight</Option Name><Normal> = </Normal><Number>1</Number><br/>
+<Option Name>CPUWeight</Option Name><Normal> = </Normal><Number>12</Number><br/>
+<Option Name>CPUWeight</Option Name><Normal> = </Normal><Number>123</Number><br/>
+<Option Name>CPUWeight</Option Name><Normal> = </Normal><Number>1234</Number><br/>
+<Option Name>CPUWeight</Option Name><Normal> = </Normal><Number>1234</Number><br/>
+<Option Name>CPUWeight</Option Name><Normal> = </Normal><Number>10000</Number><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>CPUWeight</Option Name><Normal> = -</Normal><Number>1</Number><br/>
+<Option Name>CPUWeight</Option Name><Normal> = 0</Normal><br/>
+<Option Name>CPUWeight</Option Name><Normal> = 1000</Normal><Number>1</Number><br/>
+<Option Name>CPUWeight</Option Name><Normal> = 1</Normal><Number>2345</Number><br/>
+<Option Name>CPUWeight</Option Name><Normal> = 12.</Normal><Number>3</Number><br/>
+<Option Name>CPUWeight</Option Name><Normal> = invalid</Normal><br/>
+<Comment># multiple values</Comment><br/>
+<Option Name>CPUWeight</Option Name><Normal> = 1 </Normal><Number>10000</Number><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
 <Comment>###### delegate</Comment><br/>
 <Section Header>[Service]</Section Header><br/>
 <Comment># single boolean</Comment><br/>
+<Option Name>Delegate</Option Name><Normal> = </Normal><Constant>false</Constant><br/>
 <Option Name>Delegate</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
 <Comment># single controller</Comment><br/>
 <Option Name>Delegate</Option Name><Normal> = </Normal><Constant>blkio</Constant><br/>
@@ -1542,18 +1597,21 @@
 <Option Name>DirectoryMode</Option Name><Normal> = </Normal><File Mode>0755</File Mode><Normal> 0755</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
-<Comment>###### firmware type</Comment><br/>
+<Comment>###### firmware</Comment><br/>
 <Section Header>[Unit]</Section Header><br/>
 <Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Constant>uefi</Constant><br/>
 <Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Constant>device-tree</Constant><br/>
 <Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Constant>device-tree-compatible</Constant><Normal>(some-device-tree)</Normal><br/>
 <Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Constant>device-tree-compatible</Constant><Normal>(  some-device-tree )</Normal><br/>
+<Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Constant>smbios-field</Constant><Normal>(board_name = "Custom Board")</Normal><br/>
 <Comment>## invalid values</Comment><br/>
 <Option Name>ConditionFirmware</Option Name><Normal> = invalid</Normal><br/>
 <Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Constant>device-tree</Constant><Normal>-invalid</Normal><br/>
 <Comment># missing argument</Comment><br/>
 <Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Constant>device-tree</Constant><Normal>-compatible</Normal><br/>
 <Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Constant>device-tree</Constant><Normal>-compatible()</Normal><br/>
+<Option Name>ConditionFirmware</Option Name><Normal> = smbios-field</Normal><br/>
+<Option Name>ConditionFirmware</Option Name><Normal> = smbios-field()</Normal><br/>
 <Comment># multiple values</Comment><br/>
 <Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Constant>uefi</Constant><Normal> device-tree</Normal><br/>
 <Normal></Normal><br/>
@@ -1625,6 +1683,7 @@
 <Normal></Normal><br/>
 <Comment>###### group and user</Comment><br/>
 <Section Header>[Service]</Section Header><br/>
+<Option Name>User</Option Name><Normal> = </Normal><Number>0</Number><br/>
 <Option Name>User</Option Name><Normal> = </Normal><Number>1000</Number><br/>
 <Option Name>Group</Option Name><Normal> = </Normal><Number>100</Number><br/>
 <Option Name>User</Option Name><Normal> = some-name</Normal><br/>
@@ -2040,7 +2099,7 @@
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### percent</Comment><br/>
-<Section Header>[Slice]</Section Header><br/>
+<Normal>[Slice]</Normal><br/>
 <Option Name>CPUQuota</Option Name><Normal> = </Normal><Number>0.1</Number><Measurement Unit>%</Measurement Unit><br/>
 <Option Name>CPUQuota</Option Name><Normal> = </Normal><Number>12</Number><Normal> </Normal><Measurement Unit>%</Measurement Unit><br/>
 <Option Name>CPUQuota</Option Name><Normal> = </Normal><Number>123.4</Number><Measurement Unit>%</Measurement Unit><br/>
@@ -2498,26 +2557,33 @@
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>2</Number><Measurement Unit>sec</Measurement Unit><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>12 </Number><Measurement Unit>second</Measurement Unit><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>1 </Number><Measurement Unit>seconds</Measurement Unit><br/>
+<Comment># minute</Comment><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>342 </Number><Measurement Unit>m</Measurement Unit><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>2</Number><Measurement Unit>min</Measurement Unit><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>7 </Number><Measurement Unit>minute</Measurement Unit><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>1 </Number><Measurement Unit>minutes</Measurement Unit><br/>
+<Comment># hour</Comment><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>2 </Number><Measurement Unit>h</Measurement Unit><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>48   </Number><Measurement Unit>hr</Measurement Unit><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>2</Number><Measurement Unit>hour</Measurement Unit><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>2</Number><Measurement Unit>hours</Measurement Unit><br/>
+<Comment># day</Comment><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>2 </Number><Measurement Unit>d</Measurement Unit><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>1 </Number><Measurement Unit>day</Measurement Unit><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>7  </Number><Measurement Unit>days</Measurement Unit><br/>
+<Comment># week</Comment><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>2 </Number><Measurement Unit>w</Measurement Unit><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>123 </Number><Measurement Unit>week</Measurement Unit><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>0 </Number><Measurement Unit>weeks</Measurement Unit><br/>
+<Comment># month</Comment><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>12 </Number><Measurement Unit>M</Measurement Unit><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>7 </Number><Measurement Unit>month</Measurement Unit><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>1 </Number><Measurement Unit>months</Measurement Unit><br/>
+<Comment># year</Comment><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>1</Number><Measurement Unit>y</Measurement Unit><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>123</Number><Measurement Unit>year</Measurement Unit><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>12 </Number><Measurement Unit>years</Measurement Unit><br/>
+<Comment># combined</Comment><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>55</Number><Measurement Unit>s</Measurement Unit><Number>500</Number><Measurement Unit>ms</Measurement Unit><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>300</Number><Measurement Unit>ms</Measurement Unit><Number>20</Number><Measurement Unit>s</Measurement Unit><Normal> </Normal><Number>5</Number><Measurement Unit>day</Measurement Unit><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>123 5 </Number><Measurement Unit>days</Measurement Unit><Normal> </Normal><Number>1</Number><Measurement Unit>m</Measurement Unit><Normal> </Normal><Number>12 1</Number><Measurement Unit>sec</Measurement Unit><Normal> </Normal><Number>123 </Number><Continuation>\</Continuation><br/>
@@ -2712,23 +2778,23 @@
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### weight</Comment><br/>
-<Section Header>[Slice]</Section Header><br/>
+<Section Header>[Service]</Section Header><br/>
 <Comment># integer 1..10000</Comment><br/>
-<Option Name>CPUWeight</Option Name><Normal> = </Normal><Number>1</Number><br/>
-<Option Name>CPUWeight</Option Name><Normal> = </Normal><Number>12</Number><br/>
-<Option Name>CPUWeight</Option Name><Normal> = </Normal><Number>123</Number><br/>
-<Option Name>CPUWeight</Option Name><Normal> = </Normal><Number>1234</Number><br/>
-<Option Name>CPUWeight</Option Name><Normal> = </Normal><Number>1234</Number><br/>
-<Option Name>CPUWeight</Option Name><Normal> = </Normal><Number>10000</Number><br/>
+<Option Name>IOWeight</Option Name><Normal> = </Normal><Number>1</Number><br/>
+<Option Name>IOWeight</Option Name><Normal> = </Normal><Number>12</Number><br/>
+<Option Name>IOWeight</Option Name><Normal> = </Normal><Number>123</Number><br/>
+<Option Name>IOWeight</Option Name><Normal> = </Normal><Number>1234</Number><br/>
+<Option Name>IOWeight</Option Name><Normal> = </Normal><Number>1234</Number><br/>
+<Option Name>IOWeight</Option Name><Normal> = </Normal><Number>10000</Number><br/>
 <Comment>## invalid values</Comment><br/>
-<Option Name>CPUWeight</Option Name><Normal> = -</Normal><Number>1</Number><br/>
-<Option Name>CPUWeight</Option Name><Normal> = 0</Normal><br/>
-<Option Name>CPUWeight</Option Name><Normal> = 1000</Normal><Number>1</Number><br/>
-<Option Name>CPUWeight</Option Name><Normal> = 1</Normal><Number>2345</Number><br/>
-<Option Name>CPUWeight</Option Name><Normal> = 12.</Normal><Number>3</Number><br/>
-<Option Name>CPUWeight</Option Name><Normal> = invalid</Normal><br/>
+<Option Name>IOWeight</Option Name><Normal> = -</Normal><Number>1</Number><br/>
+<Option Name>IOWeight</Option Name><Normal> = 0</Normal><br/>
+<Option Name>IOWeight</Option Name><Normal> = 1000</Normal><Number>1</Number><br/>
+<Option Name>IOWeight</Option Name><Normal> = 1</Normal><Number>2345</Number><br/>
+<Option Name>IOWeight</Option Name><Normal> = 12.</Normal><Number>3</Number><br/>
+<Option Name>IOWeight</Option Name><Normal> = invalid</Normal><br/>
 <Comment># multiple values</Comment><br/>
-<Option Name>CPUWeight</Option Name><Normal> = 1 </Normal><Number>10000</Number><br/>
+<Option Name>IOWeight</Option Name><Normal> = 1 </Normal><Number>10000</Number><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### working directory</Comment><br/>

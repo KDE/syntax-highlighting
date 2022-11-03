@@ -35,7 +35,7 @@ TimeoutSec = 5 m 20 s
 
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Path]</beginfold id='1'>
 PathExists = /some/absolute/path
-PathExistsGlob = /some/glob*
+PathExistsGlob = /some/g[lo]b*
 PathChanged = /some/absolute/path
 PathModified = /some/absolute/path
 DirectoryNotEmpty = /some/absolute/path
@@ -306,15 +306,6 @@ BPFProgram = bind6:/sys/fs/bpf/sock-addr-hook
 RestrictNetworkInterfaces = ~eth1 eth2
 
 
-<endfold id='1'></endfold id='1'><beginfold id='1'>[Slice]</beginfold id='1'>
-CPUAccounting = yes
-CPUWeight = 1234
-StartupCPUWeight = 321
-CPUQuota = 123.4%
-CPUQuotaPeriodSec = 1s 23ms 45us
-MemoryAccounting = no
-
-
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Socket]</beginfold id='1'>
 ListenStream = 0.0.0.0:4000
 ListenDatagram = /path/to/socket
@@ -451,6 +442,7 @@ ConditionVirtualization = |vmware
 ConditionHost = !shodan*
 ConditionKernelCommandLine = !kernel_option
 ConditionKernelVersion = | >= 4.*
+ConditionCredential = name
 ConditionEnvironment = SOME_ENVIRONMENT_VARIABLE=some_value
 ConditionSecurity = | ! selinux
 ConditionCapability = !CAP_NET_ADMIN
@@ -470,8 +462,9 @@ ConditionFileIsExecutable = !/some/path
 ConditionUser = |@system
 ConditionGroup = |groupname
 ConditionControlGroupController = memory
-ConditionMemory = | >= 1500000
+ConditionMemory = | >= 1G
 ConditionCPUs = | < 8
+ConditionCPUFeature = | sse2
 ConditionOSRelease = ID=some-id
 ConditionMemoryPressure = 20%/5min
 ConditionCPUPressure = 12%/10sec
@@ -481,6 +474,7 @@ AssertVirtualization = |vmware
 AssertHost = !shodan*
 AssertKernelCommandLine = !kernel_option
 AssertKernelVersion = !>=5.3
+AssertCredential = name
 AssertEnvironment = SOME_ENVIRONMENT_VARIABLE=some_value
 AssertSecurity = | ! selinux
 AssertCapability = !CAP_NET_ADMIN
@@ -500,6 +494,7 @@ AssertFileIsExecutable = !/some/path
 AssertUser = |@system
 AssertGroup = |groupname
 AssertControlGroupController = memory
+AssertCPUFeature = | sse4_2
 AssertOSRelease = ID=some-id
 AssertMemoryPressure = 20%/5min
 AssertCPUPressure = 12%/10sec
@@ -509,6 +504,7 @@ AssertIOPressure = 30% / 1min
 ###### invalid sections
 [Device]
 [Invalid]
+[Slice]
 [Target]
 
 
@@ -617,44 +613,61 @@ AssertCapability = !! CAP_CHOWN
 
 ###### AC cardinal
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Unit]</beginfold id='1'>
-ConditionMemory = < 123456789
-ConditionMemory = <= 123456789
-ConditionMemory = = 123456789
-ConditionMemory = != 123456789
-ConditionMemory = >=123456789
-ConditionMemory = > 123456789
-ConditionMemory = |< 123456789
-ConditionMemory = |<= 123456789
-ConditionMemory = |= 123456789
-ConditionMemory = | != 123456789
-ConditionMemory = | >=123456789
-ConditionMemory = | > 123456789
+ConditionCPUs = < 123456789
+ConditionCPUs = <= 123456789
+ConditionCPUs = = 123456789
+ConditionCPUs = != 123456789
+ConditionCPUs = >=123456789
+ConditionCPUs = > 123456789
+ConditionCPUs = |< 123456789
+ConditionCPUs = |<= 123456789
+ConditionCPUs = |= 123456789
+ConditionCPUs = | != 123456789
+ConditionCPUs = | >=123456789
+ConditionCPUs = | > 123456789
 ## other options
 ConditionCPUs = > 4
 ## invalid values
-ConditionMemory = == 123456789
-ConditionMemory = >> 123456789
-ConditionMemory = = 123456789.987
-ConditionMemory = || = 123456789.987
+ConditionCPUs = == 123456789
+ConditionCPUs = >> 123456789
+ConditionCPUs = = 123456789.987
+ConditionCPUs = || = 123456789.987
+
+
+###### AC cardinal KMGT
+<endfold id='1'></endfold id='1'><beginfold id='1'>[Unit]</beginfold id='1'>
+ConditionMemory = > 123456789
+ConditionMemory = |< 123456789
+ConditionMemory = |! >= 1G
+ConditionMemory = | != 512K
+## invalid values
+# no exabyte (yet)
+ConditionMemory = = 1E
+
+
+###### AC cpu feature
+<endfold id='1'></endfold id='1'><beginfold id='1'>[Unit]</beginfold id='1'>
+# see "cpu feature" for all possible values
+ConditionCPUFeature = |! sse2
 
 
 ###### AC controller cg (assert/condition for control group controller)
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Unit]</beginfold id='1'>
-AssertControlGroupController = blkio
-AssertControlGroupController = | blkio
-AssertControlGroupController = |! blkio
-AssertControlGroupController = ! blkio
+AssertControlGroupController = cpu
+AssertControlGroupController = | cpu
+AssertControlGroupController = |! cpu
+AssertControlGroupController = ! cpu
 # other options
-ConditionControlGroupController = |! blkio
+ConditionControlGroupController = |! cpu
 ## invalid values
-AssertControlGroupController = !| blkio
-AssertControlGroupController = || blkio
-AssertControlGroupController = !! blkio
+AssertControlGroupController = !| cpu
+AssertControlGroupController = || cpu
+AssertControlGroupController = !! cpu
 
 
-###### AC firmware type
+###### AC firmware
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Unit]</beginfold id='1'>
-# see "firmware type" for all possible values
+# see "firmware" for all possible values
 ConditionFirmware = |! uefi
 
 
@@ -954,7 +967,6 @@ FailureAction = invalid
 FailureAction = invalid exit
 # multiple values
 FailureAction = none exit
-FailureActionExitStatus = 123
 
 
 ###### architecture
@@ -1115,8 +1127,8 @@ MemoryMin = 12M
 MemoryMin = 12G
 MemoryMin = 12T
 MemoryMin = 12 G
-MemoryMin = infinity
 MemoryMin = 20%
+MemoryMin = infinity
 ## invalid values
 MemoryMin = invalid
 # invalid bytes suffix
@@ -1124,6 +1136,25 @@ MemoryMin = 12g
 MemoryMin = 12H
 MemoryMin = 12 E
 MemoryMin = 12P
+
+
+###### cardinal KGMT
+<endfold id='1'></endfold id='1'><beginfold id='1'>[Socket]</beginfold id='1'>
+PipeSize = 123
+PipeSize = 12K
+PipeSize = 12M
+PipeSize = 12G
+PipeSize = 12T
+PipeSize = 12 G
+## invalid values
+PipeSize = invalid
+PipeSize = infinity
+# invalid bytes suffix
+PipeSize = 12g
+PipeSize = 12H
+PipeSize = 12 E
+PipeSize = 12P
+PipeSize = 20%
 
 
 ###### cardinal KGMT infinity
@@ -1137,12 +1168,12 @@ MemorySwapMax = 12 G
 MemorySwapMax = infinity
 ## invalid values
 MemorySwapMax = invalid
-MemorySwapMax = 20%
 # invalid bytes suffix
 MemorySwapMax = 12g
 MemorySwapMax = 12H
 MemorySwapMax = 12 E
 MemorySwapMax = 12P
+MemorySwapMax = 20%
 
 
 ###### collect mode
@@ -1180,17 +1211,19 @@ ConditionUser = name1 name2
 
 ###### controller cg (control group controller)
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Unit]</beginfold id='1'>
-AssertControlGroupController = blkio
 AssertControlGroupController = cpu
-AssertControlGroupController = cpuacct
-AssertControlGroupController = devices
+AssertControlGroupController = cpuset
 AssertControlGroupController = io
 AssertControlGroupController = memory
-AssertControlGroupController = v1
-AssertControlGroupController = v2
+AssertControlGroupController = pids
 ## invalid values
 AssertControlGroupController = invalid
-AssertControlGroupController = bpf-firewall
+# removed as of v252
+AssertControlGroupController = blkio
+AssertControlGroupController = cpuacct
+AssertControlGroupController = devices
+AssertControlGroupController = v1
+AssertControlGroupController = v2
 # multiple values
 AssertControlGroupController = cpu memory
 
@@ -1334,9 +1367,31 @@ CPUSchedulingPriority = 100
 CPUSchedulingPriority = 12 34
 
 
+###### cpu weight
+<endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
+CPUWeight = idle
+# integer 1..10000
+CPUWeight = 1
+CPUWeight = 12
+CPUWeight = 123
+CPUWeight = 1234
+CPUWeight = 1234
+CPUWeight = 10000
+## invalid values
+CPUWeight = -1
+CPUWeight = 0
+CPUWeight = 10001
+CPUWeight = 12345
+CPUWeight = 12.3
+CPUWeight = invalid
+# multiple values
+CPUWeight = 1 10000
+
+
 ###### delegate
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
 # single boolean
+Delegate = false
 Delegate = true
 # single controller
 Delegate = blkio
@@ -1542,18 +1597,21 @@ DirectoryMode = 07
 DirectoryMode = 0755 0755
 
 
-###### firmware type
+###### firmware
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Unit]</beginfold id='1'>
 ConditionFirmware = uefi
 ConditionFirmware = device-tree
 ConditionFirmware = device-tree-compatible(some-device-tree)
 ConditionFirmware = device-tree-compatible(  some-device-tree )
+ConditionFirmware = smbios-field(board_name = "Custom Board")
 ## invalid values
 ConditionFirmware = invalid
 ConditionFirmware = device-tree-invalid
 # missing argument
 ConditionFirmware = device-tree-compatible
 ConditionFirmware = device-tree-compatible()
+ConditionFirmware = smbios-field
+ConditionFirmware = smbios-field()
 # multiple values
 ConditionFirmware = uefi device-tree
 
@@ -1625,6 +1683,7 @@ RestrictFileSystems = @auxiliary-api btrfs \
 
 ###### group and user
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
+User = 0
 User = 1000
 Group = 100
 User = some-name
@@ -2040,7 +2099,7 @@ OOMScoreAdjust = 1001
 
 
 ###### percent
-<endfold id='1'></endfold id='1'><beginfold id='1'>[Slice]</beginfold id='1'>
+[Slice]
 CPUQuota = 0.1%
 CPUQuota = 12 %
 CPUQuota = 123.4%
@@ -2498,26 +2557,33 @@ OnBootSec = 74 s
 OnBootSec = 2sec
 OnBootSec = 12 second
 OnBootSec = 1 seconds
+# minute
 OnBootSec = 342 m
 OnBootSec = 2min
 OnBootSec = 7 minute
 OnBootSec = 1 minutes
+# hour
 OnBootSec = 2 h
 OnBootSec = 48   hr
 OnBootSec = 2hour
 OnBootSec = 2hours
+# day
 OnBootSec = 2 d
 OnBootSec = 1 day
 OnBootSec = 7  days
+# week
 OnBootSec = 2 w
 OnBootSec = 123 week
 OnBootSec = 0 weeks
+# month
 OnBootSec = 12 M
 OnBootSec = 7 month
 OnBootSec = 1 months
+# year
 OnBootSec = 1y
 OnBootSec = 123year
 OnBootSec = 12 years
+# combined
 OnBootSec = 55s500ms
 OnBootSec = 300ms20s 5day
 OnBootSec = 123 5 days 1m 12 1sec 123 \
@@ -2712,23 +2778,23 @@ ConditionVirtualization = xen vmware
 
 
 ###### weight
-<endfold id='1'></endfold id='1'><beginfold id='1'>[Slice]</beginfold id='1'>
+<endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
 # integer 1..10000
-CPUWeight = 1
-CPUWeight = 12
-CPUWeight = 123
-CPUWeight = 1234
-CPUWeight = 1234
-CPUWeight = 10000
+IOWeight = 1
+IOWeight = 12
+IOWeight = 123
+IOWeight = 1234
+IOWeight = 1234
+IOWeight = 10000
 ## invalid values
-CPUWeight = -1
-CPUWeight = 0
-CPUWeight = 10001
-CPUWeight = 12345
-CPUWeight = 12.3
-CPUWeight = invalid
+IOWeight = -1
+IOWeight = 0
+IOWeight = 10001
+IOWeight = 12345
+IOWeight = 12.3
+IOWeight = invalid
 # multiple values
-CPUWeight = 1 10000
+IOWeight = 1 10000
 
 
 ###### working directory

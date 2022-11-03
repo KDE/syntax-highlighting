@@ -41,7 +41,7 @@
 
 <span style="font-weight:bold;">[Path]</span>
 <span style="color:#2980b9;">PathExists</span> = /some/absolute/path
-<span style="color:#2980b9;">PathExistsGlob</span> = /some/glob*
+<span style="color:#2980b9;">PathExistsGlob</span> = /some/g<span style="color:#3daee9;">[lo]</span>b<span style="color:#3daee9;">*</span>
 <span style="color:#2980b9;">PathChanged</span> = /some/absolute/path
 <span style="color:#2980b9;">PathModified</span> = /some/absolute/path
 <span style="color:#2980b9;">DirectoryNotEmpty</span> = /some/absolute/path
@@ -312,15 +312,6 @@
 <span style="color:#2980b9;">RestrictNetworkInterfaces</span> = <span style="color:#da4453;">~</span>eth1 eth2
 
 
-<span style="font-weight:bold;">[Slice]</span>
-<span style="color:#2980b9;">CPUAccounting</span> = <span style="color:#27aeae;font-weight:bold;">yes</span>
-<span style="color:#2980b9;">CPUWeight</span> = <span style="color:#f67400;">1234</span>
-<span style="color:#2980b9;">StartupCPUWeight</span> = <span style="color:#f67400;">321</span>
-<span style="color:#2980b9;">CPUQuota</span> = <span style="color:#f67400;">123.4</span><span style="font-style:italic;">%</span>
-<span style="color:#2980b9;">CPUQuotaPeriodSec</span> = <span style="color:#f67400;">1</span><span style="font-style:italic;">s</span> <span style="color:#f67400;">23</span><span style="font-style:italic;">ms</span> <span style="color:#f67400;">45</span><span style="font-style:italic;">us</span>
-<span style="color:#2980b9;">MemoryAccounting</span> = <span style="color:#27aeae;font-weight:bold;">no</span>
-
-
 <span style="font-weight:bold;">[Socket]</span>
 <span style="color:#2980b9;">ListenStream</span> = 0.0.0.0:4000
 <span style="color:#2980b9;">ListenDatagram</span> = /path/to/socket
@@ -457,6 +448,7 @@
 <span style="color:#2980b9;">ConditionHost</span> = <span style="color:#da4453;">!</span>shodan<span style="color:#3daee9;">*</span>
 <span style="color:#2980b9;">ConditionKernelCommandLine</span> = <span style="color:#da4453;">!</span>kernel_option
 <span style="color:#2980b9;">ConditionKernelVersion</span> = <span style="color:#da4453;">| </span>&gt;= 4.<span style="color:#3daee9;">*</span>
+<span style="color:#2980b9;">ConditionCredential</span> = name
 <span style="color:#2980b9;">ConditionEnvironment</span> = SOME_ENVIRONMENT_VARIABLE=some_value
 <span style="color:#2980b9;">ConditionSecurity</span> = <span style="color:#da4453;">| !</span> <span style="color:#27aeae;font-weight:bold;">selinux</span>
 <span style="color:#2980b9;">ConditionCapability</span> = <span style="color:#da4453;">!</span><span style="color:#27aeae;font-weight:bold;">CAP_NET_ADMIN</span>
@@ -476,8 +468,9 @@
 <span style="color:#2980b9;">ConditionUser</span> = <span style="color:#da4453;">|</span><span style="color:#27aeae;font-weight:bold;">@system</span>
 <span style="color:#2980b9;">ConditionGroup</span> = <span style="color:#da4453;">|</span>groupname
 <span style="color:#2980b9;">ConditionControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">memory</span>
-<span style="color:#2980b9;">ConditionMemory</span> = <span style="color:#da4453;">| </span>&gt;= <span style="color:#f67400;">1500000</span>
+<span style="color:#2980b9;">ConditionMemory</span> = <span style="color:#da4453;">| </span>&gt;= <span style="color:#f67400;">1</span><span style="font-style:italic;">G</span>
 <span style="color:#2980b9;">ConditionCPUs</span> = <span style="color:#da4453;">| </span>&lt; <span style="color:#f67400;">8</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#da4453;">| </span><span style="color:#27aeae;font-weight:bold;">sse2</span>
 <span style="color:#2980b9;">ConditionOSRelease</span> = ID=some-id
 <span style="color:#2980b9;">ConditionMemoryPressure</span> = <span style="color:#f67400;">20</span>%<span style="color:#da4453;">/</span><span style="color:#27aeae;font-weight:bold;font-style:italic;">5min</span>
 <span style="color:#2980b9;">ConditionCPUPressure</span> = <span style="color:#f67400;">12</span>%<span style="color:#da4453;">/</span><span style="color:#27aeae;font-weight:bold;font-style:italic;">10sec</span>
@@ -487,6 +480,7 @@
 <span style="color:#2980b9;">AssertHost</span> = <span style="color:#da4453;">!</span>shodan<span style="color:#3daee9;">*</span>
 <span style="color:#2980b9;">AssertKernelCommandLine</span> = <span style="color:#da4453;">!</span>kernel_option
 <span style="color:#2980b9;">AssertKernelVersion</span> = <span style="color:#da4453;">!</span>&gt;=5.3
+<span style="color:#2980b9;">AssertCredential</span> = name
 <span style="color:#2980b9;">AssertEnvironment</span> = SOME_ENVIRONMENT_VARIABLE=some_value
 <span style="color:#2980b9;">AssertSecurity</span> = <span style="color:#da4453;">| !</span> <span style="color:#27aeae;font-weight:bold;">selinux</span>
 <span style="color:#2980b9;">AssertCapability</span> = <span style="color:#da4453;">!</span><span style="color:#27aeae;font-weight:bold;">CAP_NET_ADMIN</span>
@@ -506,6 +500,7 @@
 <span style="color:#2980b9;">AssertUser</span> = <span style="color:#da4453;">|</span><span style="color:#27aeae;font-weight:bold;">@system</span>
 <span style="color:#2980b9;">AssertGroup</span> = <span style="color:#da4453;">|</span>groupname
 <span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">memory</span>
+<span style="color:#2980b9;">AssertCPUFeature</span> = <span style="color:#da4453;">| </span><span style="color:#27aeae;font-weight:bold;">sse4_2</span>
 <span style="color:#2980b9;">AssertOSRelease</span> = ID=some-id
 <span style="color:#2980b9;">AssertMemoryPressure</span> = <span style="color:#f67400;">20</span>%<span style="color:#da4453;">/</span><span style="color:#27aeae;font-weight:bold;font-style:italic;">5min</span>
 <span style="color:#2980b9;">AssertCPUPressure</span> = <span style="color:#f67400;">12</span>%<span style="color:#da4453;">/</span><span style="color:#27aeae;font-weight:bold;font-style:italic;">10sec</span>
@@ -515,6 +510,7 @@
 <span style="color:#7a7c7d;">###### invalid sections</span>
 [Device]
 [Invalid]
+[Slice]
 [Target]
 
 
@@ -623,44 +619,61 @@ WantedBy = some.service some.socket
 
 <span style="color:#7a7c7d;">###### AC cardinal</span>
 <span style="font-weight:bold;">[Unit]</span>
-<span style="color:#2980b9;">ConditionMemory</span> = &lt; <span style="color:#f67400;">123456789</span>
-<span style="color:#2980b9;">ConditionMemory</span> = &lt;= <span style="color:#f67400;">123456789</span>
-<span style="color:#2980b9;">ConditionMemory</span> = = <span style="color:#f67400;">123456789</span>
-<span style="color:#2980b9;">ConditionMemory</span> = != <span style="color:#f67400;">123456789</span>
-<span style="color:#2980b9;">ConditionMemory</span> = &gt;=<span style="color:#f67400;">123456789</span>
-<span style="color:#2980b9;">ConditionMemory</span> = &gt; <span style="color:#f67400;">123456789</span>
-<span style="color:#2980b9;">ConditionMemory</span> = <span style="color:#da4453;">|</span>&lt; <span style="color:#f67400;">123456789</span>
-<span style="color:#2980b9;">ConditionMemory</span> = <span style="color:#da4453;">|</span>&lt;= <span style="color:#f67400;">123456789</span>
-<span style="color:#2980b9;">ConditionMemory</span> = <span style="color:#da4453;">|</span>= <span style="color:#f67400;">123456789</span>
-<span style="color:#2980b9;">ConditionMemory</span> = <span style="color:#da4453;">| </span>!= <span style="color:#f67400;">123456789</span>
-<span style="color:#2980b9;">ConditionMemory</span> = <span style="color:#da4453;">| </span>&gt;=<span style="color:#f67400;">123456789</span>
-<span style="color:#2980b9;">ConditionMemory</span> = <span style="color:#da4453;">| </span>&gt; <span style="color:#f67400;">123456789</span>
+<span style="color:#2980b9;">ConditionCPUs</span> = &lt; <span style="color:#f67400;">123456789</span>
+<span style="color:#2980b9;">ConditionCPUs</span> = &lt;= <span style="color:#f67400;">123456789</span>
+<span style="color:#2980b9;">ConditionCPUs</span> = = <span style="color:#f67400;">123456789</span>
+<span style="color:#2980b9;">ConditionCPUs</span> = != <span style="color:#f67400;">123456789</span>
+<span style="color:#2980b9;">ConditionCPUs</span> = &gt;=<span style="color:#f67400;">123456789</span>
+<span style="color:#2980b9;">ConditionCPUs</span> = &gt; <span style="color:#f67400;">123456789</span>
+<span style="color:#2980b9;">ConditionCPUs</span> = <span style="color:#da4453;">|</span>&lt; <span style="color:#f67400;">123456789</span>
+<span style="color:#2980b9;">ConditionCPUs</span> = <span style="color:#da4453;">|</span>&lt;= <span style="color:#f67400;">123456789</span>
+<span style="color:#2980b9;">ConditionCPUs</span> = <span style="color:#da4453;">|</span>= <span style="color:#f67400;">123456789</span>
+<span style="color:#2980b9;">ConditionCPUs</span> = <span style="color:#da4453;">| </span>!= <span style="color:#f67400;">123456789</span>
+<span style="color:#2980b9;">ConditionCPUs</span> = <span style="color:#da4453;">| </span>&gt;=<span style="color:#f67400;">123456789</span>
+<span style="color:#2980b9;">ConditionCPUs</span> = <span style="color:#da4453;">| </span>&gt; <span style="color:#f67400;">123456789</span>
 <span style="color:#7a7c7d;">## other options</span>
 <span style="color:#2980b9;">ConditionCPUs</span> = &gt; <span style="color:#f67400;">4</span>
 <span style="color:#7a7c7d;">## invalid values</span>
-<span style="color:#2980b9;">ConditionMemory</span> = == <span style="color:#f67400;">123456789</span>
-<span style="color:#2980b9;">ConditionMemory</span> = &gt;&gt; <span style="color:#f67400;">123456789</span>
-<span style="color:#2980b9;">ConditionMemory</span> = = <span style="color:#f67400;">123456789</span>.987
-<span style="color:#2980b9;">ConditionMemory</span> = <span style="color:#da4453;">|</span>| = <span style="color:#f67400;">123456789</span>.987
+<span style="color:#2980b9;">ConditionCPUs</span> = == <span style="color:#f67400;">123456789</span>
+<span style="color:#2980b9;">ConditionCPUs</span> = &gt;&gt; <span style="color:#f67400;">123456789</span>
+<span style="color:#2980b9;">ConditionCPUs</span> = = <span style="color:#f67400;">123456789</span>.987
+<span style="color:#2980b9;">ConditionCPUs</span> = <span style="color:#da4453;">|</span>| = <span style="color:#f67400;">123456789</span>.987
+
+
+<span style="color:#7a7c7d;">###### AC cardinal KMGT</span>
+<span style="font-weight:bold;">[Unit]</span>
+<span style="color:#2980b9;">ConditionMemory</span> = &gt; <span style="color:#f67400;">123456789</span>
+<span style="color:#2980b9;">ConditionMemory</span> = <span style="color:#da4453;">|</span>&lt; <span style="color:#f67400;">123456789</span>
+<span style="color:#2980b9;">ConditionMemory</span> = <span style="color:#da4453;">|!</span> &gt;= <span style="color:#f67400;">1</span><span style="font-style:italic;">G</span>
+<span style="color:#2980b9;">ConditionMemory</span> = <span style="color:#da4453;">| </span>!= <span style="color:#f67400;">512</span><span style="font-style:italic;">K</span>
+<span style="color:#7a7c7d;">## invalid values</span>
+<span style="color:#7a7c7d;"># no exabyte (yet)</span>
+<span style="color:#2980b9;">ConditionMemory</span> = = <span style="color:#f67400;">1</span>E
+
+
+<span style="color:#7a7c7d;">###### AC cpu feature</span>
+<span style="font-weight:bold;">[Unit]</span>
+<span style="color:#7a7c7d;"># see &quot;cpu feature&quot; for all possible values</span>
+<span style="color:#2980b9;">ConditionCPUFeature</span> = <span style="color:#da4453;">|!</span> <span style="color:#27aeae;font-weight:bold;">sse2</span>
 
 
 <span style="color:#7a7c7d;">###### AC controller cg (assert/condition for control group controller)</span>
 <span style="font-weight:bold;">[Unit]</span>
-<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">blkio</span>
-<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#da4453;">| </span><span style="color:#27aeae;font-weight:bold;">blkio</span>
-<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#da4453;">|!</span> <span style="color:#27aeae;font-weight:bold;">blkio</span>
-<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#da4453;">!</span> <span style="color:#27aeae;font-weight:bold;">blkio</span>
+<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">cpu</span>
+<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#da4453;">| </span><span style="color:#27aeae;font-weight:bold;">cpu</span>
+<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#da4453;">|!</span> <span style="color:#27aeae;font-weight:bold;">cpu</span>
+<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#da4453;">!</span> <span style="color:#27aeae;font-weight:bold;">cpu</span>
 <span style="color:#7a7c7d;"># other options</span>
-<span style="color:#2980b9;">ConditionControlGroupController</span> = <span style="color:#da4453;">|!</span> <span style="color:#27aeae;font-weight:bold;">blkio</span>
+<span style="color:#2980b9;">ConditionControlGroupController</span> = <span style="color:#da4453;">|!</span> <span style="color:#27aeae;font-weight:bold;">cpu</span>
 <span style="color:#7a7c7d;">## invalid values</span>
-<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#da4453;">!</span>| <span style="color:#27aeae;font-weight:bold;">blkio</span>
-<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#da4453;">|</span>| <span style="color:#27aeae;font-weight:bold;">blkio</span>
-<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#da4453;">!</span>! <span style="color:#27aeae;font-weight:bold;">blkio</span>
+<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#da4453;">!</span>| <span style="color:#27aeae;font-weight:bold;">cpu</span>
+<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#da4453;">|</span>| <span style="color:#27aeae;font-weight:bold;">cpu</span>
+<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#da4453;">!</span>! <span style="color:#27aeae;font-weight:bold;">cpu</span>
 
 
-<span style="color:#7a7c7d;">###### AC firmware type</span>
+<span style="color:#7a7c7d;">###### AC firmware</span>
 <span style="font-weight:bold;">[Unit]</span>
-<span style="color:#7a7c7d;"># see &quot;firmware type&quot; for all possible values</span>
+<span style="color:#7a7c7d;"># see &quot;firmware&quot; for all possible values</span>
 <span style="color:#2980b9;">ConditionFirmware</span> = <span style="color:#da4453;">|!</span> <span style="color:#27aeae;font-weight:bold;">uefi</span>
 
 
@@ -960,7 +973,6 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">FailureAction</span> = invalid <span style="color:#27aeae;font-weight:bold;">exit</span>
 <span style="color:#7a7c7d;"># multiple values</span>
 <span style="color:#2980b9;">FailureAction</span> = <span style="color:#27aeae;font-weight:bold;">none</span> exit
-<span style="color:#2980b9;">FailureActionExitStatus</span> = <span style="color:#f67400;">123</span>
 
 
 <span style="color:#7a7c7d;">###### architecture</span>
@@ -1121,8 +1133,8 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">MemoryMin</span> = <span style="color:#f67400;">12</span><span style="font-style:italic;">G</span>
 <span style="color:#2980b9;">MemoryMin</span> = <span style="color:#f67400;">12</span><span style="font-style:italic;">T</span>
 <span style="color:#2980b9;">MemoryMin</span> = <span style="color:#f67400;">12 </span><span style="font-style:italic;">G</span>
-<span style="color:#2980b9;">MemoryMin</span> = <span style="color:#27aeae;font-weight:bold;">infinity</span>
 <span style="color:#2980b9;">MemoryMin</span> = <span style="color:#f67400;">20</span><span style="font-style:italic;">%</span>
+<span style="color:#2980b9;">MemoryMin</span> = <span style="color:#27aeae;font-weight:bold;">infinity</span>
 <span style="color:#7a7c7d;">## invalid values</span>
 <span style="color:#2980b9;">MemoryMin</span> = invalid
 <span style="color:#7a7c7d;"># invalid bytes suffix</span>
@@ -1130,6 +1142,25 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">MemoryMin</span> = <span style="color:#f67400;">12</span>H
 <span style="color:#2980b9;">MemoryMin</span> = <span style="color:#f67400;">12 </span>E
 <span style="color:#2980b9;">MemoryMin</span> = <span style="color:#f67400;">12</span>P
+
+
+<span style="color:#7a7c7d;">###### cardinal KGMT</span>
+<span style="font-weight:bold;">[Socket]</span>
+<span style="color:#2980b9;">PipeSize</span> = <span style="color:#f67400;">123</span>
+<span style="color:#2980b9;">PipeSize</span> = <span style="color:#f67400;">12</span><span style="font-style:italic;">K</span>
+<span style="color:#2980b9;">PipeSize</span> = <span style="color:#f67400;">12</span><span style="font-style:italic;">M</span>
+<span style="color:#2980b9;">PipeSize</span> = <span style="color:#f67400;">12</span><span style="font-style:italic;">G</span>
+<span style="color:#2980b9;">PipeSize</span> = <span style="color:#f67400;">12</span><span style="font-style:italic;">T</span>
+<span style="color:#2980b9;">PipeSize</span> = <span style="color:#f67400;">12 </span><span style="font-style:italic;">G</span>
+<span style="color:#7a7c7d;">## invalid values</span>
+<span style="color:#2980b9;">PipeSize</span> = invalid
+<span style="color:#2980b9;">PipeSize</span> = infinity
+<span style="color:#7a7c7d;"># invalid bytes suffix</span>
+<span style="color:#2980b9;">PipeSize</span> = <span style="color:#f67400;">12</span>g
+<span style="color:#2980b9;">PipeSize</span> = <span style="color:#f67400;">12</span>H
+<span style="color:#2980b9;">PipeSize</span> = <span style="color:#f67400;">12 </span>E
+<span style="color:#2980b9;">PipeSize</span> = <span style="color:#f67400;">12</span>P
+<span style="color:#2980b9;">PipeSize</span> = <span style="color:#f67400;">20</span>%
 
 
 <span style="color:#7a7c7d;">###### cardinal KGMT infinity</span>
@@ -1143,12 +1174,12 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">MemorySwapMax</span> = <span style="color:#27aeae;font-weight:bold;">infinity</span>
 <span style="color:#7a7c7d;">## invalid values</span>
 <span style="color:#2980b9;">MemorySwapMax</span> = invalid
-<span style="color:#2980b9;">MemorySwapMax</span> = <span style="color:#f67400;">20</span>%
 <span style="color:#7a7c7d;"># invalid bytes suffix</span>
 <span style="color:#2980b9;">MemorySwapMax</span> = <span style="color:#f67400;">12</span>g
 <span style="color:#2980b9;">MemorySwapMax</span> = <span style="color:#f67400;">12</span>H
 <span style="color:#2980b9;">MemorySwapMax</span> = <span style="color:#f67400;">12 </span>E
 <span style="color:#2980b9;">MemorySwapMax</span> = <span style="color:#f67400;">12</span>P
+<span style="color:#2980b9;">MemorySwapMax</span> = <span style="color:#f67400;">20</span>%
 
 
 <span style="color:#7a7c7d;">###### collect mode</span>
@@ -1186,17 +1217,19 @@ WantedBy = some.service some.socket
 
 <span style="color:#7a7c7d;">###### controller cg (control group controller)</span>
 <span style="font-weight:bold;">[Unit]</span>
-<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">blkio</span>
 <span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">cpu</span>
-<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">cpuacct</span>
-<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">devices</span>
+<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">cpuset</span>
 <span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">io</span>
 <span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">memory</span>
-<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">v1</span>
-<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">v2</span>
+<span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">pids</span>
 <span style="color:#7a7c7d;">## invalid values</span>
 <span style="color:#2980b9;">AssertControlGroupController</span> = invalid
-<span style="color:#2980b9;">AssertControlGroupController</span> = bpf-firewall
+<span style="color:#7a7c7d;"># removed as of v252</span>
+<span style="color:#2980b9;">AssertControlGroupController</span> = blkio
+<span style="color:#2980b9;">AssertControlGroupController</span> = cpuacct
+<span style="color:#2980b9;">AssertControlGroupController</span> = devices
+<span style="color:#2980b9;">AssertControlGroupController</span> = v1
+<span style="color:#2980b9;">AssertControlGroupController</span> = v2
 <span style="color:#7a7c7d;"># multiple values</span>
 <span style="color:#2980b9;">AssertControlGroupController</span> = <span style="color:#27aeae;font-weight:bold;">cpu</span> memory
 
@@ -1340,9 +1373,31 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">CPUSchedulingPriority</span> = <span style="color:#f67400;">12</span> 34
 
 
+<span style="color:#7a7c7d;">###### cpu weight</span>
+<span style="font-weight:bold;">[Service]</span>
+<span style="color:#2980b9;">CPUWeight</span> = <span style="color:#27aeae;font-weight:bold;">idle</span>
+<span style="color:#7a7c7d;"># integer 1..10000</span>
+<span style="color:#2980b9;">CPUWeight</span> = <span style="color:#f67400;">1</span>
+<span style="color:#2980b9;">CPUWeight</span> = <span style="color:#f67400;">12</span>
+<span style="color:#2980b9;">CPUWeight</span> = <span style="color:#f67400;">123</span>
+<span style="color:#2980b9;">CPUWeight</span> = <span style="color:#f67400;">1234</span>
+<span style="color:#2980b9;">CPUWeight</span> = <span style="color:#f67400;">1234</span>
+<span style="color:#2980b9;">CPUWeight</span> = <span style="color:#f67400;">10000</span>
+<span style="color:#7a7c7d;">## invalid values</span>
+<span style="color:#2980b9;">CPUWeight</span> = -<span style="color:#f67400;">1</span>
+<span style="color:#2980b9;">CPUWeight</span> = 0
+<span style="color:#2980b9;">CPUWeight</span> = 1000<span style="color:#f67400;">1</span>
+<span style="color:#2980b9;">CPUWeight</span> = 1<span style="color:#f67400;">2345</span>
+<span style="color:#2980b9;">CPUWeight</span> = 12.<span style="color:#f67400;">3</span>
+<span style="color:#2980b9;">CPUWeight</span> = invalid
+<span style="color:#7a7c7d;"># multiple values</span>
+<span style="color:#2980b9;">CPUWeight</span> = 1 <span style="color:#f67400;">10000</span>
+
+
 <span style="color:#7a7c7d;">###### delegate</span>
 <span style="font-weight:bold;">[Service]</span>
 <span style="color:#7a7c7d;"># single boolean</span>
+<span style="color:#2980b9;">Delegate</span> = <span style="color:#27aeae;font-weight:bold;">false</span>
 <span style="color:#2980b9;">Delegate</span> = <span style="color:#27aeae;font-weight:bold;">true</span>
 <span style="color:#7a7c7d;"># single controller</span>
 <span style="color:#2980b9;">Delegate</span> = <span style="color:#27aeae;font-weight:bold;">blkio</span>
@@ -1548,18 +1603,21 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">DirectoryMode</span> = <span style="color:#f67400;">0755</span> 0755
 
 
-<span style="color:#7a7c7d;">###### firmware type</span>
+<span style="color:#7a7c7d;">###### firmware</span>
 <span style="font-weight:bold;">[Unit]</span>
 <span style="color:#2980b9;">ConditionFirmware</span> = <span style="color:#27aeae;font-weight:bold;">uefi</span>
 <span style="color:#2980b9;">ConditionFirmware</span> = <span style="color:#27aeae;font-weight:bold;">device-tree</span>
 <span style="color:#2980b9;">ConditionFirmware</span> = <span style="color:#27aeae;font-weight:bold;">device-tree-compatible</span>(some-device-tree)
 <span style="color:#2980b9;">ConditionFirmware</span> = <span style="color:#27aeae;font-weight:bold;">device-tree-compatible</span>(  some-device-tree )
+<span style="color:#2980b9;">ConditionFirmware</span> = <span style="color:#27aeae;font-weight:bold;">smbios-field</span>(board_name = &quot;Custom Board&quot;)
 <span style="color:#7a7c7d;">## invalid values</span>
 <span style="color:#2980b9;">ConditionFirmware</span> = invalid
 <span style="color:#2980b9;">ConditionFirmware</span> = <span style="color:#27aeae;font-weight:bold;">device-tree</span>-invalid
 <span style="color:#7a7c7d;"># missing argument</span>
 <span style="color:#2980b9;">ConditionFirmware</span> = <span style="color:#27aeae;font-weight:bold;">device-tree</span>-compatible
 <span style="color:#2980b9;">ConditionFirmware</span> = <span style="color:#27aeae;font-weight:bold;">device-tree</span>-compatible()
+<span style="color:#2980b9;">ConditionFirmware</span> = smbios-field
+<span style="color:#2980b9;">ConditionFirmware</span> = smbios-field()
 <span style="color:#7a7c7d;"># multiple values</span>
 <span style="color:#2980b9;">ConditionFirmware</span> = <span style="color:#27aeae;font-weight:bold;">uefi</span> device-tree
 
@@ -1631,6 +1689,7 @@ WantedBy = some.service some.socket
 
 <span style="color:#7a7c7d;">###### group and user</span>
 <span style="font-weight:bold;">[Service]</span>
+<span style="color:#2980b9;">User</span> = <span style="color:#f67400;">0</span>
 <span style="color:#2980b9;">User</span> = <span style="color:#f67400;">1000</span>
 <span style="color:#2980b9;">Group</span> = <span style="color:#f67400;">100</span>
 <span style="color:#2980b9;">User</span> = some-name
@@ -2046,7 +2105,7 @@ WantedBy = some.service some.socket
 
 
 <span style="color:#7a7c7d;">###### percent</span>
-<span style="font-weight:bold;">[Slice]</span>
+[Slice]
 <span style="color:#2980b9;">CPUQuota</span> = <span style="color:#f67400;">0.1</span><span style="font-style:italic;">%</span>
 <span style="color:#2980b9;">CPUQuota</span> = <span style="color:#f67400;">12</span> <span style="font-style:italic;">%</span>
 <span style="color:#2980b9;">CPUQuota</span> = <span style="color:#f67400;">123.4</span><span style="font-style:italic;">%</span>
@@ -2504,26 +2563,33 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">2</span><span style="font-style:italic;">sec</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">12 </span><span style="font-style:italic;">second</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">1 </span><span style="font-style:italic;">seconds</span>
+<span style="color:#7a7c7d;"># minute</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">342 </span><span style="font-style:italic;">m</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">2</span><span style="font-style:italic;">min</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">7 </span><span style="font-style:italic;">minute</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">1 </span><span style="font-style:italic;">minutes</span>
+<span style="color:#7a7c7d;"># hour</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">2 </span><span style="font-style:italic;">h</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">48   </span><span style="font-style:italic;">hr</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">2</span><span style="font-style:italic;">hour</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">2</span><span style="font-style:italic;">hours</span>
+<span style="color:#7a7c7d;"># day</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">2 </span><span style="font-style:italic;">d</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">1 </span><span style="font-style:italic;">day</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">7  </span><span style="font-style:italic;">days</span>
+<span style="color:#7a7c7d;"># week</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">2 </span><span style="font-style:italic;">w</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">123 </span><span style="font-style:italic;">week</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">0 </span><span style="font-style:italic;">weeks</span>
+<span style="color:#7a7c7d;"># month</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">12 </span><span style="font-style:italic;">M</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">7 </span><span style="font-style:italic;">month</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">1 </span><span style="font-style:italic;">months</span>
+<span style="color:#7a7c7d;"># year</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">1</span><span style="font-style:italic;">y</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">123</span><span style="font-style:italic;">year</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">12 </span><span style="font-style:italic;">years</span>
+<span style="color:#7a7c7d;"># combined</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">55</span><span style="font-style:italic;">s</span><span style="color:#f67400;">500</span><span style="font-style:italic;">ms</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">300</span><span style="font-style:italic;">ms</span><span style="color:#f67400;">20</span><span style="font-style:italic;">s</span> <span style="color:#f67400;">5</span><span style="font-style:italic;">day</span>
 <span style="color:#2980b9;">OnBootSec</span> = <span style="color:#f67400;">123 5 </span><span style="font-style:italic;">days</span> <span style="color:#f67400;">1</span><span style="font-style:italic;">m</span> <span style="color:#f67400;">12 1</span><span style="font-style:italic;">sec</span> <span style="color:#f67400;">123 </span><span style="color:#fdbc4b;font-weight:bold;">\</span>
@@ -2718,23 +2784,23 @@ WantedBy = some.service some.socket
 
 
 <span style="color:#7a7c7d;">###### weight</span>
-<span style="font-weight:bold;">[Slice]</span>
+<span style="font-weight:bold;">[Service]</span>
 <span style="color:#7a7c7d;"># integer 1..10000</span>
-<span style="color:#2980b9;">CPUWeight</span> = <span style="color:#f67400;">1</span>
-<span style="color:#2980b9;">CPUWeight</span> = <span style="color:#f67400;">12</span>
-<span style="color:#2980b9;">CPUWeight</span> = <span style="color:#f67400;">123</span>
-<span style="color:#2980b9;">CPUWeight</span> = <span style="color:#f67400;">1234</span>
-<span style="color:#2980b9;">CPUWeight</span> = <span style="color:#f67400;">1234</span>
-<span style="color:#2980b9;">CPUWeight</span> = <span style="color:#f67400;">10000</span>
+<span style="color:#2980b9;">IOWeight</span> = <span style="color:#f67400;">1</span>
+<span style="color:#2980b9;">IOWeight</span> = <span style="color:#f67400;">12</span>
+<span style="color:#2980b9;">IOWeight</span> = <span style="color:#f67400;">123</span>
+<span style="color:#2980b9;">IOWeight</span> = <span style="color:#f67400;">1234</span>
+<span style="color:#2980b9;">IOWeight</span> = <span style="color:#f67400;">1234</span>
+<span style="color:#2980b9;">IOWeight</span> = <span style="color:#f67400;">10000</span>
 <span style="color:#7a7c7d;">## invalid values</span>
-<span style="color:#2980b9;">CPUWeight</span> = -<span style="color:#f67400;">1</span>
-<span style="color:#2980b9;">CPUWeight</span> = 0
-<span style="color:#2980b9;">CPUWeight</span> = 1000<span style="color:#f67400;">1</span>
-<span style="color:#2980b9;">CPUWeight</span> = 1<span style="color:#f67400;">2345</span>
-<span style="color:#2980b9;">CPUWeight</span> = 12.<span style="color:#f67400;">3</span>
-<span style="color:#2980b9;">CPUWeight</span> = invalid
+<span style="color:#2980b9;">IOWeight</span> = -<span style="color:#f67400;">1</span>
+<span style="color:#2980b9;">IOWeight</span> = 0
+<span style="color:#2980b9;">IOWeight</span> = 1000<span style="color:#f67400;">1</span>
+<span style="color:#2980b9;">IOWeight</span> = 1<span style="color:#f67400;">2345</span>
+<span style="color:#2980b9;">IOWeight</span> = 12.<span style="color:#f67400;">3</span>
+<span style="color:#2980b9;">IOWeight</span> = invalid
 <span style="color:#7a7c7d;"># multiple values</span>
-<span style="color:#2980b9;">CPUWeight</span> = 1 <span style="color:#f67400;">10000</span>
+<span style="color:#2980b9;">IOWeight</span> = 1 <span style="color:#f67400;">10000</span>
 
 
 <span style="color:#7a7c7d;">###### working directory</span>

@@ -15,11 +15,10 @@
 #
 import click
 import jinja2
-import pathlib
 import re
 import yaml
 
-import pprint
+from lxml import etree
 
 
 _TEMPLATED_NAME = re.compile('<[^>]+>')
@@ -156,6 +155,84 @@ def transform_command(cmd):
     return cmd
 
 
+def remove_duplicate_list_nodes(contexts, highlighting):
+    remap = {}
+
+    items_by_kws = {}
+    # extract duplicate keyword list
+    for items in highlighting:
+        if items.tag != 'list':
+            break
+        k = '<'.join(item.text for item in items)
+        name = items.attrib['name']
+        rename = items_by_kws.get(k)
+        if rename:
+            remap[name] = rename
+            highlighting.remove(items)
+        else:
+            items_by_kws[k] = name
+
+    # update keyword list name referenced by each rule
+    for context in contexts:
+        for rule in context:
+            if rule.tag == 'keyword':
+                name = rule.attrib['String']
+                rule.attrib['String'] = remap.get(name, name)
+
+
+def remove_duplicate_context_nodes(contexts):
+    # 3 levels: ctx, ctx_op and ctx_op_nested
+    for _ in range(3):
+        remap = {}
+        duplicated = {}
+
+        # remove duplicate nodes
+        for context in contexts:
+            name = context.attrib['name']
+            context.attrib['name'] = 'dummy'
+            ref = duplicated.setdefault(etree.tostring(context), [])
+            if ref:
+                contexts.remove(context)
+            else:
+                context.attrib['name'] = name
+                ref.append(name)
+            remap[name] = ref[0]
+
+        # update context name referenced by each rule
+        for context in contexts:
+            for rule in context:
+                ref = remap.get(rule.attrib.get('context'))
+                if ref:
+                    rule.attrib['context'] = ref
+
+
+def remove_duplicate_nodes(xml_string):
+    parser = etree.XMLParser(resolve_entities=False, collect_ids=False)
+    root = etree.fromstring(xml_string.encode(), parser=parser)
+    highlighting = root[0]
+
+    contexts = highlighting.find('contexts')
+
+    remove_duplicate_list_nodes(contexts, highlighting)
+    remove_duplicate_context_nodes(contexts)
+
+    # reformat comments
+    xml = etree.tostring(root)
+    xml = re.sub(b'(?=[^\n ])<!--', b'\n<!--', xml)
+    xml = re.sub(b'-->(?=[^ \n])', b'-->\n', xml)
+
+    # extract DOCTYPE removed by etree.fromstring and reformat <language>
+    doctype = xml_string[:xml_string.find('<highlighting')]
+
+    # remove unformatted <language>
+    xml = xml[xml.find(b'<highlighting'):]
+
+    # last comment removed by etree.fromstring
+    last_comment = '\n<!-- kate: replace-tabs on; indent-width 2; tab-width 2; -->'
+
+    return f'{doctype}{xml.decode()}{last_comment}'
+
+
 #BEGIN Jinja filters
 
 def cmd_is_nulary(cmd):
@@ -232,6 +309,8 @@ def cli(input_yaml, template):
 
     tpl = env.from_string(template.read())
     result = tpl.render(data)
+    result = remove_duplicate_nodes(result)
+
     print(result)
 
 

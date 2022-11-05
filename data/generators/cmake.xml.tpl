@@ -179,6 +179,7 @@
         <!--[- endif ]-->
         <!--[- if not command.first_args_are_targets or (command.named_args and command.named_args.kw) ]-->
       <context attribute="Normal Text" lineEndContext="#stay" name="<!--{command.name}-->_ctx_op">
+        <DetectSpaces />
         <!--[- if command.nested_parentheses ]-->
         <DetectChar attribute="Normal Text" context="<!--{command.name}-->_ctx_op_nested" char="(" />
         <!--[- endif ]-->
@@ -232,6 +233,7 @@
         <!--[- endif ]-->
         <!--[- if command.nested_parentheses ]-->
       <context attribute="Normal Text" lineEndContext="#stay" name="<!--{command.name}-->_ctx_op_nested">
+        <DetectSpaces />
         <DetectChar attribute="Normal Text" context="#pop" char=")" />
         <DetectChar attribute="Normal Text" context="<!--{command.name}-->_ctx_op_nested" char="(" />
         <!--[- if command.named_args and command.named_args.kw ]-->
@@ -352,6 +354,7 @@
         <IncludeRules context="Detect Special Values" />
         <IncludeRules context="Detect Aliased Targets" />
         <IncludeRules context="Detect Generator Expressions" />
+        <DetectIdentifier />
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="Detect Special Values">
@@ -367,8 +370,10 @@
       </context>
 
       <context attribute="Comment" lineEndContext="#pop" name="Match Comments">
+        <DetectSpaces />
         <RegExpr attribute="Comment" context="#pop!Bracketed Comment" String="#\[(=*)\[" beginRegion="BracketedComment" />
         <DetectChar attribute="Comment" context="#pop!Comment" char="#" />
+        <DetectIdentifier />
       </context>
 
       <context attribute="Comment" lineEndContext="#pop" name="Match Comments and Docs">
@@ -377,9 +382,10 @@
       </context>
 
       <context attribute="Comment" lineEndContext="#pop" name="Comment">
-        <LineContinue attribute="Comment" context="#pop" />
         <DetectSpaces />
+        <LineContinue attribute="Comment" context="#pop" />
         <IncludeRules context="##Comments" />
+        <DetectIdentifier />
       </context>
 
       <context attribute="Comment" lineEndContext="#stay" name="RST Documentation" dynamic="true">
@@ -395,6 +401,8 @@
       </context>
 
       <context attribute="Strings" lineEndContext="#stay" name="String">
+        <DetectSpaces />
+        <DetectIdentifier />
         <RegExpr attribute="Strings" context="#pop" String="&quot;(?=[ );]|$)" />
         <Detect2Chars attribute="Escapes" context="#stay" char="\" char1="&quot;" />
         <Detect2Chars attribute="Escapes" context="#stay" char="\" char1="$" />
@@ -421,6 +429,7 @@
         <keyword attribute="Generator Expression Keyword" context="#stay" String="generator-expressions" insensitive="false" />
         <IncludeRules context="Detect Aliased Targets" />
         <IncludeRules context="Detect Variable Substitutions" />
+        <DetectIdentifier />
       </context>
 
     </contexts>

@@ -113,6 +113,25 @@
       <!--[- endfor ]-->
     </list>
 
+    <!-- Source/cmStringAlgorithms.cxx: bool cmIsOff(cm::string_view val) -->
+    <list name="true_special_arg">
+      <item>TRUE</item>
+      <item>ON</item>
+      <item>YES</item>
+      <item>Y</item>
+      <item>0</item>
+    </list>
+
+    <!-- Source/cmStringAlgorithms.cxx: bool cmIsOff(cm::string_view val) -->
+    <list name="false_special_arg">
+      <item>FALSE</item>
+      <item>OFF</item>
+      <item>NO</item>
+      <item>IGNORE</item>
+      <item>N</item>
+      <item>0</item>
+    </list>
+
     <contexts>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="Normal Text">
@@ -336,20 +355,9 @@
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="Detect Special Values">
-        <RegExpr attribute="Version Arg" context="#stay" String="\b[0-9]+(.[0-9]+)+\b" />
-        <!-- Source/cmStringAlgorithms.cxx: bool cmIsOff(cm::string_view val) -->
-        <WordDetect attribute="True Special Arg" context="#stay" String="TRUE" insensitive="true" />
-        <WordDetect attribute="True Special Arg" context="#stay" String="ON" insensitive="true" />
-        <WordDetect attribute="True Special Arg" context="#stay" String="YES" insensitive="true" />
-        <WordDetect attribute="True Special Arg" context="#stay" String="Y" insensitive="true" />
-        <WordDetect attribute="True Special Arg" context="#stay" String="1" />
-        <!-- Source/cmStringAlgorithms.cxx: bool cmIsOff(cm::string_view val) -->
-        <WordDetect attribute="False Special Arg" context="#stay" String="FALSE" insensitive="true" />
-        <WordDetect attribute="False Special Arg" context="#stay" String="OFF" insensitive="true" />
-        <WordDetect attribute="False Special Arg" context="#stay" String="NO" insensitive="true" />
-        <WordDetect attribute="False Special Arg" context="#stay" String="N" insensitive="true" />
-        <WordDetect attribute="False Special Arg" context="#stay" String="IGNORE" insensitive="true" />
-        <WordDetect attribute="False Special Arg" context="#stay" String="0" />
+        <RegExpr attribute="Version Arg" context="#stay" String="\b[0-9]++(.[0-9]++)+\b" />
+        <keyword attribute="True Special Arg" context="#stay" String="true_special_arg" insensitive="true" />
+        <keyword attribute="False Special Arg" context="#stay" String="false_special_arg" insensitive="true" />
         <RegExpr attribute="False Special Arg" context="#stay" String="\b(?:&var_ref_re;-)?NOTFOUND\b" />
         <RegExpr attribute="Special Args" context="#stay" String="\bCMP[0-9][0-9][0-9][0-9]\b" />
       </context>

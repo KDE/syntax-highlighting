@@ -299,6 +299,21 @@ private:
     bool m_isResolved = false;
 };
 
+class DynamicRegExpr final : public Rule
+{
+public:
+    DynamicRegExpr(const HighlightingContextData::Rule::RegExpr &data);
+
+protected:
+    MatchResult doMatch(QStringView text, int offset, const QStringList &) const override;
+
+private:
+    void resolve();
+    QString m_pattern;
+    QRegularExpression::PatternOptions m_patternOptions;
+    bool m_isResolved = false;
+};
+
 class StringDetect final : public Rule
 {
 public:

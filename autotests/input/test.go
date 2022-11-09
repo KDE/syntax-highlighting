@@ -60,3 +60,10 @@ func main() {
 			return
 	}
 }
+
+var s string = "A string with \x60 a horse \140 \u2014 \U0001F40E"
+var s string = "A string with \x6 a horse \400 \u201 \U0001F40"
+var s string = "A string with \x6x a horse \400x \u201x \U0001F40x"
+var c float32 = imag(987i) + 0o_7_7_7 + 0x1.fp-2 + 0b101010 01 0o21 0x1
+var c float32 = imag(0x_987i) + 0o_7_7_7i + 0x1.fp-2i 0b101010 023__
+type R[T any, C comparable] struct { a T; b C }

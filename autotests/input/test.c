@@ -92,3 +92,6 @@ int y; // variable shall not be grey
 #elif defined (B)
 int z; // variable shall not be grey
 #endif
+
+// C23 format
+"%w8ux %w8dx %DDfx";

@@ -217,6 +217,17 @@ void RepositoryPrivate::load(Repository *repo)
 
     // do lookup in standard paths, if not disabled
 #ifndef NO_STANDARD_PATHS
+    // do lookup in installed path when has no syntax resource
+#ifndef HAS_SYNTAX_RESOURCE
+    for (const auto &dir : QStandardPaths::locateAll(QStandardPaths::GenericDataLocation,
+                                                     QStringLiteral("org.kde.syntax-highlighting/syntax-bundled"),
+                                                     QStandardPaths::LocateDirectory)) {
+        if (!loadSyntaxFolderFromIndex(repo, dir)) {
+            loadSyntaxFolder(repo, dir);
+        }
+    }
+#endif
+
     for (const auto &dir : QStandardPaths::locateAll(QStandardPaths::GenericDataLocation,
                                                      QStringLiteral("org.kde.syntax-highlighting/syntax"),
                                                      QStandardPaths::LocateDirectory)) {
@@ -289,11 +300,11 @@ void RepositoryPrivate::loadSyntaxFolder(Repository *repo, const QString &path)
     }
 }
 
-void RepositoryPrivate::loadSyntaxFolderFromIndex(Repository *repo, const QString &path)
+bool RepositoryPrivate::loadSyntaxFolderFromIndex(Repository *repo, const QString &path)
 {
     QFile indexFile(path + QLatin1String("/index.katesyntax"));
     if (!indexFile.open(QFile::ReadOnly)) {
-        return;
+        return false;
     }
 
     const auto indexDoc(QCborValue::fromCbor(indexFile.readAll()));
@@ -311,6 +322,8 @@ void RepositoryPrivate::loadSyntaxFolderFromIndex(Repository *repo, const QStrin
             addDefinition(def);
         }
     }
+
+    return true;
 }
 
 void RepositoryPrivate::addDefinition(const Definition &def)

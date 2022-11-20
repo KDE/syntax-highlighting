@@ -2520,7 +2520,7 @@ QStringList readListing(const QString &fileName)
         xml.readNext();
 
         // add only .xml files, no .json or stuff
-        if (xml.isCharacters() && xml.text().toString().contains(QLatin1String(".xml"))) {
+        if (xml.isCharacters() && xml.text().contains(QLatin1String(".xml"))) {
             listing.append(xml.text().toString());
         }
     }

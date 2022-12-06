@@ -55,7 +55,7 @@ set(SYNTAX_DATA_QRC_FILES_STRING ${qrc_body})
 configure_file(syntax-data.qrc.in ${qrc_file} @ONLY)
 
 # generate the index file
-add_custom_target(index.katesyntax DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/index.katesyntax")
+add_custom_target(katesyntax DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/index.katesyntax")
 add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/index.katesyntax"
     COMMAND katehighlightingindexer "${CMAKE_CURRENT_BINARY_DIR}/index.katesyntax" "${CMAKE_CURRENT_SOURCE_DIR}/schema/language.xsd" "${CMAKE_CURRENT_BINARY_DIR}/syntax-data.qrc"
     DEPENDS katehighlightingindexer ${defs} ${CMAKE_CURRENT_SOURCE_DIR}/schema/language.xsd ${CMAKE_CURRENT_BINARY_DIR}/syntax-data.qrc
@@ -72,7 +72,7 @@ if (QRC_SYNTAX)
 
     target_sources(SyntaxHighlightingData PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/qrc_syntax-data.cpp)
 else()
-    add_dependencies(SyntaxHighlightingData index.katesyntax)
+    add_dependencies(SyntaxHighlightingData katesyntax)
     # install the syntax files as normal files into the prefix
     install (FILES "${CMAKE_CURRENT_BINARY_DIR}/index.katesyntax" ${defs} DESTINATION ${KDE_INSTALL_DATADIR}/org.kde.syntax-highlighting/syntax-bundled)
 endif()

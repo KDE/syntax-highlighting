@@ -469,6 +469,13 @@ select * from stuff where id < 0.42;
 Select col1, col2 From stuff Where stuff.col1 IS NOT NuLL;
 ```
 
+## Nim
+
+```nim
+proc main() =
+    echo "Hello world!"
+```
+
 ## TypeScript
 
 ```ts

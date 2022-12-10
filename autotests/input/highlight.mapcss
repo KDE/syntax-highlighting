@@ -1,0 +1,129 @@
+/*
+ * SPDX-FileCopyrightText: 2022 Volker Krause <vkrause@kde.org>
+ * SPDX-License-Identifier: MIT
+ */
+
+// samples taken from kosmindoormap MapCSS parser unit tests
+
+@import url("included.mapcss");
+
+// union selector
+area[railway=platform],
+relation[type=multipolygon][railway=platform]
+{
+    color: #ff550022;
+    fill-color: #80f0e0d0;
+}
+
+// chained selector
+area[railway=platform] node[sign]
+{
+    fill-color: #ff0000;
+    opacity: 0.5;
+}
+
+// condition with colon-separated keys
+node[building:part][building:part=elevator]
+{
+    opacity: 1;
+    color: building:color;
+}
+
+// text properties
+* {
+    text: ref;
+    text-color: #ff00ff;
+}
+
+// line properties
+line {
+    dashes: 3,5;
+    linecap: round;
+    linejoin: bevel;
+    casing-width: 1;
+    casing-color: #444444;
+    casing-dashes: 1,1;
+}
+
+// zoom ranges
+node|z12-13 {}
+node|z10 {}
+node|z-10 {}
+node|z10- {}
+node|z12-13[name] {}
+node|z14-[name] {}
+
+// numeric comparison conditions
+* [layer>1],
+* [layer<2],
+* [layer>=3],
+* [layer<=4] {}
+
+// object types as tag or property values
+area[indoor=area] {
+    text-position: line;
+    width: width;
+}
+
+// units
+* {
+    font-size: 16pt;
+    width: 42px;
+    casing-width: 2m;
+}
+
+// negative numbers
+* {
+    width: -10.42;
+}
+
+
+// colors
+* {
+    text-color: #aabbcc;
+    fill-color: #80ccbbaa;
+    casing-color: #123;
+    shield-color: rgb(1.0, 0.5, 0.25);
+    shield-casing-color: rgba(0.75, 1.0, 0.25, 0.5);
+    color: "red";
+}
+
+// set tag
+node[shop=bakery] {
+    set mx:important;
+}
+
+// set tag to a specific value
+area[shop=bakery] {
+    set mx:importance = "high";
+    set mx:importance = 20;
+}
+
+// set class
+node[shop=bakery],
+node[shop=pastry]
+{
+    set .importantShops;
+}
+
+// class selectors
+node.importantShops { color: "red"; }
+way.importantShops|z20- { color: "green"; }
+*.importantShops[access=no] { color: "blue"; }
+
+// layer selectors (see https://wiki.openstreetmap.org/wiki/MapCSS/0.2/Proposal_layer_selector)
+way[highway]::road {
+  width: 8;
+  color: #ffffff;
+  casing-width: 2;
+  casing-color: #a0a0a0;
+}
+way[railway=tram]::tram {
+  width: 2;
+  color: #303030;
+  z-index: 1;
+}
+// default layer selector
+node::default {
+    icon-image: "bla";
+}

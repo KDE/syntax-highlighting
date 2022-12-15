@@ -27,6 +27,7 @@ include(ECMAddQch)
 include(ECMOptionalAddSubdirectory)
 include(ECMGenerateExportHeader)
 include(ECMDeprecationSettings)
+include(ECMQmlModule)
 
 ecm_setup_version(PROJECT
     VARIABLE_PREFIX SyntaxHighlighting

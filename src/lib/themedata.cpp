@@ -238,5 +238,9 @@ QRgb ThemeData::editorColor(Theme::EditorColorRole role) const
 
 TextStyleData ThemeData::textStyleOverride(const QString &definitionName, const QString &attributeName) const
 {
-    return m_textStyleOverrides.value(definitionName).value(attributeName);
+    auto it = m_textStyleOverrides.find(definitionName);
+    if (it != m_textStyleOverrides.end()) {
+        return it->value(attributeName);
+    }
+    return TextStyleData();
 }

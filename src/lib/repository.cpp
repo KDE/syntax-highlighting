@@ -152,23 +152,29 @@ QVector<Theme> Repository::themes() const
     return d->m_themes;
 }
 
+static auto lowerBoundTheme(const QVector<KSyntaxHighlighting::Theme> &themes, QStringView themeName)
+{
+    return std::lower_bound(themes.begin(), themes.end(), themeName, [](const Theme &lhs, QStringView rhs) {
+        return lhs.name() < rhs;
+    });
+}
+
 Theme Repository::theme(const QString &themeName) const
 {
-    for (const auto &theme : std::as_const(d->m_themes)) {
-        if (theme.name() == themeName) {
-            return theme;
-        }
+    const auto &themes = d->m_themes;
+    const auto it = lowerBoundTheme(themes, themeName);
+    if (it != themes.end() && (*it).name() == themeName) {
+        return *it;
     }
-
     return Theme();
 }
 
 Theme Repository::defaultTheme(Repository::DefaultTheme t) const
 {
     if (t == DarkTheme) {
-        return theme(QLatin1String("Breeze Dark"));
+        return theme(QStringLiteral("Breeze Dark"));
     }
-    return theme(QLatin1String("Breeze Light"));
+    return theme(QStringLiteral("Breeze Light"));
 }
 
 Theme Repository::defaultTheme(Repository::DefaultTheme t)
@@ -179,26 +185,25 @@ Theme Repository::defaultTheme(Repository::DefaultTheme t)
 Theme Repository::themeForPalette(const QPalette &palette) const
 {
     const auto base = palette.color(QPalette::Base);
-    const auto themes = d->m_themes;
 
     // find themes with matching background colors
-    QVector<KSyntaxHighlighting::Theme> matchingThemes;
-    for (const auto &theme : themes) {
+    QVector<const KSyntaxHighlighting::Theme *> matchingThemes;
+    for (const auto &theme : std::as_const(d->m_themes)) {
         const auto background = theme.editorColor(KSyntaxHighlighting::Theme::EditorColorRole::BackgroundColor);
         if (background == base.rgb()) {
-            matchingThemes.append(theme);
+            matchingThemes.append(&theme);
         }
     }
     if (!matchingThemes.empty()) {
         // if there's multiple, search for one with a matching highlight color
         const auto highlight = palette.color(QPalette::Highlight);
-        for (const auto &theme : std::as_const(matchingThemes)) {
-            auto selection = theme.editorColor(KSyntaxHighlighting::Theme::EditorColorRole::TextSelection);
+        for (const auto *theme : std::as_const(matchingThemes)) {
+            auto selection = theme->editorColor(KSyntaxHighlighting::Theme::EditorColorRole::TextSelection);
             if (selection == highlight.rgb()) {
-                return theme;
+                return *theme;
             }
         }
-        return matchingThemes.first();
+        return *matchingThemes.first();
     }
 
     // fallback to just use the default light or dark theme
@@ -359,15 +364,16 @@ static int themeRevision(const Theme &theme)
 
 void RepositoryPrivate::addTheme(const Theme &theme)
 {
-    const auto it = std::lower_bound(m_themes.begin(), m_themes.end(), theme, [](const Theme &lhs, const Theme &rhs) {
-        return lhs.name() < rhs.name();
-    });
-    if (it == m_themes.end() || (*it).name() != theme.name()) {
-        m_themes.insert(it, theme);
+    const auto &constThemes = m_themes;
+    const auto themeName = theme.name();
+    const auto constIt = lowerBoundTheme(constThemes, themeName);
+    const auto index = constIt - constThemes.begin();
+    if (constIt == constThemes.end() || (*constIt).name() != themeName) {
+        m_themes.insert(index, theme);
         return;
     }
-    if (themeRevision(*it) < themeRevision(theme)) {
-        *it = theme;
+    if (themeRevision(*constIt) < themeRevision(theme)) {
+        m_themes[index] = theme;
     }
 }
 

@@ -614,7 +614,7 @@ void DefinitionData::loadItemData(QXmlStreamReader &reader)
             if (reader.name() == QLatin1String("itemData")) {
                 Format f;
                 auto formatData = FormatPrivate::detachAndGet(f);
-                formatData->definition = q;
+                formatData->definitionName = name;
                 formatData->load(reader);
                 formatData->id = RepositoryPrivate::get(repo)->nextFormatId();
                 formats.insert(f.name(), f);

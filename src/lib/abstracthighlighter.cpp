@@ -119,14 +119,13 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
     // verify/initialize state
     auto newState = state;
     auto stateData = StateData::get(newState);
-    const DefinitionRef currentDefRef(d->m_definition);
-    if (!stateData->isEmpty() && (stateData->m_defRef != currentDefRef)) {
+    if (!stateData->isEmpty() && (stateData->m_defRef != d->m_definition)) {
         qCDebug(Log) << "Got invalid state, resetting.";
         stateData->clear();
     }
     if (stateData->isEmpty()) {
         stateData->push(defData->initialContext(), QStringList());
-        stateData->m_defRef = currentDefRef;
+        stateData->m_defRef = DefinitionRef(d->m_definition);
     }
 
     // process empty lines

@@ -7,7 +7,6 @@
 #ifndef KSYNTAXHIGHLIGHTING_FORMAT_P_H
 #define KSYNTAXHIGHLIGHTING_FORMAT_P_H
 
-#include "definitionref_p.h"
 #include "textstyledata_p.h"
 #include "theme.h"
 
@@ -30,7 +29,7 @@ public:
     bool hasColor(const Theme &theme, StyleColor styleColor, ThemeColor themeColor) const;
     QColor color(const Theme &theme, StyleColor styleColor, ThemeColor themeColor) const;
 
-    DefinitionRef definition;
+    QString definitionName;
     QString name;
     TextStyleData style;
     Theme::TextStyle defaultStyle = Theme::Normal;

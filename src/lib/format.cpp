@@ -43,11 +43,7 @@ FormatPrivate *FormatPrivate::detachAndGet(Format &format)
 
 TextStyleData FormatPrivate::styleOverride(const Theme &theme) const
 {
-    const auto themeData = ThemeData::get(theme);
-    if (themeData) {
-        return themeData->textStyleOverride(definition.definition().name(), name);
-    }
-    return TextStyleData();
+    return ThemeData::get(theme)->textStyleOverride(definitionName, name);
 }
 
 QColor FormatPrivate::color(const Theme &theme, StyleColor styleColor, ThemeColor themeColor) const

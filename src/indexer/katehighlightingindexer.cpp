@@ -54,9 +54,10 @@ public:
     {
         if (xml.isStartElement()) {
             if (m_currentContext) {
-                m_currentContext->rules.append(Context::Rule{});
+                m_currentContext->rules.push_back(Context::Rule{});
                 auto &rule = m_currentContext->rules.back();
                 m_success = rule.parseElement(m_currentDefinition->filename, xml) && m_success;
+                m_currentContext->hasDynamicRule = m_currentContext->hasDynamicRule || rule.dynamic == XmlBool::True;
             } else if (m_currentKeywords) {
                 m_success = m_currentKeywords->items.parseElement(m_currentDefinition->filename, xml) && m_success;
             } else if (xml.name() == QStringLiteral("context")) {
@@ -477,6 +478,8 @@ private:
 
             // AnyChar, DetectChar, StringDetect, RegExpr, WordDetect, keyword
             QString string;
+            // RegExpr without .* as suffix
+            QString sanitizedString;
 
             // Float, HlCHex, HlCOct, Int, WordDetect, keyword
             QString additionalDeliminator;
@@ -532,6 +535,15 @@ private:
                             // remove parentheses on a copy of string
                             auto reg = QString(string).replace(removeParentheses, QString());
                             isDotRegex = reg.contains(isDot);
+
+                            // Remove .* and .*$ suffix.
+                            static const QRegularExpression allSuffix(QStringLiteral("(?<!\\\\)[.][*][?+]?[$]?$"));
+                            sanitizedString = string;
+                            sanitizedString.replace(allSuffix, QString());
+                            // string is a catch-all, do not sanitize
+                            if (sanitizedString.isEmpty() || sanitizedString == QStringLiteral("^")) {
+                                sanitizedString = string;
+                            }
                         }
                         return success;
                     }
@@ -665,6 +677,7 @@ private:
         bool isOnlyIncluded = true;
         // becomes true when an includedRule refers to it with includeAttrib=true
         bool referencedWithIncludeAttrib = false;
+        bool hasDynamicRule = false;
         QString name;
         QString attribute;
         ContextName lineEndContext;
@@ -861,7 +874,8 @@ private:
             QMutableMapIterator<QString, Context> contextIt(definition.contexts);
             while (contextIt.hasNext()) {
                 contextIt.next();
-                for (auto &rule : contextIt.value().rules) {
+                auto &currentContext = contextIt.value();
+                for (auto &rule : currentContext.rules) {
                     if (rule.type != Context::Rule::Type::IncludeRules) {
                         continue;
                     }
@@ -890,6 +904,7 @@ private:
                     contexts.append(rule.context.context);
 
                     for (int i = 0; i < contexts.size(); ++i) {
+                        currentContext.hasDynamicRule = contexts[i]->hasDynamicRule;
                         for (const auto &includedRule : contexts[i]->rules) {
                             if (includedRule.type != Context::Rule::Type::IncludeRules) {
                                 rule.includedRules.append(&includedRule);
@@ -1052,7 +1067,13 @@ private:
                 }
             }
 
-            auto reg = rule.string;
+            auto reg = (rule.lookAhead == XmlBool::True) ? rule.sanitizedString : rule.string;
+            if (rule.lookAhead == XmlBool::True) {
+                static const QRegularExpression removeAllSuffix(QStringLiteral(
+                    R"(((?<!\\)\\(?:[DSWdsw]|x[0-9a-fA-F]{2}|x\{[0-9a-fA-F]+\}|0\d\d|o\{[0-7]+\}|u[0-9a-fA-F]{4})|(?<!\\)[^])}\\]|(?=\\)\\\\)[*][?+]?$)"));
+                reg.replace(removeAllSuffix, QString());
+            }
+
             reg.replace(QStringLiteral("{1}"), QString());
 
             // is DetectSpaces
@@ -1097,8 +1118,12 @@ private:
 #undef REG_ESCAPE_CHAR
 
             // use minimal or lazy operator
-            static const QRegularExpression isMinimal(QStringLiteral(R"([.][*+][^][?+*()|$]*$)"));
-            if (rule.lookAhead == XmlBool::True && rule.minimal != XmlBool::True && reg.contains(isMinimal)) {
+            static const QRegularExpression isMinimal(QStringLiteral("(?![.][*+?][$]?[)]*$)[.][*+?][^?+]"));
+            static const QRegularExpression hasNotGreedy(QStringLiteral("[*+?][?+]"));
+
+            if (rule.lookAhead == XmlBool::True && rule.minimal != XmlBool::True && reg.contains(isMinimal) && !reg.contains(hasNotGreedy)
+                && (!rule.context.context || !rule.context.context->hasDynamicRule || regexp.captureCount() == 0)
+                && (reg.back() != QLatin1Char('$') || reg.contains(QLatin1Char('|')))) {
                 qWarning() << filename << "line" << rule.line
                            << "RegExpr should be have minimal=\"1\" or use lazy operator (i.g, '.*' -> '.*?'):" << rule.string;
                 return false;
@@ -2055,8 +2080,25 @@ private:
                     }
                     const auto &rule2 = *rulePtr;
                     if (rule2.type == Context::Rule::Type::RegExpr && isCompatible(rule2) && rule.insensitive == rule2.insensitive
-                        && rule.dynamic == rule2.dynamic && rule.string.startsWith(rule2.string)) {
-                        updateUnreachable1({&rule2, ruleIterator.currentIncludeRules()});
+                        && rule.dynamic == rule2.dynamic && rule.sanitizedString.startsWith(rule2.sanitizedString)) {
+                        bool add = (rule.sanitizedString.startsWith(rule2.string) || rule.sanitizedString.size() < rule2.sanitizedString.size() + 2);
+                        if (!add) {
+                            // \s.* (sanitized = \s) is considered hiding \s*\S
+                            // we check the quantifiers to see if this is the case
+                            auto c1 = rule.sanitizedString[rule2.sanitizedString.size()].unicode();
+                            auto c2 = rule.sanitizedString[rule2.sanitizedString.size() + 1].unicode();
+                            auto c3 = rule2.sanitizedString.back().unicode();
+                            if (c3 == '*' || c3 == '?' || c3 == '+') {
+                                add = true;
+                            } else if (c1 == '*' || c1 == '?') {
+                                add = !((c2 == '?' || c2 == '+') || (rule.sanitizedString.size() >= rule2.sanitizedString.size() + 3));
+                            } else {
+                                add = true;
+                            }
+                        }
+                        if (add) {
+                            updateUnreachable1({&rule2, ruleIterator.currentIncludeRules()});
+                        }
                     }
                 }
 

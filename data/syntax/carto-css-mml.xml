@@ -87,7 +87,7 @@
      as SQL and everything else not, regardless of the key.
 -->
 
-<language name="CartoCSS MML" version="1" kateversion="5.44" section="Markup"
+<language name="CartoCSS MML" version="2" kateversion="5.44" section="Markup"
           extensions="*.mml"
           author="Dr Orlovsky MA (dr.orlovsky@gmail.com), Nibaldo González (nibgonz@gmail.com), Lukas Sommer (sommerluk@gmail.com)" license="LGPL">
   <highlighting>
@@ -552,7 +552,7 @@
 
       <!-- If the literal operator is starting the line (after a space, use block indentation) -->
       <context attribute="Normal Text" lineEndContext="#stay" name="literal-block-only-operator" dynamic="true" noIndentationBasedFolding="true">
-        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1.*$" dynamic="true" column="0" />
+        <StringDetect attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="%1" dynamic="true" column="0" />
 
         <RegExpr attribute="Normal Text" context="#pop" String="^\s*\S" lookAhead="true" column="0" endRegion="Literal" />
         <RegExpr attribute="Comment" context="comment" String="(?:^|\s)#" />
@@ -560,21 +560,21 @@
       </context>
       <!-- If the literal operator is the first character of a line (or after header) -->
       <context attribute="Normal Text" lineEndContext="#stay" name="literal-block-simple" noIndentationBasedFolding="true">
-        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^\s.*$" column="0" />
+        <DetectSpaces attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" column="0" />
 
         <RegExpr attribute="Normal Text" context="#pop" String="^\s*\S" lookAhead="true" column="0" endRegion="Literal" />
         <RegExpr attribute="Comment" context="comment" String="(?:^|\s)#" />
       </context>
       <!-- If there is a data type or other content before the liretal operator (use block indentation) -->
       <context attribute="Normal Text" lineEndContext="#stay" name="literal-block-after-data" dynamic="true" noIndentationBasedFolding="true">
-        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1.*$" dynamic="true" column="0" />
+        <StringDetect attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="%1" dynamic="true" column="0" />
 
         <RegExpr attribute="Normal Text" context="#pop" String="^\s*\S" lookAhead="true" column="0" endRegion="Literal" />
         <RegExpr context="before-literal-operator" String="\S" lookAhead="true" />
       </context>
       <!-- If there is a key before the literal operator -->
       <context attribute="Normal Text" lineEndContext="#stay" name="literal-block-key" dynamic="true" noIndentationBasedFolding="true">
-        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1\s.*$" dynamic="true" column="0" />
+        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1\s" dynamic="true" column="0" />
 
         <RegExpr attribute="Normal Text" context="#pop" String="^\s*\S" lookAhead="true" column="0" endRegion="Literal" />
         <!-- Attribute of the Key (the Key was previously highlighted) -->
@@ -596,52 +596,52 @@
 
       <!-- If there are dashes/"?" before the literal operator -->
       <context attribute="Normal Text" lineEndContext="#stay" name="literal-block-withdash-s1" dynamic="true" noIndentationBasedFolding="true">
-        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1\s.*$" dynamic="true" column="0" />
+        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1\s" dynamic="true" column="0" />
         <IncludeRules context="literal-block-default" />
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="literal-block-withdash-s2" dynamic="true" noIndentationBasedFolding="true">
-        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2&space;\s.*$" dynamic="true" column="0" />
+        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2&space;\s" dynamic="true" column="0" />
         <IncludeRules context="literal-block-default" />
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="literal-block-withdash-s3" dynamic="true" noIndentationBasedFolding="true">
-        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2%3&space;{2}\s.*$" dynamic="true" column="0" />
+        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2%3&space;{2}\s" dynamic="true" column="0" />
         <IncludeRules context="literal-block-default" />
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="literal-block-withdash-s4" dynamic="true" noIndentationBasedFolding="true">
-        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2%3%4&space;{3}\s.*$" dynamic="true" column="0" />
+        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2%3%4&space;{3}\s" dynamic="true" column="0" />
         <IncludeRules context="literal-block-default" />
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="literal-block-withdash-s5" dynamic="true" noIndentationBasedFolding="true">
-        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2%3%4%5&space;{4}\s.*$" dynamic="true" column="0" />
+        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2%3%4%5&space;{4}\s" dynamic="true" column="0" />
         <IncludeRules context="literal-block-default" />
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="literal-block-withdash-s6" dynamic="true" noIndentationBasedFolding="true">
-        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2%3%4%5%6&space;{5}\s.*$" dynamic="true" column="0" />
+        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2%3%4%5%6&space;{5}\s" dynamic="true" column="0" />
         <IncludeRules context="literal-block-default" />
       </context>
       <!-- If there are dashes/"?" and a Key before the literal operator -->
       <context attribute="Normal Text" lineEndContext="#stay" name="literal-block-key-withdash-s2" dynamic="true" noIndentationBasedFolding="true">
-        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2&space;\s.*$" dynamic="true" column="0" />
+        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2&space;\s" dynamic="true" column="0" />
         <IncludeRules context="literal-block-key-default" />
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="literal-block-key-withdash-s3" dynamic="true" noIndentationBasedFolding="true">
-        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2%3&space;{2}\s.*$" dynamic="true" column="0" />
+        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2%3&space;{2}\s" dynamic="true" column="0" />
         <IncludeRules context="literal-block-key-default" />
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="literal-block-key-withdash-s4" dynamic="true" noIndentationBasedFolding="true">
-        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2%3%4&space;{3}\s.*$" dynamic="true" column="0" />
+        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2%3%4&space;{3}\s" dynamic="true" column="0" />
         <IncludeRules context="literal-block-key-default" />
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="literal-block-key-withdash-s5" dynamic="true" noIndentationBasedFolding="true">
-        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2%3%4%5&space;{4}\s.*$" dynamic="true" column="0" />
+        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2%3%4%5&space;{4}\s" dynamic="true" column="0" />
         <IncludeRules context="literal-block-key-default" />
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="literal-block-key-withdash-s6" dynamic="true" noIndentationBasedFolding="true">
-        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2%3%4%5%6&space;{5}\s.*$" dynamic="true" column="0" />
+        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2%3%4%5%6&space;{5}\s" dynamic="true" column="0" />
         <IncludeRules context="literal-block-key-default" />
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="literal-block-key-withdash-s7" dynamic="true" noIndentationBasedFolding="true">
-        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2%3%4%5%6%7&space;{6}\s.*$" dynamic="true" column="0" />
+        <RegExpr attribute="Literal/Folded Block" context="injected-sql" lookAhead="true" String="^%1%2%3%4%5%6%7&space;{6}\s" dynamic="true" column="0" />
         <IncludeRules context="literal-block-key-default" />
       </context>
     </contexts>

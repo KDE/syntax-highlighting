@@ -1,0 +1,143 @@
+# kate: hl earthfile;
+
+VERSION --shell-out-anywhere 0.6
+
+# BEGIN Global parameters
+ARG DEVTOOLSET_VERSION = 11
+ARG DEVTOOLSET = devtoolset-${DEVTOOLSET_VERSION}
+# END Global parameters
+
+ARG param_1 = "String w/ variable interpolation ${DEVTOOLSET}"
+ARG param_2 = 'String w/o variable interpolation ${DEVTOOLSET}'
+# Run shell command
+ARG param_3 = $(echo "String w/ variable interpolation ${DEVTOOLSET}")
+
+sample-target:
+    FROM alpine
+    ARG stage
+    COPY --if-exists files/${stage}/ /files/
+    SAVE ARTIFACT --keep-ts /files /share
+
+repos-conf-apt:
+    ARG image
+    ARG ppa
+
+    FROM ${image}
+
+    ENV DEBIAN_FRONTEND=noninteractive
+    ENV DEBCONF_NONINTERACTIVE_SEEN=true
+
+    IF [ "${ppa}" != '' ]
+        ARG _more_cmds = add-apt-repository -y -n ppa:${ppa}/ppa
+    ELSE
+        ARG _more_cmds = :
+    END
+
+    RUN --mount type=secret,id=+secrets/repo_gpg_key,target=/run/secrets/private-archive-keyring.gpg \
+        --mount type=cache,target=/var/cache/apt/archives \
+        --mount type=cache,target=/var/lib/apt/lists \
+        set -x; \
+        debconf-set-selections /tmp/debconf-preset.txt \
+     && rm -rf /etc/apt/apt.conf.d/docker-clean \
+     && apt-get update \
+     && apt-get install -y software-properties-common \
+     && add-apt-repository --remove multiverse \
+     && gpg -v --dearmor - </run/secrets/private-archive-keyring.gpg > /usr/share/keyrings/private-archive-keyring.gpg \
+     && ${_more_cmds}
+
+    SAVE ARTIFACT /etc/apt/sources.list /sources.list
+    SAVE ARTIFACT /usr/share/keyrings/private-archive-keyring.gpg /private-archive-keyring.gpg
+
+    IF [ "${ppa}" != '' ]
+        SAVE ARTIFACT /etc/apt/sources.list.d/${ppa}*.list /sources.list.d
+        SAVE ARTIFACT /etc/apt/trusted.gpg.d/${ppa}*.gpg /trusted.gpg.d
+    END
+
+
+APT_INSTALL:
+    COMMAND
+
+    ARG image
+    ARG packages = ''
+    ARG packages_on_hold = ''
+    ARG upgrade = 0
+    ARG clean = 0
+    ARG pm_aux_options = ''
+    ARG more_rm_files = ''
+    ARG more_cmds = :
+
+    IF [ ! -f /root/debconf-preset.txt ]
+        COPY (+repos-conf-apt/debconf-preset.txt --image=${image}) /root/debconf-preset.txt
+        ARG _debconf_cmd_cond = debconf-set-selections /root/debconf-preset.txt
+    ELSE
+        ARG _debconf_cmd_cond = :
+    END
+
+    IF [ ! -f /usr/share/keyrings/private-archive-keyring.gpg ]
+        COPY (+repos-conf-apt/private-archive-keyring.gpg --image=${image}) \
+            /usr/share/keyrings/private-archive-keyring.gpg
+        # NOTE Also copy the `sources.list` file with `multiverse` disabled!
+        COPY (+repos-conf-apt/sources.list --image=${image}) /etc/apt
+    END
+
+    # ...
+
+MAKE_PYTHON_CI_IMAGE:
+    COMMAND
+
+    ARG image
+    ARG python = python3
+    ARG python_pkg = ${python}
+    ARG python_bin = ${python}
+    ARG python_ver = 3.11
+
+    DO +APT_INSTALL --packages="${python_pkg} git"
+
+    ARG _chroot_base = $(dirname $(cat /etc/debian_chroot))
+
+    DO ./share+IMAGE_INIT \
+        --image_description="CI image for Python projects" \
+        --debian_chroot=${_chroot_base}/python/${python_ver}/ci \
+        --storage_name=none
+
+    COPY --dir (+prep-python-ci/local --image=${image}) /usr
+
+    ENV SETUPTOOLS_USE_DISTUTILS='stdlib'
+    ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+
+
+all:
+    LOCALLY
+
+    # Primary images
+    BUILD +ci
+    BUILD +clang-ci
+    BUILD +python-ci
+
+    IF [ "${BUILD_TESTING}" -gt 0 ]
+        # Also include all tests
+        BUILD +tests
+    END
+
+tests:
+    LOCALLY
+
+    BUILD +ci-tests
+    BUILD +clang-ci-tests
+    BUILD +python-ci-tests
+
+ci-tests:
+    FROM +ci
+    COPY .env /
+    DO share+RUN_TESTS --VERBOSE=${VERBOSE}
+
+clang-ci-tests:
+    FROM +clang-ci
+    COPY .env /
+    ENV EXPECT_CLANG_VERSION=${CLANG_VERSION}
+    DO share+RUN_TESTS --VERBOSE=${VERBOSE} --script=ci-tests.sh
+
+python-ci-tests:
+    FROM +python-ci
+    COPY .env /
+    DO share+RUN_TESTS --VERBOSE=${VERBOSE}

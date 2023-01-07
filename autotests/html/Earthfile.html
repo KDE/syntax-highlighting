@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>Earthfile</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (Earthfile) - Theme (Breeze Light)"/>
+</head><body style="background-color:#ffffff;color:#1f1c1b"><pre>
+<span style="color:#898887;"># </span><span style="color:#ca60ca;">kate:</span><span style="color:#898887;"> </span><span style="color:#0095ff;">hl</span><span style="color:#bf0303;"> earthfile</span><span style="color:#0095ff;">;</span>
+
+<span style="font-weight:bold;">VERSION</span> <span style="color:#0057ae;font-style:italic;">--shell-out-anywhere</span> 0.6
+
+<span style="color:#898887;"># </span><span style="color:#0057ae;background-color:#e0e9f8;">BEGIN</span><span style="color:#898887;"> Global parameters</span>
+<span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">DEVTOOLSET_VERSION</span> <span style="color:#ca60ca;">=</span> <span style="color:#b08000;">11</span>
+<span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">DEVTOOLSET</span> <span style="color:#ca60ca;">=</span> devtoolset-<span style="color:#0057ae;">${DEVTOOLSET_VERSION}</span>
+<span style="color:#898887;"># </span><span style="color:#0057ae;background-color:#e0e9f8;">END</span><span style="color:#898887;"> Global parameters</span>
+
+<span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">param_1</span> <span style="color:#ca60ca;">=</span> <span style="color:#bf0303;">&quot;String w/ variable interpolation </span><span style="color:#0057ae;">${DEVTOOLSET}</span><span style="color:#bf0303;">&quot;</span>
+<span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">param_2</span> <span style="color:#ca60ca;">=</span> <span style="color:#bf0303;">'String w/o variable interpolation ${DEVTOOLSET}'</span>
+<span style="color:#898887;"># Run shell command</span>
+<span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">param_3</span> <span style="color:#ca60ca;">=</span> <span style="color:#0057ae;">$(</span><span style="color:#644a9b;font-weight:bold;">echo</span> <span style="color:#bf0303;">&quot;String w/ variable interpolation </span><span style="color:#0057ae;">${</span><span style="color:#0057ae;">DEVTOOLSET</span><span style="color:#0057ae;">}</span><span style="color:#bf0303;">&quot;</span><span style="color:#0057ae;">)</span>
+
+<span style="color:#ff5500;">sample-target:</span>
+    <span style="font-weight:bold;">FROM</span> alpine
+    <span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">stage</span>
+    <span style="font-weight:bold;">COPY</span> <span style="color:#0057ae;font-style:italic;">--if-exists</span> files/<span style="color:#0057ae;">${stage}</span>/ /files/
+    <span style="font-weight:bold;">SAVE</span> <span style="font-weight:bold;">ARTIFACT</span> <span style="color:#0057ae;font-style:italic;">--keep-ts</span> /files /share
+
+<span style="color:#ff5500;">repos-conf-apt:</span>
+    <span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">image</span>
+    <span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">ppa</span>
+
+    <span style="font-weight:bold;">FROM</span> <span style="color:#0057ae;">${image}</span>
+
+    <span style="font-weight:bold;">ENV</span> <span style="color:#0057ae;">DEBIAN_FRONTEND</span><span style="color:#ca60ca;">=</span>noninteractive
+    <span style="font-weight:bold;">ENV</span> <span style="color:#0057ae;">DEBCONF_NONINTERACTIVE_SEEN</span><span style="color:#ca60ca;">=</span>true
+
+    <span style="font-weight:bold;">IF</span> <span style="color:#ca60ca;">[</span> <span style="color:#bf0303;">&quot;</span><span style="color:#0057ae;">${ppa}</span><span style="color:#bf0303;">&quot;</span> <span style="color:#ca60ca;">!=</span> <span style="color:#bf0303;">''</span> <span style="color:#ca60ca;">]</span>
+        <span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">_more_cmds</span> <span style="color:#ca60ca;">=</span> add-apt-repository -y -n ppa:<span style="color:#0057ae;">${ppa}</span>/ppa
+    <span style="font-weight:bold;">ELSE</span>
+        <span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">_more_cmds</span> <span style="color:#ca60ca;">=</span> :
+    <span style="font-weight:bold;">END</span>
+
+    <span style="font-weight:bold;">RUN</span> <span style="color:#0057ae;font-style:italic;">--mount type</span><span style="color:#ca60ca;">=</span><span style="color:#0057ae;font-style:italic;">secret</span><span style="color:#ca60ca;">,</span><span style="color:#0057ae;font-style:italic;">id</span><span style="color:#ca60ca;">=</span><span style="color:#ff5500;">+secrets</span><span style="color:#0095ff;font-weight:bold;">/repo_gpg_key</span><span style="color:#ca60ca;">,</span><span style="color:#0057ae;font-style:italic;">target</span><span style="color:#ca60ca;">=</span><span style="color:#0057ae;font-style:italic;">/run/secrets/private-archive-keyring.gpg</span> \
+        <span style="color:#0057ae;font-style:italic;">--mount type</span><span style="color:#ca60ca;">=</span><span style="color:#0057ae;font-style:italic;">cache</span><span style="color:#ca60ca;">,</span><span style="color:#0057ae;font-style:italic;">target</span><span style="color:#ca60ca;">=</span><span style="color:#0057ae;font-style:italic;">/var/cache/apt/archives</span> \
+        <span style="color:#0057ae;font-style:italic;">--mount type</span><span style="color:#ca60ca;">=</span><span style="color:#0057ae;font-style:italic;">cache</span><span style="color:#ca60ca;">,</span><span style="color:#0057ae;font-style:italic;">target</span><span style="color:#ca60ca;">=</span><span style="color:#0057ae;font-style:italic;">/var/lib/apt/lists</span> \
+        <span style="color:#644a9b;font-weight:bold;">set</span> <span style="color:#0057ae;">-x</span><span style="font-weight:bold;">;</span> <span style="color:#0057ae;">\</span>
+        <span style="color:#0095ff;font-weight:bold;">debconf-set-selections</span> /tmp/debconf-preset.txt <span style="color:#0057ae;">\</span>
+     <span style="font-weight:bold;">&amp;&amp;</span> <span style="color:#644a9b;">rm</span> <span style="color:#0057ae;">-rf</span> /etc/apt/apt.conf.d/docker-clean <span style="color:#0057ae;">\</span>
+     <span style="font-weight:bold;">&amp;&amp;</span> <span style="color:#0095ff;font-weight:bold;">apt-get</span> update <span style="color:#0057ae;">\</span>
+     <span style="font-weight:bold;">&amp;&amp;</span> <span style="color:#0095ff;font-weight:bold;">apt-get</span> install <span style="color:#0057ae;">-y</span> software-properties-common <span style="color:#0057ae;">\</span>
+     <span style="font-weight:bold;">&amp;&amp;</span> <span style="color:#0095ff;font-weight:bold;">add-apt-repository</span> <span style="color:#0057ae;">--remove</span> multiverse <span style="color:#0057ae;">\</span>
+     <span style="font-weight:bold;">&amp;&amp;</span> <span style="color:#0095ff;font-weight:bold;">gpg</span> <span style="color:#0057ae;">-v</span> <span style="color:#0057ae;">--dearmor</span> <span style="color:#0057ae;">-</span> <span style="color:#ca60ca;">&lt;</span>/run/secrets/private-archive-keyring.gpg <span style="color:#ca60ca;">&gt;</span> /usr/share/keyrings/private-archive-keyring.gpg <span style="color:#0057ae;">\</span>
+     <span style="font-weight:bold;">&amp;&amp;</span> <span style="color:#0057ae;">${</span><span style="color:#0057ae;">_more_cmds</span><span style="color:#0057ae;">}</span>
+
+    <span style="font-weight:bold;">SAVE</span> <span style="font-weight:bold;">ARTIFACT</span> /etc/apt/sources.list /sources.list
+    <span style="font-weight:bold;">SAVE</span> <span style="font-weight:bold;">ARTIFACT</span> /usr/share/keyrings/private-archive-keyring.gpg /private-archive-keyring.gpg
+
+    <span style="font-weight:bold;">IF</span> <span style="color:#ca60ca;">[</span> <span style="color:#bf0303;">&quot;</span><span style="color:#0057ae;">${ppa}</span><span style="color:#bf0303;">&quot;</span> <span style="color:#ca60ca;">!=</span> <span style="color:#bf0303;">''</span> <span style="color:#ca60ca;">]</span>
+        <span style="font-weight:bold;">SAVE</span> <span style="font-weight:bold;">ARTIFACT</span> /etc/apt/sources.list.d/<span style="color:#0057ae;">${ppa}</span>*.list /sources.list.d
+        <span style="font-weight:bold;">SAVE</span> <span style="font-weight:bold;">ARTIFACT</span> /etc/apt/trusted.gpg.d/<span style="color:#0057ae;">${ppa}</span>*.gpg /trusted.gpg.d
+    <span style="font-weight:bold;">END</span>
+
+
+<span style="color:#644a9b;">APT_INSTALL:</span>
+    <span style="font-weight:bold;">COMMAND</span>
+
+    <span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">image</span>
+    <span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">packages</span> <span style="color:#ca60ca;">=</span> <span style="color:#bf0303;">''</span>
+    <span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">packages_on_hold</span> <span style="color:#ca60ca;">=</span> <span style="color:#bf0303;">''</span>
+    <span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">upgrade</span> <span style="color:#ca60ca;">=</span> <span style="color:#b08000;">0</span>
+    <span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">clean</span> <span style="color:#ca60ca;">=</span> <span style="color:#b08000;">0</span>
+    <span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">pm_aux_options</span> <span style="color:#ca60ca;">=</span> <span style="color:#bf0303;">''</span>
+    <span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">more_rm_files</span> <span style="color:#ca60ca;">=</span> <span style="color:#bf0303;">''</span>
+    <span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">more_cmds</span> <span style="color:#ca60ca;">=</span> :
+
+    <span style="font-weight:bold;">IF</span> <span style="color:#ca60ca;">[</span> <span style="color:#ca60ca;">!</span> <span style="color:#ca60ca;">-f</span> /root/debconf-preset.txt <span style="color:#ca60ca;">]</span>
+        <span style="font-weight:bold;">COPY</span> (<span style="color:#ff5500;">+repos-conf-apt</span><span style="color:#0095ff;font-weight:bold;">/debconf-preset.txt</span> <span style="color:#0057ae;font-style:italic;">--image</span><span style="color:#ca60ca;">=</span><span style="color:#0057ae;">${image}</span>) /root/debconf-preset.txt
+        <span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">_debconf_cmd_cond</span> <span style="color:#ca60ca;">=</span> debconf-set-selections /root/debconf-preset.txt
+    <span style="font-weight:bold;">ELSE</span>
+        <span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">_debconf_cmd_cond</span> <span style="color:#ca60ca;">=</span> :
+    <span style="font-weight:bold;">END</span>
+
+    <span style="font-weight:bold;">IF</span> <span style="color:#ca60ca;">[</span> <span style="color:#ca60ca;">!</span> <span style="color:#ca60ca;">-f</span> /usr/share/keyrings/private-archive-keyring.gpg <span style="color:#ca60ca;">]</span>
+        <span style="font-weight:bold;">COPY</span> (<span style="color:#ff5500;">+repos-conf-apt</span><span style="color:#0095ff;font-weight:bold;">/private-archive-keyring.gpg</span> <span style="color:#0057ae;font-style:italic;">--image</span><span style="color:#ca60ca;">=</span><span style="color:#0057ae;">${image}</span>) \
+            /usr/share/keyrings/private-archive-keyring.gpg
+        <span style="color:#898887;"># </span><span style="color:#81ca2d;background-color:#f7e6e6;font-weight:bold;">NOTE</span><span style="color:#898887;"> Also copy the `sources.list` file with `multiverse` disabled!</span>
+        <span style="font-weight:bold;">COPY</span> (<span style="color:#ff5500;">+repos-conf-apt</span><span style="color:#0095ff;font-weight:bold;">/sources.list</span> <span style="color:#0057ae;font-style:italic;">--image</span><span style="color:#ca60ca;">=</span><span style="color:#0057ae;">${image}</span>) /etc/apt
+    <span style="font-weight:bold;">END</span>
+
+    <span style="color:#898887;"># ...</span>
+
+<span style="color:#644a9b;">MAKE_PYTHON_CI_IMAGE:</span>
+    <span style="font-weight:bold;">COMMAND</span>
+
+    <span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">image</span>
+    <span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">python</span> <span style="color:#ca60ca;">=</span> python3
+    <span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">python_pkg</span> <span style="color:#ca60ca;">=</span> <span style="color:#0057ae;">${python}</span>
+    <span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">python_bin</span> <span style="color:#ca60ca;">=</span> <span style="color:#0057ae;">${python}</span>
+    <span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">python_ver</span> <span style="color:#ca60ca;">=</span> <span style="color:#b08000;">3</span>.<span style="color:#b08000;">11</span>
+
+    <span style="font-weight:bold;">DO</span> <span style="color:#644a9b;">+APT_INSTALL</span> <span style="color:#0057ae;font-style:italic;">--packages</span><span style="color:#ca60ca;">=</span><span style="color:#bf0303;">&quot;</span><span style="color:#0057ae;">${python_pkg}</span><span style="color:#bf0303;"> git&quot;</span>
+
+    <span style="font-weight:bold;">ARG</span> <span style="color:#0057ae;">_chroot_base</span> <span style="color:#ca60ca;">=</span> <span style="color:#0057ae;">$(</span><span style="color:#644a9b;">dirname</span> <span style="color:#0057ae;">$(</span><span style="color:#644a9b;">cat</span> /etc/debian_chroot<span style="color:#0057ae;">)</span><span style="color:#0057ae;">)</span>
+
+    <span style="font-weight:bold;">DO</span> <span style="color:#0095ff;font-weight:bold;">./share</span><span style="color:#644a9b;">+IMAGE_INIT</span> \
+        <span style="color:#0057ae;font-style:italic;">--image_description</span><span style="color:#ca60ca;">=</span><span style="color:#bf0303;">&quot;CI image for Python projects&quot;</span> \
+        <span style="color:#0057ae;font-style:italic;">--debian_chroot</span><span style="color:#ca60ca;">=</span><span style="color:#0057ae;">${</span><span style="color:#0057ae;">_chroot_base</span><span style="color:#0057ae;">}</span>/python/<span style="color:#0057ae;">${python_ver}</span>/ci \
+        <span style="color:#0057ae;font-style:italic;">--storage_name</span><span style="color:#ca60ca;">=</span>none
+
+    <span style="font-weight:bold;">COPY</span> <span style="color:#0057ae;font-style:italic;">--dir</span> (<span style="color:#ff5500;">+prep-python-ci</span><span style="color:#0095ff;font-weight:bold;">/local</span> <span style="color:#0057ae;font-style:italic;">--image</span><span style="color:#ca60ca;">=</span><span style="color:#0057ae;">${image}</span>) /usr
+
+    <span style="font-weight:bold;">ENV</span> <span style="color:#0057ae;">SETUPTOOLS_USE_DISTUTILS</span><span style="color:#ca60ca;">=</span><span style="color:#bf0303;">'stdlib'</span>
+    <span style="font-weight:bold;">ENV</span> <span style="color:#0057ae;">PIP_DISABLE_PIP_VERSION_CHECK</span><span style="color:#ca60ca;">=</span>1
+
+
+<span style="color:#ff5500;">all:</span>
+    <span style="font-weight:bold;">LOCALLY</span>
+
+    <span style="color:#898887;"># Primary images</span>
+    <span style="font-weight:bold;">BUILD</span> <span style="color:#ff5500;">+ci</span>
+    <span style="font-weight:bold;">BUILD</span> <span style="color:#ff5500;">+clang-ci</span>
+    <span style="font-weight:bold;">BUILD</span> <span style="color:#ff5500;">+python-ci</span>
+
+    <span style="font-weight:bold;">IF</span> <span style="color:#ca60ca;">[</span> <span style="color:#bf0303;">&quot;</span><span style="color:#0057ae;">${BUILD_TESTING}</span><span style="color:#bf0303;">&quot;</span> <span style="color:#ca60ca;">-gt</span> <span style="color:#b08000;">0</span> <span style="color:#ca60ca;">]</span>
+        <span style="color:#898887;"># Also include all tests</span>
+        <span style="font-weight:bold;">BUILD</span> <span style="color:#ff5500;">+tests</span>
+    <span style="font-weight:bold;">END</span>
+
+<span style="color:#ff5500;">tests:</span>
+    <span style="font-weight:bold;">LOCALLY</span>
+
+    <span style="font-weight:bold;">BUILD</span> <span style="color:#ff5500;">+ci-tests</span>
+    <span style="font-weight:bold;">BUILD</span> <span style="color:#ff5500;">+clang-ci-tests</span>
+    <span style="font-weight:bold;">BUILD</span> <span style="color:#ff5500;">+python-ci-tests</span>
+
+<span style="color:#ff5500;">ci-tests:</span>
+    <span style="font-weight:bold;">FROM</span> <span style="color:#ff5500;">+ci</span>
+    <span style="font-weight:bold;">COPY</span> .env /
+    <span style="font-weight:bold;">DO</span> <span style="color:#0095ff;font-weight:bold;">share</span><span style="color:#644a9b;">+RUN_TESTS</span> <span style="color:#0057ae;font-style:italic;">--VERBOSE</span><span style="color:#ca60ca;">=</span><span style="color:#0057ae;">${VERBOSE}</span>
+
+<span style="color:#ff5500;">clang-ci-tests:</span>
+    <span style="font-weight:bold;">FROM</span> <span style="color:#ff5500;">+clang-ci</span>
+    <span style="font-weight:bold;">COPY</span> .env /
+    <span style="font-weight:bold;">ENV</span> <span style="color:#0057ae;">EXPECT_CLANG_VERSION</span><span style="color:#ca60ca;">=</span><span style="color:#0057ae;">${</span><span style="color:#0057ae;">CLANG_VERSION</span><span style="color:#0057ae;">}</span>
+    <span style="font-weight:bold;">DO</span> <span style="color:#0095ff;font-weight:bold;">share</span><span style="color:#644a9b;">+RUN_TESTS</span> <span style="color:#0057ae;font-style:italic;">--VERBOSE</span><span style="color:#ca60ca;">=</span><span style="color:#0057ae;">${VERBOSE}</span> <span style="color:#0057ae;font-style:italic;">--script</span><span style="color:#ca60ca;">=</span>ci-tests.sh
+
+<span style="color:#ff5500;">python-ci-tests:</span>
+    <span style="font-weight:bold;">FROM</span> <span style="color:#ff5500;">+python-ci</span>
+    <span style="font-weight:bold;">COPY</span> .env /
+    <span style="font-weight:bold;">DO</span> <span style="color:#0095ff;font-weight:bold;">share</span><span style="color:#644a9b;">+RUN_TESTS</span> <span style="color:#0057ae;font-style:italic;">--VERBOSE</span><span style="color:#ca60ca;">=</span><span style="color:#0057ae;">${VERBOSE}</span>
+</pre></body></html>

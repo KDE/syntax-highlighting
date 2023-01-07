@@ -1,0 +1,143 @@
+<Comment># </Comment><Keyword>kate:</Keyword><Comment> </Comment><Variable>hl</Variable><String> earthfile</String><Variable>;</Variable><br/>
+<Normal Text></Normal Text><br/>
+<Command>VERSION</Command><Normal Text> </Normal Text><Command Option>--shell-out-anywhere</Command Option><Normal Text> 0.6</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment># </Comment><Region Marker>BEGIN</Region Marker><Comment> Global parameters</Comment><br/>
+<Command>ARG</Command><Normal Text> </Normal Text><Variable>DEVTOOLSET_VERSION</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Integer>11</Integer><br/>
+<Command>ARG</Command><Normal Text> </Normal Text><Variable>DEVTOOLSET</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> devtoolset-</Normal Text><Variable>${DEVTOOLSET_VERSION}</Variable><br/>
+<Comment># </Comment><Region Marker>END</Region Marker><Comment> Global parameters</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Command>ARG</Command><Normal Text> </Normal Text><Variable>param_1</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><String DoubleQ>"String w/ variable interpolation </String DoubleQ><Variable>${DEVTOOLSET}</Variable><String DoubleQ>"</String DoubleQ><br/>
+<Command>ARG</Command><Normal Text> </Normal Text><Variable>param_2</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><String SingleQ>'String w/o variable interpolation ${DEVTOOLSET}'</String SingleQ><br/>
+<Comment># Run shell command</Comment><br/>
+<Command>ARG</Command><Normal Text> </Normal Text><Variable>param_3</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Variable>$(</Variable><Builtin>echo</Builtin><Normal Text> </Normal Text><String DoubleQ>"String w/ variable interpolation </String DoubleQ><Parameter Expansion>${</Parameter Expansion><Variable>DEVTOOLSET</Variable><Parameter Expansion>}</Parameter Expansion><String DoubleQ>"</String DoubleQ><Variable>)</Variable><br/>
+<Normal Text></Normal Text><br/>
+<Target Name>sample-target:</Target Name><br/>
+<Normal Text>    </Normal Text><Command>FROM</Command><Normal Text> alpine</Normal Text><br/>
+<Normal Text>    </Normal Text><Command>ARG</Command><Normal Text> </Normal Text><Variable>stage</Variable><br/>
+<Normal Text>    </Normal Text><Command>COPY</Command><Normal Text> </Normal Text><Command Option>--if-exists</Command Option><Normal Text> files/</Normal Text><Variable>${stage}</Variable><Normal Text>/ /files/</Normal Text><br/>
+<Normal Text>    </Normal Text><Command>SAVE</Command><Normal Text> </Normal Text><Command>ARTIFACT</Command><Normal Text> </Normal Text><Command Option>--keep-ts</Command Option><Normal Text> /files /share</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Target Name>repos-conf-apt:</Target Name><br/>
+<Normal Text>    </Normal Text><Command>ARG</Command><Normal Text> </Normal Text><Variable>image</Variable><br/>
+<Normal Text>    </Normal Text><Command>ARG</Command><Normal Text> </Normal Text><Variable>ppa</Variable><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Command>FROM</Command><Normal Text> </Normal Text><Variable>${image}</Variable><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Command>ENV</Command><Normal Text> </Normal Text><Variable>DEBIAN_FRONTEND</Variable><Operator>=</Operator><Normal Text>noninteractive</Normal Text><br/>
+<Normal Text>    </Normal Text><Command>ENV</Command><Normal Text> </Normal Text><Variable>DEBCONF_NONINTERACTIVE_SEEN</Variable><Operator>=</Operator><Normal Text>true</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Command>IF</Command><Normal Text> </Normal Text><Operator>[</Operator><Normal Text> </Normal Text><String DoubleQ>"</String DoubleQ><Variable>${ppa}</Variable><String DoubleQ>"</String DoubleQ><Normal Text> </Normal Text><Operator>!=</Operator><Normal Text> </Normal Text><String SingleQ>''</String SingleQ><Normal Text> </Normal Text><Operator>]</Operator><br/>
+<Normal Text>        </Normal Text><Command>ARG</Command><Normal Text> </Normal Text><Internal/Local Variable>_more_cmds</Internal/Local Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> add-apt-repository -y -n ppa:</Normal Text><Variable>${ppa}</Variable><Normal Text>/ppa</Normal Text><br/>
+<Normal Text>    </Normal Text><Command>ELSE</Command><br/>
+<Normal Text>        </Normal Text><Command>ARG</Command><Normal Text> </Normal Text><Internal/Local Variable>_more_cmds</Internal/Local Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> :</Normal Text><br/>
+<Normal Text>    </Normal Text><Command>END</Command><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Command>RUN</Command><Normal Text> </Normal Text><Command Option>--mount type</Command Option><Operator>=</Operator><Command Option>secret</Command Option><Operator>,</Operator><Command Option>id</Command Option><Operator>=</Operator><Target Name>+secrets</Target Name><Artifact Name>/repo_gpg_key</Artifact Name><Operator>,</Operator><Command Option>target</Command Option><Operator>=</Operator><Command Option>/run/secrets/private-archive-keyring.gpg</Command Option><Normal Text> \</Normal Text><br/>
+<Normal Text>        </Normal Text><Command Option>--mount type</Command Option><Operator>=</Operator><Command Option>cache</Command Option><Operator>,</Operator><Command Option>target</Command Option><Operator>=</Operator><Command Option>/var/cache/apt/archives</Command Option><Normal Text> \</Normal Text><br/>
+<Normal Text>        </Normal Text><Command Option>--mount type</Command Option><Operator>=</Operator><Command Option>cache</Command Option><Operator>,</Operator><Command Option>target</Command Option><Operator>=</Operator><Command Option>/var/lib/apt/lists</Command Option><Normal Text> \</Normal Text><br/>
+<Normal Text>        </Normal Text><Builtin>set</Builtin><Normal Text> </Normal Text><Option>-x</Option><Control>;</Control><Normal Text> </Normal Text><Escape>\</Escape><br/>
+<Normal Text>        </Normal Text><OtherCommand>debconf-set-selections</OtherCommand><Normal Text> </Normal Text><Path>/tmp/debconf-preset.txt</Path><Normal Text> </Normal Text><Escape>\</Escape><br/>
+<Normal Text>     </Normal Text><Control>&&</Control><Normal Text> </Normal Text><Command>rm</Command><Normal Text> </Normal Text><Option>-rf</Option><Normal Text> </Normal Text><Path>/etc/apt/apt.conf.d/docker-clean</Path><Normal Text> </Normal Text><Escape>\</Escape><br/>
+<Normal Text>     </Normal Text><Control>&&</Control><Normal Text> </Normal Text><OtherCommand>apt-get</OtherCommand><Normal Text> update </Normal Text><Escape>\</Escape><br/>
+<Normal Text>     </Normal Text><Control>&&</Control><Normal Text> </Normal Text><OtherCommand>apt-get</OtherCommand><Normal Text> install </Normal Text><Option>-y</Option><Normal Text> software-properties-common </Normal Text><Escape>\</Escape><br/>
+<Normal Text>     </Normal Text><Control>&&</Control><Normal Text> </Normal Text><OtherCommand>add-apt-repository</OtherCommand><Normal Text> </Normal Text><Option>--remove</Option><Normal Text> multiverse </Normal Text><Escape>\</Escape><br/>
+<Normal Text>     </Normal Text><Control>&&</Control><Normal Text> </Normal Text><OtherCommand>gpg</OtherCommand><Normal Text> </Normal Text><Option>-v</Option><Normal Text> </Normal Text><Option>--dearmor</Option><Normal Text> </Normal Text><Option>-</Option><Normal Text> </Normal Text><Redirection><</Redirection><Path>/run/secrets/private-archive-keyring.gpg</Path><Normal Text> </Normal Text><Redirection>></Redirection><Normal Text> </Normal Text><Path>/usr/share/keyrings/private-archive-keyring.gpg</Path><Normal Text> </Normal Text><Escape>\</Escape><br/>
+<Normal Text>     </Normal Text><Control>&&</Control><Normal Text> </Normal Text><Parameter Expansion>${</Parameter Expansion><Variable>_more_cmds</Variable><Parameter Expansion>}</Parameter Expansion><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Command>SAVE</Command><Normal Text> </Normal Text><Command>ARTIFACT</Command><Normal Text> /etc/apt/sources.list /sources.list</Normal Text><br/>
+<Normal Text>    </Normal Text><Command>SAVE</Command><Normal Text> </Normal Text><Command>ARTIFACT</Command><Normal Text> /usr/share/keyrings/private-archive-keyring.gpg /private-archive-keyring.gpg</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Command>IF</Command><Normal Text> </Normal Text><Operator>[</Operator><Normal Text> </Normal Text><String DoubleQ>"</String DoubleQ><Variable>${ppa}</Variable><String DoubleQ>"</String DoubleQ><Normal Text> </Normal Text><Operator>!=</Operator><Normal Text> </Normal Text><String SingleQ>''</String SingleQ><Normal Text> </Normal Text><Operator>]</Operator><br/>
+<Normal Text>        </Normal Text><Command>SAVE</Command><Normal Text> </Normal Text><Command>ARTIFACT</Command><Normal Text> /etc/apt/sources.list.d/</Normal Text><Variable>${ppa}</Variable><Normal Text>*.list /sources.list.d</Normal Text><br/>
+<Normal Text>        </Normal Text><Command>SAVE</Command><Normal Text> </Normal Text><Command>ARTIFACT</Command><Normal Text> /etc/apt/trusted.gpg.d/</Normal Text><Variable>${ppa}</Variable><Normal Text>*.gpg /trusted.gpg.d</Normal Text><br/>
+<Normal Text>    </Normal Text><Command>END</Command><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<User Defined Command>APT_INSTALL:</User Defined Command><br/>
+<Normal Text>    </Normal Text><Command>COMMAND</Command><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Command>ARG</Command><Normal Text> </Normal Text><Variable>image</Variable><br/>
+<Normal Text>    </Normal Text><Command>ARG</Command><Normal Text> </Normal Text><Variable>packages</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><String SingleQ>''</String SingleQ><br/>
+<Normal Text>    </Normal Text><Command>ARG</Command><Normal Text> </Normal Text><Variable>packages_on_hold</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><String SingleQ>''</String SingleQ><br/>
+<Normal Text>    </Normal Text><Command>ARG</Command><Normal Text> </Normal Text><Variable>upgrade</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Integer>0</Integer><br/>
+<Normal Text>    </Normal Text><Command>ARG</Command><Normal Text> </Normal Text><Variable>clean</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Integer>0</Integer><br/>
+<Normal Text>    </Normal Text><Command>ARG</Command><Normal Text> </Normal Text><Variable>pm_aux_options</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><String SingleQ>''</String SingleQ><br/>
+<Normal Text>    </Normal Text><Command>ARG</Command><Normal Text> </Normal Text><Variable>more_rm_files</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><String SingleQ>''</String SingleQ><br/>
+<Normal Text>    </Normal Text><Command>ARG</Command><Normal Text> </Normal Text><Variable>more_cmds</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> :</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Command>IF</Command><Normal Text> </Normal Text><Operator>[</Operator><Normal Text> </Normal Text><Operator>!</Operator><Normal Text> </Normal Text><Operator>-f</Operator><Normal Text> /root/debconf-preset.txt </Normal Text><Operator>]</Operator><br/>
+<Normal Text>        </Normal Text><Command>COPY</Command><Normal Text> (</Normal Text><Target Name>+repos-conf-apt</Target Name><Artifact Name>/debconf-preset.txt</Artifact Name><Normal Text> </Normal Text><Build Arg>--image</Build Arg><Operator>=</Operator><Variable>${image}</Variable><Normal Text>) /root/debconf-preset.txt</Normal Text><br/>
+<Normal Text>        </Normal Text><Command>ARG</Command><Normal Text> </Normal Text><Internal/Local Variable>_debconf_cmd_cond</Internal/Local Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> debconf-set-selections /root/debconf-preset.txt</Normal Text><br/>
+<Normal Text>    </Normal Text><Command>ELSE</Command><br/>
+<Normal Text>        </Normal Text><Command>ARG</Command><Normal Text> </Normal Text><Internal/Local Variable>_debconf_cmd_cond</Internal/Local Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> :</Normal Text><br/>
+<Normal Text>    </Normal Text><Command>END</Command><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Command>IF</Command><Normal Text> </Normal Text><Operator>[</Operator><Normal Text> </Normal Text><Operator>!</Operator><Normal Text> </Normal Text><Operator>-f</Operator><Normal Text> /usr/share/keyrings/private-archive-keyring.gpg </Normal Text><Operator>]</Operator><br/>
+<Normal Text>        </Normal Text><Command>COPY</Command><Normal Text> (</Normal Text><Target Name>+repos-conf-apt</Target Name><Artifact Name>/private-archive-keyring.gpg</Artifact Name><Normal Text> </Normal Text><Build Arg>--image</Build Arg><Operator>=</Operator><Variable>${image}</Variable><Normal Text>) \</Normal Text><br/>
+<Normal Text>            /usr/share/keyrings/private-archive-keyring.gpg</Normal Text><br/>
+<Normal Text>        </Normal Text><Comment># </Comment><Alert Level 3>NOTE</Alert Level 3><Comment> Also copy the `sources.list` file with `multiverse` disabled!</Comment><br/>
+<Normal Text>        </Normal Text><Command>COPY</Command><Normal Text> (</Normal Text><Target Name>+repos-conf-apt</Target Name><Artifact Name>/sources.list</Artifact Name><Normal Text> </Normal Text><Build Arg>--image</Build Arg><Operator>=</Operator><Variable>${image}</Variable><Normal Text>) /etc/apt</Normal Text><br/>
+<Normal Text>    </Normal Text><Command>END</Command><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Comment># ...</Comment><br/>
+<Normal Text></Normal Text><br/>
+<User Defined Command>MAKE_PYTHON_CI_IMAGE:</User Defined Command><br/>
+<Normal Text>    </Normal Text><Command>COMMAND</Command><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Command>ARG</Command><Normal Text> </Normal Text><Variable>image</Variable><br/>
+<Normal Text>    </Normal Text><Command>ARG</Command><Normal Text> </Normal Text><Variable>python</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> python3</Normal Text><br/>
+<Normal Text>    </Normal Text><Command>ARG</Command><Normal Text> </Normal Text><Variable>python_pkg</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Variable>${python}</Variable><br/>
+<Normal Text>    </Normal Text><Command>ARG</Command><Normal Text> </Normal Text><Variable>python_bin</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Variable>${python}</Variable><br/>
+<Normal Text>    </Normal Text><Command>ARG</Command><Normal Text> </Normal Text><Variable>python_ver</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Integer>3</Integer><Normal Text>.</Normal Text><Integer>11</Integer><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Command>DO</Command><Normal Text> </Normal Text><User Defined Command>+APT_INSTALL</User Defined Command><Normal Text> </Normal Text><Build Arg>--packages</Build Arg><Operator>=</Operator><String DoubleQ>"</String DoubleQ><Variable>${python_pkg}</Variable><String DoubleQ> git"</String DoubleQ><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Command>ARG</Command><Normal Text> </Normal Text><Internal/Local Variable>_chroot_base</Internal/Local Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Variable>$(</Variable><Command>dirname</Command><Normal Text> </Normal Text><Parameter Expansion>$(</Parameter Expansion><Command>cat</Command><Normal Text> </Normal Text><Path>/etc/debian_chroot</Path><Parameter Expansion>)</Parameter Expansion><Variable>)</Variable><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Command>DO</Command><Normal Text> </Normal Text><Reference>./share</Reference><User Defined Command>+IMAGE_INIT</User Defined Command><Normal Text> \</Normal Text><br/>
+<Normal Text>        </Normal Text><Build Arg>--image_description</Build Arg><Operator>=</Operator><String DoubleQ>"CI image for Python projects"</String DoubleQ><Normal Text> \</Normal Text><br/>
+<Normal Text>        </Normal Text><Build Arg>--debian_chroot</Build Arg><Operator>=</Operator><Variable>${</Variable><Internal/Local Variable>_chroot_base</Internal/Local Variable><Variable>}</Variable><Normal Text>/python/</Normal Text><Variable>${python_ver}</Variable><Normal Text>/ci \</Normal Text><br/>
+<Normal Text>        </Normal Text><Build Arg>--storage_name</Build Arg><Operator>=</Operator><Normal Text>none</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Command>COPY</Command><Normal Text> </Normal Text><Command Option>--dir</Command Option><Normal Text> (</Normal Text><Target Name>+prep-python-ci</Target Name><Artifact Name>/local</Artifact Name><Normal Text> </Normal Text><Build Arg>--image</Build Arg><Operator>=</Operator><Variable>${image}</Variable><Normal Text>) /usr</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Command>ENV</Command><Normal Text> </Normal Text><Variable>SETUPTOOLS_USE_DISTUTILS</Variable><Operator>=</Operator><String SingleQ>'stdlib'</String SingleQ><br/>
+<Normal Text>    </Normal Text><Command>ENV</Command><Normal Text> </Normal Text><Variable>PIP_DISABLE_PIP_VERSION_CHECK</Variable><Operator>=</Operator><Normal Text>1</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Target Name>all:</Target Name><br/>
+<Normal Text>    </Normal Text><Command>LOCALLY</Command><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Comment># Primary images</Comment><br/>
+<Normal Text>    </Normal Text><Command>BUILD</Command><Normal Text> </Normal Text><Target Name>+ci</Target Name><br/>
+<Normal Text>    </Normal Text><Command>BUILD</Command><Normal Text> </Normal Text><Target Name>+clang-ci</Target Name><br/>
+<Normal Text>    </Normal Text><Command>BUILD</Command><Normal Text> </Normal Text><Target Name>+python-ci</Target Name><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Command>IF</Command><Normal Text> </Normal Text><Operator>[</Operator><Normal Text> </Normal Text><String DoubleQ>"</String DoubleQ><Variable>${BUILD_TESTING}</Variable><String DoubleQ>"</String DoubleQ><Normal Text> </Normal Text><Operator>-gt</Operator><Normal Text> </Normal Text><Integer>0</Integer><Normal Text> </Normal Text><Operator>]</Operator><br/>
+<Normal Text>        </Normal Text><Comment># Also include all tests</Comment><br/>
+<Normal Text>        </Normal Text><Command>BUILD</Command><Normal Text> </Normal Text><Target Name>+tests</Target Name><br/>
+<Normal Text>    </Normal Text><Command>END</Command><br/>
+<Normal Text></Normal Text><br/>
+<Target Name>tests:</Target Name><br/>
+<Normal Text>    </Normal Text><Command>LOCALLY</Command><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Command>BUILD</Command><Normal Text> </Normal Text><Target Name>+ci-tests</Target Name><br/>
+<Normal Text>    </Normal Text><Command>BUILD</Command><Normal Text> </Normal Text><Target Name>+clang-ci-tests</Target Name><br/>
+<Normal Text>    </Normal Text><Command>BUILD</Command><Normal Text> </Normal Text><Target Name>+python-ci-tests</Target Name><br/>
+<Normal Text></Normal Text><br/>
+<Target Name>ci-tests:</Target Name><br/>
+<Normal Text>    </Normal Text><Command>FROM</Command><Normal Text> </Normal Text><Target Name>+ci</Target Name><br/>
+<Normal Text>    </Normal Text><Command>COPY</Command><Normal Text> .env /</Normal Text><br/>
+<Normal Text>    </Normal Text><Command>DO</Command><Normal Text> </Normal Text><Reference>share</Reference><User Defined Command>+RUN_TESTS</User Defined Command><Normal Text> </Normal Text><Build Arg>--VERBOSE</Build Arg><Operator>=</Operator><Variable>${VERBOSE}</Variable><br/>
+<Normal Text></Normal Text><br/>
+<Target Name>clang-ci-tests:</Target Name><br/>
+<Normal Text>    </Normal Text><Command>FROM</Command><Normal Text> </Normal Text><Target Name>+clang-ci</Target Name><br/>
+<Normal Text>    </Normal Text><Command>COPY</Command><Normal Text> .env /</Normal Text><br/>
+<Normal Text>    </Normal Text><Command>ENV</Command><Normal Text> </Normal Text><Variable>EXPECT_CLANG_VERSION</Variable><Operator>=</Operator><Parameter Expansion>${</Parameter Expansion><Variable>CLANG_VERSION</Variable><Parameter Expansion>}</Parameter Expansion><br/>
+<Normal Text>    </Normal Text><Command>DO</Command><Normal Text> </Normal Text><Reference>share</Reference><User Defined Command>+RUN_TESTS</User Defined Command><Normal Text> </Normal Text><Build Arg>--VERBOSE</Build Arg><Operator>=</Operator><Variable>${VERBOSE}</Variable><Normal Text> </Normal Text><Build Arg>--script</Build Arg><Operator>=</Operator><Normal Text>ci-tests.sh</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Target Name>python-ci-tests:</Target Name><br/>
+<Normal Text>    </Normal Text><Command>FROM</Command><Normal Text> </Normal Text><Target Name>+python-ci</Target Name><br/>
+<Normal Text>    </Normal Text><Command>COPY</Command><Normal Text> .env /</Normal Text><br/>
+<Normal Text>    </Normal Text><Command>DO</Command><Normal Text> </Normal Text><Reference>share</Reference><User Defined Command>+RUN_TESTS</User Defined Command><Normal Text> </Normal Text><Build Arg>--VERBOSE</Build Arg><Operator>=</Operator><Variable>${VERBOSE}</Variable><br/>

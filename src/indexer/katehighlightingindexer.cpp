@@ -2678,6 +2678,11 @@ int main(int argc, char *argv[])
             xml.readNext();
             filesChecker.processElement(xml);
         }
+
+        if (xml.hasError()) {
+            anyError = 33;
+            qWarning() << hlFilename << "-" << xml.errorString() << "@ offset" << xml.characterOffset();
+        }
     }
 
     filesChecker.resolveContexts();

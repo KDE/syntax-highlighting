@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd" [
-  <!ENTITY div "ID|IDENTIFICATION|ENVIRONMENT|DATA|PROCEDURE">
-  <!ENTITY sec "COMMUNICATION|CONFIGURATION|INPUT-OUTPUT|FILE|WORKING-STORAGE|LOCAL-STORAGE|LINKAGE|REPORT|SCREEN">
+  <!ENTITY div "DATA|ENVIRONMENT|ID|IDENTIFICATION|PROCEDURE">
+  <!ENTITY sec "COMMUNICATION|CONFIGURATION|FILE|INPUT-OUTPUT|LINKAGE|LOCAL-STORAGE|REPORT|SCREEN|WORKING-STORAGE">
   <!ENTITY seplist "[\s&lt;>+/*$,;():=.]">
+  <!ENTITY picsym "([-+*$ABCDENPRSUVXZ910]+(\([0-9]+\))?)+">
 ]>
-<language name="COBOL" section="Sources" version="1" kateversion="5.62" extensions="*.cob;*.cbl"
+<language name="COBOL" section="Sources" version="2" kateversion="5.62"
+          extensions="*.cob;*.cbl;*.cpy;*.copy;*.lst;*.pco;*.scb;*.sqb"
           author="Jonathan Poelen (jonathan.poelen@gmail.com);github.com/MihailJP" license="MIT">
 <highlighting>
 
@@ -640,20 +642,21 @@
     <DetectChar attribute="Comment" context="comment" char="/" column="0"/>
     <DetectChar attribute="String" context="stringDQ" char="&quot;"/>
     <DetectChar attribute="String" context="stringSQ" char="'"/>
-    <Detect2Chars attribute="Comment" context="comment" char="*" char1=">"/>
+    <StringDetect attribute="Comment" context="comment" String="*>"/>
     <AnyChar attribute="Normal Text" String="&lt;>+/*$,;():="/>
-    <WordDetect attribute="Keywords" context="end" String="END" insensitive="1"/>
     <keyword attribute="Keywords" String="keywords-block" beginRegion="ID"/>
     <keyword attribute="Other Reserved Words" context="picture" String="picture"/>
     <keyword attribute="Verb" String="verbs"/>
     <keyword attribute="Usage" String="usages"/>
     <keyword attribute="Constant" String="constants"/>
     <keyword attribute="Logical" String="logical"/>
+    <WordDetect attribute="Keywords" context="end" String="END" insensitive="1"/>
     <RegExpr attribute="Division" String="\b(?!-)(&div;)\s+DIVISION\b(?!-)" insensitive="1"/>
     <RegExpr attribute="Section" String="\b(?!-)(&sec;)\s+SECTION\b(?!-)" insensitive="1"/>
     <keyword attribute="Keywords" String="keywords"/>
     <keyword attribute="Other Reserved Words" String="reserved"/>
-    <RegExpr attribute="Other Reserved Words" context="function" String="\b(?!-)FUNCTION\s+" insensitive="1"/>
+    <WordDetect attribute="Other Reserved Words" context="function" String="FUNCTION" insensitive="1"/>
+    <WordDetect context="exec" String="EXEC" insensitive="1" lookAhead="1"/>
     <RegExpr attribute="Float" String="(?&lt;=^|\s)-?[0-9]*\.[0-9]+(?=$|&seplist;)" context="#stay"/>
     <RegExpr attribute="Decimal" String="(?&lt;=^|\s)-?[0-9]+(?=$|&seplist;)" context="#stay"/>
     <RegExpr attribute="Hex" String="H(&quot;[0-9A-F]+&quot;|'[0-9A-F]+')" insensitive="1"/>
@@ -687,16 +690,27 @@
     <DetectSpaces attribute="Normal Text" context="#pop!picture3"/>
   </context>
   <context name="picture3" attribute="Error" lineEndContext="#pop">
-    <RegExpr attribute="Picture" String="\s*(([\-$*,+S]+(\([0-9]+\))?)*(Z(\([0-9]+\))?|,)*([9AXPN](\([0-9]+\))?|[,/B])*[.V]?([9AXPN](\([0-9]+\))?|[,/B])+(CR|DB)?|[+]+)(?=\.?(\s|$))" insensitive="1" context="#pop"/>
-    <AnyChar attribute="Normal Text" context="#pop" String=". &#9;"/>
-    <Detect2Chars attribute="Comment" context="#pop!comment" char="*" char1=">"/>
+    <RegExpr attribute="Picture" String="\s*&picsym;([,./]&picsym;)*(CR|DB)?" insensitive="1" context="#pop"/>
+    <AnyChar attribute="Normal Text" context="#pop" String=",./ &#9;"/>
+    <StringDetect attribute="Comment" context="#pop!comment" String="*>"/>
   </context>
 
   <context name="function" attribute="Error" lineEndContext="#pop">
     <keyword attribute="Function" context="#pop" String="functions"/>
     <WordDetect attribute="Other Reserved Words" context="#pop" String="ALL" insensitive="1"/>
     <AnyChar attribute="Normal Text" context="#pop" String=". &#9;"/>
-    <Detect2Chars attribute="Comment" context="#pop!comment" char="*" char1=">"/>
+    <StringDetect attribute="Comment" context="#pop!comment" String="*>"/>
+  </context>
+
+  <context name="exec" attribute="Normal Text" lineEndContext="#pop">
+    <RegExpr attribute="SQL" String="EXEC\s+SQL\b(?!-)" context="#pop!sql" insensitive="1" beginRegion="sql"/>
+    <DetectIdentifier attribute="Normal Text" context="#pop"/>
+  </context>
+
+  <context name="sql" attribute="Normal Text" lineEndContext="#stay">
+    <StringDetect attribute="Comment" context="comment" String="*>"/>
+    <WordDetect attribute="SQL" context="#pop" String="END-EXEC" insensitive="1" endRegion="sql"/>
+    <IncludeRules context="##SQL" includeAttrib="1"/>
   </context>
 
 </contexts>
@@ -713,6 +727,7 @@
   <itemData name="Char" defStyleNum="dsChar" spellChecking="0"/>
   <itemData name="Division" defStyleNum="dsRegionMarker" spellChecking="0"/>
   <itemData name="Section" defStyleNum="dsRegionMarker" spellChecking="0"/>
+  <itemData name="SQL" defStyleNum="dsRegionMarker" spellChecking="0"/>
   <itemData name="Keywords" defStyleNum="dsKeyword" spellChecking="0"/>
   <itemData name="Verb" defStyleNum="dsKeyword" spellChecking="0"/>
   <itemData name="Picture" defStyleNum="dsDataType" spellChecking="0"/>

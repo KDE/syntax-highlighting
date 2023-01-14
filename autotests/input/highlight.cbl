@@ -103,3 +103,10 @@ END-EVALUATE
 //            DD DSNAME=SYS1.LINKLIB,DISP=SHR                           00200000
 //GO.SYSPRINT DD SYSOUT=A                                               00210000
 //                                                                      00220000
+
+*> COBOL with embedded SQL.
+*> Normally for extensions pco, scb and sqb, but currently integrated into COBOL
+EXEC SQL
+    select count(*) from abc
+END-EXEC
+ADD 1 TO x

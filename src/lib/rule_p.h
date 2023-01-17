@@ -83,6 +83,14 @@ public:
         return m_type == Type::LineContinue;
     }
 
+    // If different from nullptr, then the rule uses the skipOffset parameter of MatchResult.
+    // This is used by AbstractHighlighter::highlightLine() to look for a rule
+    // in the skipOffsets cache only if it can be found there.
+    const void *skippableOffsetId() const
+    {
+        return m_skippableOffsetId;
+    }
+
     virtual MatchResult doMatch(QStringView text, int offset, const QStringList &captures) const = 0;
 
     static Rule::Ptr create(DefinitionData &def, const HighlightingContextData::Rule &ruleData, QStringView lookupContextName);
@@ -98,6 +106,10 @@ private:
         IncludeRules,
     };
 
+protected:
+    const void *m_skippableOffsetId = nullptr;
+
+private:
     Format m_attributeFormat;
     ContextSwitch m_context;
     int m_column = -1;

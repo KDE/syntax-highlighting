@@ -32,7 +32,7 @@ include(ECMQmlModule)
 ecm_setup_version(PROJECT
     VARIABLE_PREFIX SyntaxHighlighting
     VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/ksyntaxhighlighting_version.h"
-    PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KF5SyntaxHighlightingConfigVersion.cmake"
+    PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KF6SyntaxHighlightingConfigVersion.cmake"
 )
 
 set(EXCLUDE_DEPRECATED_BEFORE_AND_AT 0 CACHE STRING "Control the range of deprecated API excluded from the build [default=0].")
@@ -114,35 +114,35 @@ endif()
 #
 # CMake package config file generation
 #
-set(CMAKECONFIG_INSTALL_DIR "${KDE_INSTALL_CMAKEPACKAGEDIR}/KF5SyntaxHighlighting")
+set(CMAKECONFIG_INSTALL_DIR "${KDE_INSTALL_CMAKEPACKAGEDIR}/KF6SyntaxHighlighting")
 
 if (BUILD_QCH)
     ecm_install_qch_export(
-        TARGETS KF5SyntaxHighlighting_QCH
-        FILE KF5SyntaxHighlightingQchTargets.cmake
+        TARGETS KF6SyntaxHighlighting_QCH
+        FILE KF6SyntaxHighlightingQchTargets.cmake
         DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
         COMPONENT Devel
     )
-    set(PACKAGE_INCLUDE_QCHTARGETS "include(\"\${CMAKE_CURRENT_LIST_DIR}/KF5SyntaxHighlightingQchTargets.cmake\")")
+    set(PACKAGE_INCLUDE_QCHTARGETS "include(\"\${CMAKE_CURRENT_LIST_DIR}/KF6SyntaxHighlightingQchTargets.cmake\")")
 endif()
 
 configure_package_config_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/KF5SyntaxHighlightingConfig.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/KF5SyntaxHighlightingConfig.cmake"
+    "${CMAKE_CURRENT_SOURCE_DIR}/KF6SyntaxHighlightingConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/KF6SyntaxHighlightingConfig.cmake"
     INSTALL_DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
 )
 
 install(FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/KF5SyntaxHighlightingConfig.cmake"
-        "${CMAKE_CURRENT_BINARY_DIR}/KF5SyntaxHighlightingConfigVersion.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/KF6SyntaxHighlightingConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/KF6SyntaxHighlightingConfigVersion.cmake"
         DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
         COMPONENT Devel)
 
-if(TARGET KF5SyntaxHighlighting)
-    install(EXPORT KF5SyntaxHighlightingTargets
+if(TARGET KF6SyntaxHighlighting)
+    install(EXPORT KF6SyntaxHighlightingTargets
         DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
-        FILE KF5SyntaxHighlightingTargets.cmake
-        NAMESPACE KF5::)
+        FILE KF6SyntaxHighlightingTargets.cmake
+        NAMESPACE KF6::)
 endif()
 
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ksyntaxhighlighting_version.h"

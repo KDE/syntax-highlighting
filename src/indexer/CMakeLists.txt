@@ -4,13 +4,13 @@ if(CMAKE_CROSSCOMPILING AND KATEHIGHLIGHTINGINDEXER_EXECUTABLE)
     add_executable(katehighlightingindexer IMPORTED GLOBAL)
     set_target_properties(katehighlightingindexer PROPERTIES IMPORTED_LOCATION ${KATEHIGHLIGHTINGINDEXER_EXECUTABLE})
 elseif(CMAKE_CROSSCOMPILING)
-    if (NOT KF5_HOST_TOOLING)
-        message(FATAL_ERROR "Please provide a prefix with a native Qt build and pass -DKF5_HOST_TOOLING=path")
+    if (NOT KF6_HOST_TOOLING)
+        message(FATAL_ERROR "Please provide a prefix with a native Qt build and pass -DKF6_HOST_TOOLING=path")
     endif()
 
     # search native tooling prefix
-    string(FIND ${KF5_HOST_TOOLING} /lib idx)
-    string(SUBSTRING ${KF5_HOST_TOOLING} 0 ${idx} NATIVE_PREFIX)
+    string(FIND ${KF6_HOST_TOOLING} /lib idx)
+    string(SUBSTRING ${KF6_HOST_TOOLING} 0 ${idx} NATIVE_PREFIX)
     message(STATUS "Building katehighlightingindexer against ${NATIVE_PREFIX}")
 
     include(ExternalProject)

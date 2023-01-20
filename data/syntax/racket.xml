@@ -16,7 +16,7 @@
 Since Racket supports multiple scheme-like language, this was an extension to scheme.xml
 It also contains keywords for a few popular racket-based langs.
 -->
-<language version="1" kateversion="5.62" name="Racket" section="Scripts" extensions="*.rkt;*.scrbl" author="slbtty(shenlebantongying@gmail.com)" license="MIT" priority="9">
+<language version="2" kateversion="5.62" name="Racket" section="Scripts" extensions="*.rkt;*.scrbl" author="slbtty(shenlebantongying@gmail.com)" license="MIT" priority="9">
   <highlighting>
     <list name="operators">
       <item>&lt;=</item>
@@ -809,14 +809,7 @@ It also contains keywords for a few popular racket-based langs.
       <item>zero?</item>
     </list>
     <contexts>
-      <context name="Level0" attribute="Normal" lineEndContext="#stay">
-        <DetectChar attribute="Brackets1" context="Level1" char="("/>
-        <Detect2Chars attribute="Brackets1" context="Level1" char="'" char1="("/>
-        <Detect2Chars attribute="Brackets1" context="Level1" char="`" char1="("/>
-        <Detect2Chars attribute="Brackets1" context="Level1" char="#" char1="("/>
-        <Detect2Chars attribute="Brackets1" context="Level1" char="@" char1="("/>
-        <IncludeRules context="Default"/>
-      </context>
+
 
       <context name="Default" attribute="Normal" lineEndContext="#stay">
         <DetectSpaces/>
@@ -827,7 +820,7 @@ It also contains keywords for a few popular racket-based langs.
         <DetectChar attribute="Comment" context="semicolon" char=";" lookAhead="1"/>
         <DetectChar attribute="String" context="String" char="&quot;"/>
         <Detect2Chars attribute="String" context="Template" char="&amp;" char1="{"/>
-        <AnyChar attribute="Other Brackets" context="#stay" String="{}[]"/>
+        <AnyChar attribute="Brackets" context="#stay" String="(){}[]"/>
         <keyword attribute="Keyword" context="#stay" String="keywords"/>
         <keyword attribute="Definition" context="function_decl" String="defines"/>
         <keyword attribute="Operator" context="#stay" String="operators"/>
@@ -848,8 +841,6 @@ It also contains keywords for a few popular racket-based langs.
       <context name="TemplateTemplate" attribute="String" lineEndContext="#pop">
         <Detect2Chars attribute="Operator" context="#stay" char="&amp;" char1="|" firstNonSpace="1"/>
         <Detect2Chars attribute="Operator" context="#pop!NotNewlineTemplate" char="&amp;" char1="-"/>
-        <Detect2Chars attribute="Brackets1" context="#pop!Level1" char="&amp;" char1="("/>
-        <Detect2Chars attribute="Brackets1" context="#pop!EmbeddedExpressionTemplate" char="&amp;" char1="["/>
         <Detect2Chars attribute="Extension" context="#pop!FormatTemplate" char="&amp;" char1="~"/>
         <StringDetect attribute="Comment" context="#pop!MultiLineComment" String="&amp;#|" beginRegion="comment"/>
         <RegExpr attribute="Char" context="#pop!EndCharTemplate" String="(&amp;(?:#(?:[0-9]+|x[0-9a-fA-F]+)|[_a-zA-Z][-:_a-zA-Z0-9]*))" lookAhead="1"/>
@@ -859,10 +850,6 @@ It also contains keywords for a few popular racket-based langs.
         <AnyChar attribute="Extension" context="#pop" String="({["/>
         <AnyChar attribute="Extension" context="FormatTemplate" String=")}]"/>
         <RegExpr attribute="Extension" context="#pop" String="[^(){}\[\]]+"/>
-      </context>
-      <context name="EmbeddedExpressionTemplate" attribute="Normal" lineEndContext="#stay">
-        <DetectChar attribute="Brackets1" context="#pop" char="]"/>
-        <IncludeRules context="Level1"/>
       </context>
       <context name="NotNewlineTemplate" attribute="String" lineEndContext="#pop" fallthroughContext="#pop">
         <DetectSpaces/>
@@ -919,12 +906,10 @@ It also contains keywords for a few popular racket-based langs.
       </context>
 
       <context name="XMLTagExpr1" attribute="Normal" lineEndContext="#stay">
-        <DetectChar attribute="Brackets1" context="Level1" char="("/>
         <DetectChar attribute="XML Tag" context="#pop!XMLTag" char=")"/>
         <IncludeRules context="Default"/>
       </context>
       <context name="XMLTagExpr2" attribute="Normal" lineEndContext="#stay">
-        <DetectChar attribute="Brackets1" context="Level1" char="("/>
         <DetectChar attribute="XML Tag" context="#pop!XMLTag" char="}"/>
         <IncludeRules context="Default"/>
       </context>
@@ -981,24 +966,10 @@ It also contains keywords for a few popular racket-based langs.
         <DetectChar attribute="XML String" context="XMLEscape" char="&amp;" lookAhead="1"/>
         <DetectChar attribute="XML Error" context="#stay" char="&lt;"/>
       </context>
-
       <context name="XMLEscape" attribute="XML String" lineEndContext="#stay">
-        <Detect2Chars attribute="Brackets1" context="#pop!XMLEnclosedExpr1" char="&amp;" char1="("/>
-        <Detect2Chars attribute="Brackets1" context="#pop!XMLEnclosedExpr2" char="&amp;" char1="{"/>
         <RegExpr attribute="XML Entity" context="#pop" String="&amp;(?:lt|gt|amp|quot|apos|#[0-9]+|x[0-9a-fA-F]+);"/>
         <DetectChar attribute="XML Error" context="#pop" char="&amp;"/>
       </context>
-      <context name="XMLEnclosedExpr1" attribute="Normal" lineEndContext="#pop">
-        <DetectChar attribute="Brackets2" context="Level2" char="("/>
-        <DetectChar attribute="Brackets1" context="#pop" char=")"/>
-        <IncludeRules context="Default"/>
-      </context>
-      <context name="XMLEnclosedExpr2" attribute="Normal" lineEndContext="#pop">
-        <DetectChar attribute="Brackets2" context="Level2" char="("/>
-        <DetectChar attribute="Brackets1" context="#pop" char="}"/>
-        <IncludeRules context="Default"/>
-      </context>
-
       <context name="XMLProc" attribute="XML Attribute" lineEndContext="#stay" fallthroughContext="XMLProcAttrs">
         <RegExpr attribute="XML Tag" context="XMLProcAttrs" String="[^\s?]+"/>
       </context>
@@ -1298,65 +1269,8 @@ It also contains keywords for a few popular racket-based langs.
         <DetectSpaces/>
       </context>
 
-
       <context name="function_decl" attribute="Function" lineEndContext="#stay">
         <RegExpr attribute="Function" context="#pop" String="\s*[A-Za-z0-9-!$%&quot;*/:&lt;=>?~_^+.@]*\s*"/>
-      </context>
-
-
-      <context name="Level1" attribute="Normal" lineEndContext="#stay">
-        <DetectChar attribute="Brackets2" context="Level2" char="("/>
-        <Detect2Chars attribute="Brackets2" context="Level2" char="'" char1="("/>
-        <Detect2Chars attribute="Brackets2" context="Level2" char="`" char1="("/>
-        <Detect2Chars attribute="Brackets2" context="Level2" char="#" char1="("/>
-        <Detect2Chars attribute="Brackets2" context="Level2" char="@" char1="("/>
-        <DetectChar attribute="Brackets1" context="#pop" char=")"/>
-        <IncludeRules context="Default"/>
-      </context>
-      <context name="Level2" attribute="Normal" lineEndContext="#stay">
-        <DetectChar attribute="Brackets3" context="Level3" char="("/>
-        <Detect2Chars attribute="Brackets3" context="Level3" char="'" char1="("/>
-        <Detect2Chars attribute="Brackets3" context="Level3" char="`" char1="("/>
-        <Detect2Chars attribute="Brackets3" context="Level3" char="#" char1="("/>
-        <Detect2Chars attribute="Brackets3" context="Level3" char="@" char1="("/>
-        <DetectChar attribute="Brackets2" context="#pop" char=")"/>
-        <IncludeRules context="Default"/>
-      </context>
-      <context name="Level3" attribute="Normal" lineEndContext="#stay">
-        <DetectChar attribute="Brackets4" context="Level4" char="("/>
-        <Detect2Chars attribute="Brackets4" context="Level4" char="'" char1="("/>
-        <Detect2Chars attribute="Brackets4" context="Level4" char="`" char1="("/>
-        <Detect2Chars attribute="Brackets4" context="Level4" char="#" char1="("/>
-        <Detect2Chars attribute="Brackets4" context="Level4" char="@" char1="("/>
-        <DetectChar attribute="Brackets3" context="#pop" char=")"/>
-        <IncludeRules context="Default"/>
-      </context>
-      <context name="Level4" attribute="Normal" lineEndContext="#stay">
-        <DetectChar attribute="Brackets5" context="Level5" char="("/>
-        <Detect2Chars attribute="Brackets5" context="Level5" char="'" char1="("/>
-        <Detect2Chars attribute="Brackets5" context="Level5" char="`" char1="("/>
-        <Detect2Chars attribute="Brackets5" context="Level5" char="#" char1="("/>
-        <Detect2Chars attribute="Brackets5" context="Level5" char="@" char1="("/>
-        <DetectChar attribute="Brackets4" context="#pop" char=")"/>
-        <IncludeRules context="Default"/>
-      </context>
-      <context name="Level5" attribute="Normal" lineEndContext="#stay">
-        <DetectChar attribute="Brackets6" context="Level6" char="("/>
-        <Detect2Chars attribute="Brackets6" context="Level6" char="'" char1="("/>
-        <Detect2Chars attribute="Brackets6" context="Level6" char="`" char1="("/>
-        <Detect2Chars attribute="Brackets6" context="Level6" char="#" char1="("/>
-        <Detect2Chars attribute="Brackets6" context="Level6" char="@" char1="("/>
-        <DetectChar attribute="Brackets5" context="#pop" char=")"/>
-        <IncludeRules context="Default"/>
-      </context>
-      <context name="Level6" attribute="Normal" lineEndContext="#stay">
-        <DetectChar attribute="Brackets1" context="Level1" char="("/>
-        <Detect2Chars attribute="Brackets1" context="Level1" char="'" char1="("/>
-        <Detect2Chars attribute="Brackets1" context="Level1" char="`" char1="("/>
-        <Detect2Chars attribute="Brackets1" context="Level1" char="#" char1="("/>
-        <Detect2Chars attribute="Brackets1" context="Level1" char="@" char1="("/>
-        <DetectChar attribute="Brackets6" context="#pop" char=")"/>
-        <IncludeRules context="Default"/>
       </context>
     </contexts>
     <itemDatas>
@@ -1381,13 +1295,7 @@ It also contains keywords for a few popular racket-based langs.
       <itemData name="XML String"  defStyleNum="dsString"/>
       <itemData name="XML Error"   defStyleNum="dsError" spellChecking="0"/>
       <itemData name="XML Entity"  defStyleNum="dsDecVal" spellChecking="0"/>
-      <itemData name="Brackets1"   defStyleNum="dsNormal" color="#ff0000" bold="1" spellChecking="0"/>
-      <itemData name="Brackets2"   defStyleNum="dsNormal" color="#ff8800" bold="1" spellChecking="0"/>
-      <itemData name="Brackets3"   defStyleNum="dsNormal" color="#888800" bold="1" spellChecking="0"/>
-      <itemData name="Brackets4"   defStyleNum="dsNormal" color="#008800" bold="1" spellChecking="0"/>
-      <itemData name="Brackets5"   defStyleNum="dsNormal" color="#3689e6" bold="1" spellChecking="0"/> <!-- #000088 -->
-      <itemData name="Brackets6"   defStyleNum="dsNormal" color="#a100a1" bold="1" spellChecking="0"/> <!-- #880088 -->
-      <itemData name="Other Brackets" defStyleNum="dsOperator" spellChecking="0"/>
+      <itemData name="Brackets" defStyleNum="dsOperator" spellChecking="0"/>
     </itemDatas>
   </highlighting>
   <general>

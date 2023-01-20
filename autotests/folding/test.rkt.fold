@@ -1,5 +1,3 @@
-([([([([(())])])])])
-
 #lang racket/gui
 
 (define my-language 'English)

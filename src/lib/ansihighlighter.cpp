@@ -1218,18 +1218,12 @@ void AnsiHighlighter::setOutputFile(const QString &fileName)
         return;
     }
     d->out.setDevice(&d->file);
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    d->out.setCodec("UTF-8");
-#endif
 }
 
 void AnsiHighlighter::setOutputFile(FILE *fileHandle)
 {
     d->file.open(fileHandle, QIODevice::WriteOnly);
     d->out.setDevice(&d->file);
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    d->out.setCodec("UTF-8");
-#endif
 }
 
 void AnsiHighlighter::highlightFile(const QString &fileName, AnsiFormat format, bool useEditorBackground, TraceOptions traceOptions)
@@ -1370,9 +1364,6 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
     }
 
     QTextStream in(dev);
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    in.setCodec("UTF-8");
-#endif
 
     if (!traceOptions) {
         State state;

@@ -1,4 +1,4 @@
-if(TARGET Qt${QT_MAJOR_VERSION}::Widgets)
+if(TARGET Qt6::Widgets)
     add_executable(codeeditor codeeditor.cpp main.cpp)
-    target_link_libraries(codeeditor Qt${QT_MAJOR_VERSION}::Widgets KF6SyntaxHighlighting)
+    target_link_libraries(codeeditor Qt6::Widgets KF6SyntaxHighlighting)
 endif()

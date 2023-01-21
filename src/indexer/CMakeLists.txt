@@ -19,7 +19,7 @@ elseif(CMAKE_CROSSCOMPILING)
                         CMAKE_ARGS -DKSYNTAXHIGHLIGHTING_USE_GUI=OFF
                             -DECM_DIR=${ECM_DIR} -DCMAKE_PREFIX_PATH=${NATIVE_PREFIX}
                             -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}
-                            -DQT_MAJOR_VERSION=${QT_MAJOR_VERSION}
+                            -DQT_MAJOR_VERSION=6
                         INSTALL_COMMAND ""
                         BUILD_BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/native_katehighlightingindexer-prefix/src/native_katehighlightingindexer-build/bin/katehighlightingindexer
                     )
@@ -34,6 +34,6 @@ else()
     if(Qt5XmlPatterns_FOUND AND NOT ECM_ENABLE_SANITIZERS)
         target_link_libraries(katehighlightingindexer Qt5::XmlPatterns)
     else()
-        target_link_libraries(katehighlightingindexer Qt${QT_MAJOR_VERSION}::Core)
+        target_link_libraries(katehighlightingindexer Qt6::Core)
     endif()
 endif()

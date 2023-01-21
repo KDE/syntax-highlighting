@@ -1,4 +1,4 @@
-if(TARGET Qt${QT_MAJOR_VERSION}::Widgets AND TARGET Qt${QT_MAJOR_VERSION}::PrintSupport)
+if(TARGET Qt6::Widgets AND TARGET Qt6::PrintSupport)
     add_executable(codepdfprinter codepdfprinter.cpp main.cpp)
-    target_link_libraries(codepdfprinter Qt${QT_MAJOR_VERSION}::Widgets Qt${QT_MAJOR_VERSION}::PrintSupport KF6SyntaxHighlighting)
+    target_link_libraries(codepdfprinter Qt6::Widgets Qt6::PrintSupport KF6SyntaxHighlighting)
 endif()

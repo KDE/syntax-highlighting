@@ -50,9 +50,9 @@ set_target_properties(KF6SyntaxHighlighting PROPERTIES
 
 target_link_libraries(KF6SyntaxHighlighting
     PUBLIC
-        Qt${QT_MAJOR_VERSION}::Gui
+        Qt6::Gui
     PRIVATE
-        Qt${QT_MAJOR_VERSION}::Network
+        Qt6::Network
 )
 
 set(Forwarding_Header_Names

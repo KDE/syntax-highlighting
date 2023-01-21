@@ -11,7 +11,7 @@ target_sources(kquicksyntaxhighlightingplugin PRIVATE
 )
 target_link_libraries(kquicksyntaxhighlightingplugin PRIVATE
     KF6SyntaxHighlighting
-    Qt${QT_MAJOR_VERSION}::Quick
+    Qt6::Quick
 )
 
 ecm_finalize_qml_module(kquicksyntaxhighlightingplugin DESTINATION ${KDE_INSTALL_QMLDIR})

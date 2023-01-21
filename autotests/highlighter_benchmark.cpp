@@ -34,9 +34,6 @@ public:
         }
 
         QTextStream in(&f);
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        in.setCodec("UTF-8");
-#endif
         while (!in.atEnd()) {
             m_fileContents.append(in.readLine());
         }

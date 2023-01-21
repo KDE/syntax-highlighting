@@ -108,15 +108,6 @@ protected:
     AbstractHighlighter();
     AbstractHighlighter(AbstractHighlighterPrivate *dd);
 
-#if KSYNTAXHIGHLIGHTING_ENABLE_DEPRECATED_SINCE(5, 87)
-    /**
-     * @copydoc highlightLine(QStringView,const State&)
-     * @deprecated since 5.87, use highlightLine(QStringView, const State&) instead.
-     */
-    // no deprecation warning, as removal of this will automatically "port" the using code
-    State highlightLine(const QString &text, const State &state);
-#endif
-
     // TODO KF6: add an optional void* context argument that is passed through
     // to the applyX() calls, so highlighters dealing with some form of line object
     // (such as QSyntaxHighlighter or KTextEditor) can avoid some ugly hacks to have

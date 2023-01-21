@@ -97,13 +97,6 @@ static inline int firstNonSpaceChar(QStringView text)
     return text.size();
 }
 
-#if KSYNTAXHIGHLIGHTING_BUILD_DEPRECATED_SINCE(5, 87)
-State AbstractHighlighter::highlightLine(const QString &text, const State &state)
-{
-    return highlightLine(QStringView(text), state);
-}
-#endif
-
 State AbstractHighlighter::highlightLine(QStringView text, const State &state)
 {
     Q_D(AbstractHighlighter);

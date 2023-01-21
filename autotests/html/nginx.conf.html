@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>nginx.conf</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (nginx Configuration) - Theme (Breeze Light)"/>
+</head><body style="background-color:#ffffff;color:#1f1c1b"><pre>
+<span style="color:#898887;"># example nginx config for highlighting</span>
+
+<span style="color:#0057ae;">user</span> nginx<span style="color:#ca60ca;">;</span>
+<span style="color:#0057ae;">worker_processes</span> auto<span style="color:#ca60ca;">;</span>
+<span style="color:#0057ae;">error_log</span> /var/log/nginx/error.log<span style="color:#ca60ca;">;</span>
+<span style="color:#0057ae;">pid</span> /run/nginx.pid<span style="color:#ca60ca;">;</span>
+
+<span style="color:#898887;"># Load dynamic modules. See /usr/share/nginx/README.dynamic.</span>
+<span style="color:#0057ae;">include</span> /usr/share/nginx/modules/*.conf<span style="color:#ca60ca;">;</span>
+
+<span style="color:#0057ae;">events</span> <span style="color:#ca60ca;">{</span>
+    <span style="color:#0057ae;">worker_connections</span> <span style="color:#b08000;">1024</span><span style="color:#ca60ca;">;</span>
+<span style="color:#ca60ca;">}</span>
+
+<span style="color:#0057ae;">http</span> <span style="color:#ca60ca;">{</span>
+    <span style="color:#0057ae;">server_tokens</span> <span style="font-weight:bold;">off</span><span style="color:#ca60ca;">;</span>
+    <span style="color:#0057ae;">include</span>             /etc/nginx/mime.types<span style="color:#ca60ca;">;</span>
+    <span style="color:#0057ae;">default_type</span>        application/octet-stream<span style="color:#ca60ca;">;</span>
+
+    <span style="color:#0057ae;">server_names_hash_bucket_size</span> <span style="color:#b08000;">64</span><span style="color:#ca60ca;">;</span>
+    <span style="color:#0057ae;">server_names_hash_max_size</span> <span style="color:#b08000;">1024</span><span style="color:#ca60ca;">;</span>
+    <span style="color:#0057ae;">types_hash_max_size</span> <span style="color:#b08000;">2048</span><span style="color:#ca60ca;">;</span>
+
+    <span style="color:#0057ae;">log_format</span>  main  <span style="color:#bf0303;">'</span><span style="color:#0057ae;">$remote_addr</span><span style="color:#bf0303;"> - </span><span style="color:#0057ae;">$remote_user</span><span style="color:#bf0303;"> [</span><span style="color:#0057ae;">$time_local</span><span style="color:#bf0303;">] &quot;</span><span style="color:#0057ae;">$request</span><span style="color:#bf0303;">&quot; '</span>
+                      <span style="color:#bf0303;">'</span><span style="color:#0057ae;">$status</span><span style="color:#bf0303;"> </span><span style="color:#0057ae;">$body_bytes_sent</span><span style="color:#bf0303;"> &quot;</span><span style="color:#0057ae;">$http_referer</span><span style="color:#bf0303;">&quot; '</span>
+                      <span style="color:#bf0303;">'&quot;</span><span style="color:#0057ae;">$http_user_agent</span><span style="color:#bf0303;">&quot; &quot;</span><span style="color:#0057ae;">$http_x_forwarded_for</span><span style="color:#bf0303;">&quot;'</span><span style="color:#ca60ca;">;</span>
+
+    <span style="color:#0057ae;">map</span> <span style="color:#0057ae;">$remote_addr</span> <span style="color:#0057ae;">$not_lb_request</span> <span style="color:#ca60ca;">{</span>
+      192.168.1.234 0;  <span style="color:#898887;"># our loadbalancer</span>
+      default       1;  <span style="color:#898887;"># any other host</span>
+    <span style="color:#ca60ca;">}</span>
+
+    <span style="color:#0057ae;">access_log</span>  /var/log/nginx/access.log  main if=<span style="color:#0057ae;">$not_lb_request</span><span style="color:#ca60ca;">;</span>
+
+    <span style="color:#0057ae;">real_ip_header</span> X-Forwarded-For<span style="color:#ca60ca;">;</span>
+    <span style="color:#0057ae;">set_real_ip_from</span> <span style="color:#b08000;">192</span>.<span style="color:#b08000;">168</span>.<span style="color:#b08000;">1</span>.<span style="color:#b08000;">234</span><span style="color:#ca60ca;">;</span>  <span style="color:#898887;"># trust our loadbalancer to present the correct client IP</span>
+
+    <span style="color:#0057ae;">map</span> <span style="color:#0057ae;">$http_x_forwarded_proto</span> <span style="color:#0057ae;">$real_scheme</span> <span style="color:#ca60ca;">{</span>
+        default <span style="color:#0057ae;">$http_x_forwarded_proto</span>;
+        <span style="color:#bf0303;">''</span>      <span style="color:#0057ae;">$scheme</span>;
+    <span style="color:#ca60ca;">}</span>
+
+    <span style="color:#0057ae;">sendfile</span>            <span style="font-weight:bold;">on</span><span style="color:#ca60ca;">;</span>
+    <span style="color:#0057ae;">tcp_nopush</span>          <span style="font-weight:bold;">on</span><span style="color:#ca60ca;">;</span>
+    <span style="color:#0057ae;">tcp_nodelay</span>         <span style="font-weight:bold;">on</span><span style="color:#ca60ca;">;</span>
+
+    <span style="color:#0057ae;">keepalive_timeout</span>   <span style="color:#b08000;">75</span> <span style="color:#b08000;">20</span><span style="color:#ca60ca;">;</span>
+    <span style="color:#0057ae;">ignore_invalid_headers</span> <span style="font-weight:bold;">on</span><span style="color:#ca60ca;">;</span>
+
+    <span style="color:#0057ae;">gzip</span> <span style="font-weight:bold;">off</span><span style="color:#ca60ca;">;</span>
+
+    <span style="color:#0057ae;">charset</span> utf-<span style="color:#b08000;">8</span><span style="color:#ca60ca;">;</span>
+    <span style="color:#0057ae;">index</span> index.html index.htm<span style="color:#ca60ca;">;</span>
+
+    <span style="color:#0057ae;">server</span> <span style="color:#ca60ca;">{</span>
+        <span style="color:#0057ae;">listen</span>       <span style="color:#b08000;">80</span><span style="color:#ca60ca;">;</span>
+        <span style="color:#0057ae;">server_name</span>  localhost<span style="color:#ca60ca;">;</span>
+
+        <span style="color:#0057ae;">location</span> / <span style="color:#ca60ca;">{</span>
+            <span style="color:#0057ae;">root</span>   html<span style="color:#ca60ca;">;</span>
+            <span style="color:#0057ae;">index</span>  index.html index.htm<span style="color:#ca60ca;">;</span>
+        <span style="color:#ca60ca;">}</span>
+
+        <span style="color:#0057ae;">error_page</span>   <span style="color:#b08000;">404</span> /<span style="color:#b08000;">404</span>.html<span style="color:#ca60ca;">;</span>
+
+        <span style="color:#898887;"># redirect server error pages to the static page /50x.html</span>
+        <span style="color:#0057ae;">error_page</span>   <span style="color:#b08000;">500</span> <span style="color:#b08000;">502</span> <span style="color:#b08000;">503</span> <span style="color:#b08000;">504</span>  /50x.html<span style="color:#ca60ca;">;</span>
+        <span style="color:#0057ae;">location</span> = /50x.html <span style="color:#ca60ca;">{</span>
+            <span style="color:#0057ae;">root</span>   html<span style="color:#ca60ca;">;</span>
+        <span style="color:#ca60ca;">}</span>
+
+        <span style="color:#898887;"># pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000</span>
+        <span style="color:#0057ae;">location</span> ~ \.php$ <span style="color:#ca60ca;">{</span>
+            <span style="color:#0057ae;">root</span>           html<span style="color:#ca60ca;">;</span>
+            <span style="color:#0057ae;">fastcgi_pass</span>   <span style="color:#b08000;">127</span>.<span style="color:#b08000;">0</span>.<span style="color:#b08000;">0</span>.<span style="color:#b08000;">1</span>:<span style="color:#b08000;">9000</span><span style="color:#ca60ca;">;</span>
+            <span style="color:#0057ae;">fastcgi_index</span>  index.php<span style="color:#ca60ca;">;</span>
+            <span style="color:#0057ae;">fastcgi_param</span>  SCRIPT_FILENAME  /scripts<span style="color:#0057ae;">$fastcgi_script_name</span><span style="color:#ca60ca;">;</span>
+            <span style="color:#0057ae;">include</span>        fastcgi_params<span style="color:#ca60ca;">;</span>
+        <span style="color:#ca60ca;">}</span>
+
+        <span style="color:#898887;"># deny access to .htaccess files, if Apache's document root</span>
+        <span style="color:#898887;"># concurs with nginx's one</span>
+        <span style="color:#0057ae;">location</span> ~ /\.ht <span style="color:#ca60ca;">{</span>
+            <span style="color:#0057ae;">deny</span>  <span style="font-weight:bold;">all</span><span style="color:#ca60ca;">;</span>
+        <span style="color:#ca60ca;">}</span>
+    <span style="color:#ca60ca;">}</span>
+
+    <span style="color:#898887;"># HTTPS server</span>
+    <span style="color:#0057ae;">server</span> <span style="color:#ca60ca;">{</span>
+        <span style="color:#0057ae;">listen</span>       <span style="color:#b08000;">443</span> <span style="font-weight:bold;">ssl</span><span style="color:#ca60ca;">;</span>
+        <span style="color:#0057ae;">server_name</span>  localhost secure.example.org<span style="color:#ca60ca;">;</span>
+
+        <span style="color:#0057ae;">ssl_certificate</span>      cert.pem<span style="color:#ca60ca;">;</span>
+        <span style="color:#0057ae;">ssl_certificate_key</span>  cert.key<span style="color:#ca60ca;">;</span>
+
+        <span style="color:#0057ae;">ssl_session_cache</span>    shared:SSL:<span style="color:#b08000;">1m</span><span style="color:#ca60ca;">;</span>
+        <span style="color:#0057ae;">ssl_session_timeout</span>  <span style="color:#b08000;">5m</span><span style="color:#ca60ca;">;</span>
+
+        <span style="color:#0057ae;">ssl_ciphers</span>  HIGH:!aNULL:!MD5<span style="color:#ca60ca;">;</span>
+        <span style="color:#0057ae;">ssl_prefer_server_ciphers</span>  <span style="font-weight:bold;">on</span><span style="color:#ca60ca;">;</span>
+
+        <span style="color:#0057ae;">location</span> / <span style="color:#ca60ca;">{</span>
+            <span style="color:#0057ae;">root</span>   html<span style="color:#ca60ca;">;</span>
+            <span style="color:#0057ae;">index</span>  index.html index.htm<span style="color:#ca60ca;">;</span>
+        <span style="color:#ca60ca;">}</span>
+    <span style="color:#ca60ca;">}</span>
+
+    <span style="color:#898887;"># default server block</span>
+    <span style="color:#0057ae;">server</span> <span style="color:#ca60ca;">{</span>
+        <span style="color:#0057ae;">listen</span>       <span style="color:#b08000;">80</span><span style="color:#ca60ca;">;</span>
+        <span style="color:#0057ae;">server_name</span>  _<span style="color:#ca60ca;">;</span>
+
+        <span style="color:#0057ae;">location</span> / <span style="color:#ca60ca;">{</span>
+            <span style="color:#0057ae;">return</span> <span style="color:#b08000;">403</span><span style="color:#ca60ca;">;</span>
+        <span style="color:#ca60ca;">}</span>
+
+        <span style="color:#0057ae;">location</span> /tftp <span style="color:#ca60ca;">{</span>
+            <span style="color:#0057ae;">allow</span> <span style="color:#b08000;">192</span>.<span style="color:#b08000;">168</span>.<span style="color:#b08000;">1</span>.<span style="color:#b08000;">0</span>/<span style="color:#b08000;">24</span><span style="color:#ca60ca;">;</span>
+            <span style="color:#0057ae;">deny</span> <span style="font-weight:bold;">all</span><span style="color:#ca60ca;">;</span>
+            <span style="color:#0057ae;">root</span> /data<span style="color:#ca60ca;">;</span>
+        <span style="color:#ca60ca;">}</span>
+    <span style="color:#ca60ca;">}</span>
+
+    <span style="color:#898887;"># &quot;unit&quot; testing ;-)</span>
+    <span style="color:#0057ae;">client_body_timeout</span> <span style="color:#b08000;">1y</span> <span style="color:#b08000;">12M</span> <span style="color:#b08000;">52w</span> <span style="color:#b08000;">365d</span> <span style="color:#b08000;">1337h</span> <span style="color:#b08000;">256m</span> <span style="color:#b08000;">42s</span> <span style="color:#b08000;">440ms</span><span style="color:#ca60ca;">;</span>
+    <span style="color:#0057ae;">client_max_body_size</span> <span style="color:#b08000;">1024</span> <span style="color:#b08000;">56k</span> <span style="color:#b08000;">56K</span> <span style="color:#b08000;">64m</span> <span style="color:#b08000;">64M</span> <span style="color:#b08000;">32g</span> <span style="color:#b08000;">32G</span><span style="color:#ca60ca;">;</span>
+<span style="color:#ca60ca;">}</span>
+</pre></body></html>

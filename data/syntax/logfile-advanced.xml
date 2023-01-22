@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language SYSTEM "language.dtd" [
-  <!ENTITY debug "debug">
-  <!ENTITY error "err|error|fail|failure|fatal">
-  <!ENTITY info "info|information">
-  <!ENTITY warn "warn|warning">
-  <!ENTITY search "([^defiw]*+((?!\b(&debug;|&error;|&info;|&warn;)\b)[defiw])?)*?">
+  <!-- same as logfile.xml -->
+  <!ENTITY critical "crit|critical|fatal|QFATAL">
+  <!ENTITY debug "debug|QDEBUG">
+  <!ENTITY error "err|error|fail|failure|QCRITICAL">
+  <!ENTITY info "info|information|QINFO">
+  <!ENTITY warn "warn|warning|QWARN">
+  <!ENTITY firstchars "cdefiqw">
+  <!ENTITY search "([^&firstchars;]*+((?!\b(&critical;|&debug;|&error;|&info;|&warn;)\b)[&firstchars;])?)*+">
 
   <!ENTITY hex "[0-9a-fA-F]">
 
@@ -12,12 +15,16 @@
   <!ENTITY date2 "[0-9]{2}[-/.][0-9]{2}[-/.][0-9]{4}">
   <!ENTITY date3 "(\d+\s+)?\b(January|February|March|April|May|June|July|August|September|October|November|December|(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sept?|Oct|Nov|Dec)\.?)\b\s+[0-9]+\s+">
 
-  <!ENTITY symbols "[](){}&lt;>+-=&#37;~*/^|&amp;$!@">
+  <!ENTITY symbols ":[](){}&lt;>+-=&#37;~*^|&amp;$!@">
+  <!ENTITY pathsymbols "/">
   <!ENTITY namespace "[a-zA-Z][-0-9a-zA-Z]*(\.[0-9a-zA-Z]+)+">
-  <!ENTITY hexdata "&hex;{8}-&hex;{4}-&hex;|&hex;{0,4}[:-]&hex;{0,4}[:-]&hex;{0,4}">
-  <!ENTITY path "[-:\w.]+[/\\][-:\w.?=&amp;&#37;;/\\]+">
+  <!ENTITY uuid "&hex;{8}[:-]&hex;{4}[:-]&hex;{4}[:-]&hex;{4}[:-]&hex;{12}">
+  <!ENTITY hexdata "(?&lt;!-)\b(&uuid;|&hex;{1,4}([:-]&hex;{0,4}){5,7})\b">
+  <!ENTITY path "\b[A-Z]:\\[-:\w.?=&amp;&#37;;/\\]+|(?&lt;![\w.-])(\.{1,3}[/\\]|((https?|s?ftp|ssh|mail|file|resource|wss?)://))[-:\w.?=&amp;&#37;;/\\]+">
+  <!ENTITY escapechar "\\x&hex;{2}|\\[uU]&hex;{4,8}|\\[0-7]{3}|\\.">
+  <!ENTITY ident "[a-zA-Z][-\w.]*">
 ]>
-<language name="Log File (advanced)" section="Other" version="1" kateversion="5.62" extensions="*.log" priority="4" author="Jonathan Poelen (jonathan.poelen@gmail.com)" license="MIT">
+<language name="Log File (advanced)" section="Other" version="2" kateversion="5.62" extensions="*.log" priority="4" author="Jonathan Poelen (jonathan.poelen@gmail.com)" license="MIT">
 <highlighting>
 
 <list name="constants">
@@ -34,10 +41,15 @@
   </context>
 
   <context name="Time" lineEndContext="#pop" attribute="Normal" fallthroughContext="#pop!StartLevel">
-    <DetectChar char="T" attribute="Time Separator"/>
+    <DetectChar char="T" context="CheckTimeSeparator" lookAhead="1"/>
     <DetectChar char="]" attribute="Normal" context="#pop!StartLevel"/>
     <DetectSpaces/>
     <RegExpr String="[0-9][0-9]:[0-9][0-9]:[0-9][0-9](\.[0-9]+)?" attribute="Time" context="#pop!TimeZone"/>
+  </context>
+  <context name="CheckTimeSeparator" lineEndContext="#pop" attribute="Normal">
+    <DetectChar char="T" context="#pop#pop!StartLevel" column="0" lookAhead="1"/>
+    <DetectChar char="T" context="#pop#pop!StartLevel" column="1" lookAhead="1"/>
+    <DetectChar char="T" attribute="Time Separator" context="#pop"/>
   </context>
 
   <context name="TimeZone" lineEndContext="#pop" attribute="Normal" fallthroughContext="#pop!StartLevel">
@@ -49,10 +61,11 @@
   <context name="StartLevel" lineEndContext="#pop" attribute="Normal" fallthroughContext="#pop!Normal">
     <DetectSpaces/>
     <DetectChar char="]" attribute="Normal"/>
-    <RegExpr String="&search;\b(&info;)\b" context="#pop!Information" insensitive="1" lookAhead="1"/>
-    <RegExpr String="&search;\b(&debug;)\b" context="#pop!Debug" insensitive="1" lookAhead="1"/>
-    <RegExpr String="&search;\b(&warn;)\b" context="#pop!Warning" insensitive="1" lookAhead="1"/>
-    <RegExpr String="&search;\b(&error;)\b" context="#pop!Error" insensitive="1" lookAhead="1"/>
+    <RegExpr String="&search;\b(&info;)\b|" context="#pop!Information" insensitive="1" lookAhead="1"/>
+    <RegExpr String="&search;\b(&debug;)\b|" context="#pop!Debug" insensitive="1" lookAhead="1"/>
+    <RegExpr String="&search;\b(&warn;)\b|" context="#pop!Warning" insensitive="1" lookAhead="1"/>
+    <RegExpr String="&search;\b(&error;)\b|" context="#pop!Error" insensitive="1" lookAhead="1"/>
+    <RegExpr String="&search;\b(&critical;)\b|" context="#pop!Critical" insensitive="1" lookAhead="1"/>
   </context>
 
   <context name="String" lineEndContext="#stay" attribute="Normal">
@@ -64,16 +77,33 @@
   <!-- Information -->
 
   <context name="Information" lineEndContext="#pop" attribute="Information">
-    <DetectSpaces context="InformationAfterSpace"/>
+    <DetectSpaces context="InformationAfterSpace" attribute="Information"/>
     <DetectChar char="&quot;" context="#pop!InformationStringDQ" attribute="Information String DoubleQ"/>
-    <HlCHex attribute="Information Integer"/>
     <AnyChar String="&symbols;" attribute="Information Symbol"/>
+    <HlCHex attribute="Information Integer"/>
     <RegExpr String="&namespace;" attribute="Information Namespace"/>
     <RegExpr String="&hexdata;" context="InformationHexData" lookAhead="1"/>
-    <Int attribute="Information Integer"/>
+    <RegExpr String="[0-9]+(?=(\.[0-9]+){2})" attribute="Information Integer" context="InformationIPv4"/>
+    <Float attribute="Information Float" context="InformationSkipPath"/>
+    <Int attribute="Information Integer" context="InformationSkipPath"/>
     <RegExpr String="&path;" attribute="Information Path"/>
+    <AnyChar String="&pathsymbols;" attribute="Information Symbol"/>
     <keyword String="constants" attribute="Information Constant"/>
-    <DetectIdentifier/>
+    <DetectIdentifier attribute="Information" context="InformationIdent"/>
+  </context>
+
+  <context name="InformationIPv4" lineEndContext="#pop#pop" attribute="Information" fallthroughContext="#pop">
+    <Int attribute="Information Integer"/>
+    <DetectChar char="." attribute="Information"/>
+  </context>
+
+  <context name="InformationIdent" lineEndContext="#pop#pop" attribute="Information" fallthroughContext="#pop">
+    <AnyChar String="-.0123456789" attribute="Information"/>
+    <DetectIdentifier attribute="Information"/>
+  </context>
+
+  <context name="InformationSkipPath" lineEndContext="#pop#pop" attribute="Normal" fallthroughContext="#pop">
+    <DetectChar char="/" context="#pop" attribute="Information Symbol"/>
   </context>
 
   <context name="InformationAfterSpace" lineEndContext="#pop#pop" attribute="Normal" fallthroughContext="#pop">
@@ -93,22 +123,39 @@
   <context name="InformationStringDQ" lineEndContext="#pop#pop" attribute="Information String DoubleQ">
     <DetectChar char="&quot;" context="#pop" attribute="Information String DoubleQ"/>
     <IncludeRules context="String"/>
-    <RegExpr String="\\x&hex;{2}|\\[uU]&hex;{4,8}|\\[0-7]{3}|\\." attribute="Information Escape Char"/>
+    <RegExpr String="&escapechar;" attribute="Information Escape Char"/>
   </context>
 
   <!-- Debug -->
 
   <context name="Debug" lineEndContext="#pop" attribute="Debug">
-    <DetectSpaces context="DebugAfterSpace"/>
+    <DetectSpaces context="DebugAfterSpace" attribute="Debug"/>
     <DetectChar char="&quot;" context="#pop!DebugStringDQ" attribute="Debug String DoubleQ"/>
-    <HlCHex attribute="Debug Integer"/>
     <AnyChar String="&symbols;" attribute="Debug Symbol"/>
+    <HlCHex attribute="Debug Integer"/>
     <RegExpr String="&namespace;" attribute="Debug Namespace"/>
     <RegExpr String="&hexdata;" context="DebugHexData" lookAhead="1"/>
-    <Int attribute="Debug Integer"/>
+    <RegExpr String="[0-9]+(?=(\.[0-9]+){2})" attribute="Debug Integer" context="DebugIPv4"/>
+    <Float attribute="Debug Float" context="DebugSkipPath"/>
+    <Int attribute="Debug Integer" context="DebugSkipPath"/>
     <RegExpr String="&path;" attribute="Debug Path"/>
+    <AnyChar String="&pathsymbols;" attribute="Debug Symbol"/>
     <keyword String="constants" attribute="Debug Constant"/>
-    <DetectIdentifier/>
+    <DetectIdentifier attribute="Debug" context="DebugIdent"/>
+  </context>
+
+  <context name="DebugIPv4" lineEndContext="#pop#pop" attribute="Debug" fallthroughContext="#pop">
+    <Int attribute="Debug Integer"/>
+    <DetectChar char="." attribute="Debug"/>
+  </context>
+
+  <context name="DebugIdent" lineEndContext="#pop#pop" attribute="Debug" fallthroughContext="#pop">
+    <AnyChar String="-.0123456789" attribute="Debug"/>
+    <DetectIdentifier attribute="Debug"/>
+  </context>
+
+  <context name="DebugSkipPath" lineEndContext="#pop#pop" attribute="Normal" fallthroughContext="#pop">
+    <DetectChar char="/" context="#pop" attribute="Debug Symbol"/>
   </context>
 
   <context name="DebugAfterSpace" lineEndContext="#pop#pop" attribute="Normal" fallthroughContext="#pop">
@@ -128,22 +175,39 @@
   <context name="DebugStringDQ" lineEndContext="#pop#pop" attribute="Debug String DoubleQ">
     <DetectChar char="&quot;" context="#pop" attribute="Debug String DoubleQ"/>
     <IncludeRules context="String"/>
-    <RegExpr String="\\x&hex;{2}|\\[uU]&hex;{4,8}|\\[0-7]{3}|\\." attribute="Debug Escape Char"/>
+    <RegExpr String="&escapechar;" attribute="Debug Escape Char"/>
   </context>
 
   <!-- Warning -->
 
   <context name="Warning" lineEndContext="#pop" attribute="Warning">
-    <DetectSpaces context="WarningAfterSpace"/>
+    <DetectSpaces context="WarningAfterSpace" attribute="Warning"/>
     <DetectChar char="&quot;" context="#pop!WarningStringDQ" attribute="Warning String DoubleQ"/>
-    <HlCHex attribute="Warning Integer"/>
     <AnyChar String="&symbols;" attribute="Warning Symbol"/>
+    <HlCHex attribute="Warning Integer"/>
     <RegExpr String="&namespace;" attribute="Warning Namespace"/>
     <RegExpr String="&hexdata;" context="WarningHexData" lookAhead="1"/>
-    <Int attribute="Warning Integer"/>
+    <RegExpr String="[0-9]+(?=(\.[0-9]+){2})" attribute="Warning Integer" context="WarningIPv4"/>
+    <Float attribute="Warning Float" context="WarningSkipPath"/>
+    <Int attribute="Warning Integer" context="WarningSkipPath"/>
     <RegExpr String="&path;" attribute="Warning Path"/>
+    <AnyChar String="&pathsymbols;" attribute="Warning Symbol"/>
     <keyword String="constants" attribute="Warning Constant"/>
-    <DetectIdentifier/>
+    <DetectIdentifier attribute="Warning" context="WarningIdent"/>
+  </context>
+
+  <context name="WarningIPv4" lineEndContext="#pop#pop" attribute="Warning" fallthroughContext="#pop">
+    <Int attribute="Warning Integer"/>
+    <DetectChar char="." attribute="Warning"/>
+  </context>
+
+  <context name="WarningIdent" lineEndContext="#pop#pop" attribute="Warning" fallthroughContext="#pop">
+    <AnyChar String="-.0123456789" attribute="Warning"/>
+    <DetectIdentifier attribute="Warning"/>
+  </context>
+
+  <context name="WarningSkipPath" lineEndContext="#pop#pop" attribute="Normal" fallthroughContext="#pop">
+    <DetectChar char="/" context="#pop" attribute="Warning Symbol"/>
   </context>
 
   <context name="WarningAfterSpace" lineEndContext="#pop#pop" attribute="Normal" fallthroughContext="#pop">
@@ -163,22 +227,39 @@
   <context name="WarningStringDQ" lineEndContext="#pop#pop" attribute="Warning String DoubleQ">
     <DetectChar char="&quot;" context="#pop" attribute="Warning String DoubleQ"/>
     <IncludeRules context="String"/>
-    <RegExpr String="\\x&hex;{2}|\\[uU]&hex;{4,8}|\\[0-7]{3}|\\." attribute="Warning Escape Char"/>
+    <RegExpr String="&escapechar;" attribute="Warning Escape Char"/>
   </context>
 
   <!-- Error -->
 
   <context name="Error" lineEndContext="#pop" attribute="Error">
-    <DetectSpaces context="ErrorAfterSpace"/>
+    <DetectSpaces context="ErrorAfterSpace" attribute="Error"/>
     <DetectChar char="&quot;" context="#pop!ErrorStringDQ" attribute="Error String DoubleQ"/>
-    <HlCHex attribute="Error Integer"/>
     <AnyChar String="&symbols;" attribute="Error Symbol"/>
+    <HlCHex attribute="Error Integer"/>
     <RegExpr String="&namespace;" attribute="Error Namespace"/>
     <RegExpr String="&hexdata;" context="ErrorHexData" lookAhead="1"/>
-    <Int attribute="Error Integer"/>
+    <RegExpr String="[0-9]+(?=(\.[0-9]+){2})" attribute="Error Integer" context="ErrorIPv4"/>
+    <Float attribute="Error Float" context="ErrorSkipPath"/>
+    <Int attribute="Error Integer" context="ErrorSkipPath"/>
     <RegExpr String="&path;" attribute="Error Path"/>
+    <AnyChar String="&pathsymbols;" attribute="Error Symbol"/>
     <keyword String="constants" attribute="Error Constant"/>
-    <DetectIdentifier/>
+    <DetectIdentifier attribute="Error" context="ErrorIdent"/>
+  </context>
+
+  <context name="ErrorIPv4" lineEndContext="#pop#pop" attribute="Error" fallthroughContext="#pop">
+    <Int attribute="Error Integer"/>
+    <DetectChar char="." attribute="Error"/>
+  </context>
+
+  <context name="ErrorIdent" lineEndContext="#pop#pop" attribute="Error" fallthroughContext="#pop">
+    <AnyChar String="-.0123456789" attribute="Error"/>
+    <DetectIdentifier attribute="Error"/>
+  </context>
+
+  <context name="ErrorSkipPath" lineEndContext="#pop#pop" attribute="Normal" fallthroughContext="#pop">
+    <DetectChar char="/" context="#pop" attribute="Error Symbol"/>
   </context>
 
   <context name="ErrorAfterSpace" lineEndContext="#pop#pop" attribute="Normal" fallthroughContext="#pop">
@@ -198,22 +279,91 @@
   <context name="ErrorStringDQ" lineEndContext="#pop#pop" attribute="Error String DoubleQ">
     <DetectChar char="&quot;" context="#pop" attribute="Error String DoubleQ"/>
     <IncludeRules context="String"/>
-    <RegExpr String="\\x&hex;{2}|\\[uU]&hex;{4,8}|\\[0-7]{3}|\\." attribute="Error Escape Char"/>
+    <RegExpr String="&escapechar;" attribute="Error Escape Char"/>
+  </context>
+
+  <!-- Critical -->
+
+  <context name="Critical" lineEndContext="#pop" attribute="Critical">
+    <DetectSpaces context="CriticalAfterSpace" attribute="Critical"/>
+    <DetectChar char="&quot;" context="#pop!CriticalStringDQ" attribute="Critical String DoubleQ"/>
+    <AnyChar String="&symbols;" attribute="Critical Symbol"/>
+    <HlCHex attribute="Critical Integer"/>
+    <RegExpr String="&namespace;" attribute="Critical Namespace"/>
+    <RegExpr String="&hexdata;" context="CriticalHexData" lookAhead="1"/>
+    <RegExpr String="[0-9]+(?=(\.[0-9]+){2})" attribute="Critical Integer" context="CriticalIPv4"/>
+    <Float attribute="Critical Float" context="CriticalSkipPath"/>
+    <Int attribute="Critical Integer" context="CriticalSkipPath"/>
+    <RegExpr String="&path;" attribute="Critical Path"/>
+    <AnyChar String="&pathsymbols;" attribute="Critical Symbol"/>
+    <keyword String="constants" attribute="Critical Constant"/>
+    <DetectIdentifier attribute="Critical" context="CriticalIdent"/>
+  </context>
+
+  <context name="CriticalIPv4" lineEndContext="#pop#pop" attribute="Critical" fallthroughContext="#pop">
+    <Int attribute="Critical Integer"/>
+    <DetectChar char="." attribute="Critical"/>
+  </context>
+
+  <context name="CriticalIdent" lineEndContext="#pop#pop" attribute="Critical" fallthroughContext="#pop">
+    <AnyChar String="-.0123456789" attribute="Critical"/>
+    <DetectIdentifier attribute="Critical"/>
+  </context>
+
+  <context name="CriticalSkipPath" lineEndContext="#pop#pop" attribute="Normal" fallthroughContext="#pop">
+    <DetectChar char="/" context="#pop" attribute="Critical Symbol"/>
+  </context>
+
+  <context name="CriticalAfterSpace" lineEndContext="#pop#pop" attribute="Normal" fallthroughContext="#pop">
+    <DetectChar char="'" context="#pop!CriticalStringSQ" attribute="Critical String SingleQ"/>
+  </context>
+
+  <context name="CriticalHexData" lineEndContext="#pop#pop" attribute="Normal" fallthroughContext="#pop">
+    <RegExpr String="&hex;+" attribute="Critical Hexadecimal"/>
+    <AnyChar String=":-" attribute="Critical Symbol"/>
+  </context>
+
+  <context name="CriticalStringSQ" lineEndContext="#pop#pop" attribute="Critical String SingleQ">
+    <DetectChar char="'" context="#pop" attribute="Critical String SingleQ"/>
+    <IncludeRules context="String"/>
+  </context>
+
+  <context name="CriticalStringDQ" lineEndContext="#pop#pop" attribute="Critical String DoubleQ">
+    <DetectChar char="&quot;" context="#pop" attribute="Critical String DoubleQ"/>
+    <IncludeRules context="String"/>
+    <RegExpr String="&escapechar;" attribute="Critical Escape Char"/>
   </context>
 
   <!-- Normal -->
 
   <context name="Normal" lineEndContext="#pop" attribute="Normal">
-    <DetectSpaces context="NormalAfterSpace"/>
+    <DetectSpaces context="NormalAfterSpace" attribute="Normal"/>
     <DetectChar char="&quot;" context="#pop!NormalStringDQ" attribute="Normal String DoubleQ"/>
-    <HlCHex attribute="Normal Integer"/>
     <AnyChar String="&symbols;" attribute="Normal Symbol"/>
+    <HlCHex attribute="Normal Integer"/>
     <RegExpr String="&namespace;" attribute="Normal Namespace"/>
     <RegExpr String="&hexdata;" context="NormalHexData" lookAhead="1"/>
-    <Int attribute="Normal Integer"/>
+    <RegExpr String="[0-9]+(?=(\.[0-9]+){2})" attribute="Normal Integer" context="NormalIPv4"/>
+    <Float attribute="Normal Float" context="NormalSkipPath"/>
+    <Int attribute="Normal Integer" context="NormalSkipPath"/>
     <RegExpr String="&path;" attribute="Normal Path"/>
+    <AnyChar String="&pathsymbols;" attribute="Normal Symbol"/>
     <keyword String="constants" attribute="Normal Constant"/>
-    <DetectIdentifier/>
+    <DetectIdentifier attribute="Normal" context="NormalIdent"/>
+  </context>
+
+  <context name="NormalIPv4" lineEndContext="#pop#pop" attribute="Normal" fallthroughContext="#pop">
+    <Int attribute="Normal Integer"/>
+    <DetectChar char="." attribute="Normal"/>
+  </context>
+
+  <context name="NormalIdent" lineEndContext="#pop#pop" attribute="Normal" fallthroughContext="#pop">
+    <AnyChar String="-.0123456789" attribute="Normal"/>
+    <DetectIdentifier attribute="Normal"/>
+  </context>
+
+  <context name="NormalSkipPath" lineEndContext="#pop#pop" attribute="Normal" fallthroughContext="#pop">
+    <DetectChar char="/" context="#pop" attribute="Normal Symbol"/>
   </context>
 
   <context name="NormalAfterSpace" lineEndContext="#pop#pop" attribute="Normal" fallthroughContext="#pop">
@@ -233,7 +383,7 @@
   <context name="NormalStringDQ" lineEndContext="#pop#pop" attribute="Normal String DoubleQ">
     <DetectChar char="&quot;" context="#pop" attribute="Normal String DoubleQ"/>
     <IncludeRules context="String"/>
-    <RegExpr String="\\x&hex;{2}|\\[uU]&hex;{4,8}|\\[0-7]{3}|\\." attribute="Normal Escape Char"/>
+    <RegExpr String="&escapechar;" attribute="Normal Escape Char"/>
   </context>
 
 </contexts>
@@ -241,6 +391,7 @@
 <itemDatas>
   <itemData name="Normal" defStyleNum="dsNormal"/>
   <itemData name="Normal Symbol" defStyleNum="dsOperator"/>
+  <itemData name="Normal Float" defStyleNum="dsFloat"/>
   <itemData name="Normal Integer" defStyleNum="dsDecVal"/>
   <itemData name="Normal Hexadecimal" defStyleNum="dsBaseN"/>
   <itemData name="Normal Namespace" defStyleNum="dsAttribute"/>
@@ -252,6 +403,7 @@
 
   <itemData name="Information" defStyleNum="dsPreprocessor"/>
   <itemData name="Information Symbol" defStyleNum="dsOperator"/>
+  <itemData name="Information Float" defStyleNum="dsFloat"/>
   <itemData name="Information Integer" defStyleNum="dsDecVal"/>
   <itemData name="Information Hexadecimal" defStyleNum="dsBaseN"/>
   <itemData name="Information Namespace" defStyleNum="dsAttribute"/>
@@ -263,6 +415,7 @@
 
   <itemData name="Warning" defStyleNum="dsInformation"/>
   <itemData name="Warning Symbol" defStyleNum="dsOperator"/>
+  <itemData name="Warning Float" defStyleNum="dsFloat"/>
   <itemData name="Warning Integer" defStyleNum="dsDecVal"/>
   <itemData name="Warning Hexadecimal" defStyleNum="dsBaseN"/>
   <itemData name="Warning Namespace" defStyleNum="dsAttribute"/>
@@ -272,8 +425,9 @@
   <itemData name="Warning String DoubleQ" defStyleNum="dsString"/>
   <itemData name="Warning Escape Char" defStyleNum="dsSpecialChar"/>
 
-  <itemData name="Error" defStyleNum="dsError" underline="0" bold="1"/>
+  <itemData name="Error" defStyleNum="dsError" underline="0" bold="0"/>
   <itemData name="Error Symbol" defStyleNum="dsOperator"/>
+  <itemData name="Error Float" defStyleNum="dsFloat"/>
   <itemData name="Error Integer" defStyleNum="dsDecVal"/>
   <itemData name="Error Hexadecimal" defStyleNum="dsBaseN"/>
   <itemData name="Error Namespace" defStyleNum="dsAttribute"/>
@@ -283,8 +437,21 @@
   <itemData name="Error String DoubleQ" defStyleNum="dsString"/>
   <itemData name="Error Escape Char" defStyleNum="dsSpecialChar"/>
 
+  <itemData name="Critical" defStyleNum="dsError" bold="1"/>
+  <itemData name="Critical Symbol" defStyleNum="dsOperator" bold="1"/>
+  <itemData name="Critical Float" defStyleNum="dsFloat"/>
+  <itemData name="Critical Integer" defStyleNum="dsDecVal" bold="1"/>
+  <itemData name="Critical Hexadecimal" defStyleNum="dsBaseN" bold="1"/>
+  <itemData name="Critical Namespace" defStyleNum="dsAttribute" bold="1"/>
+  <itemData name="Critical Constant" defStyleNum="dsVariable" bold="1"/>
+  <itemData name="Critical Path" defStyleNum="dsChar" bold="1"/>
+  <itemData name="Critical String SingleQ" defStyleNum="dsVerbatimString" bold="1"/>
+  <itemData name="Critical String DoubleQ" defStyleNum="dsString" bold="1"/>
+  <itemData name="Critical Escape Char" defStyleNum="dsSpecialChar" bold="1"/>
+
   <itemData name="Debug" defStyleNum="dsDataType"/>
   <itemData name="Debug Symbol" defStyleNum="dsOperator"/>
+  <itemData name="Debug Float" defStyleNum="dsFloat"/>
   <itemData name="Debug Integer" defStyleNum="dsDecVal"/>
   <itemData name="Debug Hexadecimal" defStyleNum="dsBaseN"/>
   <itemData name="Debug Namespace" defStyleNum="dsAttribute"/>

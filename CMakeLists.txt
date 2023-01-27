@@ -52,11 +52,9 @@ set_package_properties(Qt6Widgets PROPERTIES PURPOSE "Example application.")
 set_package_properties(Qt6PrintSupport PROPERTIES PURPOSE "Example application.")
 set_package_properties(Qt6Quick PROPERTIES PURPOSE "QtQuick bindings.")
 
-# QXmlPatters was removed in Qt6
-if (QT_MAJOR_VERSION STREQUAL "5")
-    find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE QUIET OPTIONAL_COMPONENTS XmlPatterns)
-    set_package_properties(Qt5XmlPatterns PROPERTIES PURPOSE "Compile-time validation of syntax definition files.")
-endif()
+# https://xerces.apache.org/index.html for validation
+find_package (XercesC)
+set_package_properties(XercesC PROPERTIES PURPOSE "Compile-time validation of syntax definition files.")
 
 find_package(Perl REQUIRED)
 set_package_properties(Perl PROPERTIES PURPOSE "Auto-generate PHP syntax definition files.")

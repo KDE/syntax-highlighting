@@ -12,12 +12,167 @@
 #include <QFileInfo>
 #include <QMutableMapIterator>
 #include <QRegularExpression>
+#include <QScopeGuard>
 #include <QVariant>
 #include <QXmlStreamReader>
 
-#ifdef QT_XMLPATTERNS_LIB
-#include <QXmlSchema>
-#include <QXmlSchemaValidator>
+#ifdef HAS_XERCESC
+
+#include <xercesc/framework/XMLGrammarPoolImpl.hpp>
+
+#include <xercesc/parsers/SAX2XMLReaderImpl.hpp>
+
+#include <xercesc/sax/ErrorHandler.hpp>
+#include <xercesc/sax/SAXParseException.hpp>
+
+#include <xercesc/util/PlatformUtils.hpp>
+#include <xercesc/util/XMLString.hpp>
+#include <xercesc/util/XMLUni.hpp>
+
+#include <xercesc/framework/XMLGrammarPoolImpl.hpp>
+#include <xercesc/validators/common/Grammar.hpp>
+
+using namespace xercesc;
+
+/*
+ * Ideas taken from:
+ *
+ * author    : Boris Kolpackov <boris@codesynthesis.com>
+ * copyright : not copyrighted - public domain
+ *
+ * This program uses Xerces-C++ SAX2 parser to load a set of schema files
+ * and then to validate a set of XML documents against these schemas. To
+ * build this program you will need Xerces-C++ 3.0.0 or later. For more
+ * information, see:
+ *
+ * http://www.codesynthesis.com/~boris/blog/2010/03/15/validating-external-schemas-xerces-cxx/
+ */
+
+/**
+ * Error handler object used during xml schema validation.
+ */
+class CustomErrorHandler : public ErrorHandler
+{
+public:
+    /**
+     * Constructor
+     * @param messages Pointer to the error message string to fill.
+     */
+    CustomErrorHandler(QString *messages)
+        : m_messages(messages)
+    {
+    }
+
+    /**
+     * Check global success/fail state.
+     * @return True if there was a failure, false otherwise.
+     */
+    bool failed() const
+    {
+        return m_failed;
+    }
+
+private:
+    /**
+     * Severity classes for error messages.
+     */
+    enum severity { s_warning, s_error, s_fatal };
+
+    /**
+     * Wrapper for warning exceptions.
+     * @param e Exception to handle.
+     */
+    void warning(const SAXParseException &e) override
+    {
+        m_failed = true; // be strict, warnings are evil, too!
+        handle(e, s_warning);
+    }
+
+    /**
+     * Wrapper for error exceptions.
+     * @param e Exception to handle.
+     */
+    void error(const SAXParseException &e) override
+    {
+        m_failed = true;
+        handle(e, s_error);
+    }
+
+    /**
+     * Wrapper for fatal error exceptions.
+     * @param e Exception to handle.
+     */
+    void fatalError(const SAXParseException &e) override
+    {
+        m_failed = true;
+        handle(e, s_fatal);
+    }
+
+    /**
+     * Reset the error status to "no error".
+     */
+    void resetErrors() override
+    {
+        m_failed = false;
+    }
+
+    /**
+     * Generic handler for error/warning/fatal error message exceptions.
+     * @param e Exception to handle.
+     * @param s Enum value encoding the message severtity.
+     */
+    void handle(const SAXParseException &e, severity s)
+    {
+        // get id to print
+        const XMLCh *xid(e.getPublicId());
+        if (!xid)
+            xid = e.getSystemId();
+
+        m_messages << QString::fromUtf16(xid) << ":" << e.getLineNumber() << ":" << e.getColumnNumber() << " " << (s == s_warning ? "warning: " : "error: ")
+                   << QString::fromUtf16(e.getMessage()) << Qt::endl;
+    }
+
+private:
+    /**
+     * Storage for created error messages in this handler.
+     */
+    QTextStream m_messages;
+
+    /**
+     * Global error state. True if there was an error, false otherwise.
+     */
+    bool m_failed = false;
+};
+
+void init_parser(SAX2XMLReaderImpl &parser)
+{
+    // Commonly useful configuration.
+    //
+    parser.setFeature(XMLUni::fgSAX2CoreNameSpaces, true);
+    parser.setFeature(XMLUni::fgSAX2CoreNameSpacePrefixes, true);
+    parser.setFeature(XMLUni::fgSAX2CoreValidation, true);
+
+    // Enable validation.
+    //
+    parser.setFeature(XMLUni::fgXercesSchema, true);
+    parser.setFeature(XMLUni::fgXercesSchemaFullChecking, true);
+    parser.setFeature(XMLUni::fgXercesValidationErrorAsFatal, true);
+
+    // Use the loaded grammar during parsing.
+    //
+    parser.setFeature(XMLUni::fgXercesUseCachedGrammarInParse, true);
+
+    // Don't load schemas from any other source (e.g., from XML document's
+    // xsi:schemaLocation attributes).
+    //
+    parser.setFeature(XMLUni::fgXercesLoadSchema, false);
+
+    // Xerces-C++ 3.1.0 is the first version with working multi import
+    // support.
+    //
+    parser.setFeature(XMLUni::fgXercesHandleMultipleImports, true);
+}
+
 #endif
 
 #include "../lib/worddelimiters_p.h"
@@ -2629,12 +2784,32 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-#ifdef QT_XMLPATTERNS_LIB
-    // open schema
-    QXmlSchema schema;
-    if (!schema.load(QUrl::fromLocalFile(app.arguments().at(2)))) {
+#ifdef HAS_XERCESC
+    // care for proper init and cleanup
+    XMLPlatformUtils::Initialize();
+    auto cleanup = qScopeGuard(XMLPlatformUtils::Terminate);
+
+    /*
+     * parse XSD first time and cache it
+     */
+    XMLGrammarPoolImpl newGp(XMLPlatformUtils::fgMemoryManager);
+
+    // create parser for the XSD
+    SAX2XMLReaderImpl parser(XMLPlatformUtils::fgMemoryManager, &newGp);
+    init_parser(parser);
+    QString messages;
+    CustomErrorHandler eh(&messages);
+    parser.setErrorHandler(&eh);
+
+    // load grammar into the pool, on error just abort
+    const auto xsdFile = app.arguments().at(2);
+    if (!parser.loadGrammar((const char16_t *)xsdFile.utf16(), Grammar::SchemaGrammarType, true) || eh.failed()) {
+        qWarning("Failed to parse %s: %s", qPrintable(xsdFile), qPrintable(messages));
         return 2;
     }
+
+    // lock the pool, no later modifications wanted!
+    newGp.lockPool();
 #endif
 
     const QString hlFilenamesListing = app.arguments().value(3);
@@ -2665,13 +2840,13 @@ int main(int argc, char *argv[])
             continue;
         }
 
-#ifdef QT_XMLPATTERNS_LIB
+#ifdef HAS_XERCESC
         // validate against schema
-        QXmlSchemaValidator validator(schema);
-        if (!validator.validate(&hlFile, QUrl::fromLocalFile(hlFile.fileName()))) {
-            anyError = 4;
-            continue;
-        }
+        // QXmlSchemaValidator validator(schema);
+        // if (!validator.validate(&hlFile, QUrl::fromLocalFile(hlFile.fileName()))) {
+        //     anyError = 4;
+        //     continue;
+        // }
 #endif
 
         // read the needed attributes from toplevel language tag

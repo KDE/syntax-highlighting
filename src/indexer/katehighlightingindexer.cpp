@@ -2792,10 +2792,10 @@ int main(int argc, char *argv[])
     /*
      * parse XSD first time and cache it
      */
-    XMLGrammarPoolImpl newGp(XMLPlatformUtils::fgMemoryManager);
+    XMLGrammarPoolImpl xsd(XMLPlatformUtils::fgMemoryManager);
 
     // create parser for the XSD
-    SAX2XMLReaderImpl parser(XMLPlatformUtils::fgMemoryManager, &newGp);
+    SAX2XMLReaderImpl parser(XMLPlatformUtils::fgMemoryManager, &xsd);
     init_parser(parser);
     QString messages;
     CustomErrorHandler eh(&messages);
@@ -2804,12 +2804,12 @@ int main(int argc, char *argv[])
     // load grammar into the pool, on error just abort
     const auto xsdFile = app.arguments().at(2);
     if (!parser.loadGrammar((const char16_t *)xsdFile.utf16(), Grammar::SchemaGrammarType, true) || eh.failed()) {
-        qWarning("Failed to parse %s: %s", qPrintable(xsdFile), qPrintable(messages));
+        qWarning("Failed to parse XSD %s: %s", qPrintable(xsdFile), qPrintable(messages));
         return 2;
     }
 
     // lock the pool, no later modifications wanted!
-    newGp.lockPool();
+    xsd.lockPool();
 #endif
 
     const QString hlFilenamesListing = app.arguments().value(3);
@@ -2841,12 +2841,22 @@ int main(int argc, char *argv[])
         }
 
 #ifdef HAS_XERCESC
-        // validate against schema
-        // QXmlSchemaValidator validator(schema);
-        // if (!validator.validate(&hlFile, QUrl::fromLocalFile(hlFile.fileName()))) {
-        //     anyError = 4;
-        //     continue;
-        // }
+        // create parser
+        SAX2XMLReaderImpl parser(XMLPlatformUtils::fgMemoryManager, &xsd);
+        init_parser(parser);
+        QString messages;
+        CustomErrorHandler eh(&messages);
+        parser.setErrorHandler(&eh);
+
+        // parse the XML file
+        parser.parse((const char16_t *)hlFile.fileName().utf16());
+
+        // report issues
+        if (eh.failed()) {
+            qWarning("Failed to validate XML %s: %s", qPrintable(hlFile.fileName()), qPrintable(messages));
+            anyError = 4;
+            continue;
+        }
 #endif
 
         // read the needed attributes from toplevel language tag

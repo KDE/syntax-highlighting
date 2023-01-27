@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE language SYSTEM "language.dtd"
+<!DOCTYPE language
 [
   <!-- NOTE See https://cmake.org/cmake/help/latest/manual/cmake-language.7.html#variable-references -->
   <!ENTITY var_ref_re "[/\.\+\-_0-9A-Za-z]+">

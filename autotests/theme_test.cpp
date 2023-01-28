@@ -221,7 +221,7 @@ private Q_SLOTS:
         for (const auto &key : definedColors) {
             const QString context = textStyleName + QLatin1Char('/') + key + QLatin1Char('=') + textStyle.value(key).toString();
             if (isColorEntry(key)) {
-                QVERIFY2(QColor::isValidColor(textStyle.value(key).toString()), context.toLatin1().data());
+                QVERIFY2(QColor::isValidColorName(textStyle.value(key).toString()), context.toLatin1().data());
             } else if (isFontStyleEntry(key)) {
                 QVERIFY2(textStyle.value(key).isBool(), context.toLatin1().data());
             } else {
@@ -309,7 +309,7 @@ private Q_SLOTS:
 
         // verify all editor colors are valid
         for (const auto &key : requiredEditorColors) {
-            QVERIFY(QColor::isValidColor(editorColors.value(key).toString()));
+            QVERIFY(QColor::isValidColorName(editorColors.value(key).toString()));
         }
 
         // verify custom-styles if any

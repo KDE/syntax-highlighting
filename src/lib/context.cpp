@@ -38,7 +38,16 @@ void Context::resolveContexts(DefinitionData &def, const HighlightingContextData
     m_lineEndContext.resolve(def, data.lineEndContext);
     m_lineEmptyContext.resolve(def, data.lineEmptyContext);
     m_fallthroughContext.resolve(def, data.fallthroughContext);
+    m_stopEmptyLineContextSwitchLoop = data.stopEmptyLineContextSwitchLoop;
     m_fallthrough = !m_fallthroughContext.isStay();
+
+    /**
+     * line end context switches only when lineEmptyContext is #stay. This avoids
+     * skipping empty lines after a line continuation character (see bug 405903)
+     */
+    if (m_lineEmptyContext.isStay()) {
+        m_lineEmptyContext = m_lineEndContext;
+    }
 
     m_rules.reserve(data.rules.size());
     for (const auto &ruleData : data.rules) {

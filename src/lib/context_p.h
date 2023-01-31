@@ -55,6 +55,11 @@ public:
         return m_fallthrough;
     }
 
+    bool stopEmptyLineContextSwitchLoop() const
+    {
+        return m_stopEmptyLineContextSwitchLoop;
+    }
+
     const ContextSwitch &fallthroughContext() const
     {
         return m_fallthroughContext;
@@ -97,6 +102,7 @@ private:
 
     ResolveState m_resolveState = Unresolved;
     bool m_fallthrough = false;
+    bool m_stopEmptyLineContextSwitchLoop = true;
     bool m_indentationBasedFolding;
 };
 }

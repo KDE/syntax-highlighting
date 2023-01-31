@@ -841,6 +841,7 @@ private:
         QVector<Rule> rules;
         XmlBool dynamic{};
         XmlBool fallthrough{};
+        XmlBool stopEmptyLineContextSwitchLoop{};
 
         bool parseElement(const QString &filename, QXmlStreamReader &xml)
         {
@@ -852,12 +853,17 @@ private:
                 Parser parser{filename, xml, attr, success};
                 XmlBool noIndentationBasedFolding{};
 
-                const bool isExtracted = parser.extractString(name, QStringLiteral("name")) || parser.extractString(attribute, QStringLiteral("attribute"))
+                // clang-format off
+                const bool isExtracted = parser.extractString(name, QStringLiteral("name"))
+                    || parser.extractString(attribute, QStringLiteral("attribute"))
                     || parser.extractString(lineEndContext.name, QStringLiteral("lineEndContext"))
                     || parser.extractString(lineEmptyContext.name, QStringLiteral("lineEmptyContext"))
                     || parser.extractString(fallthroughContext.name, QStringLiteral("fallthroughContext"))
-                    || parser.extractXmlBool(dynamic, QStringLiteral("dynamic")) || parser.extractXmlBool(fallthrough, QStringLiteral("fallthrough"))
+                    || parser.extractXmlBool(dynamic, QStringLiteral("dynamic"))
+                    || parser.extractXmlBool(fallthrough, QStringLiteral("fallthrough"))
+                    || parser.extractXmlBool(stopEmptyLineContextSwitchLoop, QStringLiteral("stopEmptyLineContextSwitchLoop"))
                     || parser.extractXmlBool(noIndentationBasedFolding, QStringLiteral("noIndentationBasedFolding"));
+                // clang-format on
 
                 success = parser.checkIfExtracted(isExtracted);
             }
@@ -1173,7 +1179,7 @@ private:
                 usedAttributeNames.insert({context.attribute, context.line});
             }
 
-            success = checkfallthrough(definition, context) && success;
+            success = checkContextAttribute(definition, context) && success;
             success = checkUreachableRules(definition.filename, context, unreachableIncludedRules) && success;
             success = suggestRuleMerger(definition.filename, context) && success;
 
@@ -1573,9 +1579,9 @@ private:
         return true;
     }
 
-    //! Search for rules with lookAhead="true" and context="#stay".
-    //! This would cause an infinite loop.
-    bool checkfallthrough(const Definition &definition, const Context &context) const
+    //! Check fallthrough and fallthroughContext.
+    //! Check kateversion for stopEmptyLineContextSwitchLoop.
+    bool checkContextAttribute(const Definition &definition, const Context &context) const
     {
         bool success = true;
 
@@ -1597,6 +1603,12 @@ private:
                            << context.name;
                 success = false;
             }
+        }
+
+        if (context.stopEmptyLineContextSwitchLoop != XmlBool::Unspecified && definition.kateVersion < Version{5, 103}) {
+            qWarning() << definition.filename << "line" << context.line
+                       << "stopEmptyLineContextSwitchLoop attribute is only valid with kateversion >= 5.103 in context" << context.name;
+            success = false;
         }
 
         return success;

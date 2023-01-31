@@ -876,11 +876,6 @@ private:
                 success = false;
             }
 
-            if (lineEndContext.name.isEmpty()) {
-                qWarning() << filename << "line" << xml.lineNumber() << "missing attribute: lineEndContext";
-                success = false;
-            }
-
             return success;
         }
     };
@@ -961,7 +956,6 @@ private:
         const Context *firstContext = nullptr;
         QString filename;
         WordDelimiters wordDelimiters;
-        XmlBool casesensitive{};
         Version kateVersion{};
         QString kateVersionStr;
         QString languageName;

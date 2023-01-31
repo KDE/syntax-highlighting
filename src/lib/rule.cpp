@@ -521,7 +521,7 @@ KeywordListRule::KeywordListRule(const KeywordList &keywordList, DefinitionData 
     , m_caseSensitivity(data.hasCaseSensitivityOverride ? data.caseSensitivityOverride : keywordList.caseSensitivity())
 {
     resolveAdditionalWordDelimiters(m_wordDelimiters, data.wordDelimiters);
-    m_skippableOffsetId = this;
+    m_hasSkipOffset = true;
 }
 
 MatchResult KeywordListRule::doMatch(QStringView text, int offset, const QStringList &) const
@@ -646,7 +646,7 @@ static MatchResult regexMatch(const QRegularExpression &regexp, QStringView text
 RegExpr::RegExpr(const HighlightingContextData::Rule::RegExpr &data)
     : m_regexp(data.pattern, makePattenOptions(data))
 {
-    m_skippableOffsetId = this;
+    m_hasSkipOffset = true;
 }
 
 void RegExpr::resolve()
@@ -674,7 +674,7 @@ DynamicRegExpr::DynamicRegExpr(const HighlightingContextData::Rule::RegExpr &dat
     , m_patternOptions(makePattenOptions(data))
 {
     m_dynamic = true;
-    m_skippableOffsetId = this;
+    m_hasSkipOffset = true;
 }
 
 void DynamicRegExpr::resolve()

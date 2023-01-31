@@ -307,12 +307,10 @@ public:
                 success = false;
             }
 
-            QSet<const Keywords *> referencedKeywords;
             QSet<ItemDatas::Style> usedAttributeNames;
             QSet<ItemDatas::Style> ignoredAttributeNames;
-            success = checkKeywordsList(definition, referencedKeywords) && success;
-            success =
-                checkContexts(definition, referencedKeywords, usedAttributeNames, ignoredAttributeNames, usedContexts, unreachableIncludedRules) && success;
+            success = checkKeywordsList(definition) && success;
+            success = checkContexts(definition, usedAttributeNames, ignoredAttributeNames, usedContexts, unreachableIncludedRules) && success;
 
             // search for non-existing itemDatas.
             const auto invalidNames = usedAttributeNames - definition.itemDatas.styleNames;
@@ -1149,7 +1147,6 @@ private:
 
     //! Check contexts and rules
     bool checkContexts(const Definition &definition,
-                       QSet<const Keywords *> &referencedKeywords,
                        QSet<ItemDatas::Style> &usedAttributeNames,
                        QSet<ItemDatas::Style> &ignoredAttributeNames,
                        const QSet<const Context *> &usedContexts,
@@ -1193,7 +1190,7 @@ private:
                 }
                 success = checkLookAhead(rule) && success;
                 success = checkStringDetect(rule) && success;
-                success = checkKeyword(definition, rule, referencedKeywords) && success;
+                success = checkKeyword(definition, rule) && success;
                 success = checkRegExpr(filename, rule, context) && success;
                 success = checkDelimiters(definition, rule) && success;
             }
@@ -1586,12 +1583,6 @@ private:
         bool success = true;
 
         if (!context.fallthroughContext.name.isEmpty()) {
-            if (context.fallthroughContext.stay) {
-                qWarning() << definition.filename << "line" << context.line << "possible infinite loop due to fallthroughContext=\"#stay\" in context "
-                           << context.name;
-                success = false;
-            }
-
             const bool mandatoryFallthroughAttribute = definition.kateVersion < Version{5, 62};
             if (context.fallthrough == XmlBool::True && !mandatoryFallthroughAttribute) {
                 qWarning() << definition.filename << "line" << context.line << "fallthrough attribute is unnecessary with kateversion >= 5.62 in context"
@@ -1645,15 +1636,12 @@ private:
         return false;
     }
 
-    //! Search for rules with lookAhead="true" and context="#stay".
-    //! This would cause an infinite loop.
-    bool checkKeyword(const Definition &definition, const Context::Rule &rule, QSet<const Keywords *> &referencedKeywords) const
+    //! Check that keyword rule reference an existing keyword list.
+    bool checkKeyword(const Definition &definition, const Context::Rule &rule) const
     {
         if (rule.type == Context::Rule::Type::keyword) {
             auto it = definition.keywordsList.find(rule.string);
-            if (it != definition.keywordsList.end()) {
-                referencedKeywords.insert(&*it);
-            } else {
+            if (it == definition.keywordsList.end()) {
                 qWarning() << rule.filename << "line" << rule.line << "reference of non-existing keyword list:" << rule.string;
                 return false;
             }
@@ -1671,13 +1659,7 @@ private:
         return true;
     }
 
-    //! Check that StringDetect contains more that 2 characters
-    //! Fix with following command:
-    //! \code
-    //!   sed -E
-    //!   '/StringDetect/{/dynamic="(1|true)|insensitive="(1|true)/!{s/StringDetect(.*)String="(.|&lt;|&gt;|&quot;|&amp;)(.|&lt;|&gt;|&quot;|&amp;)"/Detect2Chars\1char="\2"
-    //!   char1="\3"/;t;s/StringDetect(.*)String="(.|&lt;|&gt;|&quot;|&amp;)"/DetectChar\1char="\2"/}}' -i file.xml...
-    //! \endcode
+    //! Check that StringDetect contains a placeHolder when dynamic="1"
     bool checkStringDetect(const Context::Rule &rule) const
     {
         if (rule.type == Context::Rule::Type::StringDetect) {
@@ -1694,7 +1676,7 @@ private:
     }
 
     //! Check \<include> and delimiter in a keyword list
-    bool checkKeywordsList(const Definition &definition, QSet<const Keywords *> &referencedKeywords) const
+    bool checkKeywordsList(const Definition &definition) const
     {
         bool success = true;
 
@@ -1709,7 +1691,7 @@ private:
                                << "<include> is only available since version \"5.53\". Please, increase kateversion.";
                     success = false;
                 }
-                success = checkKeywordInclude(definition, include, referencedKeywords) && success;
+                success = checkKeywordInclude(definition, include) && success;
             }
 
             // Check that keyword list items do not have deliminator character
@@ -1729,16 +1711,13 @@ private:
     }
 
     //! Search for non-existing keyword include.
-    bool checkKeywordInclude(const Definition &definition, const Keywords::Items::Item &include, QSet<const Keywords *> &referencedKeywords) const
+    bool checkKeywordInclude(const Definition &definition, const Keywords::Items::Item &include) const
     {
         bool containsKeywordName = true;
         int const idx = include.content.indexOf(QStringLiteral("##"));
         if (idx == -1) {
             auto it = definition.keywordsList.find(include.content);
             containsKeywordName = (it != definition.keywordsList.end());
-            if (containsKeywordName) {
-                referencedKeywords.insert(&*it);
-            }
         } else {
             auto defName = include.content.mid(idx + 2);
             auto listName = include.content.left(idx);

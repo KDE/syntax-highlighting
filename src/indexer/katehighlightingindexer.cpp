@@ -2170,6 +2170,8 @@ private:
             case Context::Rule::Type::Float:
                 updateUnreachable2(CharTableArray(detectChars, rule).find(QStringLiteral("0123456789.")));
                 updateUnreachable1(floatRule.setRule(rule));
+                // check that Float is before Int
+                updateUnreachable1(Rule4(intRule).setRule(rule));
                 break;
 
             // check if hidden by another DetectIdentifier rule

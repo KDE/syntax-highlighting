@@ -395,7 +395,8 @@ quint16 RepositoryPrivate::nextFormatId()
 
 void Repository::reload()
 {
-    qCDebug(Log) << "Reloading syntax definitions!";
+    Q_EMIT aboutToReload();
+
     for (const auto &def : std::as_const(d->m_sortedDefs)) {
         DefinitionData::get(def)->clear();
     }
@@ -410,6 +411,8 @@ void Repository::reload()
     d->m_formatId = 0;
 
     d->load(this);
+
+    Q_EMIT reloaded();
 }
 
 void Repository::addCustomSearchPath(const QString &path)

@@ -9,6 +9,7 @@
 
 #include "ksyntaxhighlighting_export.h"
 
+#include <QObject>
 #include <QVector>
 #include <QtGlobal>
 
@@ -124,8 +125,10 @@ class Theme;
  * @see Definition, Theme, AbstractHighlighter
  * @since 5.28
  */
-class KSYNTAXHIGHLIGHTING_EXPORT Repository
+class KSYNTAXHIGHLIGHTING_EXPORT Repository : public QObject
 {
+    Q_OBJECT
+
 public:
     /**
      * Create a new syntax definition repository.
@@ -279,6 +282,17 @@ public:
      * @since 5.39
      */
     QVector<QString> customSearchPaths() const;
+
+Q_SIGNALS:
+    /**
+     * This signal is emitted before the reload is started.
+     */
+    void aboutToReload();
+
+    /**
+     * This signal is emitted when the reload is finished.
+     */
+    void reloaded();
 
 private:
     Q_DISABLE_COPY(Repository)

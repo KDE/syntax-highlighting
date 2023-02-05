@@ -130,7 +130,7 @@ protected:
     MatchResult doMatch(QStringView text, int offset, const QStringList &) const override;
 
 private:
-    QString m_chars;
+    WordDelimiters m_chars;
 };
 
 class DetectChar final : public Rule

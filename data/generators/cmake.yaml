@@ -1,4 +1,4 @@
-version: 44
+version: 45
 
 global-properties:
     - ALLOW_DUPLICATE_CUSTOM_TARGETS
@@ -261,6 +261,7 @@ target-properties:
     - JOB_POOL_LINK
     - LABELS
     - <LANG>_CLANG_TIDY
+    - <LANG>_CLANG_TIDY_EXPORT_FIXES_DIR                    # Since 3.26
     - <LANG>_COMPILER_LAUNCHER
     - <LANG>_CPPCHECK                                       # Since 3.10
     - <LANG>_CPPLINT
@@ -535,70 +536,88 @@ install-properties:
     - CPACK_WIX_ACL
 
 generator-expressions:
-    # Boolean Generator Expressions
-    #   * Logical Operators
+    # Conditional Expressions
+    - IF
     - 0
     - 1
     - BOOL
+    # Logical Operators
     - AND
     - OR
     - NOT
-    #   * String Comparisons
+    # String Comparisons
     - STREQUAL
     - EQUAL
-    - IN_LIST                                               # Since 3.12
+    # Version Comparisons
     - VERSION_LESS
     - VERSION_GREATER
     - VERSION_EQUAL
     - VERSION_LESS_EQUAL
     - VERSION_GREATER_EQUAL
-    #   * Path Comparisons
+    # String Transformations
+    - LOWER_CASE
+    - UPPER_CASE
+    - MAKE_C_IDENTIFIER
+    # List Expressions
+    - IN_LIST                                               # Since 3.12
+    - JOIN
+    - REMOVE_DUPLICATES                                     # Since 3.15
+    - FILTER                                                # Since 3.15
+    # Path Comparisons
     - PATH_EQUAL                                            # Since 3.24
     #   * Path Queries
     #   * Path Decomposition
     #   * Path Transformations
     # TODO Need a bit deeper genex parsing to get sub-commands of `PATH`
     - PATH                                                  # Since 3.24
-    #   * Variable Queries
-    - TARGET_EXISTS                                         # Since 3.12
+    # Shell Paths
+    - SHELL_PATH
+    # Configuration Expressions
     - CONFIG
+    - OUTPUT_CONFIG                                         # Since 3.20
+    - COMMAND_CONFIG                                        # Since 3.20
+    # Toolchain And Language Expressions
+    #   * Platform
     - PLATFORM_ID
-    - C_COMPILER_ID
-    - CXX_COMPILER_ID
-    - CUDA_COMPILER_ID                                      # Since 3.15
-    - Fortran_COMPILER_ID
+    #   * Compiler Version
     - C_COMPILER_VERSION
     - CXX_COMPILER_VERSION
     - CUDA_COMPILER_VERSION                                 # Since 3.15
+    - OBJC_COMPILER_VERSION                                 # Since 3.16
+    - OBJCXX_COMPILER_VERSION                               # Since 3.16
     - Fortran_COMPILER_VERSION
-    - TARGET_POLICY
-    - COMPILE_FEATURES
+    - HIP_COMPILER_VERSION                                  # Since 3.21
+    - ISPC_COMPILER_VERSION                                 # Since 3.19
+    #   * Compiler Language And ID
+    - C_COMPILER_ID
+    - CXX_COMPILER_ID
+    - CUDA_COMPILER_ID                                      # Since 3.15
+    - OBJC_COMPILER_ID                                      # Since 3.16
+    - OBJCXX_COMPILER_ID                                    # Since 3.16
+    - Fortran_COMPILER_ID
+    - HIP_COMPILER_ID                                       # Since 3.21
+    - ISPC_COMPILER_ID                                      # Since 3.19
+    - COMPILE_LANGUAGE                                      # Since 3.3
     - COMPILE_LANG_AND_ID                                   # Since 3.15
-    - COMPILE_LANGUAGE
-    - LINK_LANG_AND_ID                                      # Since 3.18
+    #   * Compile Features
+    - COMPILE_FEATURES
+    #   * Linker Language And ID
     - LINK_LANGUAGE                                         # Since 3.18
-    - DEVICE_LINK                                           # Since 3.18
-    - HOST_LINK                                             # Since 3.18
+    - LINK_LANG_AND_ID                                      # Since 3.18
+    #   * Link Features
     - LINK_LIBRARY                                          # Since 3.24
     - LINK_GROUP                                            # Since 3.24
-    # String-Valued Generator Expressions
-    #   * Escaped Characters
-    - ANGLE-R
-    - COMMA
-    - SEMICOLON
-    #   * Conditional Expressions
-    - IF
-    #   * String Transformations
-    - JOIN
-    - REMOVE_DUPLICATES                                     # Since 3.15
-    - FILTER                                                # Since 3.15
-    - LOWER_CASE
-    - UPPER_CASE
-    - GENEX_EVAL                                            # Since 3.12
-    - TARGET_GENEX_EVAL                                     # Since 3.12
-    #   * Variable Queries (NOTE Already included above)
-    #   * Target-Dependent Queries
+    #   * Link Context
+    - LINK_ONLY
+    - DEVICE_LINK                                           # Since 3.18
+    - HOST_LINK                                             # Since 3.18
+    # Target-Dependent Expressions
+    - TARGET_EXISTS                                         # Since 3.12
     - TARGET_NAME_IF_EXISTS                                 # Since 3.12
+    - TARGET_NAME
+    - TARGET_PROPERTY
+    - TARGET_OBJECTS
+    - TARGET_POLICY
     - TARGET_FILE
     - TARGET_FILE_BASE_NAME                                 # Since 3.15
     - TARGET_FILE_PREFIX                                    # Since 3.15
@@ -612,7 +631,6 @@ generator-expressions:
     - TARGET_LINKER_FILE_NAME
     - TARGET_LINKER_FILE_DIR
     - TARGET_SONAME_FILE
-    - TARGET_SONAME_FILE
     - TARGET_SONAME_FILE_NAME
     - TARGET_SONAME_FILE_DIR
     - TARGET_PDB_FILE
@@ -622,19 +640,21 @@ generator-expressions:
     - TARGET_BUNDLE_DIR_NAME                                # Since 3.24
     - TARGET_BUNDLE_DIR
     - TARGET_BUNDLE_CONTENT_DIR
-    - TARGET_PROPERTY
     - TARGET_RUNTIME_DLLS                                   # Since 3.21
-    - INSTALL_PREFIX
-    # Output-Related Expressions
-    - TARGET_NAME
-    - LINK_ONLY
+    # Export And Install Expressions
     - INSTALL_INTERFACE
     - BUILD_INTERFACE
-    - MAKE_C_IDENTIFIER
-    - TARGET_OBJECTS
-    - SHELL_PATH
-    - OUTPUT_CONFIG                                         # Since 3.20
-    - COMMAND_CONFIG                                        # Since 3.20
+    - BUILD_LOCAL_INTERFACE                                 # Since 3.26
+    - INSTALL_PREFIX
+    # Multi-level Expression Evaluation
+    - GENEX_EVAL                                            # Since 3.12
+    - TARGET_GENEX_EVAL                                     # Since 3.12
+    # Escaped Characters
+    - ANGLE-R
+    - COMMA
+    - SEMICOLON
+    # Deprecated Expressions
+    # - CONFIGURATION
 
 variables:
     # Variables that Provide Information
@@ -686,6 +706,7 @@ variables:
     - CMAKE_JOB_POOL_LINK
     - CMAKE_JOB_POOLS                                       # Since 3.11
     - CMAKE_<LANG>_COMPILER_AR
+    - CMAKE_<LANG>_COMPILER_FRONTEND_VARIANT                # Since 3.14
     - CMAKE_<LANG>_COMPILER_RANLIB
     - CMAKE_LINK_LIBRARY_SUFFIX
     - CMAKE_LINK_SEARCH_END_STATIC
@@ -735,9 +756,16 @@ variables:
     - CMAKE_VS_NsightTegra_VERSION
     - CMAKE_VS_NUGET_PACKAGE_RESTORE                        # Since 3.23
     - CMAKE_VS_PLATFORM_NAME
+    - CMAKE_VS_PLATFORM_NAME_DEFAULT                        # Since 3.14.3
     - CMAKE_VS_PLATFORM_TOOLSET
     - CMAKE_VS_PLATFORM_TOOLSET_CUDA
-    - CMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE
+    - CMAKE_VS_PLATFORM_TOOLSET_CUDA_CUSTOM_DIR             # Since 3.16
+    - CMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE           # Since 3.8
+    - CMAKE_VS_PLATFORM_TOOLSET_VERSION                     # Since 3.12
+    - CMAKE_VS_TARGET_FRAMEWORK_IDENTIFIER                  # Since 3.22
+    - CMAKE_VS_TARGET_FRAMEWORK_TARGETS_VERSION             # Since 3.22
+    - CMAKE_VS_TARGET_FRAMEWORK_VERSION                     # Since 3.22
+    - CMAKE_VS_VERSION_BUILD_NUMBER                         # Since 3.26
     - CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION
     - CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION_MAXIMUM      # Since 3.19
     - CMAKE_XCODE_BUILD_SYSTEM                              # Since 3.19
@@ -1026,6 +1054,7 @@ variables:
     - CMAKE_INTERPROCEDURAL_OPTIMIZATION_<CONFIG>
     - CMAKE_IOS_INSTALL_COMBINED
     - CMAKE_<LANG>_CLANG_TIDY
+    - CMAKE_<LANG>_CLANG_TIDY_EXPORT_FIXES_DIR              # Since 3.26
     - CMAKE_<LANG>_COMPILER_LAUNCHER
     - CMAKE_<LANG>_CPPCHECK                                 # Since 3.10
     - CMAKE_<LANG>_CPPLINT
@@ -2657,11 +2686,13 @@ environment-variables:
     # Environment Variables for CTest
     - CMAKE_CONFIG_TYPE
     - CTEST_INTERACTIVE_DEBUG_MODE
+    - CTEST_NO_TESTS_ACTION                                 # Since 3.26
     - CTEST_OUTPUT_ON_FAILURE
     - CTEST_PARALLEL_LEVEL
     - CTEST_PROGRESS_OUTPUT
     - CTEST_USE_LAUNCHERS_DEFAULT
     - DASHBOARD_TEST_FROM_CTEST
+    # Environment Variables for the CMake curses interface
     - CCMAKE_COLORS
     # Here are the `find_package` specific variables described at the
     # https://cmake.org/cmake/help/latest/command/find_package.html
@@ -3380,6 +3411,8 @@ scripting-commands:
           , CHECK_START
           , CHECK_PASS
           , CHECK_FAIL
+            # Since 3.26
+          , CONFIGURE_LOG
           ]
     -
         name: option
@@ -3614,6 +3647,7 @@ project-commands:
             ASM
           , ASM-ATT
           , ASM_NASM
+          , ASM_MARMASM                                     # Since 3.26
           , ASM_MASM
           , C
           , CSharp
@@ -3959,6 +3993,9 @@ project-commands:
           , SOURCE_FROM_CONTENT
           , SOURCE_FROM_VAR
           , SOURCE_FROM_FILE
+            # Since 3.26
+          , LOG_DESCRIPTION
+          , NO_LOG
           ]
     -
         name: try_run
@@ -3987,6 +4024,9 @@ project-commands:
           , NO_CACHE
           , RUN_OUTPUT_STDOUT_VARIABLE
           , RUN_OUTPUT_STDERR_VARIABLE
+            # Since 3.26
+          , LOG_DESCRIPTION
+          , NO_LOG
           ]
 
 ctest-commands:
@@ -4800,6 +4840,7 @@ standard-module-commands:
             - INDEPENDENT_STEP_TARGETS
             - LIST_SEPARATOR
             - COMMAND
+            - INSTALL_BYPRODUCTS                            # Since 3.26
         special-args: [IGNORED, OPTIONAL, REQUIRED, CHECKOUT, REBASE, REBASE_CHECKOUT]
         property-args: *get_target_property
     - name: ExternalProject_Get_Property

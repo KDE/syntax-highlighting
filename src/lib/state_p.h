@@ -26,10 +26,19 @@ public:
     StateData() = default;
     static StateData *get(State &state);
 
-    bool isEmpty() const;
     void clear();
-    int size() const;
-    void push(Context *context, const QStringList &captures);
+
+    bool isEmpty() const
+    {
+        return m_contextStack.isEmpty();
+    }
+
+    int size() const
+    {
+        return m_contextStack.size();
+    }
+
+    void push(Context *context, QStringList &&captures);
 
     /**
      * Pop the number of elements given from the top of the current stack.
@@ -39,10 +48,27 @@ public:
      */
     bool pop(int popCount);
 
-    Context *topContext() const;
-    const QStringList &topCaptures() const;
+    Context *topContext() const
+    {
+        return m_contextStack.last().context;
+    }
+
+    const QStringList &topCaptures() const
+    {
+        return m_contextStack.last().captures;
+    }
 
 private:
+    struct StackValue {
+        Context *context;
+        QStringList captures;
+
+        bool operator==(const StackValue &other) const
+        {
+            return context == other.context && captures == other.captures;
+        }
+    };
+
     /**
      * definition id to filter out invalid states
      */
@@ -51,7 +77,7 @@ private:
     /**
      * the context stack combines the active context + valid captures
      */
-    QVector<QPair<Context *, QStringList>> m_contextStack;
+    QVector<StackValue> m_contextStack;
 };
 
 }

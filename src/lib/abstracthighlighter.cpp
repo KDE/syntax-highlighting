@@ -272,7 +272,7 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
                 }
             }
 
-            const auto newResult = rule->doMatch(text, offset, stateData->topCaptures());
+            auto newResult = rule->doMatch(text, offset, stateData->topCaptures());
             newOffset = newResult.offset();
 
             /**
@@ -308,12 +308,12 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
 
             if (rule->isLookAhead()) {
                 Q_ASSERT(!rule->context().isStay());
-                d->switchContext(stateData, rule->context(), newResult.captures());
+                d->switchContext(stateData, rule->context(), std::move(newResult.captures()));
                 isLookAhead = true;
                 break;
             }
 
-            d->switchContext(stateData, rule->context(), newResult.captures());
+            d->switchContext(stateData, rule->context(), std::move(newResult.captures()));
             newFormat = rule->attributeFormat().isValid() ? &rule->attributeFormat() : &stateData->topContext()->attributeFormat();
             if (newOffset == text.size() && rule->isLineContinue()) {
                 lineContinuation = true;
@@ -389,7 +389,7 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
     return newState;
 }
 
-bool AbstractHighlighterPrivate::switchContext(StateData *data, const ContextSwitch &contextSwitch, const QStringList &captures)
+bool AbstractHighlighterPrivate::switchContext(StateData *data, const ContextSwitch &contextSwitch, QStringList &&captures)
 {
     // kill as many items as requested from the stack, will always keep the initial context alive!
     const bool initialContextSurvived = data->pop(contextSwitch.popCount());
@@ -397,7 +397,7 @@ bool AbstractHighlighterPrivate::switchContext(StateData *data, const ContextSwi
     // if we have a new context to add, push it
     // then we always "succeed"
     if (contextSwitch.context()) {
-        data->push(contextSwitch.context(), captures);
+        data->push(contextSwitch.context(), std::move(captures));
         return true;
     }
 

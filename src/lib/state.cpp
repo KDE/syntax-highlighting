@@ -25,25 +25,15 @@ StateData *StateData::get(State &state)
     return state.d.data();
 }
 
-bool StateData::isEmpty() const
-{
-    return m_contextStack.isEmpty();
-}
-
 void StateData::clear()
 {
     m_contextStack.clear();
 }
 
-int StateData::size() const
-{
-    return m_contextStack.size();
-}
-
-void StateData::push(Context *context, const QStringList &captures)
+void StateData::push(Context *context, QStringList &&captures)
 {
     Q_ASSERT(context);
-    m_contextStack.push_back(qMakePair(context, captures));
+    m_contextStack.push_back(StackValue{context, std::move(captures)});
 }
 
 bool StateData::pop(int popCount)
@@ -58,18 +48,6 @@ bool StateData::pop(int popCount)
     const bool initialContextSurvived = m_contextStack.size() > popCount;
     m_contextStack.resize(std::max(1, int(m_contextStack.size()) - popCount));
     return initialContextSurvived;
-}
-
-Context *StateData::topContext() const
-{
-    Q_ASSERT(!isEmpty());
-    return m_contextStack.last().first;
-}
-
-const QStringList &StateData::topCaptures() const
-{
-    Q_ASSERT(!isEmpty());
-    return m_contextStack.last().second;
 }
 
 State::State()
@@ -107,5 +85,5 @@ bool State::indentationBasedFoldingEnabled() const
     if (!d || d->m_contextStack.isEmpty()) {
         return false;
     }
-    return d->m_contextStack.last().first->indentationBasedFoldingEnabled();
+    return d->m_contextStack.last().context->indentationBasedFoldingEnabled();
 }

@@ -22,7 +22,7 @@ public:
     virtual ~AbstractHighlighterPrivate();
 
     void ensureDefinitionLoaded();
-    bool switchContext(StateData *data, const ContextSwitch &contextSwitch, const QStringList &captures);
+    bool switchContext(StateData *data, const ContextSwitch &contextSwitch, QStringList &&captures);
 
     Definition m_definition;
     Theme m_theme;

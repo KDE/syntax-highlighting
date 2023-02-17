@@ -286,11 +286,13 @@ public:
 Q_SIGNALS:
     /**
      * This signal is emitted before the reload is started.
+     * @since 6.0
      */
     void aboutToReload();
 
     /**
      * This signal is emitted when the reload is finished.
+     * @since 6.0
      */
     void reloaded();
 

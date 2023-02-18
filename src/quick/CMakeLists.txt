@@ -7,7 +7,6 @@ ecm_add_qml_module(kquicksyntaxhighlightingplugin URI "org.kde.syntaxhighlightin
 target_sources(kquicksyntaxhighlightingplugin PRIVATE
     kquicksyntaxhighlightingplugin.cpp
     kquicksyntaxhighlighter.cpp
-    repositorywrapper.cpp
 )
 target_link_libraries(kquicksyntaxhighlightingplugin PRIVATE
     KF6SyntaxHighlighting

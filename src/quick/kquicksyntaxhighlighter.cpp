@@ -89,12 +89,12 @@ void KQuickSyntaxHighlighter::setTheme(const QVariant &theme)
     }
 }
 
-RepositoryWrapper *KQuickSyntaxHighlighter::repository() const
+Repository *KQuickSyntaxHighlighter::repository() const
 {
     return m_repository;
 }
 
-void KQuickSyntaxHighlighter::setRepository(RepositoryWrapper *repository)
+void KQuickSyntaxHighlighter::setRepository(Repository *repository)
 {
     if (m_repository == repository) {
         return;
@@ -106,7 +106,9 @@ void KQuickSyntaxHighlighter::setRepository(RepositoryWrapper *repository)
 Repository *KQuickSyntaxHighlighter::unwrappedRepository() const
 {
     if (m_repository) {
-        return m_repository->m_repository;
+        return m_repository;
     }
     return defaultRepository();
 }
+
+#include "moc_kquicksyntaxhighlighter.cpp"

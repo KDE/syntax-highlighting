@@ -128,6 +128,8 @@ class Theme;
 class KSYNTAXHIGHLIGHTING_EXPORT Repository : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QVector<KSyntaxHighlighting::Definition> definitions READ definitions NOTIFY reloaded)
+    Q_PROPERTY(QVector<KSyntaxHighlighting::Theme> themes READ themes NOTIFY reloaded)
 
 public:
     /**
@@ -151,7 +153,7 @@ public:
      *       Therefore, only the string "JavaScript" will return a valid
      *       Definition file.
      */
-    Definition definitionForName(const QString &defName) const;
+    Q_INVOKABLE KSyntaxHighlighting::Definition definitionForName(const QString &defName) const;
 
     /**
      * Returns the best matching Definition for the file named @p fileName.
@@ -162,7 +164,7 @@ public:
      * If no match is found, Definition::isValid() of the returned instance
      * returns false.
      */
-    Definition definitionForFileName(const QString &fileName) const;
+    Q_INVOKABLE KSyntaxHighlighting::Definition definitionForFileName(const QString &fileName) const;
 
     /**
      * Returns all Definition%s for the file named @p fileName sorted by priority.
@@ -171,7 +173,7 @@ public:
      *
      * @since 5.56
      */
-    QVector<Definition> definitionsForFileName(const QString &fileName) const;
+    Q_INVOKABLE QVector<KSyntaxHighlighting::Definition> definitionsForFileName(const QString &fileName) const;
 
     /**
      * Returns the best matching Definition to the type named @p mimeType
@@ -181,34 +183,34 @@ public:
      *
      * @since 5.50
      */
-    Definition definitionForMimeType(const QString &mimeType) const;
+    Q_INVOKABLE KSyntaxHighlighting::Definition definitionForMimeType(const QString &mimeType) const;
 
     /**
      * Returns all Definition%s to the type named @p mimeType sorted by priority
      *
      * @since 5.56
      */
-    QVector<Definition> definitionsForMimeType(const QString &mimeType) const;
+    Q_INVOKABLE QVector<KSyntaxHighlighting::Definition> definitionsForMimeType(const QString &mimeType) const;
 
     /**
      * Returns all available Definition%s.
      * Definition%ss are ordered by translated section and translated names,
      * for consistent displaying.
      */
-    QVector<Definition> definitions() const;
+    Q_INVOKABLE QVector<KSyntaxHighlighting::Definition> definitions() const;
 
     /**
      * Returns all available color themes.
      * The returned list should never be empty.
      */
-    QVector<Theme> themes() const;
+    Q_INVOKABLE QVector<KSyntaxHighlighting::Theme> themes() const;
 
     /**
      * Returns the theme called @p themeName.
      * If the requested theme cannot be found, the retunred Theme is invalid,
      * see Theme::isValid().
      */
-    Theme theme(const QString &themeName) const;
+    Q_INVOKABLE KSyntaxHighlighting::Theme theme(const QString &themeName) const;
 
     /**
      * Built-in default theme types.
@@ -220,21 +222,14 @@ public:
         //! Theme with a dark background color.
         DarkTheme
     };
+    Q_ENUM(DefaultTheme)
 
     /**
      * Returns a default theme instance of the given type.
      * The returned Theme is guaranteed to be a valid theme.
      * @since 5.79
      */
-    Theme defaultTheme(DefaultTheme t = LightTheme) const;
-
-    /**
-     * Returns a default theme instance of the given type.
-     * The returned Theme is guaranteed to be a valid theme.
-     *
-     * KF6: remove in favor of const variant
-     */
-    Theme defaultTheme(DefaultTheme t = LightTheme);
+    Q_INVOKABLE KSyntaxHighlighting::Theme defaultTheme(DefaultTheme t = LightTheme) const;
 
     /**
      * Returns the best matching theme for the given palette

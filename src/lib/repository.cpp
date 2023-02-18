@@ -177,11 +177,6 @@ Theme Repository::defaultTheme(Repository::DefaultTheme t) const
     return theme(QStringLiteral("Breeze Light"));
 }
 
-Theme Repository::defaultTheme(Repository::DefaultTheme t)
-{
-    return std::as_const(*this).defaultTheme(t);
-}
-
 Theme Repository::themeForPalette(const QPalette &palette) const
 {
     const auto base = palette.color(QPalette::Base);
@@ -425,3 +420,5 @@ QVector<QString> Repository::customSearchPaths() const
 {
     return d->m_customSearchPaths;
 }
+
+#include "moc_repository.cpp"

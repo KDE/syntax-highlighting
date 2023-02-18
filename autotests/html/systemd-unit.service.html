@@ -94,6 +94,8 @@
 <span style="color:#0057ae;">USBFunctionDescriptors</span> = /some/absolute/path
 <span style="color:#0057ae;">USBFunctionStrings</span> = /some/absolute/path
 <span style="color:#0057ae;">OOMPolicy</span> = <span style="color:#aa5500;">stop</span>
+<span style="color:#0057ae;">OpenFile</span> = /some/path<span style="color:#ff5500;">:</span><span style="font-style:italic;">fd-name</span><span style="color:#ff5500;">:</span><span style="color:#aa5500;">graceful</span>,<span style="color:#aa5500;">read-only</span>
+<span style="color:#0057ae;">ReloadSignal</span> = <span style="color:#aa5500;">SIGUSR1</span>
 
 <span style="color:#898887;">## from systemd.exec</span>
 <span style="color:#0057ae;">ExecPaths</span> = some/path some/other/path
@@ -248,6 +250,8 @@
 <span style="color:#0057ae;">LogExtraFields</span> = <span style="color:#0057ae;">FIELD</span>=VALUE <span style="color:#0057ae;">OTHER_FIELD</span>=VALUE2
 <span style="color:#0057ae;">LogRateLimitIntervalSec</span> = <span style="color:#b08000;">1</span><span style="font-style:italic;">s</span> <span style="color:#b08000;">500</span><span style="font-style:italic;">ms</span>
 <span style="color:#0057ae;">LogRateLimitBurst</span> = <span style="color:#b08000;">50</span>
+<span style="color:#0057ae;">LogFilterPatterns</span> = <span style="color:#ff5500;">~</span>some_rx
+<span style="color:#0057ae;">LogFilterPatterns</span> = \x7esome_rx
 <span style="color:#0057ae;">LogNamespace</span> = some_name
 <span style="color:#0057ae;">SyslogIdentifier</span> = some_identifier
 <span style="color:#0057ae;">SyslogFacility</span> = <span style="color:#aa5500;">daemon</span>
@@ -288,6 +292,7 @@
 <span style="color:#0057ae;">MemoryHigh</span> = <span style="color:#b08000;">40 </span><span style="font-style:italic;">%</span>
 <span style="color:#0057ae;">MemoryMax</span> = <span style="color:#b08000;">60</span><span style="font-style:italic;">%</span>
 <span style="color:#0057ae;">MemorySwapMax</span> = <span style="color:#b08000;">10</span><span style="font-style:italic;">G</span>
+<span style="color:#0057ae;">MemoryZSwapMax</span> = <span style="color:#b08000;">2</span><span style="font-style:italic;">G</span>
 <span style="color:#0057ae;">TasksAccounting</span> = <span style="color:#aa5500;">on</span>
 <span style="color:#0057ae;">TasksMax</span> = <span style="color:#b08000;">50</span><span style="font-style:italic;">%</span>
 <span style="color:#0057ae;">IOAccounting</span> = <span style="color:#aa5500;">on</span>
@@ -2103,6 +2108,11 @@ WantedBy = some.service some.socket
 <span style="color:#0057ae;">OOMScoreAdjust</span> = <span style="color:#b08000;">+100</span>1
 <span style="color:#0057ae;">OOMScoreAdjust</span> = <span style="color:#b08000;">100</span>1
 
+<span style="color:#898887;">###### open file option</span>
+<span style="font-weight:bold;">[Service]</span>
+<span style="color:#0057ae;">OpenFile</span> = /some/path/<span style="color:#ff5500;">:</span><span style="font-style:italic;">some-name</span><span style="color:#ff5500;">:</span><span style="color:#aa5500;">append</span>,<span style="color:#aa5500;">graceful</span>,<span style="color:#aa5500;">read-only</span>,<span style="color:#aa5500;">truncate</span>
+<span style="color:#898887;">## invalid values</span>
+<span style="color:#0057ae;">OpenFile</span> = /some/path/<span style="color:#ff5500;">:</span><span style="font-style:italic;">some-name</span><span style="color:#ff5500;">:</span>some,invalid,options
 
 <span style="color:#898887;">###### percent</span>
 [Slice]
@@ -2118,6 +2128,10 @@ WantedBy = some.service some.socket
 
 <span style="color:#898887;">###### personality</span>
 <span style="font-weight:bold;">[Service]</span>
+<span style="color:#0057ae;">Personality</span> = <span style="color:#aa5500;">arm</span>
+<span style="color:#0057ae;">Personality</span> = <span style="color:#aa5500;">arm-be</span>
+<span style="color:#0057ae;">Personality</span> = <span style="color:#aa5500;">arm64</span>
+<span style="color:#0057ae;">Personality</span> = <span style="color:#aa5500;">arm64-be</span>
 <span style="color:#0057ae;">Personality</span> = <span style="color:#aa5500;">ppc</span>
 <span style="color:#0057ae;">Personality</span> = <span style="color:#aa5500;">ppc-le</span>
 <span style="color:#0057ae;">Personality</span> = <span style="color:#aa5500;">ppc64</span>
@@ -2128,6 +2142,8 @@ WantedBy = some.service some.socket
 <span style="color:#0057ae;">Personality</span> = <span style="color:#aa5500;">x86-64</span>
 <span style="color:#898887;">## invalid values</span>
 <span style="color:#0057ae;">Personality</span> = invalid
+<span style="color:#0057ae;">Personality</span> = alpha
+<span style="color:#0057ae;">Personality</span> = m68k
 <span style="color:#898887;"># multiple values</span>
 <span style="color:#0057ae;">Personality</span> = <span style="color:#aa5500;">x86-64</span> s390x
 
@@ -2443,7 +2459,7 @@ WantedBy = some.service some.socket
 <span style="color:#0057ae;">SystemCallErrorNumber</span> = <span style="color:#ff5500;">ELIBEXEC</span>
 <span style="color:#0057ae;">SystemCallErrorNumber</span> = <span style="color:#ff5500;">ELIBMAX</span>
 <span style="color:#0057ae;">SystemCallErrorNumber</span> = <span style="color:#ff5500;">ELIBSCN</span>
-<span style="color:#0057ae;">SystemCallErrorNumber</span> = <span style="color:#ff5500;">ELNRANGE</span>
+<span style="color:#0057ae;">SystemCallErrorNumber</span> = <span style="color:#ff5500;">ELNRNG</span>
 <span style="color:#0057ae;">SystemCallErrorNumber</span> = <span style="color:#ff5500;">ELOOP</span>
 <span style="color:#0057ae;">SystemCallErrorNumber</span> = <span style="color:#ff5500;">EMEDIUMTYPE</span>
 <span style="color:#0057ae;">SystemCallErrorNumber</span> = <span style="color:#ff5500;">EMFILE</span>
@@ -2761,6 +2777,7 @@ WantedBy = some.service some.socket
 <span style="color:#0057ae;">ConditionVirtualization</span> = <span style="color:#aa5500;">qemu</span>
 <span style="color:#0057ae;">ConditionVirtualization</span> = <span style="color:#aa5500;">qnx</span>
 <span style="color:#0057ae;">ConditionVirtualization</span> = <span style="color:#aa5500;">rkt</span>
+<span style="color:#0057ae;">ConditionVirtualization</span> = <span style="color:#aa5500;">sre</span>
 <span style="color:#0057ae;">ConditionVirtualization</span> = <span style="color:#aa5500;">systemd-nspawn</span>
 <span style="color:#0057ae;">ConditionVirtualization</span> = <span style="color:#aa5500;">uml</span>
 <span style="color:#0057ae;">ConditionVirtualization</span> = <span style="color:#aa5500;">vmware</span>

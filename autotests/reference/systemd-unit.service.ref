@@ -88,6 +88,8 @@
 <Option Name>USBFunctionDescriptors</Option Name><Normal> = /some/absolute/path</Normal><br/>
 <Option Name>USBFunctionStrings</Option Name><Normal> = /some/absolute/path</Normal><br/>
 <Option Name>OOMPolicy</Option Name><Normal> = </Normal><Constant>stop</Constant><br/>
+<Option Name>OpenFile</Option Name><Normal> = /some/path</Normal><Separator>:</Separator><File Descriptor Name>fd-name</File Descriptor Name><Separator>:</Separator><Constant>graceful</Constant><Normal>,</Normal><Constant>read-only</Constant><br/>
+<Option Name>ReloadSignal</Option Name><Normal> = </Normal><Constant>SIGUSR1</Constant><br/>
 <Normal></Normal><br/>
 <Comment>## from systemd.exec</Comment><br/>
 <Option Name>ExecPaths</Option Name><Normal> = some/path some/other/path</Normal><br/>
@@ -242,6 +244,8 @@
 <Option Name>LogExtraFields</Option Name><Normal> = </Normal><Environment Variable>FIELD</Environment Variable><Normal>=VALUE </Normal><Environment Variable>OTHER_FIELD</Environment Variable><Normal>=VALUE2</Normal><br/>
 <Option Name>LogRateLimitIntervalSec</Option Name><Normal> = </Normal><Number>1</Number><Measurement Unit>s</Measurement Unit><Normal> </Normal><Number>500</Number><Measurement Unit>ms</Measurement Unit><br/>
 <Option Name>LogRateLimitBurst</Option Name><Normal> = </Normal><Number>50</Number><br/>
+<Option Name>LogFilterPatterns</Option Name><Normal> = </Normal><Prefix>~</Prefix><Normal>some_rx</Normal><br/>
+<Option Name>LogFilterPatterns</Option Name><Normal> = \x7esome_rx</Normal><br/>
 <Option Name>LogNamespace</Option Name><Normal> = some_name</Normal><br/>
 <Option Name>SyslogIdentifier</Option Name><Normal> = some_identifier</Normal><br/>
 <Option Name>SyslogFacility</Option Name><Normal> = </Normal><Constant>daemon</Constant><br/>
@@ -282,6 +286,7 @@
 <Option Name>MemoryHigh</Option Name><Normal> = </Normal><Number>40 </Number><Measurement Unit>%</Measurement Unit><br/>
 <Option Name>MemoryMax</Option Name><Normal> = </Normal><Number>60</Number><Measurement Unit>%</Measurement Unit><br/>
 <Option Name>MemorySwapMax</Option Name><Normal> = </Normal><Number>10</Number><Measurement Unit>G</Measurement Unit><br/>
+<Option Name>MemoryZSwapMax</Option Name><Normal> = </Normal><Number>2</Number><Measurement Unit>G</Measurement Unit><br/>
 <Option Name>TasksAccounting</Option Name><Normal> = </Normal><Constant>on</Constant><br/>
 <Option Name>TasksMax</Option Name><Normal> = </Normal><Number>50</Number><Measurement Unit>%</Measurement Unit><br/>
 <Option Name>IOAccounting</Option Name><Normal> = </Normal><Constant>on</Constant><br/>
@@ -2097,6 +2102,11 @@
 <Option Name>OOMScoreAdjust</Option Name><Normal> = </Normal><Number>+100</Number><Normal>1</Normal><br/>
 <Option Name>OOMScoreAdjust</Option Name><Normal> = </Normal><Number>100</Number><Normal>1</Normal><br/>
 <Normal></Normal><br/>
+<Comment>###### open file option</Comment><br/>
+<Section Header>[Service]</Section Header><br/>
+<Option Name>OpenFile</Option Name><Normal> = /some/path/</Normal><Separator>:</Separator><File Descriptor Name>some-name</File Descriptor Name><Separator>:</Separator><Constant>append</Constant><Normal>,</Normal><Constant>graceful</Constant><Normal>,</Normal><Constant>read-only</Constant><Normal>,</Normal><Constant>truncate</Constant><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>OpenFile</Option Name><Normal> = /some/path/</Normal><Separator>:</Separator><File Descriptor Name>some-name</File Descriptor Name><Separator>:</Separator><Normal>some,invalid,options</Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### percent</Comment><br/>
 <Normal>[Slice]</Normal><br/>
@@ -2112,6 +2122,10 @@
 <Normal></Normal><br/>
 <Comment>###### personality</Comment><br/>
 <Section Header>[Service]</Section Header><br/>
+<Option Name>Personality</Option Name><Normal> = </Normal><Constant>arm</Constant><br/>
+<Option Name>Personality</Option Name><Normal> = </Normal><Constant>arm-be</Constant><br/>
+<Option Name>Personality</Option Name><Normal> = </Normal><Constant>arm64</Constant><br/>
+<Option Name>Personality</Option Name><Normal> = </Normal><Constant>arm64-be</Constant><br/>
 <Option Name>Personality</Option Name><Normal> = </Normal><Constant>ppc</Constant><br/>
 <Option Name>Personality</Option Name><Normal> = </Normal><Constant>ppc-le</Constant><br/>
 <Option Name>Personality</Option Name><Normal> = </Normal><Constant>ppc64</Constant><br/>
@@ -2122,6 +2136,8 @@
 <Option Name>Personality</Option Name><Normal> = </Normal><Constant>x86-64</Constant><br/>
 <Comment>## invalid values</Comment><br/>
 <Option Name>Personality</Option Name><Normal> = invalid</Normal><br/>
+<Option Name>Personality</Option Name><Normal> = alpha</Normal><br/>
+<Option Name>Personality</Option Name><Normal> = m68k</Normal><br/>
 <Comment># multiple values</Comment><br/>
 <Option Name>Personality</Option Name><Normal> = </Normal><Constant>x86-64</Constant><Normal> s390x</Normal><br/>
 <Normal></Normal><br/>
@@ -2437,7 +2453,7 @@
 <Option Name>SystemCallErrorNumber</Option Name><Normal> = </Normal><Errno Name>ELIBEXEC</Errno Name><br/>
 <Option Name>SystemCallErrorNumber</Option Name><Normal> = </Normal><Errno Name>ELIBMAX</Errno Name><br/>
 <Option Name>SystemCallErrorNumber</Option Name><Normal> = </Normal><Errno Name>ELIBSCN</Errno Name><br/>
-<Option Name>SystemCallErrorNumber</Option Name><Normal> = </Normal><Errno Name>ELNRANGE</Errno Name><br/>
+<Option Name>SystemCallErrorNumber</Option Name><Normal> = </Normal><Errno Name>ELNRNG</Errno Name><br/>
 <Option Name>SystemCallErrorNumber</Option Name><Normal> = </Normal><Errno Name>ELOOP</Errno Name><br/>
 <Option Name>SystemCallErrorNumber</Option Name><Normal> = </Normal><Errno Name>EMEDIUMTYPE</Errno Name><br/>
 <Option Name>SystemCallErrorNumber</Option Name><Normal> = </Normal><Errno Name>EMFILE</Errno Name><br/>
@@ -2755,6 +2771,7 @@
 <Option Name>ConditionVirtualization</Option Name><Normal> = </Normal><Constant>qemu</Constant><br/>
 <Option Name>ConditionVirtualization</Option Name><Normal> = </Normal><Constant>qnx</Constant><br/>
 <Option Name>ConditionVirtualization</Option Name><Normal> = </Normal><Constant>rkt</Constant><br/>
+<Option Name>ConditionVirtualization</Option Name><Normal> = </Normal><Constant>sre</Constant><br/>
 <Option Name>ConditionVirtualization</Option Name><Normal> = </Normal><Constant>systemd-nspawn</Constant><br/>
 <Option Name>ConditionVirtualization</Option Name><Normal> = </Normal><Constant>uml</Constant><br/>
 <Option Name>ConditionVirtualization</Option Name><Normal> = </Normal><Constant>vmware</Constant><br/>

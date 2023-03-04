@@ -10,8 +10,8 @@
 
 #include "ksyntaxhighlighting_export.h"
 
+#include <QList>
 #include <QPair>
-#include <QVector>
 #include <memory>
 #include <qobjectdefs.h>
 
@@ -185,13 +185,13 @@ public:
     /**
      * Mime types associated with this syntax definition.
      */
-    QVector<QString> mimeTypes() const;
+    QList<QString> mimeTypes() const;
 
     /**
      * File extensions associated with this syntax definition.
      * The returned list contains wildcards.
      */
-    QVector<QString> extensions() const;
+    QList<QString> extensions() const;
 
     /**
      * Returns the definition version.
@@ -360,7 +360,7 @@ public:
      * The order of the Format items equals the order of the itemDatas in the xml file.
      * @since 5.49
      */
-    QVector<Format> formats() const;
+    QList<Format> formats() const;
 
     /**
      * Returns a list of Definitions that are referenced with the IncludeRules rule.
@@ -369,7 +369,7 @@ public:
      *
      * @since 5.49
      */
-    QVector<Definition> includedDefinitions() const;
+    QList<Definition> includedDefinitions() const;
 
     /**
      * Returns the marker that starts a single line comment.
@@ -400,7 +400,7 @@ public:
      * the string \"{A} represents the character Ä.
      * @since 5.50
      */
-    QVector<QPair<QChar, QString>> characterEncodings() const;
+    QList<QPair<QChar, QString>> characterEncodings() const;
 
     /**
      * @}

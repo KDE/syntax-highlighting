@@ -110,7 +110,7 @@ private:
         int length;
         FoldingRegion region;
     };
-    QVector<Fold> m_folds;
+    QList<Fold> m_folds;
 
     // we use one repository for all tests
     // => the folding ids might change even if just unrelated highlighings are added

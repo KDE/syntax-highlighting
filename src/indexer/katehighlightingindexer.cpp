@@ -526,7 +526,7 @@ private:
                 }
             };
 
-            QVector<Item> keywords;
+            QList<Item> keywords;
             QSet<Item> includes;
 
             bool parseElement(const QString &filename, QXmlStreamReader &xml)
@@ -639,7 +639,7 @@ private:
             QString weakDeliminator;
 
             // rules included by IncludeRules (without IncludeRule)
-            QVector<const Rule *> includedRules;
+            QList<const Rule *> includedRules;
 
             // IncludeRules included by IncludeRules
             QSet<const Rule *> includedIncludeRules;
@@ -836,7 +836,7 @@ private:
         ContextName lineEndContext;
         ContextName lineEmptyContext;
         ContextName fallthroughContext;
-        QVector<Rule> rules;
+        QList<Rule> rules;
         XmlBool dynamic{};
         XmlBool fallthrough{};
         XmlBool stopEmptyLineContextSwitchLoop{};
@@ -1018,7 +1018,7 @@ private:
     void resolveIncludeRules()
     {
         QSet<const Context *> usedContexts;
-        QVector<const Context *> contexts;
+        QList<const Context *> contexts;
 
         QMutableMapIterator<QString, Definition> def(m_definitions);
         while (def.hasNext()) {
@@ -1089,7 +1089,7 @@ private:
     QSet<const Context *> extractUsedContexts() const
     {
         QSet<const Context *> usedContexts;
-        QVector<const Context *> contexts;
+        QList<const Context *> contexts;
 
         QMapIterator<QString, Definition> def(m_definitions);
         while (def.hasNext()) {
@@ -1135,7 +1135,7 @@ private:
     };
 
     struct IncludedRuleUnreachableBy {
-        QVector<RuleAndInclude> unreachableBy;
+        QList<RuleAndInclude> unreachableBy;
         bool alwaysUnreachable = true;
     };
 
@@ -1784,10 +1784,10 @@ private:
             }
 
             /// Search RuleAndInclude associated with the characters of @p s.
-            /// \return an empty QVector when at least one character is not found.
-            QVector<RuleAndInclude> find(QStringView s) const
+            /// \return an empty QList when at least one character is not found.
+            QList<RuleAndInclude> find(QStringView s) const
             {
-                QVector<RuleAndInclude> result;
+                QList<RuleAndInclude> result;
 
                 for (QChar c : s) {
                     if (!find(c)) {
@@ -1871,8 +1871,8 @@ private:
             }
 
             /// Search RuleAndInclude associated with the characters of @p s.
-            /// \return an empty QVector when at least one character is not found.
-            QVector<RuleAndInclude> find(QStringView s) const
+            /// \return an empty QList when at least one character is not found.
+            QList<RuleAndInclude> find(QStringView s) const
             {
                 for (int i = 0; i < m_size; ++i) {
                     auto result = m_charTables[i]->find(s);
@@ -1883,7 +1883,7 @@ private:
                         return result;
                     }
                 }
-                return QVector<RuleAndInclude>();
+                return QList<RuleAndInclude>();
             }
 
             /// Associates @p c with a rule.
@@ -1925,7 +1925,7 @@ private:
 
         // Iterates over all the rules, including those in includedRules
         struct RuleIterator {
-            RuleIterator(const QVector<ObservableRule> &rules, const ObservableRule &endRule)
+            RuleIterator(const QList<ObservableRule> &rules, const ObservableRule &endRule)
                 : m_end(&endRule - rules.data())
                 , m_rules(rules)
             {
@@ -1972,8 +1972,8 @@ private:
             int m_i = 0;
             int m_i2;
             int m_end;
-            const QVector<ObservableRule> &m_rules;
-            const QVector<const Context::Rule *> *m_includedRules = nullptr;
+            const QList<ObservableRule> &m_rules;
+            const QList<const Context::Rule *> *m_includedRules = nullptr;
         };
 
         // Dot regex container that satisfies firstNonSpace and column.
@@ -2055,7 +2055,7 @@ private:
 
         DotRegex dotRegex;
 
-        QVector<ObservableRule> observedRules;
+        QList<ObservableRule> observedRules;
         observedRules.reserve(context.rules.size());
         for (const Context::Rule &rule : context.rules) {
             const Context::Rule *includeRule = nullptr;
@@ -2077,7 +2077,7 @@ private:
         for (auto &observedRule : observedRules) {
             const Context::Rule &rule = *observedRule.rule;
             bool isUnreachable = false;
-            QVector<RuleAndInclude> unreachableBy;
+            QList<RuleAndInclude> unreachableBy;
 
             // declare rule as unreachable if ruleAndInclude is not empty
             auto updateUnreachable1 = [&](RuleAndInclude ruleAndInclude) {
@@ -2088,7 +2088,7 @@ private:
             };
 
             // declare rule as unreachable if ruleAndIncludes is not empty
-            auto updateUnreachable2 = [&](const QVector<RuleAndInclude> &ruleAndIncludes) {
+            auto updateUnreachable2 = [&](const QList<RuleAndInclude> &ruleAndIncludes) {
                 if (!ruleAndIncludes.isEmpty()) {
                     isUnreachable = true;
                     unreachableBy.append(ruleAndIncludes);

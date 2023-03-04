@@ -132,7 +132,7 @@ void verifyDefinition(const KSyntaxHighlighting::Definition &definition, const Q
     }
 }
 
-void verifyDefinitionList(const QVector<KSyntaxHighlighting::Definition> &definitionList, const QStringList &definitionNames)
+void verifyDefinitionList(const QList<KSyntaxHighlighting::Definition> &definitionList, const QStringList &definitionNames)
 {
     QStringList names;
     for (const auto &definition : definitionList) {

@@ -22,14 +22,14 @@ class TextBlockUserData : public QTextBlockUserData
 {
 public:
     State state;
-    QVector<FoldingRegion> foldingRegions;
+    QList<FoldingRegion> foldingRegions;
 };
 
 class SyntaxHighlighterPrivate : public AbstractHighlighterPrivate
 {
 public:
     static FoldingRegion foldingRegion(const QTextBlock &startBlock);
-    QVector<FoldingRegion> foldingRegions;
+    QList<FoldingRegion> foldingRegions;
 };
 
 }

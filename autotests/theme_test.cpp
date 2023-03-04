@@ -215,7 +215,7 @@ private Q_SLOTS:
         return std::find(std::begin(predefColorEntries), std::end(predefColorEntries), entry) != std::end(predefColorEntries);
     }
 
-    void verifyStyle(const QJsonObject &textStyle, const QString &textStyleName, QVector<QString> &unknown)
+    void verifyStyle(const QJsonObject &textStyle, const QString &textStyleName, QList<QString> &unknown)
     {
         const QStringList definedColors = textStyle.keys();
         for (const auto &key : definedColors) {
@@ -283,7 +283,7 @@ private Q_SLOTS:
             QVERIFY(textStyle.contains(QLatin1String("text-color")));
 
             // verify valid entry
-            QVector<QString> unknown;
+            QList<QString> unknown;
             verifyStyle(textStyle, textStyleName, unknown);
             if (!unknown.isEmpty()) {
                 qWarning() << "Unknown entries found in text-styles: " << unknown;
@@ -314,7 +314,7 @@ private Q_SLOTS:
 
         // verify custom-styles if any
         {
-            QVector<QPair<QString, QString>> invalidCustomStyles;
+            QList<QPair<QString, QString>> invalidCustomStyles;
             const auto customStyles = obj.value(QLatin1String("custom-styles")).toObject();
             for (auto it = customStyles.constBegin(); it != customStyles.constEnd(); ++it) {
                 // get definitions for this language
@@ -322,7 +322,7 @@ private Q_SLOTS:
                 const auto def = m_repo.definitionForName(lang);
                 QVERIFY2(def.isValid(), qPrintable(QStringLiteral("Definition %1 does not exist").arg(lang)));
 
-                const QVector<Format> fmts = def.formats();
+                const QList<Format> fmts = def.formats();
                 QSet<QString> fmtNames;
                 fmtNames.reserve(fmts.size());
                 for (const auto &fmt : fmts) {
@@ -345,7 +345,7 @@ private Q_SLOTS:
 
                     // now verify this text style
                     const auto entry = csIt.value().toObject();
-                    QVector<QString> unknown;
+                    QList<QString> unknown;
                     verifyStyle(entry, textStyleName, unknown);
                     if (!unknown.isEmpty()) {
                         qWarning() << "Unknown entries found in custom-styles for " << lang << ": " << unknown;

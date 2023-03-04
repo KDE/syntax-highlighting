@@ -8,7 +8,7 @@
 #define KSYNTAXHIGHLIGHTING_REPOSITORY_P_H
 
 #include <QHash>
-#include <QVector>
+#include <QList>
 
 QT_BEGIN_NAMESPACE
 class QString;
@@ -39,15 +39,15 @@ public:
     quint16 foldingRegionId(const QString &defName, const QString &foldName);
     quint16 nextFormatId();
 
-    QVector<QString> m_customSearchPaths;
+    QList<QString> m_customSearchPaths;
 
     // sorted map to have deterministic iteration order for e.g. definitionsForFileName
     QMap<QString, Definition> m_defs;
 
     // this vector is sorted by translated sections/names
-    QVector<Definition> m_sortedDefs;
+    QList<Definition> m_sortedDefs;
 
-    QVector<Theme> m_themes;
+    QList<Theme> m_themes;
 
     QHash<QPair<QString, QString>, quint16> m_foldingRegionIds;
     quint16 m_foldingRegionId = 0;

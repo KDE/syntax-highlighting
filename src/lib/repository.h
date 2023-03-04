@@ -9,8 +9,8 @@
 
 #include "ksyntaxhighlighting_export.h"
 
+#include <QList>
 #include <QObject>
-#include <QVector>
 #include <QtGlobal>
 
 #include <memory>
@@ -128,8 +128,8 @@ class Theme;
 class KSYNTAXHIGHLIGHTING_EXPORT Repository : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QVector<KSyntaxHighlighting::Definition> definitions READ definitions NOTIFY reloaded)
-    Q_PROPERTY(QVector<KSyntaxHighlighting::Theme> themes READ themes NOTIFY reloaded)
+    Q_PROPERTY(QList<KSyntaxHighlighting::Definition> definitions READ definitions NOTIFY reloaded)
+    Q_PROPERTY(QList<KSyntaxHighlighting::Theme> themes READ themes NOTIFY reloaded)
 
 public:
     /**
@@ -173,7 +173,7 @@ public:
      *
      * @since 5.56
      */
-    Q_INVOKABLE QVector<KSyntaxHighlighting::Definition> definitionsForFileName(const QString &fileName) const;
+    Q_INVOKABLE QList<KSyntaxHighlighting::Definition> definitionsForFileName(const QString &fileName) const;
 
     /**
      * Returns the best matching Definition to the type named @p mimeType
@@ -190,20 +190,20 @@ public:
      *
      * @since 5.56
      */
-    Q_INVOKABLE QVector<KSyntaxHighlighting::Definition> definitionsForMimeType(const QString &mimeType) const;
+    Q_INVOKABLE QList<KSyntaxHighlighting::Definition> definitionsForMimeType(const QString &mimeType) const;
 
     /**
      * Returns all available Definition%s.
      * Definition%ss are ordered by translated section and translated names,
      * for consistent displaying.
      */
-    Q_INVOKABLE QVector<KSyntaxHighlighting::Definition> definitions() const;
+    Q_INVOKABLE QList<KSyntaxHighlighting::Definition> definitions() const;
 
     /**
      * Returns all available color themes.
      * The returned list should never be empty.
      */
-    Q_INVOKABLE QVector<KSyntaxHighlighting::Theme> themes() const;
+    Q_INVOKABLE QList<KSyntaxHighlighting::Theme> themes() const;
 
     /**
      * Returns the theme called @p themeName.
@@ -276,7 +276,7 @@ public:
      * @see addCustomSearchPath()
      * @since 5.39
      */
-    QVector<QString> customSearchPaths() const;
+    QList<QString> customSearchPaths() const;
 
 Q_SIGNALS:
     /**

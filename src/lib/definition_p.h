@@ -13,8 +13,8 @@
 #include "worddelimiters_p.h"
 
 #include <QHash>
+#include <QList>
 #include <QString>
-#include <QVector>
 
 #include <vector>
 
@@ -80,9 +80,9 @@ public:
     std::vector<Context> contexts;
     QHash<QString, Format> formats;
     // data loaded from xml file and emptied after loading contexts
-    QVector<HighlightingContextData> contextDatas;
+    QList<HighlightingContextData> contextDatas;
     // Definition referenced by IncludeRules and ContextSwitch
-    QVector<DefinitionRef> immediateIncludedDefinitions;
+    QList<DefinitionRef> immediateIncludedDefinitions;
     WordDelimiters wordDelimiters;
     WordDelimiters wordWrapDelimiters;
     bool keywordIsLoaded = false;
@@ -93,7 +93,7 @@ public:
     CommentPosition singleLineCommentPosition = CommentPosition::StartOfLine;
     QString multiLineCommentStartMarker;
     QString multiLineCommentEndMarker;
-    QVector<QPair<QChar, QString>> characterEncodings;
+    QList<QPair<QChar, QString>> characterEncodings;
 
     QString fileName;
     QString name = QStringLiteral(QT_TRANSLATE_NOOP("Language", "None"));
@@ -102,8 +102,8 @@ public:
     QString indenter;
     QString author;
     QString license;
-    QVector<QString> mimetypes;
-    QVector<QString> extensions;
+    QList<QString> mimetypes;
+    QList<QString> extensions;
     Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive;
     int version = 0;
     int priority = 0;

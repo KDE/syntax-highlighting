@@ -77,9 +77,9 @@ Definition findHighestPriorityDefinitionIf(const QMap<QString, Definition> &defs
 }
 
 template<typename UnaryPredicate>
-QVector<Definition> findDefinitionsIf(const QMap<QString, Definition> &defs, UnaryPredicate predicate)
+QList<Definition> findDefinitionsIf(const QMap<QString, Definition> &defs, UnaryPredicate predicate)
 {
-    QVector<Definition> matches;
+    QList<Definition> matches;
     std::copy_if(defs.cbegin(), defs.cend(), std::back_inserter(matches), predicate);
     std::stable_sort(matches.begin(), matches.end(), [](const Definition &lhs, const Definition &rhs) {
         return lhs.priority() > rhs.priority();
@@ -127,7 +127,7 @@ Definition Repository::definitionForFileName(const QString &fileName) const
     return findHighestPriorityDefinitionIf(d->m_defs, anyWildcardMatches(fileNameFromFilePath(fileName)));
 }
 
-QVector<Definition> Repository::definitionsForFileName(const QString &fileName) const
+QList<Definition> Repository::definitionsForFileName(const QString &fileName) const
 {
     return findDefinitionsIf(d->m_defs, anyWildcardMatches(fileNameFromFilePath(fileName)));
 }
@@ -137,22 +137,22 @@ Definition Repository::definitionForMimeType(const QString &mimeType) const
     return findHighestPriorityDefinitionIf(d->m_defs, anyMimeTypeEquals(mimeType));
 }
 
-QVector<Definition> Repository::definitionsForMimeType(const QString &mimeType) const
+QList<Definition> Repository::definitionsForMimeType(const QString &mimeType) const
 {
     return findDefinitionsIf(d->m_defs, anyMimeTypeEquals(mimeType));
 }
 
-QVector<Definition> Repository::definitions() const
+QList<Definition> Repository::definitions() const
 {
     return d->m_sortedDefs;
 }
 
-QVector<Theme> Repository::themes() const
+QList<Theme> Repository::themes() const
 {
     return d->m_themes;
 }
 
-static auto lowerBoundTheme(const QVector<KSyntaxHighlighting::Theme> &themes, QStringView themeName)
+static auto lowerBoundTheme(const QList<KSyntaxHighlighting::Theme> &themes, QStringView themeName)
 {
     return std::lower_bound(themes.begin(), themes.end(), themeName, [](const Theme &lhs, QStringView rhs) {
         return lhs.name() < rhs;
@@ -182,7 +182,7 @@ Theme Repository::themeForPalette(const QPalette &palette) const
     const auto base = palette.color(QPalette::Base);
 
     // find themes with matching background colors
-    QVector<const KSyntaxHighlighting::Theme *> matchingThemes;
+    QList<const KSyntaxHighlighting::Theme *> matchingThemes;
     for (const auto &theme : std::as_const(d->m_themes)) {
         const auto background = theme.editorColor(KSyntaxHighlighting::Theme::EditorColorRole::BackgroundColor);
         if (background == base.rgb()) {
@@ -416,7 +416,7 @@ void Repository::addCustomSearchPath(const QString &path)
     reload();
 }
 
-QVector<QString> Repository::customSearchPaths() const
+QList<QString> Repository::customSearchPaths() const
 {
     return d->m_customSearchPaths;
 }

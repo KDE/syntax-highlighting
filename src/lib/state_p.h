@@ -8,8 +8,8 @@
 #ifndef KSYNTAXHIGHLIGHTING_STATE_P_H
 #define KSYNTAXHIGHLIGHTING_STATE_P_H
 
+#include <QList>
 #include <QSharedData>
-#include <QVector>
 
 #include "definitionref_p.h"
 
@@ -77,7 +77,7 @@ private:
     /**
      * the context stack combines the active context + valid captures
      */
-    QVector<StackValue> m_contextStack;
+    QList<StackValue> m_contextStack;
 };
 
 }

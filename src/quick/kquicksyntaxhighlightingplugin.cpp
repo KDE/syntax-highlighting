@@ -29,9 +29,9 @@ void KQuickSyntaxHighlightingPlugin::registerTypes(const char *uri)
 {
     Q_ASSERT(QLatin1String(uri) == QLatin1String("org.kde.syntaxhighlighting"));
     qRegisterMetaType<Definition>();
-    qRegisterMetaType<QVector<Definition>>();
+    qRegisterMetaType<QList<Definition>>();
     qRegisterMetaType<Theme>();
-    qRegisterMetaType<QVector<Theme>>();
+    qRegisterMetaType<QList<Theme>>();
     qmlRegisterType<KQuickSyntaxHighlighter>(uri, 1, 0, "SyntaxHighlighter");
     qmlRegisterUncreatableMetaObject(Definition::staticMetaObject, uri, 1, 0, "Definition", {});
     qmlRegisterUncreatableMetaObject(Theme::staticMetaObject, uri, 1, 0, "Theme", {});

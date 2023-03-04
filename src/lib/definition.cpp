@@ -105,12 +105,12 @@ QString Definition::translatedSection() const
     return QCoreApplication::instance()->translate("Language Section", d->section.toUtf8().constData());
 }
 
-QVector<QString> Definition::mimeTypes() const
+QList<QString> Definition::mimeTypes() const
 {
     return d->mimetypes;
 }
 
-QVector<QString> Definition::extensions() const
+QList<QString> Definition::extensions() const
 {
     return d->extensions;
 }
@@ -218,12 +218,12 @@ bool Definition::setKeywordList(const QString &name, const QStringList &content)
     }
 }
 
-QVector<Format> Definition::formats() const
+QList<Format> Definition::formats() const
 {
     d->load();
 
     // sort formats so that the order matches the order of the itemDatas in the xml files.
-    auto formatList = QVector<Format>::fromList(d->formats.values());
+    auto formatList = QList<Format>::fromList(d->formats.values());
     std::sort(formatList.begin(), formatList.end(), [](const KSyntaxHighlighting::Format &lhs, const KSyntaxHighlighting::Format &rhs) {
         return lhs.id() < rhs.id();
     });
@@ -231,13 +231,13 @@ QVector<Format> Definition::formats() const
     return formatList;
 }
 
-QVector<Definition> Definition::includedDefinitions() const
+QList<Definition> Definition::includedDefinitions() const
 {
     d->load();
 
     // init worklist and result used as guard with this definition
-    QVector<const DefinitionData *> queue{d.get()};
-    QVector<Definition> definitions{*this};
+    QList<const DefinitionData *> queue{d.get()};
+    QList<Definition> definitions{*this};
     while (!queue.empty()) {
         const auto *def = queue.back();
         queue.pop_back();
@@ -275,7 +275,7 @@ QPair<QString, QString> Definition::multiLineCommentMarker() const
     return {d->multiLineCommentStartMarker, d->multiLineCommentEndMarker};
 }
 
-QVector<QPair<QChar, QString>> Definition::characterEncodings() const
+QList<QPair<QChar, QString>> Definition::characterEncodings() const
 {
     d->load();
     return d->characterEncodings;

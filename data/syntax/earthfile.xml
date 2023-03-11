@@ -15,7 +15,7 @@
 <language
     name="Earthfile"
     section="Other"
-    version="1"
+    version="2"
     kateversion="5.79"
     extensions="Earthfile"
     author="Alex Turbov (i.zaufi@gmail.com)"
@@ -25,29 +25,76 @@
 
     <!-- https://docs.earthly.dev/docs/earthfile/builtin-args -->
     <list name="variables">
-      <item>EARTHLY_TARGET_TAG</item>
-      <item>EARTHLY_TARGET_PROJECT</item>
-      <item>EARTHLY_TARGET_PROJECT_NO_TAG</item>
-      <item>EARTHLY_TARGET_NAME</item>
-      <item>EARTHLY_TARGET_TAG</item>
-      <item>EARTHLY_TARGET_TAG_DOCKER</item>
+      <item>EARTHLY_BUILD_SHA</item>
+      <item>EARTHLY_CI</item>
+      <item>EARTHLY_GIT_AUTHOR</item>
+      <item>EARTHLY_GIT_CO_AUTHORS</item>
+      <item>EARTHLY_GIT_COMMIT_AUTHOR_TIMESTAMP</item>
+      <item>EARTHLY_GIT_COMMIT_TIMESTAMP</item>
       <item>EARTHLY_GIT_HASH</item>
-      <item>EARTHLY_GIT_SHORT_HASH</item>
       <item>EARTHLY_GIT_ORIGIN_URL</item>
       <item>EARTHLY_GIT_PROJECT_NAME</item>
-      <item>EARTHLY_GIT_COMMIT_TIMESTAMP</item>
-      <item>EARTHLY_GIT_COMMIT_AUTHOR_TIMESTAMP</item>
-      <item>EARTHLY_VERSION</item>
-      <item>EARTHLY_BUILD_SHA</item>
-      <item>TARGETPLATFORM</item>
-      <item>TARGETOS</item>
-      <item>TARGETARCH</item>
-      <item>TARGETVARIANT</item>
+      <item>EARTHLY_GIT_SHORT_HASH</item>
+      <item>EARTHLY_LOCALLY</item>
       <item>EARTHLY_SOURCE_DATE_EPOCH</item>
+      <item>EARTHLY_TARGET_NAME</item>
+      <item>EARTHLY_TARGET_PROJECT_NO_TAG</item>
+      <item>EARTHLY_TARGET_PROJECT</item>
+      <item>EARTHLY_TARGET_TAG_DOCKER</item>
+      <item>EARTHLY_TARGET_TAG</item>
+      <item>EARTHLY_TARGET</item>
+      <item>EARTHLY_VERSION</item>
+      <item>TARGETARCH</item>
+      <item>TARGETOS</item>
+      <item>TARGETPLATFORM</item>
+      <item>TARGETVARIANT</item>
       <item>USERPLATFORM</item>
       <item>USEROS</item>
       <item>USERARCH</item>
       <item>USERVARIANT</item>
+    </list>
+
+    <list name="commands-top-level-only">
+      <item>VERSION</item>
+      <item>PROJECT</item>
+    </list>
+
+    <list name="commands">
+      <item>FROM</item>
+      <item>DOCKERFILE</item>
+      <item>RUN</item>
+      <item>COPY</item>
+      <item>ARG</item>
+      <item>SAVE</item>
+      <item>ARTIFACT</item>
+      <item>AS</item>
+      <item>LOCAL</item>
+      <item>IMAGE</item>
+      <item>BUILD</item>
+      <item>GIT</item>
+      <item>CLONE</item>
+      <item>WITH</item>
+      <item>DOCKER</item>
+      <item>IF</item>
+      <item>FOR</item>
+      <item>WAIT</item>
+      <item>TRY</item>
+      <item>CACHE</item>
+      <item>LOCALLY</item>
+      <item>COMMAND</item>
+      <item>DO</item>
+      <item>IMPORT</item>
+      <item>CMD</item>
+      <item>LABEL</item>
+      <item>EXPOSE</item>
+      <item>ENV</item>
+      <item>ENTRYPOINT</item>
+      <item>VOLUME</item>
+      <item>WORKDIR</item>
+      <item>HEALTHCHECK</item>
+      <item>HOST</item>
+      <item>PIPELINE</item>
+      <item>TRIGGER</item>
     </list>
 
     <!--
@@ -62,8 +109,38 @@
       <item>sharing</item>
     </list>
 
+    <list name="trigger_events">
+      <item>manual</item>
+      <item>pr</item>
+      <item>push</item>
+    </list>
+
     <contexts>
-      <context name="Base" attribute="Normal Text" lineEndContext="#stay">
+      <context name="Global" attribute="Normal Text" lineEndContext="#stay">
+        <DetectSpaces />
+        <!-- Switch from global to recipe mode -->
+        <RegExpr
+            String="^[A-Z_][A-Z_0-9]+:"
+            column="0"
+            lookAhead="true"
+            context="Recipe"
+          />
+        <RegExpr
+            String="^[a-z][a-z\-_0-9]+:"
+            column="0"
+            lookAhead="true"
+            context="Recipe"
+          />
+
+        <!-- NOTE The following commands valid only at global level -->
+        <WordDetect String="VERSION" attribute="Command" context="VERSION_ctx" />
+        <WordDetect String="PROJECT" attribute="Command" context="PROJECT_ctx" />
+
+        <IncludeRules context="RecipeCommands" />
+      </context>
+
+      <!-- As soon as the first recipe found stay in this context 'till EOF -->
+      <context name="Recipe" attribute="Normal Text" lineEndContext="#stay">
         <RegExpr
             String="^[A-Z_][A-Z_0-9]+:"
             column="0"
@@ -81,6 +158,8 @@
             beginRegion="Recipe"
           />
         <DetectSpaces />
+        <!-- NOTE Any commands at global level (at column 0) are inappropriate now -->
+        <keyword String="commands" column="0" attribute="Error" />
         <IncludeRules context="RecipeCommands" />
       </context>
 
@@ -91,7 +170,6 @@
         <WordDetect String="ARG" attribute="Command" context="ARG_ctx" />
         <WordDetect String="FROM" attribute="Command" context="FROM_ctx" />
         <WordDetect String="BUILD" attribute="Command" context="BUILD_ctx" />
-        <WordDetect String="VERSION" attribute="Command" context="VERSION_ctx" />
         <WordDetect String="GIT" attribute="Command" context="GIT_ctx" />
         <WordDetect String="CACHE" attribute="Command" context="CACHE_ctx" />
         <WordDetect String="LOCALLY" attribute="Command" context="#stay" />
@@ -109,12 +187,24 @@
         <WordDetect String="HOST" attribute="Command" context="HOST_ctx" />
         <WordDetect String="DO" attribute="Command" context="DO_ctx" />
         <WordDetect String="COPY" attribute="Command" context="COPY_ctx" />
-        <WordDetect String="SAVE" attribute="Command" context="SAVE_ctx" />
         <WordDetect String="WAIT" attribute="Command" context="WAIT_ctx" beginRegion="WAIT" />
         <WordDetect String="WITH" attribute="Command" context="WITH_ctx" beginRegion="WITH" />
         <WordDetect String="FOR" attribute="Command" context="FOR_ctx" beginRegion="FOR" />
-        <WordDetect String="RUN" attribute="Command" context="RUN_ctx" />
         <WordDetect String="IF" attribute="Command" context="IF_ctx" beginRegion="IF" />
+        <WordDetect String="TRIGGER" attribute="Command" context="TRIGGER_ctx" />
+        <WordDetect String="PIPELINE" attribute="Command" context="PIPELINE_ctx" />
+        <WordDetect String="TRY" attribute="Command" context="TRY_ctx" beginRegion="TRY" />
+        <IncludeRules context="RecipeCommandsOnlyRUN" />
+        <IncludeRules context="RecipeCommandsOnlySAVE" />
+        <keyword String="commands-top-level-only" attribute="Error" />
+      </context>
+
+      <context name="RecipeCommandsOnlyRUN" attribute="Normal Text" lineEndContext="#pop">
+        <WordDetect String="RUN" attribute="Command" context="RUN_ctx" />
+      </context>
+
+      <context name="RecipeCommandsOnlySAVE" attribute="Normal Text" lineEndContext="#pop">
+        <WordDetect String="SAVE" attribute="Command" context="SAVE_ctx" />
       </context>
 
       <context name="RecipeContent" attribute="Normal Text" lineEndContext="#pop">
@@ -157,14 +247,14 @@
       <context name="VarName" attribute="Normal Text" lineEndContext="#pop">
         <DetectChar char="$" attribute="Variable" context="#stay" />
         <RegExpr String="_&var_name_re;" attribute="Internal/Local Variable" context="#pop" />
-        <keyword String="variables" insensitive="false" attribute="Builtin Variable" context="#pop" />
+        <keyword String="variables" attribute="Builtin Variable" context="#pop" />
         <DetectIdentifier attribute="Variable" context="#pop" />
       </context>
 
       <context name="VarSubst" attribute="Normal Text" lineEndContext="#pop" fallthroughContext="#pop">
         <DetectChar char="}" attribute="Variable" context="#pop#pop" />
         <RegExpr String="_&var_name_re;" attribute="Internal/Local Variable" context="#stay" />
-        <keyword String="variables" insensitive="false" attribute="Builtin Variable" context="#stay" />
+        <keyword String="variables" attribute="Builtin Variable" context="#stay" />
         <DetectIdentifier attribute="Variable" />
         <Detect2Chars char=":" char1="+" attribute="Variable" context="#stay" />
         <Detect2Chars char=":" char1="-" attribute="Variable" context="#stay" />
@@ -239,8 +329,9 @@
       <!-- https://docs.earthly.dev/docs/earthfile#arg -->
       <context name="ARG_ctx" attribute="Normal Text" lineEndContext="#pop">
         <StringDetect String="--required" attribute="Command Option" context="#stay" />
+        <StringDetect String="--global" attribute="Command Option" context="#stay" />
         <RegExpr String="_&var_name_re;" attribute="Internal/Local Variable" context="#stay" />
-        <keyword String="variables" insensitive="false" attribute="Builtin Variable" context="#stay" />
+        <keyword String="variables" attribute="Builtin Variable" context="#stay" />
         <DetectIdentifier attribute="Variable" context="#stay" />
         <DetectChar char="=" attribute="Operator" context="#pop!RecipeContent" />
       </context>
@@ -263,6 +354,7 @@
         <StringDetect String="--dir" attribute="Command Option" context="#stay" />
         <StringDetect String="--keep-ts" attribute="Command Option" context="#stay" />
         <StringDetect String="--keep-own" attribute="Command Option" context="#stay" />
+        <StringDetect String="--chmod" attribute="Command Option" context="#stay" />
         <StringDetect String="--if-exists" attribute="Command Option" context="#stay" />
         <StringDetect String="--platform" attribute="Command Option" context="#stay" />
         <StringDetect String="--allow-privileged" attribute="Command Option" context="#stay" />
@@ -340,6 +432,7 @@
       <!-- https://docs.earthly.dev/docs/earthfile#version -->
       <context name="VERSION_ctx" attribute="Normal Text" lineEndContext="#pop">
         <!-- https://docs.earthly.dev/docs/earthfile/features#feature-flags -->
+        <StringDetect String="--use-registry-for-with-docker" attribute="Command Option" context="#stay" />
         <StringDetect String="--use-copy-include-patterns" attribute="Command Option" context="#stay" />
         <StringDetect String="--referenced-save-only" attribute="Command Option" context="#stay" />
         <StringDetect String="--for-in" attribute="Command Option" context="#stay" />
@@ -347,10 +440,21 @@
         <StringDetect String="--no-implicit-ignore" attribute="Command Option" context="#stay" />
         <StringDetect String="--earthly-version-arg" attribute="Command Option" context="#stay" />
         <StringDetect String="--shell-out-anywhere" attribute="Command Option" context="#stay" />
-        <StringDetect String="--use-registry-for-with-docker" attribute="Command Option" context="#stay" />
-        <!--Other not from the list -->
-        <StringDetect String="--wait-block" attribute="Command Option" context="#stay" />
+        <StringDetect String="--explicit-global" attribute="Command Option" context="#stay" />
+        <StringDetect String="--check-duplicate-images" attribute="Command Option" context="#stay" />
         <StringDetect String="--use-cache-command" attribute="Command Option" context="#stay" />
+        <StringDetect String="--use-host-command" attribute="Command Option" context="#stay" />
+        <StringDetect String="--use-copy-link" attribute="Command Option" context="#stay" />
+        <StringDetect String="--new-platform" attribute="Command Option" context="#stay" />
+        <StringDetect String="--no-tar-build-output" attribute="Command Option" context="#stay" />
+        <StringDetect String="--use-no-manifest-list" attribute="Command Option" context="#stay" />
+        <StringDetect String="--use-chmod" attribute="Command Option" context="#stay" />
+        <StringDetect String="--earthly-locally-arg" attribute="Command Option" context="#stay" />
+        <StringDetect String="--use-project-secrets" attribute="Command Option" context="#stay" />
+        <StringDetect String="--use-pipelines" attribute="Command Option" context="#stay" />
+        <StringDetect String="--earthly-git-author-args" attribute="Command Option" context="#stay" />
+        <StringDetect String="--wait-block" attribute="Command Option" context="#stay" />
+        <StringDetect String="--try" attribute="Command Option" context="#stay" />
         <RegExpr String="[0-9](\.[0-9])*" context="#pop" />
       </context>
 
@@ -362,7 +466,7 @@
         <IncludeRules context="RecipeContent" />
       </context>
 
-      <!-- https://docs.earthly.dev/docs/earthfile#wait-experimental -->
+      <!-- https://docs.earthly.dev/docs/earthfile#wait -->
       <context name="WAIT_ctx" attribute="Normal Text" lineEndContext="#stay">
         <WordDetect String="END" attribute="Command" context="#pop" endRegion="WAIT" />
         <IncludeRules context="RecipeCommands" />
@@ -377,7 +481,9 @@
         <StringDetect String="--compose" attribute="Command Option" context="#stay" />
         <StringDetect String="--service" attribute="Command Option" context="#stay" />
         <StringDetect String="--allow-privileged" attribute="Command Option" context="#stay" />
-        <IncludeRules context="RecipeCommands" />
+        <IncludeRules context="RecipeCommandsOnlyRUN" />
+        <DetectChar char="#" attribute="Comment" context="Comment" />
+        <IncludeRules context="InappropriateCommands" />
       </context>
 
       <!-- https://docs.earthly.dev/docs/earthfile#for -->
@@ -393,50 +499,62 @@
       </context>
 
       <!--
+        FROM DOCKERFILE ... or FROM ... -->
+      <context name="FROM_ctx" attribute="Normal Text" lineEndContext="#pop" fallthroughContext="#pop!FROM_image_ctx">
+        <DetectSpaces />
+        <WordDetect String="DOCKERFILE" attribute="Command" context="#pop!FROM_DOCKERFILE_ctx" />
+      </context>
+
+      <!--
         FROM [options] <target> [build-args]
-        FROM DOCKERFILE [options] <context>
 
         https://docs.earthly.dev/docs/earthfile#from
-        https://docs.earthly.dev/docs/earthfile#from-dockerfile
       -->
-      <context name="FROM_ctx" attribute="Normal Text" lineEndContext="#pop">
-        <WordDetect String="DOCKERFILE" attribute="Command" context="#stay" />
-
-        <!-- Options for the first form -->
+      <context name="FROM_image_ctx" attribute="Normal Text" lineEndContext="#pop">
         <StringDetect String="--allow-privileged" attribute="Command Option" context="#stay" />
         <StringDetect String="--platform" attribute="Command Option" context="#stay" />
-
-        <!-- Options for the second form -->
-        <StringDetect String="-f" attribute="Command Option" context="#stay" />
-        <StringDetect String="--target" attribute="Command Option" context="#stay" />
-
         <IncludeRules context="RecipeContent" />
       </context>
 
       <!--
-        SAVE ARTIFACT
-        https://docs.earthly.dev/docs/earthfile#save-artifact
+        FROM DOCKERFILE [options] <context>
 
-        SAVE IMAGE
-        https://docs.earthly.dev/docs/earthfile#save-image
+        https://docs.earthly.dev/docs/earthfile#from-dockerfile
       -->
+      <context name="FROM_DOCKERFILE_ctx" attribute="Normal Text" lineEndContext="#pop">
+        <!-- Options for the second form -->
+        <StringDetect String="-f" attribute="Command Option" context="#stay" />
+        <StringDetect String="--target" attribute="Command Option" context="#stay" />
+        <StringDetect String="--platform" attribute="Command Option" context="#stay" />
+        <StringDetect String="--build-arg" attribute="Command Option" context="secret_opt" />
+
+        <IncludeRules context="RecipeContent" />
+      </context>
+
+      <!-- SAVE ARTIFACT or SAVE IMAGE -->
       <context name="SAVE_ctx" attribute="Normal Text" lineEndContext="#pop">
-        <WordDetect String="ARTIFACT" attribute="Command" context="#stay" />
+        <DetectSpaces />
+        <WordDetect String="ARTIFACT" attribute="Command" context="#pop!SAVE_ARTIFACT_ctx" />
+        <WordDetect String="IMAGE" attribute="Command" context="#pop!SAVE_IMAGE_ctx" />
+      </context>
+
+      <!-- https://docs.earthly.dev/docs/earthfile#save-artifact -->
+      <context name="SAVE_ARTIFACT_ctx" attribute="Normal Text" lineEndContext="#pop">
         <WordDetect String="AS" attribute="Command" context="#stay" />
         <WordDetect String="LOCAL" attribute="Command" context="#stay" />
-        <WordDetect String="IMAGE" attribute="Command" context="#stay" />
-
-        <!-- Options for the first form -->
         <StringDetect String="--keep-ts" attribute="Command Option" context="#stay" />
         <StringDetect String="--keep-own" attribute="Command Option" context="#stay" />
         <StringDetect String="--if-exists" attribute="Command Option" context="#stay" />
         <StringDetect String="--force" attribute="Command Option" context="#stay" />
+        <IncludeRules context="RecipeContent" />
+      </context>
 
-        <!-- Options for the second form -->
+      <!-- https://docs.earthly.dev/docs/earthfile#save-image -->
+      <context name="SAVE_IMAGE_ctx" attribute="Normal Text" lineEndContext="#pop">
         <StringDetect String="--cache-hint" attribute="Command Option" context="#stay" />
         <StringDetect String="--cache-from" attribute="Command Option" context="#stay" />
         <StringDetect String="--push" attribute="Command Option" context="#stay" />
-
+        <StringDetect String="--no-manifest-list" attribute="Command Option" context="#stay" />
         <IncludeRules context="RecipeContent" />
       </context>
 
@@ -482,6 +600,38 @@
         <IncludeRules context="RecipeCommands" />
       </context>
 
+      <!-- https://docs.earthly.dev/docs/earthfile#project -->
+      <context name="PROJECT_ctx" attribute="Normal Text" lineEndContext="#pop">
+        <IncludeRules context="RecipeContent" />
+      </context>
+
+      <!-- https://docs.earthly.dev/docs/earthfile#trigger-beta -->
+      <context name="TRIGGER_ctx" attribute="Normal Text" lineEndContext="#pop">
+        <keyword String="trigger_events" attribute="Command Option" context="#stay" />
+        <IncludeRules context="RecipeContent" />
+      </context>
+
+      <!-- https://docs.earthly.dev/docs/earthfile#pipeline-beta -->
+      <context name="PIPELINE_ctx" attribute="Normal Text" lineEndContext="#pop">
+        <StringDetect String="--push" attribute="Command Option" context="#stay" />
+        <IncludeRules context="RecipeContent" />
+      </context>
+
+      <!-- https://docs.earthly.dev/docs/earthfile#try-experimental -->
+      <context name="TRY_ctx" attribute="Normal Text" lineEndContext="#stay">
+        <WordDetect String="FINALLY" attribute="Command" context="#pop!FINALLY_ctx" />
+        <WordDetect String="END" attribute="Command" context="#pop" endRegion="TRY" />
+        <IncludeRules context="RecipeCommandsOnlyRUN" />
+        <DetectChar char="#" attribute="Comment" context="Comment" />
+        <IncludeRules context="InappropriateCommands" />
+      </context>
+      <context name="FINALLY_ctx" attribute="Normal Text" lineEndContext="#stay">
+        <WordDetect String="END" attribute="Command" context="#pop" endRegion="TRY" />
+        <IncludeRules context="RecipeCommandsOnlySAVE" />
+        <DetectChar char="#" attribute="Comment" context="Comment" />
+        <IncludeRules context="InappropriateCommands" />
+      </context>
+
       <context name="BracketExpression" attribute="Normal Text" lineEndContext="#pop">
         <DetectChar char="]" attribute="Operator" context="#pop" />
         <AnyChar String="!=" attribute="Operator" context="#stay" />
@@ -495,7 +645,7 @@
       </context>
 
       <context name="mount_arg" attribute="Command Option" lineEndContext="#stay" fallthroughContext="#pop">
-        <keyword String="mount_keys" insensitive="false" attribute="Command Option" context="#stay" />
+        <keyword String="mount_keys" attribute="Command Option" context="#stay" />
         <AnyChar String=",=" attribute="Operator" context="#stay" />
         <!--
             ALERT A mount option arg must consume characters up to the next space
@@ -523,6 +673,10 @@
         <DetectSpaces context="#pop" />
       </context>
 
+      <context name="InappropriateCommands" attribute="Normal Text">
+        <keyword String="commands" attribute="Error" />
+      </context>
+
     </contexts>
 
     <itemDatas>
@@ -543,6 +697,7 @@
       <itemData name="String DoubleQ"           defStyleNum="dsString" />
       <itemData name="String Escape"            defStyleNum="dsSpecialChar" />
       <itemData name="Integer"                  defStyleNum="dsDecVal" />
+      <itemData name="Error"                    defStyleNum="dsError" />
     </itemDatas>
 
   </highlighting>

@@ -1,6 +1,6 @@
 add_library(KF6SyntaxHighlighting)
 
-ecm_create_qm_loader(syntax_highlighting_QM_LOADER syntaxhighlighting5_qt)
+ecm_create_qm_loader(syntax_highlighting_QM_LOADER syntaxhighlighting6_qt)
 
 target_sources(KF6SyntaxHighlighting PRIVATE
     abstracthighlighter.cpp

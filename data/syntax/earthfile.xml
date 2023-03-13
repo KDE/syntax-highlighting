@@ -203,7 +203,10 @@
 
       <context name="RecipeContent" attribute="Normal Text" lineEndContext="#pop">
         <LineContinue />
+        <IncludeRules context="RecipeCommandsNoLineCont" />
+      </context>
 
+      <context name="RecipeCommandsNoLineCont" attribute="Normal Text" lineEndContext="#pop">
         <DetectChar char="'" attribute="String SingleQ" context="StringSQ" />
         <DetectChar char="&quot;" attribute="String DoubleQ" context="StringDQ" />
 
@@ -471,13 +474,32 @@
         <WordDetect String="DOCKER" attribute="Command" context="#stay" />
         <WordDetect String="END" attribute="Command" context="#pop" endRegion="WITH" />
         <StringDetect String="--pull" attribute="Command Option" context="#stay" />
-        <StringDetect String="--load" attribute="Command Option" context="#stay" />
+        <StringDetect String="--load" attribute="Command Option" context="WITH_load_arg" />
         <StringDetect String="--compose" attribute="Command Option" context="#stay" />
         <StringDetect String="--service" attribute="Command Option" context="#stay" />
         <StringDetect String="--allow-privileged" attribute="Command Option" context="#stay" />
         <IncludeRules context="RecipeCommandsOnlyRUN" />
         <DetectChar char="#" attribute="Comment" context="Comment" />
         <IncludeRules context="InappropriateCommands" />
+      </context>
+
+      <context name="WITH_load_arg" attribute="Normal Text" lineEndContext="#stay">
+        <DetectSpaces context="#stay" />
+        <DetectIdentifier attribute="Command Option" />
+        <DetectChar char="=" attribute="Operator" context="#pop!WITH_load_arg_target_ref" />
+      </context>
+
+      <context name="WITH_load_arg_target_ref" attribute="Normal Text" lineEndContext="#stay">
+        <Detect2Chars char="-" char1="-" context="#pop" />
+        <DetectChar char="-" char1="-" context="#pop" />
+        <DetectSpaces context="#pop" />
+        <DetectChar char="(" attribute="Normal Text" context="WITH_load_arg_target_ref_with_args" />
+        <IncludeRules context="RecipeCommandsNoLineCont" includeAttrib="true" />
+      </context>
+
+      <context name="WITH_load_arg_target_ref_with_args" attribute="Normal Text" lineEndContext="#stay">
+        <DetectChar char=")" attribute="Normal Text" context="#pop#pop" />
+        <IncludeRules context="RecipeCommandsNoLineCont" includeAttrib="true" />
       </context>
 
       <!-- https://docs.earthly.dev/docs/earthfile#for -->

@@ -342,7 +342,7 @@ private:
     /**
      * Constructor taking a shared ThemeData instance.
      */
-    explicit Theme(ThemeData *data);
+    KSYNTAXHIGHLIGHTING_NO_EXPORT explicit Theme(ThemeData *data);
     friend class RepositoryPrivate;
     friend class ThemeData;
 

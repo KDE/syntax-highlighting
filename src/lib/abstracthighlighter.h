@@ -106,7 +106,7 @@ public:
 
 protected:
     AbstractHighlighter();
-    AbstractHighlighter(AbstractHighlighterPrivate *dd);
+    KSYNTAXHIGHLIGHTING_NO_EXPORT explicit AbstractHighlighter(AbstractHighlighterPrivate *dd);
 
 #if KSYNTAXHIGHLIGHTING_ENABLE_DEPRECATED_SINCE(5, 87)
     /**

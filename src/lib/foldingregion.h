@@ -76,7 +76,7 @@ public:
 
 private:
     friend class Rule;
-    FoldingRegion(Type type, quint16 id);
+    KSYNTAXHIGHLIGHTING_NO_EXPORT FoldingRegion(Type type, quint16 id);
 
     quint16 m_type : 2;
     quint16 m_id : 14;

@@ -106,7 +106,7 @@ public:
 
 protected:
     AbstractHighlighter();
-    AbstractHighlighter(AbstractHighlighterPrivate *dd);
+    KSYNTAXHIGHLIGHTING_NO_EXPORT explicit AbstractHighlighter(AbstractHighlighterPrivate *dd);
 
     // TODO KF6: add an optional void* context argument that is passed through
     // to the applyX() calls, so highlighters dealing with some form of line object

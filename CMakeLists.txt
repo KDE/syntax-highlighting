@@ -29,9 +29,10 @@ include(ECMGenerateExportHeader)
 include(ECMDeprecationSettings)
 include(ECMQmlModule)
 
+set(ksyntaxhighlighting_version_header "${CMAKE_CURRENT_BINARY_DIR}/src/lib/ksyntaxhighlighting_version.h")
 ecm_setup_version(PROJECT
     VARIABLE_PREFIX SyntaxHighlighting
-    VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/ksyntaxhighlighting_version.h"
+    VERSION_HEADER "${ksyntaxhighlighting_version_header}"
     PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KF6SyntaxHighlightingConfigVersion.cmake"
     SOVERSION 6
 )
@@ -144,7 +145,7 @@ if(TARGET KF6SyntaxHighlighting)
         NAMESPACE KF6::)
 endif()
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ksyntaxhighlighting_version.h"
+install(FILES "${ksyntaxhighlighting_version_header}"
         DESTINATION "${KDE_INSTALL_INCLUDEDIR_KF}/KSyntaxHighlighting"
         COMPONENT Devel)
 

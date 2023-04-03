@@ -1,5 +1,11 @@
 add_library(KF6SyntaxHighlighting)
 
+set_target_properties(KF6SyntaxHighlighting PROPERTIES
+    VERSION     ${SyntaxHighlighting_VERSION}
+    SOVERSION   ${SyntaxHighlighting_SOVERSION}
+    EXPORT_NAME SyntaxHighlighting
+)
+
 ecm_create_qm_loader(syntax_highlighting_QM_LOADER syntaxhighlighting6_qt)
 
 target_sources(KF6SyntaxHighlighting PRIVATE
@@ -41,11 +47,6 @@ ecm_generate_export_header(KF6SyntaxHighlighting
     DEPRECATED_BASE_VERSION 0
     DEPRECATION_VERSIONS
     EXCLUDE_DEPRECATED_BEFORE_AND_AT ${EXCLUDE_DEPRECATED_BEFORE_AND_AT}
-)
-set_target_properties(KF6SyntaxHighlighting PROPERTIES
-    VERSION ${SyntaxHighlighting_VERSION}
-    SOVERSION ${SyntaxHighlighting_SOVERSION}
-    EXPORT_NAME SyntaxHighlighting
 )
 
 target_link_libraries(KF6SyntaxHighlighting

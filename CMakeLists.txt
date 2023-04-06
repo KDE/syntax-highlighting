@@ -31,7 +31,7 @@ include(ECMQmlModule)
 
 set(ksyntaxhighlighting_version_header "${CMAKE_CURRENT_BINARY_DIR}/src/lib/ksyntaxhighlighting_version.h")
 ecm_setup_version(PROJECT
-    VARIABLE_PREFIX SyntaxHighlighting
+    VARIABLE_PREFIX KSYNTAXHIGHLIGHTING
     VERSION_HEADER "${ksyntaxhighlighting_version_header}"
     PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KF6SyntaxHighlightingConfigVersion.cmake"
     SOVERSION 6

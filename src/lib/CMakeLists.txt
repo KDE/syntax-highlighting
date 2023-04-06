@@ -1,8 +1,8 @@
 add_library(KF6SyntaxHighlighting)
 
 set_target_properties(KF6SyntaxHighlighting PROPERTIES
-    VERSION     ${SyntaxHighlighting_VERSION}
-    SOVERSION   ${SyntaxHighlighting_SOVERSION}
+    VERSION     ${KSYNTAXHIGHLIGHTING_VERSION}
+    SOVERSION   ${KSYNTAXHIGHLIGHTING_SOVERSION}
     EXPORT_NAME SyntaxHighlighting
 )
 

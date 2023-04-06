@@ -808,7 +808,7 @@ bool DefinitionData::checkKateVersion(QStringView verStr)
     const auto major = verStr.left(idx).toString().toInt();
     const auto minor = verStr.mid(idx + 1).toString().toInt();
 
-    if (major > SyntaxHighlighting_VERSION_MAJOR || (major == SyntaxHighlighting_VERSION_MAJOR && minor > SyntaxHighlighting_VERSION_MINOR)) {
+    if (major > KSYNTAXHIGHLIGHTING_VERSION_MAJOR || (major == KSYNTAXHIGHLIGHTING_VERSION_MAJOR && minor > KSYNTAXHIGHLIGHTING_VERSION_MINOR)) {
         qCWarning(Log) << "Skipping" << fileName << "due to being too new, version:" << verStr;
         return false;
     }

@@ -53,7 +53,7 @@ int main(int argc, char **argv)
     QCoreApplication::setApplicationName(QStringLiteral("kate-syntax-highlighter"));
     QCoreApplication::setOrganizationDomain(QStringLiteral("kde.org"));
     QCoreApplication::setOrganizationName(QStringLiteral("KDE"));
-    QCoreApplication::setApplicationVersion(QStringLiteral(SyntaxHighlighting_VERSION_STRING));
+    QCoreApplication::setApplicationVersion(QStringLiteral(KSYNTAXHIGHLIGHTING_VERSION_STRING));
 
     Repository repo;
 

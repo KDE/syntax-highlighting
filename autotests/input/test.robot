@@ -1,0 +1,132 @@
+*** Comments ***
+Some comments go here
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam a quam erat.
+Nam ante lorem, placerat et est a, blandit rutrum magna. Vivamus congue ipsum eget neque posuere, nec egestas risus cursus. Proin nec interdum orci.
+Vivamus blandit, elit sed vehicula lobortis, orci massa malesuada nibh, at rutrum lacus quam a metus. Donec velit magna, pulvinar eget metus eu, aliquet sagittis ante.
+    ...   Donec egestas neque vel libero finibus hendrerit. Nam tempus quam ut mi interdum vulputate. Mauris ac auctor magna.
+Maecenas sollicitudin, tortor nec auctor pellentesque, sapien neque accumsan enim, quis porttitor magna est non nibh.
+Pellentesque facilisis luctus nulla, ut dignissim ligula vestibulum ac. Sed sit amet eros non turpis congue facilisis vitae vitae orci.
+Morbi et lobortis nibh. Proin blandit, diam ut blandit aliquam, ligula diam posuere lorem, sed malesuada quam massa eu elit. S
+uspendisse ultrices velit nec mauris laoreet, eget tristique tortor maximus.
+
+*** Settings ***
+Documentation    Simple example demonstrating syntax highlighting.
+...              Multiple lines.
+...              Thanks to https://spage.fi/highlight-robot !
+Library          ExampleLibrary
+Test Setup       Test Setup Keyword       argument   argument with ${VARIABLE}
+Test Teardown    Test Keyword Teardown    argument   argument with ${VARIABLE}
+Suite Setup      Big Suite Setup          ${ARG}     argument with ${VARIABLE}
+Suite Teardown   Teardown keyword         argument   argument with ${VARIABLE}
+# Comment in here too
+Resource            ${RESOURCES}/file.txt
+Variables           ${VARIABLES}/file.txt
+
+*** Variables ***
+${VARIABLE}      Variable value
+@{LIST}          List    variable    here
+&{DICT}          Key1=Value1    Key2=Value2
+
+*** Test Cases ***
+First example
+    [Documentation]    Most amazing
+    ...                documentation
+    Initialize System
+    Do Something
+    # Comment
+    Result Should Be    ${42}
+    Test if something and else something
+    A cool suite keyword    that takes a string
+    [Teardown]    Cleanup System    # Being a good citizen
+
+Test if something and else something
+    [Documentation]    Do not change colors in middle of kw/tc name
+    [Setup]    Small Keyword Setup
+
+    Kw for if something and else something
+    Do a thing     ${thing}
+    Run a for loop
+    Run a while loop to end
+    #A comment
+    Kw for if something and else something
+    ${status} =    BuiltIn.Evaluate 0 < ${result} < 10
+    Then print    ${status}
+
+Second ${variable} example
+    [Documentation]     Oneliner
+    [Template]    Keyword
+    [Tags]        aaa    bbb    ccc
+    argument1   argument2
+    argument    ${VARIABLE}
+    @{LIST}
+
+Three ${var} example ${var2} last ${var3}
+    [Documentation]     Oneliner
+    [Tags]    tag1    tag2
+    ...       more    tags
+    Given system is initialized
+    When something is done
+    # Comment
+    # Another Comment
+# Oops this comment is here
+                # This comment is way over here!
+    And things are ok
+
+    Then result should be "42" but not ${var1} #Anything inside "" should be a string
+    Another result should be '23' #also for ''
+
+
+
+*** Keywords ***
+Result Should Be
+    [Arguments]    ${expected}
+    ${actual} =    Get Value
+    Should be Equal    ${actual}    ${expected}
+
+Then result should be ${expected}
+    Result Should Be    ${expected}
+    this is also a      $variable
+    IF    $var_in_py_expr1 == $var_in_py_expr2
+        Call Keyword
+    ELSE
+        #nothing!!
+        Do nothing
+    END
+
+Kw for if something and else something
+    WHILE   ${var} = ${True}
+        IF    $var_in_py_expr1 == $var_in_py_expr2
+            Call Keyword
+        ELSE
+            #nothing!!
+            Do nothing
+        END
+    END
+
+Log items
+    [Arguments]    @{items}    ${log_values}=True
+    IF    not ${items}
+        Log to console    No items.
+    ELSE IF    len(${items}) == 1
+        IF    ${log_values}
+            Log to console    One item: ${items}[0]
+        ELSE
+            Log to console    One item.
+        END
+    ELSE
+        Log to console    ${{len(${items})}} items.
+        IF    ${log_values}
+            FOR    ${index}    ${item}    IN ENUMERATE    @{items}    start=1
+                Log to console    Item ${index}: ${item}
+            END
+        END
+    END
+
+
+*** Tasks ***
+Process invoice
+    Read information from PDF
+    Validate information "asd"
+    Submit information to backend system
+    Validate information is visible in web UI
+

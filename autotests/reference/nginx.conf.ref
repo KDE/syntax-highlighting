@@ -1,0 +1,127 @@
+<Comment># example nginx config for highlighting</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Directive>user</Directive><Normal Text> nginx</Normal Text><Symbol>;</Symbol><br/>
+<Directive>worker_processes</Directive><Normal Text> auto</Normal Text><Symbol>;</Symbol><br/>
+<Directive>error_log</Directive><Normal Text> /var/log/nginx/error.log</Normal Text><Symbol>;</Symbol><br/>
+<Directive>pid</Directive><Normal Text> /run/nginx.pid</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Load dynamic modules. See /usr/share/nginx/README.dynamic.</Comment><br/>
+<Directive>include</Directive><Normal Text> /usr/share/nginx/modules/*.conf</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Directive>events</Directive><Normal Text> </Normal Text><Symbol>{</Symbol><br/>
+<Normal Text>    </Normal Text><Directive>worker_connections</Directive><Normal Text> </Normal Text><Number>1024</Number><Symbol>;</Symbol><br/>
+<Symbol>}</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Directive>http</Directive><Normal Text> </Normal Text><Symbol>{</Symbol><br/>
+<Normal Text>    </Normal Text><Directive>server_tokens</Directive><Normal Text> </Normal Text><Keyword>off</Keyword><Symbol>;</Symbol><br/>
+<Normal Text>    </Normal Text><Directive>include</Directive><Normal Text>             /etc/nginx/mime.types</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text>    </Normal Text><Directive>default_type</Directive><Normal Text>        application/octet-stream</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Directive>server_names_hash_bucket_size</Directive><Normal Text> </Normal Text><Number>64</Number><Symbol>;</Symbol><br/>
+<Normal Text>    </Normal Text><Directive>server_names_hash_max_size</Directive><Normal Text> </Normal Text><Number>1024</Number><Symbol>;</Symbol><br/>
+<Normal Text>    </Normal Text><Directive>types_hash_max_size</Directive><Normal Text> </Normal Text><Number>2048</Number><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Directive>log_format</Directive><Normal Text>  main  </Normal Text><String>'</String><Variable>$remote_addr</Variable><String> - </String><Variable>$remote_user</Variable><String> [</String><Variable>$time_local</Variable><String>] "</String><Variable>$request</Variable><String>" '</String><br/>
+<Normal Text>                      </Normal Text><String>'</String><Variable>$status</Variable><String> </String><Variable>$body_bytes_sent</Variable><String> "</String><Variable>$http_referer</Variable><String>" '</String><br/>
+<Normal Text>                      </Normal Text><String>'"</String><Variable>$http_user_agent</Variable><String>" "</String><Variable>$http_x_forwarded_for</Variable><String>"'</String><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Directive>map</Directive><Normal Text> </Normal Text><Variable>$remote_addr</Variable><Normal Text> </Normal Text><Variable>$not_lb_request</Variable><Normal Text> </Normal Text><Symbol>{</Symbol><br/>
+<Normal Text>      192.168.1.234 0;  </Normal Text><Comment># our loadbalancer</Comment><br/>
+<Normal Text>      default       1;  </Normal Text><Comment># any other host</Comment><br/>
+<Normal Text>    </Normal Text><Symbol>}</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Directive>access_log</Directive><Normal Text>  /var/log/nginx/access.log  main if=</Normal Text><Variable>$not_lb_request</Variable><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Directive>real_ip_header</Directive><Normal Text> X-Forwarded-For</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text>    </Normal Text><Directive>set_real_ip_from</Directive><Normal Text> </Normal Text><Number>192</Number><Normal Text>.</Normal Text><Number>168</Number><Normal Text>.</Normal Text><Number>1</Number><Normal Text>.</Normal Text><Number>234</Number><Symbol>;</Symbol><Normal Text>  </Normal Text><Comment># trust our loadbalancer to present the correct client IP</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Directive>map</Directive><Normal Text> </Normal Text><Variable>$http_x_forwarded_proto</Variable><Normal Text> </Normal Text><Variable>$real_scheme</Variable><Normal Text> </Normal Text><Symbol>{</Symbol><br/>
+<Normal Text>        default </Normal Text><Variable>$http_x_forwarded_proto</Variable><Normal Text>;</Normal Text><br/>
+<Normal Text>        </Normal Text><String>''</String><Normal Text>      </Normal Text><Variable>$scheme</Variable><Normal Text>;</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>}</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Directive>sendfile</Directive><Normal Text>            </Normal Text><Keyword>on</Keyword><Symbol>;</Symbol><br/>
+<Normal Text>    </Normal Text><Directive>tcp_nopush</Directive><Normal Text>          </Normal Text><Keyword>on</Keyword><Symbol>;</Symbol><br/>
+<Normal Text>    </Normal Text><Directive>tcp_nodelay</Directive><Normal Text>         </Normal Text><Keyword>on</Keyword><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Directive>keepalive_timeout</Directive><Normal Text>   </Normal Text><Number>75</Number><Normal Text> </Normal Text><Number>20</Number><Symbol>;</Symbol><br/>
+<Normal Text>    </Normal Text><Directive>ignore_invalid_headers</Directive><Normal Text> </Normal Text><Keyword>on</Keyword><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Directive>gzip</Directive><Normal Text> </Normal Text><Keyword>off</Keyword><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Directive>charset</Directive><Normal Text> utf-</Normal Text><Number>8</Number><Symbol>;</Symbol><br/>
+<Normal Text>    </Normal Text><Directive>index</Directive><Normal Text> index.html index.htm</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Directive>server</Directive><Normal Text> </Normal Text><Symbol>{</Symbol><br/>
+<Normal Text>        </Normal Text><Directive>listen</Directive><Normal Text>       </Normal Text><Number>80</Number><Symbol>;</Symbol><br/>
+<Normal Text>        </Normal Text><Directive>server_name</Directive><Normal Text>  localhost</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Directive>location</Directive><Normal Text> / </Normal Text><Symbol>{</Symbol><br/>
+<Normal Text>            </Normal Text><Directive>root</Directive><Normal Text>   html</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text>            </Normal Text><Directive>index</Directive><Normal Text>  index.html index.htm</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text>        </Normal Text><Symbol>}</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Directive>error_page</Directive><Normal Text>   </Normal Text><Number>404</Number><Normal Text> /</Normal Text><Number>404</Number><Normal Text>.html</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Comment># redirect server error pages to the static page /50x.html</Comment><br/>
+<Normal Text>        </Normal Text><Directive>error_page</Directive><Normal Text>   </Normal Text><Number>500</Number><Normal Text> </Normal Text><Number>502</Number><Normal Text> </Normal Text><Number>503</Number><Normal Text> </Normal Text><Number>504</Number><Normal Text>  /50x.html</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text>        </Normal Text><Directive>location</Directive><Normal Text> = /50x.html </Normal Text><Symbol>{</Symbol><br/>
+<Normal Text>            </Normal Text><Directive>root</Directive><Normal Text>   html</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text>        </Normal Text><Symbol>}</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Comment># pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000</Comment><br/>
+<Normal Text>        </Normal Text><Directive>location</Directive><Normal Text> ~ \.php$ </Normal Text><Symbol>{</Symbol><br/>
+<Normal Text>            </Normal Text><Directive>root</Directive><Normal Text>           html</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text>            </Normal Text><Directive>fastcgi_pass</Directive><Normal Text>   </Normal Text><Number>127</Number><Normal Text>.</Normal Text><Number>0</Number><Normal Text>.</Normal Text><Number>0</Number><Normal Text>.</Normal Text><Number>1</Number><Normal Text>:</Normal Text><Number>9000</Number><Symbol>;</Symbol><br/>
+<Normal Text>            </Normal Text><Directive>fastcgi_index</Directive><Normal Text>  index.php</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text>            </Normal Text><Directive>fastcgi_param</Directive><Normal Text>  SCRIPT_FILENAME  /scripts</Normal Text><Variable>$fastcgi_script_name</Variable><Symbol>;</Symbol><br/>
+<Normal Text>            </Normal Text><Directive>include</Directive><Normal Text>        fastcgi_params</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text>        </Normal Text><Symbol>}</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Comment># deny access to .htaccess files, if Apache's document root</Comment><br/>
+<Normal Text>        </Normal Text><Comment># concurs with nginx's one</Comment><br/>
+<Normal Text>        </Normal Text><Directive>location</Directive><Normal Text> ~ /\.ht </Normal Text><Symbol>{</Symbol><br/>
+<Normal Text>            </Normal Text><Directive>deny</Directive><Normal Text>  </Normal Text><Keyword>all</Keyword><Symbol>;</Symbol><br/>
+<Normal Text>        </Normal Text><Symbol>}</Symbol><br/>
+<Normal Text>    </Normal Text><Symbol>}</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Comment># HTTPS server</Comment><br/>
+<Normal Text>    </Normal Text><Directive>server</Directive><Normal Text> </Normal Text><Symbol>{</Symbol><br/>
+<Normal Text>        </Normal Text><Directive>listen</Directive><Normal Text>       </Normal Text><Number>443</Number><Normal Text> </Normal Text><Keyword>ssl</Keyword><Symbol>;</Symbol><br/>
+<Normal Text>        </Normal Text><Directive>server_name</Directive><Normal Text>  localhost secure.example.org</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Directive>ssl_certificate</Directive><Normal Text>      cert.pem</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text>        </Normal Text><Directive>ssl_certificate_key</Directive><Normal Text>  cert.key</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Directive>ssl_session_cache</Directive><Normal Text>    shared:SSL:</Normal Text><Number>1m</Number><Symbol>;</Symbol><br/>
+<Normal Text>        </Normal Text><Directive>ssl_session_timeout</Directive><Normal Text>  </Normal Text><Number>5m</Number><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Directive>ssl_ciphers</Directive><Normal Text>  HIGH:!aNULL:!MD5</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text>        </Normal Text><Directive>ssl_prefer_server_ciphers</Directive><Normal Text>  </Normal Text><Keyword>on</Keyword><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Directive>location</Directive><Normal Text> / </Normal Text><Symbol>{</Symbol><br/>
+<Normal Text>            </Normal Text><Directive>root</Directive><Normal Text>   html</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text>            </Normal Text><Directive>index</Directive><Normal Text>  index.html index.htm</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text>        </Normal Text><Symbol>}</Symbol><br/>
+<Normal Text>    </Normal Text><Symbol>}</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Comment># default server block</Comment><br/>
+<Normal Text>    </Normal Text><Directive>server</Directive><Normal Text> </Normal Text><Symbol>{</Symbol><br/>
+<Normal Text>        </Normal Text><Directive>listen</Directive><Normal Text>       </Normal Text><Number>80</Number><Symbol>;</Symbol><br/>
+<Normal Text>        </Normal Text><Directive>server_name</Directive><Normal Text>  _</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Directive>location</Directive><Normal Text> / </Normal Text><Symbol>{</Symbol><br/>
+<Normal Text>            </Normal Text><Directive>return</Directive><Normal Text> </Normal Text><Number>403</Number><Symbol>;</Symbol><br/>
+<Normal Text>        </Normal Text><Symbol>}</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>        </Normal Text><Directive>location</Directive><Normal Text> /tftp </Normal Text><Symbol>{</Symbol><br/>
+<Normal Text>            </Normal Text><Directive>allow</Directive><Normal Text> </Normal Text><Number>192</Number><Normal Text>.</Normal Text><Number>168</Number><Normal Text>.</Normal Text><Number>1</Number><Normal Text>.</Normal Text><Number>0</Number><Normal Text>/</Normal Text><Number>24</Number><Symbol>;</Symbol><br/>
+<Normal Text>            </Normal Text><Directive>deny</Directive><Normal Text> </Normal Text><Keyword>all</Keyword><Symbol>;</Symbol><br/>
+<Normal Text>            </Normal Text><Directive>root</Directive><Normal Text> /data</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text>        </Normal Text><Symbol>}</Symbol><br/>
+<Normal Text>    </Normal Text><Symbol>}</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Comment># "unit" testing ;-)</Comment><br/>
+<Normal Text>    </Normal Text><Directive>client_body_timeout</Directive><Normal Text> </Normal Text><Number>1y</Number><Normal Text> </Normal Text><Number>12M</Number><Normal Text> </Normal Text><Number>52w</Number><Normal Text> </Normal Text><Number>365d</Number><Normal Text> </Normal Text><Number>1337h</Number><Normal Text> </Normal Text><Number>256m</Number><Normal Text> </Normal Text><Number>42s</Number><Normal Text> </Normal Text><Number>440ms</Number><Symbol>;</Symbol><br/>
+<Normal Text>    </Normal Text><Directive>client_max_body_size</Directive><Normal Text> </Normal Text><Number>1024</Number><Normal Text> </Normal Text><Number>56k</Number><Normal Text> </Normal Text><Number>56K</Number><Normal Text> </Normal Text><Number>64m</Number><Normal Text> </Normal Text><Number>64M</Number><Normal Text> </Normal Text><Number>32g</Number><Normal Text> </Normal Text><Number>32G</Number><Symbol>;</Symbol><br/>
+<Symbol>}</Symbol><br/>

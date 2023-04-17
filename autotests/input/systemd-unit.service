@@ -88,6 +88,8 @@ FileDescriptorStoreMax = 5
 USBFunctionDescriptors = /some/absolute/path
 USBFunctionStrings = /some/absolute/path
 OOMPolicy = stop
+OpenFile = /some/path:fd-name:graceful,read-only
+ReloadSignal = SIGUSR1
 
 ## from systemd.exec
 ExecPaths = some/path some/other/path
@@ -242,6 +244,8 @@ LogLevelMax = info
 LogExtraFields = FIELD=VALUE OTHER_FIELD=VALUE2
 LogRateLimitIntervalSec = 1s 500ms
 LogRateLimitBurst = 50
+LogFilterPatterns = ~some_rx
+LogFilterPatterns = \x7esome_rx
 LogNamespace = some_name
 SyslogIdentifier = some_identifier
 SyslogFacility = daemon
@@ -282,6 +286,7 @@ MemoryLow = 20%
 MemoryHigh = 40 %
 MemoryMax = 60%
 MemorySwapMax = 10G
+MemoryZSwapMax = 2G
 TasksAccounting = on
 TasksMax = 50%
 IOAccounting = on
@@ -2097,6 +2102,11 @@ OOMScoreAdjust = -1001
 OOMScoreAdjust = +1001
 OOMScoreAdjust = 1001
 
+###### open file option
+[Service]
+OpenFile = /some/path/:some-name:append,graceful,read-only,truncate
+## invalid values
+OpenFile = /some/path/:some-name:some,invalid,options
 
 ###### percent
 [Slice]
@@ -2112,6 +2122,10 @@ CPUQuota = 10% 20%
 
 ###### personality
 [Service]
+Personality = arm
+Personality = arm-be
+Personality = arm64
+Personality = arm64-be
 Personality = ppc
 Personality = ppc-le
 Personality = ppc64
@@ -2122,6 +2136,8 @@ Personality = x86
 Personality = x86-64
 ## invalid values
 Personality = invalid
+Personality = alpha
+Personality = m68k
 # multiple values
 Personality = x86-64 s390x
 
@@ -2437,7 +2453,7 @@ SystemCallErrorNumber = ELIBBAD
 SystemCallErrorNumber = ELIBEXEC
 SystemCallErrorNumber = ELIBMAX
 SystemCallErrorNumber = ELIBSCN
-SystemCallErrorNumber = ELNRANGE
+SystemCallErrorNumber = ELNRNG
 SystemCallErrorNumber = ELOOP
 SystemCallErrorNumber = EMEDIUMTYPE
 SystemCallErrorNumber = EMFILE
@@ -2755,6 +2771,7 @@ ConditionVirtualization = parallels
 ConditionVirtualization = qemu
 ConditionVirtualization = qnx
 ConditionVirtualization = rkt
+ConditionVirtualization = sre
 ConditionVirtualization = systemd-nspawn
 ConditionVirtualization = uml
 ConditionVirtualization = vmware

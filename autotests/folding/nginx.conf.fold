@@ -1,0 +1,127 @@
+# example nginx config for highlighting
+
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
+
+# Load dynamic modules. See /usr/share/nginx/README.dynamic.
+include /usr/share/nginx/modules/*.conf;
+
+events <beginfold id='1'>{</beginfold id='1'>
+    worker_connections 1024;
+<endfold id='1'>}</endfold id='1'>
+
+http <beginfold id='1'>{</beginfold id='1'>
+    server_tokens off;
+    include             /etc/nginx/mime.types;
+    default_type        application/octet-stream;
+
+    server_names_hash_bucket_size 64;
+    server_names_hash_max_size 1024;
+    types_hash_max_size 2048;
+
+    log_format  main  <beginfold id='2'>'</beginfold id='2'>$remote_addr - $remote_user [$time_local] "$request" <endfold id='2'>'</endfold id='2'>
+                      <beginfold id='2'>'</beginfold id='2'>$status $body_bytes_sent "$http_referer" <endfold id='2'>'</endfold id='2'>
+                      <beginfold id='2'>'</beginfold id='2'>"$http_user_agent" "$http_x_forwarded_for"<endfold id='2'>'</endfold id='2'>;
+
+    map $remote_addr $not_lb_request <beginfold id='1'>{</beginfold id='1'>
+      192.168.1.234 0;  # our loadbalancer
+      default       1;  # any other host
+    <endfold id='1'>}</endfold id='1'>
+
+    access_log  /var/log/nginx/access.log  main if=$not_lb_request;
+
+    real_ip_header X-Forwarded-For;
+    set_real_ip_from 192.168.1.234;  # trust our loadbalancer to present the correct client IP
+
+    map $http_x_forwarded_proto $real_scheme <beginfold id='1'>{</beginfold id='1'>
+        default $http_x_forwarded_proto;
+        <beginfold id='2'>'</beginfold id='2'><endfold id='2'>'</endfold id='2'>      $scheme;
+    <endfold id='1'>}</endfold id='1'>
+
+    sendfile            on;
+    tcp_nopush          on;
+    tcp_nodelay         on;
+
+    keepalive_timeout   75 20;
+    ignore_invalid_headers on;
+
+    gzip off;
+
+    charset utf-8;
+    index index.html index.htm;
+
+    server <beginfold id='1'>{</beginfold id='1'>
+        listen       80;
+        server_name  localhost;
+
+        location / <beginfold id='1'>{</beginfold id='1'>
+            root   html;
+            index  index.html index.htm;
+        <endfold id='1'>}</endfold id='1'>
+
+        error_page   404 /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html <beginfold id='1'>{</beginfold id='1'>
+            root   html;
+        <endfold id='1'>}</endfold id='1'>
+
+        # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+        location ~ \.php$ <beginfold id='1'>{</beginfold id='1'>
+            root           html;
+            fastcgi_pass   127.0.0.1:9000;
+            fastcgi_index  index.php;
+            fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+            include        fastcgi_params;
+        <endfold id='1'>}</endfold id='1'>
+
+        # deny access to .htaccess files, if Apache's document root
+        # concurs with nginx's one
+        location ~ /\.ht <beginfold id='1'>{</beginfold id='1'>
+            deny  all;
+        <endfold id='1'>}</endfold id='1'>
+    <endfold id='1'>}</endfold id='1'>
+
+    # HTTPS server
+    server <beginfold id='1'>{</beginfold id='1'>
+        listen       443 ssl;
+        server_name  localhost secure.example.org;
+
+        ssl_certificate      cert.pem;
+        ssl_certificate_key  cert.key;
+
+        ssl_session_cache    shared:SSL:1m;
+        ssl_session_timeout  5m;
+
+        ssl_ciphers  HIGH:!aNULL:!MD5;
+        ssl_prefer_server_ciphers  on;
+
+        location / <beginfold id='1'>{</beginfold id='1'>
+            root   html;
+            index  index.html index.htm;
+        <endfold id='1'>}</endfold id='1'>
+    <endfold id='1'>}</endfold id='1'>
+
+    # default server block
+    server <beginfold id='1'>{</beginfold id='1'>
+        listen       80;
+        server_name  _;
+
+        location / <beginfold id='1'>{</beginfold id='1'>
+            return 403;
+        <endfold id='1'>}</endfold id='1'>
+
+        location /tftp <beginfold id='1'>{</beginfold id='1'>
+            allow 192.168.1.0/24;
+            deny all;
+            root /data;
+        <endfold id='1'>}</endfold id='1'>
+    <endfold id='1'>}</endfold id='1'>
+
+    # "unit" testing ;-)
+    client_body_timeout 1y 12M 52w 365d 1337h 256m 42s 440ms;
+    client_max_body_size 1024 56k 56K 64m 64M 32g 32G;
+<endfold id='1'>}</endfold id='1'>

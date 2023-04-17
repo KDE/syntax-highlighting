@@ -21,16 +21,182 @@
     <span style="color:#f44f4f;">\\    return 0;</span>
     <span style="color:#f44f4f;">\\}</span>
 ;
+
+<span style="color:#7a7c7d;">// Top-level declarations are order-independent:</span>
+<span style="color:#2980b9;">const</span> print <span style="color:#3f8058;">=</span> <span style="color:#7f8c8d;">@import</span>(<span style="color:#f44f4f;">&quot;std&quot;</span>)<span style="color:#3f8058;">.</span>debug<span style="color:#3f8058;">.</span>print;
+
 <span style="font-weight:bold;">pub</span> <span style="font-weight:bold;">fn</span> main() <span style="color:#3f8058;">!</span><span style="color:#2980b9;">void</span> {
     <span style="font-weight:bold;">inline</span> <span style="color:#fdbc4b;font-weight:bold;">for</span> (values) <span style="color:#3f8058;">|</span>v<span style="color:#3f8058;">,</span> i<span style="color:#3f8058;">|</span> {
         <span style="color:#fdbc4b;font-weight:bold;">if</span> (i <span style="color:#3f8058;">!=</span> <span style="color:#f67400;">2</span>) <span style="color:#fdbc4b;font-weight:bold;">continue</span>;
         <span style="color:#fdbc4b;font-weight:bold;">try</span> expect(v);
     }
+
+    <span style="color:#7a7c7d;">// error union</span>
+    <span style="color:#2980b9;">var</span> number_or_error<span style="color:#3f8058;">:</span> <span style="color:#2980b9;">anyerror</span><span style="color:#3f8058;">!</span><span style="color:#2980b9;">i32</span> <span style="color:#3f8058;">=</span> <span style="font-weight:bold;">error</span><span style="color:#3f8058;">.</span>ArgNotFound;
+
+    print(<span style="color:#f44f4f;">&quot;</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">error union 2</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">type: {}</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">value: {!}</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">&quot;</span><span style="color:#3f8058;">,</span> <span style="color:#3f8058;">.</span>{
+        <span style="color:#7f8c8d;">@TypeOf</span>(number_or_error)<span style="color:#3f8058;">,</span> number_or_error<span style="color:#3f8058;">,</span>
+    });
+
     <span style="color:#2980b9;">const</span> stdout <span style="color:#3f8058;">=</span> std<span style="color:#3f8058;">.</span>io<span style="color:#3f8058;">.</span>getStdOut()<span style="color:#3f8058;">.</span>writer();
     <span style="color:#fdbc4b;font-weight:bold;">try</span> stdout<span style="color:#3f8058;">.</span>print(<span style="color:#f44f4f;">&quot;Hello, {s}!</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">&quot;</span><span style="color:#3f8058;">,</span> <span style="color:#3f8058;">.</span>{<span style="color:#f44f4f;">&quot;world&quot;</span>});
     <span style="color:#2980b9;">const</span> bytes <span style="color:#3f8058;">=</span> <span style="color:#f44f4f;">&quot;hello&quot;</span>;
     print(<span style="color:#f44f4f;">&quot;{}</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">&quot;</span><span style="color:#3f8058;">,</span> <span style="color:#3f8058;">.</span>{<span style="color:#7f8c8d;">@TypeOf</span>(bytes)}); <span style="color:#7a7c7d;">// *const [5:0]u8</span>
     print(<span style="color:#f44f4f;">&quot;{d}</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">&quot;</span><span style="color:#3f8058;">,</span> <span style="color:#3f8058;">.</span>{bytes[<span style="color:#f67400;">5</span>]}); <span style="color:#7a7c7d;">// 0</span>
-    print(<span style="color:#f44f4f;">&quot;{}</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">&quot;</span><span style="color:#3f8058;">,</span> <span style="color:#3f8058;">.</span>{<span style="color:#f44f4f;">'e'</span> <span style="color:#3f8058;">==</span> <span style="color:#f44f4f;">'</span><span style="color:#3daee9;">\x65</span><span style="color:#f44f4f;">'</span>}); <span style="color:#7a7c7d;">// true</span>
+    print(<span style="color:#f44f4f;">&quot;{}</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">&quot;</span><span style="color:#3f8058;">,</span> <span style="color:#3f8058;">.</span>{<span style="color:#3daee9;">'e'</span> <span style="color:#3f8058;">==</span> <span style="color:#3daee9;">'</span><span style="color:#3daee9;">\x65</span><span style="color:#3daee9;">'</span>}); <span style="color:#7a7c7d;">// true</span>
+    print(<span style="color:#f44f4f;">&quot;{d}</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">&quot;</span><span style="color:#3f8058;">,</span> <span style="color:#3f8058;">.</span>{<span style="color:#3daee9;">'</span><span style="color:#3daee9;">\u{1f4a9}</span><span style="color:#3daee9;">'</span>});                     <span style="color:#7a7c7d;">// 128169</span>
+    print(<span style="color:#f44f4f;">&quot;{d}</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">&quot;</span><span style="color:#3f8058;">,</span> <span style="color:#3f8058;">.</span>{<span style="color:#3daee9;">'💯'</span>});                            <span style="color:#7a7c7d;">// 128175</span>
+    print(<span style="color:#f44f4f;">&quot;{}</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">&quot;</span><span style="color:#3f8058;">,</span> <span style="color:#3f8058;">.</span>{mem<span style="color:#3f8058;">.</span>eql(<span style="color:#2980b9;">u8</span><span style="color:#3f8058;">,</span> <span style="color:#f44f4f;">&quot;hello&quot;</span><span style="color:#3f8058;">,</span> <span style="color:#f44f4f;">&quot;h</span><span style="color:#3daee9;">\x65</span><span style="color:#f44f4f;">llo&quot;</span>)}); <span style="color:#7a7c7d;">// true</span>
+    print(<span style="color:#f44f4f;">&quot;0x{x}</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">&quot;</span><span style="color:#3f8058;">,</span> <span style="color:#3f8058;">.</span>{<span style="color:#f44f4f;">&quot;</span><span style="color:#3daee9;">\xff</span><span style="color:#f44f4f;">&quot;</span>[<span style="color:#f67400;">0</span>]}); <span style="color:#7a7c7d;">// non-UTF-8 strings are possible with \xNN notation.</span>
+    print(<span style="color:#f44f4f;">&quot;{u}</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">&quot;</span><span style="color:#3f8058;">,</span> <span style="color:#3f8058;">.</span>{<span style="color:#3daee9;">'⚡'</span>});
+
+    _ <span style="color:#3f8058;">=</span> <span style="color:#7f8c8d;">@import</span>(<span style="color:#f44f4f;">&quot;introducing_zig_test.zig&quot;</span>);
+}
+
+<span style="color:#7a7c7d;">// Declare an enum.</span>
+<span style="color:#2980b9;">const</span> Type <span style="color:#3f8058;">=</span> <span style="font-weight:bold;">enum</span> {
+    ok<span style="color:#3f8058;">,</span>
+    not_ok<span style="color:#3f8058;">,</span>
+};
+
+<span style="font-weight:bold;">test</span> <span style="color:#f44f4f;">&quot;async skip test&quot;</span> {
+    <span style="color:#2980b9;">var</span> frame <span style="color:#3f8058;">=</span> <span style="color:#2980b9;">async</span> func();
+    <span style="color:#2980b9;">const</span> result <span style="color:#3f8058;">=</span> <span style="color:#2980b9;">await</span> frame;
+    <span style="color:#fdbc4b;font-weight:bold;">try</span> std<span style="color:#3f8058;">.</span>testing<span style="color:#3f8058;">.</span>expect(result <span style="color:#3f8058;">==</span> <span style="color:#f67400;">1</span>);
+}
+
+<span style="font-weight:bold;">fn</span> func() <span style="color:#2980b9;">i32</span> {
+    <span style="font-weight:bold;">suspend</span> {
+        <span style="font-weight:bold;">resume</span> @frame();
+    }
+    <span style="color:#fdbc4b;font-weight:bold;">return</span> <span style="color:#f67400;">1</span>;
+}
+
+<span style="font-weight:bold;">pub</span> <span style="color:#2980b9;">extern</span> <span style="color:#f44f4f;">&quot;c&quot;</span> <span style="font-weight:bold;">fn</span> @<span style="color:#f44f4f;">&quot;error&quot;</span>() <span style="color:#2980b9;">void</span>;
+<span style="font-weight:bold;">pub</span> <span style="color:#2980b9;">extern</span> <span style="color:#f44f4f;">&quot;c&quot;</span> <span style="font-weight:bold;">fn</span> @<span style="color:#f44f4f;">&quot;fstat$INODE64&quot;</span>(fd<span style="color:#3f8058;">:</span> c<span style="color:#3f8058;">.</span>fd_t<span style="color:#3f8058;">,</span> buf<span style="color:#3f8058;">:</span> <span style="color:#3f8058;">*</span>c<span style="color:#3f8058;">.</span>Stat) <span style="color:#2980b9;">c_int</span>;
+
+<span style="color:#2980b9;">const</span> Color <span style="color:#3f8058;">=</span> <span style="font-weight:bold;">enum</span> {
+  red<span style="color:#3f8058;">,</span>
+  @<span style="color:#f44f4f;">&quot;really red&quot;</span><span style="color:#3f8058;">,</span>
+};
+<span style="color:#2980b9;">const</span> color<span style="color:#3f8058;">:</span> Color <span style="color:#3f8058;">=</span> <span style="color:#3f8058;">.</span>@<span style="color:#f44f4f;">&quot;really red&quot;</span>;
+
+<span style="color:#2980b9;">var</span> y<span style="color:#3f8058;">:</span> <span style="color:#2980b9;">i32</span> <span style="color:#3f8058;">=</span> add(<span style="color:#f67400;">10</span><span style="color:#3f8058;">,</span> x);
+<span style="color:#2980b9;">const</span> x<span style="color:#3f8058;">:</span> <span style="color:#2980b9;">i32</span> <span style="color:#3f8058;">=</span> add(<span style="color:#f67400;">12</span><span style="color:#3f8058;">,</span> <span style="color:#f67400;">34</span>);
+
+<span style="font-weight:bold;">test</span> <span style="color:#f44f4f;">&quot;comptime vars&quot;</span> {
+    <span style="color:#2980b9;">var</span> x<span style="color:#3f8058;">:</span> <span style="color:#2980b9;">i32</span> <span style="color:#3f8058;">=</span> <span style="color:#f67400;">1</span>;
+    <span style="color:#2980b9;">comptime</span> <span style="color:#2980b9;">var</span> y<span style="color:#3f8058;">:</span> <span style="color:#2980b9;">i32</span> <span style="color:#3f8058;">=</span> <span style="color:#f67400;">1</span>;
+
+    x <span style="color:#3f8058;">+=</span> <span style="color:#f67400;">1</span>;
+    y <span style="color:#3f8058;">+=</span> <span style="color:#f67400;">1</span>;
+
+    <span style="color:#fdbc4b;font-weight:bold;">try</span> expect(x <span style="color:#3f8058;">==</span> <span style="color:#f67400;">2</span>);
+    <span style="color:#fdbc4b;font-weight:bold;">try</span> expect(y <span style="color:#3f8058;">==</span> <span style="color:#f67400;">2</span>);
+
+    <span style="color:#fdbc4b;font-weight:bold;">if</span> (y <span style="color:#3f8058;">!=</span> <span style="color:#f67400;">2</span>) {
+        <span style="color:#7a7c7d;">// This compile error never triggers because y is a comptime variable,</span>
+        <span style="color:#7a7c7d;">// and so `y != 2` is a comptime value, and this if is statically evaluated.</span>
+        <span style="color:#7f8c8d;">@compileError</span>(<span style="color:#f44f4f;">&quot;wrong y value&quot;</span>);
+    }
+}
+
+<span style="color:#2980b9;">const</span> decimal_int <span style="color:#3f8058;">=</span> <span style="color:#f67400;">98222</span>;
+<span style="color:#2980b9;">const</span> hex_int <span style="color:#3f8058;">=</span> <span style="color:#f67400;">0xff</span>;
+<span style="color:#2980b9;">const</span> another_hex_int <span style="color:#3f8058;">=</span> <span style="color:#f67400;">0xFF</span>;
+<span style="color:#2980b9;">const</span> octal_int <span style="color:#3f8058;">=</span> <span style="color:#f67400;">0o755</span>;
+<span style="color:#2980b9;">const</span> binary_int <span style="color:#3f8058;">=</span> <span style="color:#f67400;">0b11110000</span>;
+
+<span style="color:#7a7c7d;">// underscores may be placed between two digits as a visual separator</span>
+<span style="color:#2980b9;">const</span> one_billion <span style="color:#3f8058;">=</span> <span style="color:#f67400;">1_000_000_000</span>;
+<span style="color:#2980b9;">const</span> binary_mask <span style="color:#3f8058;">=</span> <span style="color:#f67400;">0b1_1111_1111</span>;
+<span style="color:#2980b9;">const</span> permissions <span style="color:#3f8058;">=</span> <span style="color:#f67400;">0o7_5_5</span>;
+<span style="color:#2980b9;">const</span> big_address <span style="color:#3f8058;">=</span> <span style="color:#f67400;">0xFF80_0000_0000_0000</span>;
+
+<span style="color:#2980b9;">const</span> floating_point <span style="color:#3f8058;">=</span> <span style="color:#f67400;">123.0E+77</span>;
+<span style="color:#2980b9;">const</span> another_float <span style="color:#3f8058;">=</span> <span style="color:#f67400;">123.0</span>;
+<span style="color:#2980b9;">const</span> yet_another <span style="color:#3f8058;">=</span> <span style="color:#f67400;">123.0e+77</span>;
+
+<span style="color:#2980b9;">const</span> hex_floating_point <span style="color:#3f8058;">=</span> <span style="color:#f67400;">0x103.70p-5</span>;
+<span style="color:#2980b9;">const</span> another_hex_float <span style="color:#3f8058;">=</span> <span style="color:#f67400;">0x103.70</span>;
+<span style="color:#2980b9;">const</span> yet_another_hex_float <span style="color:#3f8058;">=</span> <span style="color:#f67400;">0x103.70P-5</span>;
+
+<span style="color:#7a7c7d;">// underscores may be placed between two digits as a visual separator</span>
+<span style="color:#2980b9;">const</span> lightspeed <span style="color:#3f8058;">=</span> <span style="color:#f67400;">299_792_458.000_000</span>;
+<span style="color:#2980b9;">const</span> nanosecond <span style="color:#3f8058;">=</span> <span style="color:#f67400;">0.000_000_001</span>;
+<span style="color:#2980b9;">const</span> more_hex <span style="color:#3f8058;">=</span> <span style="color:#f67400;">0x1234_5678.9ABC_CDEFp-10</span>;
+
+<span style="color:#2980b9;">const</span> A <span style="color:#3f8058;">=</span> <span style="font-weight:bold;">error</span>{One};
+<span style="color:#2980b9;">const</span> B <span style="color:#3f8058;">=</span> <span style="font-weight:bold;">error</span>{Two};
+(A <span style="color:#3f8058;">||</span> B) <span style="color:#3f8058;">==</span> <span style="font-weight:bold;">error</span>{One<span style="color:#3f8058;">,</span> Two}
+
+<span style="color:#2980b9;">const</span> x<span style="color:#3f8058;">:</span> <span style="color:#2980b9;">u32</span> <span style="color:#3f8058;">=</span> <span style="color:#f67400;">1234</span>;
+<span style="color:#2980b9;">const</span> ptr <span style="color:#3f8058;">=</span> <span style="color:#3f8058;">&amp;</span>x;
+ptr<span style="color:#3f8058;">.*</span> <span style="color:#3f8058;">==</span> <span style="color:#f67400;">1234</span>
+
+<span style="color:#7a7c7d;">// get the size of an array</span>
+<span style="color:#2980b9;">comptime</span> {
+    assert(message<span style="color:#3f8058;">.</span>len <span style="color:#3f8058;">==</span> <span style="color:#f67400;">5</span>);
+}
+
+<span style="font-weight:bold;">test</span> <span style="color:#f44f4f;">&quot;iterate over an array&quot;</span> {
+    <span style="color:#2980b9;">var</span> sum<span style="color:#3f8058;">:</span> <span style="color:#2980b9;">usize</span> <span style="color:#3f8058;">=</span> <span style="color:#f67400;">0</span>;
+    <span style="color:#fdbc4b;font-weight:bold;">for</span> (message) <span style="color:#3f8058;">|</span>byte<span style="color:#3f8058;">|</span> {
+        sum <span style="color:#3f8058;">+=</span> byte;
+    }
+    <span style="color:#fdbc4b;font-weight:bold;">try</span> expect(sum <span style="color:#3f8058;">==</span> <span style="color:#3daee9;">'h'</span> <span style="color:#3f8058;">+</span> <span style="color:#3daee9;">'e'</span> <span style="color:#3f8058;">+</span> <span style="color:#3daee9;">'l'</span> <span style="color:#3f8058;">*</span> <span style="color:#f67400;">2</span> <span style="color:#3f8058;">+</span> <span style="color:#3daee9;">'o'</span>);
+}
+
+<span style="color:#7a7c7d;">// use compile-time code to initialize an array</span>
+<span style="color:#2980b9;">var</span> fancy_array <span style="color:#3f8058;">=</span> init<span style="color:#3f8058;">:</span> {
+    <span style="color:#2980b9;">var</span> initial_value<span style="color:#3f8058;">:</span> [<span style="color:#f67400;">10</span>]Point <span style="color:#3f8058;">=</span> <span style="color:#27aeae;font-weight:bold;">undefined</span>;
+    <span style="color:#fdbc4b;font-weight:bold;">for</span> (initial_value) <span style="color:#3f8058;">|*</span>pt<span style="color:#3f8058;">,</span> i<span style="color:#3f8058;">|</span> {
+        pt<span style="color:#3f8058;">.*</span> <span style="color:#3f8058;">=</span> Point{
+            <span style="color:#3f8058;">.</span>x <span style="color:#3f8058;">=</span> <span style="color:#7f8c8d;">@intCast</span>(<span style="color:#2980b9;">i32</span><span style="color:#3f8058;">,</span> i)<span style="color:#3f8058;">,</span>
+            <span style="color:#3f8058;">.</span>y <span style="color:#3f8058;">=</span> <span style="color:#7f8c8d;">@intCast</span>(<span style="color:#2980b9;">i32</span><span style="color:#3f8058;">,</span> i) <span style="color:#3f8058;">*</span> <span style="color:#f67400;">2</span><span style="color:#3f8058;">,</span>
+        };
+    }
+    <span style="color:#fdbc4b;font-weight:bold;">break</span> <span style="color:#3f8058;">:</span>init initial_value;
+};
+
+<span style="font-weight:bold;">test</span> <span style="color:#f44f4f;">&quot;switch on non-exhaustive enum&quot;</span> {
+    <span style="color:#fdbc4b;font-weight:bold;">try</span> expect(result);
+    <span style="color:#2980b9;">const</span> is_one <span style="color:#3f8058;">=</span> <span style="color:#fdbc4b;font-weight:bold;">switch</span> (number) {
+        <span style="color:#3f8058;">.</span>one <span style="color:#3f8058;">=&gt;</span> <span style="color:#27aeae;font-weight:bold;">true</span><span style="color:#3f8058;">,</span>
+        <span style="color:#fdbc4b;font-weight:bold;">else</span> <span style="color:#3f8058;">=&gt;</span> <span style="color:#27aeae;font-weight:bold;">false</span><span style="color:#3f8058;">,</span>
+    };
+    <span style="color:#fdbc4b;font-weight:bold;">try</span> expect(is_one);
+
+    <span style="color:#fdbc4b;font-weight:bold;">if</span> (a <span style="color:#3f8058;">!=</span> b) {
+        <span style="color:#fdbc4b;font-weight:bold;">try</span> expect(<span style="color:#27aeae;font-weight:bold;">true</span>);
+    } <span style="color:#fdbc4b;font-weight:bold;">else</span> <span style="color:#fdbc4b;font-weight:bold;">if</span> (a <span style="color:#3f8058;">==</span> <span style="color:#f67400;">9</span>) {
+        <span style="font-weight:bold;">unreachable</span>;
+    } <span style="color:#fdbc4b;font-weight:bold;">else</span> {
+        <span style="font-weight:bold;">unreachable</span>;
+    }
+}
+
+<span style="font-weight:bold;">fn</span> deferErrorExample(is_error<span style="color:#3f8058;">:</span> <span style="color:#2980b9;">bool</span>) <span style="color:#3f8058;">!</span><span style="color:#2980b9;">void</span> {
+    print(<span style="color:#f44f4f;">&quot;</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">start of function</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">&quot;</span><span style="color:#3f8058;">,</span> <span style="color:#3f8058;">.</span>{});
+
+    <span style="color:#7a7c7d;">// This will always be executed on exit</span>
+    <span style="color:#fdbc4b;font-weight:bold;">defer</span> {
+        print(<span style="color:#f44f4f;">&quot;end of function</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">&quot;</span><span style="color:#3f8058;">,</span> <span style="color:#3f8058;">.</span>{});
+    }
+
+    <span style="color:#fdbc4b;font-weight:bold;">errdefer</span> {
+        print(<span style="color:#f44f4f;">&quot;encountered an error!</span><span style="color:#3daee9;">\n</span><span style="color:#f44f4f;">&quot;</span><span style="color:#3f8058;">,</span> <span style="color:#3f8058;">.</span>{});
+    }
+}
+
+<span style="font-weight:bold;">pub</span> <span style="font-weight:bold;">fn</span> syscall3(number<span style="color:#3f8058;">:</span> <span style="color:#2980b9;">usize</span><span style="color:#3f8058;">,</span> arg1<span style="color:#3f8058;">:</span> <span style="color:#2980b9;">usize</span><span style="color:#3f8058;">,</span> arg2<span style="color:#3f8058;">:</span> <span style="color:#2980b9;">usize</span><span style="color:#3f8058;">,</span> arg3<span style="color:#3f8058;">:</span> <span style="color:#2980b9;">usize</span>) <span style="color:#2980b9;">usize</span> {
+    <span style="color:#fdbc4b;font-weight:bold;">return</span> <span style="font-weight:bold;">asm</span> <span style="color:#2980b9;">volatile</span> (<span style="color:#f44f4f;">&quot;syscall&quot;</span>
+        <span style="color:#3f8058;">:</span> [ret] <span style="color:#f44f4f;">&quot;={rax}&quot;</span> (<span style="color:#3f8058;">-&gt;</span> <span style="color:#2980b9;">usize</span>)
+        <span style="color:#3f8058;">:</span> [number] <span style="color:#f44f4f;">&quot;{rax}&quot;</span> (number)<span style="color:#3f8058;">,</span>
+          [arg1] <span style="color:#f44f4f;">&quot;{rdi}&quot;</span> (arg1)<span style="color:#3f8058;">,</span>
+          [arg2] <span style="color:#f44f4f;">&quot;{rsi}&quot;</span> (arg2)<span style="color:#3f8058;">,</span>
+          [arg3] <span style="color:#f44f4f;">&quot;{rdx}&quot;</span> (arg3)
+        <span style="color:#3f8058;">:</span> <span style="color:#f44f4f;">&quot;rcx&quot;</span><span style="color:#3f8058;">,</span> <span style="color:#f44f4f;">&quot;r11&quot;</span>
+    );
 }
 </pre></body></html>

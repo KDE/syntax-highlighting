@@ -6,6 +6,17 @@
 \%  Not a comment
 \\% This is a comment
 
+% Titles should be bold
+\subject{Subject}
+\subsubject{Sub-subject}
+\subsubsubject{Sub-sub-subject}
+\subsubsubsubject{Sub-sub-sub-subject}
+\subsubsubsubsubject{Sub-sub-sub-sub-subject}
+\section{Section}
+\subsection{Sub-section}
+\subsubsection{Sub-sub-section}
+\subsubsubsection{Sub-sub-sub-section}
+\subsubsubsubsection{Sub-sub-sub-sub-section}
 
 %% Start/stop blocks
 \startsection
@@ -19,11 +30,25 @@ normal
 
 
 %% Commands
-\def{\startstuff}
-\startstuff should be normal command colour
+\def\startstuff{Custom environment start}
+\def\stopstuff{Custom environment stop}
+\startstuff should not be normal command colour (it is an error to miss \stopstuff)
+
+\def\sayHello{Héllò Wø®łÐ}
+% This prints Héllò Wø®łÐ@@@ , If it were \sayHelloAAA it would be
+% an error, so the @ is not in the macro
+\sayHello@@@
+
+\def\testUnderscores{Text_With_Underscores}
+% This prints Text_With_Underscores_ note the final underscore and no error
+\testUnderscores_
+
+\def\€{Macro with sign}
+% This is a single macro
+\€ % This prints Macro with sign
+\€A % This prints Macro with signA   (not an error)
 
 \setupindenting[yes, big]
-\section{normal}
 
 
 %% Inline math
@@ -53,9 +78,12 @@ normal
 \mathematics the first character should be green {}
 \math        the first character should be green {}
 \m           the first character should be green {}
+\formula     the first character should be green {}
 normal
 % $should$ \mathematics{still} \math{be} \m{commented}
 
+% The underscore after sum should be blue, not macro color
+Math macro with underscores \m { v = \sum_0^1{ \sqrt{2} }! }
 
 %% Display math
 $$
@@ -75,6 +103,9 @@ The following should be red:
 Should still be math colour
 \stopformula
 normal
+
+% This is a regular macro, not math macro
+\def\mathematicsMacroShouldNotMatchThis{Not Math}
 
 %% Verbatim
 \starttyping
@@ -118,3 +149,39 @@ Commands for TABLE environment (\bTABLE and \eTABLE, \bTD and \eTD, etc.) should
     \startxcell value5 \stopxcell
   \stopxrow
 \stopxtable
+
+
+
+\subject{ Languajes directly usable in \CONTEXT }
+
+% These three sould have their own separate syntax highlighting
+
+\startluacode
+    context.chapter({first}, "Some title")
+    context.startcolumns({n = 3, rule = "on"})
+        context("Hello one")
+    context.column()
+        context("Hello two")
+    context.column()
+        context("Hello three")
+    context.stopcolumns()
+\stopluacode
+
+\startMPcode
+    transform pagecoords;
+    pagecoords := identity scaled 10mm shifted (100mm,150mm);
+    fill ( (0,0) -- (2,0) -- (2,1) -- (1,1) -- (1,2) -- cycle )
+        transformed pagecoords withcolor green;
+    draw ( (2,0) .. (2,1) .. (1,1) .. (1,2) .. (0,2) )
+        transformed pagecoords;
+    drawarrow ( (0,0) -- (2,2) ) transformed pagecoords;
+\stopMPcode
+
+\startXML
+<context name="MathModeMacroFind" attribute="Math" lineEndContext="#stay">
+    <DetectChar char="{"              attribute="Brace" context="#pop!MathModeMacro"/>
+    <RegExpr    String="&macro_math;" attribute="Macro" context="#pop"/> <!-- 1 token -->
+    <RegExpr    String="[[:graph:]]"  attribute="Math"  context="#pop"/> <!-- 1 token -->
+</context>
+\stopXML
+

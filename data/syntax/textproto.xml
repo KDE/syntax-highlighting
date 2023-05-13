@@ -25,6 +25,7 @@
 
       <context name="Message" lineEndContext="#stay" attribute="Style_Normal">
         <DetectSpaces context="#stay" attribute="Style_Normal"/>
+        <DetectChar char="#" context="Comment" attribute="Style_Comment"/>
         <DetectChar char="," context="#stay" attribute="Style_Separator_Pair"/>
 
         <DetectIdentifier context="Field_Key" attribute="Style_Key"/>
@@ -50,6 +51,7 @@
 
       <context name="Value" lineEndContext="#stay" attribute="Style_Normal">
         <DetectSpaces context="#stay" attribute="Style_Normal"/>
+        <DetectChar char="#" context="Comment" attribute="Style_Comment"/>
 
         <keyword String="Constants" context="#pop" attribute="Style_Keyword"/>
         <DetectIdentifier context="#pop" attribute="Style_Identifier_Value"/>
@@ -86,8 +88,13 @@
 
       <context name="Array" lineEndContext="#stay" fallthroughContext="Value" attribute="Style_Normal">
         <DetectSpaces context="#stay" attribute="Style_Normal"/>
+        <DetectChar char="#" context="Comment" attribute="Style_Comment"/>
         <DetectChar char="," context="#stay" attribute="Style_Separator_Array"/>
         <DetectChar char="]" context="#pop" endRegion="Region_Array" attribute="Style_Separator_Array"/>
+      </context>
+
+      <context name="Comment" lineEndContext="#pop" attribute="Style_Comment">
+        <IncludeRules context="##Comments" />
       </context>
     </contexts>
 
@@ -108,6 +115,8 @@
 
       <itemData name="Style_Keyword" defStyleNum="dsKeyword"/>
       <itemData name="Style_Extension_Type" defStyleNum="dsDataType"/>
+
+      <itemData name="Style_Comment" defStyleNum="dsComment" />
 
       <itemData name="Style_Error" defStyleNum="dsError"/>
     </itemDatas>

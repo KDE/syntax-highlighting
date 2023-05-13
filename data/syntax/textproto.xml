@@ -8,7 +8,7 @@
  ** Samples: https://github.com/protocolbuffers/protobuf/tree/main/src/google/protobuf/testdata
  ***************************************************************************
 -->
-<language name="TextProto" section="Other" version="1" kateversion="5.62" extensions="*.textproto;*.textpb;*.pbtxt"
+<language name="TextProto" section="Other" version="2" kateversion="5.62" extensions="*.textproto;*.textpb;*.pbtxt"
           author="Alexander Potashev (aspotashev@gmail.com)" license="MIT">
   <highlighting>
     <list name="Constants">
@@ -82,8 +82,15 @@
       </context>
 
       <context name="String_Value" lineEndContext="#stay" attribute="Style_String_Value">
-        <DetectChar char="&quot;" context="#pop" attribute="Style_String_Value"/>
+        <DetectChar char="&quot;" context="#pop!String_Value_End" attribute="Style_String_Value"/>
         <HlCStringChar attribute="Style_String_Value_Char" context="#stay"/>
+      </context>
+
+      <!-- One string has ended, but there may be a continuation in another pair of quotes -->
+      <context name="String_Value_End" lineEndContext="#stay" fallthroughContext="#pop" attribute="Style_Normal">
+        <DetectSpaces context="#stay" attribute="Style_Normal"/>
+        <DetectChar char="#" context="Comment" attribute="Style_Comment"/>
+        <DetectChar char="&quot;" context="#pop!String_Value" attribute="Style_String_Value"/>
       </context>
 
       <context name="Array" lineEndContext="#stay" fallthroughContext="Value" attribute="Style_Normal">

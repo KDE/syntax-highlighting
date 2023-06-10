@@ -1,4 +1,5 @@
 import Qt 4.6
+pragma Singleton
 
 // some random qml snippets stolen from the qt docs
 

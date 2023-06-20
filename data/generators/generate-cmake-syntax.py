@@ -287,7 +287,8 @@ def cli(input_yaml, template):
     del data['standard-module-commands']
 
     # Fix node names to be accessible from Jinja template
-    data['generator_expressions'] = data['generator-expressions']
+    data['generator_expressions'] = (ex for ex in data['generator-expressions'] if isinstance(ex, str))
+    data['complex_generator_expressions'] = [ex for ex in data['generator-expressions'] if not isinstance(ex, str)]
     data['deprecated_or_internal_variables'] = data['deprecated-or-internal-variables']
     data['environment_variables'] = data['environment-variables']
     del data['generator-expressions']

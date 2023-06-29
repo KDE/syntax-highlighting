@@ -346,3 +346,4 @@ void CodeEditor::toggleFold(const QTextBlock &startBlock)
 }
 
 #include "codeeditor.moc"
+#include "moc_codeeditor.cpp"

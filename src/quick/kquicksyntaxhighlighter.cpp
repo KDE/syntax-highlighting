@@ -110,3 +110,5 @@ Repository *KQuickSyntaxHighlighter::unwrappedRepository() const
     }
     return defaultRepository();
 }
+
+#include "moc_kquicksyntaxhighlighter.cpp"

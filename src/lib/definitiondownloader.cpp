@@ -178,3 +178,5 @@ void DefinitionDownloader::start()
         d->definitionListDownloadFinished(reply);
     });
 }
+
+#include "moc_definitiondownloader.cpp"

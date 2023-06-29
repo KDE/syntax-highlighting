@@ -196,3 +196,5 @@ void SyntaxHighlighter::applyFolding(int offset, int length, FoldingRegion regio
         d->foldingRegions.push_back(region);
     }
 }
+
+#include "moc_syntaxhighlighter.cpp"

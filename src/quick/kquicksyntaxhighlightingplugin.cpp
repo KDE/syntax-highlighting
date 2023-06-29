@@ -42,3 +42,5 @@ void KQuickSyntaxHighlightingPlugin::registerTypes(const char *uri)
         return defaultRepository();
     });
 }
+
+#include "moc_kquicksyntaxhighlightingplugin.cpp"

@@ -195,3 +195,5 @@ void RepositoryTestBase::definitionsForMimeTypeTest(const QString &mimeTypeName,
 {
     verifyDefinitionList(m_repo.definitionsForMimeType(mimeTypeName), definitionNames);
 }
+
+#include "moc_repository_test_base.cpp"

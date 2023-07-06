@@ -132,6 +132,10 @@ async def func2():
 assert cond, \
     "bla bla"
 
+print('dsdsa' \
+      'dsdasw'
+      'dsadsa')
+
 "\\\\\\\\\\ENSURE THAT THIS AND THE FOLLOWING LINES ARE AT THE END OF THE FILE\\\\\\\\\\ \
 "
 a = 'otherwise the next line will be

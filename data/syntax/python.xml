@@ -16,15 +16,15 @@
 		[Special cases: %prog and %default - see http://docs.python.org/library/optparse.html]
 	-->
 	<!ENTITY strsubstitution_py2 "&#37;(?:(?:\([a-zA-Z0-9_]+\))?[#0\- +]?(?:[1-9][0-9]*|\*)?(?:\.(?:[1-9][0-9]*|\*))?[hlL]?[crsdiouxXeEfFgG&#37;]|prog|default)">
-	<!-- http://docs.python.org/2/library/string.html#format-string-syntax:
+	<!-- http://docs.python.org/3/library/string.html#format-string-syntax:
 	     replacement_field ::=  "{" [field_name] ["!" conversion] [":" format_spec] "}"
 	     field_name        ::=  arg_name ("." attribute_name | "[" element_index "]")*
 	     arg_name          ::=  [identifier | integer]
 	     attribute_name    ::=  identifier
 	     element_index     ::=  integer | index_string
 	     index_string      ::=  <any source character except "]"> +
-	     conversion        ::=  "r" | "s"
-	     format_spec       ::=  [[fill]align][sign][#][0][width][,][.precision][type]
+	     conversion        ::=  "r" | "s" | "a"
+	     format_spec       ::=  [[fill]align][sign][z][#][0][width][_,][.precision][type]
 	     fill              ::=  <any character>
 	     align             ::=  "<" | ">" | "=" | "^"
 	     sign              ::=  "+" | "-" | " "
@@ -32,7 +32,8 @@
 	     precision         ::=  integer
 	     type              ::=  "b" | "c" | "d" | "e" | "E" | "f" | "F" | "g" | "G" | "n" | "o" | "s" | "x" | "X" | "%"
 	-->
-	<!ENTITY strsubstitution_py3 "\{(?:(?:[a-zA-Z0-9_]+|[0-9]+)(?:\.[a-zA-Z0-9_]+|\[[^ \]]+\])*)?(?:![rs])?(?::(?:[^}]?[&lt;&gt;=^])?[ +-]?#?0?[0-9]*(?:\.[0-9]+)?[bcdeEfFgGnosxX&#37;]?)?\}">
+	<!ENTITY format_spec "(?:![rsa])?(?::(?:[^}]?[&lt;&gt;=^])?[ +-]?z?#?0?[0-9]*[_,]?(?:\.[0-9]+)?[bcdeEfFgGnosxX&#37;]?)?">
+	<!ENTITY strsubstitution_py3 "\{(?:(?:[a-zA-Z0-9_]+|[0-9]+)(?:\.[a-zA-Z0-9_]+|\[[^ \]]+\])*)?&format_spec;?\}">
 
 	<!ENTITY rawString "(?:ru|u?r|)(?:'(?:[^']++|\\')*+'|&quot;(?:[^&quot;]++|\\&quot;)*+&quot;)">
 	<!ENTITY formatString "(?:r?f|fr?)(?:'(?:[^'{]++|\\'|\{\{|\{[^}]++\})*+'|&quot;(?:[^&quot;]++|\\&quot;|\{\{|\{[^}]*+\})*+&quot;)">
@@ -653,8 +654,7 @@
 			</context>
 			<context name="String Interpolation" attribute="String Substitution" lineEndContext="#stay">
 				<DetectChar attribute="Error" char="\" context="#pop"/>
-				<!-- format specifiers: [[fill]align][sign][#][0][minimumwidth][.precision][type] -->
-				<RegExpr attribute="String Substitution" String="(?:![rsa])?(?::(?:[^}]?[&lt;&gt;=^])?[ +-]?#?0?[0-9]*(?:\.[0-9]+)?[bcdeEfFgGnosxX%]?)?\}" context="#pop"/>
+				<RegExpr attribute="String Substitution" String="&format_spec;\}" context="#pop"/>
 				<IncludeRules context="Normal"/> <!-- TODO: create expression context instead -->
 			</context>
 

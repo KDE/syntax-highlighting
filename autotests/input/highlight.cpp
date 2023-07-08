@@ -27,7 +27,11 @@ three
 # define MULTILINE_MACRO_TEXT                        \
     /* NOTE The contents of macro is too green :D */ \
     char const s[] = "a\\b"                          \
-    "c\nd"
+    "c\nd"                                           \
+    std::uint##x##_t                                 \
+    std::vector/**/<T>                               \
+    std::chrono::/*milli*/seconds
+
 
 # define VARIADIC(a, ...)          \
     f(a##a)                        \
@@ -408,10 +412,12 @@ static const char* rawString2 = R"ab(string\nstring%s)ab ")ab";
 static const char* rawString3 = R"ab(string
 string%)ab";
 " %d %df fd" U"ds %d" R"(a%d)";
+"\x{12343} \x{1} \o{12121} \u{1221a} \N{LATIN CAPITAL LETTER A WITH MACRON}"
   "\x123xsk";
  u"\x123xsk";
 // error
 u8"\x123xsk";
+"\x{123x43} \o{121821} \u{12x21as} \N{LATIN CAPITAL letter A WITH MACRON}"
 
 // printf format
 "a%10sa%-10sa%*sa%-10.*sa%-*.*sa"

@@ -23,7 +23,7 @@
    * QML
    * CoffeeScript (embedded)
 -->
-<language name="JavaScript" version="24" kateversion="5.53" section="Scripts" extensions="*.js;*.mjs;*.cjs;*.kwinscript;*.julius"
+<language name="JavaScript" version="25" kateversion="5.53" section="Scripts" extensions="*.js;*.mjs;*.cjs;*.kwinscript;*.julius"
           mimetype="text/x-javascript;application/x-javascript;application/javascript;text/javascript" indenter="cstyle"
           author="Anders Lund (anders@alweb.dk), Joseph Wenninger (jowenn@kde.org), Whitehawk Stormchaser (zerokode@gmx.net)" license="">
 
@@ -1653,34 +1653,33 @@
       <!-- NOTE: These IncludeRules rules, except BuiltInClasses and FindBrackets are included in qml.xml -->
       <context attribute="Normal Text" lineEndContext="#stay" name="Normal">
         <DetectSpaces/>
+        <Detect2Chars attribute="Special Operators" context="#stay" char="=" char1="&gt;" />
+        <!-- symbol that is not used in any other context -->
+        <AnyChar attribute="Symbol" String=":!%&amp;+,-*=&gt;?|~^;" />
+        <DetectChar context="NoRegExp" char=")" />
+        <IncludeRules context="FindBrackets" />
+        <IncludeRules context="FindComments" />
         <IncludeRules context="FindNumbers" />
+        <IncludeRules context="FindMembers" />
         <IncludeRules context="FindKeywords" />
         <IncludeRules context="FindStrings" />
         <IncludeRules context="BuiltInClasses" />
         <IncludeRules context="FindObjectMembersAndFunctions" />
-        <IncludeRules context="FindBrackets" />
-        <IncludeRules context="JSBase" />
+        <IncludeRules context="FindIdentifier" />
+        <IncludeRules context="FindE4X" />
+        <IncludeRules context="FindRegex" />
       </context>
 
       <!-- Base Syntax. Used by the TypeScript highlighter. -->
       <context attribute="Normal Text" lineEndContext="#stay" name="JSBase">
-        <AnyChar context="NoRegExp" String="])" />
-        <!--DetectIdentifier-->
-        <!-- Do not start RegExp after non-ASCII characters (see bug #393633) -->
-        <RegExpr context="NoRegExp" String="&identifier;" />
-
-        <IncludeRules context="FindComments" />
-
-        <!-- E4X extension (=xml inside JavaScript), see bug #373713 -->
-        <RegExpr attribute="Symbol" context="#stay" String="&lt;(?=/\*|//)" />
-        <Detect2Chars attribute="Symbol" context="NoRegExp" char="&lt;" char1="/" />
-        <Detect2Chars attribute="Symbol" context="NoRegExp" char="/" char1="&gt;" />
-
-        <DetectChar attribute="Regular Expression" context="(regex caret first check)" char="/" />
-
         <!-- NOTE: The brackets {}()[] are highlighted as Normal Text. -->
         <Detect2Chars attribute="Special Operators" context="#stay" char="=" char1="&gt;" />
-        <AnyChar attribute="Symbol" String=":!%&amp;+,-/.*&lt;=&gt;?|~^&#59;" />
+        <AnyChar attribute="Symbol" String=".:!%&amp;+,-*=&gt;?|~^;" />
+
+        <IncludeRules context="FindIdentifier" />
+        <IncludeRules context="FindE4X" />
+        <IncludeRules context="FindComments" />
+        <IncludeRules context="FindRegex" />
       </context>
 
 
@@ -1702,6 +1701,23 @@
         <!-- Detect valid Regular expression in single line -->
         <RegExpr attribute="Regular Expression" context="#pop#pop!(regex caret first check)" String="/(?=(?:[^/\\\[]|\\.|\[(?:[^\]\\]|\\.)+\])+/(?:[gimsuy]+(?!\s*[\w$])|(?![/\*])|(?=/\*)))" />
         <DetectChar attribute="Symbol" context="#pop#pop" char="/" />
+      </context>
+
+      <!-- E4X extension (=xml inside JavaScript), see bug #373713 -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="FindE4X">
+        <RegExpr attribute="Symbol" context="#stay" String="&lt;(?=[^/]|/\*|//|$)" />
+        <Detect2Chars attribute="Symbol" context="NoRegExp" char="&lt;" char1="/" />
+        <Detect2Chars attribute="Symbol" context="NoRegExp" char="/" char1="&gt;" />
+      </context>
+
+      <!--DetectIdentifier-->
+      <context attribute="Normal Text" lineEndContext="#stay" name="FindIdentifier">
+        <!-- Do not start RegExp after non-ASCII characters (see bug #393633) -->
+        <RegExpr context="NoRegExp" String="&identifier;" />
+      </context>
+
+      <context attribute="Normal Text" lineEndContext="#stay" name="FindRegex">
+        <DetectChar attribute="Regular Expression" context="(regex caret first check)" char="/" />
       </context>
 
       <!-- Object, within { ... } -->
@@ -1750,15 +1766,24 @@
       <!-- Numbers -->
       <context attribute="Normal Text" lineEndContext="#stay" name="FindNumbers">
         <RegExpr attribute="Float" context="NoRegExp" String="\b&float;" />
-        <RegExpr attribute="Hex" context="NumericSufix" String="\b0[xX][0-9a-fA-F]++(_[0-9a-fA-F]++)*+"/>
+        <AnyChar context="Integer" String="0123456789" lookAhead="1"/>
+      </context>
+      <context attribute="Normal Text" lineEndContext="#stay" name="Integer">
+        <RegExpr attribute="Hex" context="#pop!NumericSufix" String="\b0[xX][0-9a-fA-F]++(_[0-9a-fA-F]++)*+"/>
         <!-- 07 is octal, 08 is decimal -->
-        <RegExpr attribute="Octal" context="NumericSufix" String="\b0([oO][0-7]++(_[0-7]++)*+|0*+[1-7][0-7]*+(_[0-7]++)*+(?!_?[89]))" />
-        <RegExpr attribute="Binary" context="NumericSufix" String="\b0[bB][01]++(_[01]++)*+" />
-        <RegExpr attribute="Decimal" context="NumericSufix" String="\b0*+([1-9][0-9]*+(_[0-9]++)*+)?"/>
+        <RegExpr attribute="Octal" context="#pop!NumericSufix" String="\b0([oO][0-7]++(_[0-7]++)*+|0*+[1-7][0-7]*+(_[0-7]++)*+(?!_?[89]))" />
+        <RegExpr attribute="Binary" context="#pop!NumericSufix" String="\b0[bB][01]++(_[01]++)*+" />
+        <!-- 0000_8 is invalid -->
+        <RegExpr attribute="Decimal" context="#pop!NumericSufix" String="\b0*+([1-9][0-9]*+(_[0-9]++)*+)?"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#pop" name="NumericSufix" fallthrough="true" fallthroughContext="#pop!NoRegExp">
         <DetectChar attribute="Normal Text" context="#pop!NoRegExp" char="n" />
         <RegExpr attribute="Error" context="#pop!NoRegExp" String="[0-9]*(&identifier;)?"/>
+      </context>
+
+      <!-- Find Objects Member -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="FindMembers">
+        <DetectChar attribute="Symbol" context="Object Member" char="." lookAhead="true" />
       </context>
 
       <!-- Find Objects Member and Functions -->
@@ -1769,7 +1794,6 @@
         <RegExpr attribute="Function Name" context="Function" String="(&identifier;)(?=\s*\()" lookAhead="true" />
         <IncludeRules context="BuiltInConstants" />
         <RegExpr attribute="Objects" context="Object Member" String="&identifier;(?=\s*\.)" />
-        <DetectChar attribute="Symbol" context="Object Member" char="." lookAhead="true" />
       </context>
       <context attribute="Normal Text" lineEndContext="#pop" name="Function">
         <keyword attribute="Function (Built-in)" context="#pop" String="functions" />

@@ -10,9 +10,36 @@ function fun()
 
 class MyClass; // reserved keywords
 
+class ClassWithPrivateField {
+    static #privateStaticField = 42;
+
+    static publicStaticMethod() {
+        return ClassWithPrivateField.#privateStaticField;
+    }
+
+    #message;
+
+    #privateMethod() {
+        return 42;
+    }
+
+    publicMethod() {
+        return this.#privateMethod();
+    }
+
+    get #decoratedMessage() {
+        return this.#message
+    }
+    set #decoratedMessage(msg) {
+        this.#message = msg;
+    }
+}
+
 // Member objects: text after "."
 object.property instanceof Number;
 iden1.iden2  . iden3.class class;
+iden1?.iden2 . iden3.class class;
+iden1.#iden2 . iden3.class class;
 
 var escapes = "aa\b\n\0a\"a\x12a\32a\u{123}a\$\%\ \#\y\aaa\
 aaa";

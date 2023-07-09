@@ -1650,11 +1650,12 @@
       <context name="Shebang Line" attribute="Comment" lineEndContext="#pop!Normal" />
 
       <!-- Normal Syntax of JavaScript. -->
-      <!-- NOTE: These IncludeRules rules, except BuiltInClasses and FindBrackets are included in qml.xml -->
+      <!-- NOTE: These IncludeRules rules, except BuiltInClasses, FindBrackets, FindPrivateOperator, FindE4X are included in qml.xml -->
       <context attribute="Normal Text" lineEndContext="#stay" name="Normal">
         <DetectSpaces/>
         <IncludeRules context="FindSomeSymbols" />
         <IncludeRules context="FindBrackets" />
+        <IncludeRules context="FindPrivateOperator" />
         <IncludeRules context="FindComments" />
         <IncludeRules context="FindNumbers" />
         <IncludeRules context="FindMembers" />
@@ -1754,6 +1755,11 @@
         <IncludeRules context="Normal" />
       </context>
 
+      <!-- '#' in "#identifier" -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="FindPrivateOperator">
+        <DetectChar attribute="Private Member Operator" char="#" />
+      </context>
+
       <!-- Keywords -->
       <context attribute="Normal Text" lineEndContext="#stay" name="FindKeywords">
         <WordDetect attribute="Keyword" context="FunctionDeclaration" String="function" />
@@ -1765,6 +1771,7 @@
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="FunctionDeclaration" fallthrough="true" fallthroughContext="#pop">
         <DetectSpaces />
+        <IncludeRules context="FindPrivateOperator" />
         <RegExpr attribute="Function Declaration" context="#pop" String="&identifier;(?=\s*\()" /> <!-- NoRegExp -->
         <IncludeRules context="FindComments" />
       </context>
@@ -1816,6 +1823,7 @@
       </context>
 
       <context attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop" name="Object Member">
+        <IncludeRules context="FindPrivateOperator" />
         <IncludeRules context="DefaultMemberObject" />
         <!-- Common functions and properties, only for autocomplete keywords -->
         <keyword attribute="Object Member" context="#pop!NoRegExp" String="dom_property" />
@@ -2069,6 +2077,7 @@
       <itemData name="Comment"      defStyleNum="dsComment" />
       <itemData name="Symbol"       defStyleNum="dsOperator" spellChecking="false" />
       <itemData name="Special Operators" defStyleNum="dsKeyword" spellChecking="false" />
+      <itemData name="Private Member Operator" defStyleNum="dsNormal" spellChecking="false" />
       <itemData name="Regular Expression" defStyleNum="dsSpecialString" spellChecking="false" />
       <itemData name="Pattern Internal Operator" defStyleNum="dsSpecialChar" spellChecking="false" />
       <itemData name="Pattern Character Class" defStyleNum="dsSpecialChar" spellChecking="false" />

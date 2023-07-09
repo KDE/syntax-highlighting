@@ -1653,9 +1653,7 @@
       <!-- NOTE: These IncludeRules rules, except BuiltInClasses and FindBrackets are included in qml.xml -->
       <context attribute="Normal Text" lineEndContext="#stay" name="Normal">
         <DetectSpaces/>
-        <Detect2Chars attribute="Special Operators" context="#stay" char="=" char1="&gt;" />
-        <!-- symbol that is not used in any other context -->
-        <AnyChar attribute="Symbol" String=":!%&amp;+,-*=&gt;?|~^;" />
+        <IncludeRules context="FindSomeSymbols" />
         <DetectChar context="NoRegExp" char=")" />
         <IncludeRules context="FindBrackets" />
         <IncludeRules context="FindComments" />
@@ -1669,17 +1667,24 @@
         <IncludeRules context="FindE4X" />
         <IncludeRules context="FindRegex" />
       </context>
+      <context attribute="Normal Text" lineEndContext="#stay" name="FindSomeSymbols">
+        <IncludeRules context="FindArrowFunction" />
+        <!-- symbol that is not used in any other context (fast path) -->
+        <AnyChar attribute="Symbol" String=":!%&amp;+,-*=&gt;?|~^;" />
+      </context>
 
       <!-- Base Syntax. Used by the TypeScript highlighter. -->
       <context attribute="Normal Text" lineEndContext="#stay" name="JSBase">
-        <!-- NOTE: The brackets {}()[] are highlighted as Normal Text. -->
-        <Detect2Chars attribute="Special Operators" context="#stay" char="=" char1="&gt;" />
-        <AnyChar attribute="Symbol" String=".:!%&amp;+,-*=&gt;?|~^;" />
-
+        <DetectChar attribute="Symbol" char="?" />
         <IncludeRules context="FindIdentifier" />
         <IncludeRules context="FindE4X" />
         <IncludeRules context="FindComments" />
         <IncludeRules context="FindRegex" />
+      </context>
+      <context attribute="Normal Text" lineEndContext="#stay" name="JSBaseSomeSymboles">
+        <IncludeRules context="FindArrowFunction" />
+        <!-- symbol that is not used in any other context (fast path) -->
+        <AnyChar attribute="Symbol" String="!%&amp;+,-*=&gt;|~^;" />
       </context>
 
 
@@ -1782,6 +1787,11 @@
       </context>
       <context attribute="Normal Text" lineEndContext="#pop" name="NumericSufixError">
         <RegExpr attribute="Error" context="#pop!NoRegExp" String="[0-9]*(&identifier;)?"/>
+      </context>
+
+      <!-- Find => -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="FindArrowFunction">
+        <Detect2Chars attribute="Special Operators" context="#stay" char="=" char1="&gt;" />
       </context>
 
       <!-- Find Objects Member -->

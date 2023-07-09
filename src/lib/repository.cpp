@@ -205,11 +205,6 @@ Theme Repository::themeForPalette(const QPalette &palette) const
     return defaultTheme((base.lightness() < 128) ? KSyntaxHighlighting::Repository::DarkTheme : KSyntaxHighlighting::Repository::LightTheme);
 }
 
-Theme Repository::themeForPalette(const QPalette &palette)
-{
-    return std::as_const(*this).themeForPalette(palette);
-}
-
 void RepositoryPrivate::load(Repository *repo)
 {
     // always add invalid default "None" highlighting

@@ -238,14 +238,6 @@ public:
     Theme themeForPalette(const QPalette &palette) const;
 
     /**
-     * Returns the best matching theme for the given palette
-     * @since 5.77
-     *
-     * KF6: remove in favor of const variant
-     **/
-    Theme themeForPalette(const QPalette &palette);
-
-    /**
      * Reloads the repository.
      * This is a moderately expensive operations and should thus only be
      * triggered when the installed syntax definition files changed.

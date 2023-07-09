@@ -466,6 +466,12 @@ h
 <<"'" cat
 bla
 '
+cat <<heredoc
+bla bla
+heredoc
+cat <<heredoc -a
+bla bla
+heredoc
 r=$(xxx $@ 2>&1)
 
 # branches

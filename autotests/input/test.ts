@@ -35,7 +35,7 @@ import URL = url.URL;
 import { Readable, Writable } from "stream";
 import { isBuffer, isString, isObject } from "util";
 
-const port = 8__88___8;
+const port = 8_88_8;
 const baseUrl = new URL(`http://localhost:${port}/`);
 const rootDir = path.dirname(__dirname);
 
@@ -116,13 +116,24 @@ var h = 1.1;
 var i = 1.;
 var j = .1;
 var k =  1;
-var l = 1__.e+3_22 | .2____e2 | 0o1_23 | 11__. ;
+var l = 1_2.e+3_22 | .2e2 | 0o1_23 | 11.2 | 08;
 
 // Bigint
 const binBig = 0b101n;
 const octBig = 0o567n;
 const hexBig = 0xC0Bn;
 const decBig = 123n;
+
+// Invalid numbers
+var l = 0xA1t;
+var m = 0b0123;
+var n = 0o29;
+var n = 0_7;
+var n = 1___1;
+var n = 1__;
+var n = 11__.;
+var n = 1__.e+3_22;
+var n = .2_e2;
 
 // Types
 let a: null = null;

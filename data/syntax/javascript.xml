@@ -7,7 +7,7 @@
   <!ENTITY DecimalIntegerLiteral "(0|[1-9][0-9]*+(_[0-9]++)*+)">
   <!ENTITY DecimalDigits "([0-9]++(_[0-9]++)*+)">
   <!ENTITY ExponentPart "([eE][+-]?&DecimalDigits;)">
-  <!ENTITY float "&DecimalIntegerLiteral;(\.&DecimalDigits;?&ExponentPart;?|&ExponentPart;)|\.&DecimalDigits;&ExponentPart;?">
+  <!ENTITY float "\b&DecimalIntegerLiteral;(\.&DecimalDigits;?&ExponentPart;?|&ExponentPart;)|\.&DecimalDigits;&ExponentPart;?">
 ]>
 
 <!--
@@ -1765,7 +1765,7 @@
 
       <!-- Numbers -->
       <context attribute="Normal Text" lineEndContext="#stay" name="FindNumbers">
-        <RegExpr attribute="Float" context="NoRegExp" String="\b&float;" />
+        <RegExpr attribute="Float" context="NoRegExp" String="&float;" />
         <AnyChar context="Integer" String="0123456789" lookAhead="1"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="Integer">
@@ -1778,6 +1778,9 @@
       </context>
       <context attribute="Normal Text" lineEndContext="#pop" name="NumericSufix" fallthrough="true" fallthroughContext="#pop!NoRegExp">
         <DetectChar attribute="Normal Text" context="#pop!NoRegExp" char="n" />
+        <IncludeRules context="NumericSufixError" />
+      </context>
+      <context attribute="Normal Text" lineEndContext="#pop" name="NumericSufixError">
         <RegExpr attribute="Error" context="#pop!NoRegExp" String="[0-9]*(&identifier;)?"/>
       </context>
 

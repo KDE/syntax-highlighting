@@ -13,6 +13,12 @@
 	<!ENTITY functionSuffix "(?=\s*(?:&lt;(?:\{(?:[^\{\}]|\{[^\{\}]*\})*\}|\((?:[^\(\)]|\([^\(\)]*\))*\)|\[(?:[^\[\]]|\[[^\[\]]*\])*\]|'(?:\\.|[^'])*'|&quot;(?:\\.|[^&quot;])*&quot;|`(?:\\.|[^`])*`|[^&lt;&gt;]|&lt;.*&gt;)*&gt;)?\()">
 
 	<!ENTITY codeContent    "&quot;(?:[^&quot;]|\\.)*&quot;|'(?:[^']|\\.)*'|`(?:[^`]|\\.)`|/\*.*\*/|/(?:[^/\\\[]|\\.|\[(?:[^\]\\]|\\.)+\])+/">
+
+  <!-- https://tc39.es/ecma262/#sec-literals-numeric-literals -->
+  <!ENTITY DecimalIntegerLiteral "(0|[1-9][0-9]*+(_[0-9]++)*+)">
+  <!ENTITY DecimalDigits "([0-9]++(_[0-9]++)*+)">
+  <!ENTITY ExponentPart "([eE][+-]?&DecimalDigits;)">
+  <!ENTITY float "\b&DecimalIntegerLiteral;(\.&DecimalDigits;?&ExponentPart;?|&ExponentPart;)|\.&DecimalDigits;&ExponentPart;?">
 ]>
 
 <!--
@@ -61,7 +67,7 @@
 -->
 
 <language name="TypeScript"
-          version="16"
+          version="17"
           kateversion="5.53"
           section="Scripts"
           extensions="*.ts;*.mts;*.cts"
@@ -375,11 +381,21 @@
 
 		<!-- Numbers -->
 		<context name="FindNumbers" attribute="Normal Text" lineEndContext="#stay">
-			<RegExpr context="NoRegExp" attribute="Hexadecimal" String="\b0[xX][\da-fA-F][\da-fA-F_]*&numSuffix;" />
-			<RegExpr context="NoRegExp" attribute="Binary" String="\b0[bB][01][01_]*&numSuffix;" />
-			<RegExpr context="NoRegExp" attribute="Float" String="(?:\b\d[\d_]*\.?|(?:\b\d[\d_]*)?\.\d[\d_]*)[eE][\+\-]?\d[\d_]*&numSuffix;|(?:\.\d[\d_]*|\b\d[\d_]*\.(?:\d[\d_]*)?)&numSuffix;" />
-			<RegExpr context="NoRegExp" attribute="Octal" String="\b0[oO]?[0-7][0-7_]*&numSuffix;" />
-			<RegExpr context="NoRegExp" attribute="Decimal" String="\b\d[\d_]*&numSuffix;" />
+			<RegExpr attribute="Float" context="NoRegExp" String="&float;" />
+			<AnyChar context="Integer" String="0123456789" lookAhead="1"/>
+		</context>
+		<!-- same as JS, but with Hexadecimal instead of Hex -->
+		<context name="Integer" attribute="Normal Text" lineEndContext="#stay">
+			<RegExpr attribute="Hexadecimal" context="#pop!NumericSufix" String="\b0[xX][0-9a-fA-F]++(_[0-9a-fA-F]++)*+"/>
+			<!-- 07 is octal, 08 is decimal -->
+			<RegExpr attribute="Octal" context="#pop!NumericSufix" String="\b0([oO][0-7]++(_[0-7]++)*+|0*+[1-7][0-7]*+(_[0-7]++)*+(?!_?[89]))" />
+			<RegExpr attribute="Binary" context="#pop!NumericSufix" String="\b0[bB][01]++(_[01]++)*+" />
+			<!-- 0000_8 is invalid -->
+			<RegExpr attribute="Decimal" context="#pop!NumericSufix" String="\b0*+([1-9][0-9]*+(_[0-9]++)*+)?"/>
+		</context>
+		<context attribute="Normal Text" lineEndContext="#pop" name="NumericSufix" fallthrough="true" fallthroughContext="#pop!NoRegExp">
+			<DetectChar attribute="Normal Text" context="#pop!NoRegExp" char="n" />
+			<IncludeRules context="NumericSufixError##JavaScript" />
 		</context>
 
 		<!-- Function Name -->
@@ -748,4 +764,4 @@
 </general>
 
 </language>
-<!-- kate: replace-tabs off; tab-width 3; indent-width 3; remove-trailing-spaces mod; dynamic-word-wrap off; -->
+<!-- kate: replace-tabs off; tab-width 3; indent-width 3; remove-trailing-spaces mod; -->

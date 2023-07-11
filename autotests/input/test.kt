@@ -17,3 +17,36 @@ abc
 fun add(a:Int, b:Int, c:Int = 0, d:Float = 12e10F): Int {
     return a + b + c + d
 } 
+
+public class MyTest {
+    lateinit var subject: TestSubject
+
+    val dyn: dynamic
+
+    @get:Rule val tempFolder = TemporaryFolder()
+
+    @set:[Inject VisibleForTesting]
+    var collaborator: Collaborator
+
+    @SetUp fun setup() {
+        subject = TestSubject()
+    }
+
+    fun @receiver:Fancy String.myExtension() {
+
+    }
+
+    @Test fun test() {
+        subject.method()  // dereference directly
+    }
+}
+
+import /* comment */ foo.Foo // comment
+class /* comment */ Foo {
+    fun /* comment */ foo(/* comment */) {
+
+    }
+
+    val /* comment */ bar = 1
+    var /* comment */ baz = 2
+}

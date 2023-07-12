@@ -82,4 +82,13 @@ Rectangle {
         objectName: 'single quote'
         objectName2: a ? b : c;
     }
+
+    Rectangle {
+        // comment
+        id: sub /* comment */
+        /* comment */width: 0x10
+        height /* comment */: 007
+        objectName: /* comment */ 'single quote'
+        objectName2: a ? b : c  /* comment */;
+    }
 }

@@ -5,7 +5,7 @@
 <Normal></Normal><br/>
 <SpecialTarget>.PHONY:</SpecialTarget><Prereq> all</Prereq><br/>
 <Normal></Normal><br/>
-<Target>all:</Target><Prereq> target</Prereq><br/>
+<Target>all</Target><TargetSeparator>:</TargetSeparator><Prereq> target</Prereq><br/>
 <Normal></Normal><br/>
 <Variable>foo</Variable><Normal> </Normal><Operator>=</Operator><String> bar </String><Operator>$(</Operator><Variable>var</Variable><Operator>)</Operator><String> </String><Operator>\</Operator><br/>
 <String>    </String><Operator>$(</Operator><Variable>baz</Variable><Operator>)</Operator><String> quux</String><br/>
@@ -18,24 +18,35 @@
 <Normal>    </Normal><Variable>libs</Variable><Operator>=$(</Operator><Variable>normal_libs</Variable><Operator>)</Operator><br/>
 <ControlFlow>endif</ControlFlow><br/>
 <Normal></Normal><br/>
-<Target>target1:</Target><br/>
+<Target>target1</Target><TargetSeparator>:</TargetSeparator><br/>
 <Error>        </Error><Normal>error</Normal><br/>
 <Normal></Normal><br/>
-<Target>target2:</Target><Prereq> bla.cpp </Prereq><Operator>$@</Operator><br/>
+<Target>target2</Target><TargetSeparator>:</TargetSeparator><Prereq> bla.cpp </Prereq><Operator>$@</Operator><br/>
 <Normal>	</Normal><Operator>$(</Operator><Variable>CC</Variable><Operator>)</Operator><Normal> bla.c -o bla.o</Normal><br/>
 <Normal>	</Normal><Operator>$(</Operator><Variable>CC</Variable><Operator>)</Operator><Normal> bla.o </Normal><Operator>$<</Operator><Normal> </Normal><Operator>\</Operator><br/>
 <Normal>	    </Normal><Operator>-</Operator><Silent>o bla.exe</Silent><br/>
-<Normal>	</Normal><Operator>@</Operator><Silent>echo </Silent><String>"hello"</String><br/>
+<Normal>	</Normal><Operator>@</Operator><Silent>echo </Silent><String>"hello"</String><Silent> </Silent><Operator>\</Operator><br/>
+<Silent>  bla bla</Silent><br/>
+<Normal>	echo </Normal><String>"hello"</String><Normal> </Normal><Operator>\</Operator><br/>
+<Normal>  bla bla</Normal><br/>
 <Normal></Normal><br/>
-<Target>target3:</Target><Prereq> </Prereq><Operator>;</Operator><Normal> </Normal><Operator>@</Operator><Silent>echo ’hello </Silent><Operator>\</Operator><br/>
+<Target>target3</Target><TargetSeparator>:</TargetSeparator><Prereq> </Prereq><Operator>;</Operator><Normal> </Normal><Operator>@</Operator><Silent>echo ’hello </Silent><Operator>\</Operator><br/>
 <Silent>world’ ; echo </Silent><String>"hello </String><Operator>\</Operator><br/>
 <String>world"</String><br/>
 <Normal>	</Normal><Operator>@</Operator><Silent>echo </Silent><String>"hello"</String><br/>
 <Normal></Normal><br/>
-<Target>target4:</Target><Prereq> </Prereq><Operator>;</Operator><Normal> echo ’hello </Normal><Operator>\</Operator><br/>
+<Target>target4</Target><TargetSeparator>:</TargetSeparator><Prereq> </Prereq><Operator>;</Operator><Normal> echo ’hello </Normal><Operator>\</Operator><br/>
 <Normal>world’ ; echo </Normal><String>"hello </String><Operator>\</Operator><br/>
 <String>world"</String><br/>
 <Normal>	echo </Normal><String>"hello"</String><br/>
+<Normal></Normal><br/>
+<Target>target5 </Target><Operator>\</Operator><br/>
+<Target>target6 </Target><Operator>\</Operator><br/>
+<Target>target7 </Target><TargetSeparator>&::</TargetSeparator><br/>
+<Normal>	</Normal><Operator>@</Operator><Silent>echo </Silent><String>"hello"</String><br/>
+<Comment># this should not break the rule</Comment><br/>
+<Normal>  </Normal><Comment># ifndef is a command</Comment><br/>
+<Normal>	ifndef</Normal><br/>
 <Normal></Normal><br/>
 <Comment># String Substitution</Comment><br/>
 <Variable>VAR</Variable><Normal> </Normal><Operator>:=</Operator><String> </String><Operator>$(</Operator><Variable>ANOTHER_VAR</Variable><RealOperator>:</RealOperator><VarModifier>%</VarModifier><RealOperator>=</RealOperator><VarModifier>%+1</VarModifier><Operator>)</Operator><br/>
@@ -57,15 +68,26 @@
 <Normal>  </Normal><Variable>var</Variable><Normal> </Normal><Operator>=</Operator><String> value\#nocomment</String><br/>
 <Normal>  </Normal><Variable>var</Variable><Normal> </Normal><Operator>=</Operator><String> value</String><Comment>#comment</Comment><br/>
 <Normal>  </Normal><Variable>var</Variable><Normal> </Normal><Operator>=</Operator><String> value;value2</String><br/>
-<Keyword>override</Keyword><Normal> </Normal><Variable>var</Variable><Normal> </Normal><Operator>=</Operator><String> a</String><br/>
+<Keyword>override</Keyword><Normal> </Normal><Variable>var </Variable><Operator>=</Operator><String> a</String><br/>
 <Normal></Normal><br/>
 <Keyword>define</Keyword><Normal> </Normal><Variable>var</Variable><Normal> </Normal><Operator>:::=</Operator><br/>
-<Normal>bar</Normal><br/>
+<String>bar</String><br/>
 <Keyword>endef</Keyword><br/>
 <Normal></Normal><br/>
 <Keyword>override</Keyword><Normal> </Normal><Keyword>define</Keyword><Normal> </Normal><Variable>var</Variable><Normal> </Normal><Operator>:::=</Operator><br/>
-<Normal>bar</Normal><br/>
+<String>bar</String><br/>
 <Keyword>endef</Keyword><br/>
+<Normal></Normal><br/>
+<Keyword>undefine</Keyword><Variable> var</Variable><br/>
+<Keyword>override</Keyword><Normal> </Normal><Keyword>undefine</Keyword><Variable> var</Variable><br/>
+<Normal></Normal><br/>
+<Keyword>export</Keyword><Variable> foo bar</Variable><br/>
+<Keyword>export</Keyword><Variable> foo </Variable><Operator>=</Operator><String> bar</String><br/>
+<Keyword>unexport</Keyword><Variable> foo bar</Variable><br/>
+<Normal></Normal><br/>
+<Target>prog</Target><TargetSeparator>:</TargetSeparator><Prereq> </Prereq><Keyword>private</Keyword><Variable> EXTRA_CFLAGS </Variable><Operator>=</Operator><String> -L/usr/local/lib</String><br/>
+<Target>prog</Target><TargetSeparator>:</TargetSeparator><Prereq> </Prereq><Variable>CFLAGS</Variable><Normal> </Normal><Operator>=</Operator><String> -g</String><br/>
+<Target>prog</Target><TargetSeparator>:</TargetSeparator><Prereq> a.o b.o</Prereq><br/>
 <Normal></Normal><br/>
 <Comment># Conditionals</Comment><br/>
 <Variable>bar</Variable><Normal> </Normal><Operator>=</Operator><br/>
@@ -77,7 +99,7 @@
 <ControlFlow>endif</ControlFlow><br/>
 <Normal></Normal><br/>
 <Variable>error_type</Variable><Normal> </Normal><Operator>:=</Operator><String> 0</String><br/>
-<Target>check:</Target><br/>
+<Target>check</Target><TargetSeparator>:</TargetSeparator><br/>
 <ControlFlow>ifeq</ControlFlow><Normal> (</Normal><Operator>$(</Operator><Variable>error_type</Variable><Operator>)</Operator><Normal>,0)</Normal><br/>
 <ControlFlow>else</ControlFlow><Normal> </Normal><ControlFlow>ifeq</ControlFlow><Normal> (</Normal><Operator>$(</Operator><Variable>error_type</Variable><Operator>)</Operator><Normal>,1)</Normal><br/>
 <ControlFlow>else</ControlFlow><Normal> </Normal><ControlFlow>ifeq</ControlFlow><Normal> (</Normal><Operator>$(</Operator><Variable>error_type</Variable><Operator>)</Operator><Normal>,2)</Normal><br/>

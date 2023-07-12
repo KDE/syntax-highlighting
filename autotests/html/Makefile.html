@@ -11,7 +11,7 @@
 
 <span style="color:#006e28;font-weight:bold;">.PHONY:</span><span style="color:#0057ae;"> all</span>
 
-<span style="color:#b08000;">all:</span><span style="color:#0057ae;"> target</span>
+<span style="color:#b08000;">all</span><span style="color:#b08000;">:</span><span style="color:#0057ae;"> target</span>
 
 <span style="color:#0057ae;">foo</span> <span style="color:#924c9d;">=</span><span style="color:#bf0303;"> bar </span><span style="color:#924c9d;">$(</span><span style="color:#0057ae;">var</span><span style="color:#924c9d;">)</span><span style="color:#bf0303;"> </span><span style="color:#924c9d;">\</span>
 <span style="color:#bf0303;">    </span><span style="color:#924c9d;">$(</span><span style="color:#0057ae;">baz</span><span style="color:#924c9d;">)</span><span style="color:#bf0303;"> quux</span>
@@ -24,24 +24,35 @@
     <span style="color:#0057ae;">libs</span><span style="color:#924c9d;">=$(</span><span style="color:#0057ae;">normal_libs</span><span style="color:#924c9d;">)</span>
 <span style="font-weight:bold;">endif</span>
 
-<span style="color:#b08000;">target1:</span>
+<span style="color:#b08000;">target1</span><span style="color:#b08000;">:</span>
 <span style="color:#bf0303;text-decoration:underline;">        </span>error
 
-<span style="color:#b08000;">target2:</span><span style="color:#0057ae;"> bla.cpp </span><span style="color:#924c9d;">$@</span>
+<span style="color:#b08000;">target2</span><span style="color:#b08000;">:</span><span style="color:#0057ae;"> bla.cpp </span><span style="color:#924c9d;">$@</span>
 	<span style="color:#924c9d;">$(</span><span style="color:#0057ae;">CC</span><span style="color:#924c9d;">)</span> bla.c -o bla.o
 	<span style="color:#924c9d;">$(</span><span style="color:#0057ae;">CC</span><span style="color:#924c9d;">)</span> bla.o <span style="color:#924c9d;">$&lt;</span> <span style="color:#924c9d;">\</span>
 	    <span style="color:#924c9d;">-</span><span style="color:#644a9b;">o bla.exe</span>
-	<span style="color:#924c9d;">@</span><span style="color:#644a9b;">echo </span><span style="color:#bf0303;">&quot;hello&quot;</span>
+	<span style="color:#924c9d;">@</span><span style="color:#644a9b;">echo </span><span style="color:#bf0303;">&quot;hello&quot;</span><span style="color:#644a9b;"> </span><span style="color:#924c9d;">\</span>
+<span style="color:#644a9b;">  bla bla</span>
+	echo <span style="color:#bf0303;">&quot;hello&quot;</span> <span style="color:#924c9d;">\</span>
+  bla bla
 
-<span style="color:#b08000;">target3:</span><span style="color:#0057ae;"> </span><span style="color:#924c9d;">;</span> <span style="color:#924c9d;">@</span><span style="color:#644a9b;">echo ’hello </span><span style="color:#924c9d;">\</span>
+<span style="color:#b08000;">target3</span><span style="color:#b08000;">:</span><span style="color:#0057ae;"> </span><span style="color:#924c9d;">;</span> <span style="color:#924c9d;">@</span><span style="color:#644a9b;">echo ’hello </span><span style="color:#924c9d;">\</span>
 <span style="color:#644a9b;">world’ ; echo </span><span style="color:#bf0303;">&quot;hello </span><span style="color:#924c9d;">\</span>
 <span style="color:#bf0303;">world&quot;</span>
 	<span style="color:#924c9d;">@</span><span style="color:#644a9b;">echo </span><span style="color:#bf0303;">&quot;hello&quot;</span>
 
-<span style="color:#b08000;">target4:</span><span style="color:#0057ae;"> </span><span style="color:#924c9d;">;</span> echo ’hello <span style="color:#924c9d;">\</span>
+<span style="color:#b08000;">target4</span><span style="color:#b08000;">:</span><span style="color:#0057ae;"> </span><span style="color:#924c9d;">;</span> echo ’hello <span style="color:#924c9d;">\</span>
 world’ ; echo <span style="color:#bf0303;">&quot;hello </span><span style="color:#924c9d;">\</span>
 <span style="color:#bf0303;">world&quot;</span>
 	echo <span style="color:#bf0303;">&quot;hello&quot;</span>
+
+<span style="color:#b08000;">target5 </span><span style="color:#924c9d;">\</span>
+<span style="color:#b08000;">target6 </span><span style="color:#924c9d;">\</span>
+<span style="color:#b08000;">target7 </span><span style="color:#b08000;">&amp;::</span>
+	<span style="color:#924c9d;">@</span><span style="color:#644a9b;">echo </span><span style="color:#bf0303;">&quot;hello&quot;</span>
+<span style="color:#898887;"># this should not break the rule</span>
+  <span style="color:#898887;"># ifndef is a command</span>
+	ifndef
 
 <span style="color:#898887;"># String Substitution</span>
 <span style="color:#0057ae;">VAR</span> <span style="color:#924c9d;">:=</span><span style="color:#bf0303;"> </span><span style="color:#924c9d;">$(</span><span style="color:#0057ae;">ANOTHER_VAR</span><span style="font-weight:bold;">:</span><span style="color:#ff5500;">%</span><span style="font-weight:bold;">=</span><span style="color:#ff5500;">%+1</span><span style="color:#924c9d;">)</span>
@@ -63,15 +74,26 @@ world’ ; echo <span style="color:#bf0303;">&quot;hello </span><span style="col
   <span style="color:#0057ae;">var</span> <span style="color:#924c9d;">=</span><span style="color:#bf0303;"> value\#nocomment</span>
   <span style="color:#0057ae;">var</span> <span style="color:#924c9d;">=</span><span style="color:#bf0303;"> value</span><span style="color:#898887;">#comment</span>
   <span style="color:#0057ae;">var</span> <span style="color:#924c9d;">=</span><span style="color:#bf0303;"> value;value2</span>
-<span style="font-weight:bold;">override</span> <span style="color:#0057ae;">var</span> <span style="color:#924c9d;">=</span><span style="color:#bf0303;"> a</span>
+<span style="font-weight:bold;">override</span> <span style="color:#0057ae;">var </span><span style="color:#924c9d;">=</span><span style="color:#bf0303;"> a</span>
 
 <span style="font-weight:bold;">define</span> <span style="color:#0057ae;">var</span> <span style="color:#924c9d;">:::=</span>
-bar
+<span style="color:#bf0303;">bar</span>
 <span style="font-weight:bold;">endef</span>
 
 <span style="font-weight:bold;">override</span> <span style="font-weight:bold;">define</span> <span style="color:#0057ae;">var</span> <span style="color:#924c9d;">:::=</span>
-bar
+<span style="color:#bf0303;">bar</span>
 <span style="font-weight:bold;">endef</span>
+
+<span style="font-weight:bold;">undefine</span><span style="color:#0057ae;"> var</span>
+<span style="font-weight:bold;">override</span> <span style="font-weight:bold;">undefine</span><span style="color:#0057ae;"> var</span>
+
+<span style="font-weight:bold;">export</span><span style="color:#0057ae;"> foo bar</span>
+<span style="font-weight:bold;">export</span><span style="color:#0057ae;"> foo </span><span style="color:#924c9d;">=</span><span style="color:#bf0303;"> bar</span>
+<span style="font-weight:bold;">unexport</span><span style="color:#0057ae;"> foo bar</span>
+
+<span style="color:#b08000;">prog</span><span style="color:#b08000;">:</span><span style="color:#0057ae;"> </span><span style="font-weight:bold;">private</span><span style="color:#0057ae;"> EXTRA_CFLAGS </span><span style="color:#924c9d;">=</span><span style="color:#bf0303;"> -L/usr/local/lib</span>
+<span style="color:#b08000;">prog</span><span style="color:#b08000;">:</span><span style="color:#0057ae;"> </span><span style="color:#0057ae;">CFLAGS</span> <span style="color:#924c9d;">=</span><span style="color:#bf0303;"> -g</span>
+<span style="color:#b08000;">prog</span><span style="color:#b08000;">:</span><span style="color:#0057ae;"> a.o b.o</span>
 
 <span style="color:#898887;"># Conditionals</span>
 <span style="color:#0057ae;">bar</span> <span style="color:#924c9d;">=</span>
@@ -83,7 +105,7 @@ bar
 <span style="font-weight:bold;">endif</span>
 
 <span style="color:#0057ae;">error_type</span> <span style="color:#924c9d;">:=</span><span style="color:#bf0303;"> 0</span>
-<span style="color:#b08000;">check:</span>
+<span style="color:#b08000;">check</span><span style="color:#b08000;">:</span>
 <span style="font-weight:bold;">ifeq</span> (<span style="color:#924c9d;">$(</span><span style="color:#0057ae;">error_type</span><span style="color:#924c9d;">)</span>,0)
 <span style="font-weight:bold;">else</span> <span style="font-weight:bold;">ifeq</span> (<span style="color:#924c9d;">$(</span><span style="color:#0057ae;">error_type</span><span style="color:#924c9d;">)</span>,1)
 <span style="font-weight:bold;">else</span> <span style="font-weight:bold;">ifeq</span> (<span style="color:#924c9d;">$(</span><span style="color:#0057ae;">error_type</span><span style="color:#924c9d;">)</span>,2)

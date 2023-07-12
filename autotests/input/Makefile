@@ -25,7 +25,10 @@ target2: bla.cpp $@
 	$(CC) bla.c -o bla.o
 	$(CC) bla.o $< \
 	    -o bla.exe
-	@echo "hello"
+	@echo "hello" \
+  bla bla
+	echo "hello" \
+  bla bla
 
 target3: ; @echo ’hello \
 world’ ; echo "hello \
@@ -36,6 +39,14 @@ target4: ; echo ’hello \
 world’ ; echo "hello \
 world"
 	echo "hello"
+
+target5 \
+target6 \
+target7 &::
+	@echo "hello"
+# this should not break the rule
+  # ifndef is a command
+	ifndef
 
 # String Substitution
 VAR := $(ANOTHER_VAR:%=%+1)
@@ -66,6 +77,17 @@ endef
 override define var :::=
 bar
 endef
+
+undefine var
+override undefine var
+
+export foo bar
+export foo = bar
+unexport foo bar
+
+prog: private EXTRA_CFLAGS = -L/usr/local/lib
+prog: CFLAGS = -g
+prog: a.o b.o
 
 # Conditionals
 bar =

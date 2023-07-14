@@ -36,6 +36,9 @@ public class Activity extends QtActivity
         num = 0x2;
         double f = .4e+49;
 	var other = "string";
+	var multilineString = """
+string \\ \n
+sdsda""";
         
         long int_dec = 1__23_48l;
         long int_oct = 072034__4l;

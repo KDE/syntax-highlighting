@@ -158,7 +158,7 @@ def decodeTextStyle(text: str) -> dict:
         styleIndex = field.pop(0)
         style = jsonConfig["text-styles"].get(indexToStyle[styleIndex], dict()).copy()
 
-    if len(field) != 10:
+    if len(field) != 10 or not any(field[0:8]):
         return dict()
 
     if field[0] and len(field[0]) == 8:
@@ -222,16 +222,20 @@ def extractCustomStyle(style: dict, realKey: str):
     for key, value in style.items():
         style = decodeTextStyle(value)
 
-        primaryKey, SeondaryKey = key.split(":")[-2:]
+        # some items have ':' in their name, therefore it is necessary to limit the split
+        keys = key.split(":", 1)
+        # invalid or None language
+        if len(keys) == 1:
+            continue
 
-        if primaryKey not in custom_styles:
-            custom_styles[primaryKey] = dict()
+        primaryKey, SecondaryKey = keys
 
-        if style and SeondaryKey not in custom_styles[primaryKey]:
-            custom_styles[primaryKey][SeondaryKey] = style
+        if style:
+            custom_style = custom_styles.setdefault(primaryKey, dict())
+            custom_style.setdefault(SecondaryKey, style)
 
-        if settings["prefferStandAloneData"] and style and realKey == primaryKey:
-            custom_styles[primaryKey][SeondaryKey] = style
+            if settings["prefferStandAloneData"] and realKey == primaryKey:
+                custom_style[SecondaryKey] = style
 
 
 def extractCustomStyles(config: ConfigParser) -> dict:

@@ -122,19 +122,14 @@ indexToStyle = {
     "29": "Others",
     "30": "Error"
 }
-normalizedSections = {}
-custom_styles = {}
+
+NormalizedSections = dict[str, str]
+Style = dict[str, str | bool]
+CustomStyles = dict[str, Style]
 
 
-def normalizeSections(sections: list):
-    value: str
-    for value in sections:
-        normal = value
-
-        if " - " in value:
-            normal = normal.split(" - ")[0]
-
-        normalizedSections[normal] = value
+def normalizeSections(sections: list[str]) -> NormalizedSections:
+    return {value.partition(" - ")[0]: value for value in sections}
 
 
 def reEcodeColors(text: str) -> str:
@@ -142,14 +137,14 @@ def reEcodeColors(text: str) -> str:
 
 
 def reEncodeBool(text: str) -> bool:
-    return True if text == "1" else False
+    return text == "1"
 
 
 def rgb_to_hex(rgb: tuple) -> str:
     return '#%02x%02x%02x' % rgb
 
 
-def decodeTextStyle(text: str) -> dict:
+def decodeTextStyle(text: str) -> Style:
     style = {}
 
     field = text.split(",")
@@ -161,21 +156,21 @@ def decodeTextStyle(text: str) -> dict:
     if len(field) != 10 or not any(field[0:8]):
         return dict()
 
-    if field[0] and len(field[0]) == 8:
+    if len(field[0]) == 8:
         style["text-color"] = reEcodeColors(field[0])
-    if field[1] and len(field[1]) == 8:
+    if len(field[1]) == 8:
         style["selected-text-color"] = reEcodeColors(field[1])
-    if field[2] and len(field[2]) == 1:
+    if len(field[2]) == 1:
         style["bold"] = reEncodeBool(field[2])
-    if field[3] and len(field[3]) == 1:
+    if len(field[3]) == 1:
         style["italic"] = reEncodeBool(field[3])
-    if field[4] and len(field[4]) == 1:
+    if len(field[4]) == 1:
         style["strike-through"] = reEncodeBool(field[4])
-    if field[5] and len(field[5]) == 1:
+    if len(field[5]) == 1:
         style["underline"] = reEncodeBool(field[5])
-    if field[6] and len(field[6]) == 8:
+    if len(field[6]) == 8:
         style["background-color"] = reEcodeColors(field[6])
-    if field[7] and len(field[7]) == 8:
+    if len(field[7]) == 8:
         style["selected-text-color"] = reEcodeColors(field[7])
     # 8: font family > ignored
     # 9: --- > ignored
@@ -183,7 +178,7 @@ def decodeTextStyle(text: str) -> dict:
     return style
 
 
-def decodeColorSettings(text: str) -> str:
+def decodeColorSettings(text: str) -> str | None:
     fieldds = tuple(map(int, text.split(",")))
 
     if len(fieldds) != 3:
@@ -192,33 +187,18 @@ def decodeColorSettings(text: str) -> str:
     return rgb_to_hex(fieldds)
 
 
-def extractEditorColors(section: dict) -> dict:
-    editor_colors = {}
-
-    key: str
-    value: str
-    for key, value in section.items():
-        editor_colors[editorColors[key]] = decodeColorSettings(value)
-
-    return editor_colors
+def extractEditorColors(section: dict[str, str]) -> dict[str, str | None]:
+    return {editorColors[key]: decodeColorSettings(value)
+            for key, value in section.items()}
 
 
-def extractTextStyles(section: dict) -> dict:
-    text_styles = {}
 
-    key: str
-    value: str
-    for key, value in section.items():
-        text_styles[textStyles[key]] = decodeTextStyle(value)
-
-    return text_styles
+def extractTextStyles(section: dict[str, str]) -> dict[str, Style]:
+    return {textStyles[key]: decodeTextStyle(value)
+            for key, value in section.items()}
 
 
-def extractCustomStyle(style: dict, realKey: str):
-    global custom_styles
-
-    key: str
-    value: str
+def extractCustomStyle(custom_styles: CustomStyles, style: Style, realKey: str):
     for key, value in style.items():
         style = decodeTextStyle(value)
 
@@ -238,18 +218,16 @@ def extractCustomStyle(style: dict, realKey: str):
                 custom_style[SecondaryKey] = style
 
 
-def extractCustomStyles(config: ConfigParser) -> dict:
-    global custom_styles
+def extractCustomStyles(config: ConfigParser, normalizedSections: NormalizedSections) -> CustomStyles:
+    custom_styles: CustomStyles = {}
 
-    key: str
-    value: str
     for key, value in normalizedSections.items():
         if not key.startswith("Highlighting"):
             continue
 
         realKey = key[len("Highlighting "):]
 
-        extractCustomStyle(config[value], realKey)
+        extractCustomStyle(custom_styles, config[value], realKey)
 
     return custom_styles
 
@@ -259,7 +237,7 @@ def main(inputFile: str):
     config.optionxform = str
     config.read(inputFile)
 
-    normalizeSections(config.sections())
+    normalizedSections = normalizeSections(config.sections())
 
     if "Editor Colors" in normalizedSections:
         jsonConfig["editor-colors"] = extractEditorColors(config[normalizedSections["Editor Colors"]])
@@ -267,7 +245,7 @@ def main(inputFile: str):
         jsonConfig["text-styles"] = extractTextStyles(config[normalizedSections["Default Item Styles"]])
 
     if settings["IncludeCustoms"]:
-        jsonConfig["custom-styles"] = extractCustomStyles(config)
+        jsonConfig["custom-styles"] = extractCustomStyles(config, normalizedSections)
 
     print(json.dumps(jsonConfig, indent=4, sort_keys=True))
 
@@ -282,4 +260,4 @@ if __name__ == "__main__":
         "revision": 1
     }
 
-    main(str(sys.argv[2]))
+    main(sys.argv[2])

@@ -156,7 +156,7 @@ def decodeTextStyle(text: str) -> dict:
 
     if len(field) == 11:
         styleIndex = field.pop(0)
-        style = jsonConfig["text-styles"][indexToStyle[styleIndex]].copy()
+        style = jsonConfig["text-styles"].get(indexToStyle[styleIndex], dict()).copy()
 
     if len(field) != 10:
         return dict()

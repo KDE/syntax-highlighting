@@ -2,6 +2,9 @@
 ## Source: http://www.rexamples.com
 
 ## Basics
+a <- 42.24
+a <- 42i
+a <- 42L
 a <- 42
 A <- a * 2  # R is case sensitive
 print(a)

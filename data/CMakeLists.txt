@@ -19,17 +19,24 @@ macro(generate_syntax_definition generator targetFile srcFile)
     set(gen_defs ${gen_defs} ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax/${targetFile})
 endmacro()
 
-# generate PHP definitions
-macro(generate_php_syntax_definition targetFile srcFile)
-    generate_syntax_definition(generate-php.pl ${targetFile} ${srcFile} ${CMAKE_CURRENT_SOURCE_DIR}/syntax/php.xml)
+macro(generate_syntax_definition_with_html syntax mergedSyntax)
+    generate_syntax_definition(generate-html.pl ${mergedSyntax}-${syntax}.xml ${mergedSyntax}.xml ${CMAKE_CURRENT_SOURCE_DIR}/syntax/${syntax}.xml)
 endmacro()
 
-generate_php_syntax_definition(javascript-php.xml javascript.xml)
-generate_php_syntax_definition(css-php.xml css.xml)
-generate_php_syntax_definition(html-php.xml html.xml)
-generate_php_syntax_definition(javascript-react-php.xml javascript-react.xml)
-generate_php_syntax_definition(typescript-php.xml typescript.xml)
-generate_php_syntax_definition(mustache-php.xml mustache.xml)
+# generate PHP definitions
+generate_syntax_definition_with_html(php html)
+generate_syntax_definition_with_html(php css)
+generate_syntax_definition_with_html(php javascript)
+generate_syntax_definition_with_html(php javascript-react)
+generate_syntax_definition_with_html(php typescript)
+generate_syntax_definition_with_html(php mustache)
+
+# generate Twig definitions
+generate_syntax_definition_with_html(twig html)
+generate_syntax_definition_with_html(twig css)
+generate_syntax_definition_with_html(twig javascript)
+generate_syntax_definition_with_html(twig javascript-react)
+generate_syntax_definition_with_html(twig typescript)
 
 # generate DoxygenLua definition
 generate_syntax_definition(generate-doxygenlua.pl doxygenlua.xml doxygen.xml)

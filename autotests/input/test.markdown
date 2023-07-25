@@ -18,7 +18,15 @@ bla bla bla.
 Intentional line break  
 via two spaces at line.
 
-Formats: _italic_, **bold**, `monospace`, ~~strikeout~~
+Formats: _italic_, **bold**, `monospace`, ~~strikeout~~, ==highlight==
+
+Emoji: :joy: :+1:
+
+Table:
+
+| Syntax      | Description | Test Text | Note |
+| :---        |    :----:   |      ---: | ---- |
+| Header      | Title       | \| this   |      |
 
 Bullet list:
 
@@ -605,6 +613,11 @@ _normal text\_
 **italic text\**
 ***only bold\***
 **bold\** bold**
+
+## Highlight
+
+==very important words== normal
+==very=important=words== normal
 
 <!-- Folding regions for nested headers should also be closed when the parent header is closed -->
 # 1

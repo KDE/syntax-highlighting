@@ -16,6 +16,7 @@
 <Option Name>Alias</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service </Unit Extension><Normal>some.invalid </Normal><Unit Name>some_</Unit Name><Specifier>%b</Specifier><Unit Extension>.service</Unit Extension><br/>
 <Option Name>WantedBy</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service </Unit Extension><Unit Name>some</Unit Name><Unit Extension>.socket </Unit Extension><Normal>some.invalid</Normal><br/>
 <Option Name>RequiredBy</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service </Unit Extension><Unit Name>some</Unit Name><Unit Extension>.socket </Unit Extension><Normal>some.invalid</Normal><br/>
+<Option Name>UpheldBy</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service </Unit Extension><Unit Name>some</Unit Name><Unit Extension>.socket </Unit Extension><Normal>some.invalid</Normal><br/>
 <Option Name>Also</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service </Unit Extension><Unit Name>some</Unit Name><Unit Extension>.socket </Unit Extension><Normal>some.invalid</Normal><br/>
 <Option Name>DefaultInstance</Option Name><Normal> = id</Normal><br/>
 <Normal></Normal><br/>
@@ -64,6 +65,8 @@
 <Option Name>ExecStop</Option Name><Normal> = /bin/kill -SIGABRT </Normal><Environment Variable>$MAINPID</Environment Variable><br/>
 <Option Name>ExecStopPost</Option Name><Normal> = </Normal><Prefix>-:!!</Prefix><Normal>/bin/stop/post</Normal><br/>
 <Option Name>RestartSec</Option Name><Normal> = </Normal><Number>15</Number><br/>
+<Option Name>RestartSteps</Option Name><Normal> = </Normal><Number>2</Number><br/>
+<Option Name>RestartMaxDelaySec</Option Name><Normal> = </Normal><Number>150</Number><Measurement Unit>ms</Measurement Unit><br/>
 <Option Name>TimeoutStartSec</Option Name><Normal> = </Normal><Number>5</Number><Measurement Unit>s</Measurement Unit><Normal> </Normal><Number>100</Number><Measurement Unit>ms</Measurement Unit><br/>
 <Option Name>TimeoutStopSec</Option Name><Normal> = </Normal><Constant>infinity</Constant><br/>
 <Option Name>TimeoutAbortSec</Option Name><Normal> = </Normal><Number>15</Number><br/>
@@ -74,6 +77,7 @@
 <Option Name>RuntimeRandomizedExtraSec</Option Name><Normal> = </Normal><Number>12</Number><br/>
 <Option Name>WatchdogSec</Option Name><Normal> = </Normal><Number>90</Number><br/>
 <Option Name>Restart</Option Name><Normal> = </Normal><Constant>on-watchdog</Constant><br/>
+<Option Name>RestartMode</Option Name><Normal> = </Normal><Constant>direct</Constant><br/>
 <Option Name>SuccessExitStatus</Option Name><Normal> = </Normal><Constant>PROTOCOL</Constant><Normal> </Normal><Constant>RUNTIME_DIRECTORY</Constant><Normal> </Normal><Continuation>\</Continuation><br/>
 <Normal>  </Normal><Constant>SECCOMP</Constant><Normal> </Normal><Number>15</Number><Normal> </Normal><Number>23</Number><Normal> </Normal><Constant>SIGUSR1</Constant><Normal> </Normal><Constant>SIGXCPU</Constant><br/>
 <Option Name>RestartPreventExitStatus</Option Name><Normal> = </Normal><Number>15</Number><Normal> </Normal><Number>23</Number><Normal> </Normal><Constant>SIGUSR1</Constant><Normal> </Normal><Continuation>\</Continuation><br/>
@@ -85,6 +89,7 @@
 <Option Name>Sockets</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.socket </Unit Extension><Continuation>\</Continuation><br/>
 <Normal>  </Normal><Unit Name>some-other</Unit Name><Unit Extension>.socket</Unit Extension><br/>
 <Option Name>FileDescriptorStoreMax</Option Name><Normal> = </Normal><Number>5</Number><br/>
+<Option Name>FileDescriptorStorePreserve</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
 <Option Name>USBFunctionDescriptors</Option Name><Normal> = /some/absolute/path</Normal><br/>
 <Option Name>USBFunctionStrings</Option Name><Normal> = /some/absolute/path</Normal><br/>
 <Option Name>OOMPolicy</Option Name><Normal> = </Normal><Constant>stop</Constant><br/>
@@ -96,6 +101,7 @@
 <Option Name>ExtensionImages</Option Name><Normal> = /source/path</Normal><br/>
 <Option Name>ExtensionDirectories</Option Name><Normal> = /source/path</Normal><br/>
 <Option Name>IPCNamespacePath</Option Name><Normal> = /some/absolute/path</Normal><br/>
+<Option Name>MemoryKSM</Option Name><Normal> = </Normal><Constant>false</Constant><br/>
 <Option Name>NoExecPaths</Option Name><Normal> = some/path some/other/path</Normal><br/>
 <Option Name>PrivateIPC</Option Name><Normal> = </Normal><Constant>false</Constant><br/>
 <Comment>## from systemd.exec Paths</Comment><br/>
@@ -104,6 +110,7 @@
 <Option Name>RootDirectory</Option Name><Normal> = /some/path</Normal><br/>
 <Option Name>RootImage</Option Name><Normal> = /some/path</Normal><br/>
 <Option Name>RootImageOptions</Option Name><Normal> = partition_name,noauto</Normal><br/>
+<Option Name>RootEphemeral</Option Name><Normal> = </Normal><Constant>false</Constant><br/>
 <Option Name>RootHash</Option Name><Normal> = /some/path</Normal><br/>
 <Option Name>RootHash</Option Name><Normal> = </Normal><Number Hexadecimal>0xABCDEF</Number Hexadecimal><br/>
 <Option Name>RootHashSignature</Option Name><Normal> =</Normal><br/>
@@ -126,6 +133,8 @@
 <Option Name>PAMName</Option Name><Normal> =</Normal><br/>
 <Option Name>LoadCredential</Option Name><Normal> = some_id:/path/to/credential/data</Normal><br/>
 <Option Name>LoadCredentialEncrypted</Option Name><Normal> = some_id:/path/to/credential/data</Normal><br/>
+<Comment># accepts an optional single trailing asterisk</Comment><br/>
+<Option Name>ImportCredential</Option Name><Normal> = some*</Normal><br/>
 <Option Name>SetCredential</Option Name><Normal> = some_id:some_credential</Normal><br/>
 <Option Name>SetCredentialEncrypted</Option Name><Normal> =  some_id:some_encrypted_credential</Normal><br/>
 <Comment>## from systemd.exec Capabilities</Comment><br/>
@@ -283,10 +292,16 @@
 <Option Name>MemoryAccounting</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
 <Option Name>MemoryMin</Option Name><Normal> = </Normal><Number>10</Number><Measurement Unit>G</Measurement Unit><br/>
 <Option Name>MemoryLow</Option Name><Normal> = </Normal><Number>20</Number><Measurement Unit>%</Measurement Unit><br/>
+<Option Name>StartupMemoryLow</Option Name><Normal> = </Normal><Number>22</Number><Measurement Unit>%</Measurement Unit><br/>
+<Option Name>DefaultStartupMemoryLow</Option Name><Normal> = </Normal><Constant>infinity</Constant><br/>
 <Option Name>MemoryHigh</Option Name><Normal> = </Normal><Number>40 </Number><Measurement Unit>%</Measurement Unit><br/>
+<Option Name>StartupMemoryHigh</Option Name><Normal> = </Normal><Number>12</Number><Measurement Unit>%</Measurement Unit><br/>
 <Option Name>MemoryMax</Option Name><Normal> = </Normal><Number>60</Number><Measurement Unit>%</Measurement Unit><br/>
+<Option Name>StartupMemoryMax</Option Name><Normal> = </Normal><Number>55</Number><Measurement Unit>%</Measurement Unit><br/>
 <Option Name>MemorySwapMax</Option Name><Normal> = </Normal><Number>10</Number><Measurement Unit>G</Measurement Unit><br/>
+<Option Name>StartupMemorySwapMax</Option Name><Normal> = </Normal><Number>5</Number><Measurement Unit>G</Measurement Unit><br/>
 <Option Name>MemoryZSwapMax</Option Name><Normal> = </Normal><Number>2</Number><Measurement Unit>G</Measurement Unit><br/>
+<Option Name>StartupMemoryZSwapMax</Option Name><Normal> = </Normal><Number>1500</Number><Normal>k</Normal><br/>
 <Option Name>TasksAccounting</Option Name><Normal> = </Normal><Constant>on</Constant><br/>
 <Option Name>TasksMax</Option Name><Normal> = </Normal><Number>50</Number><Measurement Unit>%</Measurement Unit><br/>
 <Option Name>IOAccounting</Option Name><Normal> = </Normal><Constant>on</Constant><br/>
@@ -300,13 +315,18 @@
 <Option Name>IODeviceLatencyTargetSec</Option Name><Normal> = /dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 </Normal><Number>5</Number><Measurement Unit>s</Measurement Unit><Normal> </Normal><Number>20</Number><Measurement Unit>ms</Measurement Unit><Normal> </Normal><Number>100</Number><Measurement Unit>us</Measurement Unit><br/>
 <Option Name>IPAccounting</Option Name><Normal> = </Normal><Constant>on</Constant><br/>
 <Option Name>IPAddressAllow</Option Name><Normal> = </Normal><Number>127</Number><Normal>.</Normal><Number>0</Number><Normal>.</Normal><Number>0</Number><Normal>.</Normal><Number>0</Number><Normal>/</Normal><Number>8</Number><Normal> ::</Normal><Number>1</Number><Normal>/</Normal><Number>128</Number><br/>
+<Option Name>IPAddressDeny</Option Name><Normal> = </Normal><Number>127</Number><Normal>.</Normal><Number>0</Number><Normal>.</Normal><Number>0</Number><Normal>.</Normal><Number>0</Number><Normal>/</Normal><Number>8</Number><Normal> ::</Normal><Number>1</Number><Normal>/</Normal><Number>128</Number><br/>
 <Option Name>DevicePolicy</Option Name><Normal> = </Normal><Constant>strict</Constant><br/>
 <Option Name>Slice</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.slice</Unit Extension><br/>
 <Option Name>Delegate</Option Name><Normal> = </Normal><Constant>bpf-firewall</Constant><br/>
+<Option Name>DelegateSubgroup</Option Name><Normal> = some-cgroup-name</Normal><br/>
 <Option Name>DisableControllers</Option Name><Normal> = </Normal><Constant>cpu</Constant><Normal> </Normal><Constant>io</Constant><br/>
 <Option Name>ManagedOOMSwap</Option Name><Normal> = </Normal><Constant>auto</Constant><br/>
 <Option Name>ManagedOOMMemoryPressure</Option Name><Normal> = </Normal><Constant>kill</Constant><br/>
 <Option Name>ManagedOOMMemoryPressureLimit</Option Name><Normal> = </Normal><Number>50</Number><Measurement Unit>%</Measurement Unit><br/>
+<Option Name>ManagedOOMPreference</Option Name><Normal> = </Normal><Constant>omit</Constant><br/>
+<Option Name>MemoryPressureWatch</Option Name><Normal> = </Normal><Constant>skip</Constant><br/>
+<Option Name>MemoryPressureThresholdSec</Option Name><Normal> = </Normal><Number>50</Number><Measurement Unit>ms</Measurement Unit><br/>
 <Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>bind6</Constant><Normal>:/sys/fs/bpf/sock-addr-hook</Normal><br/>
 <Option Name>RestrictNetworkInterfaces</Option Name><Normal> = </Normal><Prefix>~</Prefix><Normal>eth1 eth2</Normal><br/>
 <Normal></Normal><br/>
@@ -423,6 +443,7 @@
 <Option Name>StopPropagatedFrom</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service </Unit Extension><Unit Name>some-other</Unit Name><Unit Extension>.service</Unit Extension><br/>
 <Option Name>RequiresMountsFor</Option Name><Normal> = /tmp /var/log </Normal><Specifier>%h</Specifier><br/>
 <Option Name>OnFailureJobMode</Option Name><Normal> = </Normal><Constant>fail</Constant><br/>
+<Option Name>OnSuccessJobMode</Option Name><Normal> = </Normal><Constant>replace</Constant><br/>
 <Option Name>IgnoreOnIsolate</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
 <Option Name>StopWhenUnneeded</Option Name><Normal> = </Normal><Constant>false</Constant><br/>
 <Option Name>RefuseManualStart</Option Name><Normal> = </Normal><Constant>false</Constant><br/>
@@ -960,6 +981,11 @@
 <Section Header>[Unit]</Section Header><br/>
 <Option Name>FailureAction</Option Name><Normal> = </Normal><Constant>exit</Constant><br/>
 <Option Name>FailureAction</Option Name><Normal> = </Normal><Constant>exit-force</Constant><br/>
+<Option Name>FailureAction</Option Name><Normal> = </Normal><Constant>halt</Constant><br/>
+<Option Name>FailureAction</Option Name><Normal> = </Normal><Constant>halt-force</Constant><br/>
+<Option Name>FailureAction</Option Name><Normal> = </Normal><Constant>halt-immediate</Constant><br/>
+<Option Name>FailureAction</Option Name><Normal> = </Normal><Constant>kexec</Constant><br/>
+<Option Name>FailureAction</Option Name><Normal> = </Normal><Constant>kexec-force</Constant><br/>
 <Option Name>FailureAction</Option Name><Normal> = </Normal><Constant>none</Constant><br/>
 <Option Name>FailureAction</Option Name><Normal> = </Normal><Constant>poweroff</Constant><br/>
 <Option Name>FailureAction</Option Name><Normal> = </Normal><Constant>poweroff-force</Constant><br/>
@@ -967,6 +993,8 @@
 <Option Name>FailureAction</Option Name><Normal> = </Normal><Constant>reboot</Constant><br/>
 <Option Name>FailureAction</Option Name><Normal> = </Normal><Constant>reboot-force</Constant><br/>
 <Option Name>FailureAction</Option Name><Normal> = </Normal><Constant>reboot-immediate</Constant><br/>
+<Option Name>FailureAction</Option Name><Normal> = </Normal><Constant>soft-reboot</Constant><br/>
+<Option Name>FailureAction</Option Name><Normal> = </Normal><Constant>soft-reboot-force</Constant><br/>
 <Comment>## invalid values</Comment><br/>
 <Option Name>FailureAction</Option Name><Normal> = invalid</Normal><br/>
 <Option Name>FailureAction</Option Name><Normal> = invalid </Normal><Constant>exit</Constant><br/>
@@ -1208,29 +1236,23 @@
 <Option Name>ConditionUser</Option Name><Normal> = name1</Normal><br/>
 <Option Name>ConditionUser</Option Name><Normal> = </Normal><Number>1050</Number><br/>
 <Comment>## invalid values</Comment><br/>
-<Option Name>ConditionUser</Option Name><Normal> = name1.invalid</Normal><br/>
 <Option Name>ConditionUser</Option Name><Normal> = -1050</Normal><br/>
 <Comment># multiple values</Comment><br/>
-<Option Name>ConditionUser</Option Name><Normal> = name1 name2</Normal><br/>
+<Option Name>ConditionUser</Option Name><Normal> = </Normal><Constant>@system</Constant><Normal> 1050</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### controller cg (control group controller)</Comment><br/>
 <Section Header>[Unit]</Section Header><br/>
 <Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>cpu</Constant><br/>
-<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>cpuset</Constant><br/>
 <Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>io</Constant><br/>
 <Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>memory</Constant><br/>
 <Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>pids</Constant><br/>
+<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>v1</Constant><br/>
+<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>v2</Constant><br/>
+<Comment># multiple values</Comment><br/>
+<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>cpu</Constant><Normal> </Normal><Constant>memory</Constant><br/>
 <Comment>## invalid values</Comment><br/>
 <Option Name>AssertControlGroupController</Option Name><Normal> = invalid</Normal><br/>
-<Comment># removed as of v252</Comment><br/>
-<Option Name>AssertControlGroupController</Option Name><Normal> = blkio</Normal><br/>
-<Option Name>AssertControlGroupController</Option Name><Normal> = cpuacct</Normal><br/>
-<Option Name>AssertControlGroupController</Option Name><Normal> = devices</Normal><br/>
-<Option Name>AssertControlGroupController</Option Name><Normal> = v1</Normal><br/>
-<Option Name>AssertControlGroupController</Option Name><Normal> = v2</Normal><br/>
-<Comment># multiple values</Comment><br/>
-<Option Name>AssertControlGroupController</Option Name><Normal> = </Normal><Constant>cpu</Constant><Normal> memory</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### controller list</Comment><br/>
@@ -1964,6 +1986,18 @@
 <Option Name>CoredumpFilter</Option Name><Normal> = </Normal><Constant>private-file-backed</Constant><Normal>, </Normal><Constant>shared-dax</Constant><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
+<Comment>###### memory pressure watch</Comment><br/>
+<Section Header>[Service]</Section Header><br/>
+<Option Name>MemoryPressureWatch</Option Name><Normal> = </Normal><Constant>auto</Constant><br/>
+<Option Name>MemoryPressureWatch</Option Name><Normal> = </Normal><Constant>off</Constant><br/>
+<Option Name>MemoryPressureWatch</Option Name><Normal> = </Normal><Constant>on</Constant><br/>
+<Option Name>MemoryPressureWatch</Option Name><Normal> = </Normal><Constant>skip</Constant><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>MemoryPressureWatch</Option Name><Normal> = invalid</Normal><br/>
+<Comment># multiple values</Comment><br/>
+<Option Name>MemoryPressureWatch</Option Name><Normal> = </Normal><Constant>auto</Constant><Normal> skip</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
 <Comment>###### mount flag</Comment><br/>
 <Section Header>[Service]</Section Header><br/>
 <Option Name>MountFlags</Option Name><Normal> = </Normal><Constant>private</Constant><br/>
@@ -2192,6 +2226,16 @@
 <Option Name>Restart</Option Name><Normal> = invalid</Normal><br/>
 <Comment># multiple values</Comment><br/>
 <Option Name>Restart</Option Name><Normal> = </Normal><Constant>no</Constant><Normal> on-abort</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Comment>###### restart mode</Comment><br/>
+<Section Header>[Service]</Section Header><br/>
+<Option Name>RestartMode</Option Name><Normal> = </Normal><Constant>direct</Constant><br/>
+<Option Name>RestartMode</Option Name><Normal> = </Normal><Constant>normal</Constant><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>RestartMode</Option Name><Normal> = invalid</Normal><br/>
+<Comment># multiple values</Comment><br/>
+<Option Name>RestartMode</Option Name><Normal> = </Normal><Constant>direct</Constant><Normal> normal</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### runtime directory preserve</Comment><br/>
@@ -2564,7 +2608,10 @@
 <Comment># micro second</Comment><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>123 </Number><Measurement Unit>usec</Measurement Unit><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>123</Number><Measurement Unit>us</Measurement Unit><br/>
+<Comment># using UTF-8 "Micro Sign" U+00B5 &micro; &#181; &#xB5;</Comment><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>123 </Number><Measurement Unit>µs</Measurement Unit><br/>
+<Comment># using UTF-8 "Greek Small Letter Mu" U+03BC &mu; &#956; &#x3BC;</Comment><br/>
+<Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>123 </Number><Measurement Unit>μs</Measurement Unit><br/>
 <Comment># milli second</Comment><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>123 </Number><Measurement Unit>msec</Measurement Unit><br/>
 <Option Name>OnBootSec</Option Name><Normal> = </Normal><Number>123</Number><Measurement Unit>ms</Measurement Unit><br/>
@@ -2643,7 +2690,10 @@
 <Option Name>Timestamping</Option Name><Normal> = </Normal><Constant>off</Constant><br/>
 <Option Name>Timestamping</Option Name><Normal> = </Normal><Constant>us</Constant><br/>
 <Option Name>Timestamping</Option Name><Normal> = </Normal><Constant>usec</Constant><br/>
+<Comment># using UTF-8 "Micro Sign" U+00B5 &micro; &#181; &#xB5;</Comment><br/>
 <Option Name>Timestamping</Option Name><Normal> = </Normal><Constant>µs</Constant><br/>
+<Comment># using UTF-8 "Greek Small Letter Mu" U+03BC &mu; &#956; &#x3BC;</Comment><br/>
+<Option Name>Timestamping</Option Name><Normal> = </Normal><Constant>μs</Constant><br/>
 <Comment>## invalid values</Comment><br/>
 <Option Name>Timestamping</Option Name><Normal> = nanosec</Normal><br/>
 <Comment># multiple values</Comment><br/>

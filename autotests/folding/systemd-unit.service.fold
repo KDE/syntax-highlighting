@@ -16,6 +16,7 @@ TimeoutIdleSec = 5min 5s
 Alias = some.service some.invalid some_%b.service
 WantedBy = some.service some.socket some.invalid
 RequiredBy = some.service some.socket some.invalid
+UpheldBy = some.service some.socket some.invalid
 Also = some.service some.socket some.invalid
 DefaultInstance = id
 
@@ -64,6 +65,8 @@ ExecReload = /bin/exec/reload
 ExecStop = /bin/kill -SIGABRT $MAINPID
 ExecStopPost = -:!!/bin/stop/post
 RestartSec = 15
+RestartSteps = 2
+RestartMaxDelaySec = 150ms
 TimeoutStartSec = 5s 100ms
 TimeoutStopSec = infinity
 TimeoutAbortSec = 15
@@ -74,6 +77,7 @@ RuntimeMaxSec = 1min 20 seconds
 RuntimeRandomizedExtraSec = 12
 WatchdogSec = 90
 Restart = on-watchdog
+RestartMode = direct
 SuccessExitStatus = PROTOCOL RUNTIME_DIRECTORY \
   SECCOMP 15 23 SIGUSR1 SIGXCPU
 RestartPreventExitStatus = 15 23 SIGUSR1 \
@@ -85,6 +89,7 @@ NotifyAccess = exec
 Sockets = some.socket \
   some-other.socket
 FileDescriptorStoreMax = 5
+FileDescriptorStorePreserve = yes
 USBFunctionDescriptors = /some/absolute/path
 USBFunctionStrings = /some/absolute/path
 OOMPolicy = stop
@@ -96,6 +101,7 @@ ExecPaths = some/path some/other/path
 ExtensionImages = /source/path
 ExtensionDirectories = /source/path
 IPCNamespacePath = /some/absolute/path
+MemoryKSM = false
 NoExecPaths = some/path some/other/path
 PrivateIPC = false
 ## from systemd.exec Paths
@@ -104,6 +110,7 @@ WorkingDirectory = ~
 RootDirectory = /some/path
 RootImage = /some/path
 RootImageOptions = partition_name,noauto
+RootEphemeral = false
 RootHash = /some/path
 RootHash = 0xABCDEF
 RootHashSignature =
@@ -126,6 +133,8 @@ SupplementaryGroups = group1 group-two 100 \
 PAMName =
 LoadCredential = some_id:/path/to/credential/data
 LoadCredentialEncrypted = some_id:/path/to/credential/data
+# accepts an optional single trailing asterisk
+ImportCredential = some*
 SetCredential = some_id:some_credential
 SetCredentialEncrypted =  some_id:some_encrypted_credential
 ## from systemd.exec Capabilities
@@ -283,10 +292,16 @@ StartupAllowedMemoryNodes = 5-10, 12
 MemoryAccounting = yes
 MemoryMin = 10G
 MemoryLow = 20%
+StartupMemoryLow = 22%
+DefaultStartupMemoryLow = infinity
 MemoryHigh = 40 %
+StartupMemoryHigh = 12%
 MemoryMax = 60%
+StartupMemoryMax = 55%
 MemorySwapMax = 10G
+StartupMemorySwapMax = 5G
 MemoryZSwapMax = 2G
+StartupMemoryZSwapMax = 1500k
 TasksAccounting = on
 TasksMax = 50%
 IOAccounting = on
@@ -300,13 +315,18 @@ IOWriteIOPSMax = /dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 2K
 IODeviceLatencyTargetSec = /dev/disk/by-path/pci-0000:00:1f.2-scsi-0:0:0:0 5s 20ms 100us
 IPAccounting = on
 IPAddressAllow = 127.0.0.0/8 ::1/128
+IPAddressDeny = 127.0.0.0/8 ::1/128
 DevicePolicy = strict
 Slice = some.slice
 Delegate = bpf-firewall
+DelegateSubgroup = some-cgroup-name
 DisableControllers = cpu io
 ManagedOOMSwap = auto
 ManagedOOMMemoryPressure = kill
 ManagedOOMMemoryPressureLimit = 50%
+ManagedOOMPreference = omit
+MemoryPressureWatch = skip
+MemoryPressureThresholdSec = 50ms
 BPFProgram = bind6:/sys/fs/bpf/sock-addr-hook
 RestrictNetworkInterfaces = ~eth1 eth2
 
@@ -423,6 +443,7 @@ PropagatesStopTo = some.service some-other.service
 StopPropagatedFrom = some.service some-other.service
 RequiresMountsFor = /tmp /var/log %h
 OnFailureJobMode = fail
+OnSuccessJobMode = replace
 IgnoreOnIsolate = true
 StopWhenUnneeded = false
 RefuseManualStart = false
@@ -960,6 +981,11 @@ SystemCallFilter = @invalid @ sync
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Unit]</beginfold id='1'>
 FailureAction = exit
 FailureAction = exit-force
+FailureAction = halt
+FailureAction = halt-force
+FailureAction = halt-immediate
+FailureAction = kexec
+FailureAction = kexec-force
 FailureAction = none
 FailureAction = poweroff
 FailureAction = poweroff-force
@@ -967,6 +993,8 @@ FailureAction = poweroff-immediate
 FailureAction = reboot
 FailureAction = reboot-force
 FailureAction = reboot-immediate
+FailureAction = soft-reboot
+FailureAction = soft-reboot-force
 ## invalid values
 FailureAction = invalid
 FailureAction = invalid exit
@@ -1208,29 +1236,23 @@ ConditionUser = @system
 ConditionUser = name1
 ConditionUser = 1050
 ## invalid values
-ConditionUser = name1.invalid
 ConditionUser = -1050
 # multiple values
-ConditionUser = name1 name2
+ConditionUser = @system 1050
 
 
 ###### controller cg (control group controller)
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Unit]</beginfold id='1'>
 AssertControlGroupController = cpu
-AssertControlGroupController = cpuset
 AssertControlGroupController = io
 AssertControlGroupController = memory
 AssertControlGroupController = pids
-## invalid values
-AssertControlGroupController = invalid
-# removed as of v252
-AssertControlGroupController = blkio
-AssertControlGroupController = cpuacct
-AssertControlGroupController = devices
 AssertControlGroupController = v1
 AssertControlGroupController = v2
 # multiple values
 AssertControlGroupController = cpu memory
+## invalid values
+AssertControlGroupController = invalid
 
 
 ###### controller list
@@ -1964,6 +1986,18 @@ CoredumpFilter = invalid shared-dax
 CoredumpFilter = private-file-backed, shared-dax
 
 
+###### memory pressure watch
+<endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
+MemoryPressureWatch = auto
+MemoryPressureWatch = off
+MemoryPressureWatch = on
+MemoryPressureWatch = skip
+## invalid values
+MemoryPressureWatch = invalid
+# multiple values
+MemoryPressureWatch = auto skip
+
+
 ###### mount flag
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
 MountFlags = private
@@ -2192,6 +2226,16 @@ Restart = on-watchdog
 Restart = invalid
 # multiple values
 Restart = no on-abort
+
+
+###### restart mode
+<endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
+RestartMode = direct
+RestartMode = normal
+## invalid values
+RestartMode = invalid
+# multiple values
+RestartMode = direct normal
 
 
 ###### runtime directory preserve
@@ -2564,7 +2608,10 @@ OnBootSec = 15
 # micro second
 OnBootSec = 123 usec
 OnBootSec = 123us
+# using UTF-8 "Micro Sign" U+00B5 &micro; &#181; &#xB5;
 OnBootSec = 123 µs
+# using UTF-8 "Greek Small Letter Mu" U+03BC &mu; &#956; &#x3BC;
+OnBootSec = 123 μs
 # milli second
 OnBootSec = 123 msec
 OnBootSec = 123ms
@@ -2643,7 +2690,10 @@ Timestamping = nsec
 Timestamping = off
 Timestamping = us
 Timestamping = usec
+# using UTF-8 "Micro Sign" U+00B5 &micro; &#181; &#xB5;
 Timestamping = µs
+# using UTF-8 "Greek Small Letter Mu" U+03BC &mu; &#956; &#x3BC;
+Timestamping = μs
 ## invalid values
 Timestamping = nanosec
 # multiple values

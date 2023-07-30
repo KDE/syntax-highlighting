@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created for systemd version 253. -->
+<!-- Created for systemd version 254. -->
 <!DOCTYPE language [
 <!ENTITY alp "A-Za-z">
 <!ENTITY aln "&alp;0-9">
@@ -18,11 +18,12 @@
 <!ENTITY tsp_min "minutes?|min|m">
 <!ENTITY tsp_sec "seconds?|sec|s">
 <!ENTITY tsp_msec "msec|ms">
-<!ENTITY tsp_usec "usec|us|µs">
+<!-- Accept both UTF-8 "Micro Sign" and UTF-8 "Greek Small Letter Mu" for micro seconds. -->
+<!ENTITY tsp_usec "usec|[u&#181;&#956;]s">
 <!ENTITY tsp_unit "&tsp_year;|&tsp_month;|&tsp_week;|&tsp_day;|&tsp_hour;|&tsp_sec;|&tsp_msec;|&tsp_usec;|&tsp_min;">
 <!ENTITY tsp "\d+(?:\.\d+)?\h*(?=(&tsp_unit;)?)">
 ]>
-<language author="Andreas Gratzer" version="12" extensions="*.automount;*.device;*.mount;*.path;*.service;*.slice;*.socket;*.swap;*.target;*.timer" kateversion="5.0" license="MIT" mimetype="text/x-systemd-unit" name="systemd unit" section="Configuration">
+<language author="Andreas Gratzer" version="13" extensions="*.automount;*.device;*.mount;*.path;*.service;*.slice;*.socket;*.swap;*.target;*.timer" kateversion="5.0" license="MIT" mimetype="text/x-systemd-unit" name="systemd unit" section="Configuration">
   <highlighting>
     <list name="boolean">
       <!-- 0, 1, t, f, y, n are also valid, but handled using AnyChar. -->
@@ -34,6 +35,8 @@
       <item>off</item>
     </list>
     <list name="action">
+      <item>soft-reboot-force</item>
+      <item>soft-reboot</item>
       <item>reboot-immediate</item>
       <item>reboot-force</item>
       <item>reboot</item>
@@ -41,6 +44,11 @@
       <item>poweroff-force</item>
       <item>poweroff</item>
       <item>none</item>
+      <item>kexec-force</item>
+      <item>kexec</item>
+      <item>halt-immediate</item>
+      <item>halt-force</item>
+      <item>halt</item>
       <item>exit-force</item>
       <item>exit</item>
     </list>
@@ -219,10 +227,11 @@
       <item>blkio</item>
     </list>
     <list name="controller cg">
+      <item>v2</item>
+      <item>v1</item>
       <item>pids</item>
       <item>memory</item>
       <item>io</item>
-      <item>cpuset</item>
       <item>cpu</item>
     </list>
     <list name="cpu feature">
@@ -565,6 +574,15 @@
       <item>low-delay</item>
       <item>low-cost</item>
     </list>
+    <list name="job mode">
+      <item>replace-irreversibly</item>
+      <item>replace</item>
+      <item>isolate</item>
+      <item>ignore-requirements</item>
+      <item>ignore-dependencies</item>
+      <item>flush</item>
+      <item>fail</item>
+    </list>
     <list name="keyring mode">
       <item>shared</item>
       <item>private</item>
@@ -621,6 +639,12 @@
       <item>default</item>
       <item>all</item>
     </list>
+    <list name="memory pressure watch">
+      <item>skip</item>
+      <item>on</item>
+      <item>off</item>
+      <item>auto</item>
+    </list>
     <list name="mount flag">
       <item>slave</item>
       <item>shared</item>
@@ -647,15 +671,6 @@
       <item>interleave</item>
       <item>default</item>
       <item>bind</item>
-    </list>
-    <list name="on failure job mode">
-      <item>replace-irreversibly</item>
-      <item>replace</item>
-      <item>isolate</item>
-      <item>ignore-requirements</item>
-      <item>ignore-dependencies</item>
-      <item>flush</item>
-      <item>fail</item>
     </list>
     <list name="oom behavior">
       <item>kill</item>
@@ -712,6 +727,10 @@
       <item>no</item>
       <item>always</item>
     </list>
+    <list name="restart mode">
+      <item>normal</item>
+      <item>direct</item>
+    </list>
     <list name="runtime directory preserve">
       <item>restart</item>
     </list>
@@ -730,6 +749,7 @@
       <item>smack</item>
       <item>selinux</item>
       <item>ima</item>
+      <item>cvm</item>
       <item>audit</item>
       <item>apparmor</item>
     </list>
@@ -819,12 +839,14 @@
       <item>@swap</item>
       <item>@signal</item>
       <item>@setuid</item>
+      <item>@sandbox</item>
       <item>@resources</item>
       <item>@reboot</item>
       <item>@raw-io</item>
       <item>@process</item>
       <item>@privileged-api</item>
       <item>@privileged</item>
+      <item>@pkey</item>
       <item>@obsolete</item>
       <item>@network-io</item>
       <item>@network</item>
@@ -854,6 +876,7 @@
       <item>10sec</item>
     </list>
     <list name="timestamping">
+      <item>μs</item>
       <item>µs</item>
       <item>usec</item>
       <item>us</item>
@@ -909,13 +932,16 @@
       <item>ConfigurationDirectory</item>
       <item>ExecSearchPath</item>
       <item>ExtensionDirectories</item>
+      <item>ExtensionImagePolicy</item>
       <item>ExtensionImages</item>
       <item>IPCNamespacePath</item>
+      <item>ImportCredential</item>
       <item>InaccessiblePaths</item>
       <item>LoadCredential</item>
       <item>LoadCredentialEncrypted</item>
       <item>LogNamespace</item>
       <item>LogsDirectory</item>
+      <item>MountImagePolicy</item>
       <item>MountImages</item>
       <item>NetworkNamespacePath</item>
       <item>PAMName</item>
@@ -926,6 +952,7 @@
       <item>RootHashSignature</item>
       <item>RootImage</item>
       <item>RootImageOptions</item>
+      <item>RootImagePolicy</item>
       <item>RootVerity</item>
       <item>RuntimeDirectory</item>
       <item>SetCredential</item>
@@ -941,6 +968,7 @@
     </list>
     <list name="options resource-control">
       <!-- Only options of type "text". Others are handled separately. -->
+      <item>DelegateSubgroup</item>
       <item>DeviceAllow</item>
       <item>IPEgressFilterPath</item>
       <item>IPIngressFilterPath</item>
@@ -1195,7 +1223,7 @@
         <keyword String="collect mode" attribute="Constant" context="#pop"/>
       </context>
       <context name="controller cg" attribute="Normal" lineEndContext="#pop">
-        <keyword String="controller cg" attribute="Constant" context="#pop"/>
+        <keyword String="controller cg" attribute="Constant"/>
       </context>
       <context name="controller list" attribute="Normal" lineEndContext="#pop">
         <keyword String="controller" attribute="Constant"/>
@@ -1329,6 +1357,9 @@
         <Int attribute="Number" context="#pop"/>
         <keyword String="ip tos" attribute="Constant" context="#pop"/>
       </context>
+      <context name="job mode" attribute="Normal" lineEndContext="#pop">
+        <keyword String="job mode" attribute="Constant" context="#pop"/>
+      </context>
       <context name="keyring mode" attribute="Normal" lineEndContext="#pop">
         <keyword String="keyring mode" attribute="Constant" context="#pop"/>
       </context>
@@ -1371,6 +1402,9 @@
         <keyword String="memory mapping" attribute="Constant"/>
         <IncludeRules context="list"/>
       </context>
+      <context name="memory pressure watch" attribute="Normal" lineEndContext="#pop">
+        <keyword String="memory pressure watch" attribute="Constant" context="#pop"/>
+      </context>
       <context name="mount flag" attribute="Normal" lineEndContext="#pop">
         <keyword String="mount flag" attribute="Constant" context="#pop"/>
       </context>
@@ -1393,9 +1427,6 @@
       </context>
       <context name="numa policy" attribute="Normal" lineEndContext="#pop">
         <keyword String="numa policy" attribute="Constant" context="#pop"/>
-      </context>
-      <context name="on failure job mode" attribute="Normal" lineEndContext="#pop">
-        <keyword String="on failure job mode" attribute="Constant" context="#pop"/>
       </context>
       <context name="oom behavior" attribute="Normal" lineEndContext="#pop">
         <keyword String="oom behavior" attribute="Constant" context="#pop"/>
@@ -1440,6 +1471,9 @@
       </context>
       <context name="restart" attribute="Normal" lineEndContext="#pop">
         <keyword String="restart" attribute="Constant" context="#pop"/>
+      </context>
+      <context name="restart mode" attribute="Normal" lineEndContext="#pop">
+        <keyword String="restart mode" attribute="Constant" context="#pop"/>
       </context>
       <context name="runtime directory preserve" attribute="Normal" lineEndContext="#pop">
         <keyword String="runtime directory preserve" attribute="Constant" context="#pop"/>
@@ -1660,6 +1694,7 @@
         <WordDetect String="LogRateLimitIntervalSec" firstNonSpace="true" attribute="Option Name" context="time span"/>
         <WordDetect String="LogsDirectoryMode" firstNonSpace="true" attribute="Option Name" context="file mode"/>
         <WordDetect String="MemoryDenyWriteExecute" firstNonSpace="true" attribute="Option Name" context="boolean"/>
+        <WordDetect String="MemoryKSM" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="MountAPIVFS" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="MountFlags" firstNonSpace="true" attribute="Option Name" context="mount flag"/>
         <WordDetect String="NUMAMask" firstNonSpace="true" attribute="Option Name" context="numa mask"/>
@@ -1691,6 +1726,7 @@
         <WordDetect String="RestrictNamespaces" firstNonSpace="true" attribute="Option Name" context="~ namespace list"/>
         <WordDetect String="RestrictRealtime" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="RestrictSUIDSGID" firstNonSpace="true" attribute="Option Name" context="boolean"/>
+        <WordDetect String="RootEphemeral" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="RootHash" firstNonSpace="true" attribute="Option Name" context="hex"/>
         <WordDetect String="RuntimeDirectoryMode" firstNonSpace="true" attribute="Option Name" context="file mode"/>
         <WordDetect String="RuntimeDirectoryPreserve" firstNonSpace="true" attribute="Option Name" context="runtime directory preserve"/>
@@ -1726,6 +1762,7 @@
         <WordDetect String="Also" firstNonSpace="true" attribute="Option Name" context="unit list"/>
         <WordDetect String="DefaultInstance" firstNonSpace="true" attribute="Option Name" context="text"/>
         <WordDetect String="RequiredBy" firstNonSpace="true" attribute="Option Name" context="unit list"/>
+        <WordDetect String="UpheldBy" firstNonSpace="true" attribute="Option Name" context="unit list"/>
         <WordDetect String="WantedBy" firstNonSpace="true" attribute="Option Name" context="unit list"/>
       </context>
       <context name="options kill" attribute="Normal" lineEndContext="#stay">
@@ -1770,6 +1807,7 @@
         <WordDetect String="CPUQuota" firstNonSpace="true" attribute="Option Name" context="percent"/>
         <WordDetect String="CPUQuotaPeriodSec" firstNonSpace="true" attribute="Option Name" context="time span"/>
         <WordDetect String="CPUWeight" firstNonSpace="true" attribute="Option Name" context="cpu weight"/>
+        <WordDetect String="DefaultStartupMemoryLow" firstNonSpace="true" attribute="Option Name" context="cardinal %KMGT infinity"/>
         <WordDetect String="Delegate" firstNonSpace="true" attribute="Option Name" context="delegate"/>
         <WordDetect String="DevicePolicy" firstNonSpace="true" attribute="Option Name" context="device policy"/>
         <WordDetect String="DisableControllers" firstNonSpace="true" attribute="Option Name" context="controller list"/>
@@ -1793,6 +1831,8 @@
         <WordDetect String="MemoryLow" firstNonSpace="true" attribute="Option Name" context="cardinal %KMGT infinity"/>
         <WordDetect String="MemoryMax" firstNonSpace="true" attribute="Option Name" context="cardinal %KMGT infinity"/>
         <WordDetect String="MemoryMin" firstNonSpace="true" attribute="Option Name" context="cardinal %KMGT infinity"/>
+        <WordDetect String="MemoryPressureThresholdSec" firstNonSpace="true" attribute="Option Name" context="time span"/>
+        <WordDetect String="MemoryPressureWatch" firstNonSpace="true" attribute="Option Name" context="memory pressure watch"/>
         <WordDetect String="MemorySwapMax" firstNonSpace="true" attribute="Option Name" context="cardinal KMGT infinity"/>
         <WordDetect String="MemoryZSwapMax" firstNonSpace="true" attribute="Option Name" context="cardinal KMGT infinity"/>
         <WordDetect String="RestrictNetworkInterfaces" firstNonSpace="true" attribute="Option Name" context="~ text"/>
@@ -1803,6 +1843,11 @@
         <WordDetect String="StartupAllowedMemoryNodes" firstNonSpace="true" attribute="Option Name" context="cpu index list"/>
         <WordDetect String="StartupCPUWeight" firstNonSpace="true" attribute="Option Name" context="cpu weight"/>
         <WordDetect String="StartupIOWeight" firstNonSpace="true" attribute="Option Name" context="weight"/>
+        <WordDetect String="StartupMemoryHigh" firstNonSpace="true" attribute="Option Name" context="cardinal %KMGT infinity"/>
+        <WordDetect String="StartupMemoryLow" firstNonSpace="true" attribute="Option Name" context="cardinal %KMGT infinity"/>
+        <WordDetect String="StartupMemoryMax" firstNonSpace="true" attribute="Option Name" context="cardinal %KMGT infinity"/>
+        <WordDetect String="StartupMemorySwapMax" firstNonSpace="true" attribute="Option Name" context="cardinal %KMGT infinity"/>
+        <WordDetect String="StartupMemoryZSwapMax" firstNonSpace="true" attribute="Option Name" context="cardinal %KMGT infinity"/>
         <WordDetect String="TasksAccounting" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="TasksMax" firstNonSpace="true" attribute="Option Name" context="cardinal % infinity"/>
       </context>
@@ -1817,6 +1862,7 @@
         <WordDetect String="ExecStopPost" firstNonSpace="true" attribute="Option Name" context="exec"/>
         <WordDetect String="ExitType" firstNonSpace="true" attribute="Option Name" context="exit type"/>
         <WordDetect String="FileDescriptorStoreMax" firstNonSpace="true" attribute="Option Name" context="cardinal"/>
+        <WordDetect String="FileDescriptorStorePreserve" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="GuessMainPID" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="NonBlocking" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="NotifyAccess" firstNonSpace="true" attribute="Option Name" context="notify access"/>
@@ -1826,8 +1872,11 @@
         <WordDetect String="RemainAfterExit" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="Restart" firstNonSpace="true" attribute="Option Name" context="restart"/>
         <WordDetect String="RestartForceExitStatus" firstNonSpace="true" attribute="Option Name" context="exit status signal"/>
+        <WordDetect String="RestartMaxDelaySec" firstNonSpace="true" attribute="Option Name" context="time span"/>
+        <WordDetect String="RestartMode" firstNonSpace="true" attribute="Option Name" context="restart mode"/>
         <WordDetect String="RestartPreventExitStatus" firstNonSpace="true" attribute="Option Name" context="exit status signal"/>
         <WordDetect String="RestartSec" firstNonSpace="true" attribute="Option Name" context="time span"/>
+        <WordDetect String="RestartSteps" firstNonSpace="true" attribute="Option Name" context="cardinal"/>
         <WordDetect String="RootDirectoryStartOnly" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="RuntimeMaxSec" firstNonSpace="true" attribute="Option Name" context="timeout"/>
         <WordDetect String="RuntimeRandomizedExtraSec" firstNonSpace="true" attribute="Option Name" context="cardinal"/>
@@ -1992,8 +2041,9 @@
         <WordDetect String="JobTimeoutSec" firstNonSpace="true" attribute="Option Name" context="timeout"/>
         <WordDetect String="JoinsNamespaceOf" firstNonSpace="true" attribute="Option Name" context="unit list"/>
         <WordDetect String="OnFailure" firstNonSpace="true" attribute="Option Name" context="unit list"/>
-        <WordDetect String="OnFailureJobMode" firstNonSpace="true" attribute="Option Name" context="on failure job mode"/>
+        <WordDetect String="OnFailureJobMode" firstNonSpace="true" attribute="Option Name" context="job mode"/>
         <WordDetect String="OnSuccess" firstNonSpace="true" attribute="Option Name" context="unit list"/>
+        <WordDetect String="OnSuccessJobMode" firstNonSpace="true" attribute="Option Name" context="job mode"/>
         <WordDetect String="PartOf" firstNonSpace="true" attribute="Option Name" context="unit list"/>
         <WordDetect String="PropagatesReloadTo" firstNonSpace="true" attribute="Option Name" context="unit list"/>
         <WordDetect String="PropagatesStopTo" firstNonSpace="true" attribute="Option Name" context="unit list"/>

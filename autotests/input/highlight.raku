@@ -649,3 +649,76 @@ for $file.lines -> $line {
         say "Warning: '$p2' is not on our list!";
     }
 }
+
+my @array = [ 'x', 'xx', 'xxx', 'o', 'oo', 'X', 'Y', 'Z' ];
+my @array = <  x    xx    xxx    o    oo    X    Y    Z  >;
+
+sub plus { $^a + $^b };
+say [[&plus]] 1, 2, 3;
+
+say [X~] (1, 2), <a b>;
+
+my @n = [\~] 1..*;
+say @n[^5];
+
+my @l = <a b c d> Z~ ':' xx *;
+   @l = <a b c d> Z~ 1, 2, *;
+
+say so 1 S& 2 S& 3;
+
+say %color«cherry "$fruit"».raku
+say $a.:<++>;
+
+say 2 !(elem) (1, 2, 3);
+
+say $_ if /A/ ^ff^ /C/ for @list
+
+my @result;
+<people of earth>
+    ==> map({ .tc })
+    ==> my @caps; @caps   # also could wrap in parentheses instead
+    ==> grep /<[PE]>/
+    ==> sort()
+    ==> @result;
+
+my @result
+    <== sort()
+    <== grep({ /<[PE]>/ })
+    <== my @caps            # unlike ==>, there's no need for additional statement
+    <== map({ .tc })
+    <== <people of earth>;
+
+False and do { 42.say };
+3, do if 1 { 2 }  ;
+if 0 { say "no" } elsif False { say "NO" } else { say "yes" }
+$_ = 1; unless False -> $a { $a.say } ;
+when so $a { say 'a' }
+
+for 1..100 {
+    when * %% 15 { say 'FizzBuzz' }
+    when * %% 3  { say 'Fizz' }
+    when * %% 5  { say 'Buzz' }
+    default      { say $_ }
+}
+
+multi sub grab(**@a) { "grab $_".say for @a }
+multi sub grab(\a) {
+    a ~~ Iterable and a.VAR !~~ Scalar ?? nextwith(|a) !! nextwith(a,)
+}
+
+for '.' {
+    .Str.say when !.IO.d;
+    .IO.dir()».&?BLOCK when .IO.d # lets recurse a little!
+}
+
+say a».(0.5); say a>>.(0.5); a.:<sa> ; a. sa :!False
+func <a b>
+
+
+if 'abc-abc-abc' ~~ / $<string>=( [ $<part>=[abc] ]* % '-' ) / {
+    say ~$<string>;          # OUTPUT: «abc-abc-abc␤»
+    say ~$<string><part>;    # OUTPUT: «abc abc abc␤»
+    say ~$<string><part>[0]; # OUTPUT: «abc␤»
+}
+
+[«[«[«[+]»]»]»] <1 2 3 4>

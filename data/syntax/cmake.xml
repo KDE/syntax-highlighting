@@ -25,7 +25,7 @@
 
 <language
     name="CMake"
-    version="48"
+    version="49"
     kateversion="5.62"
     section="Other"
     extensions="CMakeLists.txt;*.cmake;*.cmake.in"
@@ -1057,7 +1057,7 @@
       <item>AFTER</item>
       <item>BEFORE</item>
     </list>
-    <list name="link_libraries_nargs">
+    <list name="link_libraries_sargs">
       <item>debug</item>
       <item>general</item>
       <item>optimized</item>
@@ -4608,7 +4608,7 @@
         <WordDetect String="target_compile_options" insensitive="true" attribute="Command" context="target_compile_options_ctx"/>
         <WordDetect String="target_include_directories" insensitive="true" attribute="Command" context="target_include_directories_ctx"/>
         <WordDetect String="target_link_directories" insensitive="true" attribute="Command" context="target_compile_options_ctx"/>
-        <WordDetect String="target_link_libraries" insensitive="true" attribute="Command" context="target_compile_definitions_ctx"/>
+        <WordDetect String="target_link_libraries" insensitive="true" attribute="Command" context="target_link_libraries_ctx"/>
         <WordDetect String="target_link_options" insensitive="true" attribute="Command" context="target_compile_definitions_ctx"/>
         <WordDetect String="target_precompile_headers" insensitive="true" attribute="Command" context="target_precompile_headers_ctx"/>
         <WordDetect String="target_sources" insensitive="true" attribute="Command" context="target_sources_ctx"/>
@@ -5537,7 +5537,7 @@
       <context attribute="Normal Text" lineEndContext="#stay" name="link_libraries_ctx_op">
         <DetectSpaces/>
         <DetectChar attribute="Normal Text" context="#pop" char=")" lookAhead="true"/>
-        <keyword attribute="Named Args" context="#stay" String="link_libraries_nargs"/>
+        <keyword attribute="Special Args" context="#stay" String="link_libraries_sargs"/>
         <IncludeRules context="User Function Args"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="load_cache_ctx">
@@ -5685,6 +5685,24 @@
         <DetectSpaces/>
         <DetectChar attribute="Normal Text" context="#pop" char=")" lookAhead="true"/>
         <keyword attribute="Named Args" context="#stay" String="target_include_directories_nargs"/>
+        <IncludeRules context="User Function Args"/>
+      </context>
+      <context attribute="Normal Text" lineEndContext="#stay" name="target_link_libraries_ctx">
+        <DetectChar attribute="Normal Text" context="target_link_libraries_ctx_op_tgt_first" char="("/>
+        <DetectChar attribute="Normal Text" context="#pop" char=")"/>
+      </context>
+      <context attribute="Normal Text" lineEndContext="#stay" name="target_link_libraries_ctx_op_tgt_first">
+        <DetectSpaces/>
+        <RegExpr attribute="Aliased Targets" context="target_link_libraries_ctx_op" String="&tgt_name_re;::&tgt_name_re;(?:\:\:&tgt_name_re;)*"/>
+        <RegExpr attribute="Targets" context="target_link_libraries_ctx_op" String="&tgt_name_re;"/>
+        <IncludeRules context="User Function Opened"/>
+        <IncludeRules context="LineError"/>
+      </context>
+      <context attribute="Normal Text" lineEndContext="#stay" name="target_link_libraries_ctx_op">
+        <DetectSpaces/>
+        <DetectChar attribute="Normal Text" context="#pop" char=")" lookAhead="true"/>
+        <keyword attribute="Named Args" context="#stay" String="target_compile_definitions_nargs"/>
+        <keyword attribute="Special Args" context="#stay" String="link_libraries_sargs"/>
         <IncludeRules context="User Function Args"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="target_precompile_headers_ctx">

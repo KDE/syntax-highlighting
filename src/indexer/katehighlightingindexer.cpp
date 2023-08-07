@@ -1199,12 +1199,13 @@ private:
     //! - dynamic=true but no place holder used?
     //! - is not . with lookAhead="1"
     //! - is not ^... without column ou firstNonSpace attribute
-    //! - is not equivalent to DetectSpaces, DetectChar, Detect2Chars, StringDetect, DetectIdentifier, RangeDetect
+    //! - is not equivalent to DetectSpaces, DetectChar, Detect2Chars, StringDetect, DetectIdentifier, RangeDetect, LineContinue or AnyChar
     //! - has no unused captures
     //! - has no unnecessary quantifier with lookAhead
     bool checkRegExpr(const QString &filename, const Context::Rule &rule, const Context &context) const
     {
-        if (rule.type == Context::Rule::Type::RegExpr) {
+        // ignore empty regex because the error is raised during xml parsing
+        if (rule.type == Context::Rule::Type::RegExpr && !rule.string.isEmpty()) {
             const QRegularExpression regexp(rule.string);
             if (!checkRegularExpression(rule.filename, regexp, rule.line)) {
                 return false;
@@ -1250,7 +1251,15 @@ private:
             if ((rule.lookAhead == XmlBool::True || rule.minimal == XmlBool::True || rule.string.contains(QStringLiteral(".*?"))
                  || rule.string.contains(QStringLiteral("[^")))
                 && reg.contains(isRange)) {
-                qWarning() << filename << "line" << rule.line << "RegExpr should be replaced by RangeDetect:" << rule.string;
+                qWarning() << rule.filename << "line" << rule.line << "RegExpr should be replaced by RangeDetect:" << rule.string;
+                return false;
+            }
+
+            // is AnyChar
+            static const QRegularExpression isAnyChar(QStringLiteral(R"(^(\^|\((\?:)?)*\[(?!\^)[-\]]?(\\[^0BDPSWbdpswoux]|[^-\]\\])*\]\)*$)"));
+            if (rule.string.contains(isAnyChar)) {
+                auto extra = (reg[0] == QLatin1Char('^') || reg[1] == QLatin1Char('^')) ? "with column=\"0\"" : "";
+                qWarning() << rule.filename << "line" << rule.line << "RegExpr should be replaced by AnyChar:" << rule.string << extra;
                 return false;
             }
 
@@ -1258,7 +1267,7 @@ private:
             static const QRegularExpression isLineContinue(QStringLiteral("^\\^?" REG_CHAR "\\$$"));
             if (reg.contains(isLineContinue)) {
                 auto extra = (reg[0] == QLatin1Char('^')) ? "with column=\"0\"" : "";
-                qWarning() << filename << "line" << rule.line << "RegExpr should be replaced by LineContinue:" << rule.string << extra;
+                qWarning() << rule.filename << "line" << rule.line << "RegExpr should be replaced by LineContinue:" << rule.string << extra;
                 return false;
             }
 
@@ -1276,7 +1285,7 @@ private:
             if (rule.lookAhead == XmlBool::True && rule.minimal != XmlBool::True && reg.contains(isMinimal) && !reg.contains(hasNotGreedy)
                 && (!rule.context.context || !rule.context.context->hasDynamicRule || regexp.captureCount() == 0)
                 && (reg.back() != QLatin1Char('$') || reg.contains(QLatin1Char('|')))) {
-                qWarning() << filename << "line" << rule.line
+                qWarning() << rule.filename << "line" << rule.line
                            << "RegExpr should be have minimal=\"1\" or use lazy operator (i.g, '.*' -> '.*?'):" << rule.string;
                 return false;
             }
@@ -1312,8 +1321,8 @@ private:
                 return false;
             }
 
-            // column="0" or firstNonSpace="1"
-            if (rule.column == -1 && rule.firstNonSpace != XmlBool::True) {
+            // column="0"
+            if (rule.column == -1) {
                 // ^ without |
                 // (^sas*) -> ok
                 // (^sa|s*) -> ko
@@ -1356,7 +1365,7 @@ private:
                     }
 
                     if (replace) {
-                        qWarning() << rule.filename << "line" << rule.line << "column=\"0\" or firstNonSpace=\"1\" missing with RegExpr:" << rule.string;
+                        qWarning() << rule.filename << "line" << rule.line << "column=\"0\" missing with RegExpr:" << rule.string;
                         return false;
                     }
                 }
@@ -1509,7 +1518,7 @@ private:
                 static const QRegularExpression unnecessaryQuantifier2(QStringLiteral(R"([*+?]([.][*+?]{0,2})?[)]*$)"));
                 auto &unnecessaryQuantifier = useCapture ? unnecessaryQuantifier1 : unnecessaryQuantifier2;
                 if (rule.lookAhead == XmlBool::True && rule.minimal != XmlBool::True && reg.contains(unnecessaryQuantifier)) {
-                    qWarning() << filename << "line" << rule.line
+                    qWarning() << rule.filename << "line" << rule.line
                                << "Last quantifier is not necessary (i.g., 'xyz*' -> 'xy', 'xyz+.' -> 'xyz.'):" << rule.string;
                     return false;
                 }

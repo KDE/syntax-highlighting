@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>highlight.g4</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (ANTLR) - Theme (Breeze Light)"/>
+</head><body style="background-color:#ffffff;color:#1f1c1b"><pre>
+<span style="color:#898887;">/* This test file tests Kate's ANTLR highlighting </span>
+<span style="color:#898887;">   compilable bt ANTLR although not directly:</span>
+<span style="color:#898887;">   grammar can be alone file for both parser and lexer</span>
+<span style="color:#898887;">   or two files</span>
+<span style="color:#898887;">   This file is merged TestParser.g4 and TestLexer.g4</span>
+<span style="color:#898887;">   this lines also tests regions of multiline comment</span>
+<span style="color:#898887;">*/</span>
+<span style="color:#898887;">//file TestParser.g4</span>
+<span style="font-weight:bold;">parser</span> <span style="font-weight:bold;">grammar</span> TestParser<span style="color:#ca60ca;">;</span>
+
+<span style="color:#0057ae;">options</span> <span style="color:#ca60ca;">{</span> tokenVocab <span style="color:#ca60ca;">=</span> TestLexer<span style="color:#ca60ca;">;</span> <span style="color:#ca60ca;">}</span>
+
+<span style="color:#898887;">// The main entry point for parsing a grammar.</span>
+
+startRule
+     <span style="color:#ca60ca;">:</span>  <span style="color:#ca60ca;">(</span>expression <span style="color:#ca60ca;">|</span> STRING<span style="color:#ca60ca;">)+</span> EOF
+     <span style="color:#ca60ca;">;</span>
+
+expression
+     <span style="color:#ca60ca;">:</span>  expression PLUS mulExpr
+     <span style="color:#ca60ca;">|</span>  expression MINUS mulExpr
+     <span style="color:#ca60ca;">|</span>  mulExpr
+     <span style="color:#ca60ca;">;</span>
+
+mulExpr
+    <span style="color:#ca60ca;">:</span>  mulExpr MUL unaryExpr
+    <span style="color:#ca60ca;">|</span>  mulExpr DIV unaryExpr
+    <span style="color:#ca60ca;">|</span>  unaryExpr
+    <span style="color:#ca60ca;">;</span>
+
+unaryExpr
+    <span style="color:#ca60ca;">:</span> atom
+    <span style="color:#ca60ca;">|</span> LPAR expression RPAR
+    <span style="color:#ca60ca;">;</span>
+
+atom
+    <span style="color:#ca60ca;">:</span> IDENT
+    <span style="color:#ca60ca;">|</span> number
+    <span style="color:#ca60ca;">;</span>
+
+number
+    <span style="color:#ca60ca;">:</span> INT
+    <span style="color:#ca60ca;">|</span> FLOAT
+    <span style="color:#ca60ca;">;</span>
+
+<span style="color:#898887;">//================================</span>
+<span style="color:#898887;">//file TestLexer.g4</span>
+
+<span style="font-weight:bold;">lexer</span> <span style="font-weight:bold;">grammar</span> TestLexer<span style="color:#ca60ca;">;</span>
+
+<span style="color:#898887;">/*'channels' and '{' must be in one line</span>
+<span style="color:#898887;"> to correct highlighting, highlighter can't</span>
+<span style="color:#898887;"> recognize regular expression &quot;(options|tokens|channels)(?=([\s]*{))&quot;</span>
+<span style="color:#898887;"> where apart from \s whitrspaces are end of lines</span>
+<span style="color:#898887;"> */</span>
+<span style="color:#0057ae;">channels</span> <span style="color:#ca60ca;">{</span> OFF_CHANNEL <span style="color:#ca60ca;">,</span> COMMENT <span style="color:#ca60ca;">}</span>
+
+
+PLUS
+    <span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">'+'</span>
+    <span style="color:#ca60ca;">;</span>
+
+MINUS
+    <span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">'-'</span>
+    <span style="color:#ca60ca;">;</span>
+
+MUL
+    <span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">'*'</span>
+    <span style="color:#ca60ca;">;</span>
+
+DIV
+    <span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">'/'</span>
+    <span style="color:#ca60ca;">;</span>
+
+LPAR
+    <span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">'('</span>
+    <span style="color:#ca60ca;">;</span>
+
+RPAR
+    <span style="color:#ca60ca;">:</span> <span style="color:#bf0303;">')'</span>
+    <span style="color:#ca60ca;">;</span>
+
+IDENT
+    <span style="color:#ca60ca;">:</span>   Nondigit
+        <span style="color:#ca60ca;">(</span>   Nondigit
+        <span style="color:#ca60ca;">|</span>   Digit
+        <span style="color:#ca60ca;">)*</span>
+    <span style="color:#ca60ca;">;</span>
+
+<span style="font-weight:bold;">fragment</span>
+Digit
+    <span style="color:#ca60ca;">:</span>   <span style="color:#924c9d;">[0-9]</span>
+    <span style="color:#ca60ca;">;</span>
+
+<span style="font-weight:bold;">fragment</span>
+NonzeroDigit
+    <span style="color:#ca60ca;">:</span>   <span style="color:#924c9d;">[1-9]</span>
+    <span style="color:#ca60ca;">;</span>
+
+<span style="font-weight:bold;">fragment</span>
+Nondigit
+    <span style="color:#ca60ca;">:</span>   <span style="color:#924c9d;">[a-zA-Z_]</span>
+    <span style="color:#ca60ca;">;</span>
+
+Sign
+    <span style="color:#ca60ca;">:</span>   <span style="color:#bf0303;">'+'</span> <span style="color:#ca60ca;">|</span> <span style="color:#bf0303;">'-'</span>
+    <span style="color:#ca60ca;">;</span>
+
+INT
+    <span style="color:#ca60ca;">:</span>  Sign<span style="color:#ca60ca;">?</span> <span style="color:#ca60ca;">(</span>NonzeroDigit Digit<span style="color:#ca60ca;">*</span> <span style="color:#ca60ca;">|</span> <span style="color:#bf0303;">'0'</span><span style="color:#ca60ca;">)</span>
+    <span style="color:#ca60ca;">;</span>
+
+<span style="font-weight:bold;">fragment</span>
+DigitSequence
+    <span style="color:#ca60ca;">:</span>   Digit<span style="color:#ca60ca;">+</span>
+    <span style="color:#ca60ca;">;</span>
+
+<span style="font-weight:bold;">fragment</span>
+ExponentPart
+    <span style="color:#ca60ca;">:</span>   <span style="color:#924c9d;">[eE]</span> Sign<span style="color:#ca60ca;">?</span> DigitSequence
+    <span style="color:#ca60ca;">;</span>
+
+<span style="font-weight:bold;">fragment</span>
+FractionalConstant
+    <span style="color:#ca60ca;">:</span>   DigitSequence<span style="color:#ca60ca;">?</span> <span style="color:#bf0303;">'.'</span> DigitSequence
+    <span style="color:#ca60ca;">|</span>   DigitSequence <span style="color:#bf0303;">'.'</span>
+    <span style="color:#ca60ca;">;</span>
+
+FLOAT
+    <span style="color:#ca60ca;">:</span>   <span style="color:#ca60ca;">(</span>FractionalConstant ExponentPart<span style="color:#ca60ca;">?</span> <span style="color:#ca60ca;">|</span> DigitSequence ExponentPart<span style="color:#ca60ca;">)</span>
+    <span style="color:#ca60ca;">;</span>
+
+
+<span style="font-weight:bold;">fragment</span>
+EscapeSequence
+    <span style="color:#ca60ca;">:</span>   <span style="color:#bf0303;">'\\'</span> <span style="color:#924c9d;">['&quot;?abfnrtvhe\\]</span>
+    <span style="color:#ca60ca;">;</span>
+
+<span style="color:#898887;">//between [] is charset , test escape \</span>
+<span style="color:#898887;">fragment</span>
+SChar
+    <span style="color:#ca60ca;">:</span>   <span style="color:#ca60ca;">~</span><span style="color:#924c9d;">[&quot;\\\r\n]</span>
+    <span style="color:#ca60ca;">|</span>   EscapeSequence
+    <span style="color:#ca60ca;">;</span>
+
+STRING
+    <span style="color:#ca60ca;">:</span>   <span style="color:#bf0303;">'&quot;'</span> SChar<span style="color:#ca60ca;">*</span> <span style="color:#bf0303;">'&quot;'</span>
+    <span style="color:#ca60ca;">;</span>
+</pre></body></html>

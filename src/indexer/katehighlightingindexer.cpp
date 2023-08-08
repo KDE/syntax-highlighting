@@ -1245,8 +1245,8 @@ private:
 
             // is RangeDetect
             static const QRegularExpression isRange(QStringLiteral("^\\^?" REG_CHAR "(?:"
-                                                                   "\\.\\*[?*]?" REG_CHAR "|"
-                                                                   "\\[\\^(" REG_ESCAPE_CHAR "|.)\\]\\*[?*]?\\1"
+                                                                   "\\.\\*[?+]?" REG_CHAR "|"
+                                                                   "\\[\\^(" REG_ESCAPE_CHAR "|.)\\]\\*[?+]?\\1"
                                                                    ")$"));
             if ((rule.lookAhead == XmlBool::True || rule.minimal == XmlBool::True || rule.string.contains(QStringLiteral(".*?"))
                  || rule.string.contains(QStringLiteral("[^")))
@@ -1467,11 +1467,8 @@ private:
 
             if (!useCapture) {
                 // is DetectIdentifier
-                static const QRegularExpression isInsensitiveDetectIdentifier(
-                    QStringLiteral(R"(^(\((\?:)?)?\[((a-z|_){2}|(A-Z|_){2})\]([+][*?]?)?\[((0-9|a-z|_){3}|(0-9|A-Z|_){3})\][*][*?]?(\))?$)"));
-                static const QRegularExpression isSensitiveDetectIdentifier(
-                    QStringLiteral(R"(^(\((\?:)?)?\[(a-z|A-Z|_){3}\]([+][*?]?)?\[(0-9|a-z|A-Z|_){4}\][*][*?]?(\))?$)"));
-                auto &isDetectIdentifier = (rule.insensitive == XmlBool::True) ? isInsensitiveDetectIdentifier : isSensitiveDetectIdentifier;
+                static const QRegularExpression isDetectIdentifier(
+                    QStringLiteral(R"(^(\((\?:)?|\^)*\[(\\p\{L\}|_){2}\]([+][?+]?)?\[(\\p\{N\}|\\p\{L\}|_){3}\][*][?+]?\)*$)"));
                 if (rule.string.contains(isDetectIdentifier)) {
                     qWarning() << rule.filename << "line" << rule.line << "RegExpr should be replaced by DetectIdentifier:" << rule.string;
                     return false;

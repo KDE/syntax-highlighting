@@ -352,10 +352,22 @@
 		</context>
 
 		<!-- Overwrite some rules of 'css.xml' to add Mustache variables -->
-		<context name="CSS-RuleSet" attribute="Normal Text" lineEndContext="#stay">
-			<DetectChar context="#pop" attribute="Normal Text" char="}" endRegion="ruleset" />
+		<context name="CSS-RuleSet" attribute="Normal Text" lineEndContext="#stay" fallthroughContext="CSS-Rule">
 			<IncludeRules context="MustacheVariables" />
-			<IncludeRules context="RuleSet##CSS" />
+			<DetectChar context="CSS-RuleSet" attribute="Normal Text" char="{" beginRegion="ruleset" />
+			<DetectChar context="#pop" attribute="Normal Text" char="}" endRegion="ruleset" />
+         <AnyChar context="CSS-Selector" String=".#:,[*>+~|&amp;" lookAhead="1" />
+		</context>
+		<context name="CSS-Selector" attribute="Normal Text" lineEndContext="#stay">
+			<IncludeRules context="MustacheVariables" />
+			<DetectChar context="#pop!CSS-RuleSet" attribute="Normal Text" char="{" beginRegion="ruleset" />
+			<DetectChar attribute="Normal Text" context="#pop#pop" char="}" endRegion="ruleset"/>
+			<IncludeRules context="Selector##CSS" />
+		</context>
+		<context name="CSS-Rule" attribute="Normal Text" lineEndContext="#stay">
+			<IncludeRules context="MustacheVariables" />
+			<AnyChar context="#pop!CSS-Selector" String=".#,[*>+~|&amp;@{}" lookAhead="1"/>
+			<IncludeRules context="Rule##CSS" />
 		</context>
 		<context name="CSS-SelectorAttr" attribute="CSS: Selector Attribute" lineEndContext="#stay">
 			<DetectChar context="#pop" attribute="CSS: Selector Attribute" char="]" />

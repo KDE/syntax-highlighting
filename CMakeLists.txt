@@ -5,9 +5,6 @@ project(KSyntaxHighlighting VERSION ${KF_VERSION})
 
 find_package(ECM 5.109.0 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
-if(POLICY CMP0063)
-    cmake_policy(SET CMP0063 NEW)
-endif()
 
 include(KDEInstallDirs)
 include(KDECMakeSettings)

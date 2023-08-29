@@ -105,11 +105,11 @@ else
 # replace list with a include
 $file =~ s/<list name="([^"]+)">.*?<\/list>/<list name="$1"><include>$1##$syntaxName<\/include><\/list>/gs;
 
+$file =~ s/<language([^>]+)kateversion="[^"]*"/<language$1kateversion="5.79"/s;
+$file =~ s/ fallthrough="(true|1)"//gs;
+
 if ($language eq "Twig")
 {
-  $file =~ s/<language([^>]+)kateversion="[^"]*"/<language$1kateversion="5.79"/s;
-  $file =~ s/ fallthrough="(true|1)"//gs;
-
   # remove Mustache syntax
   if ($root == 1)
   {

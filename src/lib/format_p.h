@@ -33,7 +33,7 @@ public:
     QString name;
     TextStyleData style;
     Theme::TextStyle defaultStyle = Theme::Normal;
-    quint16 id = 0;
+    int id = 0;
     bool spellCheck = true;
 };
 

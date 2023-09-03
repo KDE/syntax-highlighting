@@ -37,7 +37,7 @@ public:
     void addTheme(const Theme &theme);
 
     quint16 foldingRegionId(const QString &defName, const QString &foldName);
-    quint16 nextFormatId();
+    int nextFormatId();
 
     QList<QString> m_customSearchPaths;
 
@@ -51,7 +51,7 @@ public:
 
     QHash<QPair<QString, QString>, quint16> m_foldingRegionIds;
     quint16 m_foldingRegionId = 0;
-    quint16 m_formatId = 0;
+    int m_formatId = 0;
 };
 }
 

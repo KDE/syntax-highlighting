@@ -54,7 +54,7 @@ public:
      *  the repository is reloaded (which also invalidatess the corresponding
      *  Definition anyway).
      */
-    quint16 id() const;
+    int id() const;
 
     /** Returns the underlying TextStyle of this Format.
      *  Every Theme::TextStyle is visually defined by a Theme. A Format uses one

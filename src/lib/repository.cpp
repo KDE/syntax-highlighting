@@ -377,9 +377,9 @@ quint16 RepositoryPrivate::foldingRegionId(const QString &defName, const QString
     return m_foldingRegionId;
 }
 
-quint16 RepositoryPrivate::nextFormatId()
+int RepositoryPrivate::nextFormatId()
 {
-    Q_ASSERT(m_formatId < std::numeric_limits<quint16>::max());
+    Q_ASSERT(m_formatId < std::numeric_limits<int>::max());
     return ++m_formatId;
 }
 

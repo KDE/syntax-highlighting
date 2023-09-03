@@ -1138,7 +1138,7 @@ private:
         QString name;
         int offset;
         int length;
-        quint16 formatId;
+        int formatId;
     };
 
     struct ContextCaptureHighlighter : KSyntaxHighlighting::AbstractHighlighter {
@@ -1283,7 +1283,7 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
     for (auto &&definition : std::as_const(definitions)) {
         for (auto &&format : std::as_const(DefinitionData::get(definition)->formats)) {
             const auto id = format.id();
-            if (id >= d->ansiStyles.size()) {
+            if (size_t(id) >= d->ansiStyles.size()) {
                 // better than id + 1 to avoid successive allocations
                 d->ansiStyles.resize(id * 2);
             }

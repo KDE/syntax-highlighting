@@ -41,3 +41,8 @@ FoldingRegion::Type FoldingRegion::type() const
 {
     return static_cast<FoldingRegion::Type>(m_type);
 }
+
+FoldingRegion FoldingRegion::sibling() const
+{
+    return isValid() ? FoldingRegion((m_type == Begin) ? End : Begin, m_id) : FoldingRegion();
+}

@@ -109,3 +109,6 @@ endif
 $(info "'")
 $(info '"')
 $(info $(??))
+
+$(eval $(call Variable_rule,target/compile_flags,$${CXX} $$(CXXFLAGS)))
+$(eval ${call Variable_rule,target/link_flags,$$(CXX) $$(LDFLAGS) $${LDLIBS}})

@@ -1168,7 +1168,7 @@ private:
         int depth;
         int offset;
         int bindIndex;
-        quint16 regionId;
+        int regionId;
         State state;
     };
 

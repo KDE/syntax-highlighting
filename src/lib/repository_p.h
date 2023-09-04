@@ -36,7 +36,7 @@ public:
     void loadThemeFolder(const QString &path);
     void addTheme(const Theme &theme);
 
-    quint16 foldingRegionId(const QString &defName, const QString &foldName);
+    int foldingRegionId(const QString &defName, const QString &foldName);
     int nextFormatId();
 
     QList<QString> m_customSearchPaths;
@@ -49,8 +49,8 @@ public:
 
     QList<Theme> m_themes;
 
-    QHash<QPair<QString, QString>, quint16> m_foldingRegionIds;
-    quint16 m_foldingRegionId = 0;
+    QHash<QPair<QString, QString>, int> m_foldingRegionIds;
+    int m_foldingRegionId = 0;
     int m_formatId = 0;
 };
 }

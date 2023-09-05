@@ -783,7 +783,7 @@ GraphLine &lineAtOffset(std::vector<GraphLine> &graphLines, int offset)
 }
 
 // disable bold, italic and underline on |
-const QLatin1String graphSymbol("\x1b[21;23;24m|");
+const QLatin1String graphSymbol("\x1b[22;23;24m|");
 // reverse video
 const QLatin1String nameStyle("\x1b[7m");
 
@@ -1336,7 +1336,7 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
                     } else if (hasEffect) {
                         buffer.append(QLatin1String("\x1b["));
                         if (hasBold) {
-                            buffer.append(QLatin1String("21;"));
+                            buffer.append(QLatin1String("22;"));
                         }
                         if (hasItalic) {
                             buffer.append(QLatin1String("23;"));

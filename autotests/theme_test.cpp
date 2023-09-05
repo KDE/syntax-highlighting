@@ -309,7 +309,8 @@ private Q_SLOTS:
 
         // verify all editor colors are valid
         for (const auto &key : requiredEditorColors) {
-            QVERIFY(QColor::isValidColorName(editorColors.value(key).toString()));
+            auto color = editorColors.value(key).toString();
+            QVERIFY2(QColor::isValidColorName(color), color.toStdString().c_str());
         }
 
         // verify custom-styles if any

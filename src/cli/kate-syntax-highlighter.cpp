@@ -26,7 +26,6 @@ static void applyHighlighter(Highlighter &highlighter,
                              QCommandLineParser &parser,
                              bool fromFileName,
                              const QString &inFileName,
-                             const QCommandLineOption &stdinOption,
                              const QCommandLineOption &outputName,
                              const Ts &...highlightParams)
 {
@@ -38,12 +37,10 @@ static void applyHighlighter(Highlighter &highlighter,
 
     if (fromFileName) {
         highlighter.highlightFile(inFileName, highlightParams...);
-    } else if (parser.isSet(stdinOption)) {
+    } else {
         QFile inFile;
         inFile.open(stdin, QIODevice::ReadOnly);
         highlighter.highlightData(&inFile, highlightParams...);
-    } else {
-        parser.showHelp(1);
     }
 }
 
@@ -61,7 +58,9 @@ int main(int argc, char **argv)
     parser.setApplicationDescription(app.translate("SyntaxHighlightingCLI", "Command line syntax highlighter using Kate syntax definitions."));
     parser.addHelpOption();
     parser.addVersionOption();
-    parser.addPositionalArgument(app.translate("SyntaxHighlightingCLI", "source"), app.translate("SyntaxHighlightingCLI", "The source file to highlight."));
+    parser.addPositionalArgument(
+        app.translate("SyntaxHighlightingCLI", "source"),
+        app.translate("SyntaxHighlightingCLI", "The source file to highlight. If absent, read the file from stdin and the --syntax option must be used."));
 
     QCommandLineOption listDefs(QStringList() << QStringLiteral("l") << QStringLiteral("list"),
                                 app.translate("SyntaxHighlightingCLI", "List all available syntax definitions."));
@@ -112,10 +111,6 @@ int main(int argc, char **argv)
         app.translate("SyntaxHighlightingCLI", "Set HTML page's title\n(default: the filename or \"Kate Syntax Highlighter\" if reading from stdin)."),
         app.translate("SyntaxHighlightingCLI", "title"));
     parser.addOption(titleOption);
-
-    QCommandLineOption stdinOption(QStringList() << QStringLiteral("stdin"),
-                                   app.translate("SyntaxHighlightingCLI", "Read file from stdin. The -s option must also be used."));
-    parser.addOption(stdinOption);
 
     parser.process(app);
 
@@ -177,7 +172,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    QString outputFormat = parser.value(outputFormatOption);
+    const QString outputFormat = parser.value(outputFormatOption);
     if (0 == outputFormat.compare(QLatin1String("html"), Qt::CaseInsensitive)) {
         QString title;
         if (parser.isSet(titleOption)) {
@@ -187,7 +182,7 @@ int main(int argc, char **argv)
         HtmlHighlighter highlighter;
         highlighter.setDefinition(def);
         highlighter.setTheme(repo.theme(parser.value(themeName)));
-        applyHighlighter(highlighter, parser, fromFileName, inFileName, stdinOption, outputName, title);
+        applyHighlighter(highlighter, parser, fromFileName, inFileName, outputName, title);
     } else {
         auto AnsiFormat = AnsiHighlighter::AnsiFormat::TrueColor;
         if (0 == outputFormat.compare(QLatin1String("ansi256Colors"), Qt::CaseInsensitive)) {
@@ -219,7 +214,7 @@ int main(int argc, char **argv)
         AnsiHighlighter highlighter;
         highlighter.setDefinition(def);
         highlighter.setTheme(repo.theme(parser.value(themeName)));
-        applyHighlighter(highlighter, parser, fromFileName, inFileName, stdinOption, outputName, AnsiFormat, !parser.isSet(noAnsiEditorBg), debugOptions);
+        applyHighlighter(highlighter, parser, fromFileName, inFileName, outputName, AnsiFormat, !parser.isSet(noAnsiEditorBg), debugOptions);
     }
 
     return 0;

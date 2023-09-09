@@ -106,7 +106,7 @@ void HtmlHighlighter::highlightData(QIODevice *dev, const QString &title)
 
     QString htmlTitle;
     if (title.isEmpty()) {
-        htmlTitle = QStringLiteral("Kate Syntax Highlighter");
+        htmlTitle = QStringLiteral("KSyntaxHighlighter");
     } else {
         htmlTitle = title.toHtmlEscaped();
     }

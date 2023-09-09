@@ -1,4 +1,4 @@
-add_executable(ksyntaxhighlighter6 kate-syntax-highlighter.cpp)
+add_executable(ksyntaxhighlighter6 ksyntaxhighlighter.cpp)
 ecm_mark_nongui_executable(ksyntaxhighlighter6)
 target_link_libraries(ksyntaxhighlighter6 KF6SyntaxHighlighting)
 

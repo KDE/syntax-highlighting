@@ -47,7 +47,7 @@ static void applyHighlighter(Highlighter &highlighter,
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName(QStringLiteral("kate-syntax-highlighter"));
+    QCoreApplication::setApplicationName(QStringLiteral("ksyntaxhighlighter"));
     QCoreApplication::setOrganizationDomain(QStringLiteral("kde.org"));
     QCoreApplication::setOrganizationName(QStringLiteral("KDE"));
     QCoreApplication::setApplicationVersion(QStringLiteral(KSYNTAXHIGHLIGHTING_VERSION_STRING));
@@ -55,7 +55,7 @@ int main(int argc, char **argv)
     Repository repo;
 
     QCommandLineParser parser;
-    parser.setApplicationDescription(app.translate("SyntaxHighlightingCLI", "Command line syntax highlighter using Kate syntax definitions."));
+    parser.setApplicationDescription(app.translate("SyntaxHighlightingCLI", "Command line syntax highlighter using KSyntaxHighlighting syntax definitions."));
     parser.addHelpOption();
     parser.addVersionOption();
     parser.addPositionalArgument(
@@ -108,7 +108,7 @@ int main(int argc, char **argv)
 
     QCommandLineOption titleOption(
         QStringList() << QStringLiteral("T") << QStringLiteral("title"),
-        app.translate("SyntaxHighlightingCLI", "Set HTML page's title\n(default: the filename or \"Kate Syntax Highlighter\" if reading from stdin)."),
+        app.translate("SyntaxHighlightingCLI", "Set HTML page's title\n(default: the filename or \"KSyntaxHighlighter\" if reading from stdin)."),
         app.translate("SyntaxHighlightingCLI", "title"));
     parser.addOption(titleOption);
 

@@ -1,0 +1,148 @@
+<Comment>/* This test file tests Kate's ANTLR highlighting </Comment><br/>
+<Comment>   compilable bt ANTLR although not directly:</Comment><br/>
+<Comment>   grammar can be alone file for both parser and lexer</Comment><br/>
+<Comment>   or two files</Comment><br/>
+<Comment>   This file is merged TestParser.g4 and TestLexer.g4</Comment><br/>
+<Comment>   this lines also tests regions of multiline comment</Comment><br/>
+<Comment>*/</Comment><br/>
+<Comment>//file TestParser.g4</Comment><br/>
+<Keyword>parser</Keyword><Normal Text> </Normal Text><Keyword>grammar</Keyword><Normal Text> TestParser</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Attribute>options</Attribute><Normal Text> </Normal Text><Symbol>{</Symbol><Normal Text> tokenVocab </Normal Text><Symbol>=</Symbol><Normal Text> TestLexer</Normal Text><Symbol>;</Symbol><Normal Text> </Normal Text><Symbol>}</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Comment>// The main entry point for parsing a grammar.</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>startRule</Normal Text><br/>
+<Normal Text>     </Normal Text><Symbol>:</Symbol><Normal Text>  </Normal Text><Symbol>(</Symbol><Normal Text>expression </Normal Text><Symbol>|</Symbol><Normal Text> STRING</Normal Text><Symbol>)+</Symbol><Normal Text> EOF</Normal Text><br/>
+<Normal Text>     </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>expression</Normal Text><br/>
+<Normal Text>     </Normal Text><Symbol>:</Symbol><Normal Text>  expression PLUS mulExpr</Normal Text><br/>
+<Normal Text>     </Normal Text><Symbol>|</Symbol><Normal Text>  expression MINUS mulExpr</Normal Text><br/>
+<Normal Text>     </Normal Text><Symbol>|</Symbol><Normal Text>  mulExpr</Normal Text><br/>
+<Normal Text>     </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>mulExpr</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text>  mulExpr MUL unaryExpr</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>|</Symbol><Normal Text>  mulExpr DIV unaryExpr</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>|</Symbol><Normal Text>  unaryExpr</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>unaryExpr</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text> atom</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>|</Symbol><Normal Text> LPAR expression RPAR</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>atom</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text> IDENT</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>|</Symbol><Normal Text> number</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>number</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text> INT</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>|</Symbol><Normal Text> FLOAT</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Comment>//================================</Comment><br/>
+<Comment>//file TestLexer.g4</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>lexer</Keyword><Normal Text> </Normal Text><Keyword>grammar</Keyword><Normal Text> TestLexer</Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Comment>/*'channels' and '{' must be in one line</Comment><br/>
+<Comment> to correct highlighting, highlighter can't</Comment><br/>
+<Comment> recognize regular expression "(options|tokens|channels)(?=([\s]*{))"</Comment><br/>
+<Comment> where apart from \s whitrspaces are end of lines</Comment><br/>
+<Comment> */</Comment><br/>
+<Attribute>channels</Attribute><Normal Text> </Normal Text><Symbol>{</Symbol><Normal Text> OFF_CHANNEL </Normal Text><Symbol>,</Symbol><Normal Text> COMMENT </Normal Text><Symbol>}</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>PLUS</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text> </Normal Text><String>'+'</String><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>MINUS</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text> </Normal Text><String>'-'</String><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>MUL</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text> </Normal Text><String>'*'</String><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>DIV</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text> </Normal Text><String>'/'</String><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>LPAR</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text> </Normal Text><String>'('</String><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>RPAR</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text> </Normal Text><String>')'</String><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>IDENT</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text>   Nondigit</Normal Text><br/>
+<Normal Text>        </Normal Text><Symbol>(</Symbol><Normal Text>   Nondigit</Normal Text><br/>
+<Normal Text>        </Normal Text><Symbol>|</Symbol><Normal Text>   Digit</Normal Text><br/>
+<Normal Text>        </Normal Text><Symbol>)*</Symbol><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>fragment</Keyword><br/>
+<Normal Text>Digit</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text>   </Normal Text><Charset>[0-9]</Charset><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>fragment</Keyword><br/>
+<Normal Text>NonzeroDigit</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text>   </Normal Text><Charset>[1-9]</Charset><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>fragment</Keyword><br/>
+<Normal Text>Nondigit</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text>   </Normal Text><Charset>[a-zA-Z_]</Charset><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Sign</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text>   </Normal Text><String>'+'</String><Normal Text> </Normal Text><Symbol>|</Symbol><Normal Text> </Normal Text><String>'-'</String><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>INT</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text>  Sign</Normal Text><Symbol>?</Symbol><Normal Text> </Normal Text><Symbol>(</Symbol><Normal Text>NonzeroDigit Digit</Normal Text><Symbol>*</Symbol><Normal Text> </Normal Text><Symbol>|</Symbol><Normal Text> </Normal Text><String>'0'</String><Symbol>)</Symbol><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>fragment</Keyword><br/>
+<Normal Text>DigitSequence</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text>   Digit</Normal Text><Symbol>+</Symbol><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>fragment</Keyword><br/>
+<Normal Text>ExponentPart</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text>   </Normal Text><Charset>[eE]</Charset><Normal Text> Sign</Normal Text><Symbol>?</Symbol><Normal Text> DigitSequence</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>fragment</Keyword><br/>
+<Normal Text>FractionalConstant</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text>   DigitSequence</Normal Text><Symbol>?</Symbol><Normal Text> </Normal Text><String>'.'</String><Normal Text> DigitSequence</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>|</Symbol><Normal Text>   DigitSequence </Normal Text><String>'.'</String><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>FLOAT</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text>   </Normal Text><Symbol>(</Symbol><Normal Text>FractionalConstant ExponentPart</Normal Text><Symbol>?</Symbol><Normal Text> </Normal Text><Symbol>|</Symbol><Normal Text> DigitSequence ExponentPart</Normal Text><Symbol>)</Symbol><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>fragment</Keyword><br/>
+<Normal Text>EscapeSequence</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text>   </Normal Text><String>'\\'</String><Normal Text> </Normal Text><Charset>['"?abfnrtvhe\\]</Charset><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Comment>//between [] is charset , test escape \</Comment><br/>
+<Comment>fragment</Comment><br/>
+<Normal Text>SChar</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text>   </Normal Text><Symbol>~</Symbol><Charset>["\\\r\n]</Charset><br/>
+<Normal Text>    </Normal Text><Symbol>|</Symbol><Normal Text>   EscapeSequence</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>STRING</Normal Text><br/>
+<Normal Text>    </Normal Text><Symbol>:</Symbol><Normal Text>   </Normal Text><String>'"'</String><Normal Text> SChar</Normal Text><Symbol>*</Symbol><Normal Text> </Normal Text><String>'"'</String><br/>
+<Normal Text>    </Normal Text><Symbol>;</Symbol><br/>

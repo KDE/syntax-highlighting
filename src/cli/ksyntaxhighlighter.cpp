@@ -44,6 +44,14 @@ static void applyHighlighter(Highlighter &highlighter,
     }
 }
 
+static Theme theme(const Repository &repo, const QString &themeName, Repository::DefaultTheme t)
+{
+    if (themeName.isEmpty()) {
+        return repo.defaultTheme(t);
+    }
+    return repo.theme(themeName);
+}
+
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
@@ -51,8 +59,6 @@ int main(int argc, char **argv)
     QCoreApplication::setOrganizationDomain(QStringLiteral("kde.org"));
     QCoreApplication::setOrganizationName(QStringLiteral("KDE"));
     QCoreApplication::setApplicationVersion(QStringLiteral(KSYNTAXHIGHLIGHTING_VERSION_STRING));
-
-    Repository repo;
 
     QCommandLineParser parser;
     parser.setApplicationDescription(app.translate("SyntaxHighlightingCLI", "Command line syntax highlighter using KSyntaxHighlighting syntax definitions."));
@@ -84,8 +90,7 @@ int main(int argc, char **argv)
 
     QCommandLineOption themeName(QStringList() << QStringLiteral("t") << QStringLiteral("theme"),
                                  app.translate("SyntaxHighlightingCLI", "Color theme to use for highlighting."),
-                                 app.translate("SyntaxHighlightingCLI", "theme"),
-                                 repo.defaultTheme(Repository::LightTheme).name());
+                                 app.translate("SyntaxHighlightingCLI", "theme"));
     parser.addOption(themeName);
 
     QCommandLineOption outputFormatOption(
@@ -113,6 +118,8 @@ int main(int argc, char **argv)
     parser.addOption(titleOption);
 
     parser.process(app);
+
+    Repository repo;
 
     if (parser.isSet(listDefs)) {
         for (const auto &def : repo.definitions()) {
@@ -181,7 +188,7 @@ int main(int argc, char **argv)
 
         HtmlHighlighter highlighter;
         highlighter.setDefinition(def);
-        highlighter.setTheme(repo.theme(parser.value(themeName)));
+        highlighter.setTheme(theme(repo, parser.value(themeName), Repository::LightTheme));
         applyHighlighter(highlighter, parser, fromFileName, inFileName, outputName, title);
     } else {
         auto AnsiFormat = AnsiHighlighter::AnsiFormat::TrueColor;
@@ -213,7 +220,7 @@ int main(int argc, char **argv)
 
         AnsiHighlighter highlighter;
         highlighter.setDefinition(def);
-        highlighter.setTheme(repo.theme(parser.value(themeName)));
+        highlighter.setTheme(theme(repo, parser.value(themeName), Repository::DarkTheme));
         applyHighlighter(highlighter, parser, fromFileName, inFileName, outputName, AnsiFormat, !parser.isSet(noAnsiEditorBg), debugOptions);
     }
 

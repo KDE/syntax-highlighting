@@ -359,11 +359,19 @@ coproc mycoproc { awk '{print "foo" $0;fflush()}'; } >&3
 <<< s${s}s cat
 >&2 cat
 <f cat
+< f cat
 2>3 cat
 2>&3 cat
 2>& 3 cat
 2>f cat
 &>f cat
+
+<<<# comment
+<# comment
+># comment
+<<< # comment
+< # comment
+> # comment
 
 # redirections
 cat f>2
@@ -389,6 +397,13 @@ cat <<heredoc -a
 bla bla
 heredoc
 r=$(xxx $@ 2>&1)
+
+cat <<<# comment
+cat <# comment
+cat ># comment
+cat <<< # comment
+cat < # comment
+cat > # comment
 
 # branches
 cat a|cat

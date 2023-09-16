@@ -41,7 +41,7 @@ If you need any of this, check out [KTextEditor](https://api.kde.org/frameworks/
 ## Syntax definition files
 
 This library uses Kate syntax definition files for the actual highlighting,
-the file format is documented [here](https://docs.kde.org/?application=katepart&branch=trunk5&path=highlight.html).
+the file format is documented [here](https://docs.kde.org/?application=katepart&branch=stable5&path=highlight.html).
 
 More than 300 syntax definition files are included, that are located
 in **data/syntax/** and have the **.xml** extension. Additional ones are
@@ -75,7 +75,7 @@ Usually it is:
     </tr>
 </table>
 
-For more details, see ["The Highlight Definition XML Format" (Working with Syntax Highlighting, KDE Documentation)](https://docs.kde.org/?application=katepart&branch=trunk5&path=highlight.html#katehighlight-xml-format).
+For more details, see ["The Highlight Definition XML Format" (Working with Syntax Highlighting, KDE Documentation)](https://docs.kde.org/?application=katepart&branch=stable5&path=highlight.html#katehighlight-xml-format).
 
 Also, in **data/schema/** there is a script to validate the syntax definition XML
 files. Use the command `validatehl.sh mySyntax.xml`.
@@ -83,7 +83,7 @@ files. Use the command `validatehl.sh mySyntax.xml`.
 ## Color theme files
 
 This library includes the color themes, which are documented
-[here](https://docs.kde.org/?application=katepart&branch=trunk5&path=color-themes.html).
+[here](https://docs.kde.org/?application=katepart&branch=stable5&path=color-themes.html).
 
 The color theme files use the JSON format and are located in **data/themes/**
 with the **.theme** extension.
@@ -92,11 +92,11 @@ in the **org.kde.syntax-highlighting/themes/** folder of your user directory,
 allowing you to easily add custom color theme files. This location is the same
 as shown in the table of the [previous section](#syntax-definition-files),
 replacing the **syntax** folder with **themes**.
-For more details, see ["The Color Themes JSON Format" (Working with Color Themes, KDE Documentation)](https://docs.kde.org/?application=katepart&branch=trunk5&path=color-themes.html#color-themes-json).
+For more details, see ["The Color Themes JSON Format" (Working with Color Themes, KDE Documentation)](https://docs.kde.org/?application=katepart&branch=stable5&path=color-themes.html#color-themes-json).
 
 The [KTextEditor](https://api.kde.org/frameworks/ktexteditor/html/) library
 (used by Kate, Kile and KDevelop, for example) provides a
-[user interface](https://docs.kde.org/?application=katepart&branch=trunk5&path=color-themes.html#color-themes-gui)
+[user interface](https://docs.kde.org/?application=katepart&branch=stable5&path=color-themes.html#color-themes-gui)
 for editing and creating KSyntaxHighlighting color themes, including
 a tool for exporting and importing the JSON theme files.
 
@@ -184,8 +184,10 @@ All files shall contain a proper "SPDX-License-Identifier: MIT" identifier insid
 
   For more information, see:
 
-    * [Available Default Styles (Working with Syntax Highlighting, KDE Documentation)](https://docs.kde.org/?application=katepart&branch=trunk5&path=highlight.html#kate-highlight-default-styles)
+    * [Available Default Styles (Working with Syntax Highlighting, KDE Documentation)](https://docs.kde.org/?application=katepart&branch=stable5&path=highlight.html#kate-highlight-default-styles)
     * [Kate Part (KF5): New Default Styles for better Color Schemes (Kate Editor Website)](https://kate-editor.org/2014/03/07/kate-part-kf5-new-default-styles-for-better-color-schemes/)
+
+* While writing syntax, you can use `ksyntaxhighlighter6` (previously named `kate-syntax-highlighter`) to display the style or others informations associated with each part of text. For example `ksyntaxhighlighter6 --output-format=ansi --syntax-trace=format test.cpp`.
 
 * Add test files, these are found in **autotests/input/**.
   If you are going to add a new syntax XML file, create a new test file; if you

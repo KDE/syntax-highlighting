@@ -850,6 +850,13 @@
       <item>longtable</item>
     </list>
 
+    <list name="TabuEnv">
+      <item>tabu*</item>
+      <item>tabu</item>
+      <item>longtabu*</item>
+      <item>longtabu</item>
+    </list>
+
     <list name="MathModeText">
       <item>\text</item>
       <item>\textit</item>
@@ -1128,6 +1135,7 @@
         <keyword String="MathEnvParam" attribute="Environment" context="MathEnvWithParam"/>
         <keyword String="MathEnv" attribute="Environment" context="MathEnv"/>
         <keyword String="TabEnv" attribute="Environment" context="TabEnv"/>
+        <keyword String="TabuEnv" attribute="Environment" context="TabuEnv"/>
         <DetectChar char="&bullet;" attribute="Bullet" context="#stay"/>
         <RegExpr String="(\w+)code\b" attribute="Environment" context="MintedCodeEnv" lookAhead="true"/>
         <RegExpr String="&envname;" attribute="Environment" context="LatexEnv"/>
@@ -6146,6 +6154,31 @@
         <DetectChar char="{" attribute="Normal Text" context="#stay"/>
         <DetectChar char="}" attribute="Normal Text" context="#pop#pop#pop#pop#pop" endRegion="block"/>
         <keyword String="TabEnv" attribute="Environment" context="#stay"/>
+        <keyword String="TabuEnv" attribute="Environment" context="#stay"/>
+      </context>
+
+      <!-- environment type 10: tabu -->
+      <context name="TabuEnv" attribute="Environment" lineEndContext="#stay" fallthroughContext="#pop#pop#pop">
+        <DetectChar char="}" attribute="Normal Text" context="Tabu"/>
+        <RegExpr String="[^}]*" attribute="Error" context="#stay"/>
+      </context>
+
+      <!-- parse tabu options
+        \begin {tabu} [pos] {tabular preamble}
+        \begin {tabu} to <dimen> [pos] {tabular preamble}
+        \begin {tabu} spread <dimen> [pos] {tabular preamble}
+      -->
+      <context name="Tabu" attribute="Normal Text" lineEndContext="#pop!Tab">
+        <DetectChar char="{" attribute="Normal Text" context="TabuPreambule"/>
+        <DetectChar char="\" context="#pop!Tab" lookAhead="1"/>
+      </context>
+      <context name="TabuPreambule" attribute="Normal Text" lineEndContext="#stay">
+        <DetectChar char="}" attribute="Normal Text" context="#pop#pop!Tab"/>
+        <DetectChar char="{" attribute="Normal Text" context="TabuPreambuleInside"/>
+      </context>
+      <context name="TabuPreambuleInside" attribute="Normal Text" lineEndContext="#stay">
+        <DetectChar char="}" attribute="Normal Text" context="#pop"/>
+        <DetectChar char="{" attribute="Normal Text" context="TabuPreambuleInside"/>
       </context>
 
       <!-- math mode: starting with $ -->
@@ -6209,6 +6242,7 @@
       </context>
       <context name="MathEnvironmentInside" attribute="Environment" lineEndContext="#stay">
         <DetectChar char="}" attribute="Normal Text" context="#pop#pop"/>
+        <keyword String="TabuEnv" attribute="Environment" context="MathTabuEnv"/>
         <RegExpr String="&envname;" attribute="Environment" context="#stay"/>
         <RegExpr String="[^}a-zA-Z]+|." attribute="Error" context="#stay"/>
       </context>
@@ -6222,6 +6256,25 @@
         <WordDetect String="ensuremath" attribute="Environment" context="#pop!LatexEnvEnd"/>
         <RegExpr String="&envname;" attribute="Environment" context="#stay"/>
         <RegExpr String="[^}a-zA-Z]+|." attribute="Error" context="#pop#pop"/>
+      </context>
+
+      <!-- tabu in mathmode
+        \begin {tabu} [pos] {tabular preamble}
+        \begin {tabu} to <dimen> [pos] {tabular preamble}
+        \begin {tabu} spread <dimen> [pos] {tabular preamble}
+      -->
+      <context name="MathTabuEnv" attribute="Environment" lineEndContext="#stay">
+        <DetectChar char="}" attribute="Normal Text" context="MathTabu"/>
+        <RegExpr String="[^}]*" attribute="Error" context="#stay"/>
+      </context>
+      <context name="MathTabu" attribute="Math" lineEndContext="#pop#pop#pop#pop">
+        <DetectChar char="{" attribute="Normal Text" context="#pop#pop#pop#pop!MathTabuPreambule"/>
+        <DetectChar char="\" context="#pop#pop#pop#pop" lookAhead="1"/>
+        <DetectChar char="}" attribute="Normal Text" context="#pop#pop#pop#pop"/>
+      </context>
+      <context name="MathTabuPreambule" attribute="Math" lineEndContext="#stay">
+        <DetectChar char="}" attribute="Normal Text" context="#pop"/>
+        <DetectChar char="{" attribute="Normal Text" context="MathTabuPreambule"/>
       </context>
 
       <!-- command in mathmode -->

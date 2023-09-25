@@ -112,14 +112,16 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
     // verify/initialize state
     auto newState = state;
     auto stateData = StateData::get(newState);
-    const auto definitionId = DefinitionData::get(d->m_definition)->id;
-    if (!stateData->isEmpty() && stateData->m_defId != definitionId) {
+    bool isSharedData = true;
+    if (Q_UNLIKELY(stateData && stateData->m_defId != defData->id)) {
         qCDebug(Log) << "Got invalid state, resetting.";
-        stateData->clear();
+        stateData = nullptr;
     }
-    if (stateData->isEmpty()) {
+    if (Q_UNLIKELY(!stateData)) {
+        stateData = StateData::reset(newState);
         stateData->push(defData->initialContext(), QStringList());
-        stateData->m_defId = definitionId;
+        stateData->m_defId = defData->id;
+        isSharedData = false;
     }
 
     // process empty lines
@@ -134,7 +136,7 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
             /**
              * line empty context switches
              */
-            if (!d->switchContext(stateData, stateData->topContext()->lineEmptyContext(), QStringList())) {
+            if (!d->switchContext(stateData, stateData->topContext()->lineEmptyContext(), QStringList(), newState, isSharedData)) {
                 /**
                  * end when trying to #pop the main context
                  */
@@ -309,12 +311,12 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
 
             if (rule->isLookAhead()) {
                 Q_ASSERT(!rule->context().isStay());
-                d->switchContext(stateData, rule->context(), std::move(newResult.captures()));
+                d->switchContext(stateData, rule->context(), std::move(newResult.captures()), newState, isSharedData);
                 isLookAhead = true;
                 break;
             }
 
-            d->switchContext(stateData, rule->context(), std::move(newResult.captures()));
+            d->switchContext(stateData, rule->context(), std::move(newResult.captures()), newState, isSharedData);
             newFormat = rule->attributeFormat().isValid() ? &rule->attributeFormat() : &stateData->topContext()->attributeFormat();
             if (newOffset == text.size() && rule->isLineContinue()) {
                 lineContinuation = true;
@@ -327,7 +329,7 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
 
         if (newOffset <= offset) { // no matching rule
             if (stateData->topContext()->fallthrough()) {
-                d->switchContext(stateData, stateData->topContext()->fallthroughContext(), QStringList());
+                d->switchContext(stateData, stateData->topContext()->fallthroughContext(), QStringList(), newState, isSharedData);
                 continue;
             }
 
@@ -374,7 +376,7 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
     {
         int endlessLoopingCounter = 0;
         while (!stateData->topContext()->lineEndContext().isStay() && !lineContinuation) {
-            if (!d->switchContext(stateData, stateData->topContext()->lineEndContext(), QStringList())) {
+            if (!d->switchContext(stateData, stateData->topContext()->lineEndContext(), QStringList(), newState, isSharedData)) {
                 break;
             }
 
@@ -390,15 +392,27 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
     return newState;
 }
 
-bool AbstractHighlighterPrivate::switchContext(StateData *data, const ContextSwitch &contextSwitch, QStringList &&captures)
+bool AbstractHighlighterPrivate::switchContext(StateData *&data, const ContextSwitch &contextSwitch, QStringList &&captures, State &state, bool &isSharedData)
 {
+    const auto popCount = contextSwitch.popCount();
+    const auto context = contextSwitch.context();
+    if (popCount <= 0 && !context) {
+        return true;
+    }
+
+    // a modified state must be detached before modification
+    if (isSharedData) {
+        data = StateData::detach(state);
+        isSharedData = false;
+    }
+
     // kill as many items as requested from the stack, will always keep the initial context alive!
-    const bool initialContextSurvived = data->pop(contextSwitch.popCount());
+    const bool initialContextSurvived = data->pop(popCount);
 
     // if we have a new context to add, push it
     // then we always "succeed"
-    if (contextSwitch.context()) {
-        data->push(contextSwitch.context(), std::move(captures));
+    if (context) {
+        data->push(context, std::move(captures));
         return true;
     }
 

@@ -24,13 +24,13 @@ class StateData : public QSharedData
 
 public:
     StateData() = default;
-    static StateData *get(State &state);
 
-    void clear();
+    static StateData *reset(State &state);
+    static StateData *detach(State &state);
 
-    bool isEmpty() const
+    static StateData *get(const State &state)
     {
-        return m_contextStack.isEmpty();
+        return state.d.data();
     }
 
     int size() const

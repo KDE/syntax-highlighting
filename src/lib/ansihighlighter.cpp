@@ -970,12 +970,14 @@ private:
         QString label;
 
         if (m_hasStackSizeTrace) {
-            label += QLatin1Char('(') % QString::number(stateData->size()) % QLatin1Char(')');
+            // first state is empty
+            int stateSize = stateData ? stateData->size() : 0;
+            label = QLatin1Char('(') % QString::number(stateSize) % QLatin1Char(')');
         }
 
         if (m_hasContextTrace) {
             // first state is empty
-            if (stateData->isEmpty()) {
+            if (!stateData) {
                 return label + QStringLiteral("[???]");
             }
 

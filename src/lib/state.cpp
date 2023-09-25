@@ -14,20 +14,17 @@
 
 using namespace KSyntaxHighlighting;
 
-StateData *StateData::get(State &state)
+StateData *StateData::reset(State &state)
 {
-    // create state data on demand, to make default state construction cheap
-    if (!state.d) {
-        state.d = new StateData();
-    } else {
-        state.d.detach();
-    }
-    return state.d.data();
+    auto *p = new StateData();
+    state.d.reset(p);
+    return p;
 }
 
-void StateData::clear()
+StateData *StateData::detach(State &state)
 {
-    m_contextStack.clear();
+    state.d.detach();
+    return state.d.data();
 }
 
 void StateData::push(Context *context, QStringList &&captures)
@@ -44,7 +41,7 @@ bool StateData::pop(int popCount)
     }
 
     // keep the initial context alive in any case
-    Q_ASSERT(!isEmpty());
+    Q_ASSERT(!m_contextStack.isEmpty());
     const bool initialContextSurvived = m_contextStack.size() > popCount;
     m_contextStack.resize(std::max(1, int(m_contextStack.size()) - popCount));
     return initialContextSurvived;

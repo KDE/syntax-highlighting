@@ -47,24 +47,17 @@ bool StateData::pop(int popCount)
     return initialContextSurvived;
 }
 
-State::State()
-{
-}
+State::State() = default;
 
-State::State(const State &other)
-    : d(other.d)
-{
-}
+State::State(State &&other) noexcept = default;
 
-State::~State()
-{
-}
+State::State(const State &other) = default;
 
-State &State::operator=(const State &other)
-{
-    d = other.d;
-    return *this;
-}
+State::~State() = default;
+
+State &State::operator=(State &&other) noexcept = default;
+
+State &State::operator=(const State &other) = default;
 
 bool State::operator==(const State &other) const
 {

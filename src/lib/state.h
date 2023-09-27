@@ -29,8 +29,10 @@ public:
      *  in a document.
      */
     State();
+    State(State &&other) noexcept;
     State(const State &other);
     ~State();
+    State &operator=(State &&rhs) noexcept;
     State &operator=(const State &rhs);
 
     /** Compares two states for equality.

@@ -265,10 +265,11 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
                  */
                 if (rule->isDynamic() && (capturesForLastDynamicSkipOffset != stateData->topCaptures())) {
                     skipOffsets.clear();
-                }
-                currentSkipOffset = getSkipOffsetValue(rule.get());
-                if (currentSkipOffset < 0 || currentSkipOffset > offset) {
-                    continue;
+                } else {
+                    currentSkipOffset = getSkipOffsetValue(rule.get());
+                    if (currentSkipOffset < 0 || currentSkipOffset > offset) {
+                        continue;
+                    }
                 }
             }
 

@@ -13,6 +13,8 @@
 #include <KSyntaxHighlighting/State>
 #include <KSyntaxHighlighting/Theme>
 
+#include "state_p.h"
+
 #include <QDir>
 #include <QFile>
 #include <QObject>
@@ -26,30 +28,31 @@ using namespace KSyntaxHighlighting;
 class TestHighlighter : public AbstractHighlighter
 {
 public:
-    void highlightFile(const QString &inFileName, const QString &outFileName)
+    int highlightFile(const QString &inFileName, const QString &outFileName)
     {
         QFile outFile(outFileName);
         if (!outFile.open(QFile::WriteOnly | QFile::Truncate)) {
             qWarning() << "Failed to open output file" << outFileName << ":" << outFile.errorString();
-            return;
+            return 0;
         }
         m_out.setDevice(&outFile);
 
         QFile f(inFileName);
         if (!f.open(QFile::ReadOnly)) {
             qWarning() << "Failed to open input file" << inFileName << ":" << f.errorString();
-            return;
+            return 0;
         }
 
         QTextStream in(&f);
         State state;
-        while (!in.atEnd()) {
-            m_currentLine = in.readLine();
+        while (in.readLineInto(&m_currentLine)) {
             state = highlightLine(m_currentLine, state);
             m_out << "<br/>\n";
         }
 
         m_out.flush();
+        auto *stateData = StateData::get(state);
+        return stateData ? stateData->size() : 0;
     }
 
 protected:
@@ -190,7 +193,10 @@ private Q_SLOTS:
         qDebug() << "Using syntax" << def.name();
         m_coveredDefinitions[def.name()].push_back(inFile);
         highlighter.setDefinition(def);
-        highlighter.highlightFile(inFile, outFile);
+        int lastStackSize = highlighter.highlightFile(inFile, outFile);
+        // arbitrary condition to detect syntaxes that stack contexts indefinitely
+        // instead of going back to the parent
+        QVERIFY2(lastStackSize < 15, qPrintable(def.name() + QStringLiteral("seems to stack contexts indefinitely, perhaps #pop's are missing?")));
 
         /**
          * compare results

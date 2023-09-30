@@ -58,9 +58,9 @@ exclude_title = {
   '<hue>',
   '<hue-interpolation-method>',
   '<ident>',
-  '<length>',
   '<image>',
   '<integer>',
+  '<length>',
   '<length-percentage>',
   '<number>',
   '<percentage>',
@@ -438,7 +438,7 @@ for md in sorted(scss_dir.glob('source/documentation/modules/**/*.md')):
   func_list = _function_list_extractor.findall(md.read_text())
   func_items = set(_function_extractor.findall(''.join(func_list)))
   scss_functions.append(f'\n{sep}<!-- {md.stem} -->')
-  scss_functions.extend(f'{sep}<item>{func}</item>' for func in func_items - functions)
+  scss_functions.extend(f'{sep}<item>{func}</item>' for func in sorted(func_items - functions))
 
 for md in scss_dir.glob('source/documentation/at-rules/**/*.md'):
   with open(md) as f:

@@ -1282,8 +1282,8 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
     }
 
     // initialize ansiStyles
-    for (auto &&definition : std::as_const(definitions)) {
-        for (auto &&format : std::as_const(DefinitionData::get(definition)->formats)) {
+    for (const auto &definition : std::as_const(definitions)) {
+        for (const auto &format : std::as_const(DefinitionData::get(definition)->formats)) {
             const auto id = format.id();
             if (size_t(id) >= d->ansiStyles.size()) {
                 // better than id + 1 to avoid successive allocations

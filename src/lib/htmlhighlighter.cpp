@@ -72,7 +72,7 @@ void HtmlHighlighter::highlightFile(const QString &fileName, const QString &titl
 
 /**
  * @brief toHtmlRgba
- * Converts QColor -> rgba(r, g, b, a) if there is an alpha channel
+ * Converts QColor -> #RRGGBBAA if there is an alpha channel
  * otherwise it will just return the hexcode. This is because QColor
  * outputs #AARRGGBB, whereas browser support #RRGGBBAA.
  *
@@ -84,18 +84,18 @@ static QString toHtmlRgbaString(const QColor &color)
     if (color.alpha() == 0xFF) {
         return color.name();
     }
-
-    QString rgba = QStringLiteral("rgba(");
-    rgba.append(QString::number(color.red()));
-    rgba.append(QLatin1Char(','));
-    rgba.append(QString::number(color.green()));
-    rgba.append(QLatin1Char(','));
-    rgba.append(QString::number(color.blue()));
-    rgba.append(QLatin1Char(','));
-    // this must be alphaF
-    rgba.append(QString::number(color.alphaF()));
-    rgba.append(QLatin1Char(')'));
-    return rgba;
+    static const char16_t digits[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+    QChar hexcode[9];
+    hexcode[0] = QLatin1Char('#');
+    hexcode[1] = digits[color.red() >> 4];
+    hexcode[2] = digits[color.red() & 0xf];
+    hexcode[3] = digits[color.green() >> 4];
+    hexcode[4] = digits[color.green() & 0xf];
+    hexcode[5] = digits[color.blue() >> 4];
+    hexcode[6] = digits[color.blue() & 0xf];
+    hexcode[7] = digits[color.alpha() >> 4];
+    hexcode[8] = digits[color.alpha() & 0xf];
+    return QString(hexcode, 9);
 }
 
 void HtmlHighlighter::highlightData(QIODevice *dev, const QString &title)

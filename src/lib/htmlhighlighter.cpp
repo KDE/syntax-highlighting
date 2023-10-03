@@ -196,9 +196,20 @@ void HtmlHighlighter::applyFormat(int offset, int length, const Format &format)
         *d->out << htmlStyle;
     }
 
-    *d->out << d->currentLine.mid(offset, length).toHtmlEscaped();
+    for (QChar ch : QStringView(d->currentLine).mid(offset, length)) {
+        if (ch == u'<')
+            *d->out << QStringLiteral("&lt;");
+        else if (ch == u'>')
+            *d->out << QStringLiteral("&gt;");
+        else if (ch == u'&')
+            *d->out << QStringLiteral("&amp;");
+        else if (ch == u'"')
+            *d->out << QStringLiteral("&quot;");
+        else
+            *d->out << ch;
+    }
 
     if (!htmlStyle.isEmpty()) {
-        *d->out << "</span>";
+        *d->out << QStringLiteral("</span>");
     }
 }

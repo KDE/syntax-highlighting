@@ -5,6 +5,7 @@
 */
 
 #include "ansihighlighter.h"
+#include "abstracthighlighter_p.h"
 #include "context_p.h"
 #include "definition.h"
 #include "definition_p.h"
@@ -18,6 +19,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QHash>
+#include <QIODevice>
 #include <QTextStream>
 
 #include <cmath>
@@ -1192,7 +1194,7 @@ private:
 };
 } // anonymous namespace
 
-class KSyntaxHighlighting::AnsiHighlighterPrivate
+class KSyntaxHighlighting::AnsiHighlighterPrivate : public AbstractHighlighterPrivate
 {
 public:
     QTextStream out;
@@ -1203,7 +1205,7 @@ public:
 };
 
 AnsiHighlighter::AnsiHighlighter()
-    : d(new AnsiHighlighterPrivate())
+    : AbstractHighlighter(new AnsiHighlighterPrivate())
 {
 }
 
@@ -1211,6 +1213,7 @@ AnsiHighlighter::~AnsiHighlighter() = default;
 
 void AnsiHighlighter::setOutputFile(const QString &fileName)
 {
+    Q_D(AnsiHighlighter);
     if (d->file.isOpen()) {
         d->file.close();
     }
@@ -1224,6 +1227,7 @@ void AnsiHighlighter::setOutputFile(const QString &fileName)
 
 void AnsiHighlighter::setOutputFile(FILE *fileHandle)
 {
+    Q_D(AnsiHighlighter);
     d->file.open(fileHandle, QIODevice::WriteOnly);
     d->out.setDevice(&d->file);
 }
@@ -1242,6 +1246,8 @@ void AnsiHighlighter::highlightFile(const QString &fileName, AnsiFormat format, 
 
 void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useEditorBackground, TraceOptions traceOptions)
 {
+    Q_D(AnsiHighlighter);
+
     if (!d->out.device()) {
         qCWarning(Log) << "No output stream defined!";
         return;
@@ -1398,6 +1404,7 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
 
 void AnsiHighlighter::applyFormat(int offset, int length, const Format &format)
 {
+    Q_D(AnsiHighlighter);
     auto const &ansiStyle = d->ansiStyles[format.id()];
     d->out << ansiStyle.first << d->currentLine.mid(offset, length) << ansiStyle.second;
 }

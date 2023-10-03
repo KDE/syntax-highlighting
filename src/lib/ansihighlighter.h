@@ -11,10 +11,11 @@
 #include "ksyntaxhighlighting_export.h"
 
 #include <QFlags>
-#include <QIODevice>
 #include <QString>
 
-#include <memory>
+QT_BEGIN_NAMESPACE
+class QIODevice;
+QT_END_NAMESPACE
 
 namespace KSyntaxHighlighting
 {
@@ -55,7 +56,7 @@ protected:
     void applyFormat(int offset, int length, const Format &format) override;
 
 private:
-    std::unique_ptr<AnsiHighlighterPrivate> d;
+    Q_DECLARE_PRIVATE(AnsiHighlighter)
 };
 }
 

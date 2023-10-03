@@ -159,7 +159,9 @@ void HtmlHighlighter::highlightData(QIODevice *dev, const QString &title)
 
             if (!buffer.isEmpty()) {
                 buffer.insert(0, QStringLiteral("<span style=\""));
-                buffer += QStringLiteral("\">");
+                // replace last ';'
+                buffer.back() = u'"';
+                buffer += u'>';
             }
         }
     }
@@ -207,12 +209,8 @@ void HtmlHighlighter::applyFormat(int offset, int length, const Format &format)
     for (QChar ch : QStringView(d->currentLine).mid(offset, length)) {
         if (ch == u'<')
             *d->out << QStringLiteral("&lt;");
-        else if (ch == u'>')
-            *d->out << QStringLiteral("&gt;");
         else if (ch == u'&')
             *d->out << QStringLiteral("&amp;");
-        else if (ch == u'"')
-            *d->out << QStringLiteral("&quot;");
         else
             *d->out << ch;
     }

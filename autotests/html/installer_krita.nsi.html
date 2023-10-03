@@ -4,650 +4,650 @@
 <title>installer_krita.nsi</title>
 <meta name="generator" content="KF5::SyntaxHighlighting - Definition (NSIS) - Theme (Breeze Light)"/>
 </head><body style="background-color:#ffffff;color:#1f1c1b"><pre>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">ifndef</span> KRITA_INSTALLER_32 <span style="color:#ca60ca;">&amp;</span> KRITA_INSTALLER_64
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">error</span> <span style="color:#bf0303;">&quot;Either one of KRITA_INSTALLER_32 or KRITA_INSTALLER_64 must be defined.&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">endif</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">ifdef</span> KRITA_INSTALLER_32 <span style="color:#ca60ca;">&amp;</span> KRITA_INSTALLER_64
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">error</span> <span style="color:#bf0303;">&quot;Only one of KRITA_INSTALLER_32 or KRITA_INSTALLER_64 should be defined.&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">endif</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">ifndef</span> KRITA_INSTALLER_32 <span style="color:#ca60ca">&amp;</span> KRITA_INSTALLER_64
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">error</span> <span style="color:#bf0303">"Either one of KRITA_INSTALLER_32 or KRITA_INSTALLER_64 must be defined."</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">endif</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">ifdef</span> KRITA_INSTALLER_32 <span style="color:#ca60ca">&amp;</span> KRITA_INSTALLER_64
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">error</span> <span style="color:#bf0303">"Only one of KRITA_INSTALLER_32 or KRITA_INSTALLER_64 should be defined."</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">endif</span>
 
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">ifndef</span> KRITA_PACKAGE_ROOT
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">error</span> <span style="color:#bf0303;">&quot;KRITA_PACKAGE_ROOT should be defined and point to the root of the package files.&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">endif</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">ifndef</span> KRITA_PACKAGE_ROOT
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">error</span> <span style="color:#bf0303">"KRITA_PACKAGE_ROOT should be defined and point to the root of the package files."</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">endif</span>
 
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">ifdef</span> KRITA_INSTALLER_64
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> KRITA_INSTALLER_BITNESS 64
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">else</span>
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> KRITA_INSTALLER_BITNESS 32
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">endif</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">ifdef</span> KRITA_INSTALLER_64
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> KRITA_INSTALLER_BITNESS 64
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">else</span>
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> KRITA_INSTALLER_BITNESS 32
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">endif</span>
 
-<span style="color:#0095ff;font-weight:bold;">Unicode</span> true
-# Enabling DPI awareness creates awful CJK text in some sizes<span style="color:#ca60ca;">,</span> so don't enable it.
-<span style="color:#0095ff;font-weight:bold;">ManifestDPIAware</span> false
+<span style="color:#0095ff;font-weight:bold">Unicode</span> true
+# Enabling DPI awareness creates awful CJK text in some sizes<span style="color:#ca60ca">,</span> so don't enable it.
+<span style="color:#0095ff;font-weight:bold">ManifestDPIAware</span> false
 
-# Krita constants <span style="color:#ca60ca;">(</span>can be overridden in command line params<span style="color:#ca60ca;">)</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> /<span style="font-weight:bold;">ifndef</span> KRITA_VERSION <span style="color:#bf0303;">&quot;0.0.0.0&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> /<span style="font-weight:bold;">ifndef</span> KRITA_VERSION_DISPLAY <span style="color:#bf0303;">&quot;test-version&quot;</span>
-#<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> /<span style="font-weight:bold;">ifndef</span> KRITA_VERSION_GIT <span style="color:#bf0303;">&quot;&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> /<span style="font-weight:bold;">ifndef</span> KRITA_INSTALLER_OUTPUT_DIR <span style="color:#bf0303;">&quot;&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">ifdef</span> KRITA_INSTALLER_64
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> /<span style="font-weight:bold;">ifndef</span> KRITA_INSTALLER_OUTPUT_NAME <span style="color:#bf0303;">&quot;krita_x64_setup.exe&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">else</span>
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> /<span style="font-weight:bold;">ifndef</span> KRITA_INSTALLER_OUTPUT_NAME <span style="color:#bf0303;">&quot;krita_x86_setup.exe&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">endif</span>
+# Krita constants <span style="color:#ca60ca">(</span>can be overridden in command line params<span style="color:#ca60ca">)</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> /<span style="font-weight:bold">ifndef</span> KRITA_VERSION <span style="color:#bf0303">"0.0.0.0"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> /<span style="font-weight:bold">ifndef</span> KRITA_VERSION_DISPLAY <span style="color:#bf0303">"test-version"</span>
+#<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> /<span style="font-weight:bold">ifndef</span> KRITA_VERSION_GIT <span style="color:#bf0303">""</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> /<span style="font-weight:bold">ifndef</span> KRITA_INSTALLER_OUTPUT_DIR <span style="color:#bf0303">""</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">ifdef</span> KRITA_INSTALLER_64
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> /<span style="font-weight:bold">ifndef</span> KRITA_INSTALLER_OUTPUT_NAME <span style="color:#bf0303">"krita_x64_setup.exe"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">else</span>
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> /<span style="font-weight:bold">ifndef</span> KRITA_INSTALLER_OUTPUT_NAME <span style="color:#bf0303">"krita_x86_setup.exe"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">endif</span>
 
-# Krita constants <span style="color:#ca60ca;">(</span>fixed<span style="color:#ca60ca;">)</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">if</span> <span style="color:#bf0303;">&quot;${KRITA_INSTALLER_OUTPUT_DIR}&quot;</span> <span style="color:#ca60ca;">==</span> <span style="color:#bf0303;">&quot;&quot;</span>
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> KRITA_INSTALLER_OUTPUT <span style="color:#bf0303;">&quot;${KRITA_INSTALLER_OUTPUT_NAME}&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">else</span>
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> KRITA_INSTALLER_OUTPUT <span style="color:#bf0303;">&quot;${KRITA_INSTALLER_OUTPUT_DIR}\${KRITA_INSTALLER_OUTPUT_NAME}&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">endif</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> KRTIA_PUBLISHER <span style="color:#bf0303;">&quot;Krita Foundation&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">ifdef</span> KRITA_INSTALLER_64
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> KRITA_PRODUCTNAME <span style="color:#bf0303;">&quot;Krita (x64)&quot;</span>
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> KRITA_UNINSTALL_REGKEY <span style="color:#bf0303;">&quot;Krita_x64&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">else</span>
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> KRITA_PRODUCTNAME <span style="color:#bf0303;">&quot;Krita (x86)&quot;</span>
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> KRITA_UNINSTALL_REGKEY <span style="color:#bf0303;">&quot;Krita_x86&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">endif</span>
+# Krita constants <span style="color:#ca60ca">(</span>fixed<span style="color:#ca60ca">)</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">if</span> <span style="color:#bf0303">"${KRITA_INSTALLER_OUTPUT_DIR}"</span> <span style="color:#ca60ca">==</span> <span style="color:#bf0303">""</span>
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> KRITA_INSTALLER_OUTPUT <span style="color:#bf0303">"${KRITA_INSTALLER_OUTPUT_NAME}"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">else</span>
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> KRITA_INSTALLER_OUTPUT <span style="color:#bf0303">"${KRITA_INSTALLER_OUTPUT_DIR}\${KRITA_INSTALLER_OUTPUT_NAME}"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">endif</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> KRTIA_PUBLISHER <span style="color:#bf0303">"Krita Foundation"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">ifdef</span> KRITA_INSTALLER_64
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> KRITA_PRODUCTNAME <span style="color:#bf0303">"Krita (x64)"</span>
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> KRITA_UNINSTALL_REGKEY <span style="color:#bf0303">"Krita_x64"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">else</span>
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> KRITA_PRODUCTNAME <span style="color:#bf0303">"Krita (x86)"</span>
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> KRITA_UNINSTALL_REGKEY <span style="color:#bf0303">"Krita_x86"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">endif</span>
 
-<span style="color:#0095ff;font-weight:bold;">VIProductVersion</span> <span style="color:#bf0303;">&quot;${KRITA_VERSION}&quot;</span>
-<span style="color:#0095ff;font-weight:bold;">VIAddVersionKey</span> <span style="color:#bf0303;">&quot;CompanyName&quot;</span> <span style="color:#bf0303;">&quot;${KRTIA_PUBLISHER}&quot;</span>
-<span style="color:#0095ff;font-weight:bold;">VIAddVersionKey</span> <span style="color:#bf0303;">&quot;FileDescription&quot;</span> <span style="color:#bf0303;">&quot;${KRITA_PRODUCTNAME} ${KRITA_VERSION_DISPLAY} Setup&quot;</span>
-<span style="color:#0095ff;font-weight:bold;">VIAddVersionKey</span> <span style="color:#bf0303;">&quot;FileVersion&quot;</span> <span style="color:#bf0303;">&quot;${KRITA_VERSION}&quot;</span>
-<span style="color:#0095ff;font-weight:bold;">VIAddVersionKey</span> <span style="color:#bf0303;">&quot;InternalName&quot;</span> <span style="color:#bf0303;">&quot;${KRITA_INSTALLER_OUTPUT_NAME}&quot;</span>
-<span style="color:#0095ff;font-weight:bold;">VIAddVersionKey</span> <span style="color:#bf0303;">&quot;LegalCopyright&quot;</span> <span style="color:#bf0303;">&quot;${KRTIA_PUBLISHER}&quot;</span>
-<span style="color:#0095ff;font-weight:bold;">VIAddVersionKey</span> <span style="color:#bf0303;">&quot;OriginalFileName&quot;</span> <span style="color:#bf0303;">&quot;${KRITA_INSTALLER_OUTPUT_NAME}&quot;</span>
-<span style="color:#0095ff;font-weight:bold;">VIAddVersionKey</span> <span style="color:#bf0303;">&quot;ProductName&quot;</span> <span style="color:#bf0303;">&quot;${KRITA_PRODUCTNAME} ${KRITA_VERSION_DISPLAY} Setup&quot;</span>
-<span style="color:#0095ff;font-weight:bold;">VIAddVersionKey</span> <span style="color:#bf0303;">&quot;ProductVersion&quot;</span> <span style="color:#bf0303;">&quot;${KRITA_VERSION}&quot;</span>
+<span style="color:#0095ff;font-weight:bold">VIProductVersion</span> <span style="color:#bf0303">"${KRITA_VERSION}"</span>
+<span style="color:#0095ff;font-weight:bold">VIAddVersionKey</span> <span style="color:#bf0303">"CompanyName"</span> <span style="color:#bf0303">"${KRTIA_PUBLISHER}"</span>
+<span style="color:#0095ff;font-weight:bold">VIAddVersionKey</span> <span style="color:#bf0303">"FileDescription"</span> <span style="color:#bf0303">"${KRITA_PRODUCTNAME} ${KRITA_VERSION_DISPLAY} Setup"</span>
+<span style="color:#0095ff;font-weight:bold">VIAddVersionKey</span> <span style="color:#bf0303">"FileVersion"</span> <span style="color:#bf0303">"${KRITA_VERSION}"</span>
+<span style="color:#0095ff;font-weight:bold">VIAddVersionKey</span> <span style="color:#bf0303">"InternalName"</span> <span style="color:#bf0303">"${KRITA_INSTALLER_OUTPUT_NAME}"</span>
+<span style="color:#0095ff;font-weight:bold">VIAddVersionKey</span> <span style="color:#bf0303">"LegalCopyright"</span> <span style="color:#bf0303">"${KRTIA_PUBLISHER}"</span>
+<span style="color:#0095ff;font-weight:bold">VIAddVersionKey</span> <span style="color:#bf0303">"OriginalFileName"</span> <span style="color:#bf0303">"${KRITA_INSTALLER_OUTPUT_NAME}"</span>
+<span style="color:#0095ff;font-weight:bold">VIAddVersionKey</span> <span style="color:#bf0303">"ProductName"</span> <span style="color:#bf0303">"${KRITA_PRODUCTNAME} ${KRITA_VERSION_DISPLAY} Setup"</span>
+<span style="color:#0095ff;font-weight:bold">VIAddVersionKey</span> <span style="color:#bf0303">"ProductVersion"</span> <span style="color:#bf0303">"${KRITA_VERSION}"</span>
 
-<span style="color:#0095ff;font-weight:bold;">BrandingText</span> <span style="color:#bf0303;">&quot;[NSIS ${NSIS_VERSION}]  ${KRITA_PRODUCTNAME} ${KRITA_VERSION}&quot;</span>
+<span style="color:#0095ff;font-weight:bold">BrandingText</span> <span style="color:#bf0303">"[NSIS ${NSIS_VERSION}]  ${KRITA_PRODUCTNAME} ${KRITA_VERSION}"</span>
 
-<span style="color:#0095ff;font-weight:bold;">Name</span> <span style="color:#bf0303;">&quot;${KRITA_PRODUCTNAME} ${KRITA_VERSION_DISPLAY}&quot;</span>
-<span style="color:#0095ff;font-weight:bold;">OutFile</span> $<span style="color:#ca60ca;">{</span>KRITA_INSTALLER_OUTPUT<span style="color:#ca60ca;">}</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">ifdef</span> KRITA_INSTALLER_64
-	<span style="color:#0095ff;font-weight:bold;">InstallDir</span> <span style="color:#bf0303;">&quot;$PROGRAMFILES64\Krita (x64)&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">else</span>
-	<span style="color:#0095ff;font-weight:bold;">InstallDir</span> <span style="color:#bf0303;">&quot;$PROGRAMFILES32\Krita (x86)&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">endif</span>
+<span style="color:#0095ff;font-weight:bold">Name</span> <span style="color:#bf0303">"${KRITA_PRODUCTNAME} ${KRITA_VERSION_DISPLAY}"</span>
+<span style="color:#0095ff;font-weight:bold">OutFile</span> $<span style="color:#ca60ca">{</span>KRITA_INSTALLER_OUTPUT<span style="color:#ca60ca">}</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">ifdef</span> KRITA_INSTALLER_64
+	<span style="color:#0095ff;font-weight:bold">InstallDir</span> <span style="color:#bf0303">"$PROGRAMFILES64\Krita (x64)"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">else</span>
+	<span style="color:#0095ff;font-weight:bold">InstallDir</span> <span style="color:#bf0303">"$PROGRAMFILES32\Krita (x86)"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">endif</span>
 XPstyle on
 
-<span style="color:#0095ff;font-weight:bold;">ShowInstDetails</span> show
-<span style="color:#0095ff;font-weight:bold;">ShowUninstDetails</span> show
+<span style="color:#0095ff;font-weight:bold">ShowInstDetails</span> show
+<span style="color:#0095ff;font-weight:bold">ShowUninstDetails</span> show
 
-<span style="color:#0095ff;font-weight:bold;">Var</span> KritaStartMenuFolder
-<span style="color:#0095ff;font-weight:bold;">Var</span> CreateDesktopIcon
+<span style="color:#0095ff;font-weight:bold">Var</span> KritaStartMenuFolder
+<span style="color:#0095ff;font-weight:bold">Var</span> CreateDesktopIcon
 
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">include</span> MUI2.nsh
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">include</span> MUI2.nsh
 
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> <span style="color:#9500ff;font-weight:bold;">MUI_FINISHPAGE_NOAUTOCLOSE</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> <span style="color:#9500ff;font-weight:bold">MUI_FINISHPAGE_NOAUTOCLOSE</span>
 
 # Installer Pages
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_PAGE_WELCOME</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> <span style="color:#9500ff;font-weight:bold;">MUI_LICENSEPAGE_CHECKBOX</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_PAGE_LICENSE</span> <span style="color:#bf0303;">&quot;license_gpl-3.0.rtf&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_PAGE_DIRECTORY</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_PAGE_COMPONENTS</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> <span style="color:#9500ff;font-weight:bold;">MUI_PAGE_CUSTOMFUNCTION_PRE</span>  func_ShellExLicensePage_Init
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> <span style="color:#9500ff;font-weight:bold;">MUI_PAGE_HEADER_TEXT</span> <span style="color:#bf0303;">&quot;$(ShellExLicensePageHeader)&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_PAGE_LICENSE</span> <span style="color:#bf0303;">&quot;license.rtf&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> <span style="color:#9500ff;font-weight:bold;">MUI_STARTMENUPAGE_DEFAULTFOLDER</span> <span style="color:#bf0303;">&quot;Krita&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> <span style="color:#9500ff;font-weight:bold;">MUI_STARTMENUPAGE_REGISTRY_ROOT</span> HKLM
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> <span style="color:#9500ff;font-weight:bold;">MUI_STARTMENUPAGE_REGISTRY_KEY</span> <span style="color:#bf0303;">&quot;Software\Krita&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> <span style="color:#9500ff;font-weight:bold;">MUI_STARTMENUPAGE_REGISTRY_VALUENAME</span> <span style="color:#bf0303;">&quot;StartMenuFolder&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> <span style="color:#9500ff;font-weight:bold;">MUI_STARTMENUPAGE_NODISABLE</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_PAGE_STARTMENU</span> Krita $KritaStartMenuFolder
-<span style="color:#0095ff;font-weight:bold;">Page</span> Custom func_BeforeInstallPage_Init
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_PAGE_INSTFILES</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_PAGE_FINISH</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_PAGE_WELCOME</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> <span style="color:#9500ff;font-weight:bold">MUI_LICENSEPAGE_CHECKBOX</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_PAGE_LICENSE</span> <span style="color:#bf0303">"license_gpl-3.0.rtf"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_PAGE_DIRECTORY</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_PAGE_COMPONENTS</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> <span style="color:#9500ff;font-weight:bold">MUI_PAGE_CUSTOMFUNCTION_PRE</span>  func_ShellExLicensePage_Init
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> <span style="color:#9500ff;font-weight:bold">MUI_PAGE_HEADER_TEXT</span> <span style="color:#bf0303">"$(ShellExLicensePageHeader)"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_PAGE_LICENSE</span> <span style="color:#bf0303">"license.rtf"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> <span style="color:#9500ff;font-weight:bold">MUI_STARTMENUPAGE_DEFAULTFOLDER</span> <span style="color:#bf0303">"Krita"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> <span style="color:#9500ff;font-weight:bold">MUI_STARTMENUPAGE_REGISTRY_ROOT</span> HKLM
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> <span style="color:#9500ff;font-weight:bold">MUI_STARTMENUPAGE_REGISTRY_KEY</span> <span style="color:#bf0303">"Software\Krita"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> <span style="color:#9500ff;font-weight:bold">MUI_STARTMENUPAGE_REGISTRY_VALUENAME</span> <span style="color:#bf0303">"StartMenuFolder"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> <span style="color:#9500ff;font-weight:bold">MUI_STARTMENUPAGE_NODISABLE</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_PAGE_STARTMENU</span> Krita $KritaStartMenuFolder
+<span style="color:#0095ff;font-weight:bold">Page</span> Custom func_BeforeInstallPage_Init
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_PAGE_INSTFILES</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_PAGE_FINISH</span>
 
 # Uninstaller Pages
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> <span style="color:#9500ff;font-weight:bold;">MUI_PAGE_CUSTOMFUNCTION_PRE</span> un.func_UnintallFirstpage_Init
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_UNPAGE_CONFIRM</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_UNPAGE_INSTFILES</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> <span style="color:#9500ff;font-weight:bold">MUI_PAGE_CUSTOMFUNCTION_PRE</span> un.func_UnintallFirstpage_Init
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_UNPAGE_CONFIRM</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_UNPAGE_INSTFILES</span>
 
 # Languages
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_LANGUAGE</span> <span style="color:#bf0303;">&quot;English&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_LANGUAGE</span> <span style="color:#bf0303;">&quot;TradChinese&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_LANGUAGE</span> <span style="color:#bf0303;">&quot;SimpChinese&quot;</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_LANGUAGE</span> <span style="color:#bf0303">"English"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_LANGUAGE</span> <span style="color:#bf0303">"TradChinese"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_LANGUAGE</span> <span style="color:#bf0303">"SimpChinese"</span>
 
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">include</span> Sections.nsh
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">include</span> LogicLib.nsh
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">include</span> x64.nsh
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">include</span> WinVer.nsh
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">include</span> WordFunc.nsh
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">include</span> Sections.nsh
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">include</span> LogicLib.nsh
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">include</span> x64.nsh
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">include</span> WinVer.nsh
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">include</span> WordFunc.nsh
 
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">define</span> KRITA_SHELLEX_DIR <span style="color:#bf0303;">&quot;$INSTDIR\shellex&quot;</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">define</span> KRITA_SHELLEX_DIR <span style="color:#bf0303">"$INSTDIR\shellex"</span>
 
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">include</span> <span style="color:#bf0303;">&quot;include\FileExists2.nsh&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">include</span> <span style="color:#bf0303;">&quot;include\IsFileInUse.nsh&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">include</span> <span style="color:#bf0303;">&quot;krita_versions_detect.nsh&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">include</span> <span style="color:#bf0303;">&quot;krita_shell_integration.nsh&quot;</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">include</span> <span style="color:#bf0303">"include\FileExists2.nsh"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">include</span> <span style="color:#bf0303">"include\IsFileInUse.nsh"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">include</span> <span style="color:#bf0303">"krita_versions_detect.nsh"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">include</span> <span style="color:#bf0303">"krita_shell_integration.nsh"</span>
 
-<span style="color:#0095ff;font-weight:bold;">Var</span> KritaMsiProductX86
-<span style="color:#0095ff;font-weight:bold;">Var</span> KritaMsiProductX64
-<span style="color:#0095ff;font-weight:bold;">Var</span> KritaNsisVersion
-<span style="color:#0095ff;font-weight:bold;">Var</span> KritaNsisBitness
-<span style="color:#0095ff;font-weight:bold;">Var</span> KritaNsisInstallLocation
+<span style="color:#0095ff;font-weight:bold">Var</span> KritaMsiProductX86
+<span style="color:#0095ff;font-weight:bold">Var</span> KritaMsiProductX64
+<span style="color:#0095ff;font-weight:bold">Var</span> KritaNsisVersion
+<span style="color:#0095ff;font-weight:bold">Var</span> KritaNsisBitness
+<span style="color:#0095ff;font-weight:bold">Var</span> KritaNsisInstallLocation
 
-<span style="color:#0095ff;font-weight:bold;">Var</span> PrevShellExInstallLocation
-<span style="color:#0095ff;font-weight:bold;">Var</span> PrevShellExStandalone
+<span style="color:#0095ff;font-weight:bold">Var</span> PrevShellExInstallLocation
+<span style="color:#0095ff;font-weight:bold">Var</span> PrevShellExStandalone
 
-<span style="color:#0095ff;font-weight:bold;">Var</span> UninstallShellExStandalone
+<span style="color:#0095ff;font-weight:bold">Var</span> UninstallShellExStandalone
 
-<span style="color:#0095ff;font-weight:bold;">Section</span> <span style="color:#bf0303;">&quot;-Remove_shellex&quot;</span> SEC_remove_shellex
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $PrevShellExInstallLocation <span style="color:#ca60ca;">!=</span> <span style="color:#bf0303;">&quot;&quot;</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">AndIf</span><span style="color:#ca60ca;">}</span> $PrevShellExStandalone <span style="color:#ca60ca;">==</span> 1
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">AndIf</span><span style="color:#ca60ca;">}</span> $KritaNsisVersion <span style="color:#ca60ca;">==</span> <span style="color:#bf0303;">&quot;&quot;</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">AndIf</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>FileExists<span style="color:#ca60ca;">}</span> <span style="color:#bf0303;">&quot;$PrevShellExInstallLocation\uninstall.exe&quot;</span>
+<span style="color:#0095ff;font-weight:bold">Section</span> <span style="color:#bf0303">"-Remove_shellex"</span> SEC_remove_shellex
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $PrevShellExInstallLocation <span style="color:#ca60ca">!=</span> <span style="color:#bf0303">""</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">AndIf</span><span style="color:#ca60ca">}</span> $PrevShellExStandalone <span style="color:#ca60ca">==</span> 1
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">AndIf</span><span style="color:#ca60ca">}</span> $KritaNsisVersion <span style="color:#ca60ca">==</span> <span style="color:#bf0303">""</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">AndIf</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>FileExists<span style="color:#ca60ca">}</span> <span style="color:#bf0303">"$PrevShellExInstallLocation\uninstall.exe"</span>
 		push $R0
-		<span style="color:#0095ff;font-weight:bold;">DetailPrint</span> <span style="color:#bf0303;">&quot;$(RemovingShellEx)&quot;</span>
-		<span style="color:#0095ff;font-weight:bold;">SetDetailsPrint</span> listonly
-		<span style="color:#0095ff;font-weight:bold;">ExecWait</span> <span style="color:#bf0303;">&quot;$PrevShellExInstallLocation\uninstall.exe /S _?=$PrevShellExInstallLocation&quot;</span> $R0
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $R0 <span style="color:#ca60ca;">!=</span> 0
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">IfNot</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>Silent<span style="color:#ca60ca;">}</span>
-				<span style="color:#0095ff;font-weight:bold;">MessageBox</span> <span style="color:#9500ff;font-weight:bold;">MB_OK</span><span style="color:#ca60ca;">|</span>MB_ICONSTOP <span style="color:#bf0303;">&quot;$(RemoveShellExFailed)&quot;</span>
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-			<span style="color:#0095ff;font-weight:bold;">SetDetailsPrint</span> both
-			<span style="color:#0095ff;font-weight:bold;">DetailPrint</span> <span style="color:#bf0303;">&quot;$(RemoveShellExFailed)&quot;</span>
-			<span style="color:#0095ff;font-weight:bold;">Abort</span>
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-		<span style="color:#0095ff;font-weight:bold;">Delete</span> <span style="color:#bf0303;">&quot;$PrevShellExInstallLocation\uninstall.exe&quot;</span>
-		<span style="color:#0095ff;font-weight:bold;">RMDir</span> /REBOOTOK <span style="color:#bf0303;">&quot;$PrevShellExInstallLocation&quot;</span>
-		<span style="color:#0095ff;font-weight:bold;">SetRebootFlag</span> false
-		<span style="color:#0095ff;font-weight:bold;">SetDetailsPrint</span> lastused
-		<span style="color:#0095ff;font-weight:bold;">DetailPrint</span> <span style="color:#bf0303;">&quot;$(RemoveShellExDone)&quot;</span>
+		<span style="color:#0095ff;font-weight:bold">DetailPrint</span> <span style="color:#bf0303">"$(RemovingShellEx)"</span>
+		<span style="color:#0095ff;font-weight:bold">SetDetailsPrint</span> listonly
+		<span style="color:#0095ff;font-weight:bold">ExecWait</span> <span style="color:#bf0303">"$PrevShellExInstallLocation\uninstall.exe /S _?=$PrevShellExInstallLocation"</span> $R0
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $R0 <span style="color:#ca60ca">!=</span> 0
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">IfNot</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>Silent<span style="color:#ca60ca">}</span>
+				<span style="color:#0095ff;font-weight:bold">MessageBox</span> <span style="color:#9500ff;font-weight:bold">MB_OK</span><span style="color:#ca60ca">|</span>MB_ICONSTOP <span style="color:#bf0303">"$(RemoveShellExFailed)"</span>
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+			<span style="color:#0095ff;font-weight:bold">SetDetailsPrint</span> both
+			<span style="color:#0095ff;font-weight:bold">DetailPrint</span> <span style="color:#bf0303">"$(RemoveShellExFailed)"</span>
+			<span style="color:#0095ff;font-weight:bold">Abort</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+		<span style="color:#0095ff;font-weight:bold">Delete</span> <span style="color:#bf0303">"$PrevShellExInstallLocation\uninstall.exe"</span>
+		<span style="color:#0095ff;font-weight:bold">RMDir</span> /REBOOTOK <span style="color:#bf0303">"$PrevShellExInstallLocation"</span>
+		<span style="color:#0095ff;font-weight:bold">SetRebootFlag</span> false
+		<span style="color:#0095ff;font-weight:bold">SetDetailsPrint</span> lastused
+		<span style="color:#0095ff;font-weight:bold">DetailPrint</span> <span style="color:#bf0303">"$(RemoveShellExDone)"</span>
 		pop $R0
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-<span style="color:#0095ff;font-weight:bold;">SectionEnd</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+<span style="color:#0095ff;font-weight:bold">SectionEnd</span>
 
-<span style="color:#0095ff;font-weight:bold;">Section</span> <span style="color:#bf0303;">&quot;$(SectionRemoveOldVer)&quot;</span> SEC_remove_old_version
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $KritaNsisInstallLocation <span style="color:#ca60ca;">!=</span> <span style="color:#bf0303;">&quot;&quot;</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">AndIf</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>FileExists<span style="color:#ca60ca;">}</span> <span style="color:#bf0303;">&quot;$KritaNsisInstallLocation\uninstall.exe&quot;</span>
+<span style="color:#0095ff;font-weight:bold">Section</span> <span style="color:#bf0303">"$(SectionRemoveOldVer)"</span> SEC_remove_old_version
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $KritaNsisInstallLocation <span style="color:#ca60ca">!=</span> <span style="color:#bf0303">""</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">AndIf</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>FileExists<span style="color:#ca60ca">}</span> <span style="color:#bf0303">"$KritaNsisInstallLocation\uninstall.exe"</span>
 		push $R0
-		<span style="color:#0095ff;font-weight:bold;">DetailPrint</span> <span style="color:#bf0303;">&quot;$(RemovingOldVer)&quot;</span>
-		<span style="color:#0095ff;font-weight:bold;">SetDetailsPrint</span> listonly
-		<span style="color:#0095ff;font-weight:bold;">ExecWait</span> <span style="color:#bf0303;">&quot;$KritaNsisInstallLocation\uninstall.exe /S _?=$KritaNsisInstallLocation&quot;</span> $R0
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $R0 <span style="color:#ca60ca;">!=</span> 0
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">IfNot</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>Silent<span style="color:#ca60ca;">}</span>
-				<span style="color:#0095ff;font-weight:bold;">MessageBox</span> <span style="color:#9500ff;font-weight:bold;">MB_OK</span><span style="color:#ca60ca;">|</span>MB_ICONSTOP <span style="color:#bf0303;">&quot;$(RemoveOldVerFailed)&quot;</span>
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-			<span style="color:#0095ff;font-weight:bold;">SetDetailsPrint</span> both
-			<span style="color:#0095ff;font-weight:bold;">DetailPrint</span> <span style="color:#bf0303;">&quot;$(RemoveOldVerFailed)&quot;</span>
-			<span style="color:#0095ff;font-weight:bold;">Abort</span>
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-		<span style="color:#0095ff;font-weight:bold;">Delete</span> <span style="color:#bf0303;">&quot;$KritaNsisInstallLocation\uninstall.exe&quot;</span>
-		<span style="color:#0095ff;font-weight:bold;">RMDir</span> /REBOOTOK <span style="color:#bf0303;">&quot;$KritaNsisInstallLocation&quot;</span>
-		<span style="color:#0095ff;font-weight:bold;">SetRebootFlag</span> false
-		<span style="color:#0095ff;font-weight:bold;">SetDetailsPrint</span> lastused
-		<span style="color:#0095ff;font-weight:bold;">DetailPrint</span> <span style="color:#bf0303;">&quot;$(RemoveOldVerDone)&quot;</span>
+		<span style="color:#0095ff;font-weight:bold">DetailPrint</span> <span style="color:#bf0303">"$(RemovingOldVer)"</span>
+		<span style="color:#0095ff;font-weight:bold">SetDetailsPrint</span> listonly
+		<span style="color:#0095ff;font-weight:bold">ExecWait</span> <span style="color:#bf0303">"$KritaNsisInstallLocation\uninstall.exe /S _?=$KritaNsisInstallLocation"</span> $R0
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $R0 <span style="color:#ca60ca">!=</span> 0
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">IfNot</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>Silent<span style="color:#ca60ca">}</span>
+				<span style="color:#0095ff;font-weight:bold">MessageBox</span> <span style="color:#9500ff;font-weight:bold">MB_OK</span><span style="color:#ca60ca">|</span>MB_ICONSTOP <span style="color:#bf0303">"$(RemoveOldVerFailed)"</span>
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+			<span style="color:#0095ff;font-weight:bold">SetDetailsPrint</span> both
+			<span style="color:#0095ff;font-weight:bold">DetailPrint</span> <span style="color:#bf0303">"$(RemoveOldVerFailed)"</span>
+			<span style="color:#0095ff;font-weight:bold">Abort</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+		<span style="color:#0095ff;font-weight:bold">Delete</span> <span style="color:#bf0303">"$KritaNsisInstallLocation\uninstall.exe"</span>
+		<span style="color:#0095ff;font-weight:bold">RMDir</span> /REBOOTOK <span style="color:#bf0303">"$KritaNsisInstallLocation"</span>
+		<span style="color:#0095ff;font-weight:bold">SetRebootFlag</span> false
+		<span style="color:#0095ff;font-weight:bold">SetDetailsPrint</span> lastused
+		<span style="color:#0095ff;font-weight:bold">DetailPrint</span> <span style="color:#bf0303">"$(RemoveOldVerDone)"</span>
 		pop $R0
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-<span style="color:#0095ff;font-weight:bold;">SectionEnd</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+<span style="color:#0095ff;font-weight:bold">SectionEnd</span>
 
-<span style="color:#0095ff;font-weight:bold;">Section</span> <span style="color:#bf0303;">&quot;-Thing&quot;</span>
-	<span style="color:#0095ff;font-weight:bold;">SetOutPath</span> $INSTDIR
-	<span style="color:#0095ff;font-weight:bold;">WriteRegStr</span> HKLM <span style="color:#bf0303;">&quot;Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}&quot;</span> \
-	                 <span style="color:#bf0303;">&quot;DisplayName&quot;</span> <span style="color:#bf0303;">&quot;${KRITA_PRODUCTNAME} ${KRITA_VERSION_DISPLAY}&quot;</span>
-	<span style="color:#0095ff;font-weight:bold;">WriteRegStr</span> HKLM <span style="color:#bf0303;">&quot;Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}&quot;</span> \
-	                 <span style="color:#bf0303;">&quot;UninstallString&quot;</span> <span style="color:#bf0303;">&quot;$\&quot;</span>$INSTDIR\uninstall.exe$\<span style="color:#bf0303;">&quot;&quot;</span>
-	<span style="color:#0095ff;font-weight:bold;">WriteUninstaller</span> $INSTDIR\uninstall.exe
-	<span style="color:#0095ff;font-weight:bold;">WriteRegStr</span> HKLM <span style="color:#bf0303;">&quot;Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}&quot;</span> \
-	                 <span style="color:#bf0303;">&quot;DisplayVersion&quot;</span> <span style="color:#bf0303;">&quot;${KRITA_VERSION}&quot;</span>
-	<span style="color:#0095ff;font-weight:bold;">WriteRegStr</span> HKLM <span style="color:#bf0303;">&quot;Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}&quot;</span> \
-	                 <span style="color:#bf0303;">&quot;DisplayIcon&quot;</span> <span style="color:#bf0303;">&quot;$\&quot;</span>$INSTDIR\shellex\krita.ico$\<span style="color:#bf0303;">&quot;,0&quot;</span>
-	<span style="color:#0095ff;font-weight:bold;">WriteRegStr</span> HKLM <span style="color:#bf0303;">&quot;Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}&quot;</span> \
-	                 <span style="color:#bf0303;">&quot;URLInfoAbout&quot;</span> <span style="color:#bf0303;">&quot;https://krita.org/&quot;</span>
-	<span style="color:#0095ff;font-weight:bold;">WriteRegStr</span> HKLM <span style="color:#bf0303;">&quot;Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}&quot;</span> \
-	                 <span style="color:#bf0303;">&quot;InstallLocation&quot;</span> <span style="color:#bf0303;">&quot;$INSTDIR&quot;</span>
-	<span style="color:#0095ff;font-weight:bold;">WriteRegStr</span> HKLM <span style="color:#bf0303;">&quot;Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}&quot;</span> \
-	                 <span style="color:#bf0303;">&quot;Publisher&quot;</span> <span style="color:#bf0303;">&quot;${KRTIA_PUBLISHER}&quot;</span>
-	#WriteRegDWORD HKLM <span style="color:#bf0303;">&quot;Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}&quot;</span> \
-	#                   <span style="color:#bf0303;">&quot;EstimatedSize&quot;</span> 250000
-	<span style="color:#0095ff;font-weight:bold;">WriteRegDWORD</span> HKLM <span style="color:#bf0303;">&quot;Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}&quot;</span> \
-	                   <span style="color:#bf0303;">&quot;NoModify&quot;</span> 1
-	<span style="color:#0095ff;font-weight:bold;">WriteRegDWORD</span> HKLM <span style="color:#bf0303;">&quot;Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}&quot;</span> \
-	                   <span style="color:#bf0303;">&quot;NoRepair&quot;</span> 1
+<span style="color:#0095ff;font-weight:bold">Section</span> <span style="color:#bf0303">"-Thing"</span>
+	<span style="color:#0095ff;font-weight:bold">SetOutPath</span> $INSTDIR
+	<span style="color:#0095ff;font-weight:bold">WriteRegStr</span> HKLM <span style="color:#bf0303">"Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}"</span> \
+	                 <span style="color:#bf0303">"DisplayName"</span> <span style="color:#bf0303">"${KRITA_PRODUCTNAME} ${KRITA_VERSION_DISPLAY}"</span>
+	<span style="color:#0095ff;font-weight:bold">WriteRegStr</span> HKLM <span style="color:#bf0303">"Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}"</span> \
+	                 <span style="color:#bf0303">"UninstallString"</span> <span style="color:#bf0303">"$\"</span>$INSTDIR\uninstall.exe$\<span style="color:#bf0303">""</span>
+	<span style="color:#0095ff;font-weight:bold">WriteUninstaller</span> $INSTDIR\uninstall.exe
+	<span style="color:#0095ff;font-weight:bold">WriteRegStr</span> HKLM <span style="color:#bf0303">"Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}"</span> \
+	                 <span style="color:#bf0303">"DisplayVersion"</span> <span style="color:#bf0303">"${KRITA_VERSION}"</span>
+	<span style="color:#0095ff;font-weight:bold">WriteRegStr</span> HKLM <span style="color:#bf0303">"Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}"</span> \
+	                 <span style="color:#bf0303">"DisplayIcon"</span> <span style="color:#bf0303">"$\"</span>$INSTDIR\shellex\krita.ico$\<span style="color:#bf0303">",0"</span>
+	<span style="color:#0095ff;font-weight:bold">WriteRegStr</span> HKLM <span style="color:#bf0303">"Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}"</span> \
+	                 <span style="color:#bf0303">"URLInfoAbout"</span> <span style="color:#bf0303">"https://krita.org/"</span>
+	<span style="color:#0095ff;font-weight:bold">WriteRegStr</span> HKLM <span style="color:#bf0303">"Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}"</span> \
+	                 <span style="color:#bf0303">"InstallLocation"</span> <span style="color:#bf0303">"$INSTDIR"</span>
+	<span style="color:#0095ff;font-weight:bold">WriteRegStr</span> HKLM <span style="color:#bf0303">"Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}"</span> \
+	                 <span style="color:#bf0303">"Publisher"</span> <span style="color:#bf0303">"${KRTIA_PUBLISHER}"</span>
+	#WriteRegDWORD HKLM <span style="color:#bf0303">"Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}"</span> \
+	#                   <span style="color:#bf0303">"EstimatedSize"</span> 250000
+	<span style="color:#0095ff;font-weight:bold">WriteRegDWORD</span> HKLM <span style="color:#bf0303">"Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}"</span> \
+	                   <span style="color:#bf0303">"NoModify"</span> 1
+	<span style="color:#0095ff;font-weight:bold">WriteRegDWORD</span> HKLM <span style="color:#bf0303">"Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}"</span> \
+	                   <span style="color:#bf0303">"NoRepair"</span> 1
 	# Registry entries for version recognition
 	#   InstallLocation:
 	#     Where krita is installed
-	<span style="color:#0095ff;font-weight:bold;">WriteRegStr</span> HKLM <span style="color:#bf0303;">&quot;Software\Krita&quot;</span> \
-	                 <span style="color:#bf0303;">&quot;InstallLocation&quot;</span> <span style="color:#bf0303;">&quot;$INSTDIR&quot;</span>
+	<span style="color:#0095ff;font-weight:bold">WriteRegStr</span> HKLM <span style="color:#bf0303">"Software\Krita"</span> \
+	                 <span style="color:#bf0303">"InstallLocation"</span> <span style="color:#bf0303">"$INSTDIR"</span>
 	#   Version:
 	#     Version of Krita
-	<span style="color:#0095ff;font-weight:bold;">WriteRegStr</span> HKLM <span style="color:#bf0303;">&quot;Software\Krita&quot;</span> \
-	                 <span style="color:#bf0303;">&quot;Version&quot;</span> <span style="color:#bf0303;">&quot;${KRITA_VERSION}&quot;</span>
+	<span style="color:#0095ff;font-weight:bold">WriteRegStr</span> HKLM <span style="color:#bf0303">"Software\Krita"</span> \
+	                 <span style="color:#bf0303">"Version"</span> <span style="color:#bf0303">"${KRITA_VERSION}"</span>
 	#   x64:
-	#     Set to 1 for 64<span style="color:#ca60ca;">-</span>bit Krita<span style="color:#ca60ca;">,</span> can be missing for 32<span style="color:#ca60ca;">-</span>bit Krita
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">ifdef</span> KRITA_INSTALLER_64
-	<span style="color:#0095ff;font-weight:bold;">WriteRegDWORD</span> HKLM <span style="color:#bf0303;">&quot;Software\Krita&quot;</span> \
-	                   <span style="color:#bf0303;">&quot;x64&quot;</span> 1
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">else</span>
-	<span style="color:#0095ff;font-weight:bold;">DeleteRegValue</span> HKLM <span style="color:#bf0303;">&quot;Software\Krita&quot;</span> <span style="color:#bf0303;">&quot;x64&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">endif</span>
+	#     Set to 1 for 64<span style="color:#ca60ca">-</span>bit Krita<span style="color:#ca60ca">,</span> can be missing for 32<span style="color:#ca60ca">-</span>bit Krita
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">ifdef</span> KRITA_INSTALLER_64
+	<span style="color:#0095ff;font-weight:bold">WriteRegDWORD</span> HKLM <span style="color:#bf0303">"Software\Krita"</span> \
+	                   <span style="color:#bf0303">"x64"</span> 1
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">else</span>
+	<span style="color:#0095ff;font-weight:bold">DeleteRegValue</span> HKLM <span style="color:#bf0303">"Software\Krita"</span> <span style="color:#bf0303">"x64"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">endif</span>
 	#   InstallerLanguage:
-	#     Language used by the installer <span style="color:#ca60ca;">(</span>to be re<span style="color:#ca60ca;">-</span>used for the uninstaller<span style="color:#ca60ca;">)</span>
-	<span style="color:#0095ff;font-weight:bold;">WriteRegStr</span> HKLM <span style="color:#bf0303;">&quot;Software\Krita&quot;</span> \
-	                 <span style="color:#bf0303;">&quot;InstallerLanguage&quot;</span> <span style="color:#bf0303;">&quot;$LANGUAGE&quot;</span>
+	#     Language used by the installer <span style="color:#ca60ca">(</span>to be re<span style="color:#ca60ca">-</span>used for the uninstaller<span style="color:#ca60ca">)</span>
+	<span style="color:#0095ff;font-weight:bold">WriteRegStr</span> HKLM <span style="color:#bf0303">"Software\Krita"</span> \
+	                 <span style="color:#bf0303">"InstallerLanguage"</span> <span style="color:#bf0303">"$LANGUAGE"</span>
 	#   StartMenuFolder:
 	#     Start Menu Folder
-	#     Handled by Modern UI 2.0 <span style="color:#9500ff;font-weight:bold;">MUI_PAGE_STARTMENU</span>
-<span style="color:#0095ff;font-weight:bold;">SectionEnd</span>
+	#     Handled by Modern UI 2.0 <span style="color:#9500ff;font-weight:bold">MUI_PAGE_STARTMENU</span>
+<span style="color:#0095ff;font-weight:bold">SectionEnd</span>
 
-<span style="color:#0095ff;font-weight:bold;">Section</span> <span style="color:#bf0303;">&quot;${KRITA_PRODUCTNAME}&quot;</span> SEC_product_main
-	# TODO: Maybe switch to explicit file list<span style="color:#ca60ca;">?</span>
-	<span style="color:#0095ff;font-weight:bold;">File</span> /r /x ffmpeg.exe /x ffmpeg_README.txt /x ffmpeg_LICENSE.txt $<span style="color:#ca60ca;">{</span>KRITA_PACKAGE_ROOT<span style="color:#ca60ca;">}</span>\bin
-	<span style="color:#0095ff;font-weight:bold;">File</span> /r $<span style="color:#ca60ca;">{</span>KRITA_PACKAGE_ROOT<span style="color:#ca60ca;">}</span>\lib
-	<span style="color:#0095ff;font-weight:bold;">File</span> /r $<span style="color:#ca60ca;">{</span>KRITA_PACKAGE_ROOT<span style="color:#ca60ca;">}</span>\share
-	<span style="color:#0095ff;font-weight:bold;">File</span> /r $<span style="color:#ca60ca;">{</span>KRITA_PACKAGE_ROOT<span style="color:#ca60ca;">}</span>\python
-<span style="color:#0095ff;font-weight:bold;">SectionEnd</span>
+<span style="color:#0095ff;font-weight:bold">Section</span> <span style="color:#bf0303">"${KRITA_PRODUCTNAME}"</span> SEC_product_main
+	# TODO: Maybe switch to explicit file list<span style="color:#ca60ca">?</span>
+	<span style="color:#0095ff;font-weight:bold">File</span> /r /x ffmpeg.exe /x ffmpeg_README.txt /x ffmpeg_LICENSE.txt $<span style="color:#ca60ca">{</span>KRITA_PACKAGE_ROOT<span style="color:#ca60ca">}</span>\bin
+	<span style="color:#0095ff;font-weight:bold">File</span> /r $<span style="color:#ca60ca">{</span>KRITA_PACKAGE_ROOT<span style="color:#ca60ca">}</span>\lib
+	<span style="color:#0095ff;font-weight:bold">File</span> /r $<span style="color:#ca60ca">{</span>KRITA_PACKAGE_ROOT<span style="color:#ca60ca">}</span>\share
+	<span style="color:#0095ff;font-weight:bold">File</span> /r $<span style="color:#ca60ca">{</span>KRITA_PACKAGE_ROOT<span style="color:#ca60ca">}</span>\python
+<span style="color:#0095ff;font-weight:bold">SectionEnd</span>
 
-<span style="color:#0095ff;font-weight:bold;">Section</span> <span style="color:#bf0303;">&quot;-Main_associate&quot;</span>
-	<span style="color:#0095ff;font-weight:bold;">CreateDirectory</span> $<span style="color:#ca60ca;">{</span>KRITA_SHELLEX_DIR<span style="color:#ca60ca;">}</span>
-	$<span style="color:#ca60ca;">{</span>Krita_RegisterFileAssociation<span style="color:#ca60ca;">}</span> <span style="color:#bf0303;">&quot;$INSTDIR\bin\krita.exe&quot;</span>
-<span style="color:#0095ff;font-weight:bold;">SectionEnd</span>
+<span style="color:#0095ff;font-weight:bold">Section</span> <span style="color:#bf0303">"-Main_associate"</span>
+	<span style="color:#0095ff;font-weight:bold">CreateDirectory</span> $<span style="color:#ca60ca">{</span>KRITA_SHELLEX_DIR<span style="color:#ca60ca">}</span>
+	$<span style="color:#ca60ca">{</span>Krita_RegisterFileAssociation<span style="color:#ca60ca">}</span> <span style="color:#bf0303">"$INSTDIR\bin\krita.exe"</span>
+<span style="color:#0095ff;font-weight:bold">SectionEnd</span>
 
-<span style="color:#0095ff;font-weight:bold;">Section</span> <span style="color:#bf0303;">&quot;-Main_Shortcuts&quot;</span>
+<span style="color:#0095ff;font-weight:bold">Section</span> <span style="color:#bf0303">"-Main_Shortcuts"</span>
 	# Placing this after Krita_RegisterFileAssociation to get the icon
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_STARTMENU_WRITE_BEGIN</span> Krita
-		<span style="color:#0095ff;font-weight:bold;">CreateDirectory</span> <span style="color:#bf0303;">&quot;$SMPROGRAMS\$KritaStartMenuFolder&quot;</span>
-		<span style="color:#0095ff;font-weight:bold;">CreateShortcut</span> <span style="color:#bf0303;">&quot;$SMPROGRAMS\$KritaStartMenuFolder\${KRITA_PRODUCTNAME}.lnk&quot;</span> <span style="color:#bf0303;">&quot;$INSTDIR\bin\krita.exe&quot;</span> <span style="color:#bf0303;">&quot;&quot;</span> <span style="color:#bf0303;">&quot;$INSTDIR\shellex\krita.ico&quot;</span> 0
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_STARTMENU_WRITE_END</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $CreateDesktopIcon <span style="color:#ca60ca;">==</span> 1
-		# <span style="color:#9500ff;font-weight:bold;">For</span> the desktop icon<span style="color:#ca60ca;">,</span> keep the name short and omit version info
-		<span style="color:#0095ff;font-weight:bold;">CreateShortcut</span> <span style="color:#bf0303;">&quot;$DESKTOP\Krita.lnk&quot;</span> <span style="color:#bf0303;">&quot;$INSTDIR\bin\krita.exe&quot;</span> <span style="color:#bf0303;">&quot;&quot;</span> <span style="color:#bf0303;">&quot;$INSTDIR\shellex\krita.ico&quot;</span> 0
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-<span style="color:#0095ff;font-weight:bold;">SectionEnd</span>
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_STARTMENU_WRITE_BEGIN</span> Krita
+		<span style="color:#0095ff;font-weight:bold">CreateDirectory</span> <span style="color:#bf0303">"$SMPROGRAMS\$KritaStartMenuFolder"</span>
+		<span style="color:#0095ff;font-weight:bold">CreateShortcut</span> <span style="color:#bf0303">"$SMPROGRAMS\$KritaStartMenuFolder\${KRITA_PRODUCTNAME}.lnk"</span> <span style="color:#bf0303">"$INSTDIR\bin\krita.exe"</span> <span style="color:#bf0303">""</span> <span style="color:#bf0303">"$INSTDIR\shellex\krita.ico"</span> 0
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_STARTMENU_WRITE_END</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $CreateDesktopIcon <span style="color:#ca60ca">==</span> 1
+		# <span style="color:#9500ff;font-weight:bold">For</span> the desktop icon<span style="color:#ca60ca">,</span> keep the name short and omit version info
+		<span style="color:#0095ff;font-weight:bold">CreateShortcut</span> <span style="color:#bf0303">"$DESKTOP\Krita.lnk"</span> <span style="color:#bf0303">"$INSTDIR\bin\krita.exe"</span> <span style="color:#bf0303">""</span> <span style="color:#bf0303">"$INSTDIR\shellex\krita.ico"</span> 0
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+<span style="color:#0095ff;font-weight:bold">SectionEnd</span>
 
-<span style="color:#0095ff;font-weight:bold;">Section</span> <span style="color:#bf0303;">&quot;$(SectionShellEx)&quot;</span> SEC_shellex
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>RunningX64<span style="color:#ca60ca;">}</span>
-		$<span style="color:#ca60ca;">{</span>Krita_RegisterComComonents<span style="color:#ca60ca;">}</span> 64
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-	$<span style="color:#ca60ca;">{</span>Krita_RegisterComComonents<span style="color:#ca60ca;">}</span> 32
+<span style="color:#0095ff;font-weight:bold">Section</span> <span style="color:#bf0303">"$(SectionShellEx)"</span> SEC_shellex
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>RunningX64<span style="color:#ca60ca">}</span>
+		$<span style="color:#ca60ca">{</span>Krita_RegisterComComonents<span style="color:#ca60ca">}</span> 64
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+	$<span style="color:#ca60ca">{</span>Krita_RegisterComComonents<span style="color:#ca60ca">}</span> 32
 
-	$<span style="color:#ca60ca;">{</span>Krita_RegisterShellExtension<span style="color:#ca60ca;">}</span>
+	$<span style="color:#ca60ca">{</span>Krita_RegisterShellExtension<span style="color:#ca60ca">}</span>
 
 	#   ShellExtension\InstallLocation:
 	#     Where the shell extension is installed
-	#     <span style="color:#9500ff;font-weight:bold;">If</span> installed by Krita installer<span style="color:#ca60ca;">,</span> this must point to shellex sub<span style="color:#ca60ca;">-</span>dir
-	<span style="color:#0095ff;font-weight:bold;">WriteRegStr</span> HKLM <span style="color:#bf0303;">&quot;Software\Krita\ShellExtension&quot;</span> \
-	                 <span style="color:#bf0303;">&quot;InstallLocation&quot;</span> <span style="color:#bf0303;">&quot;$INSTDIR\shellex&quot;</span>
+	#     <span style="color:#9500ff;font-weight:bold">If</span> installed by Krita installer<span style="color:#ca60ca">,</span> this must point to shellex sub<span style="color:#ca60ca">-</span>dir
+	<span style="color:#0095ff;font-weight:bold">WriteRegStr</span> HKLM <span style="color:#bf0303">"Software\Krita\ShellExtension"</span> \
+	                 <span style="color:#bf0303">"InstallLocation"</span> <span style="color:#bf0303">"$INSTDIR\shellex"</span>
 	#   ShellExtension\Version:
 	#     Version of the shell extension
-	<span style="color:#0095ff;font-weight:bold;">WriteRegStr</span> HKLM <span style="color:#bf0303;">&quot;Software\Krita\ShellExtension&quot;</span> \
-	                 <span style="color:#bf0303;">&quot;Version&quot;</span> <span style="color:#bf0303;">&quot;${KRITASHELLEX_VERSION}&quot;</span>
+	<span style="color:#0095ff;font-weight:bold">WriteRegStr</span> HKLM <span style="color:#bf0303">"Software\Krita\ShellExtension"</span> \
+	                 <span style="color:#bf0303">"Version"</span> <span style="color:#bf0303">"${KRITASHELLEX_VERSION}"</span>
 	#   ShellExtension\Standalone:
-	#     0 <span style="color:#ca60ca;">=</span> Installed by Krita installer
-	#     1 <span style="color:#ca60ca;">=</span> Standalone installer
-	<span style="color:#0095ff;font-weight:bold;">WriteRegDWORD</span> HKLM <span style="color:#bf0303;">&quot;Software\Krita\ShellExtension&quot;</span> \
-	                   <span style="color:#bf0303;">&quot;Standalone&quot;</span> 0
+	#     0 <span style="color:#ca60ca">=</span> Installed by Krita installer
+	#     1 <span style="color:#ca60ca">=</span> Standalone installer
+	<span style="color:#0095ff;font-weight:bold">WriteRegDWORD</span> HKLM <span style="color:#bf0303">"Software\Krita\ShellExtension"</span> \
+	                   <span style="color:#bf0303">"Standalone"</span> 0
 	#   ShellExtension\KritaExePath:
 	#     Path to krita.exe as specified by user or by Krita installer
-	#     Empty <span style="font-weight:bold;">if</span> not specified
-	<span style="color:#0095ff;font-weight:bold;">WriteRegStr</span> HKLM <span style="color:#bf0303;">&quot;Software\Krita\ShellExtension&quot;</span> \
-	                 <span style="color:#bf0303;">&quot;KritaExePath&quot;</span> <span style="color:#bf0303;">&quot;$INSTDIR\bin\krita.exe&quot;</span>
-<span style="color:#0095ff;font-weight:bold;">SectionEnd</span>
+	#     Empty <span style="font-weight:bold">if</span> not specified
+	<span style="color:#0095ff;font-weight:bold">WriteRegStr</span> HKLM <span style="color:#bf0303">"Software\Krita\ShellExtension"</span> \
+	                 <span style="color:#bf0303">"KritaExePath"</span> <span style="color:#bf0303">"$INSTDIR\bin\krita.exe"</span>
+<span style="color:#0095ff;font-weight:bold">SectionEnd</span>
 
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">ifdef</span> HAS_FFMPEG
-<span style="color:#0095ff;font-weight:bold;">Section</span> <span style="color:#bf0303;">&quot;$(SectionBundledFfmpeg)&quot;</span> SEC_ffmpeg
-	<span style="color:#0095ff;font-weight:bold;">File</span> /oname<span style="color:#ca60ca;">=</span>bin\ffmpeg.exe $<span style="color:#ca60ca;">{</span>KRITA_PACKAGE_ROOT<span style="color:#ca60ca;">}</span>\bin\ffmpeg.exe
-	<span style="color:#0095ff;font-weight:bold;">File</span> /oname<span style="color:#ca60ca;">=</span>bin\ffmpeg_LICENSE.txt $<span style="color:#ca60ca;">{</span>KRITA_PACKAGE_ROOT<span style="color:#ca60ca;">}</span>\bin\ffmpeg_LICENSE.txt
-	<span style="color:#0095ff;font-weight:bold;">File</span> /oname<span style="color:#ca60ca;">=</span>bin\ffmpeg_README.txt $<span style="color:#ca60ca;">{</span>KRITA_PACKAGE_ROOT<span style="color:#ca60ca;">}</span>\bin\ffmpeg_README.txt
-<span style="color:#0095ff;font-weight:bold;">SectionEnd</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">endif</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">ifdef</span> HAS_FFMPEG
+<span style="color:#0095ff;font-weight:bold">Section</span> <span style="color:#bf0303">"$(SectionBundledFfmpeg)"</span> SEC_ffmpeg
+	<span style="color:#0095ff;font-weight:bold">File</span> /oname<span style="color:#ca60ca">=</span>bin\ffmpeg.exe $<span style="color:#ca60ca">{</span>KRITA_PACKAGE_ROOT<span style="color:#ca60ca">}</span>\bin\ffmpeg.exe
+	<span style="color:#0095ff;font-weight:bold">File</span> /oname<span style="color:#ca60ca">=</span>bin\ffmpeg_LICENSE.txt $<span style="color:#ca60ca">{</span>KRITA_PACKAGE_ROOT<span style="color:#ca60ca">}</span>\bin\ffmpeg_LICENSE.txt
+	<span style="color:#0095ff;font-weight:bold">File</span> /oname<span style="color:#ca60ca">=</span>bin\ffmpeg_README.txt $<span style="color:#ca60ca">{</span>KRITA_PACKAGE_ROOT<span style="color:#ca60ca">}</span>\bin\ffmpeg_README.txt
+<span style="color:#0095ff;font-weight:bold">SectionEnd</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">endif</span>
 
-<span style="color:#0095ff;font-weight:bold;">Section</span> <span style="color:#bf0303;">&quot;-Main_refreshShell&quot;</span>
-	$<span style="color:#ca60ca;">{</span>RefreshShell<span style="color:#ca60ca;">}</span>
-<span style="color:#0095ff;font-weight:bold;">SectionEnd</span>
+<span style="color:#0095ff;font-weight:bold">Section</span> <span style="color:#bf0303">"-Main_refreshShell"</span>
+	$<span style="color:#ca60ca">{</span>RefreshShell<span style="color:#ca60ca">}</span>
+<span style="color:#0095ff;font-weight:bold">SectionEnd</span>
 
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_FUNCTION_DESCRIPTION_BEGIN</span>
-	#<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_DESCRIPTION_TEXT</span> $<span style="color:#ca60ca;">{</span>SEC_remove_shellex<span style="color:#ca60ca;">}</span> <span style="color:#bf0303;">&quot;Remove previously installed Krita Shell Integration.&quot;</span>
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_DESCRIPTION_TEXT</span> $<span style="color:#ca60ca;">{</span>SEC_remove_old_version<span style="color:#ca60ca;">}</span> <span style="color:#bf0303;">&quot;$(SectionRemoveOldVerDesc)&quot;</span>
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_DESCRIPTION_TEXT</span> $<span style="color:#ca60ca;">{</span>SEC_product_main<span style="color:#ca60ca;">}</span> <span style="color:#bf0303;">&quot;$(SectionMainDesc)&quot;</span>
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_DESCRIPTION_TEXT</span> $<span style="color:#ca60ca;">{</span>SEC_shellex<span style="color:#ca60ca;">}</span> <span style="color:#bf0303;">&quot;$(SectionShellExDesc)&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">ifdef</span> HAS_FFMPEG
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_DESCRIPTION_TEXT</span> $<span style="color:#ca60ca;">{</span>SEC_ffmpeg<span style="color:#ca60ca;">}</span> <span style="color:#bf0303;">&quot;$(SectionBundledFfmpegDesc)&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">endif</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_FUNCTION_DESCRIPTION_END</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_FUNCTION_DESCRIPTION_BEGIN</span>
+	#<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_DESCRIPTION_TEXT</span> $<span style="color:#ca60ca">{</span>SEC_remove_shellex<span style="color:#ca60ca">}</span> <span style="color:#bf0303">"Remove previously installed Krita Shell Integration."</span>
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_DESCRIPTION_TEXT</span> $<span style="color:#ca60ca">{</span>SEC_remove_old_version<span style="color:#ca60ca">}</span> <span style="color:#bf0303">"$(SectionRemoveOldVerDesc)"</span>
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_DESCRIPTION_TEXT</span> $<span style="color:#ca60ca">{</span>SEC_product_main<span style="color:#ca60ca">}</span> <span style="color:#bf0303">"$(SectionMainDesc)"</span>
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_DESCRIPTION_TEXT</span> $<span style="color:#ca60ca">{</span>SEC_shellex<span style="color:#ca60ca">}</span> <span style="color:#bf0303">"$(SectionShellExDesc)"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">ifdef</span> HAS_FFMPEG
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_DESCRIPTION_TEXT</span> $<span style="color:#ca60ca">{</span>SEC_ffmpeg<span style="color:#ca60ca">}</span> <span style="color:#bf0303">"$(SectionBundledFfmpegDesc)"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">endif</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_FUNCTION_DESCRIPTION_END</span>
 
-<span style="color:#0095ff;font-weight:bold;">Section</span> <span style="color:#bf0303;">&quot;un.$(SectionShellEx)&quot;</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $UninstallShellExStandalone <span style="color:#ca60ca;">==</span> 1
+<span style="color:#0095ff;font-weight:bold">Section</span> <span style="color:#bf0303">"un.$(SectionShellEx)"</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $UninstallShellExStandalone <span style="color:#ca60ca">==</span> 1
 		push $R0
-		<span style="color:#0095ff;font-weight:bold;">DetailPrint</span> <span style="color:#bf0303;">&quot;$(RemovingShellEx)&quot;</span>
-		<span style="color:#0095ff;font-weight:bold;">SetDetailsPrint</span> listonly
-		<span style="color:#0095ff;font-weight:bold;">ExecWait</span> <span style="color:#bf0303;">&quot;$INSTDIR\shellex\uninstall.exe /S _?=$INSTDIR\shellex&quot;</span> $R0
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $R0 <span style="color:#ca60ca;">!=</span> 0
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">IfNot</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>Silent<span style="color:#ca60ca;">}</span>
-				<span style="color:#0095ff;font-weight:bold;">MessageBox</span> <span style="color:#9500ff;font-weight:bold;">MB_OK</span><span style="color:#ca60ca;">|</span>MB_ICONSTOP <span style="color:#bf0303;">&quot;$(RemoveShellExFailed)&quot;</span>
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-			<span style="color:#0095ff;font-weight:bold;">SetDetailsPrint</span> lastused
-			<span style="color:#0095ff;font-weight:bold;">SetDetailsPrint</span> both
-			<span style="color:#0095ff;font-weight:bold;">DetailPrint</span> <span style="color:#bf0303;">&quot;$(RemoveShellExFailed)&quot;</span>
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-		<span style="color:#0095ff;font-weight:bold;">Delete</span> <span style="color:#bf0303;">&quot;$INSTDIR\shellex\uninstall.exe&quot;</span>
-		<span style="color:#0095ff;font-weight:bold;">RMDir</span> /REBOOTOK <span style="color:#bf0303;">&quot;$INSTDIR\shellex&quot;</span>
-		<span style="color:#0095ff;font-weight:bold;">SetDetailsPrint</span> lastused
-		<span style="color:#0095ff;font-weight:bold;">DetailPrint</span> <span style="color:#bf0303;">&quot;$(RemoveShellExDone)&quot;</span>
+		<span style="color:#0095ff;font-weight:bold">DetailPrint</span> <span style="color:#bf0303">"$(RemovingShellEx)"</span>
+		<span style="color:#0095ff;font-weight:bold">SetDetailsPrint</span> listonly
+		<span style="color:#0095ff;font-weight:bold">ExecWait</span> <span style="color:#bf0303">"$INSTDIR\shellex\uninstall.exe /S _?=$INSTDIR\shellex"</span> $R0
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $R0 <span style="color:#ca60ca">!=</span> 0
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">IfNot</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>Silent<span style="color:#ca60ca">}</span>
+				<span style="color:#0095ff;font-weight:bold">MessageBox</span> <span style="color:#9500ff;font-weight:bold">MB_OK</span><span style="color:#ca60ca">|</span>MB_ICONSTOP <span style="color:#bf0303">"$(RemoveShellExFailed)"</span>
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+			<span style="color:#0095ff;font-weight:bold">SetDetailsPrint</span> lastused
+			<span style="color:#0095ff;font-weight:bold">SetDetailsPrint</span> both
+			<span style="color:#0095ff;font-weight:bold">DetailPrint</span> <span style="color:#bf0303">"$(RemoveShellExFailed)"</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+		<span style="color:#0095ff;font-weight:bold">Delete</span> <span style="color:#bf0303">"$INSTDIR\shellex\uninstall.exe"</span>
+		<span style="color:#0095ff;font-weight:bold">RMDir</span> /REBOOTOK <span style="color:#bf0303">"$INSTDIR\shellex"</span>
+		<span style="color:#0095ff;font-weight:bold">SetDetailsPrint</span> lastused
+		<span style="color:#0095ff;font-weight:bold">DetailPrint</span> <span style="color:#bf0303">"$(RemoveShellExDone)"</span>
 		pop $R0
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">Else</span><span style="color:#ca60ca;">}</span>
-		$<span style="color:#ca60ca;">{</span>Krita_UnregisterShellExtension<span style="color:#ca60ca;">}</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">Else</span><span style="color:#ca60ca">}</span>
+		$<span style="color:#ca60ca">{</span>Krita_UnregisterShellExtension<span style="color:#ca60ca">}</span>
 
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>RunningX64<span style="color:#ca60ca;">}</span>
-			$<span style="color:#ca60ca;">{</span>Krita_UnregisterComComonents<span style="color:#ca60ca;">}</span> 64
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-		$<span style="color:#ca60ca;">{</span>Krita_UnregisterComComonents<span style="color:#ca60ca;">}</span> 32
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-<span style="color:#0095ff;font-weight:bold;">SectionEnd</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>RunningX64<span style="color:#ca60ca">}</span>
+			$<span style="color:#ca60ca">{</span>Krita_UnregisterComComonents<span style="color:#ca60ca">}</span> 64
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+		$<span style="color:#ca60ca">{</span>Krita_UnregisterComComonents<span style="color:#ca60ca">}</span> 32
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+<span style="color:#0095ff;font-weight:bold">SectionEnd</span>
 
-<span style="color:#0095ff;font-weight:bold;">Section</span> <span style="color:#bf0303;">&quot;un.Main_associate&quot;</span>
-	# TODO: Conditional<span style="color:#ca60ca;">,</span> use install log
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $UninstallShellExStandalone <span style="color:#ca60ca;">!=</span> 1
-		$<span style="color:#ca60ca;">{</span>Krita_UnregisterFileAssociation<span style="color:#ca60ca;">}</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-<span style="color:#0095ff;font-weight:bold;">SectionEnd</span>
+<span style="color:#0095ff;font-weight:bold">Section</span> <span style="color:#bf0303">"un.Main_associate"</span>
+	# TODO: Conditional<span style="color:#ca60ca">,</span> use install log
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $UninstallShellExStandalone <span style="color:#ca60ca">!=</span> 1
+		$<span style="color:#ca60ca">{</span>Krita_UnregisterFileAssociation<span style="color:#ca60ca">}</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+<span style="color:#0095ff;font-weight:bold">SectionEnd</span>
 
-<span style="color:#0095ff;font-weight:bold;">Section</span> <span style="color:#bf0303;">&quot;un.Main_Shortcuts&quot;</span>
-	<span style="color:#0095ff;font-weight:bold;">Delete</span> <span style="color:#bf0303;">&quot;$DESKTOP\Krita.lnk&quot;</span>
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> MUI_STARTMENU_GETFOLDER Krita $KritaStartMenuFolder
-	<span style="color:#0095ff;font-weight:bold;">Delete</span> <span style="color:#bf0303;">&quot;$SMPROGRAMS\$KritaStartMenuFolder\${KRITA_PRODUCTNAME}.lnk&quot;</span>
-	<span style="color:#0095ff;font-weight:bold;">RMDir</span> <span style="color:#bf0303;">&quot;$SMPROGRAMS\$KritaStartMenuFolder&quot;</span>
-<span style="color:#0095ff;font-weight:bold;">SectionEnd</span>
+<span style="color:#0095ff;font-weight:bold">Section</span> <span style="color:#bf0303">"un.Main_Shortcuts"</span>
+	<span style="color:#0095ff;font-weight:bold">Delete</span> <span style="color:#bf0303">"$DESKTOP\Krita.lnk"</span>
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> MUI_STARTMENU_GETFOLDER Krita $KritaStartMenuFolder
+	<span style="color:#0095ff;font-weight:bold">Delete</span> <span style="color:#bf0303">"$SMPROGRAMS\$KritaStartMenuFolder\${KRITA_PRODUCTNAME}.lnk"</span>
+	<span style="color:#0095ff;font-weight:bold">RMDir</span> <span style="color:#bf0303">"$SMPROGRAMS\$KritaStartMenuFolder"</span>
+<span style="color:#0095ff;font-weight:bold">SectionEnd</span>
 
-<span style="color:#0095ff;font-weight:bold;">Section</span> <span style="color:#bf0303;">&quot;un.${KRITA_PRODUCTNAME}&quot;</span>
-	# TODO: Maybe switch to explicit file list or some sort of install log<span style="color:#ca60ca;">?</span>
-	<span style="color:#0095ff;font-weight:bold;">RMDir</span> /r $INSTDIR\bin
-	<span style="color:#0095ff;font-weight:bold;">RMDir</span> /r $INSTDIR\lib
-	<span style="color:#0095ff;font-weight:bold;">RMDir</span> /r $INSTDIR\share
-	<span style="color:#0095ff;font-weight:bold;">RMDir</span> /r $INSTDIR\python
-<span style="color:#0095ff;font-weight:bold;">SectionEnd</span>
+<span style="color:#0095ff;font-weight:bold">Section</span> <span style="color:#bf0303">"un.${KRITA_PRODUCTNAME}"</span>
+	# TODO: Maybe switch to explicit file list or some sort of install log<span style="color:#ca60ca">?</span>
+	<span style="color:#0095ff;font-weight:bold">RMDir</span> /r $INSTDIR\bin
+	<span style="color:#0095ff;font-weight:bold">RMDir</span> /r $INSTDIR\lib
+	<span style="color:#0095ff;font-weight:bold">RMDir</span> /r $INSTDIR\share
+	<span style="color:#0095ff;font-weight:bold">RMDir</span> /r $INSTDIR\python
+<span style="color:#0095ff;font-weight:bold">SectionEnd</span>
 
-<span style="color:#0095ff;font-weight:bold;">Section</span> <span style="color:#bf0303;">&quot;un.Thing&quot;</span>
-	<span style="color:#0095ff;font-weight:bold;">RMDir</span> /REBOOTOK $INSTDIR\shellex
-	<span style="color:#0095ff;font-weight:bold;">DeleteRegKey</span> HKLM <span style="color:#bf0303;">&quot;Software\Krita&quot;</span>
-	<span style="color:#0095ff;font-weight:bold;">DeleteRegKey</span> HKLM <span style="color:#bf0303;">&quot;Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}&quot;</span>
-	<span style="color:#0095ff;font-weight:bold;">Delete</span> $INSTDIR\uninstall.exe
-	<span style="color:#0095ff;font-weight:bold;">RMDir</span> /REBOOTOK $INSTDIR
-<span style="color:#0095ff;font-weight:bold;">SectionEnd</span>
+<span style="color:#0095ff;font-weight:bold">Section</span> <span style="color:#bf0303">"un.Thing"</span>
+	<span style="color:#0095ff;font-weight:bold">RMDir</span> /REBOOTOK $INSTDIR\shellex
+	<span style="color:#0095ff;font-weight:bold">DeleteRegKey</span> HKLM <span style="color:#bf0303">"Software\Krita"</span>
+	<span style="color:#0095ff;font-weight:bold">DeleteRegKey</span> HKLM <span style="color:#bf0303">"Software\Microsoft\Windows\CurrentVersion\Uninstall\${KRITA_UNINSTALL_REGKEY}"</span>
+	<span style="color:#0095ff;font-weight:bold">Delete</span> $INSTDIR\uninstall.exe
+	<span style="color:#0095ff;font-weight:bold">RMDir</span> /REBOOTOK $INSTDIR
+<span style="color:#0095ff;font-weight:bold">SectionEnd</span>
 
-<span style="color:#0095ff;font-weight:bold;">Section</span> <span style="color:#bf0303;">&quot;un.Main_refreshShell&quot;</span>
-	$<span style="color:#ca60ca;">{</span>RefreshShell<span style="color:#ca60ca;">}</span>
-<span style="color:#0095ff;font-weight:bold;">SectionEnd</span>
+<span style="color:#0095ff;font-weight:bold">Section</span> <span style="color:#bf0303">"un.Main_refreshShell"</span>
+	$<span style="color:#ca60ca">{</span>RefreshShell<span style="color:#ca60ca">}</span>
+<span style="color:#0095ff;font-weight:bold">SectionEnd</span>
 
-<span style="color:#0095ff;font-weight:bold;">Function</span> .onInit
-	<span style="color:#0095ff;font-weight:bold;">SetShellVarContext</span> all
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> SetSectionFlag $<span style="color:#ca60ca;">{</span>SEC_product_main<span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>SF_RO<span style="color:#ca60ca;">}</span>
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> SetSectionFlag $<span style="color:#ca60ca;">{</span>SEC_product_main<span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>SF_BOLD<span style="color:#ca60ca;">}</span>
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> SetSectionFlag $<span style="color:#ca60ca;">{</span>SEC_remove_old_version<span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>SF_RO<span style="color:#ca60ca;">}</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">ifdef</span> HAS_FFMPEG
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> SetSectionFlag $<span style="color:#ca60ca;">{</span>SEC_ffmpeg<span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>SF_RO<span style="color:#ca60ca;">}</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">endif</span>
-	<span style="color:#0095ff;font-weight:bold;">StrCpy</span> $CreateDesktopIcon 1 # Create desktop icon by default
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">IfNot</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>AtLeastWin7<span style="color:#ca60ca;">}</span>
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">IfNot</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>Silent<span style="color:#ca60ca;">}</span>
-			<span style="color:#0095ff;font-weight:bold;">MessageBox</span> <span style="color:#9500ff;font-weight:bold;">MB_OK</span><span style="color:#ca60ca;">|</span>MB_ICONSTOP <span style="color:#bf0303;">&quot;$(MsgRequireWin7)&quot;</span>
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-		<span style="color:#0095ff;font-weight:bold;">Abort</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
+<span style="color:#0095ff;font-weight:bold">Function</span> .onInit
+	<span style="color:#0095ff;font-weight:bold">SetShellVarContext</span> all
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> SetSectionFlag $<span style="color:#ca60ca">{</span>SEC_product_main<span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>SF_RO<span style="color:#ca60ca">}</span>
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> SetSectionFlag $<span style="color:#ca60ca">{</span>SEC_product_main<span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>SF_BOLD<span style="color:#ca60ca">}</span>
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> SetSectionFlag $<span style="color:#ca60ca">{</span>SEC_remove_old_version<span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>SF_RO<span style="color:#ca60ca">}</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">ifdef</span> HAS_FFMPEG
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> SetSectionFlag $<span style="color:#ca60ca">{</span>SEC_ffmpeg<span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>SF_RO<span style="color:#ca60ca">}</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">endif</span>
+	<span style="color:#0095ff;font-weight:bold">StrCpy</span> $CreateDesktopIcon 1 # Create desktop icon by default
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">IfNot</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>AtLeastWin7<span style="color:#ca60ca">}</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">IfNot</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>Silent<span style="color:#ca60ca">}</span>
+			<span style="color:#0095ff;font-weight:bold">MessageBox</span> <span style="color:#9500ff;font-weight:bold">MB_OK</span><span style="color:#ca60ca">|</span>MB_ICONSTOP <span style="color:#bf0303">"$(MsgRequireWin7)"</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+		<span style="color:#0095ff;font-weight:bold">Abort</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
 
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">IfNot</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>Silent<span style="color:#ca60ca;">}</span>
-		# Language selection<span style="color:#ca60ca;">,</span> seems that the order is predefined.
-		<span style="color:#0095ff;font-weight:bold;">Push</span> <span style="color:#bf0303;">&quot;&quot;</span> # This value is for languages auto count
-		<span style="color:#0095ff;font-weight:bold;">Push</span> $<span style="color:#ca60ca;">{</span>LANG_ENGLISH<span style="color:#ca60ca;">}</span>
-		<span style="color:#0095ff;font-weight:bold;">Push</span> English
-		<span style="color:#0095ff;font-weight:bold;">Push</span> $<span style="color:#ca60ca;">{</span>LANG_TRADCHINESE<span style="color:#ca60ca;">}</span>
-		<span style="color:#0095ff;font-weight:bold;">Push</span> <span style="color:#bf0303;">&quot;繁體中文&quot;</span>
-		<span style="color:#0095ff;font-weight:bold;">Push</span> $<span style="color:#ca60ca;">{</span>LANG_SIMPCHINESE<span style="color:#ca60ca;">}</span>
-		<span style="color:#0095ff;font-weight:bold;">Push</span> <span style="color:#bf0303;">&quot;简体中文&quot;</span>
-		<span style="color:#0095ff;font-weight:bold;">Push</span> A # <span style="color:#ca60ca;">=</span> auto count languages
-		LangDLL::LangDialog <span style="color:#bf0303;">&quot;$(^SetupCaption)&quot;</span> <span style="color:#bf0303;">&quot;$(SetupLangPrompt)&quot;</span>
-		<span style="color:#0095ff;font-weight:bold;">Pop</span> $LANGUAGE
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $LANGUAGE <span style="color:#ca60ca;">==</span> <span style="color:#bf0303;">&quot;cancel&quot;</span>
-			<span style="color:#0095ff;font-weight:bold;">Abort</span>
-		$<span style="color:#ca60ca;">{</span>Endif<span style="color:#ca60ca;">}</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">IfNot</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>Silent<span style="color:#ca60ca">}</span>
+		# Language selection<span style="color:#ca60ca">,</span> seems that the order is predefined.
+		<span style="color:#0095ff;font-weight:bold">Push</span> <span style="color:#bf0303">""</span> # This value is for languages auto count
+		<span style="color:#0095ff;font-weight:bold">Push</span> $<span style="color:#ca60ca">{</span>LANG_ENGLISH<span style="color:#ca60ca">}</span>
+		<span style="color:#0095ff;font-weight:bold">Push</span> English
+		<span style="color:#0095ff;font-weight:bold">Push</span> $<span style="color:#ca60ca">{</span>LANG_TRADCHINESE<span style="color:#ca60ca">}</span>
+		<span style="color:#0095ff;font-weight:bold">Push</span> <span style="color:#bf0303">"繁體中文"</span>
+		<span style="color:#0095ff;font-weight:bold">Push</span> $<span style="color:#ca60ca">{</span>LANG_SIMPCHINESE<span style="color:#ca60ca">}</span>
+		<span style="color:#0095ff;font-weight:bold">Push</span> <span style="color:#bf0303">"简体中文"</span>
+		<span style="color:#0095ff;font-weight:bold">Push</span> A # <span style="color:#ca60ca">=</span> auto count languages
+		LangDLL::LangDialog <span style="color:#bf0303">"$(^SetupCaption)"</span> <span style="color:#bf0303">"$(SetupLangPrompt)"</span>
+		<span style="color:#0095ff;font-weight:bold">Pop</span> $LANGUAGE
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $LANGUAGE <span style="color:#ca60ca">==</span> <span style="color:#bf0303">"cancel"</span>
+			<span style="color:#0095ff;font-weight:bold">Abort</span>
+		$<span style="color:#ca60ca">{</span>Endif<span style="color:#ca60ca">}</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
 
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">ifdef</span> KRITA_INSTALLER_64
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>RunningX64<span style="color:#ca60ca;">}</span>
-		<span style="color:#0095ff;font-weight:bold;">SetRegView</span> 64
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">Else</span><span style="color:#ca60ca;">}</span>
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">IfNot</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>Silent<span style="color:#ca60ca;">}</span>
-			<span style="color:#0095ff;font-weight:bold;">MessageBox</span> <span style="color:#9500ff;font-weight:bold;">MB_OK</span><span style="color:#ca60ca;">|</span>MB_ICONSTOP <span style="color:#bf0303;">&quot;$(Msg64bitOn32bit)&quot;</span>
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-		<span style="color:#0095ff;font-weight:bold;">Abort</span>
-	$<span style="color:#ca60ca;">{</span>Endif<span style="color:#ca60ca;">}</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">else</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>RunningX64<span style="color:#ca60ca;">}</span>
-		<span style="color:#0095ff;font-weight:bold;">SetRegView</span> 64
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">IfNot</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>Silent<span style="color:#ca60ca;">}</span>
-			<span style="color:#0095ff;font-weight:bold;">MessageBox</span> <span style="color:#9500ff;font-weight:bold;">MB_YESNO</span><span style="color:#ca60ca;">|</span>MB_ICONEXCLAMATION <span style="color:#bf0303;">&quot;$(Msg32bitOn64bit)&quot;</span> \
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">ifdef</span> KRITA_INSTALLER_64
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>RunningX64<span style="color:#ca60ca">}</span>
+		<span style="color:#0095ff;font-weight:bold">SetRegView</span> 64
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">Else</span><span style="color:#ca60ca">}</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">IfNot</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>Silent<span style="color:#ca60ca">}</span>
+			<span style="color:#0095ff;font-weight:bold">MessageBox</span> <span style="color:#9500ff;font-weight:bold">MB_OK</span><span style="color:#ca60ca">|</span>MB_ICONSTOP <span style="color:#bf0303">"$(Msg64bitOn32bit)"</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+		<span style="color:#0095ff;font-weight:bold">Abort</span>
+	$<span style="color:#ca60ca">{</span>Endif<span style="color:#ca60ca">}</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">else</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>RunningX64<span style="color:#ca60ca">}</span>
+		<span style="color:#0095ff;font-weight:bold">SetRegView</span> 64
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">IfNot</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>Silent<span style="color:#ca60ca">}</span>
+			<span style="color:#0095ff;font-weight:bold">MessageBox</span> <span style="color:#9500ff;font-weight:bold">MB_YESNO</span><span style="color:#ca60ca">|</span>MB_ICONEXCLAMATION <span style="color:#bf0303">"$(Msg32bitOn64bit)"</span> \
 			           /SD IDYES \
 			           IDYES lbl_allow32on64
-			<span style="color:#0095ff;font-weight:bold;">Abort</span>
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
+			<span style="color:#0095ff;font-weight:bold">Abort</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
 		lbl_allow32on64:
-	$<span style="color:#ca60ca;">{</span>Endif<span style="color:#ca60ca;">}</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">endif</span>
+	$<span style="color:#ca60ca">{</span>Endif<span style="color:#ca60ca">}</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">endif</span>
 
 	# Detect ancient Krita versions
-	$<span style="color:#ca60ca;">{</span>DetectKritaMsi32bit<span style="color:#ca60ca;">}</span> $KritaMsiProductX86
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>RunningX64<span style="color:#ca60ca;">}</span>
-		$<span style="color:#ca60ca;">{</span>DetectKritaMsi64bit<span style="color:#ca60ca;">}</span> $KritaMsiProductX64
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $KritaMsiProductX86 <span style="color:#ca60ca;">!=</span> <span style="color:#bf0303;">&quot;&quot;</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">OrIf</span><span style="color:#ca60ca;">}</span> $KritaMsiProductX64 <span style="color:#ca60ca;">!=</span> <span style="color:#bf0303;">&quot;&quot;</span>
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">IfNot</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>Silent<span style="color:#ca60ca;">}</span>
-			<span style="color:#0095ff;font-weight:bold;">MessageBox</span> <span style="color:#9500ff;font-weight:bold;">MB_YESNO</span><span style="color:#ca60ca;">|</span><span style="color:#9500ff;font-weight:bold;">MB_ICONQUESTION</span><span style="color:#ca60ca;">|</span>MB_DEFBUTTON1 <span style="color:#bf0303;">&quot;$(MsgAncientVerMustBeRemoved)&quot;</span> \
+	$<span style="color:#ca60ca">{</span>DetectKritaMsi32bit<span style="color:#ca60ca">}</span> $KritaMsiProductX86
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>RunningX64<span style="color:#ca60ca">}</span>
+		$<span style="color:#ca60ca">{</span>DetectKritaMsi64bit<span style="color:#ca60ca">}</span> $KritaMsiProductX64
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $KritaMsiProductX86 <span style="color:#ca60ca">!=</span> <span style="color:#bf0303">""</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">OrIf</span><span style="color:#ca60ca">}</span> $KritaMsiProductX64 <span style="color:#ca60ca">!=</span> <span style="color:#bf0303">""</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">IfNot</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>Silent<span style="color:#ca60ca">}</span>
+			<span style="color:#0095ff;font-weight:bold">MessageBox</span> <span style="color:#9500ff;font-weight:bold">MB_YESNO</span><span style="color:#ca60ca">|</span><span style="color:#9500ff;font-weight:bold">MB_ICONQUESTION</span><span style="color:#ca60ca">|</span>MB_DEFBUTTON1 <span style="color:#bf0303">"$(MsgAncientVerMustBeRemoved)"</span> \
 						/SD IDYES \
 						IDYES lbl_removeAncientVer
-			<span style="color:#0095ff;font-weight:bold;">Abort</span>
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
+			<span style="color:#0095ff;font-weight:bold">Abort</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
 		lbl_removeAncientVer:
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $KritaMsiProductX64 <span style="color:#ca60ca;">!=</span> <span style="color:#bf0303;">&quot;&quot;</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $KritaMsiProductX64 <span style="color:#ca60ca">!=</span> <span style="color:#bf0303">""</span>
 			push $R0
-			$<span style="color:#ca60ca;">{</span>MsiUninstall<span style="color:#ca60ca;">}</span> $KritaMsiProductX64 $R0
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $R0 <span style="color:#ca60ca;">!=</span> 0
-				$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">IfNot</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>Silent<span style="color:#ca60ca;">}</span>
-					$<span style="color:#ca60ca;">{</span>IfKritaMsi3Alpha<span style="color:#ca60ca;">}</span> $KritaMsiProductX64
-						<span style="color:#0095ff;font-weight:bold;">MessageBox</span> <span style="color:#9500ff;font-weight:bold;">MB_OK</span><span style="color:#ca60ca;">|</span>MB_ICONSTOP <span style="color:#bf0303;">&quot;$(MsgKrita3alpha1RemoveFailed)&quot;</span>
-					$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">Else</span><span style="color:#ca60ca;">}</span>
-						<span style="color:#0095ff;font-weight:bold;">MessageBox</span> <span style="color:#9500ff;font-weight:bold;">MB_OK</span><span style="color:#ca60ca;">|</span>MB_ICONSTOP <span style="color:#bf0303;">&quot;$(MsgKrita2msi64bitRemoveFailed)&quot;</span>
-					$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-				$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-				<span style="color:#0095ff;font-weight:bold;">Abort</span>
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
+			$<span style="color:#ca60ca">{</span>MsiUninstall<span style="color:#ca60ca">}</span> $KritaMsiProductX64 $R0
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $R0 <span style="color:#ca60ca">!=</span> 0
+				$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">IfNot</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>Silent<span style="color:#ca60ca">}</span>
+					$<span style="color:#ca60ca">{</span>IfKritaMsi3Alpha<span style="color:#ca60ca">}</span> $KritaMsiProductX64
+						<span style="color:#0095ff;font-weight:bold">MessageBox</span> <span style="color:#9500ff;font-weight:bold">MB_OK</span><span style="color:#ca60ca">|</span>MB_ICONSTOP <span style="color:#bf0303">"$(MsgKrita3alpha1RemoveFailed)"</span>
+					$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">Else</span><span style="color:#ca60ca">}</span>
+						<span style="color:#0095ff;font-weight:bold">MessageBox</span> <span style="color:#9500ff;font-weight:bold">MB_OK</span><span style="color:#ca60ca">|</span>MB_ICONSTOP <span style="color:#bf0303">"$(MsgKrita2msi64bitRemoveFailed)"</span>
+					$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+				$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+				<span style="color:#0095ff;font-weight:bold">Abort</span>
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
 			pop $R0
-			<span style="color:#0095ff;font-weight:bold;">StrCpy</span> $KritaMsiProductX64 <span style="color:#bf0303;">&quot;&quot;</span>
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $KritaMsiProductX86 <span style="color:#ca60ca;">!=</span> <span style="color:#bf0303;">&quot;&quot;</span>
+			<span style="color:#0095ff;font-weight:bold">StrCpy</span> $KritaMsiProductX64 <span style="color:#bf0303">""</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $KritaMsiProductX86 <span style="color:#ca60ca">!=</span> <span style="color:#bf0303">""</span>
 			push $R0
-			$<span style="color:#ca60ca;">{</span>MsiUninstall<span style="color:#ca60ca;">}</span> $KritaMsiProductX86 $R0
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $R0 <span style="color:#ca60ca;">!=</span> 0
-				$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">IfNot</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>Silent<span style="color:#ca60ca;">}</span>
-					<span style="color:#0095ff;font-weight:bold;">MessageBox</span> <span style="color:#9500ff;font-weight:bold;">MB_OK</span><span style="color:#ca60ca;">|</span>MB_ICONSTOP <span style="color:#bf0303;">&quot;$(MsgKrita2msi32bitRemoveFailed)&quot;</span>
-				$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-				<span style="color:#0095ff;font-weight:bold;">Abort</span>
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
+			$<span style="color:#ca60ca">{</span>MsiUninstall<span style="color:#ca60ca">}</span> $KritaMsiProductX86 $R0
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $R0 <span style="color:#ca60ca">!=</span> 0
+				$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">IfNot</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>Silent<span style="color:#ca60ca">}</span>
+					<span style="color:#0095ff;font-weight:bold">MessageBox</span> <span style="color:#9500ff;font-weight:bold">MB_OK</span><span style="color:#ca60ca">|</span>MB_ICONSTOP <span style="color:#bf0303">"$(MsgKrita2msi32bitRemoveFailed)"</span>
+				$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+				<span style="color:#0095ff;font-weight:bold">Abort</span>
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
 			pop $R0
-			<span style="color:#0095ff;font-weight:bold;">StrCpy</span> $KritaMsiProductX86 <span style="color:#bf0303;">&quot;&quot;</span>
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
+			<span style="color:#0095ff;font-weight:bold">StrCpy</span> $KritaMsiProductX86 <span style="color:#bf0303">""</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
 
-	$<span style="color:#ca60ca;">{</span>DetectKritaNsis<span style="color:#ca60ca;">}</span> $KritaNsisVersion $KritaNsisBitness $KritaNsisInstallLocation
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $KritaNsisVersion <span style="color:#ca60ca;">!=</span> <span style="color:#bf0303;">&quot;&quot;</span>
+	$<span style="color:#ca60ca">{</span>DetectKritaNsis<span style="color:#ca60ca">}</span> $KritaNsisVersion $KritaNsisBitness $KritaNsisInstallLocation
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $KritaNsisVersion <span style="color:#ca60ca">!=</span> <span style="color:#bf0303">""</span>
 		push $R0
-		$<span style="color:#ca60ca;">{</span>VersionCompare<span style="color:#ca60ca;">}</span> <span style="color:#bf0303;">&quot;${KRITA_VERSION}&quot;</span> <span style="color:#bf0303;">&quot;$KritaNsisVersion&quot;</span> $R0
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $R0 <span style="color:#ca60ca;">==</span> 0
+		$<span style="color:#ca60ca">{</span>VersionCompare<span style="color:#ca60ca">}</span> <span style="color:#bf0303">"${KRITA_VERSION}"</span> <span style="color:#bf0303">"$KritaNsisVersion"</span> $R0
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $R0 <span style="color:#ca60ca">==</span> 0
 			# Same version installed... probably
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $KritaNsisBitness <span style="color:#ca60ca;">==</span> $<span style="color:#ca60ca;">{</span>KRITA_INSTALLER_BITNESS<span style="color:#ca60ca;">}</span>
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $KritaNsisBitness <span style="color:#ca60ca">==</span> $<span style="color:#ca60ca">{</span>KRITA_INSTALLER_BITNESS<span style="color:#ca60ca">}</span>
 				# Very likely the same version
-				$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">IfNot</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>Silent<span style="color:#ca60ca;">}</span>
-					<span style="color:#0095ff;font-weight:bold;">MessageBox</span> <span style="color:#9500ff;font-weight:bold;">MB_OK</span><span style="color:#ca60ca;">|</span><span style="color:#9500ff;font-weight:bold;">MB_ICONINFORMATION</span> <span style="color:#bf0303;">&quot;$(MsgKritaSameVerReinstall)&quot;</span>
-				$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">Else</span><span style="color:#ca60ca;">}</span>
+				$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">IfNot</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>Silent<span style="color:#ca60ca">}</span>
+					<span style="color:#0095ff;font-weight:bold">MessageBox</span> <span style="color:#9500ff;font-weight:bold">MB_OK</span><span style="color:#ca60ca">|</span><span style="color:#9500ff;font-weight:bold">MB_ICONINFORMATION</span> <span style="color:#bf0303">"$(MsgKritaSameVerReinstall)"</span>
+				$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">Else</span><span style="color:#ca60ca">}</span>
 				# Very likely the same version but different arch
-				$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">IfNot</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>Silent<span style="color:#ca60ca;">}</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">ifdef</span> KRITA_INSTALLER_64
-					<span style="color:#0095ff;font-weight:bold;">MessageBox</span> <span style="color:#9500ff;font-weight:bold;">MB_OK</span><span style="color:#ca60ca;">|</span><span style="color:#9500ff;font-weight:bold;">MB_ICONINFORMATION</span> <span style="color:#bf0303;">&quot;$(MsgKrita3264bitSwap)&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">else</span>
-					<span style="color:#0095ff;font-weight:bold;">MessageBox</span> <span style="color:#9500ff;font-weight:bold;">MB_OK</span><span style="color:#ca60ca;">|</span>MB_ICONEXCLAMATION <span style="color:#bf0303;">&quot;$(MsgKrita3264bitSwap)&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">endif</span>
-				$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">ElseIf</span><span style="color:#ca60ca;">}</span> $R0 <span style="color:#ca60ca;">==</span> 1
+				$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">IfNot</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>Silent<span style="color:#ca60ca">}</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">ifdef</span> KRITA_INSTALLER_64
+					<span style="color:#0095ff;font-weight:bold">MessageBox</span> <span style="color:#9500ff;font-weight:bold">MB_OK</span><span style="color:#ca60ca">|</span><span style="color:#9500ff;font-weight:bold">MB_ICONINFORMATION</span> <span style="color:#bf0303">"$(MsgKrita3264bitSwap)"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">else</span>
+					<span style="color:#0095ff;font-weight:bold">MessageBox</span> <span style="color:#9500ff;font-weight:bold">MB_OK</span><span style="color:#ca60ca">|</span>MB_ICONEXCLAMATION <span style="color:#bf0303">"$(MsgKrita3264bitSwap)"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">endif</span>
+				$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">ElseIf</span><span style="color:#ca60ca">}</span> $R0 <span style="color:#ca60ca">==</span> 1
 			# Upgrade
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $KritaNsisBitness <span style="color:#ca60ca;">==</span> $<span style="color:#ca60ca;">{</span>KRITA_INSTALLER_BITNESS<span style="color:#ca60ca;">}</span>
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $KritaNsisBitness <span style="color:#ca60ca">==</span> $<span style="color:#ca60ca">{</span>KRITA_INSTALLER_BITNESS<span style="color:#ca60ca">}</span>
 				# Silent about upgrade
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">Else</span><span style="color:#ca60ca;">}</span>
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">Else</span><span style="color:#ca60ca">}</span>
 				# Upgrade but different arch
-				$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">IfNot</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>Silent<span style="color:#ca60ca;">}</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">ifdef</span> KRITA_INSTALLER_64
-					<span style="color:#0095ff;font-weight:bold;">MessageBox</span> <span style="color:#9500ff;font-weight:bold;">MB_OK</span><span style="color:#ca60ca;">|</span><span style="color:#9500ff;font-weight:bold;">MB_ICONINFORMATION</span> <span style="color:#bf0303;">&quot;$(MsgKrita3264bitSwap)&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">else</span>
-					<span style="color:#0095ff;font-weight:bold;">MessageBox</span> <span style="color:#9500ff;font-weight:bold;">MB_OK</span><span style="color:#ca60ca;">|</span>MB_ICONEXCLAMATION <span style="color:#bf0303;">&quot;$(MsgKrita3264bitSwap)&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">endif</span>
-				$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">ElseIf</span><span style="color:#ca60ca;">}</span> $R0 <span style="color:#ca60ca;">==</span> 2
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">IfNot</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>Silent<span style="color:#ca60ca;">}</span>
-				<span style="color:#0095ff;font-weight:bold;">MessageBox</span> <span style="color:#9500ff;font-weight:bold;">MB_OK</span><span style="color:#ca60ca;">|</span>MB_ICONSTOP <span style="color:#bf0303;">&quot;$(MsgKritaNewerAlreadyInstalled)&quot;</span>
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-			<span style="color:#0095ff;font-weight:bold;">Abort</span>
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">Else</span><span style="color:#ca60ca;">}</span>
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">IfNot</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>Silent<span style="color:#ca60ca;">}</span>
-				<span style="color:#0095ff;font-weight:bold;">MessageBox</span> <span style="color:#9500ff;font-weight:bold;">MB_OK</span><span style="color:#ca60ca;">|</span>MB_ICONSTOP <span style="color:#bf0303;">&quot;Error: Unexpected state&quot;</span>
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-			<span style="color:#0095ff;font-weight:bold;">Abort</span>
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-		<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> SetSectionFlag $<span style="color:#ca60ca;">{</span>SEC_remove_old_version<span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>SF_SELECTED<span style="color:#ca60ca;">}</span>
-		# Detect <span style="font-weight:bold;">if</span> Krita is running...
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>IsFileinUse<span style="color:#ca60ca;">}</span> <span style="color:#bf0303;">&quot;$KritaNsisInstallLocation\bin\krita.exe&quot;</span>
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">IfNot</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>Silent<span style="color:#ca60ca;">}</span>
-				<span style="color:#0095ff;font-weight:bold;">MessageBox</span> <span style="color:#9500ff;font-weight:bold;">MB_OK</span><span style="color:#ca60ca;">|</span>MB_ICONEXCLAMATION <span style="color:#bf0303;">&quot;$(MsgKritaRunning)&quot;</span>
-			$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-			<span style="color:#0095ff;font-weight:bold;">SetErrorLevel</span> 10
-			<span style="color:#0095ff;font-weight:bold;">Abort</span>
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
+				$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">IfNot</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>Silent<span style="color:#ca60ca">}</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">ifdef</span> KRITA_INSTALLER_64
+					<span style="color:#0095ff;font-weight:bold">MessageBox</span> <span style="color:#9500ff;font-weight:bold">MB_OK</span><span style="color:#ca60ca">|</span><span style="color:#9500ff;font-weight:bold">MB_ICONINFORMATION</span> <span style="color:#bf0303">"$(MsgKrita3264bitSwap)"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">else</span>
+					<span style="color:#0095ff;font-weight:bold">MessageBox</span> <span style="color:#9500ff;font-weight:bold">MB_OK</span><span style="color:#ca60ca">|</span>MB_ICONEXCLAMATION <span style="color:#bf0303">"$(MsgKrita3264bitSwap)"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">endif</span>
+				$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">ElseIf</span><span style="color:#ca60ca">}</span> $R0 <span style="color:#ca60ca">==</span> 2
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">IfNot</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>Silent<span style="color:#ca60ca">}</span>
+				<span style="color:#0095ff;font-weight:bold">MessageBox</span> <span style="color:#9500ff;font-weight:bold">MB_OK</span><span style="color:#ca60ca">|</span>MB_ICONSTOP <span style="color:#bf0303">"$(MsgKritaNewerAlreadyInstalled)"</span>
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+			<span style="color:#0095ff;font-weight:bold">Abort</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">Else</span><span style="color:#ca60ca">}</span>
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">IfNot</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>Silent<span style="color:#ca60ca">}</span>
+				<span style="color:#0095ff;font-weight:bold">MessageBox</span> <span style="color:#9500ff;font-weight:bold">MB_OK</span><span style="color:#ca60ca">|</span>MB_ICONSTOP <span style="color:#bf0303">"Error: Unexpected state"</span>
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+			<span style="color:#0095ff;font-weight:bold">Abort</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+		<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> SetSectionFlag $<span style="color:#ca60ca">{</span>SEC_remove_old_version<span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>SF_SELECTED<span style="color:#ca60ca">}</span>
+		# Detect <span style="font-weight:bold">if</span> Krita is running...
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>IsFileinUse<span style="color:#ca60ca">}</span> <span style="color:#bf0303">"$KritaNsisInstallLocation\bin\krita.exe"</span>
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">IfNot</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>Silent<span style="color:#ca60ca">}</span>
+				<span style="color:#0095ff;font-weight:bold">MessageBox</span> <span style="color:#9500ff;font-weight:bold">MB_OK</span><span style="color:#ca60ca">|</span>MB_ICONEXCLAMATION <span style="color:#bf0303">"$(MsgKritaRunning)"</span>
+			$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+			<span style="color:#0095ff;font-weight:bold">SetErrorLevel</span> 10
+			<span style="color:#0095ff;font-weight:bold">Abort</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
 		pop $R0
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">Else</span><span style="color:#ca60ca;">}</span>
-		<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> ClearSectionFlag $<span style="color:#ca60ca;">{</span>SEC_remove_old_version<span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>SF_SELECTED<span style="color:#ca60ca;">}</span>
-		<span style="color:#0095ff;font-weight:bold;">SectionSetText</span> $<span style="color:#ca60ca;">{</span>SEC_remove_old_version<span style="color:#ca60ca;">}</span> <span style="color:#bf0303;">&quot;&quot;</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">Else</span><span style="color:#ca60ca">}</span>
+		<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> ClearSectionFlag $<span style="color:#ca60ca">{</span>SEC_remove_old_version<span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>SF_SELECTED<span style="color:#ca60ca">}</span>
+		<span style="color:#0095ff;font-weight:bold">SectionSetText</span> $<span style="color:#ca60ca">{</span>SEC_remove_old_version<span style="color:#ca60ca">}</span> <span style="color:#bf0303">""</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
 
 	# Detect standalone shell extension
-	# TODO: Would it be possible to update Krita without replacing the standalone shellex<span style="color:#ca60ca;">?</span>
-	<span style="color:#0095ff;font-weight:bold;">ClearErrors</span>
-	<span style="color:#0095ff;font-weight:bold;">ReadRegStr</span> $PrevShellExInstallLocation HKLM <span style="color:#bf0303;">&quot;Software\Krita\ShellExtension&quot;</span> <span style="color:#bf0303;">&quot;InstallLocation&quot;</span>
-	#ReadRegStr $PrevShellExVersion HKLM <span style="color:#bf0303;">&quot;Software\Krita\ShellExtension&quot;</span> <span style="color:#bf0303;">&quot;Version&quot;</span>
-	<span style="color:#0095ff;font-weight:bold;">ReadRegDWORD</span> $PrevShellExStandalone HKLM <span style="color:#bf0303;">&quot;Software\Krita\ShellExtension&quot;</span> <span style="color:#bf0303;">&quot;Standalone&quot;</span>
-	#ReadRegStr $PrevShellExKritaExePath HKLM <span style="color:#bf0303;">&quot;Software\Krita\ShellExtension&quot;</span> <span style="color:#bf0303;">&quot;KritaExePath&quot;</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>Errors<span style="color:#ca60ca;">}</span>
-		# TODO: Assume no previous version installed or what<span style="color:#ca60ca;">?</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $PrevShellExStandalone <span style="color:#ca60ca;">==</span> 1
-		#<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> SetSectionFlag $<span style="color:#ca60ca;">{</span>SEC_remove_shellex<span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>SF_SELECTED<span style="color:#ca60ca;">}</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">Else</span><span style="color:#ca60ca;">}</span>
-		#<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> ClearSectionFlag $<span style="color:#ca60ca;">{</span>SEC_remove_shellex<span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>SF_SELECTED<span style="color:#ca60ca;">}</span>
-		#SectionSetText $<span style="color:#ca60ca;">{</span>SEC_remove_shellex<span style="color:#ca60ca;">}</span> <span style="color:#bf0303;">&quot;&quot;</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-<span style="color:#0095ff;font-weight:bold;">FunctionEnd</span>
+	# TODO: Would it be possible to update Krita without replacing the standalone shellex<span style="color:#ca60ca">?</span>
+	<span style="color:#0095ff;font-weight:bold">ClearErrors</span>
+	<span style="color:#0095ff;font-weight:bold">ReadRegStr</span> $PrevShellExInstallLocation HKLM <span style="color:#bf0303">"Software\Krita\ShellExtension"</span> <span style="color:#bf0303">"InstallLocation"</span>
+	#ReadRegStr $PrevShellExVersion HKLM <span style="color:#bf0303">"Software\Krita\ShellExtension"</span> <span style="color:#bf0303">"Version"</span>
+	<span style="color:#0095ff;font-weight:bold">ReadRegDWORD</span> $PrevShellExStandalone HKLM <span style="color:#bf0303">"Software\Krita\ShellExtension"</span> <span style="color:#bf0303">"Standalone"</span>
+	#ReadRegStr $PrevShellExKritaExePath HKLM <span style="color:#bf0303">"Software\Krita\ShellExtension"</span> <span style="color:#bf0303">"KritaExePath"</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>Errors<span style="color:#ca60ca">}</span>
+		# TODO: Assume no previous version installed or what<span style="color:#ca60ca">?</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $PrevShellExStandalone <span style="color:#ca60ca">==</span> 1
+		#<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> SetSectionFlag $<span style="color:#ca60ca">{</span>SEC_remove_shellex<span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>SF_SELECTED<span style="color:#ca60ca">}</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">Else</span><span style="color:#ca60ca">}</span>
+		#<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> ClearSectionFlag $<span style="color:#ca60ca">{</span>SEC_remove_shellex<span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>SF_SELECTED<span style="color:#ca60ca">}</span>
+		#SectionSetText $<span style="color:#ca60ca">{</span>SEC_remove_shellex<span style="color:#ca60ca">}</span> <span style="color:#bf0303">""</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+<span style="color:#0095ff;font-weight:bold">FunctionEnd</span>
 
-<span style="color:#0095ff;font-weight:bold;">Function</span> un.onInit
-	<span style="color:#0095ff;font-weight:bold;">SetShellVarContext</span> all
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">ifdef</span> KRITA_INSTALLER_64
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>RunningX64<span style="color:#ca60ca;">}</span>
-		<span style="color:#0095ff;font-weight:bold;">SetRegView</span> 64
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">Else</span><span style="color:#ca60ca;">}</span>
-		<span style="color:#0095ff;font-weight:bold;">Abort</span>
-	$<span style="color:#ca60ca;">{</span>Endif<span style="color:#ca60ca;">}</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">else</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>RunningX64<span style="color:#ca60ca;">}</span>
-		<span style="color:#0095ff;font-weight:bold;">SetRegView</span> 64
-	$<span style="color:#ca60ca;">{</span>Endif<span style="color:#ca60ca;">}</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">endif</span>
+<span style="color:#0095ff;font-weight:bold">Function</span> un.onInit
+	<span style="color:#0095ff;font-weight:bold">SetShellVarContext</span> all
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">ifdef</span> KRITA_INSTALLER_64
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>RunningX64<span style="color:#ca60ca">}</span>
+		<span style="color:#0095ff;font-weight:bold">SetRegView</span> 64
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">Else</span><span style="color:#ca60ca">}</span>
+		<span style="color:#0095ff;font-weight:bold">Abort</span>
+	$<span style="color:#ca60ca">{</span>Endif<span style="color:#ca60ca">}</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">else</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>RunningX64<span style="color:#ca60ca">}</span>
+		<span style="color:#0095ff;font-weight:bold">SetRegView</span> 64
+	$<span style="color:#ca60ca">{</span>Endif<span style="color:#ca60ca">}</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">endif</span>
 
 	# Get and use installer language:
-	<span style="color:#0095ff;font-weight:bold;">Push</span> $0
-	<span style="color:#0095ff;font-weight:bold;">ReadRegStr</span> $0 HKLM <span style="color:#bf0303;">&quot;Software\Krita&quot;</span> <span style="color:#bf0303;">&quot;InstallerLanguage&quot;</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $0 <span style="color:#ca60ca;">!=</span> <span style="color:#bf0303;">&quot;&quot;</span>
-		<span style="color:#0095ff;font-weight:bold;">StrCpy</span> $LANGUAGE $0
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-	<span style="color:#0095ff;font-weight:bold;">Pop</span> $0
+	<span style="color:#0095ff;font-weight:bold">Push</span> $0
+	<span style="color:#0095ff;font-weight:bold">ReadRegStr</span> $0 HKLM <span style="color:#bf0303">"Software\Krita"</span> <span style="color:#bf0303">"InstallerLanguage"</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $0 <span style="color:#ca60ca">!=</span> <span style="color:#bf0303">""</span>
+		<span style="color:#0095ff;font-weight:bold">StrCpy</span> $LANGUAGE $0
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+	<span style="color:#0095ff;font-weight:bold">Pop</span> $0
 
-	<span style="color:#0095ff;font-weight:bold;">ReadRegDWORD</span> $UninstallShellExStandalone HKLM <span style="color:#bf0303;">&quot;Software\Krita\ShellExtension&quot;</span> <span style="color:#bf0303;">&quot;Standalone&quot;</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>Silent<span style="color:#ca60ca;">}</span>
-		# Only check here <span style="font-weight:bold;">if</span> running in silent mode. It's otherwise checked in
+	<span style="color:#0095ff;font-weight:bold">ReadRegDWORD</span> $UninstallShellExStandalone HKLM <span style="color:#bf0303">"Software\Krita\ShellExtension"</span> <span style="color:#bf0303">"Standalone"</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>Silent<span style="color:#ca60ca">}</span>
+		# Only check here <span style="font-weight:bold">if</span> running in silent mode. It's otherwise checked in
 		# un.func_UnintallFirstpage_Init in order to display a prompt in the
 		# correct language.
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>IsFileinUse<span style="color:#ca60ca;">}</span> <span style="color:#bf0303;">&quot;$INSTDIR\bin\krita.exe&quot;</span>
-			<span style="color:#0095ff;font-weight:bold;">SetErrorLevel</span> 10
-			<span style="color:#0095ff;font-weight:bold;">Abort</span>
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-<span style="color:#0095ff;font-weight:bold;">FunctionEnd</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>IsFileinUse<span style="color:#ca60ca">}</span> <span style="color:#bf0303">"$INSTDIR\bin\krita.exe"</span>
+			<span style="color:#0095ff;font-weight:bold">SetErrorLevel</span> 10
+			<span style="color:#0095ff;font-weight:bold">Abort</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+<span style="color:#0095ff;font-weight:bold">FunctionEnd</span>
 
-<span style="color:#0095ff;font-weight:bold;">Function</span> un.func_UnintallFirstpage_Init
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>IsFileinUse<span style="color:#ca60ca;">}</span> <span style="color:#bf0303;">&quot;$INSTDIR\bin\krita.exe&quot;</span>
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">IfNot</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>Silent<span style="color:#ca60ca;">}</span>
-			<span style="color:#0095ff;font-weight:bold;">MessageBox</span> <span style="color:#9500ff;font-weight:bold;">MB_OK</span><span style="color:#ca60ca;">|</span>MB_ICONEXCLAMATION <span style="color:#bf0303;">&quot;$(MsgUninstallKritaRunning)&quot;</span>
-		$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-		<span style="color:#0095ff;font-weight:bold;">SetErrorLevel</span> 10
-		<span style="color:#0095ff;font-weight:bold;">Quit</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-<span style="color:#0095ff;font-weight:bold;">FunctionEnd</span>
+<span style="color:#0095ff;font-weight:bold">Function</span> un.func_UnintallFirstpage_Init
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>IsFileinUse<span style="color:#ca60ca">}</span> <span style="color:#bf0303">"$INSTDIR\bin\krita.exe"</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">IfNot</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>Silent<span style="color:#ca60ca">}</span>
+			<span style="color:#0095ff;font-weight:bold">MessageBox</span> <span style="color:#9500ff;font-weight:bold">MB_OK</span><span style="color:#ca60ca">|</span>MB_ICONEXCLAMATION <span style="color:#bf0303">"$(MsgUninstallKritaRunning)"</span>
+		$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+		<span style="color:#0095ff;font-weight:bold">SetErrorLevel</span> 10
+		<span style="color:#0095ff;font-weight:bold">Quit</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+<span style="color:#0095ff;font-weight:bold">FunctionEnd</span>
 
-<span style="color:#0095ff;font-weight:bold;">Function</span> func_ShellExLicensePage_Init
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">IfNot</span><span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>SectionIsSelected<span style="color:#ca60ca;">}</span> $<span style="color:#ca60ca;">{</span>SEC_shellex<span style="color:#ca60ca;">}</span>
-		# Skip ShellEx license page <span style="font-weight:bold;">if</span> not selected
-		<span style="color:#0095ff;font-weight:bold;">Abort</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-<span style="color:#0095ff;font-weight:bold;">FunctionEnd</span>
+<span style="color:#0095ff;font-weight:bold">Function</span> func_ShellExLicensePage_Init
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">IfNot</span><span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>SectionIsSelected<span style="color:#ca60ca">}</span> $<span style="color:#ca60ca">{</span>SEC_shellex<span style="color:#ca60ca">}</span>
+		# Skip ShellEx license page <span style="font-weight:bold">if</span> not selected
+		<span style="color:#0095ff;font-weight:bold">Abort</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+<span style="color:#0095ff;font-weight:bold">FunctionEnd</span>
 
-<span style="color:#0095ff;font-weight:bold;">Var</span> hwndChkDesktopIcon
+<span style="color:#0095ff;font-weight:bold">Var</span> hwndChkDesktopIcon
 
-<span style="color:#0095ff;font-weight:bold;">Function</span> func_DesktopShortcutPage_CheckChange
-	$<span style="color:#ca60ca;">{</span>NSD_GetState<span style="color:#ca60ca;">}</span> $hwndChkDesktopIcon $CreateDesktopIcon
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $CreateDesktopIcon <span style="color:#ca60ca;">==</span> $<span style="color:#ca60ca;">{</span>BST_CHECKED<span style="color:#ca60ca;">}</span>
-		<span style="color:#0095ff;font-weight:bold;">StrCpy</span> $CreateDesktopIcon 1
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">Else</span><span style="color:#ca60ca;">}</span>
-		<span style="color:#0095ff;font-weight:bold;">StrCpy</span> $CreateDesktopIcon 0
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-<span style="color:#0095ff;font-weight:bold;">FunctionEnd</span>
+<span style="color:#0095ff;font-weight:bold">Function</span> func_DesktopShortcutPage_CheckChange
+	$<span style="color:#ca60ca">{</span>NSD_GetState<span style="color:#ca60ca">}</span> $hwndChkDesktopIcon $CreateDesktopIcon
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $CreateDesktopIcon <span style="color:#ca60ca">==</span> $<span style="color:#ca60ca">{</span>BST_CHECKED<span style="color:#ca60ca">}</span>
+		<span style="color:#0095ff;font-weight:bold">StrCpy</span> $CreateDesktopIcon 1
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">Else</span><span style="color:#ca60ca">}</span>
+		<span style="color:#0095ff;font-weight:bold">StrCpy</span> $CreateDesktopIcon 0
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+<span style="color:#0095ff;font-weight:bold">FunctionEnd</span>
 
-<span style="color:#0095ff;font-weight:bold;">Function</span> func_BeforeInstallPage_Init
+<span style="color:#0095ff;font-weight:bold">Function</span> func_BeforeInstallPage_Init
 	push $R0
 
 	nsDialogs::Create 1018
 	pop $R0
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $R0 <span style="color:#ca60ca;">==</span> <span style="font-weight:bold;">error</span>
-		<span style="color:#0095ff;font-weight:bold;">Abort</span>
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-	<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">insertmacro</span> <span style="color:#9500ff;font-weight:bold;">MUI_HEADER_TEXT</span> <span style="color:#bf0303;">&quot;$(ConfirmInstallPageHeader)&quot;</span> <span style="color:#bf0303;">&quot;$(ConfirmInstallPageDesc)&quot;</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $R0 <span style="color:#ca60ca">==</span> <span style="font-weight:bold">error</span>
+		<span style="color:#0095ff;font-weight:bold">Abort</span>
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+	<span style="color:#ca60ca">!</span><span style="font-weight:bold">insertmacro</span> <span style="color:#9500ff;font-weight:bold">MUI_HEADER_TEXT</span> <span style="color:#bf0303">"$(ConfirmInstallPageHeader)"</span> <span style="color:#bf0303">"$(ConfirmInstallPageDesc)"</span>
 
-	$<span style="color:#ca60ca;">{</span>NSD_CreateLabel<span style="color:#ca60ca;">}</span> 0u 0u 300u 20u <span style="color:#bf0303;">&quot;$(DesktopIconPageDesc2)&quot;</span>
+	$<span style="color:#ca60ca">{</span>NSD_CreateLabel<span style="color:#ca60ca">}</span> 0u 0u 300u 20u <span style="color:#bf0303">"$(DesktopIconPageDesc2)"</span>
 	pop $R0
 
-	$<span style="color:#ca60ca;">{</span>NSD_CreateCheckbox<span style="color:#ca60ca;">}</span> 0u 20u 300u 10u <span style="color:#bf0303;">&quot;$(DesktopIconPageCheckbox)&quot;</span>
+	$<span style="color:#ca60ca">{</span>NSD_CreateCheckbox<span style="color:#ca60ca">}</span> 0u 20u 300u 10u <span style="color:#bf0303">"$(DesktopIconPageCheckbox)"</span>
 	pop $hwndChkDesktopIcon
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">If</span><span style="color:#ca60ca;">}</span> $CreateDesktopIcon <span style="color:#ca60ca;">==</span> 1
-		$<span style="color:#ca60ca;">{</span>NSD_Check<span style="color:#ca60ca;">}</span> $hwndChkDesktopIcon
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">Else</span><span style="color:#ca60ca;">}</span>
-		$<span style="color:#ca60ca;">{</span>NSD_Uncheck<span style="color:#ca60ca;">}</span> $hwndChkDesktopIcon
-	$<span style="color:#ca60ca;">{</span><span style="color:#9500ff;font-weight:bold;">EndIf</span><span style="color:#ca60ca;">}</span>
-	$<span style="color:#ca60ca;">{</span>NSD_OnClick<span style="color:#ca60ca;">}</span> $hwndChkDesktopIcon func_DesktopShortcutPage_CheckChange
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">If</span><span style="color:#ca60ca">}</span> $CreateDesktopIcon <span style="color:#ca60ca">==</span> 1
+		$<span style="color:#ca60ca">{</span>NSD_Check<span style="color:#ca60ca">}</span> $hwndChkDesktopIcon
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">Else</span><span style="color:#ca60ca">}</span>
+		$<span style="color:#ca60ca">{</span>NSD_Uncheck<span style="color:#ca60ca">}</span> $hwndChkDesktopIcon
+	$<span style="color:#ca60ca">{</span><span style="color:#9500ff;font-weight:bold">EndIf</span><span style="color:#ca60ca">}</span>
+	$<span style="color:#ca60ca">{</span>NSD_OnClick<span style="color:#ca60ca">}</span> $hwndChkDesktopIcon func_DesktopShortcutPage_CheckChange
 
-	$<span style="color:#ca60ca;">{</span>NSD_CreateLabel<span style="color:#ca60ca;">}</span> 0u 40u 300u 140u <span style="color:#bf0303;">&quot;$(ConfirmInstallPageDesc2)&quot;</span>
+	$<span style="color:#ca60ca">{</span>NSD_CreateLabel<span style="color:#ca60ca">}</span> 0u 40u 300u 140u <span style="color:#bf0303">"$(ConfirmInstallPageDesc2)"</span>
 	pop $R0
 
-	# TODO: Add install option summary for review<span style="color:#ca60ca;">?</span>
+	# TODO: Add install option summary for review<span style="color:#ca60ca">?</span>
 
 	nsDialogs::Show
 
 	pop $R0
-<span style="color:#0095ff;font-weight:bold;">FunctionEnd</span>
+<span style="color:#0095ff;font-weight:bold">FunctionEnd</span>
 
 
 # Strings
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">include</span> <span style="color:#bf0303;">&quot;translations\English.nsh&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">include</span> <span style="color:#bf0303;">&quot;translations\TradChinese.nsh&quot;</span>
-<span style="color:#ca60ca;">!</span><span style="font-weight:bold;">include</span> <span style="color:#bf0303;">&quot;translations\SimpChinese.nsh&quot;</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">include</span> <span style="color:#bf0303">"translations\English.nsh"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">include</span> <span style="color:#bf0303">"translations\TradChinese.nsh"</span>
+<span style="color:#ca60ca">!</span><span style="font-weight:bold">include</span> <span style="color:#bf0303">"translations\SimpChinese.nsh"</span>
 </pre></body></html>

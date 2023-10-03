@@ -4,115 +4,115 @@
 <title>craftenv.ps1</title>
 <meta name="generator" content="KF5::SyntaxHighlighting - Definition (PowerShell) - Theme (Breeze Light)"/>
 </head><body style="background-color:#ffffff;color:#1f1c1b"><pre>
-<span style="color:#898887;">&lt;#</span>
-<span style="color:#898887;">   Copied from Craft for testing syntax highlighting</span>
-<span style="color:#898887;">#&gt;</span>
+<span style="color:#898887">&lt;#</span>
+<span style="color:#898887">   Copied from Craft for testing syntax highlighting</span>
+<span style="color:#898887">#></span>
 
-<span style="color:#e31616;">@&quot; multi</span>
-<span style="color:#e31616;">   line</span>
-<span style="color:#e31616;">   string</span>
-<span style="color:#e31616;">&quot;@</span>
+<span style="color:#e31616">@" multi</span>
+<span style="color:#e31616">   line</span>
+<span style="color:#e31616">   string</span>
+<span style="color:#e31616">"@</span>
 
-<span style="color:#0057ae;">$foo</span> <span style="color:#ca60ca;">=</span> <span style="color:#bf0303;">&quot;Test </span><span style="color:#924c9d;">`u{2013}</span><span style="color:#bf0303;"> String</span><span style="color:#924c9d;">`n</span><span style="color:#bf0303;">with </span><span style="color:#924c9d;">`&quot;</span><span style="color:#bf0303;">escapes</span><span style="color:#924c9d;">`&quot;</span><span style="color:#bf0303;">&quot;</span>
+<span style="color:#0057ae">$foo</span> <span style="color:#ca60ca">=</span> <span style="color:#bf0303">"Test </span><span style="color:#924c9d">`u{2013}</span><span style="color:#bf0303"> String</span><span style="color:#924c9d">`n</span><span style="color:#bf0303">with </span><span style="color:#924c9d">`"</span><span style="color:#bf0303">escapes</span><span style="color:#924c9d">`"</span><span style="color:#bf0303">"</span>
 
-<span style="color:#898887;">#    this file sets some environment variables that are needed</span>
-<span style="color:#898887;">#    for finding programs and libraries etc.</span>
-<span style="color:#898887;">#    by Hannah von Reth &lt;vonreth@kde.org&gt;</span>
-<span style="color:#898887;">#    you should copy kdesettings.ini to ..\etc\kdesettings.ini</span>
-<span style="color:#898887;">#    and adapt it to your needs (see that file for more info)</span>
+<span style="color:#898887">#    this file sets some environment variables that are needed</span>
+<span style="color:#898887">#    for finding programs and libraries etc.</span>
+<span style="color:#898887">#    by Hannah von Reth &lt;vonreth@kde.org></span>
+<span style="color:#898887">#    you should copy kdesettings.ini to ..\etc\kdesettings.ini</span>
+<span style="color:#898887">#    and adapt it to your needs (see that file for more info)</span>
 
-<span style="color:#898887;">#    this file should contain all path settings - and provide thus an environment</span>
-<span style="color:#898887;">#    to build and run kde programs</span>
-<span style="color:#898887;">#    based on kdeenv.bat</span>
+<span style="color:#898887">#    this file should contain all path settings - and provide thus an environment</span>
+<span style="color:#898887">#    to build and run kde programs</span>
+<span style="color:#898887">#    based on kdeenv.bat</span>
 
-<span style="color:#644a9b;">cls</span>
-
-
-<span style="color:#0057ae;">$env</span><span style="color:#ca60ca;">:</span>CraftRoot<span style="color:#ca60ca;">=[</span>System<span style="color:#ca60ca;">.</span><span style="color:#644a9b;">IO</span><span style="color:#ca60ca;">.</span><span style="color:#644a9b;">Path</span><span style="color:#ca60ca;">]::</span>GetDirectoryName<span style="color:#ca60ca;">(</span><span style="color:#0057ae;">$myInvocation</span><span style="color:#ca60ca;">.</span><span style="color:#644a9b;">MyCommand</span><span style="color:#ca60ca;">.</span><span style="color:#644a9b;">Definition</span><span style="color:#ca60ca;">)</span>
-
-<span style="color:#0057ae;">$CRAFT_ARGUMENTS</span> <span style="color:#ca60ca;">=</span> <span style="color:#0057ae;">$args</span>
-
-<span style="color:#ca60ca;">&amp;{</span>
-<span style="color:#ca60ca;">[</span>version<span style="color:#ca60ca;">]</span><span style="color:#0057ae;">$minPythonVersion</span> <span style="color:#ca60ca;">=</span> 3<span style="color:#ca60ca;">.</span><span style="color:#644a9b;">6</span>
-
-<span style="font-weight:bold;">function</span> findPython<span style="color:#ca60ca;">([</span><span style="color:#0057ae;">string</span><span style="color:#ca60ca;">]</span> <span style="color:#0057ae;">$name</span><span style="color:#ca60ca;">)</span>
-<span style="color:#ca60ca;">{</span>
-    <span style="color:#0057ae;">$py</span> <span style="color:#ca60ca;">=</span> <span style="color:#ca60ca;">(</span><span style="color:#644a9b;">Get-Command</span> <span style="color:#0057ae;">$name</span> <span style="color:#ca60ca;">-</span>ErrorAction SilentlyContinue<span style="color:#ca60ca;">)</span>
-    <span style="font-weight:bold;">if</span> <span style="color:#ca60ca;">(</span><span style="color:#0057ae;">$py</span> <span style="color:#ca60ca;">-</span>and <span style="color:#ca60ca;">(</span><span style="color:#0057ae;">$py</span> <span style="color:#ca60ca;">|</span> <span style="color:#644a9b;">Get-Member</span> Version<span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">-</span>and <span style="color:#0057ae;">$py</span><span style="color:#ca60ca;">.</span><span style="color:#644a9b;">Version</span> <span style="color:#ca60ca;">-</span>ge <span style="color:#0057ae;">$minPythonVersion</span><span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
-        <span style="color:#0057ae;">$env</span><span style="color:#ca60ca;">:</span>CRAFT_PYTHON<span style="color:#ca60ca;">=</span><span style="color:#0057ae;">$py</span><span style="color:#ca60ca;">.</span><span style="color:#644a9b;">Source</span>
-    <span style="color:#ca60ca;">}</span>
-<span style="color:#ca60ca;">}</span>
-
-findPython<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;python3&quot;</span><span style="color:#ca60ca;">)</span>
-findPython<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;python&quot;</span><span style="color:#ca60ca;">)</span>
-
-<span style="font-weight:bold;">function</span> readINI<span style="color:#ca60ca;">([</span><span style="color:#0057ae;">string</span><span style="color:#ca60ca;">]</span> <span style="color:#0057ae;">$fileName</span><span style="color:#ca60ca;">)</span>
-<span style="color:#ca60ca;">{</span>
-   <span style="color:#0057ae;">$ini</span> <span style="color:#ca60ca;">=</span> @<span style="color:#ca60ca;">{}</span>
-
-  <span style="font-weight:bold;">switch</span> <span style="color:#ca60ca;">-</span>regex <span style="color:#ca60ca;">-</span>file <span style="color:#0057ae;">$fileName</span> <span style="color:#ca60ca;">{</span>
-    <span style="color:#bf0303;">&quot;^\[(.+)\]$&quot;</span> <span style="color:#ca60ca;">{</span>
-      <span style="color:#0057ae;">$section</span> <span style="color:#ca60ca;">=</span> <span style="color:#0057ae;">$matches</span><span style="color:#ca60ca;">[</span>1<span style="color:#ca60ca;">].</span><span style="color:#644a9b;">Trim</span><span style="color:#ca60ca;">()</span>
-      <span style="color:#0057ae;">$ini</span><span style="color:#ca60ca;">[</span><span style="color:#0057ae;">$section</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> @<span style="color:#ca60ca;">{}</span>
-    <span style="color:#ca60ca;">}</span>
-    <span style="color:#bf0303;">&quot;^\s*([^#].+?)\s*=\s*(.*)&quot;</span> <span style="color:#ca60ca;">{</span>
-      <span style="color:#0057ae;">$name</span><span style="color:#ca60ca;">,</span><span style="color:#0057ae;">$value</span> <span style="color:#ca60ca;">=</span> <span style="color:#0057ae;">$matches</span><span style="color:#ca60ca;">[</span>1<span style="color:#ca60ca;">..</span><span style="color:#644a9b;">2</span><span style="color:#ca60ca;">]</span>
-      <span style="color:#0057ae;">$ini</span><span style="color:#ca60ca;">[</span><span style="color:#0057ae;">$section</span><span style="color:#ca60ca;">][</span><span style="color:#0057ae;">$name</span><span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">=</span> <span style="color:#0057ae;">$value</span><span style="color:#ca60ca;">.</span><span style="color:#644a9b;">Trim</span><span style="color:#ca60ca;">()</span>
-    <span style="color:#ca60ca;">}</span>
-  <span style="color:#ca60ca;">}</span>
-  <span style="color:#0057ae;">$ini</span>
-<span style="color:#ca60ca;">}</span>
+<span style="color:#644a9b">cls</span>
 
 
+<span style="color:#0057ae">$env</span><span style="color:#ca60ca">:</span>CraftRoot<span style="color:#ca60ca">=[</span>System<span style="color:#ca60ca">.</span><span style="color:#644a9b">IO</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">Path</span><span style="color:#ca60ca">]::</span>GetDirectoryName<span style="color:#ca60ca">(</span><span style="color:#0057ae">$myInvocation</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">MyCommand</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">Definition</span><span style="color:#ca60ca">)</span>
 
-<span style="font-weight:bold;">if</span><span style="color:#ca60ca;">(</span><span style="color:#644a9b;">test-path</span> <span style="color:#ca60ca;">-</span>path <span style="color:#0057ae;">$env</span><span style="color:#ca60ca;">:</span>CraftRoot\<span style="color:#ca60ca;">..</span>\etc\kdesettings<span style="color:#ca60ca;">.</span><span style="color:#644a9b;">ini</span><span style="color:#ca60ca;">)</span>
-<span style="color:#ca60ca;">{</span>
-    <span style="color:#0057ae;">$settings</span> <span style="color:#ca60ca;">=</span> readINI <span style="color:#0057ae;">$env</span><span style="color:#ca60ca;">:</span>CraftRoot\<span style="color:#ca60ca;">..</span>\etc\kdesettings<span style="color:#ca60ca;">.</span><span style="color:#644a9b;">ini</span>
-<span style="color:#ca60ca;">}</span>
-<span style="font-weight:bold;">else</span>
-<span style="color:#ca60ca;">{</span>
-    <span style="color:#644a9b;">Write-Error</span><span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;$env:CraftRoot\..\etc\kdesettings.ini Does not exist&quot;</span><span style="color:#ca60ca;">)</span>
-    <span style="font-weight:bold;">break</span>
-<span style="color:#ca60ca;">}</span>
-<span style="font-weight:bold;">if</span><span style="color:#ca60ca;">(</span> <span style="color:#0057ae;">$CRAFT_ARGUMENTS</span><span style="color:#ca60ca;">[</span>0<span style="color:#ca60ca;">]</span> <span style="color:#ca60ca;">-</span>eq <span style="color:#bf0303;">&quot;--get&quot;</span><span style="color:#ca60ca;">)</span>
-<span style="color:#ca60ca;">{</span>
-    <span style="color:#644a9b;">Write-Host</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">$settings</span><span style="color:#ca60ca;">[</span><span style="color:#0057ae;">$CRAFT_ARGUMENTS</span><span style="color:#ca60ca;">[</span>1<span style="color:#ca60ca;">]][</span><span style="color:#0057ae;">$CRAFT_ARGUMENTS</span><span style="color:#ca60ca;">[</span>2<span style="color:#ca60ca;">]])</span>
-    <span style="font-weight:bold;">break</span>
-<span style="color:#ca60ca;">}</span>
+<span style="color:#0057ae">$CRAFT_ARGUMENTS</span> <span style="color:#ca60ca">=</span> <span style="color:#0057ae">$args</span>
 
+<span style="color:#ca60ca">&amp;{</span>
+<span style="color:#ca60ca">[</span>version<span style="color:#ca60ca">]</span><span style="color:#0057ae">$minPythonVersion</span> <span style="color:#ca60ca">=</span> 3<span style="color:#ca60ca">.</span><span style="color:#644a9b">6</span>
 
-<span style="font-weight:bold;">function</span> prependPATH<span style="color:#ca60ca;">([</span><span style="color:#0057ae;">string</span><span style="color:#ca60ca;">]</span> <span style="color:#0057ae;">$path</span><span style="color:#ca60ca;">)</span>
-<span style="color:#ca60ca;">{</span>
-    <span style="color:#0057ae;">$env</span><span style="color:#ca60ca;">:</span>PATH<span style="color:#ca60ca;">=</span><span style="color:#bf0303;">&quot;$path{0}$env:PATH&quot;</span> <span style="color:#ca60ca;">-</span>f <span style="color:#ca60ca;">[</span>IO<span style="color:#ca60ca;">.</span><span style="color:#644a9b;">Path</span><span style="color:#ca60ca;">]::</span>PathSeparator
-<span style="color:#ca60ca;">}</span>
+<span style="font-weight:bold">function</span> findPython<span style="color:#ca60ca">([</span><span style="color:#0057ae">string</span><span style="color:#ca60ca">]</span> <span style="color:#0057ae">$name</span><span style="color:#ca60ca">)</span>
+<span style="color:#ca60ca">{</span>
+    <span style="color:#0057ae">$py</span> <span style="color:#ca60ca">=</span> <span style="color:#ca60ca">(</span><span style="color:#644a9b">Get-Command</span> <span style="color:#0057ae">$name</span> <span style="color:#ca60ca">-</span>ErrorAction SilentlyContinue<span style="color:#ca60ca">)</span>
+    <span style="font-weight:bold">if</span> <span style="color:#ca60ca">(</span><span style="color:#0057ae">$py</span> <span style="color:#ca60ca">-</span>and <span style="color:#ca60ca">(</span><span style="color:#0057ae">$py</span> <span style="color:#ca60ca">|</span> <span style="color:#644a9b">Get-Member</span> Version<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">-</span>and <span style="color:#0057ae">$py</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">Version</span> <span style="color:#ca60ca">-</span>ge <span style="color:#0057ae">$minPythonVersion</span><span style="color:#ca60ca">)</span> <span style="color:#ca60ca">{</span>
+        <span style="color:#0057ae">$env</span><span style="color:#ca60ca">:</span>CRAFT_PYTHON<span style="color:#ca60ca">=</span><span style="color:#0057ae">$py</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">Source</span>
+    <span style="color:#ca60ca">}</span>
+<span style="color:#ca60ca">}</span>
 
+findPython<span style="color:#ca60ca">(</span><span style="color:#bf0303">"python3"</span><span style="color:#ca60ca">)</span>
+findPython<span style="color:#ca60ca">(</span><span style="color:#bf0303">"python"</span><span style="color:#ca60ca">)</span>
 
-<span style="font-weight:bold;">if</span><span style="color:#ca60ca;">(</span> <span style="color:#ca60ca;">-</span>Not <span style="color:#0057ae;">$env</span><span style="color:#ca60ca;">:</span>CRAFT_PYTHON<span style="color:#ca60ca;">)</span>
-<span style="color:#ca60ca;">{</span>
-    prependPATH <span style="color:#0057ae;">$settings</span><span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;Paths&quot;</span><span style="color:#ca60ca;">][</span><span style="color:#bf0303;">&quot;Python&quot;</span><span style="color:#ca60ca;">]</span>
-    <span style="color:#0057ae;">$env</span><span style="color:#ca60ca;">:</span>CRAFT_PYTHON<span style="color:#ca60ca;">=[</span>IO<span style="color:#ca60ca;">.</span><span style="color:#644a9b;">PATH</span><span style="color:#ca60ca;">]::</span>COMBINE<span style="color:#ca60ca;">(</span><span style="color:#0057ae;">$settings</span><span style="color:#ca60ca;">[</span><span style="color:#bf0303;">&quot;Paths&quot;</span><span style="color:#ca60ca;">][</span><span style="color:#bf0303;">&quot;Python&quot;</span><span style="color:#ca60ca;">],</span> <span style="color:#bf0303;">&quot;python&quot;</span><span style="color:#ca60ca;">)</span>
-<span style="color:#ca60ca;">}</span>
+<span style="font-weight:bold">function</span> readINI<span style="color:#ca60ca">([</span><span style="color:#0057ae">string</span><span style="color:#ca60ca">]</span> <span style="color:#0057ae">$fileName</span><span style="color:#ca60ca">)</span>
+<span style="color:#ca60ca">{</span>
+   <span style="color:#0057ae">$ini</span> <span style="color:#ca60ca">=</span> @<span style="color:#ca60ca">{}</span>
 
-<span style="color:#ca60ca;">(&amp;</span> <span style="color:#0057ae;">$env</span><span style="color:#ca60ca;">:</span>CRAFT_PYTHON <span style="color:#ca60ca;">([</span>IO<span style="color:#ca60ca;">.</span><span style="color:#644a9b;">PATH</span><span style="color:#ca60ca;">]::</span>COMBINE<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;$env:CraftRoot&quot;</span><span style="color:#ca60ca;">,</span> <span style="color:#bf0303;">&quot;bin&quot;</span><span style="color:#ca60ca;">,</span> <span style="color:#bf0303;">&quot;CraftSetupHelper.py&quot;</span><span style="color:#ca60ca;">))</span> <span style="color:#bf0303;">&quot;--setup&quot;</span><span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">|</span>
-<span style="font-weight:bold;">foreach</span> <span style="color:#ca60ca;">{</span>
-  <span style="font-weight:bold;">if</span> <span style="color:#ca60ca;">(</span><span style="color:#0057ae;">$_</span> <span style="color:#ca60ca;">-</span>match <span style="color:#bf0303;">&quot;=&quot;</span><span style="color:#ca60ca;">)</span> <span style="color:#ca60ca;">{</span>
-    <span style="color:#0057ae;">$v</span> <span style="color:#ca60ca;">=</span> <span style="color:#0057ae;">$_</span><span style="color:#ca60ca;">.</span><span style="color:#644a9b;">split</span><span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;=&quot;</span><span style="color:#ca60ca;">)</span>
-    <span style="color:#644a9b;">set-item</span> <span style="color:#ca60ca;">-</span>force <span style="color:#ca60ca;">-</span>path <span style="color:#bf0303;">&quot;ENV:\$($v[0])&quot;</span>  <span style="color:#ca60ca;">-</span>value <span style="color:#bf0303;">&quot;$($v[1])&quot;</span>
-    <span style="color:#898887;">#Write-Host(&quot;$v[0]=$v[1]&quot;)</span>
-  <span style="color:#ca60ca;">}</span>
-<span style="color:#ca60ca;">}</span>
-
-<span style="color:#644a9b;">cd</span> <span style="color:#bf0303;">&quot;$env:KDEROOT&quot;</span>
-<span style="color:#ca60ca;">}</span>
+  <span style="font-weight:bold">switch</span> <span style="color:#ca60ca">-</span>regex <span style="color:#ca60ca">-</span>file <span style="color:#0057ae">$fileName</span> <span style="color:#ca60ca">{</span>
+    <span style="color:#bf0303">"^\[(.+)\]$"</span> <span style="color:#ca60ca">{</span>
+      <span style="color:#0057ae">$section</span> <span style="color:#ca60ca">=</span> <span style="color:#0057ae">$matches</span><span style="color:#ca60ca">[</span>1<span style="color:#ca60ca">].</span><span style="color:#644a9b">Trim</span><span style="color:#ca60ca">()</span>
+      <span style="color:#0057ae">$ini</span><span style="color:#ca60ca">[</span><span style="color:#0057ae">$section</span><span style="color:#ca60ca">]</span> <span style="color:#ca60ca">=</span> @<span style="color:#ca60ca">{}</span>
+    <span style="color:#ca60ca">}</span>
+    <span style="color:#bf0303">"^\s*([^#].+?)\s*=\s*(.*)"</span> <span style="color:#ca60ca">{</span>
+      <span style="color:#0057ae">$name</span><span style="color:#ca60ca">,</span><span style="color:#0057ae">$value</span> <span style="color:#ca60ca">=</span> <span style="color:#0057ae">$matches</span><span style="color:#ca60ca">[</span>1<span style="color:#ca60ca">..</span><span style="color:#644a9b">2</span><span style="color:#ca60ca">]</span>
+      <span style="color:#0057ae">$ini</span><span style="color:#ca60ca">[</span><span style="color:#0057ae">$section</span><span style="color:#ca60ca">][</span><span style="color:#0057ae">$name</span><span style="color:#ca60ca">]</span> <span style="color:#ca60ca">=</span> <span style="color:#0057ae">$value</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">Trim</span><span style="color:#ca60ca">()</span>
+    <span style="color:#ca60ca">}</span>
+  <span style="color:#ca60ca">}</span>
+  <span style="color:#0057ae">$ini</span>
+<span style="color:#ca60ca">}</span>
 
 
-<span style="font-weight:bold;">function</span> Global<span style="color:#ca60ca;">:</span>craft<span style="color:#ca60ca;">()</span> <span style="color:#ca60ca;">{</span>
-    <span style="font-weight:bold;">return</span> <span style="color:#ca60ca;">&amp;</span> <span style="color:#0057ae;">$env</span><span style="color:#ca60ca;">:</span>CRAFT_PYTHON <span style="color:#ca60ca;">([</span>IO<span style="color:#ca60ca;">.</span><span style="color:#644a9b;">PATH</span><span style="color:#ca60ca;">]::</span>COMBINE<span style="color:#ca60ca;">(</span><span style="color:#bf0303;">&quot;$env:CraftRoot&quot;</span><span style="color:#ca60ca;">,</span> <span style="color:#bf0303;">&quot;bin&quot;</span><span style="color:#ca60ca;">,</span> <span style="color:#bf0303;">&quot;craft.py&quot;</span><span style="color:#ca60ca;">))</span> <span style="color:#0057ae;">$args</span>
-<span style="color:#ca60ca;">}</span>
+
+<span style="font-weight:bold">if</span><span style="color:#ca60ca">(</span><span style="color:#644a9b">test-path</span> <span style="color:#ca60ca">-</span>path <span style="color:#0057ae">$env</span><span style="color:#ca60ca">:</span>CraftRoot\<span style="color:#ca60ca">..</span>\etc\kdesettings<span style="color:#ca60ca">.</span><span style="color:#644a9b">ini</span><span style="color:#ca60ca">)</span>
+<span style="color:#ca60ca">{</span>
+    <span style="color:#0057ae">$settings</span> <span style="color:#ca60ca">=</span> readINI <span style="color:#0057ae">$env</span><span style="color:#ca60ca">:</span>CraftRoot\<span style="color:#ca60ca">..</span>\etc\kdesettings<span style="color:#ca60ca">.</span><span style="color:#644a9b">ini</span>
+<span style="color:#ca60ca">}</span>
+<span style="font-weight:bold">else</span>
+<span style="color:#ca60ca">{</span>
+    <span style="color:#644a9b">Write-Error</span><span style="color:#ca60ca">(</span><span style="color:#bf0303">"$env:CraftRoot\..\etc\kdesettings.ini Does not exist"</span><span style="color:#ca60ca">)</span>
+    <span style="font-weight:bold">break</span>
+<span style="color:#ca60ca">}</span>
+<span style="font-weight:bold">if</span><span style="color:#ca60ca">(</span> <span style="color:#0057ae">$CRAFT_ARGUMENTS</span><span style="color:#ca60ca">[</span>0<span style="color:#ca60ca">]</span> <span style="color:#ca60ca">-</span>eq <span style="color:#bf0303">"--get"</span><span style="color:#ca60ca">)</span>
+<span style="color:#ca60ca">{</span>
+    <span style="color:#644a9b">Write-Host</span><span style="color:#ca60ca">(</span><span style="color:#0057ae">$settings</span><span style="color:#ca60ca">[</span><span style="color:#0057ae">$CRAFT_ARGUMENTS</span><span style="color:#ca60ca">[</span>1<span style="color:#ca60ca">]][</span><span style="color:#0057ae">$CRAFT_ARGUMENTS</span><span style="color:#ca60ca">[</span>2<span style="color:#ca60ca">]])</span>
+    <span style="font-weight:bold">break</span>
+<span style="color:#ca60ca">}</span>
 
 
-<span style="font-weight:bold;">if</span><span style="color:#ca60ca;">(</span><span style="color:#0057ae;">$args</span><span style="color:#ca60ca;">.</span><span style="color:#644a9b;">Length</span> <span style="color:#ca60ca;">-</span>ne 0<span style="color:#ca60ca;">)</span>
-<span style="color:#ca60ca;">{</span>
-    <span style="color:#644a9b;">invoke-expression</span> <span style="color:#ca60ca;">-</span>command <span style="color:#bf0303;">&quot;$args&quot;</span>
-<span style="color:#ca60ca;">}</span>
+<span style="font-weight:bold">function</span> prependPATH<span style="color:#ca60ca">([</span><span style="color:#0057ae">string</span><span style="color:#ca60ca">]</span> <span style="color:#0057ae">$path</span><span style="color:#ca60ca">)</span>
+<span style="color:#ca60ca">{</span>
+    <span style="color:#0057ae">$env</span><span style="color:#ca60ca">:</span>PATH<span style="color:#ca60ca">=</span><span style="color:#bf0303">"$path{0}$env:PATH"</span> <span style="color:#ca60ca">-</span>f <span style="color:#ca60ca">[</span>IO<span style="color:#ca60ca">.</span><span style="color:#644a9b">Path</span><span style="color:#ca60ca">]::</span>PathSeparator
+<span style="color:#ca60ca">}</span>
+
+
+<span style="font-weight:bold">if</span><span style="color:#ca60ca">(</span> <span style="color:#ca60ca">-</span>Not <span style="color:#0057ae">$env</span><span style="color:#ca60ca">:</span>CRAFT_PYTHON<span style="color:#ca60ca">)</span>
+<span style="color:#ca60ca">{</span>
+    prependPATH <span style="color:#0057ae">$settings</span><span style="color:#ca60ca">[</span><span style="color:#bf0303">"Paths"</span><span style="color:#ca60ca">][</span><span style="color:#bf0303">"Python"</span><span style="color:#ca60ca">]</span>
+    <span style="color:#0057ae">$env</span><span style="color:#ca60ca">:</span>CRAFT_PYTHON<span style="color:#ca60ca">=[</span>IO<span style="color:#ca60ca">.</span><span style="color:#644a9b">PATH</span><span style="color:#ca60ca">]::</span>COMBINE<span style="color:#ca60ca">(</span><span style="color:#0057ae">$settings</span><span style="color:#ca60ca">[</span><span style="color:#bf0303">"Paths"</span><span style="color:#ca60ca">][</span><span style="color:#bf0303">"Python"</span><span style="color:#ca60ca">],</span> <span style="color:#bf0303">"python"</span><span style="color:#ca60ca">)</span>
+<span style="color:#ca60ca">}</span>
+
+<span style="color:#ca60ca">(&amp;</span> <span style="color:#0057ae">$env</span><span style="color:#ca60ca">:</span>CRAFT_PYTHON <span style="color:#ca60ca">([</span>IO<span style="color:#ca60ca">.</span><span style="color:#644a9b">PATH</span><span style="color:#ca60ca">]::</span>COMBINE<span style="color:#ca60ca">(</span><span style="color:#bf0303">"$env:CraftRoot"</span><span style="color:#ca60ca">,</span> <span style="color:#bf0303">"bin"</span><span style="color:#ca60ca">,</span> <span style="color:#bf0303">"CraftSetupHelper.py"</span><span style="color:#ca60ca">))</span> <span style="color:#bf0303">"--setup"</span><span style="color:#ca60ca">)</span> <span style="color:#ca60ca">|</span>
+<span style="font-weight:bold">foreach</span> <span style="color:#ca60ca">{</span>
+  <span style="font-weight:bold">if</span> <span style="color:#ca60ca">(</span><span style="color:#0057ae">$_</span> <span style="color:#ca60ca">-</span>match <span style="color:#bf0303">"="</span><span style="color:#ca60ca">)</span> <span style="color:#ca60ca">{</span>
+    <span style="color:#0057ae">$v</span> <span style="color:#ca60ca">=</span> <span style="color:#0057ae">$_</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">split</span><span style="color:#ca60ca">(</span><span style="color:#bf0303">"="</span><span style="color:#ca60ca">)</span>
+    <span style="color:#644a9b">set-item</span> <span style="color:#ca60ca">-</span>force <span style="color:#ca60ca">-</span>path <span style="color:#bf0303">"ENV:\$($v[0])"</span>  <span style="color:#ca60ca">-</span>value <span style="color:#bf0303">"$($v[1])"</span>
+    <span style="color:#898887">#Write-Host("$v[0]=$v[1]")</span>
+  <span style="color:#ca60ca">}</span>
+<span style="color:#ca60ca">}</span>
+
+<span style="color:#644a9b">cd</span> <span style="color:#bf0303">"$env:KDEROOT"</span>
+<span style="color:#ca60ca">}</span>
+
+
+<span style="font-weight:bold">function</span> Global<span style="color:#ca60ca">:</span>craft<span style="color:#ca60ca">()</span> <span style="color:#ca60ca">{</span>
+    <span style="font-weight:bold">return</span> <span style="color:#ca60ca">&amp;</span> <span style="color:#0057ae">$env</span><span style="color:#ca60ca">:</span>CRAFT_PYTHON <span style="color:#ca60ca">([</span>IO<span style="color:#ca60ca">.</span><span style="color:#644a9b">PATH</span><span style="color:#ca60ca">]::</span>COMBINE<span style="color:#ca60ca">(</span><span style="color:#bf0303">"$env:CraftRoot"</span><span style="color:#ca60ca">,</span> <span style="color:#bf0303">"bin"</span><span style="color:#ca60ca">,</span> <span style="color:#bf0303">"craft.py"</span><span style="color:#ca60ca">))</span> <span style="color:#0057ae">$args</span>
+<span style="color:#ca60ca">}</span>
+
+
+<span style="font-weight:bold">if</span><span style="color:#ca60ca">(</span><span style="color:#0057ae">$args</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">Length</span> <span style="color:#ca60ca">-</span>ne 0<span style="color:#ca60ca">)</span>
+<span style="color:#ca60ca">{</span>
+    <span style="color:#644a9b">invoke-expression</span> <span style="color:#ca60ca">-</span>command <span style="color:#bf0303">"$args"</span>
+<span style="color:#ca60ca">}</span>
 </pre></body></html>

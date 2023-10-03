@@ -4,450 +4,450 @@
 <title>test.nim</title>
 <meta name="generator" content="KF5::SyntaxHighlighting - Definition (Nim) - Theme (Breeze Light)"/>
 </head><body style="background-color:#ffffff;color:#1f1c1b"><pre>
-<span style="color:#898887;"># Nim Sample file</span>
-<span style="color:#898887;"># Obtained form: https://nim-by-example.github.io/</span>
-
-<span style="color:#898887;"># Comment </span><span style="color:#e85848;background-color:#451e1a;font-weight:bold;">ALERT</span><span style="color:#898887;"> </span><span style="color:#81ca2d;background-color:#f7e6e6;font-weight:bold;">NOTE</span><span style="color:#898887;"> </span><span style="color:#ca9219;background-color:#451e1a;font-weight:bold;">FIXME</span>
-<span style="color:#898887;">#[ Multi-line</span>
-<span style="color:#898887;">comment ]#</span>
-
-<span style="color:#607880;">## Documentation comment</span>
-<span style="color:#607880;">##[ Multi-line</span>
-<span style="color:#607880;">    documentation comment ]##</span>
-
-<span style="font-weight:bold;">import</span> strformat
-
-<span style="font-weight:bold;">type</span>
-    <span style="color:#0057ae;">Person</span> <span style="color:#898887;">=</span> <span style="font-weight:bold;">object</span>
-        name<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">string</span>
-        age<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">Natural</span> <span style="color:#898887;"># Ensures the age is positive</span>
-
-<span style="font-weight:bold;">let</span> people <span style="color:#898887;">=</span> <span style="font-weight:bold;">[</span>
-    <span style="color:#0057ae;">Person</span><span style="font-weight:bold;">(</span>name<span style="font-weight:bold;">:</span> <span style="color:#bf0303;">&quot;John&quot;</span><span style="font-weight:bold;">,</span> age<span style="font-weight:bold;">:</span> <span style="color:#b08000;">45</span><span style="font-weight:bold;">),</span>
-    <span style="color:#0057ae;">Person</span><span style="font-weight:bold;">(</span>name<span style="font-weight:bold;">:</span> <span style="color:#bf0303;">&quot;Kate&quot;</span><span style="font-weight:bold;">,</span> age<span style="font-weight:bold;">:</span> <span style="color:#b08000;">30</span><span style="font-weight:bold;">)</span>
-<span style="font-weight:bold;">]</span>
-
-<span style="font-weight:bold;">for</span> person <span style="color:#898887;font-weight:bold;">in</span> people<span style="font-weight:bold;">:</span>
-    <span style="color:#898887;"># Type-safe string interpolation,</span>
-    <span style="color:#898887;"># evaluated at compile time.</span>
-    <span style="font-weight:bold;">echo</span><span style="font-weight:bold;">(</span><span style="color:#644a9b;">fmt</span><span style="color:#bf0303;">&quot;{person.name} is {person.age} years old&quot;</span><span style="font-weight:bold;">)</span>
-
-<span style="color:#898887;"># Thanks to Nim's 'iterator' and 'yield' constructs,</span>
-<span style="color:#898887;"># iterators are as easy to write as ordinary</span>
-<span style="color:#898887;"># functions. They are compiled to inline loops.</span>
-<span style="font-weight:bold;">iterator</span> <span style="color:#bf0303;font-weight:bold;">oddNumbers</span><span style="font-weight:bold;">[</span><span style="color:#0057ae;">Idx</span><span style="font-weight:bold;">,</span> <span style="color:#0057ae;">T</span><span style="font-weight:bold;">](</span>a<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">array</span><span style="font-weight:bold;">[</span><span style="color:#0057ae;">Idx</span><span style="font-weight:bold;">,</span> <span style="color:#0057ae;">T</span><span style="font-weight:bold;">]):</span> <span style="color:#0057ae;">T</span> <span style="color:#898887;">=</span>
-    <span style="font-weight:bold;">for</span> x <span style="color:#898887;font-weight:bold;">in</span> a<span style="font-weight:bold;">:</span>
-        <span style="font-weight:bold;">if</span> x <span style="color:#898887;font-weight:bold;">mod</span> <span style="color:#b08000;">2</span> <span style="color:#898887;">==</span> <span style="color:#b08000;">1</span><span style="font-weight:bold;">:</span>
-            <span style="font-weight:bold;">yield</span> x
-
-<span style="font-weight:bold;">for</span> odd <span style="color:#898887;font-weight:bold;">in</span> <span style="color:#644a9b;">oddNumbers</span><span style="font-weight:bold;">([</span><span style="color:#b08000;">3</span><span style="font-weight:bold;">,</span> <span style="color:#b08000;">6</span><span style="font-weight:bold;">,</span> <span style="color:#b08000;">9</span><span style="font-weight:bold;">,</span> <span style="color:#b08000;">12</span><span style="font-weight:bold;">,</span> <span style="color:#b08000;">15</span><span style="font-weight:bold;">,</span> <span style="color:#b08000;">18</span><span style="font-weight:bold;">]):</span>
-    <span style="font-weight:bold;">echo</span> odd
-
-<span style="color:#898887;"># Use Nim's macro system to transform a dense</span>
-<span style="color:#898887;"># data-centric description of x86 instructions</span>
-<span style="color:#898887;"># into lookup tables that are used by</span>
-<span style="color:#898887;"># assemblers and JITs.</span>
-<span style="font-weight:bold;">import</span> macros<span style="font-weight:bold;">,</span> strutils
-
-<span style="font-weight:bold;">macro</span> <span style="color:#bf0303;font-weight:bold;">toLookupTable</span><span style="font-weight:bold;">(</span>data<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">static</span><span style="font-weight:bold;">[</span><span style="color:#0057ae;">string</span><span style="font-weight:bold;">]):</span> <span style="color:#0057ae;">untyped</span> <span style="color:#898887;">=</span>
-    <span style="color:#006e28;">result</span> <span style="color:#898887;">=</span> <span style="color:#644a9b;">newTree</span><span style="font-weight:bold;">(</span>nnkBracket<span style="font-weight:bold;">)</span>
-    <span style="font-weight:bold;">for</span> w <span style="color:#898887;font-weight:bold;">in</span> data<span style="font-weight:bold;">.</span><span style="color:#644a9b;">split</span><span style="font-weight:bold;">(</span><span style="color:#924c9d;">';'</span><span style="font-weight:bold;">):</span>
-        <span style="color:#006e28;">result</span><span style="font-weight:bold;">.</span><span style="color:#0057ae;">add</span> <span style="color:#644a9b;">newLit</span><span style="font-weight:bold;">(</span>w<span style="font-weight:bold;">)</span>
-
-<span style="font-weight:bold;">const</span>
-    data <span style="color:#898887;">=</span> <span style="color:#bf0303;">&quot;mov;btc;cli;xor&quot;</span>
-    opcodes <span style="color:#898887;">=</span> <span style="color:#644a9b;">toLookupTable</span><span style="font-weight:bold;">(</span>data<span style="font-weight:bold;">)</span>
-
-<span style="font-weight:bold;">for</span> o <span style="color:#898887;font-weight:bold;">in</span> opcodes<span style="font-weight:bold;">:</span>
-    <span style="font-weight:bold;">echo</span> o
-
-<span style="color:#898887;"># Variables</span>
-<span style="font-weight:bold;">proc</span> <span style="color:#bf0303;font-weight:bold;">getAlphabet</span><span style="font-weight:bold;">():</span> <span style="color:#0057ae;">string</span> <span style="color:#898887;">=</span>
-    <span style="font-weight:bold;">var</span> accm <span style="color:#898887;">=</span> <span style="color:#bf0303;">&quot;&quot;</span>
-    <span style="font-weight:bold;">for</span> letter <span style="color:#898887;font-weight:bold;">in</span> <span style="color:#924c9d;">'a'</span><span style="font-weight:bold;">..</span><span style="color:#924c9d;">'z'</span><span style="font-weight:bold;">:</span>  <span style="color:#898887;"># see iterators</span>
-        accm<span style="font-weight:bold;">.</span><span style="color:#644a9b;">add</span><span style="font-weight:bold;">(</span>letter<span style="font-weight:bold;">)</span>
-    <span style="font-weight:bold;">return</span> accm
-
-<span style="color:#898887;"># Computed at compilation time</span>
-<span style="font-weight:bold;">const</span> alphabet <span style="color:#898887;">=</span> <span style="color:#644a9b;">getAlphabet</span><span style="font-weight:bold;">()</span>
-
-<span style="color:#898887;"># Mutable variables</span>
-<span style="font-weight:bold;">var</span>
-    a <span style="color:#898887;">=</span> <span style="color:#bf0303;">&quot;foo&quot;</span>
-    b <span style="color:#898887;">=</span> <span style="color:#b08000;">0</span>
-    <span style="color:#898887;"># Works fine, initialized to 0</span>
-    c<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">int</span>
-
-<span style="color:#898887;"># Immutable variables</span>
-<span style="font-weight:bold;">let</span>
-    d <span style="color:#898887;">=</span> <span style="color:#bf0303;">&quot;foo&quot;</span>
-    e <span style="color:#898887;">=</span> <span style="color:#b08000;">5</span>
-    <span style="color:#898887;"># Compile-time error, must be initialized at creation</span>
-    f<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">float</span>
-
-<span style="color:#898887;"># Works fine, `a` is mutable</span>
-a<span style="font-weight:bold;">.</span><span style="color:#644a9b;">add</span><span style="font-weight:bold;">(</span><span style="color:#bf0303;">&quot;bar&quot;</span><span style="font-weight:bold;">)</span>
-b <span style="color:#898887;">+=</span> <span style="color:#b08000;">1</span>
-c <span style="color:#898887;">=</span> <span style="color:#b08000;">3</span>
-
-<span style="color:#898887;"># Compile-time error, const cannot be modified at run-time</span>
-alphabet <span style="color:#898887;">=</span> <span style="color:#bf0303;">&quot;abc&quot;</span>
-
-<span style="color:#898887;"># Compile-time error, `d` and `e` are immutable</span>
-d<span style="font-weight:bold;">.</span><span style="color:#644a9b;">add</span><span style="font-weight:bold;">(</span><span style="color:#bf0303;">&quot;bar&quot;</span><span style="font-weight:bold;">)</span>
-e <span style="color:#898887;">+=</span> <span style="color:#b08000;">1</span>
-
-<span style="color:#898887;"># Const</span>
-<span style="color:#0057ae;">STRING_LITERAL</span><span style="font-weight:bold;">(</span><span style="color:#0057ae;">TMP129</span><span style="font-weight:bold;">,</span> <span style="color:#bf0303;">&quot;abcdefghijklmnopqrstuvwxyz&quot;</span><span style="font-weight:bold;">,</span> <span style="color:#b08000;">26</span><span style="font-weight:bold;">);</span>
-
-<span style="color:#898887;"># Loops</span>
-<span style="font-weight:bold;">import</span> strutils<span style="font-weight:bold;">,</span> random
-
-<span style="color:#644a9b;">randomize</span><span style="font-weight:bold;">()</span>
-<span style="font-weight:bold;">let</span> answer <span style="color:#898887;">=</span> <span style="color:#644a9b;">random</span><span style="font-weight:bold;">(</span><span style="color:#b08000;">10</span><span style="font-weight:bold;">)</span> <span style="color:#898887;">+</span> <span style="color:#b08000;">1</span>
-<span style="font-weight:bold;">while</span> <span style="color:#aa5500;font-weight:bold;">true</span><span style="font-weight:bold;">:</span>
-    <span style="font-weight:bold;">echo</span> <span style="color:#bf0303;">&quot;I have a number from 1 to 10, what is it? &quot;</span>
-    <span style="font-weight:bold;">let</span> guess <span style="color:#898887;">=</span> <span style="color:#644a9b;">parseInt</span><span style="font-weight:bold;">(</span>stdin<span style="font-weight:bold;">.</span><span style="color:#0057ae;">readLine</span><span style="font-weight:bold;">)</span>
-
-    <span style="font-weight:bold;">if</span> guess <span style="color:#898887;">&lt;</span> answer<span style="font-weight:bold;">:</span>
-        <span style="font-weight:bold;">echo</span> <span style="color:#bf0303;">&quot;Too low, try again&quot;</span>
-    <span style="font-weight:bold;">elif</span> guess <span style="color:#898887;">&gt;</span> answer<span style="font-weight:bold;">:</span>
-        <span style="font-weight:bold;">echo</span> <span style="color:#bf0303;">&quot;Too high, try again&quot;</span>
-    <span style="font-weight:bold;">else</span><span style="font-weight:bold;">:</span>
-        <span style="font-weight:bold;">echo</span> <span style="color:#bf0303;">&quot;Correct!&quot;</span>
-        <span style="font-weight:bold;">break</span>
-
-<span style="font-weight:bold;">block</span> busyloops<span style="font-weight:bold;">:</span>
-    <span style="font-weight:bold;">while</span> <span style="color:#aa5500;font-weight:bold;">true</span><span style="font-weight:bold;">:</span>
-        <span style="font-weight:bold;">while</span> <span style="color:#aa5500;font-weight:bold;">true</span><span style="font-weight:bold;">:</span>
-        <span style="font-weight:bold;">break</span> busyloops
-
-<span style="color:#898887;"># Case Statements</span>
-<span style="font-weight:bold;">case</span> <span style="color:#bf0303;">&quot;charlie&quot;</span><span style="font-weight:bold;">:</span>
-    <span style="color:#898887;font-weight:bold;">of</span> <span style="color:#bf0303;">&quot;alfa&quot;</span><span style="font-weight:bold;">:</span>
-        <span style="font-weight:bold;">echo</span> <span style="color:#bf0303;">&quot;A&quot;</span>
-    <span style="color:#898887;font-weight:bold;">of</span> <span style="color:#bf0303;">&quot;bravo&quot;</span><span style="font-weight:bold;">:</span>
-        <span style="font-weight:bold;">echo</span> <span style="color:#bf0303;">&quot;B&quot;</span>
-    <span style="color:#898887;font-weight:bold;">of</span> <span style="color:#bf0303;">&quot;charlie&quot;</span><span style="font-weight:bold;">:</span>
-        <span style="font-weight:bold;">echo</span> <span style="color:#bf0303;">&quot;C&quot;</span>
-    <span style="font-weight:bold;">else</span><span style="font-weight:bold;">:</span>
-        <span style="font-weight:bold;">echo</span> <span style="color:#bf0303;">&quot;Unrecognized letter&quot;</span>
-
-<span style="font-weight:bold;">case</span> <span style="color:#924c9d;">'h'</span><span style="font-weight:bold;">:</span>
-    <span style="color:#898887;font-weight:bold;">of</span> <span style="color:#924c9d;">'a'</span><span style="font-weight:bold;">,</span> <span style="color:#924c9d;">'e'</span><span style="font-weight:bold;">,</span> <span style="color:#924c9d;">'i'</span><span style="font-weight:bold;">,</span> <span style="color:#924c9d;">'o'</span><span style="font-weight:bold;">,</span> <span style="color:#924c9d;">'u'</span><span style="font-weight:bold;">:</span>
-        <span style="font-weight:bold;">echo</span> <span style="color:#bf0303;">&quot;Vowel&quot;</span>
-    <span style="color:#898887;font-weight:bold;">of</span> <span style="color:#924c9d;">'\127'</span><span style="font-weight:bold;">..</span><span style="color:#924c9d;">'\255'</span><span style="font-weight:bold;">:</span>
-        <span style="font-weight:bold;">echo</span> <span style="color:#bf0303;">&quot;Unknown&quot;</span>
-    <span style="font-weight:bold;">else</span><span style="font-weight:bold;">:</span>
-        <span style="font-weight:bold;">echo</span> <span style="color:#bf0303;">&quot;Consonant&quot;</span>
-
-<span style="font-weight:bold;">proc</span> <span style="color:#bf0303;font-weight:bold;">positiveOrNegative</span><span style="font-weight:bold;">(</span>num<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">int</span><span style="font-weight:bold;">):</span> <span style="color:#0057ae;">string</span> <span style="color:#898887;">=</span>
-    <span style="color:#006e28;">result</span> <span style="color:#898887;">=</span> <span style="font-weight:bold;">case</span> num<span style="font-weight:bold;">:</span>
-        <span style="color:#898887;font-weight:bold;">of</span> <span style="color:#644a9b;">low</span><span style="font-weight:bold;">(</span><span style="color:#0057ae;">int</span><span style="font-weight:bold;">)..</span> <span style="color:#898887;">-</span><span style="color:#b08000;">1</span><span style="font-weight:bold;">:</span>
-            <span style="color:#bf0303;">&quot;negative&quot;</span>
-        <span style="color:#898887;font-weight:bold;">of</span> <span style="color:#b08000;">0</span><span style="font-weight:bold;">:</span>
-            <span style="color:#bf0303;">&quot;zero&quot;</span>
-        <span style="color:#898887;font-weight:bold;">of</span> <span style="color:#b08000;">1</span><span style="font-weight:bold;">..</span><span style="color:#644a9b;">high</span><span style="font-weight:bold;">(</span><span style="color:#0057ae;">int</span><span style="font-weight:bold;">):</span>
-            <span style="color:#bf0303;">&quot;positive&quot;</span>
-        <span style="font-weight:bold;">else</span><span style="font-weight:bold;">:</span>
-            <span style="color:#bf0303;">&quot;impossible&quot;</span>
-
-<span style="font-weight:bold;">echo</span> <span style="color:#644a9b;">positiveOrNegative</span><span style="font-weight:bold;">(</span><span style="color:#898887;">-</span><span style="color:#b08000;">1</span><span style="font-weight:bold;">)</span>
-
-<span style="color:#898887;"># items and pairs</span>
-<span style="font-weight:bold;">type</span>
-    <span style="color:#0057ae;">CustomRange</span> <span style="color:#898887;">=</span> <span style="font-weight:bold;">object</span>
-        low<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">int</span>
-        high<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">int</span>
-
-<span style="font-weight:bold;">iterator</span> <span style="color:#bf0303;font-weight:bold;">items</span><span style="font-weight:bold;">(</span>range<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">CustomRange</span><span style="font-weight:bold;">):</span> <span style="color:#0057ae;">int</span> <span style="color:#898887;">=</span>
-    <span style="font-weight:bold;">var</span> i <span style="color:#898887;">=</span> range<span style="font-weight:bold;">.</span><span style="color:#0057ae;">low</span>
-    <span style="font-weight:bold;">while</span> i <span style="color:#898887;">&lt;=</span> range<span style="font-weight:bold;">.</span><span style="color:#0057ae;">high</span><span style="font-weight:bold;">:</span>
-        <span style="font-weight:bold;">yield</span> i
-        <span style="color:#644a9b;">inc</span> i
-
-<span style="font-weight:bold;">iterator</span> <span style="color:#bf0303;font-weight:bold;">pairs</span><span style="font-weight:bold;">(</span>range<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">CustomRange</span><span style="font-weight:bold;">):</span> <span style="color:#0057ae;">tuple</span><span style="font-weight:bold;">[</span>a<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">int</span><span style="font-weight:bold;">,</span> b<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">char</span><span style="font-weight:bold;">]</span> <span style="color:#898887;">=</span>
-    <span style="font-weight:bold;">for</span> i <span style="color:#898887;font-weight:bold;">in</span> range<span style="font-weight:bold;">:</span>  <span style="color:#898887;"># uses CustomRange.items</span>
-        <span style="font-weight:bold;">yield</span> <span style="font-weight:bold;">(</span>i<span style="font-weight:bold;">,</span> <span style="color:#0057ae;">char</span><span style="font-weight:bold;">(</span>i <span style="color:#898887;">+</span> <span style="color:#644a9b;">ord</span><span style="font-weight:bold;">(</span><span style="color:#924c9d;">'a'</span><span style="font-weight:bold;">)))</span>
-
-<span style="font-weight:bold;">for</span> i<span style="font-weight:bold;">,</span> c <span style="color:#898887;font-weight:bold;">in</span> <span style="color:#0057ae;">CustomRange</span><span style="font-weight:bold;">(</span>low<span style="font-weight:bold;">:</span> <span style="color:#b08000;">1</span><span style="font-weight:bold;">,</span> high<span style="font-weight:bold;">:</span> <span style="color:#b08000;">3</span><span style="font-weight:bold;">):</span>
-    <span style="font-weight:bold;">echo</span> c
-
-<span style="color:#898887;"># Operators</span>
-<span style="font-weight:bold;">iterator</span> <span style="color:#bf0303;font-weight:bold;">`...`</span><span style="color:#898887;">*</span><span style="font-weight:bold;">[</span><span style="color:#0057ae;">T</span><span style="font-weight:bold;">](</span>a<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">T</span><span style="font-weight:bold;">,</span> b<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">T</span><span style="font-weight:bold;">):</span> <span style="color:#0057ae;">T</span> <span style="color:#898887;">=</span>
-    <span style="font-weight:bold;">var</span> res<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">T</span> <span style="color:#898887;">=</span> <span style="color:#0057ae;">T</span><span style="font-weight:bold;">(</span>a<span style="font-weight:bold;">)</span>
-    <span style="font-weight:bold;">while</span> res <span style="color:#898887;">&lt;=</span> b<span style="font-weight:bold;">:</span>
-        <span style="font-weight:bold;">yield</span> res
-        <span style="color:#644a9b;">inc</span> res
-
-<span style="font-weight:bold;">for</span> i <span style="color:#898887;font-weight:bold;">in</span> <span style="color:#b08000;">0</span><span style="font-weight:bold;">...</span><span style="color:#b08000;">5</span><span style="font-weight:bold;">:</span>
-    <span style="font-weight:bold;">echo</span> i
-
-<span style="color:#898887;"># Inline Iterators</span>
-<span style="font-weight:bold;">iterator</span> <span style="color:#bf0303;font-weight:bold;">countTo</span><span style="font-weight:bold;">(</span>n<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">int</span><span style="font-weight:bold;">):</span> <span style="color:#0057ae;">int</span> <span style="color:#898887;">=</span>
-    <span style="font-weight:bold;">var</span> i <span style="color:#898887;">=</span> <span style="color:#b08000;">0</span>
-    <span style="font-weight:bold;">while</span> i <span style="color:#898887;">&lt;=</span> n<span style="font-weight:bold;">:</span>
-        <span style="font-weight:bold;">yield</span> i
-        <span style="color:#644a9b;">inc</span> i
-
-<span style="font-weight:bold;">for</span> i <span style="color:#898887;font-weight:bold;">in</span> <span style="color:#644a9b;">countTo</span><span style="font-weight:bold;">(</span><span style="color:#b08000;">5</span><span style="font-weight:bold;">):</span>
-    <span style="font-weight:bold;">echo</span> i
-
-<span style="color:#898887;"># Closure Iterators</span>
-<span style="font-weight:bold;">proc</span> <span style="color:#bf0303;font-weight:bold;">countTo</span><span style="font-weight:bold;">(</span>n<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">int</span><span style="font-weight:bold;">):</span> <span style="font-weight:bold;">iterator</span><span style="font-weight:bold;">():</span> <span style="color:#0057ae;">int</span> <span style="color:#898887;">=</span>
-    <span style="font-weight:bold;">return</span> <span style="font-weight:bold;">iterator</span><span style="font-weight:bold;">():</span> <span style="color:#0057ae;">int</span> <span style="color:#898887;">=</span>
-        <span style="font-weight:bold;">var</span> i <span style="color:#898887;">=</span> <span style="color:#b08000;">0</span>
-        <span style="font-weight:bold;">while</span> i <span style="color:#898887;">&lt;=</span> n<span style="font-weight:bold;">:</span>
-            <span style="font-weight:bold;">yield</span> i
-            <span style="color:#644a9b;">inc</span> i
-
-<span style="font-weight:bold;">let</span> countTo20 <span style="color:#898887;">=</span> <span style="color:#644a9b;">countTo</span><span style="font-weight:bold;">(</span><span style="color:#b08000;">20</span><span style="font-weight:bold;">)</span>
-
-<span style="font-weight:bold;">echo</span> <span style="color:#644a9b;">countTo20</span><span style="font-weight:bold;">()</span>
-
-<span style="font-weight:bold;">var</span> output <span style="color:#898887;">=</span> <span style="color:#bf0303;">&quot;&quot;</span>
-<span style="color:#898887;"># Raw iterator usage:</span>
-<span style="font-weight:bold;">while</span> <span style="color:#aa5500;font-weight:bold;">true</span><span style="font-weight:bold;">:</span>
-    <span style="color:#898887;"># 1. grab an element</span>
-    <span style="font-weight:bold;">let</span> next <span style="color:#898887;">=</span> <span style="color:#644a9b;">countTo20</span><span style="font-weight:bold;">()</span>
-    <span style="color:#898887;"># 2. Is the element bogus? It's the end of the loop, discard it</span>
-    <span style="font-weight:bold;">if</span> <span style="color:#644a9b;">finished</span><span style="font-weight:bold;">(</span>countTo20<span style="font-weight:bold;">):</span>
-        <span style="font-weight:bold;">break</span>
-    <span style="color:#898887;"># 3. Loop body goes here:</span>
-    output<span style="font-weight:bold;">.</span><span style="color:#644a9b;">add</span><span style="font-weight:bold;">(</span><span style="color:#898887;">$</span>next <span style="color:#898887;">&amp;</span> <span style="color:#bf0303;">&quot; &quot;</span><span style="font-weight:bold;">)</span>
-
-<span style="font-weight:bold;">echo</span> output
-
-output <span style="color:#898887;">=</span> <span style="color:#bf0303;">&quot;&quot;</span>
-<span style="font-weight:bold;">let</span> countTo9 <span style="color:#898887;">=</span> <span style="color:#644a9b;">countTo</span><span style="font-weight:bold;">(</span><span style="color:#b08000;">9</span><span style="font-weight:bold;">)</span>
-<span style="font-weight:bold;">for</span> i <span style="color:#898887;font-weight:bold;">in</span> <span style="color:#644a9b;">countTo9</span><span style="font-weight:bold;">():</span>
-    output<span style="font-weight:bold;">.</span><span style="color:#644a9b;">add</span><span style="font-weight:bold;">(</span><span style="color:#898887;">$</span>i<span style="font-weight:bold;">)</span>
-<span style="font-weight:bold;">echo</span> output
-
-<span style="color:#898887;"># Procs</span>
-<span style="font-weight:bold;">proc</span> <span style="color:#bf0303;font-weight:bold;">fibonacci</span><span style="font-weight:bold;">(</span>n<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">int</span><span style="font-weight:bold;">):</span> <span style="color:#0057ae;">int</span> <span style="color:#898887;">=</span>
-    <span style="font-weight:bold;">if</span> n <span style="color:#898887;">&lt;</span> <span style="color:#b08000;">2</span><span style="font-weight:bold;">:</span>
-        <span style="color:#006e28;">result</span> <span style="color:#898887;">=</span> n
-    <span style="font-weight:bold;">else</span><span style="font-weight:bold;">:</span>
-        <span style="color:#006e28;">result</span> <span style="color:#898887;">=</span> <span style="color:#644a9b;">fibonacci</span><span style="font-weight:bold;">(</span>n <span style="color:#898887;">-</span> <span style="color:#b08000;">1</span><span style="font-weight:bold;">)</span> <span style="color:#898887;">+</span> <span style="font-weight:bold;">(</span>n <span style="color:#898887;">-</span> <span style="color:#b08000;">2</span><span style="font-weight:bold;">).</span><span style="color:#0057ae;">fibonacci</span>
-
-<span style="color:#898887;"># Operators</span>
-<span style="font-weight:bold;">proc</span> <span style="color:#bf0303;font-weight:bold;">`$`</span><span style="font-weight:bold;">(</span>a<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">array</span><span style="font-weight:bold;">[</span><span style="color:#b08000;">2</span><span style="font-weight:bold;">,</span> <span style="color:#0057ae;">array</span><span style="font-weight:bold;">[</span><span style="color:#b08000;">2</span><span style="font-weight:bold;">,</span> <span style="color:#0057ae;">int</span><span style="font-weight:bold;">]]):</span> <span style="color:#0057ae;">string</span> <span style="color:#898887;">=</span>
-    <span style="color:#006e28;">result</span> <span style="color:#898887;">=</span> <span style="color:#bf0303;">&quot;&quot;</span>
-    <span style="font-weight:bold;">for</span> v <span style="color:#898887;font-weight:bold;">in</span> a<span style="font-weight:bold;">:</span>
-        <span style="font-weight:bold;">for</span> vx <span style="color:#898887;font-weight:bold;">in</span> v<span style="font-weight:bold;">:</span>
-            <span style="color:#006e28;">result</span><span style="font-weight:bold;">.</span><span style="color:#644a9b;">add</span><span style="font-weight:bold;">(</span><span style="color:#898887;">$</span>vx <span style="color:#898887;">&amp;</span> <span style="color:#bf0303;">&quot;, &quot;</span><span style="font-weight:bold;">)</span>
-        <span style="color:#006e28;">result</span><span style="font-weight:bold;">.</span><span style="color:#644a9b;">add</span><span style="font-weight:bold;">(</span><span style="color:#bf0303;">&quot;</span><span style="color:#3daee9;">\n</span><span style="color:#bf0303;">&quot;</span><span style="font-weight:bold;">)</span>
-
-<span style="font-weight:bold;">echo</span><span style="font-weight:bold;">([[</span><span style="color:#b08000;">1</span><span style="font-weight:bold;">,</span> <span style="color:#b08000;">2</span><span style="font-weight:bold;">],</span> <span style="font-weight:bold;">[</span><span style="color:#b08000;">3</span><span style="font-weight:bold;">,</span> <span style="color:#b08000;">4</span><span style="font-weight:bold;">]])</span>  <span style="color:#898887;"># See varargs for</span>
-                        <span style="color:#898887;"># how echo works</span>
-
-<span style="font-weight:bold;">proc</span> <span style="color:#bf0303;font-weight:bold;">`^&amp;*^@%`</span><span style="font-weight:bold;">(</span>a<span style="font-weight:bold;">,</span> b<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">string</span><span style="font-weight:bold;">):</span> <span style="color:#0057ae;">string</span> <span style="color:#898887;">=</span>
-    <span style="color:#607880;">## A confusingly named useless operator</span>
-    <span style="color:#006e28;">result</span> <span style="color:#898887;">=</span> a<span style="font-weight:bold;">[</span><span style="color:#b08000;">0</span><span style="font-weight:bold;">]</span> <span style="color:#898887;">&amp;</span> b<span style="font-weight:bold;">[</span><span style="color:#644a9b;">high</span><span style="font-weight:bold;">(</span>b<span style="font-weight:bold;">)]</span>
-
-<span style="font-weight:bold;">assert</span><span style="font-weight:bold;">(</span><span style="color:#bf0303;">&quot;foo&quot;</span> <span style="color:#898887;">^&amp;*^@%</span> <span style="color:#bf0303;">&quot;bar&quot;</span> <span style="color:#898887;">==</span> <span style="color:#bf0303;">&quot;fr&quot;</span><span style="font-weight:bold;">)</span>
-
-<span style="color:#898887;"># Generic Functions</span>
-<span style="color:#898887;"># Not really good idea for obvious reasons</span>
-<span style="font-weight:bold;">let</span> zero <span style="color:#898887;">=</span> <span style="color:#bf0303;">&quot;&quot;</span>
-<span style="font-weight:bold;">proc</span> <span style="color:#bf0303;font-weight:bold;">`+`</span><span style="font-weight:bold;">(</span>a<span style="font-weight:bold;">,</span> b<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">string</span><span style="font-weight:bold;">):</span> <span style="color:#0057ae;">string</span> <span style="color:#898887;">=</span>
-    a <span style="color:#898887;">&amp;</span> b
-
-<span style="font-weight:bold;">proc</span> <span style="color:#bf0303;font-weight:bold;">`*`</span><span style="font-weight:bold;">[</span><span style="color:#0057ae;">T</span><span style="font-weight:bold;">](</span>a<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">T</span><span style="font-weight:bold;">,</span> b<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">int</span><span style="font-weight:bold;">):</span> <span style="color:#0057ae;">T</span> <span style="color:#898887;">=</span>
-    <span style="color:#006e28;">result</span> <span style="color:#898887;">=</span> zero
-    <span style="font-weight:bold;">for</span> i <span style="color:#898887;font-weight:bold;">in</span> <span style="color:#b08000;">0</span><span style="font-weight:bold;">..</span>b<span style="color:#898887;">-</span><span style="color:#b08000;">1</span><span style="font-weight:bold;">:</span>
-        <span style="color:#006e28;">result</span> <span style="color:#898887;">=</span> <span style="color:#006e28;">result</span> <span style="color:#898887;">+</span> <span style="color:#644a9b;">a </span> <span style="color:#898887;"># calls `+` from line 3</span>
-
-<span style="font-weight:bold;">assert</span><span style="font-weight:bold;">(</span><span style="color:#bf0303;">&quot;a&quot;</span> <span style="color:#898887;">*</span> <span style="color:#b08000;">10</span> <span style="color:#898887;">==</span> <span style="color:#bf0303;">&quot;aaaaaaaaaa&quot;</span><span style="font-weight:bold;">)</span>
-
-<span style="color:#898887;"># Blocks</span>
-<span style="font-weight:bold;">block</span> outer<span style="font-weight:bold;">:</span>
-    <span style="font-weight:bold;">for</span> i <span style="color:#898887;font-weight:bold;">in</span> <span style="color:#b08000;">0</span><span style="font-weight:bold;">..</span><span style="color:#b08000;">2000</span><span style="font-weight:bold;">:</span>
-        <span style="font-weight:bold;">for</span> j <span style="color:#898887;font-weight:bold;">in</span> <span style="color:#b08000;">0</span><span style="font-weight:bold;">..</span><span style="color:#b08000;">2000</span><span style="font-weight:bold;">:</span>
-            <span style="font-weight:bold;">if</span> i<span style="color:#898887;">+</span>j <span style="color:#898887;">==</span> <span style="color:#b08000;">3145</span><span style="font-weight:bold;">:</span>
-                <span style="font-weight:bold;">echo</span> i<span style="font-weight:bold;">,</span> <span style="color:#bf0303;">&quot;, &quot;</span><span style="font-weight:bold;">,</span> j
-                <span style="font-weight:bold;">break</span> outer
-
-<span style="font-weight:bold;">let</span> b <span style="color:#898887;">=</span> <span style="color:#b08000;">3</span>
-<span style="font-weight:bold;">block</span><span style="font-weight:bold;">:</span>
-    <span style="font-weight:bold;">let</span> b <span style="color:#898887;">=</span> <span style="color:#bf0303;">&quot;3&quot;</span>  <span style="color:#898887;"># shadowing is probably a dumb idea</span>
-
-<span style="color:#898887;"># Primitive types</span>
-<span style="font-weight:bold;">let</span>
-    a<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">int8</span> <span style="color:#898887;">=</span> <span style="color:#b08000;">0x7F</span> <span style="color:#898887;"># Works</span>
-    b<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">uint8</span> <span style="color:#898887;">=</span> <span style="color:#b08000;">0b1111_1111</span> <span style="color:#898887;"># Works</span>
-    d <span style="color:#898887;">=</span> <span style="color:#b08000;">0xFF</span> <span style="color:#898887;"># type is int</span>
-    c<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">uint8</span> <span style="color:#898887;">=</span> <span style="color:#b08000;">256</span> <span style="color:#898887;"># Compile time error</span>
-<span style="font-weight:bold;">let</span>
-    a<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">int</span> <span style="color:#898887;">=</span> <span style="color:#b08000;">2</span>
-    b<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">int</span> <span style="color:#898887;">=</span> <span style="color:#b08000;">4</span>
-<span style="font-weight:bold;">echo</span> <span style="color:#b08000;">4</span><span style="color:#898887;">/</span><span style="color:#b08000;">2</span>
-
-<span style="color:#898887;"># Types Aliases</span>
-<span style="font-weight:bold;">type</span>
-    <span style="color:#0057ae;">MyInteger</span><span style="color:#898887;">*</span> <span style="color:#898887;">=</span> <span style="color:#0057ae;">int</span>
-
-<span style="font-weight:bold;">let</span> a<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">int</span> <span style="color:#898887;">=</span> <span style="color:#b08000;">2</span>
-<span style="font-weight:bold;">discard</span> a <span style="color:#898887;">+</span> <span style="color:#0057ae;">MyInteger</span><span style="font-weight:bold;">(</span><span style="color:#b08000;">4</span><span style="font-weight:bold;">)</span>
-
-<span style="color:#898887;"># Objects</span>
-<span style="font-weight:bold;">type</span>
-    <span style="color:#0057ae;">Animal</span><span style="color:#898887;">*</span> <span style="color:#898887;">=</span> <span style="font-weight:bold;">object</span>
-        name<span style="color:#898887;">*</span><span style="font-weight:bold;">,</span> species<span style="color:#898887;">*</span><span style="font-weight:bold;">:</span> <span style="color:#0057ae;">string</span>
-        age<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">int</span>
-
-<span style="font-weight:bold;">proc</span> <span style="color:#bf0303;font-weight:bold;">sleep</span><span style="color:#898887;">*</span><span style="font-weight:bold;">(</span>a<span style="font-weight:bold;">:</span> <span style="font-weight:bold;">var</span> <span style="color:#0057ae;">Animal</span><span style="font-weight:bold;">)</span> <span style="color:#898887;">=</span>
-    a<span style="font-weight:bold;">.</span><span style="color:#0057ae;">age</span> <span style="color:#898887;">+=</span> <span style="color:#b08000;">1</span>
-
-<span style="font-weight:bold;">proc</span> <span style="color:#bf0303;font-weight:bold;">dead</span><span style="color:#898887;">*</span><span style="font-weight:bold;">(</span>a<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">Animal</span><span style="font-weight:bold;">):</span> <span style="color:#0057ae;">bool</span> <span style="color:#898887;">=</span>
-    <span style="color:#006e28;">result</span> <span style="color:#898887;">=</span> a<span style="font-weight:bold;">.</span><span style="color:#0057ae;">age</span> <span style="color:#898887;">&gt;</span> <span style="color:#b08000;">20</span>
-
-<span style="font-weight:bold;">var</span> carl<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">Animal</span>
-carl <span style="color:#898887;">=</span> <span style="color:#0057ae;">Animal</span><span style="font-weight:bold;">(</span><span style="color:#644a9b;">name</span> <span style="font-weight:bold;">:</span> <span style="color:#bf0303;">&quot;Carl&quot;</span><span style="font-weight:bold;">,</span>
-              <span style="color:#644a9b;">species</span> <span style="font-weight:bold;">:</span> <span style="color:#bf0303;">&quot;L. glama&quot;</span><span style="font-weight:bold;">,</span>
-              <span style="color:#644a9b;">age</span> <span style="font-weight:bold;">:</span> <span style="color:#b08000;">12</span><span style="font-weight:bold;">)</span>
-
-<span style="font-weight:bold;">let</span> joe <span style="color:#898887;">=</span> <span style="color:#0057ae;">Animal</span><span style="font-weight:bold;">(</span><span style="color:#644a9b;">name</span> <span style="font-weight:bold;">:</span> <span style="color:#bf0303;">&quot;Joe&quot;</span><span style="font-weight:bold;">,</span>
-                 <span style="color:#644a9b;">species</span> <span style="font-weight:bold;">:</span> <span style="color:#bf0303;">&quot;H. sapiens&quot;</span><span style="font-weight:bold;">,</span>
-                 <span style="color:#644a9b;">age</span> <span style="font-weight:bold;">:</span> <span style="color:#b08000;">23</span><span style="font-weight:bold;">)</span>
-
-<span style="font-weight:bold;">assert</span><span style="font-weight:bold;">(</span><span style="color:#898887;font-weight:bold;">not</span> carl<span style="font-weight:bold;">.</span><span style="color:#0057ae;">dead</span><span style="font-weight:bold;">)</span>
-<span style="font-weight:bold;">for</span> i <span style="color:#898887;font-weight:bold;">in</span> <span style="color:#b08000;">0</span><span style="font-weight:bold;">..</span><span style="color:#b08000;">10</span><span style="font-weight:bold;">:</span>
-    carl<span style="font-weight:bold;">.</span><span style="color:#644a9b;">sleep</span><span style="font-weight:bold;">()</span>
-<span style="font-weight:bold;">assert</span> carl<span style="font-weight:bold;">.</span><span style="color:#0057ae;">dead</span>
-
-<span style="color:#898887;"># Enums</span>
-<span style="font-weight:bold;">type</span>
-    <span style="color:#0057ae;">CompassDirections</span> <span style="color:#898887;">=</span> <span style="font-weight:bold;">enum</span>
-        cdNorth<span style="font-weight:bold;">,</span> cdEast<span style="font-weight:bold;">,</span> cdSouth<span style="font-weight:bold;">,</span> cdWest
-
-    <span style="color:#0057ae;">Colors</span> <span style="color:#0057ae;">{.pure.}</span> <span style="color:#898887;">=</span> <span style="font-weight:bold;">enum</span>
-        <span style="color:#0057ae;">Red</span> <span style="color:#898887;">=</span> <span style="color:#bf0303;">&quot;FF0000&quot;</span><span style="font-weight:bold;">,</span> <span style="color:#0057ae;">Green</span> <span style="color:#898887;">=</span> <span style="font-weight:bold;">(</span><span style="color:#b08000;">1</span><span style="font-weight:bold;">,</span> <span style="color:#bf0303;">&quot;00FF00&quot;</span><span style="font-weight:bold;">),</span> <span style="color:#0057ae;">Blue</span> <span style="color:#898887;">=</span> <span style="color:#bf0303;">&quot;0000FF&quot;</span>
-
-    <span style="color:#0057ae;">Signals</span> <span style="color:#898887;">=</span> <span style="font-weight:bold;">enum</span>
-        sigQuit <span style="color:#898887;">=</span> <span style="color:#b08000;">3</span><span style="font-weight:bold;">,</span> sigAbort <span style="color:#898887;">=</span> <span style="color:#b08000;">6</span><span style="font-weight:bold;">,</span> sigKill <span style="color:#898887;">=</span> <span style="color:#b08000;">9</span>
-
-<span style="color:#898887;"># Distinct Types</span>
-<span style="font-weight:bold;">type</span>
-    <span style="color:#0057ae;">Dollars</span><span style="color:#898887;">*</span> <span style="color:#898887;">=</span> <span style="color:#0057ae;">distinct</span> <span style="color:#0057ae;">float</span>
-
-<span style="font-weight:bold;">var</span> a <span style="color:#898887;">=</span> <span style="color:#b08000;">20.</span><span style="color:#0057ae;">Dollars</span>
-a <span style="color:#898887;">=</span> <span style="color:#b08000;">25</span>  <span style="color:#898887;"># Doesn't compile</span>
-a <span style="color:#898887;">=</span> <span style="color:#b08000;">25.</span><span style="color:#0057ae;">Dollars</span>  <span style="color:#898887;"># Works fine</span>
-
-<span style="color:#898887;"># Strings</span>
-<span style="font-weight:bold;">echo</span> <span style="color:#bf0303;">&quot;words words words ⚑&quot;</span>
-<span style="font-weight:bold;">echo</span> <span style="color:#bf0303;">&quot;&quot;&quot;</span>
-<span style="color:#bf0303;">&lt;html&gt;</span>
-<span style="color:#bf0303;">  &lt;head&gt;</span>
-<span style="color:#bf0303;">  &lt;/head&gt;\n\n</span>
-
-<span style="color:#bf0303;">  &lt;body&gt;</span>
-<span style="color:#bf0303;">  &lt;/body&gt;</span>
-<span style="color:#bf0303;">&lt;/html&gt; &quot;&quot;&quot;</span>
-
-<span style="font-weight:bold;">proc</span> <span style="color:#bf0303;font-weight:bold;">re</span><span style="font-weight:bold;">(</span>s<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">string</span><span style="font-weight:bold;">):</span> <span style="color:#0057ae;">string</span> <span style="color:#898887;">=</span> s
-
-<span style="font-weight:bold;">echo</span> <span style="color:#bf0303;">r&quot;.</span><span style="color:#3daee9;">&quot;&quot;</span><span style="color:#bf0303;">.\s\&quot;</span>      <span style="color:#898887;"># Raw string</span>
-<span style="font-weight:bold;">echo</span> <span style="color:#bf0303;">re&quot;</span><span style="color:#3daee9;">\b</span><span style="color:#3daee9;">[a-z]</span><span style="color:#3daee9;">++\b</span><span style="color:#bf0303;">&quot;</span> <span style="color:#898887;"># Regular expression</span>
-<span style="font-weight:bold;">echo</span> <span style="color:#644a9b;">function</span><span style="color:#bf0303;">&quot;text&quot;</span>  <span style="color:#898887;"># Tagged string</span>
-
-<span style="color:#898887;"># Arrays</span>
-<span style="font-weight:bold;">type</span>
-    <span style="color:#0057ae;">ThreeStringAddress</span> <span style="color:#898887;">=</span> <span style="color:#0057ae;">array</span><span style="font-weight:bold;">[</span><span style="color:#b08000;">3</span><span style="font-weight:bold;">,</span> <span style="color:#0057ae;">string</span><span style="font-weight:bold;">]</span>
-<span style="font-weight:bold;">let</span> names<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">ThreeStringAddress</span> <span style="color:#898887;">=</span> <span style="font-weight:bold;">[</span><span style="color:#bf0303;">&quot;Jasmine&quot;</span><span style="font-weight:bold;">,</span> <span style="color:#bf0303;">&quot;Ktisztina&quot;</span><span style="font-weight:bold;">,</span> <span style="color:#bf0303;">&quot;Kristof&quot;</span><span style="font-weight:bold;">]</span>
-<span style="font-weight:bold;">let</span> addresses<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">ThreeStringAddress</span> <span style="color:#898887;">=</span> <span style="font-weight:bold;">[</span><span style="color:#bf0303;">&quot;101 Betburweg&quot;</span><span style="font-weight:bold;">,</span> <span style="color:#bf0303;">&quot;66 Bellion Drive&quot;</span><span style="font-weight:bold;">,</span> <span style="color:#bf0303;">&quot;194 Laarderweg&quot;</span><span style="font-weight:bold;">]</span>
-
-<span style="font-weight:bold;">type</span>
-    <span style="color:#0057ae;">Matrix</span><span style="font-weight:bold;">[</span><span style="color:#0057ae;">W</span><span style="font-weight:bold;">,</span> <span style="color:#0057ae;">H</span><span style="font-weight:bold;">:</span> <span style="color:#0057ae;">static</span><span style="font-weight:bold;">[</span><span style="color:#0057ae;">int</span><span style="font-weight:bold;">]]</span> <span style="color:#898887;">=</span>
-        <span style="color:#0057ae;">array</span><span style="font-weight:bold;">[</span><span style="color:#b08000;">1</span><span style="font-weight:bold;">..</span><span style="color:#0057ae;">W</span><span style="font-weight:bold;">,</span> <span style="color:#0057ae;">array</span><span style="font-weight:bold;">[</span><span style="color:#b08000;">1</span><span style="font-weight:bold;">..</span><span style="color:#0057ae;">H</span><span style="font-weight:bold;">,</span> <span style="color:#0057ae;">int</span><span style="font-weight:bold;">]]</span>
-
-<span style="font-weight:bold;">let</span> mat1<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">Matrix</span><span style="font-weight:bold;">[</span><span style="color:#b08000;">2</span><span style="font-weight:bold;">,</span> <span style="color:#b08000;">2</span><span style="font-weight:bold;">]</span> <span style="color:#898887;">=</span> <span style="font-weight:bold;">[[</span><span style="color:#b08000;">1</span><span style="font-weight:bold;">,</span> <span style="color:#b08000;">0</span><span style="font-weight:bold;">],</span>
-                          <span style="font-weight:bold;">[</span><span style="color:#b08000;">0</span><span style="font-weight:bold;">,</span> <span style="color:#b08000;">1</span><span style="font-weight:bold;">]]</span>
-<span style="font-weight:bold;">let</span> mat2<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">Matrix</span><span style="font-weight:bold;">[</span><span style="color:#b08000;">2</span><span style="font-weight:bold;">,</span> <span style="color:#b08000;">2</span><span style="font-weight:bold;">]</span> <span style="color:#898887;">=</span> <span style="font-weight:bold;">[[</span><span style="color:#b08000;">0</span><span style="font-weight:bold;">,</span> <span style="color:#b08000;">1</span><span style="font-weight:bold;">],</span>
-                          <span style="font-weight:bold;">[</span><span style="color:#b08000;">1</span><span style="font-weight:bold;">,</span> <span style="color:#b08000;">0</span><span style="font-weight:bold;">]]</span>
-
-<span style="font-weight:bold;">proc</span> <span style="color:#bf0303;font-weight:bold;">`+`</span><span style="font-weight:bold;">[</span><span style="color:#0057ae;">W</span><span style="font-weight:bold;">,</span> <span style="color:#0057ae;">H</span><span style="font-weight:bold;">](</span>a<span style="font-weight:bold;">,</span> b<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">Matrix</span><span style="font-weight:bold;">[</span><span style="color:#0057ae;">W</span><span style="font-weight:bold;">,</span> <span style="color:#0057ae;">H</span><span style="font-weight:bold;">]):</span>
-    <span style="color:#0057ae;">Matrix</span><span style="font-weight:bold;">[</span><span style="color:#0057ae;">W</span><span style="font-weight:bold;">,</span> <span style="color:#0057ae;">H</span><span style="font-weight:bold;">]</span> <span style="color:#898887;">=</span>
-        <span style="font-weight:bold;">for</span> i <span style="color:#898887;font-weight:bold;">in</span> <span style="color:#b08000;">1</span><span style="font-weight:bold;">..</span><span style="color:#644a9b;">high</span><span style="font-weight:bold;">(</span>a<span style="font-weight:bold;">):</span>
-            <span style="font-weight:bold;">for</span> j <span style="color:#898887;font-weight:bold;">in</span> <span style="color:#b08000;">1</span><span style="font-weight:bold;">..</span><span style="color:#644a9b;">high</span><span style="font-weight:bold;">(</span>a<span style="font-weight:bold;">[</span><span style="color:#b08000;">0</span><span style="font-weight:bold;">]):</span>
-                <span style="color:#006e28;">result</span><span style="font-weight:bold;">[</span>i<span style="font-weight:bold;">][</span>j<span style="font-weight:bold;">]</span> <span style="color:#898887;">=</span> a<span style="font-weight:bold;">[</span>i<span style="font-weight:bold;">][</span>j<span style="font-weight:bold;">]</span> <span style="color:#898887;">+</span> b<span style="font-weight:bold;">[</span>i<span style="font-weight:bold;">][</span>j<span style="font-weight:bold;">]</span>
-
-<span style="color:#898887;"># Seqs</span>
-<span style="font-weight:bold;">var</span>
-    a <span style="color:#898887;">=</span> <span style="color:#898887;">@</span><span style="font-weight:bold;">[</span><span style="color:#b08000;">1</span><span style="font-weight:bold;">,</span> <span style="color:#b08000;">2</span><span style="font-weight:bold;">,</span> <span style="color:#b08000;">3</span><span style="font-weight:bold;">]</span>
-    b <span style="color:#898887;">=</span> <span style="color:#644a9b;">newSeq</span><span style="font-weight:bold;">[</span><span style="color:#0057ae;">int</span><span style="font-weight:bold;">](</span><span style="color:#b08000;">3</span><span style="font-weight:bold;">)</span>
-
-<span style="font-weight:bold;">for</span> i<span style="font-weight:bold;">,</span> v <span style="color:#898887;font-weight:bold;">in</span> a<span style="font-weight:bold;">:</span>
-    b<span style="font-weight:bold;">[</span>i<span style="font-weight:bold;">]</span> <span style="color:#898887;">=</span> v<span style="color:#898887;">*</span>v
-
-<span style="font-weight:bold;">for</span> i <span style="color:#898887;font-weight:bold;">in</span> <span style="color:#b08000;">4</span><span style="font-weight:bold;">..</span><span style="color:#b08000;">100</span><span style="font-weight:bold;">:</span>
-    b<span style="font-weight:bold;">.</span><span style="color:#644a9b;">add</span><span style="font-weight:bold;">(</span>i <span style="color:#898887;">*</span> i<span style="font-weight:bold;">)</span>
-
-b<span style="font-weight:bold;">.</span><span style="color:#644a9b;">delete</span><span style="font-weight:bold;">(</span><span style="color:#b08000;">0</span><span style="font-weight:bold;">)</span>  <span style="color:#898887;"># takes O(n) time</span>
-b <span style="color:#898887;">=</span> a<span style="font-weight:bold;">[</span><span style="color:#b08000;">0</span><span style="font-weight:bold;">]</span> <span style="color:#898887;">&amp;</span> <span style="color:#644a9b;">b </span> <span style="color:#898887;"># Same as original b</span>
-
-<span style="color:#898887;"># JSON</span>
-<span style="font-weight:bold;">import</span> json
-
-<span style="font-weight:bold;">let</span> element <span style="color:#898887;">=</span> <span style="color:#bf0303;">&quot;Hydrogen&quot;</span>
-<span style="font-weight:bold;">let</span> atomicNumber <span style="color:#898887;">=</span> <span style="color:#b08000;">1</span>
-
-<span style="font-weight:bold;">let</span> jsonObject <span style="color:#898887;">=</span> <span style="color:#898887;">%*</span> <span style="font-weight:bold;">{</span><span style="color:#bf0303;">&quot;element&quot;</span><span style="font-weight:bold;">:</span> element<span style="font-weight:bold;">,</span> <span style="color:#bf0303;">&quot;atomicNumber&quot;</span><span style="font-weight:bold;">:</span> atomicNumber<span style="font-weight:bold;">}</span>
-<span style="color:#898887;"># This will print {&quot;element&quot;:&quot;Hydrogen&quot;, &quot;atomicNumber&quot;: 1}</span>
-<span style="font-weight:bold;">echo</span> <span style="color:#898887;">$</span>jsonObject
-
-<span style="color:#898887;"># We start with a string representation of a JSON object</span>
-<span style="font-weight:bold;">let</span> jsonObject <span style="color:#898887;">=</span> <span style="color:#bf0303;">&quot;&quot;&quot;{&quot;name&quot;: &quot;Sky&quot;, &quot;age&quot;: 32}&quot;&quot;&quot;</span>
-<span style="font-weight:bold;">let</span> jsonArray <span style="color:#898887;">=</span> <span style="color:#bf0303;">&quot;&quot;&quot;[7, 8, 9]&quot;&quot;&quot;</span>
-
-<span style="font-weight:bold;">let</span> parsedObject <span style="color:#898887;">=</span> <span style="color:#644a9b;">parseJson</span><span style="font-weight:bold;">(</span>jsonObject<span style="font-weight:bold;">)</span>
-<span style="font-weight:bold;">let</span> name <span style="color:#898887;">=</span> parsedObject<span style="font-weight:bold;">[</span><span style="color:#bf0303;">&quot;name&quot;</span><span style="font-weight:bold;">].</span><span style="color:#644a9b;">getStr</span><span style="font-weight:bold;">()</span>
-<span style="color:#898887;"># This will print Sky</span>
-<span style="font-weight:bold;">echo</span> name
-
-<span style="font-weight:bold;">let</span> parsedArray <span style="color:#898887;">=</span> <span style="color:#644a9b;">parseJson</span><span style="font-weight:bold;">(</span>jsonArray<span style="font-weight:bold;">)</span>
-<span style="font-weight:bold;">let</span> eight <span style="color:#898887;">=</span> parsedArray<span style="font-weight:bold;">[</span><span style="color:#b08000;">1</span><span style="font-weight:bold;">].</span><span style="color:#644a9b;">getInt</span><span style="font-weight:bold;">()</span>
-<span style="color:#898887;"># This will print 8</span>
-<span style="font-weight:bold;">echo</span> eight
-
-<span style="color:#898887;"># First we'll define our types</span>
-<span style="font-weight:bold;">type</span>
-    <span style="color:#0057ae;">Element</span> <span style="color:#898887;">=</span> <span style="font-weight:bold;">object</span>
-        name<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">string</span>
-        atomicNumber<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">int</span>
-
-<span style="color:#898887;"># Let's say this is the JSON we want to convert</span>
-<span style="font-weight:bold;">let</span> jsonObject <span style="color:#898887;">=</span> <span style="color:#644a9b;">parseJson</span><span style="font-weight:bold;">(</span><span style="color:#bf0303;">&quot;&quot;&quot;{&quot;name&quot;: &quot;Carbon&quot;, &quot;atomicNumber&quot;: 6}&quot;&quot;&quot;</span><span style="font-weight:bold;">)</span>
-
-<span style="font-weight:bold;">let</span> element <span style="color:#898887;">=</span> <span style="color:#644a9b;">to</span><span style="font-weight:bold;">(</span>jsonObject<span style="font-weight:bold;">,</span> <span style="color:#0057ae;">Element</span><span style="font-weight:bold;">)</span>
-<span style="color:#898887;"># This will print Carbon</span>
-<span style="font-weight:bold;">echo</span> element<span style="font-weight:bold;">.</span><span style="color:#0057ae;">name</span>
-<span style="color:#898887;"># This will print 6</span>
-<span style="font-weight:bold;">echo</span> element<span style="font-weight:bold;">.</span><span style="color:#0057ae;">atomicNumber</span>
-
-<span style="color:#898887;"># Object Oriented Programming</span>
-<span style="font-weight:bold;">type</span> <span style="color:#0057ae;font-weight:bold;">Animal</span> <span style="color:#898887;">=</span> <span style="color:#0057ae;">ref</span> <span style="font-weight:bold;">object</span> <span style="color:#898887;font-weight:bold;">of</span> <span style="color:#0057ae;">RootObj</span>
-    name<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">string</span>
-    age<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">int</span>
-<span style="font-weight:bold;">method</span> <span style="color:#bf0303;font-weight:bold;">vocalize</span><span style="font-weight:bold;">(</span>this<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">Animal</span><span style="font-weight:bold;">):</span> <span style="color:#0057ae;">string</span> <span style="color:#0057ae;">{.base.}</span> <span style="color:#898887;">=</span> <span style="color:#bf0303;">&quot;...&quot;</span>
-<span style="font-weight:bold;">method</span> <span style="color:#bf0303;font-weight:bold;">ageHumanYrs</span><span style="font-weight:bold;">(</span>this<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">Animal</span><span style="font-weight:bold;">):</span> <span style="color:#0057ae;">int</span> <span style="color:#0057ae;">{.base.}</span> <span style="color:#898887;">=</span> this<span style="font-weight:bold;">.</span><span style="color:#0057ae;">age</span>
-
-<span style="font-weight:bold;">type</span> <span style="color:#0057ae;font-weight:bold;">Dog</span> <span style="color:#898887;">=</span> <span style="color:#0057ae;">ref</span> <span style="font-weight:bold;">object</span> <span style="color:#898887;font-weight:bold;">of</span> <span style="color:#0057ae;">Animal</span>
-<span style="font-weight:bold;">method</span> <span style="color:#bf0303;font-weight:bold;">vocalize</span><span style="font-weight:bold;">(</span>this<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">Dog</span><span style="font-weight:bold;">):</span> <span style="color:#0057ae;">string</span> <span style="color:#898887;">=</span> <span style="color:#bf0303;">&quot;woof&quot;</span>
-<span style="font-weight:bold;">method</span> <span style="color:#bf0303;font-weight:bold;">ageHumanYrs</span><span style="font-weight:bold;">(</span>this<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">Dog</span><span style="font-weight:bold;">):</span> <span style="color:#0057ae;">int</span> <span style="color:#898887;">=</span> this<span style="font-weight:bold;">.</span><span style="color:#0057ae;">age</span> <span style="color:#898887;">*</span> <span style="color:#b08000;">7</span>
-
-<span style="font-weight:bold;">type</span> <span style="color:#0057ae;font-weight:bold;">Cat</span> <span style="color:#898887;">=</span> <span style="color:#0057ae;">ref</span> <span style="font-weight:bold;">object</span> <span style="color:#898887;font-weight:bold;">of</span> <span style="color:#0057ae;">Animal</span>
-<span style="font-weight:bold;">method</span> <span style="color:#bf0303;font-weight:bold;">vocalize</span><span style="font-weight:bold;">(</span>this<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">Cat</span><span style="font-weight:bold;">):</span> <span style="color:#0057ae;">string</span> <span style="color:#898887;">=</span> <span style="color:#bf0303;">&quot;meow&quot;</span>
-
-<span style="font-weight:bold;">var</span> animals<span style="font-weight:bold;">:</span> <span style="color:#0057ae;">seq</span><span style="font-weight:bold;">[</span><span style="color:#0057ae;">Animal</span><span style="font-weight:bold;">]</span> <span style="color:#898887;">=</span> <span style="color:#898887;">@</span><span style="font-weight:bold;">[]</span>
-animals<span style="font-weight:bold;">.</span><span style="color:#644a9b;">add</span><span style="font-weight:bold;">(</span><span style="color:#0057ae;">Dog</span><span style="font-weight:bold;">(</span>name<span style="font-weight:bold;">:</span> <span style="color:#bf0303;">&quot;Sparky&quot;</span><span style="font-weight:bold;">,</span> age<span style="font-weight:bold;">:</span> <span style="color:#b08000;">10</span><span style="font-weight:bold;">))</span>
-animals<span style="font-weight:bold;">.</span><span style="color:#644a9b;">add</span><span style="font-weight:bold;">(</span><span style="color:#0057ae;">Cat</span><span style="font-weight:bold;">(</span>name<span style="font-weight:bold;">:</span> <span style="color:#bf0303;">&quot;Mitten&quot;</span><span style="font-weight:bold;">,</span> age<span style="font-weight:bold;">:</span> <span style="color:#b08000;">10</span><span style="font-weight:bold;">))</span>
-
-<span style="font-weight:bold;">for</span> a <span style="color:#898887;font-weight:bold;">in</span> animals<span style="font-weight:bold;">:</span>
-    <span style="font-weight:bold;">echo</span> a<span style="font-weight:bold;">.</span><span style="color:#644a9b;">vocalize</span><span style="font-weight:bold;">()</span>
-    <span style="font-weight:bold;">echo</span> a<span style="font-weight:bold;">.</span><span style="color:#644a9b;">ageHumanYrs</span><span style="font-weight:bold;">()</span>
-
-<span style="font-weight:bold;">let</span> slash <span style="color:#898887;">=</span> <span style="color:#bf0303;">&quot;</span><span style="color:#3daee9;">\\</span><span style="color:#bf0303;">&quot;</span>
+<span style="color:#898887"># Nim Sample file</span>
+<span style="color:#898887"># Obtained form: https://nim-by-example.github.io/</span>
+
+<span style="color:#898887"># Comment </span><span style="color:#e85848;background-color:#451e1a;font-weight:bold">ALERT</span><span style="color:#898887"> </span><span style="color:#81ca2d;background-color:#f7e6e6;font-weight:bold">NOTE</span><span style="color:#898887"> </span><span style="color:#ca9219;background-color:#451e1a;font-weight:bold">FIXME</span>
+<span style="color:#898887">#[ Multi-line</span>
+<span style="color:#898887">comment ]#</span>
+
+<span style="color:#607880">## Documentation comment</span>
+<span style="color:#607880">##[ Multi-line</span>
+<span style="color:#607880">    documentation comment ]##</span>
+
+<span style="font-weight:bold">import</span> strformat
+
+<span style="font-weight:bold">type</span>
+    <span style="color:#0057ae">Person</span> <span style="color:#898887">=</span> <span style="font-weight:bold">object</span>
+        name<span style="font-weight:bold">:</span> <span style="color:#0057ae">string</span>
+        age<span style="font-weight:bold">:</span> <span style="color:#0057ae">Natural</span> <span style="color:#898887"># Ensures the age is positive</span>
+
+<span style="font-weight:bold">let</span> people <span style="color:#898887">=</span> <span style="font-weight:bold">[</span>
+    <span style="color:#0057ae">Person</span><span style="font-weight:bold">(</span>name<span style="font-weight:bold">:</span> <span style="color:#bf0303">"John"</span><span style="font-weight:bold">,</span> age<span style="font-weight:bold">:</span> <span style="color:#b08000">45</span><span style="font-weight:bold">),</span>
+    <span style="color:#0057ae">Person</span><span style="font-weight:bold">(</span>name<span style="font-weight:bold">:</span> <span style="color:#bf0303">"Kate"</span><span style="font-weight:bold">,</span> age<span style="font-weight:bold">:</span> <span style="color:#b08000">30</span><span style="font-weight:bold">)</span>
+<span style="font-weight:bold">]</span>
+
+<span style="font-weight:bold">for</span> person <span style="color:#898887;font-weight:bold">in</span> people<span style="font-weight:bold">:</span>
+    <span style="color:#898887"># Type-safe string interpolation,</span>
+    <span style="color:#898887"># evaluated at compile time.</span>
+    <span style="font-weight:bold">echo</span><span style="font-weight:bold">(</span><span style="color:#644a9b">fmt</span><span style="color:#bf0303">"{person.name} is {person.age} years old"</span><span style="font-weight:bold">)</span>
+
+<span style="color:#898887"># Thanks to Nim's 'iterator' and 'yield' constructs,</span>
+<span style="color:#898887"># iterators are as easy to write as ordinary</span>
+<span style="color:#898887"># functions. They are compiled to inline loops.</span>
+<span style="font-weight:bold">iterator</span> <span style="color:#bf0303;font-weight:bold">oddNumbers</span><span style="font-weight:bold">[</span><span style="color:#0057ae">Idx</span><span style="font-weight:bold">,</span> <span style="color:#0057ae">T</span><span style="font-weight:bold">](</span>a<span style="font-weight:bold">:</span> <span style="color:#0057ae">array</span><span style="font-weight:bold">[</span><span style="color:#0057ae">Idx</span><span style="font-weight:bold">,</span> <span style="color:#0057ae">T</span><span style="font-weight:bold">]):</span> <span style="color:#0057ae">T</span> <span style="color:#898887">=</span>
+    <span style="font-weight:bold">for</span> x <span style="color:#898887;font-weight:bold">in</span> a<span style="font-weight:bold">:</span>
+        <span style="font-weight:bold">if</span> x <span style="color:#898887;font-weight:bold">mod</span> <span style="color:#b08000">2</span> <span style="color:#898887">==</span> <span style="color:#b08000">1</span><span style="font-weight:bold">:</span>
+            <span style="font-weight:bold">yield</span> x
+
+<span style="font-weight:bold">for</span> odd <span style="color:#898887;font-weight:bold">in</span> <span style="color:#644a9b">oddNumbers</span><span style="font-weight:bold">([</span><span style="color:#b08000">3</span><span style="font-weight:bold">,</span> <span style="color:#b08000">6</span><span style="font-weight:bold">,</span> <span style="color:#b08000">9</span><span style="font-weight:bold">,</span> <span style="color:#b08000">12</span><span style="font-weight:bold">,</span> <span style="color:#b08000">15</span><span style="font-weight:bold">,</span> <span style="color:#b08000">18</span><span style="font-weight:bold">]):</span>
+    <span style="font-weight:bold">echo</span> odd
+
+<span style="color:#898887"># Use Nim's macro system to transform a dense</span>
+<span style="color:#898887"># data-centric description of x86 instructions</span>
+<span style="color:#898887"># into lookup tables that are used by</span>
+<span style="color:#898887"># assemblers and JITs.</span>
+<span style="font-weight:bold">import</span> macros<span style="font-weight:bold">,</span> strutils
+
+<span style="font-weight:bold">macro</span> <span style="color:#bf0303;font-weight:bold">toLookupTable</span><span style="font-weight:bold">(</span>data<span style="font-weight:bold">:</span> <span style="color:#0057ae">static</span><span style="font-weight:bold">[</span><span style="color:#0057ae">string</span><span style="font-weight:bold">]):</span> <span style="color:#0057ae">untyped</span> <span style="color:#898887">=</span>
+    <span style="color:#006e28">result</span> <span style="color:#898887">=</span> <span style="color:#644a9b">newTree</span><span style="font-weight:bold">(</span>nnkBracket<span style="font-weight:bold">)</span>
+    <span style="font-weight:bold">for</span> w <span style="color:#898887;font-weight:bold">in</span> data<span style="font-weight:bold">.</span><span style="color:#644a9b">split</span><span style="font-weight:bold">(</span><span style="color:#924c9d">';'</span><span style="font-weight:bold">):</span>
+        <span style="color:#006e28">result</span><span style="font-weight:bold">.</span><span style="color:#0057ae">add</span> <span style="color:#644a9b">newLit</span><span style="font-weight:bold">(</span>w<span style="font-weight:bold">)</span>
+
+<span style="font-weight:bold">const</span>
+    data <span style="color:#898887">=</span> <span style="color:#bf0303">"mov;btc;cli;xor"</span>
+    opcodes <span style="color:#898887">=</span> <span style="color:#644a9b">toLookupTable</span><span style="font-weight:bold">(</span>data<span style="font-weight:bold">)</span>
+
+<span style="font-weight:bold">for</span> o <span style="color:#898887;font-weight:bold">in</span> opcodes<span style="font-weight:bold">:</span>
+    <span style="font-weight:bold">echo</span> o
+
+<span style="color:#898887"># Variables</span>
+<span style="font-weight:bold">proc</span> <span style="color:#bf0303;font-weight:bold">getAlphabet</span><span style="font-weight:bold">():</span> <span style="color:#0057ae">string</span> <span style="color:#898887">=</span>
+    <span style="font-weight:bold">var</span> accm <span style="color:#898887">=</span> <span style="color:#bf0303">""</span>
+    <span style="font-weight:bold">for</span> letter <span style="color:#898887;font-weight:bold">in</span> <span style="color:#924c9d">'a'</span><span style="font-weight:bold">..</span><span style="color:#924c9d">'z'</span><span style="font-weight:bold">:</span>  <span style="color:#898887"># see iterators</span>
+        accm<span style="font-weight:bold">.</span><span style="color:#644a9b">add</span><span style="font-weight:bold">(</span>letter<span style="font-weight:bold">)</span>
+    <span style="font-weight:bold">return</span> accm
+
+<span style="color:#898887"># Computed at compilation time</span>
+<span style="font-weight:bold">const</span> alphabet <span style="color:#898887">=</span> <span style="color:#644a9b">getAlphabet</span><span style="font-weight:bold">()</span>
+
+<span style="color:#898887"># Mutable variables</span>
+<span style="font-weight:bold">var</span>
+    a <span style="color:#898887">=</span> <span style="color:#bf0303">"foo"</span>
+    b <span style="color:#898887">=</span> <span style="color:#b08000">0</span>
+    <span style="color:#898887"># Works fine, initialized to 0</span>
+    c<span style="font-weight:bold">:</span> <span style="color:#0057ae">int</span>
+
+<span style="color:#898887"># Immutable variables</span>
+<span style="font-weight:bold">let</span>
+    d <span style="color:#898887">=</span> <span style="color:#bf0303">"foo"</span>
+    e <span style="color:#898887">=</span> <span style="color:#b08000">5</span>
+    <span style="color:#898887"># Compile-time error, must be initialized at creation</span>
+    f<span style="font-weight:bold">:</span> <span style="color:#0057ae">float</span>
+
+<span style="color:#898887"># Works fine, `a` is mutable</span>
+a<span style="font-weight:bold">.</span><span style="color:#644a9b">add</span><span style="font-weight:bold">(</span><span style="color:#bf0303">"bar"</span><span style="font-weight:bold">)</span>
+b <span style="color:#898887">+=</span> <span style="color:#b08000">1</span>
+c <span style="color:#898887">=</span> <span style="color:#b08000">3</span>
+
+<span style="color:#898887"># Compile-time error, const cannot be modified at run-time</span>
+alphabet <span style="color:#898887">=</span> <span style="color:#bf0303">"abc"</span>
+
+<span style="color:#898887"># Compile-time error, `d` and `e` are immutable</span>
+d<span style="font-weight:bold">.</span><span style="color:#644a9b">add</span><span style="font-weight:bold">(</span><span style="color:#bf0303">"bar"</span><span style="font-weight:bold">)</span>
+e <span style="color:#898887">+=</span> <span style="color:#b08000">1</span>
+
+<span style="color:#898887"># Const</span>
+<span style="color:#0057ae">STRING_LITERAL</span><span style="font-weight:bold">(</span><span style="color:#0057ae">TMP129</span><span style="font-weight:bold">,</span> <span style="color:#bf0303">"abcdefghijklmnopqrstuvwxyz"</span><span style="font-weight:bold">,</span> <span style="color:#b08000">26</span><span style="font-weight:bold">);</span>
+
+<span style="color:#898887"># Loops</span>
+<span style="font-weight:bold">import</span> strutils<span style="font-weight:bold">,</span> random
+
+<span style="color:#644a9b">randomize</span><span style="font-weight:bold">()</span>
+<span style="font-weight:bold">let</span> answer <span style="color:#898887">=</span> <span style="color:#644a9b">random</span><span style="font-weight:bold">(</span><span style="color:#b08000">10</span><span style="font-weight:bold">)</span> <span style="color:#898887">+</span> <span style="color:#b08000">1</span>
+<span style="font-weight:bold">while</span> <span style="color:#aa5500;font-weight:bold">true</span><span style="font-weight:bold">:</span>
+    <span style="font-weight:bold">echo</span> <span style="color:#bf0303">"I have a number from 1 to 10, what is it? "</span>
+    <span style="font-weight:bold">let</span> guess <span style="color:#898887">=</span> <span style="color:#644a9b">parseInt</span><span style="font-weight:bold">(</span>stdin<span style="font-weight:bold">.</span><span style="color:#0057ae">readLine</span><span style="font-weight:bold">)</span>
+
+    <span style="font-weight:bold">if</span> guess <span style="color:#898887">&lt;</span> answer<span style="font-weight:bold">:</span>
+        <span style="font-weight:bold">echo</span> <span style="color:#bf0303">"Too low, try again"</span>
+    <span style="font-weight:bold">elif</span> guess <span style="color:#898887">></span> answer<span style="font-weight:bold">:</span>
+        <span style="font-weight:bold">echo</span> <span style="color:#bf0303">"Too high, try again"</span>
+    <span style="font-weight:bold">else</span><span style="font-weight:bold">:</span>
+        <span style="font-weight:bold">echo</span> <span style="color:#bf0303">"Correct!"</span>
+        <span style="font-weight:bold">break</span>
+
+<span style="font-weight:bold">block</span> busyloops<span style="font-weight:bold">:</span>
+    <span style="font-weight:bold">while</span> <span style="color:#aa5500;font-weight:bold">true</span><span style="font-weight:bold">:</span>
+        <span style="font-weight:bold">while</span> <span style="color:#aa5500;font-weight:bold">true</span><span style="font-weight:bold">:</span>
+        <span style="font-weight:bold">break</span> busyloops
+
+<span style="color:#898887"># Case Statements</span>
+<span style="font-weight:bold">case</span> <span style="color:#bf0303">"charlie"</span><span style="font-weight:bold">:</span>
+    <span style="color:#898887;font-weight:bold">of</span> <span style="color:#bf0303">"alfa"</span><span style="font-weight:bold">:</span>
+        <span style="font-weight:bold">echo</span> <span style="color:#bf0303">"A"</span>
+    <span style="color:#898887;font-weight:bold">of</span> <span style="color:#bf0303">"bravo"</span><span style="font-weight:bold">:</span>
+        <span style="font-weight:bold">echo</span> <span style="color:#bf0303">"B"</span>
+    <span style="color:#898887;font-weight:bold">of</span> <span style="color:#bf0303">"charlie"</span><span style="font-weight:bold">:</span>
+        <span style="font-weight:bold">echo</span> <span style="color:#bf0303">"C"</span>
+    <span style="font-weight:bold">else</span><span style="font-weight:bold">:</span>
+        <span style="font-weight:bold">echo</span> <span style="color:#bf0303">"Unrecognized letter"</span>
+
+<span style="font-weight:bold">case</span> <span style="color:#924c9d">'h'</span><span style="font-weight:bold">:</span>
+    <span style="color:#898887;font-weight:bold">of</span> <span style="color:#924c9d">'a'</span><span style="font-weight:bold">,</span> <span style="color:#924c9d">'e'</span><span style="font-weight:bold">,</span> <span style="color:#924c9d">'i'</span><span style="font-weight:bold">,</span> <span style="color:#924c9d">'o'</span><span style="font-weight:bold">,</span> <span style="color:#924c9d">'u'</span><span style="font-weight:bold">:</span>
+        <span style="font-weight:bold">echo</span> <span style="color:#bf0303">"Vowel"</span>
+    <span style="color:#898887;font-weight:bold">of</span> <span style="color:#924c9d">'\127'</span><span style="font-weight:bold">..</span><span style="color:#924c9d">'\255'</span><span style="font-weight:bold">:</span>
+        <span style="font-weight:bold">echo</span> <span style="color:#bf0303">"Unknown"</span>
+    <span style="font-weight:bold">else</span><span style="font-weight:bold">:</span>
+        <span style="font-weight:bold">echo</span> <span style="color:#bf0303">"Consonant"</span>
+
+<span style="font-weight:bold">proc</span> <span style="color:#bf0303;font-weight:bold">positiveOrNegative</span><span style="font-weight:bold">(</span>num<span style="font-weight:bold">:</span> <span style="color:#0057ae">int</span><span style="font-weight:bold">):</span> <span style="color:#0057ae">string</span> <span style="color:#898887">=</span>
+    <span style="color:#006e28">result</span> <span style="color:#898887">=</span> <span style="font-weight:bold">case</span> num<span style="font-weight:bold">:</span>
+        <span style="color:#898887;font-weight:bold">of</span> <span style="color:#644a9b">low</span><span style="font-weight:bold">(</span><span style="color:#0057ae">int</span><span style="font-weight:bold">)..</span> <span style="color:#898887">-</span><span style="color:#b08000">1</span><span style="font-weight:bold">:</span>
+            <span style="color:#bf0303">"negative"</span>
+        <span style="color:#898887;font-weight:bold">of</span> <span style="color:#b08000">0</span><span style="font-weight:bold">:</span>
+            <span style="color:#bf0303">"zero"</span>
+        <span style="color:#898887;font-weight:bold">of</span> <span style="color:#b08000">1</span><span style="font-weight:bold">..</span><span style="color:#644a9b">high</span><span style="font-weight:bold">(</span><span style="color:#0057ae">int</span><span style="font-weight:bold">):</span>
+            <span style="color:#bf0303">"positive"</span>
+        <span style="font-weight:bold">else</span><span style="font-weight:bold">:</span>
+            <span style="color:#bf0303">"impossible"</span>
+
+<span style="font-weight:bold">echo</span> <span style="color:#644a9b">positiveOrNegative</span><span style="font-weight:bold">(</span><span style="color:#898887">-</span><span style="color:#b08000">1</span><span style="font-weight:bold">)</span>
+
+<span style="color:#898887"># items and pairs</span>
+<span style="font-weight:bold">type</span>
+    <span style="color:#0057ae">CustomRange</span> <span style="color:#898887">=</span> <span style="font-weight:bold">object</span>
+        low<span style="font-weight:bold">:</span> <span style="color:#0057ae">int</span>
+        high<span style="font-weight:bold">:</span> <span style="color:#0057ae">int</span>
+
+<span style="font-weight:bold">iterator</span> <span style="color:#bf0303;font-weight:bold">items</span><span style="font-weight:bold">(</span>range<span style="font-weight:bold">:</span> <span style="color:#0057ae">CustomRange</span><span style="font-weight:bold">):</span> <span style="color:#0057ae">int</span> <span style="color:#898887">=</span>
+    <span style="font-weight:bold">var</span> i <span style="color:#898887">=</span> range<span style="font-weight:bold">.</span><span style="color:#0057ae">low</span>
+    <span style="font-weight:bold">while</span> i <span style="color:#898887">&lt;=</span> range<span style="font-weight:bold">.</span><span style="color:#0057ae">high</span><span style="font-weight:bold">:</span>
+        <span style="font-weight:bold">yield</span> i
+        <span style="color:#644a9b">inc</span> i
+
+<span style="font-weight:bold">iterator</span> <span style="color:#bf0303;font-weight:bold">pairs</span><span style="font-weight:bold">(</span>range<span style="font-weight:bold">:</span> <span style="color:#0057ae">CustomRange</span><span style="font-weight:bold">):</span> <span style="color:#0057ae">tuple</span><span style="font-weight:bold">[</span>a<span style="font-weight:bold">:</span> <span style="color:#0057ae">int</span><span style="font-weight:bold">,</span> b<span style="font-weight:bold">:</span> <span style="color:#0057ae">char</span><span style="font-weight:bold">]</span> <span style="color:#898887">=</span>
+    <span style="font-weight:bold">for</span> i <span style="color:#898887;font-weight:bold">in</span> range<span style="font-weight:bold">:</span>  <span style="color:#898887"># uses CustomRange.items</span>
+        <span style="font-weight:bold">yield</span> <span style="font-weight:bold">(</span>i<span style="font-weight:bold">,</span> <span style="color:#0057ae">char</span><span style="font-weight:bold">(</span>i <span style="color:#898887">+</span> <span style="color:#644a9b">ord</span><span style="font-weight:bold">(</span><span style="color:#924c9d">'a'</span><span style="font-weight:bold">)))</span>
+
+<span style="font-weight:bold">for</span> i<span style="font-weight:bold">,</span> c <span style="color:#898887;font-weight:bold">in</span> <span style="color:#0057ae">CustomRange</span><span style="font-weight:bold">(</span>low<span style="font-weight:bold">:</span> <span style="color:#b08000">1</span><span style="font-weight:bold">,</span> high<span style="font-weight:bold">:</span> <span style="color:#b08000">3</span><span style="font-weight:bold">):</span>
+    <span style="font-weight:bold">echo</span> c
+
+<span style="color:#898887"># Operators</span>
+<span style="font-weight:bold">iterator</span> <span style="color:#bf0303;font-weight:bold">`...`</span><span style="color:#898887">*</span><span style="font-weight:bold">[</span><span style="color:#0057ae">T</span><span style="font-weight:bold">](</span>a<span style="font-weight:bold">:</span> <span style="color:#0057ae">T</span><span style="font-weight:bold">,</span> b<span style="font-weight:bold">:</span> <span style="color:#0057ae">T</span><span style="font-weight:bold">):</span> <span style="color:#0057ae">T</span> <span style="color:#898887">=</span>
+    <span style="font-weight:bold">var</span> res<span style="font-weight:bold">:</span> <span style="color:#0057ae">T</span> <span style="color:#898887">=</span> <span style="color:#0057ae">T</span><span style="font-weight:bold">(</span>a<span style="font-weight:bold">)</span>
+    <span style="font-weight:bold">while</span> res <span style="color:#898887">&lt;=</span> b<span style="font-weight:bold">:</span>
+        <span style="font-weight:bold">yield</span> res
+        <span style="color:#644a9b">inc</span> res
+
+<span style="font-weight:bold">for</span> i <span style="color:#898887;font-weight:bold">in</span> <span style="color:#b08000">0</span><span style="font-weight:bold">...</span><span style="color:#b08000">5</span><span style="font-weight:bold">:</span>
+    <span style="font-weight:bold">echo</span> i
+
+<span style="color:#898887"># Inline Iterators</span>
+<span style="font-weight:bold">iterator</span> <span style="color:#bf0303;font-weight:bold">countTo</span><span style="font-weight:bold">(</span>n<span style="font-weight:bold">:</span> <span style="color:#0057ae">int</span><span style="font-weight:bold">):</span> <span style="color:#0057ae">int</span> <span style="color:#898887">=</span>
+    <span style="font-weight:bold">var</span> i <span style="color:#898887">=</span> <span style="color:#b08000">0</span>
+    <span style="font-weight:bold">while</span> i <span style="color:#898887">&lt;=</span> n<span style="font-weight:bold">:</span>
+        <span style="font-weight:bold">yield</span> i
+        <span style="color:#644a9b">inc</span> i
+
+<span style="font-weight:bold">for</span> i <span style="color:#898887;font-weight:bold">in</span> <span style="color:#644a9b">countTo</span><span style="font-weight:bold">(</span><span style="color:#b08000">5</span><span style="font-weight:bold">):</span>
+    <span style="font-weight:bold">echo</span> i
+
+<span style="color:#898887"># Closure Iterators</span>
+<span style="font-weight:bold">proc</span> <span style="color:#bf0303;font-weight:bold">countTo</span><span style="font-weight:bold">(</span>n<span style="font-weight:bold">:</span> <span style="color:#0057ae">int</span><span style="font-weight:bold">):</span> <span style="font-weight:bold">iterator</span><span style="font-weight:bold">():</span> <span style="color:#0057ae">int</span> <span style="color:#898887">=</span>
+    <span style="font-weight:bold">return</span> <span style="font-weight:bold">iterator</span><span style="font-weight:bold">():</span> <span style="color:#0057ae">int</span> <span style="color:#898887">=</span>
+        <span style="font-weight:bold">var</span> i <span style="color:#898887">=</span> <span style="color:#b08000">0</span>
+        <span style="font-weight:bold">while</span> i <span style="color:#898887">&lt;=</span> n<span style="font-weight:bold">:</span>
+            <span style="font-weight:bold">yield</span> i
+            <span style="color:#644a9b">inc</span> i
+
+<span style="font-weight:bold">let</span> countTo20 <span style="color:#898887">=</span> <span style="color:#644a9b">countTo</span><span style="font-weight:bold">(</span><span style="color:#b08000">20</span><span style="font-weight:bold">)</span>
+
+<span style="font-weight:bold">echo</span> <span style="color:#644a9b">countTo20</span><span style="font-weight:bold">()</span>
+
+<span style="font-weight:bold">var</span> output <span style="color:#898887">=</span> <span style="color:#bf0303">""</span>
+<span style="color:#898887"># Raw iterator usage:</span>
+<span style="font-weight:bold">while</span> <span style="color:#aa5500;font-weight:bold">true</span><span style="font-weight:bold">:</span>
+    <span style="color:#898887"># 1. grab an element</span>
+    <span style="font-weight:bold">let</span> next <span style="color:#898887">=</span> <span style="color:#644a9b">countTo20</span><span style="font-weight:bold">()</span>
+    <span style="color:#898887"># 2. Is the element bogus? It's the end of the loop, discard it</span>
+    <span style="font-weight:bold">if</span> <span style="color:#644a9b">finished</span><span style="font-weight:bold">(</span>countTo20<span style="font-weight:bold">):</span>
+        <span style="font-weight:bold">break</span>
+    <span style="color:#898887"># 3. Loop body goes here:</span>
+    output<span style="font-weight:bold">.</span><span style="color:#644a9b">add</span><span style="font-weight:bold">(</span><span style="color:#898887">$</span>next <span style="color:#898887">&amp;</span> <span style="color:#bf0303">" "</span><span style="font-weight:bold">)</span>
+
+<span style="font-weight:bold">echo</span> output
+
+output <span style="color:#898887">=</span> <span style="color:#bf0303">""</span>
+<span style="font-weight:bold">let</span> countTo9 <span style="color:#898887">=</span> <span style="color:#644a9b">countTo</span><span style="font-weight:bold">(</span><span style="color:#b08000">9</span><span style="font-weight:bold">)</span>
+<span style="font-weight:bold">for</span> i <span style="color:#898887;font-weight:bold">in</span> <span style="color:#644a9b">countTo9</span><span style="font-weight:bold">():</span>
+    output<span style="font-weight:bold">.</span><span style="color:#644a9b">add</span><span style="font-weight:bold">(</span><span style="color:#898887">$</span>i<span style="font-weight:bold">)</span>
+<span style="font-weight:bold">echo</span> output
+
+<span style="color:#898887"># Procs</span>
+<span style="font-weight:bold">proc</span> <span style="color:#bf0303;font-weight:bold">fibonacci</span><span style="font-weight:bold">(</span>n<span style="font-weight:bold">:</span> <span style="color:#0057ae">int</span><span style="font-weight:bold">):</span> <span style="color:#0057ae">int</span> <span style="color:#898887">=</span>
+    <span style="font-weight:bold">if</span> n <span style="color:#898887">&lt;</span> <span style="color:#b08000">2</span><span style="font-weight:bold">:</span>
+        <span style="color:#006e28">result</span> <span style="color:#898887">=</span> n
+    <span style="font-weight:bold">else</span><span style="font-weight:bold">:</span>
+        <span style="color:#006e28">result</span> <span style="color:#898887">=</span> <span style="color:#644a9b">fibonacci</span><span style="font-weight:bold">(</span>n <span style="color:#898887">-</span> <span style="color:#b08000">1</span><span style="font-weight:bold">)</span> <span style="color:#898887">+</span> <span style="font-weight:bold">(</span>n <span style="color:#898887">-</span> <span style="color:#b08000">2</span><span style="font-weight:bold">).</span><span style="color:#0057ae">fibonacci</span>
+
+<span style="color:#898887"># Operators</span>
+<span style="font-weight:bold">proc</span> <span style="color:#bf0303;font-weight:bold">`$`</span><span style="font-weight:bold">(</span>a<span style="font-weight:bold">:</span> <span style="color:#0057ae">array</span><span style="font-weight:bold">[</span><span style="color:#b08000">2</span><span style="font-weight:bold">,</span> <span style="color:#0057ae">array</span><span style="font-weight:bold">[</span><span style="color:#b08000">2</span><span style="font-weight:bold">,</span> <span style="color:#0057ae">int</span><span style="font-weight:bold">]]):</span> <span style="color:#0057ae">string</span> <span style="color:#898887">=</span>
+    <span style="color:#006e28">result</span> <span style="color:#898887">=</span> <span style="color:#bf0303">""</span>
+    <span style="font-weight:bold">for</span> v <span style="color:#898887;font-weight:bold">in</span> a<span style="font-weight:bold">:</span>
+        <span style="font-weight:bold">for</span> vx <span style="color:#898887;font-weight:bold">in</span> v<span style="font-weight:bold">:</span>
+            <span style="color:#006e28">result</span><span style="font-weight:bold">.</span><span style="color:#644a9b">add</span><span style="font-weight:bold">(</span><span style="color:#898887">$</span>vx <span style="color:#898887">&amp;</span> <span style="color:#bf0303">", "</span><span style="font-weight:bold">)</span>
+        <span style="color:#006e28">result</span><span style="font-weight:bold">.</span><span style="color:#644a9b">add</span><span style="font-weight:bold">(</span><span style="color:#bf0303">"</span><span style="color:#3daee9">\n</span><span style="color:#bf0303">"</span><span style="font-weight:bold">)</span>
+
+<span style="font-weight:bold">echo</span><span style="font-weight:bold">([[</span><span style="color:#b08000">1</span><span style="font-weight:bold">,</span> <span style="color:#b08000">2</span><span style="font-weight:bold">],</span> <span style="font-weight:bold">[</span><span style="color:#b08000">3</span><span style="font-weight:bold">,</span> <span style="color:#b08000">4</span><span style="font-weight:bold">]])</span>  <span style="color:#898887"># See varargs for</span>
+                        <span style="color:#898887"># how echo works</span>
+
+<span style="font-weight:bold">proc</span> <span style="color:#bf0303;font-weight:bold">`^&amp;*^@%`</span><span style="font-weight:bold">(</span>a<span style="font-weight:bold">,</span> b<span style="font-weight:bold">:</span> <span style="color:#0057ae">string</span><span style="font-weight:bold">):</span> <span style="color:#0057ae">string</span> <span style="color:#898887">=</span>
+    <span style="color:#607880">## A confusingly named useless operator</span>
+    <span style="color:#006e28">result</span> <span style="color:#898887">=</span> a<span style="font-weight:bold">[</span><span style="color:#b08000">0</span><span style="font-weight:bold">]</span> <span style="color:#898887">&amp;</span> b<span style="font-weight:bold">[</span><span style="color:#644a9b">high</span><span style="font-weight:bold">(</span>b<span style="font-weight:bold">)]</span>
+
+<span style="font-weight:bold">assert</span><span style="font-weight:bold">(</span><span style="color:#bf0303">"foo"</span> <span style="color:#898887">^&amp;*^@%</span> <span style="color:#bf0303">"bar"</span> <span style="color:#898887">==</span> <span style="color:#bf0303">"fr"</span><span style="font-weight:bold">)</span>
+
+<span style="color:#898887"># Generic Functions</span>
+<span style="color:#898887"># Not really good idea for obvious reasons</span>
+<span style="font-weight:bold">let</span> zero <span style="color:#898887">=</span> <span style="color:#bf0303">""</span>
+<span style="font-weight:bold">proc</span> <span style="color:#bf0303;font-weight:bold">`+`</span><span style="font-weight:bold">(</span>a<span style="font-weight:bold">,</span> b<span style="font-weight:bold">:</span> <span style="color:#0057ae">string</span><span style="font-weight:bold">):</span> <span style="color:#0057ae">string</span> <span style="color:#898887">=</span>
+    a <span style="color:#898887">&amp;</span> b
+
+<span style="font-weight:bold">proc</span> <span style="color:#bf0303;font-weight:bold">`*`</span><span style="font-weight:bold">[</span><span style="color:#0057ae">T</span><span style="font-weight:bold">](</span>a<span style="font-weight:bold">:</span> <span style="color:#0057ae">T</span><span style="font-weight:bold">,</span> b<span style="font-weight:bold">:</span> <span style="color:#0057ae">int</span><span style="font-weight:bold">):</span> <span style="color:#0057ae">T</span> <span style="color:#898887">=</span>
+    <span style="color:#006e28">result</span> <span style="color:#898887">=</span> zero
+    <span style="font-weight:bold">for</span> i <span style="color:#898887;font-weight:bold">in</span> <span style="color:#b08000">0</span><span style="font-weight:bold">..</span>b<span style="color:#898887">-</span><span style="color:#b08000">1</span><span style="font-weight:bold">:</span>
+        <span style="color:#006e28">result</span> <span style="color:#898887">=</span> <span style="color:#006e28">result</span> <span style="color:#898887">+</span> <span style="color:#644a9b">a </span> <span style="color:#898887"># calls `+` from line 3</span>
+
+<span style="font-weight:bold">assert</span><span style="font-weight:bold">(</span><span style="color:#bf0303">"a"</span> <span style="color:#898887">*</span> <span style="color:#b08000">10</span> <span style="color:#898887">==</span> <span style="color:#bf0303">"aaaaaaaaaa"</span><span style="font-weight:bold">)</span>
+
+<span style="color:#898887"># Blocks</span>
+<span style="font-weight:bold">block</span> outer<span style="font-weight:bold">:</span>
+    <span style="font-weight:bold">for</span> i <span style="color:#898887;font-weight:bold">in</span> <span style="color:#b08000">0</span><span style="font-weight:bold">..</span><span style="color:#b08000">2000</span><span style="font-weight:bold">:</span>
+        <span style="font-weight:bold">for</span> j <span style="color:#898887;font-weight:bold">in</span> <span style="color:#b08000">0</span><span style="font-weight:bold">..</span><span style="color:#b08000">2000</span><span style="font-weight:bold">:</span>
+            <span style="font-weight:bold">if</span> i<span style="color:#898887">+</span>j <span style="color:#898887">==</span> <span style="color:#b08000">3145</span><span style="font-weight:bold">:</span>
+                <span style="font-weight:bold">echo</span> i<span style="font-weight:bold">,</span> <span style="color:#bf0303">", "</span><span style="font-weight:bold">,</span> j
+                <span style="font-weight:bold">break</span> outer
+
+<span style="font-weight:bold">let</span> b <span style="color:#898887">=</span> <span style="color:#b08000">3</span>
+<span style="font-weight:bold">block</span><span style="font-weight:bold">:</span>
+    <span style="font-weight:bold">let</span> b <span style="color:#898887">=</span> <span style="color:#bf0303">"3"</span>  <span style="color:#898887"># shadowing is probably a dumb idea</span>
+
+<span style="color:#898887"># Primitive types</span>
+<span style="font-weight:bold">let</span>
+    a<span style="font-weight:bold">:</span> <span style="color:#0057ae">int8</span> <span style="color:#898887">=</span> <span style="color:#b08000">0x7F</span> <span style="color:#898887"># Works</span>
+    b<span style="font-weight:bold">:</span> <span style="color:#0057ae">uint8</span> <span style="color:#898887">=</span> <span style="color:#b08000">0b1111_1111</span> <span style="color:#898887"># Works</span>
+    d <span style="color:#898887">=</span> <span style="color:#b08000">0xFF</span> <span style="color:#898887"># type is int</span>
+    c<span style="font-weight:bold">:</span> <span style="color:#0057ae">uint8</span> <span style="color:#898887">=</span> <span style="color:#b08000">256</span> <span style="color:#898887"># Compile time error</span>
+<span style="font-weight:bold">let</span>
+    a<span style="font-weight:bold">:</span> <span style="color:#0057ae">int</span> <span style="color:#898887">=</span> <span style="color:#b08000">2</span>
+    b<span style="font-weight:bold">:</span> <span style="color:#0057ae">int</span> <span style="color:#898887">=</span> <span style="color:#b08000">4</span>
+<span style="font-weight:bold">echo</span> <span style="color:#b08000">4</span><span style="color:#898887">/</span><span style="color:#b08000">2</span>
+
+<span style="color:#898887"># Types Aliases</span>
+<span style="font-weight:bold">type</span>
+    <span style="color:#0057ae">MyInteger</span><span style="color:#898887">*</span> <span style="color:#898887">=</span> <span style="color:#0057ae">int</span>
+
+<span style="font-weight:bold">let</span> a<span style="font-weight:bold">:</span> <span style="color:#0057ae">int</span> <span style="color:#898887">=</span> <span style="color:#b08000">2</span>
+<span style="font-weight:bold">discard</span> a <span style="color:#898887">+</span> <span style="color:#0057ae">MyInteger</span><span style="font-weight:bold">(</span><span style="color:#b08000">4</span><span style="font-weight:bold">)</span>
+
+<span style="color:#898887"># Objects</span>
+<span style="font-weight:bold">type</span>
+    <span style="color:#0057ae">Animal</span><span style="color:#898887">*</span> <span style="color:#898887">=</span> <span style="font-weight:bold">object</span>
+        name<span style="color:#898887">*</span><span style="font-weight:bold">,</span> species<span style="color:#898887">*</span><span style="font-weight:bold">:</span> <span style="color:#0057ae">string</span>
+        age<span style="font-weight:bold">:</span> <span style="color:#0057ae">int</span>
+
+<span style="font-weight:bold">proc</span> <span style="color:#bf0303;font-weight:bold">sleep</span><span style="color:#898887">*</span><span style="font-weight:bold">(</span>a<span style="font-weight:bold">:</span> <span style="font-weight:bold">var</span> <span style="color:#0057ae">Animal</span><span style="font-weight:bold">)</span> <span style="color:#898887">=</span>
+    a<span style="font-weight:bold">.</span><span style="color:#0057ae">age</span> <span style="color:#898887">+=</span> <span style="color:#b08000">1</span>
+
+<span style="font-weight:bold">proc</span> <span style="color:#bf0303;font-weight:bold">dead</span><span style="color:#898887">*</span><span style="font-weight:bold">(</span>a<span style="font-weight:bold">:</span> <span style="color:#0057ae">Animal</span><span style="font-weight:bold">):</span> <span style="color:#0057ae">bool</span> <span style="color:#898887">=</span>
+    <span style="color:#006e28">result</span> <span style="color:#898887">=</span> a<span style="font-weight:bold">.</span><span style="color:#0057ae">age</span> <span style="color:#898887">></span> <span style="color:#b08000">20</span>
+
+<span style="font-weight:bold">var</span> carl<span style="font-weight:bold">:</span> <span style="color:#0057ae">Animal</span>
+carl <span style="color:#898887">=</span> <span style="color:#0057ae">Animal</span><span style="font-weight:bold">(</span><span style="color:#644a9b">name</span> <span style="font-weight:bold">:</span> <span style="color:#bf0303">"Carl"</span><span style="font-weight:bold">,</span>
+              <span style="color:#644a9b">species</span> <span style="font-weight:bold">:</span> <span style="color:#bf0303">"L. glama"</span><span style="font-weight:bold">,</span>
+              <span style="color:#644a9b">age</span> <span style="font-weight:bold">:</span> <span style="color:#b08000">12</span><span style="font-weight:bold">)</span>
+
+<span style="font-weight:bold">let</span> joe <span style="color:#898887">=</span> <span style="color:#0057ae">Animal</span><span style="font-weight:bold">(</span><span style="color:#644a9b">name</span> <span style="font-weight:bold">:</span> <span style="color:#bf0303">"Joe"</span><span style="font-weight:bold">,</span>
+                 <span style="color:#644a9b">species</span> <span style="font-weight:bold">:</span> <span style="color:#bf0303">"H. sapiens"</span><span style="font-weight:bold">,</span>
+                 <span style="color:#644a9b">age</span> <span style="font-weight:bold">:</span> <span style="color:#b08000">23</span><span style="font-weight:bold">)</span>
+
+<span style="font-weight:bold">assert</span><span style="font-weight:bold">(</span><span style="color:#898887;font-weight:bold">not</span> carl<span style="font-weight:bold">.</span><span style="color:#0057ae">dead</span><span style="font-weight:bold">)</span>
+<span style="font-weight:bold">for</span> i <span style="color:#898887;font-weight:bold">in</span> <span style="color:#b08000">0</span><span style="font-weight:bold">..</span><span style="color:#b08000">10</span><span style="font-weight:bold">:</span>
+    carl<span style="font-weight:bold">.</span><span style="color:#644a9b">sleep</span><span style="font-weight:bold">()</span>
+<span style="font-weight:bold">assert</span> carl<span style="font-weight:bold">.</span><span style="color:#0057ae">dead</span>
+
+<span style="color:#898887"># Enums</span>
+<span style="font-weight:bold">type</span>
+    <span style="color:#0057ae">CompassDirections</span> <span style="color:#898887">=</span> <span style="font-weight:bold">enum</span>
+        cdNorth<span style="font-weight:bold">,</span> cdEast<span style="font-weight:bold">,</span> cdSouth<span style="font-weight:bold">,</span> cdWest
+
+    <span style="color:#0057ae">Colors</span> <span style="color:#0057ae">{.pure.}</span> <span style="color:#898887">=</span> <span style="font-weight:bold">enum</span>
+        <span style="color:#0057ae">Red</span> <span style="color:#898887">=</span> <span style="color:#bf0303">"FF0000"</span><span style="font-weight:bold">,</span> <span style="color:#0057ae">Green</span> <span style="color:#898887">=</span> <span style="font-weight:bold">(</span><span style="color:#b08000">1</span><span style="font-weight:bold">,</span> <span style="color:#bf0303">"00FF00"</span><span style="font-weight:bold">),</span> <span style="color:#0057ae">Blue</span> <span style="color:#898887">=</span> <span style="color:#bf0303">"0000FF"</span>
+
+    <span style="color:#0057ae">Signals</span> <span style="color:#898887">=</span> <span style="font-weight:bold">enum</span>
+        sigQuit <span style="color:#898887">=</span> <span style="color:#b08000">3</span><span style="font-weight:bold">,</span> sigAbort <span style="color:#898887">=</span> <span style="color:#b08000">6</span><span style="font-weight:bold">,</span> sigKill <span style="color:#898887">=</span> <span style="color:#b08000">9</span>
+
+<span style="color:#898887"># Distinct Types</span>
+<span style="font-weight:bold">type</span>
+    <span style="color:#0057ae">Dollars</span><span style="color:#898887">*</span> <span style="color:#898887">=</span> <span style="color:#0057ae">distinct</span> <span style="color:#0057ae">float</span>
+
+<span style="font-weight:bold">var</span> a <span style="color:#898887">=</span> <span style="color:#b08000">20.</span><span style="color:#0057ae">Dollars</span>
+a <span style="color:#898887">=</span> <span style="color:#b08000">25</span>  <span style="color:#898887"># Doesn't compile</span>
+a <span style="color:#898887">=</span> <span style="color:#b08000">25.</span><span style="color:#0057ae">Dollars</span>  <span style="color:#898887"># Works fine</span>
+
+<span style="color:#898887"># Strings</span>
+<span style="font-weight:bold">echo</span> <span style="color:#bf0303">"words words words ⚑"</span>
+<span style="font-weight:bold">echo</span> <span style="color:#bf0303">"""</span>
+<span style="color:#bf0303">&lt;html></span>
+<span style="color:#bf0303">  &lt;head></span>
+<span style="color:#bf0303">  &lt;/head>\n\n</span>
+
+<span style="color:#bf0303">  &lt;body></span>
+<span style="color:#bf0303">  &lt;/body></span>
+<span style="color:#bf0303">&lt;/html> """</span>
+
+<span style="font-weight:bold">proc</span> <span style="color:#bf0303;font-weight:bold">re</span><span style="font-weight:bold">(</span>s<span style="font-weight:bold">:</span> <span style="color:#0057ae">string</span><span style="font-weight:bold">):</span> <span style="color:#0057ae">string</span> <span style="color:#898887">=</span> s
+
+<span style="font-weight:bold">echo</span> <span style="color:#bf0303">r".</span><span style="color:#3daee9">""</span><span style="color:#bf0303">.\s\"</span>      <span style="color:#898887"># Raw string</span>
+<span style="font-weight:bold">echo</span> <span style="color:#bf0303">re"</span><span style="color:#3daee9">\b</span><span style="color:#3daee9">[a-z]</span><span style="color:#3daee9">++\b</span><span style="color:#bf0303">"</span> <span style="color:#898887"># Regular expression</span>
+<span style="font-weight:bold">echo</span> <span style="color:#644a9b">function</span><span style="color:#bf0303">"text"</span>  <span style="color:#898887"># Tagged string</span>
+
+<span style="color:#898887"># Arrays</span>
+<span style="font-weight:bold">type</span>
+    <span style="color:#0057ae">ThreeStringAddress</span> <span style="color:#898887">=</span> <span style="color:#0057ae">array</span><span style="font-weight:bold">[</span><span style="color:#b08000">3</span><span style="font-weight:bold">,</span> <span style="color:#0057ae">string</span><span style="font-weight:bold">]</span>
+<span style="font-weight:bold">let</span> names<span style="font-weight:bold">:</span> <span style="color:#0057ae">ThreeStringAddress</span> <span style="color:#898887">=</span> <span style="font-weight:bold">[</span><span style="color:#bf0303">"Jasmine"</span><span style="font-weight:bold">,</span> <span style="color:#bf0303">"Ktisztina"</span><span style="font-weight:bold">,</span> <span style="color:#bf0303">"Kristof"</span><span style="font-weight:bold">]</span>
+<span style="font-weight:bold">let</span> addresses<span style="font-weight:bold">:</span> <span style="color:#0057ae">ThreeStringAddress</span> <span style="color:#898887">=</span> <span style="font-weight:bold">[</span><span style="color:#bf0303">"101 Betburweg"</span><span style="font-weight:bold">,</span> <span style="color:#bf0303">"66 Bellion Drive"</span><span style="font-weight:bold">,</span> <span style="color:#bf0303">"194 Laarderweg"</span><span style="font-weight:bold">]</span>
+
+<span style="font-weight:bold">type</span>
+    <span style="color:#0057ae">Matrix</span><span style="font-weight:bold">[</span><span style="color:#0057ae">W</span><span style="font-weight:bold">,</span> <span style="color:#0057ae">H</span><span style="font-weight:bold">:</span> <span style="color:#0057ae">static</span><span style="font-weight:bold">[</span><span style="color:#0057ae">int</span><span style="font-weight:bold">]]</span> <span style="color:#898887">=</span>
+        <span style="color:#0057ae">array</span><span style="font-weight:bold">[</span><span style="color:#b08000">1</span><span style="font-weight:bold">..</span><span style="color:#0057ae">W</span><span style="font-weight:bold">,</span> <span style="color:#0057ae">array</span><span style="font-weight:bold">[</span><span style="color:#b08000">1</span><span style="font-weight:bold">..</span><span style="color:#0057ae">H</span><span style="font-weight:bold">,</span> <span style="color:#0057ae">int</span><span style="font-weight:bold">]]</span>
+
+<span style="font-weight:bold">let</span> mat1<span style="font-weight:bold">:</span> <span style="color:#0057ae">Matrix</span><span style="font-weight:bold">[</span><span style="color:#b08000">2</span><span style="font-weight:bold">,</span> <span style="color:#b08000">2</span><span style="font-weight:bold">]</span> <span style="color:#898887">=</span> <span style="font-weight:bold">[[</span><span style="color:#b08000">1</span><span style="font-weight:bold">,</span> <span style="color:#b08000">0</span><span style="font-weight:bold">],</span>
+                          <span style="font-weight:bold">[</span><span style="color:#b08000">0</span><span style="font-weight:bold">,</span> <span style="color:#b08000">1</span><span style="font-weight:bold">]]</span>
+<span style="font-weight:bold">let</span> mat2<span style="font-weight:bold">:</span> <span style="color:#0057ae">Matrix</span><span style="font-weight:bold">[</span><span style="color:#b08000">2</span><span style="font-weight:bold">,</span> <span style="color:#b08000">2</span><span style="font-weight:bold">]</span> <span style="color:#898887">=</span> <span style="font-weight:bold">[[</span><span style="color:#b08000">0</span><span style="font-weight:bold">,</span> <span style="color:#b08000">1</span><span style="font-weight:bold">],</span>
+                          <span style="font-weight:bold">[</span><span style="color:#b08000">1</span><span style="font-weight:bold">,</span> <span style="color:#b08000">0</span><span style="font-weight:bold">]]</span>
+
+<span style="font-weight:bold">proc</span> <span style="color:#bf0303;font-weight:bold">`+`</span><span style="font-weight:bold">[</span><span style="color:#0057ae">W</span><span style="font-weight:bold">,</span> <span style="color:#0057ae">H</span><span style="font-weight:bold">](</span>a<span style="font-weight:bold">,</span> b<span style="font-weight:bold">:</span> <span style="color:#0057ae">Matrix</span><span style="font-weight:bold">[</span><span style="color:#0057ae">W</span><span style="font-weight:bold">,</span> <span style="color:#0057ae">H</span><span style="font-weight:bold">]):</span>
+    <span style="color:#0057ae">Matrix</span><span style="font-weight:bold">[</span><span style="color:#0057ae">W</span><span style="font-weight:bold">,</span> <span style="color:#0057ae">H</span><span style="font-weight:bold">]</span> <span style="color:#898887">=</span>
+        <span style="font-weight:bold">for</span> i <span style="color:#898887;font-weight:bold">in</span> <span style="color:#b08000">1</span><span style="font-weight:bold">..</span><span style="color:#644a9b">high</span><span style="font-weight:bold">(</span>a<span style="font-weight:bold">):</span>
+            <span style="font-weight:bold">for</span> j <span style="color:#898887;font-weight:bold">in</span> <span style="color:#b08000">1</span><span style="font-weight:bold">..</span><span style="color:#644a9b">high</span><span style="font-weight:bold">(</span>a<span style="font-weight:bold">[</span><span style="color:#b08000">0</span><span style="font-weight:bold">]):</span>
+                <span style="color:#006e28">result</span><span style="font-weight:bold">[</span>i<span style="font-weight:bold">][</span>j<span style="font-weight:bold">]</span> <span style="color:#898887">=</span> a<span style="font-weight:bold">[</span>i<span style="font-weight:bold">][</span>j<span style="font-weight:bold">]</span> <span style="color:#898887">+</span> b<span style="font-weight:bold">[</span>i<span style="font-weight:bold">][</span>j<span style="font-weight:bold">]</span>
+
+<span style="color:#898887"># Seqs</span>
+<span style="font-weight:bold">var</span>
+    a <span style="color:#898887">=</span> <span style="color:#898887">@</span><span style="font-weight:bold">[</span><span style="color:#b08000">1</span><span style="font-weight:bold">,</span> <span style="color:#b08000">2</span><span style="font-weight:bold">,</span> <span style="color:#b08000">3</span><span style="font-weight:bold">]</span>
+    b <span style="color:#898887">=</span> <span style="color:#644a9b">newSeq</span><span style="font-weight:bold">[</span><span style="color:#0057ae">int</span><span style="font-weight:bold">](</span><span style="color:#b08000">3</span><span style="font-weight:bold">)</span>
+
+<span style="font-weight:bold">for</span> i<span style="font-weight:bold">,</span> v <span style="color:#898887;font-weight:bold">in</span> a<span style="font-weight:bold">:</span>
+    b<span style="font-weight:bold">[</span>i<span style="font-weight:bold">]</span> <span style="color:#898887">=</span> v<span style="color:#898887">*</span>v
+
+<span style="font-weight:bold">for</span> i <span style="color:#898887;font-weight:bold">in</span> <span style="color:#b08000">4</span><span style="font-weight:bold">..</span><span style="color:#b08000">100</span><span style="font-weight:bold">:</span>
+    b<span style="font-weight:bold">.</span><span style="color:#644a9b">add</span><span style="font-weight:bold">(</span>i <span style="color:#898887">*</span> i<span style="font-weight:bold">)</span>
+
+b<span style="font-weight:bold">.</span><span style="color:#644a9b">delete</span><span style="font-weight:bold">(</span><span style="color:#b08000">0</span><span style="font-weight:bold">)</span>  <span style="color:#898887"># takes O(n) time</span>
+b <span style="color:#898887">=</span> a<span style="font-weight:bold">[</span><span style="color:#b08000">0</span><span style="font-weight:bold">]</span> <span style="color:#898887">&amp;</span> <span style="color:#644a9b">b </span> <span style="color:#898887"># Same as original b</span>
+
+<span style="color:#898887"># JSON</span>
+<span style="font-weight:bold">import</span> json
+
+<span style="font-weight:bold">let</span> element <span style="color:#898887">=</span> <span style="color:#bf0303">"Hydrogen"</span>
+<span style="font-weight:bold">let</span> atomicNumber <span style="color:#898887">=</span> <span style="color:#b08000">1</span>
+
+<span style="font-weight:bold">let</span> jsonObject <span style="color:#898887">=</span> <span style="color:#898887">%*</span> <span style="font-weight:bold">{</span><span style="color:#bf0303">"element"</span><span style="font-weight:bold">:</span> element<span style="font-weight:bold">,</span> <span style="color:#bf0303">"atomicNumber"</span><span style="font-weight:bold">:</span> atomicNumber<span style="font-weight:bold">}</span>
+<span style="color:#898887"># This will print {"element":"Hydrogen", "atomicNumber": 1}</span>
+<span style="font-weight:bold">echo</span> <span style="color:#898887">$</span>jsonObject
+
+<span style="color:#898887"># We start with a string representation of a JSON object</span>
+<span style="font-weight:bold">let</span> jsonObject <span style="color:#898887">=</span> <span style="color:#bf0303">"""{"name": "Sky", "age": 32}"""</span>
+<span style="font-weight:bold">let</span> jsonArray <span style="color:#898887">=</span> <span style="color:#bf0303">"""[7, 8, 9]"""</span>
+
+<span style="font-weight:bold">let</span> parsedObject <span style="color:#898887">=</span> <span style="color:#644a9b">parseJson</span><span style="font-weight:bold">(</span>jsonObject<span style="font-weight:bold">)</span>
+<span style="font-weight:bold">let</span> name <span style="color:#898887">=</span> parsedObject<span style="font-weight:bold">[</span><span style="color:#bf0303">"name"</span><span style="font-weight:bold">].</span><span style="color:#644a9b">getStr</span><span style="font-weight:bold">()</span>
+<span style="color:#898887"># This will print Sky</span>
+<span style="font-weight:bold">echo</span> name
+
+<span style="font-weight:bold">let</span> parsedArray <span style="color:#898887">=</span> <span style="color:#644a9b">parseJson</span><span style="font-weight:bold">(</span>jsonArray<span style="font-weight:bold">)</span>
+<span style="font-weight:bold">let</span> eight <span style="color:#898887">=</span> parsedArray<span style="font-weight:bold">[</span><span style="color:#b08000">1</span><span style="font-weight:bold">].</span><span style="color:#644a9b">getInt</span><span style="font-weight:bold">()</span>
+<span style="color:#898887"># This will print 8</span>
+<span style="font-weight:bold">echo</span> eight
+
+<span style="color:#898887"># First we'll define our types</span>
+<span style="font-weight:bold">type</span>
+    <span style="color:#0057ae">Element</span> <span style="color:#898887">=</span> <span style="font-weight:bold">object</span>
+        name<span style="font-weight:bold">:</span> <span style="color:#0057ae">string</span>
+        atomicNumber<span style="font-weight:bold">:</span> <span style="color:#0057ae">int</span>
+
+<span style="color:#898887"># Let's say this is the JSON we want to convert</span>
+<span style="font-weight:bold">let</span> jsonObject <span style="color:#898887">=</span> <span style="color:#644a9b">parseJson</span><span style="font-weight:bold">(</span><span style="color:#bf0303">"""{"name": "Carbon", "atomicNumber": 6}"""</span><span style="font-weight:bold">)</span>
+
+<span style="font-weight:bold">let</span> element <span style="color:#898887">=</span> <span style="color:#644a9b">to</span><span style="font-weight:bold">(</span>jsonObject<span style="font-weight:bold">,</span> <span style="color:#0057ae">Element</span><span style="font-weight:bold">)</span>
+<span style="color:#898887"># This will print Carbon</span>
+<span style="font-weight:bold">echo</span> element<span style="font-weight:bold">.</span><span style="color:#0057ae">name</span>
+<span style="color:#898887"># This will print 6</span>
+<span style="font-weight:bold">echo</span> element<span style="font-weight:bold">.</span><span style="color:#0057ae">atomicNumber</span>
+
+<span style="color:#898887"># Object Oriented Programming</span>
+<span style="font-weight:bold">type</span> <span style="color:#0057ae;font-weight:bold">Animal</span> <span style="color:#898887">=</span> <span style="color:#0057ae">ref</span> <span style="font-weight:bold">object</span> <span style="color:#898887;font-weight:bold">of</span> <span style="color:#0057ae">RootObj</span>
+    name<span style="font-weight:bold">:</span> <span style="color:#0057ae">string</span>
+    age<span style="font-weight:bold">:</span> <span style="color:#0057ae">int</span>
+<span style="font-weight:bold">method</span> <span style="color:#bf0303;font-weight:bold">vocalize</span><span style="font-weight:bold">(</span>this<span style="font-weight:bold">:</span> <span style="color:#0057ae">Animal</span><span style="font-weight:bold">):</span> <span style="color:#0057ae">string</span> <span style="color:#0057ae">{.base.}</span> <span style="color:#898887">=</span> <span style="color:#bf0303">"..."</span>
+<span style="font-weight:bold">method</span> <span style="color:#bf0303;font-weight:bold">ageHumanYrs</span><span style="font-weight:bold">(</span>this<span style="font-weight:bold">:</span> <span style="color:#0057ae">Animal</span><span style="font-weight:bold">):</span> <span style="color:#0057ae">int</span> <span style="color:#0057ae">{.base.}</span> <span style="color:#898887">=</span> this<span style="font-weight:bold">.</span><span style="color:#0057ae">age</span>
+
+<span style="font-weight:bold">type</span> <span style="color:#0057ae;font-weight:bold">Dog</span> <span style="color:#898887">=</span> <span style="color:#0057ae">ref</span> <span style="font-weight:bold">object</span> <span style="color:#898887;font-weight:bold">of</span> <span style="color:#0057ae">Animal</span>
+<span style="font-weight:bold">method</span> <span style="color:#bf0303;font-weight:bold">vocalize</span><span style="font-weight:bold">(</span>this<span style="font-weight:bold">:</span> <span style="color:#0057ae">Dog</span><span style="font-weight:bold">):</span> <span style="color:#0057ae">string</span> <span style="color:#898887">=</span> <span style="color:#bf0303">"woof"</span>
+<span style="font-weight:bold">method</span> <span style="color:#bf0303;font-weight:bold">ageHumanYrs</span><span style="font-weight:bold">(</span>this<span style="font-weight:bold">:</span> <span style="color:#0057ae">Dog</span><span style="font-weight:bold">):</span> <span style="color:#0057ae">int</span> <span style="color:#898887">=</span> this<span style="font-weight:bold">.</span><span style="color:#0057ae">age</span> <span style="color:#898887">*</span> <span style="color:#b08000">7</span>
+
+<span style="font-weight:bold">type</span> <span style="color:#0057ae;font-weight:bold">Cat</span> <span style="color:#898887">=</span> <span style="color:#0057ae">ref</span> <span style="font-weight:bold">object</span> <span style="color:#898887;font-weight:bold">of</span> <span style="color:#0057ae">Animal</span>
+<span style="font-weight:bold">method</span> <span style="color:#bf0303;font-weight:bold">vocalize</span><span style="font-weight:bold">(</span>this<span style="font-weight:bold">:</span> <span style="color:#0057ae">Cat</span><span style="font-weight:bold">):</span> <span style="color:#0057ae">string</span> <span style="color:#898887">=</span> <span style="color:#bf0303">"meow"</span>
+
+<span style="font-weight:bold">var</span> animals<span style="font-weight:bold">:</span> <span style="color:#0057ae">seq</span><span style="font-weight:bold">[</span><span style="color:#0057ae">Animal</span><span style="font-weight:bold">]</span> <span style="color:#898887">=</span> <span style="color:#898887">@</span><span style="font-weight:bold">[]</span>
+animals<span style="font-weight:bold">.</span><span style="color:#644a9b">add</span><span style="font-weight:bold">(</span><span style="color:#0057ae">Dog</span><span style="font-weight:bold">(</span>name<span style="font-weight:bold">:</span> <span style="color:#bf0303">"Sparky"</span><span style="font-weight:bold">,</span> age<span style="font-weight:bold">:</span> <span style="color:#b08000">10</span><span style="font-weight:bold">))</span>
+animals<span style="font-weight:bold">.</span><span style="color:#644a9b">add</span><span style="font-weight:bold">(</span><span style="color:#0057ae">Cat</span><span style="font-weight:bold">(</span>name<span style="font-weight:bold">:</span> <span style="color:#bf0303">"Mitten"</span><span style="font-weight:bold">,</span> age<span style="font-weight:bold">:</span> <span style="color:#b08000">10</span><span style="font-weight:bold">))</span>
+
+<span style="font-weight:bold">for</span> a <span style="color:#898887;font-weight:bold">in</span> animals<span style="font-weight:bold">:</span>
+    <span style="font-weight:bold">echo</span> a<span style="font-weight:bold">.</span><span style="color:#644a9b">vocalize</span><span style="font-weight:bold">()</span>
+    <span style="font-weight:bold">echo</span> a<span style="font-weight:bold">.</span><span style="color:#644a9b">ageHumanYrs</span><span style="font-weight:bold">()</span>
+
+<span style="font-weight:bold">let</span> slash <span style="color:#898887">=</span> <span style="color:#bf0303">"</span><span style="color:#3daee9">\\</span><span style="color:#bf0303">"</span>
 </pre></body></html>

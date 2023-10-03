@@ -6,6 +6,7 @@
 */
 
 #include "htmlhighlighter.h"
+#include "abstracthighlighter_p.h"
 #include "definition.h"
 #include "definition_p.h"
 #include "format.h"
@@ -15,11 +16,12 @@
 
 #include <QFile>
 #include <QFileInfo>
+#include <QIODevice>
 #include <QTextStream>
 
 using namespace KSyntaxHighlighting;
 
-class KSyntaxHighlighting::HtmlHighlighterPrivate
+class KSyntaxHighlighting::HtmlHighlighterPrivate : public AbstractHighlighterPrivate
 {
 public:
     std::unique_ptr<QTextStream> out;
@@ -29,7 +31,7 @@ public:
 };
 
 HtmlHighlighter::HtmlHighlighter()
-    : d(new HtmlHighlighterPrivate())
+    : AbstractHighlighter(new HtmlHighlighterPrivate())
 {
 }
 
@@ -39,6 +41,7 @@ HtmlHighlighter::~HtmlHighlighter()
 
 void HtmlHighlighter::setOutputFile(const QString &fileName)
 {
+    Q_D(HtmlHighlighter);
     d->file.reset(new QFile(fileName));
     if (!d->file->open(QFile::WriteOnly | QFile::Truncate)) {
         qCWarning(Log) << "Failed to open output file" << fileName << ":" << d->file->errorString();
@@ -50,6 +53,7 @@ void HtmlHighlighter::setOutputFile(const QString &fileName)
 
 void HtmlHighlighter::setOutputFile(FILE *fileHandle)
 {
+    Q_D(HtmlHighlighter);
     d->out.reset(new QTextStream(fileHandle, QIODevice::WriteOnly));
     d->out->setEncoding(QStringConverter::Utf8);
 }
@@ -100,6 +104,8 @@ static QString toHtmlRgbaString(const QColor &color)
 
 void HtmlHighlighter::highlightData(QIODevice *dev, const QString &title)
 {
+    Q_D(HtmlHighlighter);
+
     if (!d->out) {
         qCWarning(Log) << "No output stream defined!";
         return;
@@ -112,8 +118,8 @@ void HtmlHighlighter::highlightData(QIODevice *dev, const QString &title)
         htmlTitle = title.toHtmlEscaped();
     }
 
-    const auto theme = this->theme();
-    const auto definition = this->definition();
+    const auto &theme = d->m_theme;
+    const auto &definition = d->m_definition;
 
     auto definitions = definition.includedDefinitions();
     definitions.append(definition);
@@ -189,6 +195,8 @@ void HtmlHighlighter::applyFormat(int offset, int length, const Format &format)
     if (length == 0) {
         return;
     }
+
+    Q_D(HtmlHighlighter);
 
     auto const &htmlStyle = d->htmlStyles[format.id()];
 

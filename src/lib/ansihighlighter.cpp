@@ -795,6 +795,8 @@ const QLatin1String nameStyle("\x1b[7m");
 class DebugSyntaxHighlighter : public KSyntaxHighlighting::AbstractHighlighter
 {
 public:
+    using Option = KSyntaxHighlighting::AnsiHighlighter::Option;
+    using Options = KSyntaxHighlighting::AnsiHighlighter::Options;
     using TraceOption = KSyntaxHighlighting::AnsiHighlighter::TraceOption;
     using TraceOptions = KSyntaxHighlighting::AnsiHighlighter::TraceOptions;
 
@@ -817,6 +819,7 @@ public:
                        QLatin1String infoStyle,
                        QLatin1String editorBackground,
                        const std::vector<QPair<QString, QString>> &ansiStyles,
+                       Options options,
                        TraceOptions traceOptions)
     {
         initRegionStyles(ansiStyles);
@@ -833,6 +836,7 @@ public:
         bool firstLine = true;
         State state;
         QString currentLine;
+        const bool isUnbuffered = options.testFlag(Option::Unbuffered);
         while (in.readLineInto(&currentLine)) {
             auto oldState = state;
             state = highlightLine(currentLine, state);
@@ -866,6 +870,10 @@ public:
             }
 
             m_highlightedFragments.clear();
+
+            if (isUnbuffered) {
+                out.flush();
+            }
         }
     }
 
@@ -1232,7 +1240,7 @@ void AnsiHighlighter::setOutputFile(FILE *fileHandle)
     d->out.setDevice(&d->file);
 }
 
-void AnsiHighlighter::highlightFile(const QString &fileName, AnsiFormat format, bool useEditorBackground, TraceOptions traceOptions)
+void AnsiHighlighter::highlightFile(const QString &fileName, AnsiFormat format, Options options, TraceOptions traceOptions)
 {
     QFileInfo fi(fileName);
     QFile f(fileName);
@@ -1241,10 +1249,10 @@ void AnsiHighlighter::highlightFile(const QString &fileName, AnsiFormat format, 
         return;
     }
 
-    highlightData(&f, format, useEditorBackground, traceOptions);
+    highlightData(&f, format, options, traceOptions);
 }
 
-void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useEditorBackground, TraceOptions traceOptions)
+void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, Options options, TraceOptions traceOptions)
 {
     Q_D(AnsiHighlighter);
 
@@ -1266,6 +1274,8 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
     AnsiBuffer backgroundColorBuffer;
     QLatin1String foregroundDefaultColor;
     QLatin1String backgroundDefaultColor;
+
+    const bool useEditorBackground = options.testFlag(Option::UseEditorBackground);
 
     // https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_parameters
 
@@ -1373,6 +1383,7 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
     if (!traceOptions) {
         State state;
         QString currentLine;
+        const bool isUnbuffered = options.testFlag(Option::Unbuffered);
         while (in.readLineInto(&currentLine)) {
             d->currentLine = currentLine;
             state = highlightLine(d->currentLine, state);
@@ -1382,6 +1393,10 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
             } else {
                 d->out << QLatin1Char('\n');
             }
+
+            if (isUnbuffered) {
+                d->out.flush();
+            }
         }
     } else {
         AnsiBuffer buffer;
@@ -1390,7 +1405,7 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, bool useE
         buffer.setFinalStyle();
         DebugSyntaxHighlighter debugHighlighter;
         debugHighlighter.setDefinition(definition);
-        debugHighlighter.highlightData(in, d->out, buffer.latin1(), backgroundDefaultColor, d->ansiStyles, traceOptions);
+        debugHighlighter.highlightData(in, d->out, buffer.latin1(), backgroundDefaultColor, d->ansiStyles, options, traceOptions);
     }
 
     if (useEditorBackground) {

@@ -30,6 +30,13 @@ public:
         XTerm256Color,
     };
 
+    enum class Option {
+        NoOptions,
+        UseEditorBackground = 1 << 0,
+        Unbuffered = 1 << 1,
+    };
+    Q_DECLARE_FLAGS(Options, Option)
+
     enum class TraceOption {
         NoOptions,
         Format = 1 << 0,
@@ -44,10 +51,12 @@ public:
 
     void highlightFile(const QString &fileName,
                        AnsiFormat format = AnsiFormat::TrueColor,
-                       bool useEditorBackground = true,
+                       Options options = Option::UseEditorBackground,
                        TraceOptions traceOptions = TraceOptions());
-    void
-    highlightData(QIODevice *device, AnsiFormat format = AnsiFormat::TrueColor, bool useEditorBackground = true, TraceOptions traceOptions = TraceOptions());
+    void highlightData(QIODevice *device,
+                       AnsiFormat format = AnsiFormat::TrueColor,
+                       Options options = Option::UseEditorBackground,
+                       TraceOptions traceOptions = TraceOptions());
 
     void setOutputFile(const QString &fileName);
     void setOutputFile(FILE *fileHandle);

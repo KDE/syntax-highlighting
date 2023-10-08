@@ -111,6 +111,10 @@ int main(int argc, char **argv)
                                       app.translate("SyntaxHighlightingCLI", "Disable ANSI background for the default color."));
     parser.addOption(noAnsiEditorBg);
 
+    QCommandLineOption unbufferedAnsi(QStringList() << QStringLiteral("U") << QStringLiteral("unbuffered"),
+                                      app.translate("SyntaxHighlightingCLI", "For ansi format, flush on each line."));
+    parser.addOption(unbufferedAnsi);
+
     QCommandLineOption titleOption(
         QStringList() << QStringLiteral("T") << QStringLiteral("title"),
         app.translate("SyntaxHighlightingCLI", "Set HTML page's title\n(default: the filename or \"KSyntaxHighlighter\" if reading from stdin)."),
@@ -218,10 +222,14 @@ int main(int argc, char **argv)
             }
         }
 
+        AnsiHighlighter::Options options{};
+        options |= parser.isSet(noAnsiEditorBg) ? AnsiHighlighter::Option::NoOptions : AnsiHighlighter::Option::UseEditorBackground;
+        options |= parser.isSet(unbufferedAnsi) ? AnsiHighlighter::Option::Unbuffered : AnsiHighlighter::Option::NoOptions;
+
         AnsiHighlighter highlighter;
         highlighter.setDefinition(def);
         highlighter.setTheme(theme(repo, parser.value(themeName), Repository::DarkTheme));
-        applyHighlighter(highlighter, parser, fromFileName, inFileName, outputName, AnsiFormat, !parser.isSet(noAnsiEditorBg), debugOptions);
+        applyHighlighter(highlighter, parser, fromFileName, inFileName, outputName, AnsiFormat, options, debugOptions);
     }
 
     return 0;

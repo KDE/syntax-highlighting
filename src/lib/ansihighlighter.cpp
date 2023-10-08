@@ -1259,8 +1259,8 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, Options o
     }
 
     const auto is256Colors = (format == AnsiFormat::XTerm256Color);
-    const auto theme = this->theme();
-    const auto definition = this->definition();
+    const auto &theme = d->m_theme;
+    const auto &definition = d->m_definition;
 
     auto definitions = definition.includedDefinitions();
     definitions.append(definition);

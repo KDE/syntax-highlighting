@@ -36,7 +36,10 @@ public:
     DefinitionData(const DefinitionData &) = delete;
     DefinitionData &operator=(const DefinitionData &) = delete;
 
-    static DefinitionData *get(const Definition &def);
+    static DefinitionData *get(const Definition &def)
+    {
+        return def.d.get();
+    }
 
     bool isLoaded() const;
     bool loadMetaData(const QString &definitionFileName);

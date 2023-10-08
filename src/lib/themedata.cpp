@@ -18,11 +18,6 @@
 
 using namespace KSyntaxHighlighting;
 
-ThemeData *ThemeData::get(const Theme &theme)
-{
-    return theme.m_data.data();
-}
-
 ThemeData::ThemeData()
 {
     memset(m_editorColors, 0, sizeof(m_editorColors));

@@ -21,6 +21,11 @@ public:
     FormatPrivate() = default;
     static FormatPrivate *detachAndGet(Format &format);
 
+    static std::intptr_t ptrId(const Format &format)
+    {
+        return std::intptr_t(format.d.data());
+    }
+
     TextStyleData styleOverride(const Theme &theme) const;
     void load(QXmlStreamReader &reader);
 

@@ -43,11 +43,6 @@ DefinitionData::DefinitionData()
 
 DefinitionData::~DefinitionData() = default;
 
-DefinitionData *DefinitionData::get(const Definition &def)
-{
-    return def.d.get();
-}
-
 Definition::Definition()
     : d(new DefinitionData)
 {

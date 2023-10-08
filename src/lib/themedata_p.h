@@ -24,7 +24,10 @@ namespace KSyntaxHighlighting
 class ThemeData : public QSharedData
 {
 public:
-    static ThemeData *get(const Theme &theme);
+    static ThemeData *get(const Theme &theme)
+    {
+        return theme.m_data.data();
+    }
 
     /**
      * Default constructor, creating an uninitialized ThemeData instance.

@@ -103,7 +103,7 @@ int main(int argc, char **argv)
     QCommandLineOption traceOption(QStringList() << QStringLiteral("syntax-trace"),
                                    app.translate("SyntaxHighlightingCLI",
                                                  "Add information to debug a syntax file. Only works with --output-format=ansi or ansi256Colors. Possible "
-                                                 "values are format, region, context and stackSize."),
+                                                 "values are format, region, context, stackSize and all."),
                                    app.translate("SyntaxHighlightingCLI", "type"));
     parser.addOption(traceOption);
 
@@ -203,18 +203,22 @@ int main(int argc, char **argv)
             return 2;
         }
 
-        auto debugOptions = AnsiHighlighter::TraceOptions();
+        AnsiHighlighter::Options options{};
+        options |= parser.isSet(noAnsiEditorBg) ? AnsiHighlighter::Option::NoOptions : AnsiHighlighter::Option::UseEditorBackground;
+        options |= parser.isSet(unbufferedAnsi) ? AnsiHighlighter::Option::Unbuffered : AnsiHighlighter::Option::NoOptions;
         if (parser.isSet(traceOption)) {
-            const auto options = parser.values(traceOption);
-            for (auto const &option : options) {
+            const auto traceOptions = parser.values(traceOption);
+            for (auto const &option : traceOptions) {
                 if (option == QStringLiteral("format")) {
-                    debugOptions |= AnsiHighlighter::TraceOption::Format;
+                    options |= AnsiHighlighter::Option::TraceFormat;
                 } else if (option == QStringLiteral("region")) {
-                    debugOptions |= AnsiHighlighter::TraceOption::Region;
+                    options |= AnsiHighlighter::Option::TraceRegion;
                 } else if (option == QStringLiteral("context")) {
-                    debugOptions |= AnsiHighlighter::TraceOption::Context;
+                    options |= AnsiHighlighter::Option::TraceContext;
                 } else if (option == QStringLiteral("stackSize")) {
-                    debugOptions |= AnsiHighlighter::TraceOption::StackSize;
+                    options |= AnsiHighlighter::Option::TraceStackSize;
+                } else if (option == QStringLiteral("all")) {
+                    options |= AnsiHighlighter::Option::TraceAll;
                 } else {
                     std::cerr << "Unknown trace name." << std::endl;
                     return 2;
@@ -222,14 +226,10 @@ int main(int argc, char **argv)
             }
         }
 
-        AnsiHighlighter::Options options{};
-        options |= parser.isSet(noAnsiEditorBg) ? AnsiHighlighter::Option::NoOptions : AnsiHighlighter::Option::UseEditorBackground;
-        options |= parser.isSet(unbufferedAnsi) ? AnsiHighlighter::Option::Unbuffered : AnsiHighlighter::Option::NoOptions;
-
         AnsiHighlighter highlighter;
         highlighter.setDefinition(def);
         highlighter.setTheme(theme(repo, parser.value(themeName), Repository::DarkTheme));
-        applyHighlighter(highlighter, parser, fromFileName, inFileName, outputName, AnsiFormat, options, debugOptions);
+        applyHighlighter(highlighter, parser, fromFileName, inFileName, outputName, AnsiFormat, options);
     }
 
     return 0;

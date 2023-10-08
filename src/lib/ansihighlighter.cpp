@@ -797,8 +797,6 @@ class DebugSyntaxHighlighter : public KSyntaxHighlighting::AbstractHighlighter
 public:
     using Option = KSyntaxHighlighting::AnsiHighlighter::Option;
     using Options = KSyntaxHighlighting::AnsiHighlighter::Options;
-    using TraceOption = KSyntaxHighlighting::AnsiHighlighter::TraceOption;
-    using TraceOptions = KSyntaxHighlighting::AnsiHighlighter::TraceOptions;
 
     void setDefinition(const KSyntaxHighlighting::Definition &def) override
     {
@@ -819,15 +817,14 @@ public:
                        QLatin1String infoStyle,
                        QLatin1String editorBackground,
                        const std::vector<QPair<QString, QString>> &ansiStyles,
-                       Options options,
-                       TraceOptions traceOptions)
+                       Options options)
     {
         initRegionStyles(ansiStyles);
 
-        m_hasFormatTrace = traceOptions.testFlag(TraceOption::Format);
-        m_hasRegionTrace = traceOptions.testFlag(TraceOption::Region);
-        m_hasStackSizeTrace = traceOptions.testFlag(TraceOption::StackSize);
-        m_hasContextTrace = traceOptions.testFlag(TraceOption::Context);
+        m_hasFormatTrace = options.testFlag(Option::TraceFormat);
+        m_hasRegionTrace = options.testFlag(Option::TraceRegion);
+        m_hasStackSizeTrace = options.testFlag(Option::TraceStackSize);
+        m_hasContextTrace = options.testFlag(Option::TraceContext);
         const bool hasFormatOrContextTrace = m_hasFormatTrace || m_hasContextTrace || m_hasStackSizeTrace;
 
         const bool hasSeparator = hasFormatOrContextTrace && m_hasRegionTrace;
@@ -1240,7 +1237,7 @@ void AnsiHighlighter::setOutputFile(FILE *fileHandle)
     d->out.setDevice(&d->file);
 }
 
-void AnsiHighlighter::highlightFile(const QString &fileName, AnsiFormat format, Options options, TraceOptions traceOptions)
+void AnsiHighlighter::highlightFile(const QString &fileName, AnsiFormat format, Options options)
 {
     QFileInfo fi(fileName);
     QFile f(fileName);
@@ -1249,10 +1246,10 @@ void AnsiHighlighter::highlightFile(const QString &fileName, AnsiFormat format, 
         return;
     }
 
-    highlightData(&f, format, options, traceOptions);
+    highlightData(&f, format, options);
 }
 
-void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, Options options, TraceOptions traceOptions)
+void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, Options options)
 {
     Q_D(AnsiHighlighter);
 
@@ -1380,7 +1377,7 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, Options o
 
     QTextStream in(dev);
 
-    if (!traceOptions) {
+    if (!options.testAnyFlag(Option::TraceAll)) {
         State state;
         QString currentLine;
         const bool isUnbuffered = options.testFlag(Option::Unbuffered);
@@ -1405,7 +1402,7 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, Options o
         buffer.setFinalStyle();
         DebugSyntaxHighlighter debugHighlighter;
         debugHighlighter.setDefinition(definition);
-        debugHighlighter.highlightData(in, d->out, buffer.latin1(), backgroundDefaultColor, d->ansiStyles, options, traceOptions);
+        debugHighlighter.highlightData(in, d->out, buffer.latin1(), backgroundDefaultColor, d->ansiStyles, options);
     }
 
     if (useEditorBackground) {

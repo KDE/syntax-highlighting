@@ -34,29 +34,21 @@ public:
         NoOptions,
         UseEditorBackground = 1 << 0,
         Unbuffered = 1 << 1,
+
+        // Options that displays a useful visual aid for syntax creation
+        TraceFormat = 1 << 2,
+        TraceRegion = 1 << 3,
+        TraceContext = 1 << 4,
+        TraceStackSize = 1 << 5,
+        TraceAll = TraceFormat | TraceRegion | TraceContext | TraceStackSize,
     };
     Q_DECLARE_FLAGS(Options, Option)
-
-    enum class TraceOption {
-        NoOptions,
-        Format = 1 << 0,
-        Region = 1 << 1,
-        Context = 1 << 2,
-        StackSize = 1 << 3,
-    };
-    Q_DECLARE_FLAGS(TraceOptions, TraceOption)
 
     AnsiHighlighter();
     ~AnsiHighlighter() override;
 
-    void highlightFile(const QString &fileName,
-                       AnsiFormat format = AnsiFormat::TrueColor,
-                       Options options = Option::UseEditorBackground,
-                       TraceOptions traceOptions = TraceOptions());
-    void highlightData(QIODevice *device,
-                       AnsiFormat format = AnsiFormat::TrueColor,
-                       Options options = Option::UseEditorBackground,
-                       TraceOptions traceOptions = TraceOptions());
+    void highlightFile(const QString &fileName, AnsiFormat format = AnsiFormat::TrueColor, Options options = Option::UseEditorBackground);
+    void highlightData(QIODevice *device, AnsiFormat format = AnsiFormat::TrueColor, Options options = Option::UseEditorBackground);
 
     void setOutputFile(const QString &fileName);
     void setOutputFile(FILE *fileHandle);
@@ -69,6 +61,6 @@ private:
 };
 }
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(KSyntaxHighlighting::AnsiHighlighter::TraceOptions)
+Q_DECLARE_OPERATORS_FOR_FLAGS(KSyntaxHighlighting::AnsiHighlighter::Options)
 
 #endif // KSYNTAXHIGHLIGHTING_ANSIHIGHLIGHTER_H

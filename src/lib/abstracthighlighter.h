@@ -7,20 +7,15 @@
 #ifndef KSYNTAXHIGHLIGHTING_ABSTRACTHIGHLIGHTERM_H
 #define KSYNTAXHIGHLIGHTING_ABSTRACTHIGHLIGHTERM_H
 
+#include "definition.h"
 #include "ksyntaxhighlighting_export.h"
 
 #include <QObject>
-
-#include <memory>
-
-QT_BEGIN_NAMESPACE
-class QString;
-QT_END_NAMESPACE
+#include <QStringView>
 
 namespace KSyntaxHighlighting
 {
 class AbstractHighlighterPrivate;
-class Definition;
 class FoldingRegion;
 class Format;
 class State;

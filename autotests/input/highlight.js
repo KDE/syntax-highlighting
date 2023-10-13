@@ -110,7 +110,7 @@ re = /a|b/;
 
 /*
    Tests for the regex parser.
-   It will parse classes, quanitfiers, special characters and regex operaters,
+   It will parse classes, quantifiers, special characters and regex operaters,
    as specified in the netscape documentation for javascript.
    Regexps are only parsed in their clean form, as the RegExp(string) constructor
    is using a quoted string.

@@ -112,7 +112,7 @@ int main(int argc, char **argv)
     parser.addOption(noAnsiEditorBg);
 
     QCommandLineOption unbufferedAnsi(QStringList() << QStringLiteral("U") << QStringLiteral("unbuffered"),
-                                      app.translate("SyntaxHighlightingCLI", "For ansi format, flush on each line."));
+                                      app.translate("SyntaxHighlightingCLI", "For ansi and ansi256Colors formats, flush the output buffer on each line."));
     parser.addOption(unbufferedAnsi);
 
     QCommandLineOption titleOption(

@@ -109,6 +109,10 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
         return State();
     }
 
+    // cache limit
+    if (defData->unify.size() > 1024 * 1024)
+        defData->unify.clear();
+
     // verify/initialize state
     auto newState = state;
     auto stateData = StateData::get(newState);
@@ -156,7 +160,7 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
         }
         auto context = stateData->topContext();
         applyFormat(0, 0, context->attributeFormat());
-        return newState;
+        return *defData->unify.insert(newState);
     }
 
     int offset = 0;
@@ -389,7 +393,7 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
         }
     }
 
-    return newState;
+    return *defData->unify.insert(newState);
 }
 
 bool AbstractHighlighterPrivate::switchContext(StateData *&data, const ContextSwitch &contextSwitch, QStringList &&captures, State &state, bool &isSharedData)

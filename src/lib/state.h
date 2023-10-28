@@ -10,6 +10,7 @@
 #include "ksyntaxhighlighting_export.h"
 
 #include <QExplicitlySharedDataPointer>
+#include <QHash>
 
 namespace KSyntaxHighlighting
 {
@@ -56,11 +57,24 @@ public:
      */
     bool indentationBasedFoldingEnabled() const;
 
-private:
+public:
     friend class StateData;
     QExplicitlySharedDataPointer<StateData> d;
 };
 
+}
+
+size_t qHash(KSyntaxHighlighting::State state, size_t seed);
+namespace std
+{
+template<>
+struct hash<KSyntaxHighlighting::State> {
+    // seed is optional
+    size_t operator()(const KSyntaxHighlighting::State &key, size_t seed = 0) const
+    {
+        return qHash(key, seed);
+    }
+};
 }
 
 QT_BEGIN_NAMESPACE

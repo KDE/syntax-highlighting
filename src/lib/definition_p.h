@@ -10,10 +10,12 @@
 
 #include "definitionref_p.h"
 #include "highlightingdata_p.hpp"
+#include "state.h"
 #include "worddelimiters_p.h"
 
 #include <QHash>
 #include <QList>
+#include <QSet>
 #include <QString>
 
 #include <vector>
@@ -111,6 +113,7 @@ public:
     int version = 0;
     int priority = 0;
     bool hidden = false;
+    mutable QSet<State> unify;
 };
 }
 

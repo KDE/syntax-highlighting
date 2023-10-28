@@ -12,6 +12,13 @@
 
 #include <QStringList>
 
+std::size_t qHash(const KSyntaxHighlighting::State state, std::size_t seed)
+{
+    if (!state.d)
+        return 0;
+    return qHashMulti(seed, *state.d);
+}
+
 using namespace KSyntaxHighlighting;
 
 StateData *StateData::reset(State &state)

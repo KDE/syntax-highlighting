@@ -8,8 +8,8 @@
 #ifndef KSYNTAXHIGHLIGHTING_STATE_P_H
 #define KSYNTAXHIGHLIGHTING_STATE_P_H
 
-#include <QList>
 #include <QSharedData>
+#include <QVarLengthArray>
 
 #include "definitionref_p.h"
 
@@ -58,7 +58,7 @@ public:
         return m_contextStack.last().captures;
     }
 
-private:
+public:
     struct StackValue {
         Context *context;
         QStringList captures;
@@ -77,9 +77,18 @@ private:
     /**
      * the context stack combines the active context + valid captures
      */
-    QList<StackValue> m_contextStack;
+    QVarLengthArray<StackValue, 8> m_contextStack;
 };
 
+inline std::size_t qHash(const StateData::StackValue &stackValue, std::size_t seed = 0)
+{
+    return qHashMulti(seed, stackValue.context, stackValue.captures);
+}
+
+inline std::size_t qHash(const StateData &k, std::size_t seed = 0)
+{
+    return qHashMulti(seed, k.m_defId, k.m_contextStack);
+}
 }
 
 #endif

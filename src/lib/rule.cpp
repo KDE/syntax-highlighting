@@ -619,7 +619,7 @@ static MatchResult regexMatch(const QRegularExpression &regexp, QStringView text
     /**
      * match the pattern
      */
-    const auto result = regexp.match(text, offset, QRegularExpression::NormalMatch, QRegularExpression::DontCheckSubjectStringMatchOption);
+    const auto result = regexp.matchView(text, offset, QRegularExpression::NormalMatch, QRegularExpression::DontCheckSubjectStringMatchOption);
     if (result.capturedStart() == offset) {
         /**
          * we only need to compute the captured texts if we have real capture groups

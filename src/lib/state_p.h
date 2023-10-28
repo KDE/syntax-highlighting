@@ -8,8 +8,10 @@
 #ifndef KSYNTAXHIGHLIGHTING_STATE_P_H
 #define KSYNTAXHIGHLIGHTING_STATE_P_H
 
+#include <vector>
+
 #include <QSharedData>
-#include <QVarLengthArray>
+#include <QStringList>
 
 #include "definitionref_p.h"
 
@@ -50,12 +52,12 @@ public:
 
     Context *topContext() const
     {
-        return m_contextStack.last().context;
+        return m_contextStack.back().context;
     }
 
     const QStringList &topCaptures() const
     {
-        return m_contextStack.last().captures;
+        return m_contextStack.back().captures;
     }
 
 public:
@@ -77,7 +79,7 @@ public:
     /**
      * the context stack combines the active context + valid captures
      */
-    QVarLengthArray<StackValue, 8> m_contextStack;
+    std::vector<StackValue> m_contextStack;
 };
 
 inline std::size_t qHash(const StateData::StackValue &stackValue, std::size_t seed = 0)
@@ -87,7 +89,7 @@ inline std::size_t qHash(const StateData::StackValue &stackValue, std::size_t se
 
 inline std::size_t qHash(const StateData &k, std::size_t seed = 0)
 {
-    return qHashMulti(seed, k.m_defId, k.m_contextStack);
+    return qHashMulti(seed, k.m_defId, qHashRange(k.m_contextStack.begin(), k.m_contextStack.end(), seed));
 }
 }
 

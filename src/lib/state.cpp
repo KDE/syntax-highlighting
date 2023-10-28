@@ -48,8 +48,8 @@ bool StateData::pop(int popCount)
     }
 
     // keep the initial context alive in any case
-    Q_ASSERT(!m_contextStack.isEmpty());
-    const bool initialContextSurvived = m_contextStack.size() > popCount;
+    Q_ASSERT(!m_contextStack.empty());
+    const bool initialContextSurvived = int(m_contextStack.size()) > popCount;
     m_contextStack.resize(std::max(1, int(m_contextStack.size()) - popCount));
     return initialContextSurvived;
 }
@@ -79,8 +79,8 @@ bool State::operator!=(const State &other) const
 
 bool State::indentationBasedFoldingEnabled() const
 {
-    if (!d || d->m_contextStack.isEmpty()) {
+    if (!d || d->m_contextStack.empty()) {
         return false;
     }
-    return d->m_contextStack.last().context->indentationBasedFoldingEnabled();
+    return d->m_contextStack.back().context->indentationBasedFoldingEnabled();
 }

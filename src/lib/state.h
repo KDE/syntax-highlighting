@@ -57,24 +57,13 @@ public:
      */
     bool indentationBasedFoldingEnabled() const;
 
-public:
+private:
     friend class StateData;
+    friend std::size_t qHash(const State &, std::size_t);
     QExplicitlySharedDataPointer<StateData> d;
 };
 
-}
-
-size_t qHash(KSyntaxHighlighting::State state, size_t seed);
-namespace std
-{
-template<>
-struct hash<KSyntaxHighlighting::State> {
-    // seed is optional
-    size_t operator()(const KSyntaxHighlighting::State &key, size_t seed = 0) const
-    {
-        return qHash(key, seed);
-    }
-};
+KSYNTAXHIGHLIGHTING_EXPORT std::size_t qHash(const State &state, std::size_t seed = 0);
 }
 
 QT_BEGIN_NAMESPACE

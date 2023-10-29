@@ -23,6 +23,7 @@ class StateData : public QSharedData
 {
     friend class State;
     friend class AbstractHighlighter;
+    friend std::size_t qHash(const StateData &, std::size_t);
 
 public:
     StateData() = default;
@@ -60,7 +61,6 @@ public:
         return m_contextStack.back().captures;
     }
 
-public:
     struct StackValue {
         Context *context;
         QStringList captures;
@@ -71,6 +71,7 @@ public:
         }
     };
 
+private:
     /**
      * definition id to filter out invalid states
      */

@@ -14,7 +14,10 @@
 
 namespace KSyntaxHighlighting
 {
+class State;
 class StateData;
+
+KSYNTAXHIGHLIGHTING_EXPORT std::size_t qHash(const State &state, std::size_t seed = 0);
 
 /** Opaque handle to the state of the highlighting engine.
  *  This needs to be fed into AbstractHighlighter for every line of text
@@ -62,8 +65,6 @@ private:
     friend std::size_t qHash(const State &, std::size_t);
     QExplicitlySharedDataPointer<StateData> d;
 };
-
-KSYNTAXHIGHLIGHTING_EXPORT std::size_t qHash(const State &state, std::size_t seed = 0);
 }
 
 QT_BEGIN_NAMESPACE

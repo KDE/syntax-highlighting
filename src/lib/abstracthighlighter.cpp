@@ -109,8 +109,10 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
         return State();
     }
 
-    // cache limit
-    if (defData->unify.size() > 1024 * 1024)
+    // limit the cache for unification to some reasonable size
+    // we use here at the moment 64k elements to not hog too much memory
+    // and to make the clearing no big stall
+    if (defData->unify.size() > 64 * 1024)
         defData->unify.clear();
 
     // verify/initialize state

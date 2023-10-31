@@ -42,7 +42,7 @@ Inline ``code``, :ref:`interpreted role`, `trailing`:ref:,
 :py:ref:`role with a colon`. The `default interpreted role` and regular text
 after.
 
-A reference_, `link <https://kde.org>`_ Plain link: https://kde.org. A footnote
+A reference_, `link <https://kde.org>`_ Plain link: https://kde.org. `An anonymous link <https://kde.org>`__. A footnote
 reference [1]_.
 
 .. [1] Footnote content

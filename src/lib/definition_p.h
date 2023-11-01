@@ -113,6 +113,8 @@ public:
     int version = 0;
     int priority = 0;
     bool hidden = false;
+
+    // cache that is used to unify states in AbstractHighlighter::highlightLine
     mutable QSet<State> unify;
 };
 }

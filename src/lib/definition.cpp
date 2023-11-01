@@ -400,6 +400,9 @@ void DefinitionData::clear()
     version = 0.0f;
     priority = 0;
     hidden = false;
+
+    // purge our cache that is used to unify states
+    unify.clear();
 }
 
 bool DefinitionData::loadMetaData(const QString &definitionFileName)

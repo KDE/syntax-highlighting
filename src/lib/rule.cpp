@@ -90,8 +90,8 @@ static int matchEscapedChar(QStringView text, int offset)
 static QString replaceCaptures(const QString &pattern, const QStringList &captures, bool quote)
 {
     auto result = pattern;
-    for (int i = captures.size() - 1; i >= 1; --i) {
-        result.replace(QLatin1Char('%') + QString::number(i), quote ? QRegularExpression::escape(captures.at(i)) : captures.at(i));
+    for (int i = captures.size(); i >= 1; --i) {
+        result.replace(QLatin1Char('%') + QString::number(i), quote ? QRegularExpression::escape(captures.at(i - 1)) : captures.at(i - 1));
     }
     return result;
 }
@@ -243,7 +243,7 @@ MatchResult AnyChar::doMatch(QStringView text, int offset, const QStringList &) 
 
 DetectChar::DetectChar(const HighlightingContextData::Rule::DetectChar &data)
     : m_char(data.char1)
-    , m_captureIndex(data.dynamic ? data.char1.digitValue() : 0)
+    , m_captureIndex((data.dynamic ? data.char1.digitValue() : 0) - 1)
 {
     m_dynamic = data.dynamic;
 }
@@ -251,7 +251,7 @@ DetectChar::DetectChar(const HighlightingContextData::Rule::DetectChar &data)
 MatchResult DetectChar::doMatch(QStringView text, int offset, const QStringList &captures) const
 {
     if (m_dynamic) {
-        if (m_captureIndex == 0 || captures.size() <= m_captureIndex || captures.at(m_captureIndex).isEmpty()) {
+        if (m_captureIndex == -1 || captures.size() <= m_captureIndex || captures.at(m_captureIndex).isEmpty()) {
             return offset;
         }
         if (text.at(offset) == captures.at(m_captureIndex).at(0)) {
@@ -617,8 +617,14 @@ static MatchResult regexMatch(const QRegularExpression &regexp, QStringView text
          * highlightings should only address %1..%.., see e.g. replaceCaptures
          * DetectChar ignores %0, too
          */
-        if (result.lastCapturedIndex() > 0) {
-            return MatchResult(offset + result.capturedLength(), result.capturedTexts());
+        int lastCapturedIndex = result.lastCapturedIndex();
+        if (lastCapturedIndex > 0) {
+            QStringList captures;
+            captures.reserve(lastCapturedIndex);
+            // ignore the capturing group number 0
+            for (int i = 1; i <= lastCapturedIndex; ++i)
+                captures.push_back(result.captured(i));
+            return MatchResult(offset + result.capturedLength(), std::move(captures));
         }
 
         /**

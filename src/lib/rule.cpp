@@ -592,25 +592,16 @@ static QRegularExpression::PatternOptions makePattenOptions(const HighlightingCo
 
 static void resolveRegex(QRegularExpression &regexp, Context *context)
 {
-    if (!regexp.isValid()) {
-        // DontCaptureOption with back reference capture is an error, remove this option then try again
+    bool enableCapture = context && context->hasDynamicRule();
+
+    // disable DontCaptureOption when reference a context with dynamic rule or
+    // with invalid regex because DontCaptureOption with back reference capture is an error
+    if (enableCapture || !regexp.isValid()) {
         regexp.setPatternOptions(regexp.patternOptions() & ~QRegularExpression::DontCaptureOption);
-
-        if (!regexp.isValid()) {
-            qCDebug(Log) << "Invalid regexp:" << regexp.pattern();
-        }
-
-        return;
     }
 
-    // disable DontCaptureOption when reference a context with dynamic rule
-    if (context) {
-        for (const Rule::Ptr &rule : context->rules()) {
-            if (rule->isDynamic()) {
-                regexp.setPatternOptions(regexp.patternOptions() & ~QRegularExpression::DontCaptureOption);
-                break;
-            }
-        }
+    if (!regexp.isValid()) {
+        qCDebug(Log) << "Invalid regexp:" << regexp.pattern();
     }
 }
 
@@ -651,10 +642,6 @@ RegExpr::RegExpr(const HighlightingContextData::Rule::RegExpr &data)
 
 void RegExpr::resolve()
 {
-    if (m_isResolved) {
-        return;
-    }
-
     m_isResolved = true;
 
     resolveRegex(m_regexp, context().context());
@@ -679,10 +666,6 @@ DynamicRegExpr::DynamicRegExpr(const HighlightingContextData::Rule::RegExpr &dat
 
 void DynamicRegExpr::resolve()
 {
-    if (m_isResolved) {
-        return;
-    }
-
     m_isResolved = true;
 
     QRegularExpression regexp(m_pattern, m_patternOptions);

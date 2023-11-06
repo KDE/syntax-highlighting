@@ -87,7 +87,10 @@ QString Definition::name() const
 
 QString Definition::translatedName() const
 {
-    return QCoreApplication::instance()->translate("Language", d->name.toUtf8().constData());
+    if (d->translatedName.isEmpty()) {
+        d->translatedName = QCoreApplication::instance()->translate("Language", d->nameUtf8.isEmpty() ? d->name.toUtf8().constData() : d->nameUtf8.constData());
+    }
+    return d->translatedName;
 }
 
 QString Definition::section() const
@@ -97,7 +100,11 @@ QString Definition::section() const
 
 QString Definition::translatedSection() const
 {
-    return QCoreApplication::instance()->translate("Language Section", d->section.toUtf8().constData());
+    if (d->translatedSection.isEmpty()) {
+        d->translatedSection = QCoreApplication::instance()->translate("Language Section",
+                                                                       d->sectionUtf8.isEmpty() ? d->section.toUtf8().constData() : d->sectionUtf8.constData());
+    }
+    return d->translatedSection;
 }
 
 QList<QString> Definition::mimeTypes() const
@@ -389,7 +396,12 @@ void DefinitionData::clear()
     characterEncodings.clear();
 
     fileName.clear();
+    name = QStringLiteral(QT_TRANSLATE_NOOP("Language", "None"));
+    nameUtf8.clear();
+    translatedName.clear();
     section.clear();
+    sectionUtf8.clear();
+    translatedSection.clear();
     style.clear();
     indenter.clear();
     author.clear();
@@ -431,7 +443,9 @@ bool DefinitionData::loadMetaData(const QString &definitionFileName)
 bool DefinitionData::loadMetaData(const QString &file, const QCborMap &obj)
 {
     name = obj.value(QLatin1String("name")).toString();
+    nameUtf8 = obj.value(QLatin1String("name")).toByteArray();
     section = obj.value(QLatin1String("section")).toString();
+    sectionUtf8 = obj.value(QLatin1String("section")).toByteArray();
     version = obj.value(QLatin1String("version")).toInteger();
     priority = obj.value(QLatin1String("priority")).toInteger();
     style = obj.value(QLatin1String("style")).toString();

@@ -102,7 +102,11 @@ public:
 
     QString fileName;
     QString name = QStringLiteral(QT_TRANSLATE_NOOP("Language", "None"));
+    QByteArray nameUtf8;
+    mutable QString translatedName;
     QString section;
+    QByteArray sectionUtf8;
+    mutable QString translatedSection;
     QString style;
     QString indenter;
     QString author;

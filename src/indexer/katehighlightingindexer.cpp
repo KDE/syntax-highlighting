@@ -2886,6 +2886,10 @@ int main(int argc, char *argv[])
         // add boolean one
         hl[QStringLiteral("hidden")] = attrToBool(xml.attributes().value(QLatin1String("hidden")));
 
+        // keep some strings as UTF-8 for faster translations
+        hl[QStringLiteral("nameUtf8")] = hl[QStringLiteral("name")].toString().toUtf8();
+        hl[QStringLiteral("sectionUtf8")] = hl[QStringLiteral("section")].toString().toUtf8();
+
         // remember hl
         hls[QFileInfo(hlFile).fileName()] = hl;
 

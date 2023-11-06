@@ -396,7 +396,6 @@ void DefinitionData::clear()
     characterEncodings.clear();
 
     fileName.clear();
-    name = QStringLiteral(QT_TRANSLATE_NOOP("Language", "None"));
     nameUtf8.clear();
     translatedName.clear();
     section.clear();

@@ -82,9 +82,18 @@ bool ThemeData::load(const QString &filePath)
         return false;
     }
     const QByteArray jsonData = loadFile.readAll();
+    // look for metadata object
+    int metaDataStart = jsonData.indexOf("\"metadata\"");
+    int start = jsonData.indexOf('{', metaDataStart);
+    int end = jsonData.indexOf("}", metaDataStart);
+    if (start < 0 || end < 0) {
+        qCWarning(Log) << "Failed to parse theme file" << filePath << ":"
+                       << "no metadata object found";
+        return false;
+    }
 
     QJsonParseError parseError;
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData, &parseError);
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData.mid(start, (end + 1) - start), &parseError);
     if (parseError.error != QJsonParseError::NoError) {
         qCWarning(Log) << "Failed to parse theme file" << filePath << ":" << parseError.errorString();
         return false;
@@ -92,10 +101,8 @@ bool ThemeData::load(const QString &filePath)
 
     m_filePath = filePath;
 
-    QJsonObject obj = jsonDoc.object();
-
     // read metadata
-    const QJsonObject metadata = obj.value(QLatin1String("metadata")).toObject();
+    QJsonObject metadata = jsonDoc.object();
     m_name = metadata.value(QLatin1String("name")).toString();
     m_revision = metadata.value(QLatin1String("revision")).toInt();
     return true;

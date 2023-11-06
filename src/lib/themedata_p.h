@@ -40,6 +40,8 @@ public:
      */
     bool load(const QString &filePath);
 
+    void loadComplete();
+
     /**
      * Returns the unique name of this Theme.
      */
@@ -142,6 +144,8 @@ private:
     //! This is either a resource location (":/themes/Default.theme"), or a file
     //! on disk (in a read-only or a writeable location).
     QString m_filePath;
+
+    bool m_completelyLoaded = false;
 
     //! TextStyles
     std::vector<TextStyleData> m_textStyles;

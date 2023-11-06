@@ -12,6 +12,7 @@
 #include "format.h"
 #include "ksyntaxhighlighting_logging.h"
 #include "repository.h"
+#include "repository_p.h"
 #include "rule_p.h"
 #include "state.h"
 #include "state_p.h"
@@ -165,6 +166,8 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
         return *defData->unify.insert(newState);
     }
 
+    auto &dynamicRegexpCache = RepositoryPrivate::get(defData->repo)->m_dynamicRegexpCache;
+
     int offset = 0;
     int beginOffset = 0;
     bool lineContinuation = false;
@@ -281,7 +284,7 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
                 }
             }
 
-            auto newResult = rule->doMatch(text, offset, stateData->topCaptures());
+            auto newResult = rule->doMatch(text, offset, stateData->topCaptures(), dynamicRegexpCache);
             newOffset = newResult.offset();
 
             /**

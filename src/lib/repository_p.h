@@ -10,6 +10,8 @@
 #include <QHash>
 #include <QList>
 
+#include "dynamicregexpcache_p.h"
+
 QT_BEGIN_NAMESPACE
 class QString;
 QT_END_NAMESPACE
@@ -52,6 +54,8 @@ public:
     QHash<QPair<QString, QString>, int> m_foldingRegionIds;
     int m_foldingRegionId = 0;
     int m_formatId = 0;
+
+    DynamicRegexpCache m_dynamicRegexpCache;
 };
 }
 

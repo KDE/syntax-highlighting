@@ -455,13 +455,10 @@ bool DefinitionData::loadMetaData(const QString &file, const QCborMap &obj)
     fileName = file;
 
     const auto exts = obj.value(QLatin1String("extensions")).toString();
-    for (const auto &ext : exts.split(QLatin1Char(';'), Qt::SkipEmptyParts)) {
-        extensions.push_back(ext);
-    }
+    extensions = exts.split(QLatin1Char(';'), Qt::SkipEmptyParts);
+
     const auto mts = obj.value(QLatin1String("mimetype")).toString();
-    for (const auto &mt : mts.split(QLatin1Char(';'), Qt::SkipEmptyParts)) {
-        mimetypes.push_back(mt);
-    }
+    mimetypes = mts.split(QLatin1Char(';'), Qt::SkipEmptyParts);
 
     return true;
 }

@@ -103,10 +103,6 @@ protected:
     AbstractHighlighter();
     KSYNTAXHIGHLIGHTING_NO_EXPORT explicit AbstractHighlighter(AbstractHighlighterPrivate *dd);
 
-    // TODO KF6: add an optional void* context argument that is passed through
-    // to the applyX() calls, so highlighters dealing with some form of line object
-    // (such as QSyntaxHighlighter or KTextEditor) can avoid some ugly hacks to have
-    // this context available in their applyX methods
     /**
      * Highlight the given line. Call this from your derived class
      * where appropriate. This will result in any number of applyFormat()

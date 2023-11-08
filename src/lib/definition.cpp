@@ -26,8 +26,6 @@
 #include <QCborMap>
 #include <QCoreApplication>
 #include <QFile>
-#include <QHash>
-#include <QStringList>
 #include <QXmlStreamReader>
 
 #include <algorithm>

@@ -9,12 +9,10 @@
 
 #include <QHash>
 #include <QList>
+#include <QMap>
+#include <QString>
 
 #include "dynamicregexpcache_p.h"
-
-QT_BEGIN_NAMESPACE
-class QString;
-QT_END_NAMESPACE
 
 namespace KSyntaxHighlighting
 {

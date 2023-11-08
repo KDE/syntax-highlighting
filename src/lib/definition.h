@@ -12,13 +12,9 @@
 
 #include <QList>
 #include <QPair>
+#include <QString>
 #include <memory>
 #include <qobjectdefs.h>
-
-QT_BEGIN_NAMESPACE
-class QChar;
-class QString;
-QT_END_NAMESPACE
 
 namespace KSyntaxHighlighting
 {

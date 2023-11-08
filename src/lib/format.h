@@ -13,12 +13,6 @@
 
 #include <QExplicitlySharedDataPointer>
 
-QT_BEGIN_NAMESPACE
-class QColor;
-class QString;
-class QXmlStreamReader;
-QT_END_NAMESPACE
-
 namespace KSyntaxHighlighting
 {
 class FormatPrivate;

@@ -13,6 +13,10 @@
 #include <QSharedData>
 #include <QString>
 
+QT_BEGIN_NAMESPACE
+class QXmlStreamReader;
+QT_END_NAMESPACE
+
 namespace KSyntaxHighlighting
 {
 class FormatPrivate : public QSharedData

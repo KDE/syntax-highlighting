@@ -34,10 +34,10 @@ public:
      */
     State();
     State(State &&other) noexcept;
-    State(const State &other);
+    State(const State &other) noexcept;
     ~State();
     State &operator=(State &&rhs) noexcept;
-    State &operator=(const State &rhs);
+    State &operator=(const State &rhs) noexcept;
 
     /** Compares two states for equality.
      *  For two equal states and identical text input, AbstractHighlighter

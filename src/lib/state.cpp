@@ -1,4 +1,4 @@
-/*
+﻿/*
     SPDX-FileCopyrightText: 2016 Volker Krause <vkrause@kde.org>
     SPDX-FileCopyrightText: 2018 Christoph Cullmann <cullmann@kde.org>
 
@@ -51,13 +51,13 @@ State::State() = default;
 
 State::State(State &&other) noexcept = default;
 
-State::State(const State &other) = default;
+State::State(const State &other) noexcept = default;
 
 State::~State() = default;
 
 State &State::operator=(State &&other) noexcept = default;
 
-State &State::operator=(const State &other) = default;
+State &State::operator=(const State &other) noexcept = default;
 
 bool State::operator==(const State &other) const
 {

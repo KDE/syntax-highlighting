@@ -228,12 +228,6 @@ void RepositoryPrivate::load(Repository *repo)
                                                      QStandardPaths::LocateDirectory)) {
         loadSyntaxFolder(repo, dir);
     }
-
-    // backward compatibility with Kate
-    for (const auto &dir :
-         QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("katepart5/syntax"), QStandardPaths::LocateDirectory)) {
-        loadSyntaxFolder(repo, dir);
-    }
 #endif
 
     // default resources are always used, this is the one location that has a index cbor file

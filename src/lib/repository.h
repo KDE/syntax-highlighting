@@ -77,13 +77,6 @@ class Theme;
  *    map to $HOME/.local5/share/org.kde.syntax-highlighting/syntax and
  *    /usr/share/org.kde.syntax-highlighting/syntax.
  *
- * -# Next, for backwards compatibility with Kate, all syntax highlighting
- *    files are loaded that are located in
- *    QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("katepart5/syntax"), QStandardPaths::LocateDirectory);
- *    Again, under Unix, this uses $XDG_DATA_HOME and $XDG_DATA_DIRS, which
- *    could map to $HOME/.local5/share/katepart5/syntax and
- *    /usr/share/katepart5/syntax.
- *
  * -# Then, all files compiled into the library through resources are loaded.
  *    The internal resource path is ":/org.kde.syntax-highlighting/syntax".
  *    This path should never be touched by other applications.

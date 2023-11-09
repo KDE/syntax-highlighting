@@ -42,7 +42,7 @@ DefinitionData::DefinitionData()
 DefinitionData::~DefinitionData() = default;
 
 Definition::Definition()
-    : d(new DefinitionData)
+    : d(std::make_shared<DefinitionData>())
 {
     d->q = *this;
 }
@@ -56,6 +56,9 @@ Definition &Definition::operator=(const Definition &) = default;
 Definition::Definition(std::shared_ptr<DefinitionData> &&dd)
     : d(std::move(dd))
 {
+    if (!d) {
+        Definition().d.swap(d);
+    }
 }
 
 bool Definition::operator==(const Definition &other) const
@@ -223,7 +226,7 @@ QList<Format> Definition::formats() const
     d->load();
 
     // sort formats so that the order matches the order of the itemDatas in the xml files.
-    auto formatList = QList<Format>::fromList(d->formats.values());
+    auto formatList = d->formats.values();
     std::sort(formatList.begin(), formatList.end(), [](const KSyntaxHighlighting::Format &lhs, const KSyntaxHighlighting::Format &rhs) {
         return lhs.id() < rhs.id();
     });
@@ -811,8 +814,8 @@ bool DefinitionData::checkKateVersion(QStringView verStr)
         qCWarning(Log) << "Skipping" << fileName << "due to having no valid kateversion attribute:" << verStr;
         return false;
     }
-    const auto major = verStr.left(idx).toString().toInt();
-    const auto minor = verStr.mid(idx + 1).toString().toInt();
+    const auto major = verStr.left(idx).toInt();
+    const auto minor = verStr.mid(idx + 1).toInt();
 
     if (major > KSYNTAXHIGHLIGHTING_VERSION_MAJOR || (major == KSYNTAXHIGHLIGHTING_VERSION_MAJOR && minor > KSYNTAXHIGHLIGHTING_VERSION_MINOR)) {
         qCWarning(Log) << "Skipping" << fileName << "due to being too new, version:" << verStr;
@@ -840,34 +843,20 @@ void DefinitionData::addImmediateIncludedDefinition(const Definition &def)
 
 DefinitionRef::DefinitionRef() = default;
 
-DefinitionRef::DefinitionRef(const Definition &def)
+DefinitionRef::DefinitionRef(const Definition &def) noexcept
     : d(def.d)
 {
 }
 
-DefinitionRef::DefinitionRef(Definition &&def)
-    : d(std::move(def.d))
-{
-}
-
-DefinitionRef &DefinitionRef::operator=(const Definition &def)
+DefinitionRef &DefinitionRef::operator=(const Definition &def) noexcept
 {
     d = def.d;
     return *this;
 }
 
-DefinitionRef &DefinitionRef::operator=(Definition &&def)
-{
-    d = std::move(def.d);
-    return *this;
-}
-
 Definition DefinitionRef::definition() const
 {
-    if (!d.expired()) {
-        return Definition(d.lock());
-    }
-    return Definition();
+    return Definition(d.lock());
 }
 
 bool DefinitionRef::operator==(const DefinitionRef &other) const

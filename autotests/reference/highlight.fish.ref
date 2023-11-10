@@ -47,6 +47,7 @@
 <CommandPath>ls/</CommandPath><br/>
 <UnixCommand>ls</UnixCommand><Separator>;</Separator><Builtin>echo</Builtin><Normal Text> xy</Normal Text><br/>
 <UnixCommand>flex++</UnixCommand><br/>
+<Builtin>echo</Builtin><Normal Text> [abc] abc</Normal Text><br/>
 <Normal Text></Normal Text><br/>
 <Comment>#specials</Comment><br/>
 <Builtin>command</Builtin><Normal Text> </Normal Text><Option>-s</Option><Normal Text> </Normal Text><UnixCommand>ls</UnixCommand><br/>
@@ -58,6 +59,12 @@
 <Builtin>set</Builtin><Normal Text> </Normal Text><Variable>test1</Variable><Index>[1..</Index><Variable>$n</Variable><Index>]</Index><Normal Text> </Normal Text><Variable>$test</Variable><Separator>;</Separator><Normal Text> </Normal Text><Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$test1</Variable><br/>
 <Builtin>set</Builtin><Normal Text> </Normal Text><Variable>test1</Variable><Index>[</Index><Variable>$n</Variable><Index>..1]</Index><Normal Text> </Normal Text><Variable>$test</Variable><Separator>;</Separator><Normal Text> </Normal Text><Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$test1</Variable><br/>
 <Builtin>set</Builtin><Normal Text> </Normal Text><Variable>test1</Variable><Index>[2..4 -2..-4]</Index><Normal Text> </Normal Text><Variable>$test1</Variable><Index>[4..2 -4..-2]</Index><Separator>;</Separator><Normal Text> </Normal Text><Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$test1</Variable><br/>
+<Builtin>set</Builtin><Normal Text> </Normal Text><Variable>test1</Variable><Index>[2..4 -2..-4]</Index><Normal Text>[1] </Normal Text><Variable>$test1</Variable><Index>[4..2 -4..-2][1]</Index><br/>
+<Comment>#                     ~~~ invalid</Comment><br/>
+<Builtin>set</Builtin><Normal Text> </Normal Text><Variable>test1</Variable><Escape>\</Escape><br/>
+<Index>[2..4 -2..-4]</Index><Escape>\</Escape><br/>
+<Normal Text>[1] a</Normal Text><br/>
+<Comment>#~~ invalid</Comment><br/>
 <Builtin>set</Builtin><Normal Text> </Normal Text><Variable>page_url</Variable><Normal Text> </Normal Text><Path>http://fishshell.com/docs/</Path><Variable>$version_string</Variable><Path>/</Path><Variable>$fish_help_page</Variable><Normal Text>    </Normal Text><Comment># ???</Comment><br/>
 <Builtin>string</Builtin><Normal Text> </Normal Text><Builtin>split</Builtin><Normal Text> </Normal Text><Path>.</Path><Normal Text> example.com</Normal Text><br/>
 <Builtin>set</Builtin><Normal Text> </Normal Text><Variable>b</Variable><Normal Text> </Normal Text><Keychar>(</Keychar><Builtin>string</Builtin><Normal Text> </Normal Text><Builtin>repeat</Builtin><Normal Text> </Normal Text><Option>-n</Option><Normal Text> 512 x</Normal Text><Keychar>)</Keychar><br/>
@@ -236,6 +243,10 @@
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$$foo</Variable><Index>[</Index><Variable>$i</Variable><Index>]</Index><br/>
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$test</Variable><Index>[</Index><Keychar>(</Keychar><Builtin>count</Builtin><Normal Text> </Normal Text><Variable>$test</Variable><Keychar>)</Keychar><Index>..1]</Index><br/>
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$test</Variable><Index>[1..</Index><Keychar>(</Keychar><Builtin>count</Builtin><Normal Text> </Normal Text><Variable>$test</Variable><Index>[3]</Index><Keychar>)</Keychar><Index>]</Index><br/>
+<Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$$foo</Variable><Index>[1..-1][5]</Index><br/>
+<Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$$foo</Variable><Index>[1..-1]</Index><Escape>\</Escape><br/>
+<Index>[5][2]</Index><Escape>\</Escape><br/>
+<Index>[5]</Index><br/>
 <Normal Text></Normal Text><br/>
 <Normal Text> </Normal Text><Comment>#show error</Comment><br/>
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$PATH</Variable><Index>[</Index><Error>error</Error><br/>
@@ -271,6 +282,15 @@
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>>></Redirection><Path>mem/abc</Path><Keychar>)</Keychar><br/>
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$test</Variable><Index>[2]</Index><Keychar>)</Keychar><br/>
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><CommandPath>/usr</CommandPath><String DoubleQ>"/bi"</String DoubleQ><CommandPath>n/</CommandPath><UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Path>/tmp</Path><Keychar>)</Keychar><br/>
+<Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><UnixCommand>seq</UnixCommand><Normal Text> 10</Normal Text><Keychar>)</Keychar><Index>[1]</Index><Normal Text>[2]</Normal Text><br/>
+<Comment>#               ~~~ not an index</Comment><br/>
+<Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><UnixCommand>seq</UnixCommand><Normal Text> 10</Normal Text><Keychar>)</Keychar><Escape>\</Escape><br/>
+<Index>[1]</Index><Normal Text>[2]</Normal Text><br/>
+<Comment>#  ~~~ not an index</Comment><br/>
+<Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><UnixCommand>seq</UnixCommand><Normal Text> 10</Normal Text><Keychar>)</Keychar><Escape>\</Escape><br/>
+<Index>[1]</Index><Escape>\</Escape><br/>
+<Normal Text>[2]</Normal Text><br/>
+<Comment>#~~ not an index</Comment><br/>
 <Normal Text></Normal Text><br/>
 <Comment># multline command substitution</Comment><br/>
 <Builtin>set</Builtin><Normal Text> </Normal Text><Variable>x</Variable><Normal Text> </Normal Text><Keychar>(</Keychar><Builtin>echo</Builtin><Normal Text> dirlist</Normal Text><Separator>;</Separator><Normal Text> </Normal Text><Comment># blabla</Comment><br/>

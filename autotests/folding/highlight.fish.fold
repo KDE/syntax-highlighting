@@ -47,6 +47,7 @@ ls *path_detected
 ls/
 ls;echo xy
 flex++
+echo [abc] abc
 
 #specials
 command -s ls
@@ -58,6 +59,12 @@ set test1[-1..1] $test; echo $test1
 set test1[1..$n] $test; echo $test1
 set test1[$n..1] $test; echo $test1
 set test1[2..4 -2..-4] $test1[4..2 -4..-2]; echo $test1
+set test1[2..4 -2..-4][1] $test1[4..2 -4..-2][1]
+#                     ~~~ invalid
+set test1\
+[2..4 -2..-4]\
+[1] a
+#~~ invalid
 set page_url http://fishshell.com/docs/$version_string/$fish_help_page    # ???
 string split . example.com
 set b (string repeat -n 512 x)
@@ -236,6 +243,10 @@ echo The plural of $WORD is {$WORD}s
 echo $$foo[$i]
 echo $test[(count $test)..1]
 echo $test[1..(count $test[3])]
+echo $$foo[1..-1][5]
+echo $$foo[1..-1]\
+[5][2]\
+[5]
 
  #show error
 echo $PATH[error
@@ -271,6 +282,15 @@ echo (/usr/bin/ls)
 echo (ls >>mem/abc)
 echo (echo $test[2])
 echo (/usr"/bi"n/ls /tmp)
+echo (seq 10)[1][2]
+#               ~~~ not an index
+echo (seq 10)\
+[1][2]
+#  ~~~ not an index
+echo (seq 10)\
+[1]\
+[2]
+#~~ not an index
 
 # multline command substitution
 set x (echo dirlist; # blabla

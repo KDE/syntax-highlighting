@@ -24,7 +24,7 @@
 ]>
 
 
-<language name="Fish" version="8" kateversion="5.72" section="Scripts" extensions="*.fish;fishd.*" mimetype="application/x-fish" casesensitive="1" author="Arnd Diestelhorst (adiestelhorst@m-xchg.de)" license="LGPL">
+<language name="Fish" version="9" kateversion="5.72" section="Scripts" extensions="*.fish;fishd.*" mimetype="application/x-fish" casesensitive="1" author="Arnd Diestelhorst (adiestelhorst@m-xchg.de)" license="LGPL">
 
 
   <highlighting>
@@ -251,8 +251,24 @@
         <LineContinue attribute="Escape" />
         <AnyChar attribute="Separator" context="#pop" String="&commandsep;" />
         <RegExpr attribute="Option" String="-&alnumdash;*" />
-        <RegExpr attribute="Variable" String="&varname;" context="Arguments" />
+        <RegExpr attribute="Variable" String="&varname;" context="set_CheckSubscript" />
         <IncludeRules context="FindVarExpansion" />
+      </context>
+
+      <!-- check set var[1] -->
+      <context name="set_CheckSubscript" attribute="Normal Text" fallthroughContext="#pop!Arguments" lineEndContext="#pop#pop">
+        <LineContinue attribute="Escape" context="set_CheckSubscript2"/>
+        <DetectChar attribute="Index" context="set_Subscript" char="["/>
+      </context>
+      <!-- check set var\
+                 [1] -->
+      <context name="set_CheckSubscript2" attribute="Normal Text" fallthroughContext="#pop#pop!Arguments" lineEndContext="#pop#pop#pop">
+        <DetectChar attribute="Index" context="#pop!set_Subscript" char="["/>
+      </context>
+
+      <context name="set_Subscript" attribute="Index" lineEndContext="#pop#pop#pop">
+        <DetectChar attribute="Index" context="#pop#pop!Arguments" char="]" />
+        <IncludeRules context="InSubscript" />
       </context>
 
       <context name="string" attribute="Normal Text" lineEndContext="#pop">
@@ -439,7 +455,6 @@
         <RegExpr attribute="Option" String="-&alnumdash;*" />
         <RegExpr attribute="Redirection" context="Redirect" String="[0-9]*(?:&gt;{1,2}|&lt;|\^{1,2})" />
         <DetectChar attribute="Operator" char="="/>
-        <DetectChar attribute="Index" context="Subscript" char="["/>
         <IncludeRules context="FindStrings" />
         <IncludeRules context="FindVarExpansion" />
         <IncludeRules context="FindSubstitutions" />
@@ -480,16 +495,19 @@
         <RegExpr    attribute="Redirection" context="#pop!TokEnd" String="&amp;(?:[0-9]+|-)" />
       </context>
 
-      <context name="Subscript" attribute="Index" lineEndContext="#pop">
-        <LineContinue attribute="Escape" />
-        <Detect2Chars char="]" char1="[" />
-        <DetectChar attribute="Index" context="#pop" char="]" />
+      <context name="InSubscript" attribute="Index" lineEndContext="#pop">
         <Detect2Chars char="." char1="." />
+        <LineContinue attribute="Escape" />
         <RegExpr attribute="Index" String=" *-?\d+" />
         <IncludeRules context="FindVarExpansion" />
         <IncludeRules context="FindSubstitutions" />
         <DetectSpaces attribute="Normal Text" />
         <RegExpr attribute="Error" String="[^\]]" />
+      </context>
+
+      <context name="Subscript" attribute="Index" lineEndContext="#pop">
+        <DetectChar attribute="Index" context="#pop" char="]" />
+        <IncludeRules context="InSubscript" />
       </context>
 
       <!-- FindStrings looks for single and double quoted strings -->
@@ -534,7 +552,23 @@
 
       <context name="CommandSubstitution" attribute="Normal Text" fallthroughContext="Root" lineEndContext="#stay">
         <LineContinue attribute="Escape" />
-        <DetectChar attribute="Keychar" context="#pop" char=")" />
+        <DetectChar attribute="Keychar" context="CommandSubstitutionCheckSubscript" char=")" />
+      </context>
+
+      <!-- check (...)[1] -->
+      <context name="CommandSubstitutionCheckSubscript" attribute="Normal Text" fallthroughContext="#pop#pop" lineEndContext="#pop#pop">
+        <LineContinue attribute="Escape" context="CommandSubstitutionCheckSubscript2"/>
+        <DetectChar attribute="Index" context="CommandSubstitutionSubscript" char="["/>
+      </context>
+      <!-- check (...)\
+                 [1] -->
+      <context name="CommandSubstitutionCheckSubscript2" attribute="Normal Text" fallthroughContext="#pop#pop#pop" lineEndContext="#pop#pop#pop">
+        <DetectChar attribute="Index" context="#pop!CommandSubstitutionSubscript" char="["/>
+      </context>
+
+      <context name="CommandSubstitutionSubscript" attribute="Index" lineEndContext="#pop#pop#pop">
+        <DetectChar attribute="Index" context="#pop#pop#pop" char="]" />
+        <IncludeRules context="InSubscript" />
       </context>
 
       <!--	Brace Expansion consumes anything till } -->

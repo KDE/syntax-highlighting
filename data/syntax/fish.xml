@@ -21,6 +21,7 @@
         <!ENTITY homedir           "~[&portable_filename;]*">
         <!ENTITY pathdetect        "(?:(?:\.\.?|&homedir;)&white_or_eol;|(?:[^$\\{}&separator;/\*\?]|\\&escapechars;)*(:?[/?]|\*\*?))">
         <!ENTITY pathpart          "(?:[^&separator;/]|\\&escapechars;)*(?:/|(?=[&quot;']))">
+        <!ENTITY command           "([-\w+,-:=!.@#&#37;^_`~]+|\\ )+">
 ]>
 
 
@@ -192,7 +193,7 @@
         <RegExpr attribute="CommandPath" context="CommandPart" String="&pathdetect;" />
         <IncludeRules context="FindSpecialCommands" /> <!--before unixcommands, because f test, but after path detection-->
         <keyword attribute="UnixCommand" context="Arguments" String="unixcommands"/>
-        <RegExpr attribute="Command" context="CommandPart" String="&funcname;" />
+        <RegExpr attribute="Command" context="CommandPart" String="&command;" />
         <DetectChar context="CommandPart" char="&quot;" lookAhead="true"/>
       </context>
 
@@ -203,7 +204,7 @@
         <AnyChar context="#pop!Arguments" String="&eocommand;" lookAhead="true"/>
         <RegExpr attribute="CommandPath" String="&pathpart;" />
         <keyword attribute="UnixCommand" String="unixcommands"/>
-        <RegExpr attribute="Command" String="&funcname;" />
+        <RegExpr attribute="Command" String="&command;" />
         <IncludeRules context="FindStrings" />
         <RegExpr attribute="Error" String="." />
       </context>
@@ -301,14 +302,9 @@
 
       <context name="ArgumentsTest" attribute="Normal Text" lineEndContext="#pop">
         <LineContinue attribute="Escape" />
-        <DetectChar context="#pop" char="#" lookAhead="true" />
-        <IncludeRules context="ArgumentsTest_common" />
-      </context>
-
-      <context name="ArgumentsTest_common" attribute="Normal Text" lineEndContext="#pop">
         <RegExpr attribute="Operator" context="DirectPath" String="-&testoptsfile; " />
         <RegExpr attribute="Operator" String="-&testoptsother; |!=?|=| -eq | -ne | -gt | -ge | -lt | -le "/>
-        <AnyChar context="#pop" String="&commandsep;" lookAhead="true"/>
+        <AnyChar context="#pop" String="&commandsep;#" lookAhead="true"/>
         <IncludeRules context="FindArgumentsCommon" />
       </context>
 
@@ -444,13 +440,13 @@
       <!--Argument Rules match the items after a command
             this one is a collection with the common part for inclusion-->
       <context name="Arguments" attribute="Normal Text" lineEndContext="#pop">
-        <DetectChar attribute="Comment" context="Comment" char="#"/>
         <AnyChar context="#pop" String="&commandsep;)" lookAhead="true"/>
+        <DetectChar attribute="Comment" context="Comment" char="#"/>
         <IncludeRules context="FindArgumentsCommon" />
       </context>
 
       <context name="FindArgumentsCommon" attribute="Normal Text" lineEndContext="#stay">
-        <LineContinue attribute="Escape" />
+        <LineContinue context="ArgumentPotentialMultiLineComment" lookAhead="1"/>
         <DetectSpaces attribute="Normal Text" />
         <RegExpr attribute="Option" String="-&alnumdash;*" />
         <RegExpr attribute="Redirection" context="Redirect" String="[0-9]*(?:&gt;{1,2}|&lt;|\^{1,2})" />
@@ -463,6 +459,17 @@
         <IncludeRules context="FindPaths" />
         <IncludeRules context="FindEscapes" />
         <RegExpr attribute="Normal Text" String="[^&separator;&special;]*" />  <!--unknown token-->
+      </context>
+
+      <!-- check \ preceded by a space -->
+      <context name="ArgumentPotentialMultiLineComment" attribute="Comment">
+        <RegExpr attribute="Escape" context="ArgumentComment" String="(?&lt;=\s)\\$" />
+        <LineContinue attribute="Escape" context="#pop"/>
+      </context>
+
+      <context name="ArgumentComment" attribute="Comment" fallthroughContext="#pop#pop">
+        <DetectSpaces attribute="Normal Text"/>
+        <DetectChar context="Comment" char="#"/>
       </context>
 
       <context name="ArgumentsNonePre" attribute="Normal Text" lineEndContext="#pop">

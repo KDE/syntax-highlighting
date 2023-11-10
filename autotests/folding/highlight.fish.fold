@@ -39,6 +39,9 @@ other> abc  # ok
 oth>er abc  # ok
 ot(her) abc # show error
 
+-cmd
+déjà-vu
+
 ls /ho"me/te"st'user'/abc$dir[3]/ab(echo cdefg)cd/xyz
 cat\ alog -abc
 ls path_not_detected
@@ -65,6 +68,9 @@ set test1\
 [2..4 -2..-4]\
 [1] a
 #~~ invalid
+set test1 \
+    #bla bla
+    a b c
 set page_url http://fishshell.com/docs/$version_string/$fish_help_page    # ???
 string split . example.com
 set b (string repeat -n 512 x)
@@ -367,11 +373,14 @@ read \
 
 
 # see https://github.com/fish-shell/fish-shell/pull/1987
-# this should work, but I found no way to implement it:
 echo before comment \
   # comment
   # comment2
-  after comment # error: after should be just another argument
+  after comment # just another argument
+echo before comment\
+  # comment        ^ no space
+  # comment2
+  after comment # a command
 from root
 
 echo "hello" | \

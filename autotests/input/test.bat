@@ -60,6 +60,8 @@ cls
 echo. & echo. & echo 1 & echo 2
 pause & exit /b 0
 echo foo ^& ^| ^^ ^< ^> ^( ^)
+echo foo ^
+echo bar &rem here, echo is not a command
 echo %%
 echo %PATH%
 echo %HomeDrive%\Users\%UserName%
@@ -79,6 +81,8 @@ runas /User:%UserName% "cmd /c \"notepad \"%cd%\\%~nx0\""
 timeout /t 10 /nobreak
 exit /b
 test.bat arg
+test.bat arg^
+arg
 
 call :WriteTestBat >>test.bat
 echo abc2>file

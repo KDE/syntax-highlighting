@@ -180,29 +180,29 @@ Theme Repository::defaultTheme(Repository::DefaultTheme t) const
 Theme Repository::themeForPalette(const QPalette &palette) const
 {
     const auto base = palette.color(QPalette::Base);
+    const auto highlight = palette.color(QPalette::Highlight).rgb();
 
-    // find themes with matching background colors
-    QList<const KSyntaxHighlighting::Theme *> matchingThemes;
+    // find themes with matching background and highlight colors
+    const Theme *firstMatchingTheme = nullptr;
     for (const auto &theme : std::as_const(d->m_themes)) {
-        const auto background = theme.editorColor(KSyntaxHighlighting::Theme::EditorColorRole::BackgroundColor);
+        const auto background = theme.editorColor(Theme::EditorColorRole::BackgroundColor);
         if (background == base.rgb()) {
-            matchingThemes.append(&theme);
-        }
-    }
-    if (!matchingThemes.empty()) {
-        // if there's multiple, search for one with a matching highlight color
-        const auto highlight = palette.color(QPalette::Highlight);
-        for (const auto *theme : std::as_const(matchingThemes)) {
-            auto selection = theme->editorColor(KSyntaxHighlighting::Theme::EditorColorRole::TextSelection);
-            if (selection == highlight.rgb()) {
-                return *theme;
+            // find theme with a matching highlight color
+            auto selection = theme.editorColor(Theme::EditorColorRole::TextSelection);
+            if (selection == highlight) {
+                return theme;
+            }
+            if (!firstMatchingTheme) {
+                firstMatchingTheme = &theme;
             }
         }
-        return *matchingThemes.first();
+    }
+    if (firstMatchingTheme) {
+        return *firstMatchingTheme;
     }
 
     // fallback to just use the default light or dark theme
-    return defaultTheme((base.lightness() < 128) ? KSyntaxHighlighting::Repository::DarkTheme : KSyntaxHighlighting::Repository::LightTheme);
+    return defaultTheme((base.lightness() < 128) ? Repository::DarkTheme : Repository::LightTheme);
 }
 
 void RepositoryPrivate::load(Repository *repo)

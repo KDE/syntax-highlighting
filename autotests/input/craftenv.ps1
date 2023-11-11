@@ -1,13 +1,106 @@
 <#
-   Copied from Craft for testing syntax highlighting
+  .SYNOPSIS
+  Lorem ipsum dolor sit amet.
+
+  .DESCRIPTION
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+  sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+  .PARAMETER InputPath
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+  .parameter InputPath
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+  bla .PARAMETER InputPath
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+  .EXAMPLE
+  PS> .\foo.ps1
 #>
 
 @" multi
    line
    string
+   $x
+   "'
+   \n
+ "@
 "@
 
-$foo = "Test `u{2013} String`nwith `"escapes`""
+@' multi
+   line
+   string
+   $x
+   "'
+   \n
+ '@
+'@
+
+$foo = "Test `u{2013} String`nwith `"escapes`" """
+$foo = "Test `u{2013} String`nwith `"escapes`" `
+dssad"
+$foo = 'bla bla''bla bla $x `n'
+$Global:HOME = "abc"
+
+[bool]::Parse('false')
+
+echo [bool]::Parse('false')
+echo $env:EDITOR ${env:EDITOR} $foo ${foo} $foo-bar ${foo-bar} ${a b
+c}
+echo "hashtable: $(@{ key = 'value' })"
+echo 122.42kb 332.d 23d 625 3232e+2 0x233 0b1101
+echo 0xaj 0b1112 123a
+
+docker run -dp 3000:3000 `
+  -w /app -v "$(pwd):/app" `
+  --network todo-app `
+  -e MYSQL_HOST=mysql `
+  -e MYSQL_USER=root `
+  -e MYSQL_PASSWORD=secret `
+  -e MYSQL_DB=todos `
+  node:12-alpine `
+  cmd "npm install && npm run start"
+
+
+function Get-NewPix
+{
+  $start = Get-Date -Month 1 -Day 1 -Year 2010
+  $allpix = Get-ChildItem -Path $env:UserProfile\*.jpg -Recurse
+  $allpix | Where-Object {$_.LastWriteTime -gt $Start}
+}
+
+function Get-SmallFiles {
+  Param($Size)
+  Get-ChildItem $HOME | Where-Object {
+    $_.Length -lt $Size -and !$_.PSIsContainer
+  }
+}
+
+function Get-EscapedPath
+{
+    param(
+    [Parameter(
+        Position=0,
+        Mandatory=$true
+        ValueFromPipeline=$true,
+        ValueFromPipelineByPropertyName=$true)
+    ]
+    [string]$path
+    )
+
+    process {
+        if ($path.Contains(' '))
+        {
+            return '"' + $path + '"'
+        }
+        return $path
+    }
+}
+
+<#
+   Copied from Craft for testing syntax highlighting
+#>
 
 #    this file sets some environment variables that are needed
 #    for finding programs and libraries etc.
@@ -79,7 +172,6 @@ function prependPATH([string] $path)
 {
     $env:PATH="$path{0}$env:PATH" -f [IO.Path]::PathSeparator
 }
-
 
 if( -Not $env:CRAFT_PYTHON)
 {

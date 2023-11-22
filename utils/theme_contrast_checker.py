@@ -6,38 +6,51 @@ import argparse
 import json
 import sys
 
-parser = argparse.ArgumentParser(description='Contrast checker for themes.')
+parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
+                                 description='''Contrast checker for themes
+
+Allows you to view all the colors and backgrounds applied to a theme and rate the contrast based on the APCA (Accessible Perceptual Contrast Algorithm) used in WCAG 3. A very low score is a sign of poor contrast, and can make reading difficult or impossible.
+
+However, color perception depends on the individual, hardware or software configurations (night/blue light filter), lighting or simply surrounding colors. For example, low contrast may remain legible in the editor when not surrounded by bright color.
+
+There are 3 options for modifying the contract result:
+
+  -a / --add-luminance and -p / --add-percent-luminance to directly modify the output value. For example, -p -14 -a 15 increases the constrast a little when it's low and very little when it's high.
+
+  -C / --color-space Okl selects a color space with different properties, mainly on the color red.
+''')
 
 parser.add_argument('-f', '--bg', metavar='BACKGROUND', action='append',
-                    help='Show only the specified background color styles')
+                    help='show only the specified background color styles')
 parser.add_argument('-l', '--language', metavar='LANGUAGE', action='append',
-                    help='Show only the specified language')
+                    help='show only the specified language')
 
 parser.add_argument('-c', '--no-custom-styles', action='store_true',
-                    help='Do not display custom languages')
+                    help='do not display custom languages')
 parser.add_argument('-s', '--no-standard-styles', action='store_true',
-                    help='Do not display standard colors')
+                    help='do not display standard colors')
 parser.add_argument('-b', '--no-borders', action='store_true',
-                    help='Do not display border colors')
+                    help='do not display border colors')
 parser.add_argument('-H', '--no-legend', action='store_true',
-                    help='Do not display legend')
+                    help='do not display legend')
 
 parser.add_argument('-M', '--min-luminance', metavar='LUMINANCE', type=float, default=0,
-                    help='Only displays colors with a lower luminance')
+                    help='only displays colors with a lower luminance')
 parser.add_argument('-L', '--max-luminance', metavar='LUMINANCE', type=float, default=110.0,
-                    help='Only displays colors with a lower luminance')
+                    help='only displays colors with a lower luminance')
 
 parser.add_argument('-a', '--add-luminance', metavar='LUMINANCE', type=float, default=0,
-                    help='Add fixed value for luminance')
+                    help='add fixed value for luminance')
 parser.add_argument('-p', '--add-percent-luminance', metavar='LUMINANCE', type=float, default=0,
-                    help='Add percent luminance. Apply before --add-luminance.')
+                    help='add percent luminance. Apply before --add-luminance')
 
-parser.add_argument('-P', '--profile', default='Oklab',
-                    choices=['Oklab', 'W3', 'DisplayP3', 'AdobeRGB'],
-                    help='Select an APCA constant profile')
+# sRGB is W3 in APCA
+parser.add_argument('-C', '--color-space', default='sRGB',
+                    choices=['sRGB', 'DisplayP3', 'AdobeRGB', 'Rec2020', 'Okl'],
+                    help='select a color space ; Okl is a color space that increases the contrast of red with black or blue background and decreases it with white or green background')
 
 parser.add_argument('-d', '--compute-diff', action='store_true',
-                    help='Compute luminance between 2 colors or more. The first color represents the background, the others the foreground')
+                    help='compute luminance between 2 colors or more ; the first color represents the background, the others the foreground')
 
 parser.add_argument('themes_or_colors', metavar='THEME_OR_COLOR', nargs='+',
                     help='a .theme file or a color (#rgb, #rrggbb, #argb, #aarrggbb) when -d / --compute-diff is used')
@@ -90,48 +103,88 @@ def parse_rgb_color(color: str, bg: RGBColor) -> RGBColor:
     )
 
 
-if args.profile == 'Oklab':
-    def inverse_gamma_companding(c: int) -> float:
-        # [0, 255] to [0, 1]
-        v = c / 255.0;
-        if v <= 0.04045:
-            return v / 12.92
-        return ((v + 0.055) / 1.055) ** 2.4
+# based on https://drafts.csswg.org/css-color/#color-conversion-code (CSS 4)
+# 17. Sample code for Color Conversions
 
-    def sRGBtoY(rgb: RGBColor) -> float:
+def lin_sRGB(c: int) -> float:
+    # [0, 255] to [0, 1]
+    v = c / 255.0
+    if v <= 0.04045:
+        return v / 12.92
+    return ((v + 0.055) / 1.055) ** 2.4
+
+sRGB_to_Y_mat = (
+    0.21263900587151036,
+    0.71516867876775592,
+    0.072192315360733714,
+)
+
+DisplayP3_to_Y_mat = (
+    0.22897456406974884,
+    0.69173852183650619,
+    0.079286914093744998,
+)
+
+# not in CSS
+Okl_to_Y_mat = (
+    # These values are the formula which calculates `l` in the XYZ to Okalab transformation.
+    # (https://bottosson.github.io/posts/oklab/#converting-from-linear-srgb-to-oklab)
+    # Specifically taking these values doesn't really make sense, but compared to sRGB
+    # - the luminance between red and green will be very greatly decreased
+    # - the luminance between red and white will be decreased
+    # - the luminance between red and blue / black color will be greatly increased
+    # - the luminance between blue and green will be decreased
+    0.4122214708,
+    0.5363325363,
+    0.0514459929,
+)
+
+def lin_AdobeRGB(c: int) -> float:
+    # [0, 255] to [0, 1]
+    return (c / 255.0) ** 2.19921875
+
+AdobeRGB_to_Y_mat = (
+    0.29734497525053616,
+    0.62736356625546597,
+    0.07529145849399789,
+)
+
+def lin_Rec2020(c: int) -> float:
+    # [0, 255] to [0, 1]
+    v = c / 255.0
+
+    if v < 0.08124285829863151:
+        return v / 4.5
+
+    return ((v + 0.09929682680944) / 1.09929682680944) ** (1 / 0.45)
+
+Rec2020_to_Y_mat = (
+    0.26270021201126703,
+    0.67799807151887104,
+    0.059301716469861945,
+)
+
+def make_to_Y(lin, mat):
+    def to_Y(rgb: RGBColor) -> float:
         return (
-            0.4122214708 * inverse_gamma_companding(rgb[0]) +
-            0.5363325363 * inverse_gamma_companding(rgb[1]) +
-            0.0514459929 * inverse_gamma_companding(rgb[2])
+            mat[0] * lin(rgb[0]) +
+            mat[1] * lin(rgb[1]) +
+            mat[2] * lin(rgb[2])
         )
-else:
-    if args.profile == 'W3':
-        mainTRC = 2.4  # exponent for emulating actual monitor perception
-        # sRGB coefficients
-        sRco = 0.2126729
-        sGco = 0.7151522
-        sBco = 0.0721750
+    return to_Y
 
-    elif args.profile == 'DisplayP3':
-        mainTRC = 2.4  # exponent for emulating actual monitor perception
-        # displayP3 coefficients
-        sRco = 0.2289829594805780
-        sGco = 0.6917492625852380
-        sBco = 0.0792677779341829
 
-    else:  # AdobeRGB
-        mainTRC = 2.35  # exponent for emulating actual monitor perception
-        # adobeRGB coefficients
-        sRco = 0.2973550227113810
-        sGco = 0.6273727497145280
-        sBco = 0.0752722275740913
+if args.color_space == 'sRGB':
+    rgb_to_Y = make_to_Y(lin_sRGB, sRGB_to_Y_mat)
+elif args.color_space == 'Okl':
+    rgb_to_Y = make_to_Y(lin_sRGB, Okl_to_Y_mat)
+elif args.color_space == 'DisplayP3':
+    rgb_to_Y = make_to_Y(lin_sRGB, DisplayP3_to_Y_mat)
+elif args.color_space == 'AdobeRGB':
+    rgb_to_Y = make_to_Y(lin_AdobeRGB, AdobeRGB_to_Y_mat)
+else:  # Rec2020
+    rgb_to_Y = make_to_Y(lin_Rec2020, Rec2020_to_Y_mat)
 
-    def sRGBtoY(rgb: RGBColor) -> float:
-        return (
-            sRco * (rgb[0] / 255) ** mainTRC +
-            sGco * (rgb[1] / 255) ** mainTRC +
-            sBco * (rgb[2] / 255) ** mainTRC
-        )
 
 # https://github.com/Myndex/apca-w3
 
@@ -195,7 +248,7 @@ class ColorInfo:
     def __init__(self, rgb: str, bg: RGBColor):
         self.text = rgb
         self.color = parse_rgb_color(rgb, bg)
-        self.Y = sRGBtoY(self.color)
+        self.Y = rgb_to_Y(self.color)
 
     def __str__(self) -> str:
         return self.text

@@ -52,6 +52,9 @@ parser.add_argument('-C', '--color-space', default='sRGB',
 parser.add_argument('-d', '--compute-diff', action='store_true',
                     help='compute luminance between 2 colors or more ; the first color represents the background, the others the foreground')
 
+parser.add_argument('-F', '--output-format', default='ansi', choices=['ansi', 'html'])
+parser.add_argument('-T', '--html-title', help='title of html page when --output-format=html')
+
 parser.add_argument('themes_or_colors', metavar='THEME_OR_COLOR', nargs='+',
                     help='a .theme file or a color (#rgb, #rrggbb, #argb, #aarrggbb) when -d / --compute-diff is used')
 
@@ -259,9 +262,9 @@ BOLD_LUMINANCE       = (80, 65, 50, 38, 30)
 SPELL_LUMINANCE      = (70, 55, 40, 30, 25)
 DECORATION_LUMINANCE = (60, 45, 30, 15, 10)
 
-BOLD_TEXT = (BOLD_LUMINANCE, '\x1b[1mText. ▐')
-NORMAL_TEXT = (NORMAL_LUMINANCE, 'Text. ▐')
-DECORATION_TEXT = (DECORATION_LUMINANCE, NORMAL_TEXT[1])
+BOLD_TEXT = (BOLD_LUMINANCE, False, 'Text. ▐')
+NORMAL_TEXT = (NORMAL_LUMINANCE, True, 'Text. ▐')
+DECORATION_TEXT = (DECORATION_LUMINANCE, False, 'Text. ▐')
 HEADER = (
     '\x1b[35m'
     ' Background                             |'
@@ -277,7 +280,7 @@ RANK4 = '\x1b[33m'
 RANK5 = '\x1b[31m'
 RANK6 = '\x1b[31;1m'
 
-def _ffloat(x: float) -> str:
+def ffloat(x: float) -> str:
     s = f'{x:>5.1f}\x1b[m'
     return s.replace('.', '\x1b[37m.')
 
@@ -287,6 +290,7 @@ def flum(luminance: float,
          bg: ColorInfo,
          fg: ColorInfo,
          luminance_values: tuple[int, int, int, int, int],
+         is_bold: bool,
          sample_text: str
          ) -> str:
     """
@@ -299,7 +303,7 @@ def flum(luminance: float,
     if add_luminance or add_percent_luminance:
         adjusted_luminance += adjusted_luminance * add_percent_luminance + add_luminance
         adjusted_luminance = max(0, min(108, adjusted_luminance))
-        adjusted_text = f' \x1b[35m->\x1b[m {_ffloat(adjusted_luminance)}'
+        adjusted_text = f' \x1b[35m->\x1b[m {ffloat(adjusted_luminance)}'
 
     (AAAA, AAA, AA, BAD, VERY_BAD) = luminance_values
     if adjusted_luminance >= AAAA:
@@ -317,8 +321,9 @@ def flum(luminance: float,
 
     (r1, g1, b1) = fg.color
     (r2, g2, b2) = bg.color
-    return f'{_ffloat(luminance)}{adjusted_text} | {score}\x1b[m  ' \
-           f'\x1b[38;2;{r1};{g1};{b1};48;2;{r2};{g2};{b2}m {sample_text} \x1b[m'
+    bold = ';1' if is_bold else ''
+    return f'{ffloat(luminance)}{adjusted_text} | {score}\x1b[m  ' \
+           f'\x1b[38;2;{r1};{g1};{b1};48;2;{r2};{g2};{b2}{bold}m {sample_text} \x1b[m'
 
 def color2ansi(rgb: RGBColor) -> str:
     return f'{rgb[0]};{rgb[1]};{rgb[2]}'
@@ -356,6 +361,8 @@ def create_tab_from_text_styles(min_luminance: float,
     return '\n'.join(lines)
 
 
+output = []
+
 def run_borders(
     min_luminance: float,
     max_luminance: float,
@@ -364,7 +371,7 @@ def run_borders(
     editor_colors: dict[str, str],
     bg_editor: RGBColor
 ) -> None:
-    print('\n\x1b[34mIcon Border\x1b[m:')
+    output.append('\n\x1b[34mIcon Border\x1b[m:\n')
 
     bg_icon = ColorInfo(editor_colors['IconBorder'], (0, 0, 0))
     bg_current_line = ColorInfo(editor_colors['CurrentLine'], bg_editor.color)
@@ -391,13 +398,13 @@ def run_borders(
               f'\x1b[48;2;{color2ansi(bg_current_line.color)}m        \x1b[m'
 
     # imitates the border of Kate editor
-    print(f'          LineNumbers: {xborder} 42 {xeditor} bg:  IconBorder | BackgroundColor\n'
+    output.append(f'          LineNumbers: {xborder} 42 {xeditor} bg:  IconBorder | BackgroundColor\n'
           f'    CurrentLineNumber: {cborder} 43 {ceditor} bg: CurrentLine | CurrentLine\n'
           f'          LineNumbers: {xborder} 44{xmodified}{xeditor} (ModifiedLines)\n'
           f'    CurrentLineNumber: {cborder} 45{cmodified}{ceditor}\n'
           f'          LineNumbers: {xborder} 46{xsaved}{xeditor} (SavedLines)\n'
           f'    CurrentLineNumber: {cborder} 47{csaved}{ceditor}\n'
-          f'                            ⧹ Separator\n\n{HEADER}')
+          f'                            ⧹ Separator\n\n{HEADER}\n')
 
     color_line_number = ('LineNumbers', fg_line, NORMAL_TEXT)
     colors = (
@@ -420,8 +427,8 @@ def run_borders(
                 lines.append(f' {col} | {fcol2(k, fg.text)} | {result}')
 
         if lines:
-            print('\n'.join(lines))
-            print()
+            output.append('\n'.join(lines))
+            output.append('\n\n')
 
     # table for Separator color
     for name, bg in (
@@ -433,8 +440,8 @@ def run_borders(
         if min_luminance <= abs(lum) <= max_luminance:
             col = fcol1(name, bg.text)
             result = flum(lum, add_luminance, add_percent_luminance,
-                          bg, fg_separator, DECORATION_LUMINANCE, NORMAL_TEXT[1])
-            print(f' {col} | {fcol2("Separator", fg_separator.text)} | {result}')
+                          bg, fg_separator, DECORATION_LUMINANCE, False, NORMAL_TEXT[2])
+            output.append(f' {col} | {fcol2("Separator", fg_separator.text)} | {result}\n')
 
 
 def run(d: dict[str, str | dict[str, bool | str | dict[str, bool | str]]],
@@ -452,7 +459,7 @@ def run(d: dict[str, str | dict[str, bool | str | dict[str, bool | str]]],
 
     bg_editor = ColorInfo(editor_colors['BackgroundColor'], (0, 0, 0))
 
-    print(f'\x1b[1;34mTheme\x1b[m: {d["metadata"]["name"]}')
+    output.append(f'\x1b[34;1mTheme\x1b[m: {d["metadata"]["name"]}\n')
 
     if show_borders:
         run_borders(min_luminance, max_luminance,
@@ -463,7 +470,7 @@ def run(d: dict[str, str | dict[str, bool | str | dict[str, bool | str]]],
     # Editor
     #
 
-    print('\n\x1b[34mText Area\x1b[m:')
+    output.append('\n\x1b[34mText Area\x1b[m:\n')
 
     editor_bg_colors = {
         k: (ColorInfo(editor_colors[k], bg_editor.color), 'text-color')
@@ -509,12 +516,12 @@ def run(d: dict[str, str | dict[str, bool | str | dict[str, bool | str]]],
             lum = APCA_contrast(fg.Y, bg.Y)
             if min_luminance <= abs(lum) <= max_luminance:
                 result = flum(lum, add_luminance, add_percent_luminance,
-                              bg, fg, SPELL_LUMINANCE, '~~~~~~~')
+                              bg, fg, SPELL_LUMINANCE, False, '~~~~~~~')
                 spell_line = f' {col} | {fcol2(name, fg.text)} | {result}'
                 tab = f'{tab}\n{spell_line}' if tab else spell_line
 
             if tab:
-                print(f'\n{HEADER}\n{tab}')
+                output.append(f'\n{HEADER}\n{tab}\n')
 
         # table by language for custom styles
         for language, defs in sorted(custom_styles.items()):
@@ -525,7 +532,7 @@ def run(d: dict[str, str | dict[str, bool | str | dict[str, bool | str]]],
                 add_luminance, add_percent_luminance,
                 col, kstyle, bg, defs
             ):
-                print(f'\n\x1b[36mLanguage: "{language}"\x1b[m:\n{tab}')
+                output.append(f'\n\x1b[36mLanguage: "{language}"\x1b[m:\n{tab}\n')
 
     # ignored:
     # - WordWrapMarker
@@ -549,9 +556,8 @@ def result_legend(AAAA: float, AAA: float, AA: float, BAD: float, VERY_BAD: floa
     )
 
 
-try:
-    if not args.no_legend:
-        print(f'''Luminance legend:
+if not args.no_legend:
+    output.append(f'''Luminance legend:
 - Range for light theme: [0; 106]
 - Range for  dark theme: [0; 108]
 - Result for normal text:    {result_legend(*NORMAL_LUMINANCE)}
@@ -560,53 +566,204 @@ try:
 - Result for decoration:     {result_legend(*DECORATION_LUMINANCE)}
 
 Luminance adjustement: {args.add_percent_luminance:+}% {args.add_luminance:+}  (see -p and -a)
+
 ''')
 
-    add_luminance = args.add_luminance
-    add_percent_luminance = args.add_percent_luminance / 100
+add_luminance = args.add_luminance
+add_percent_luminance = args.add_percent_luminance / 100
 
-    if args.compute_diff:
-        bg = ColorInfo(args.themes_or_colors[0], (0,0,0))
-        print('Background | Foreground')
+if args.compute_diff:
+    bg = ColorInfo(args.themes_or_colors[0], (0,0,0))
+    output.append('Background | Foreground\n')
 
-        # compares the background with all foreground colors in normal and bold
-        for color in args.themes_or_colors[1:]:
-            fg = ColorInfo(color, bg.color)
-            lum = APCA_contrast(fg.Y, bg.Y)
-            col = f'{bg.text:^10} | {fg.text:^10} |'
-            print(col, flum(lum, add_luminance, add_percent_luminance,
-                            bg, fg, *NORMAL_TEXT))
-            print(col, flum(lum, add_luminance, add_percent_luminance,
-                            bg, fg, *BOLD_TEXT))
+    # compares the background with all foreground colors in normal and bold
+    for color in args.themes_or_colors[1:]:
+        fg = ColorInfo(color, bg.color)
+        lum = APCA_contrast(fg.Y, bg.Y)
+        col = f'{bg.text:^10} | {fg.text:^10} | '
+        output.append(col)
+        output.append(flum(lum, add_luminance, add_percent_luminance, bg, fg, *NORMAL_TEXT))
+        output.append('\n')
+        output.append(col)
+        output.append(flum(lum, add_luminance, add_percent_luminance, bg, fg, *BOLD_TEXT))
+        output.append('\n')
+else:
+    add_new_line = False
+    for theme in args.themes_or_colors:
+        if add_new_line:
+            output.append('\n\n')
+        add_new_line = True
+
+        # read json theme file
+        try:
+            if theme == '-':
+                data = json.load(sys.stdin)
+            else:
+                with open(theme) as f:
+                    data = json.load(f)
+        except OSError as e:
+            print(f'\x1b[31m{e}\x1b[m', file=sys.stderr)
+            continue
+
+        run(data,
+            args.min_luminance,
+            args.max_luminance,
+            add_luminance,
+            add_percent_luminance,
+            not args.no_borders,
+            not args.no_custom_styles,
+            not args.no_standard_styles,
+            args.bg and set(args.bg),
+            args.language and set(args.language),
+        )
+
+is_html = args.output_format == 'html' and not args.compute_diff
+
+output = ''.join(output)
+
+if is_html:
+    import re
+
+    ansi_to_html = {
+        '1': 'bold',
+        '31': 'red',
+        '32': 'green',
+        '33': 'orange',
+        '34': 'blue',
+        '35': 'purple',
+        '36': 'cyan',
+        '37': 'gray',
+    }
+
+    extract_color = re.compile(r'([34])8;2;(\d+);(\d+);(\d+)')
+    extract_effect = re.compile(r'\d+')
+
+    depth = 0
+    def replace_styles(m) -> str:
+        global depth
+
+        effects = m[1]
+        if not effects:
+            ret = '</span>' * depth
+            depth = 0
+            return ret
+
+        depth += 1
+        colors = []
+        def rgb(m) -> str:
+           prop = 'color' if m[1] == '3' else 'background'
+           colors.append(f'{prop}:rgb({m[2]},{m[3]},{m[4]})')
+           return ''
+        effects = extract_color.sub(rgb, effects)
+        if colors:
+            styles = ';'.join(colors)
+            styles = f' style="{styles}"'
+        else:
+            styles = ''
+
+        classes = ' '.join(map(lambda s: ansi_to_html[s], extract_effect.findall(effects)))
+        if classes:
+            classes = f' class="{classes}"'
+
+        return f'<span{styles}{classes}>'
+
+    output = re.sub(r'\x1b\[([^m]*)m', replace_styles, output)
+
+try:
+    if is_html:
+        bg = data['editor-colors']['BackgroundColor'];
+        rgb = parse_rgb_color(bg, (0,0,0))
+        if (rgb[0] < 127) + (rgb[0] < 127) + (rgb[0] < 127) >= 2:
+            tmode1 = '#light:target'
+            tmode2 = ''
+            mode1 = 'dark'
+            mode2 = 'light'
+        else:
+            tmode1 = ''
+            tmode2 = '#dark:target'
+            mode1 = 'light'
+            mode2 = 'dark'
+        title = args.html_title or data["metadata"]["name"]
+        sys.stdout.write(f'''<!DOCTYPE html>
+<html><head><title>{title}</title><style>
+html, body, #mode {{
+  padding: 0;
+  margin: 0;
+}}
+
+body {{
+  padding: .5em;
+}}
+
+pre {{
+  font-family: "JetBrains Mono", "Liberation Mono", Firacode, "DejaVu Sans Mono", Inconsolata, monospace;
+}}
+
+.bold {{ font-weight: bold }}
+
+/* light theme */
+
+body{tmode1} {{
+  background: #ddd;
+  color: #000;
+}}
+
+{tmode1} .red {{ color: #A02222 }}
+{tmode1} .green {{ color: #229022 }}
+{tmode1} .orange {{ color: #909022 }}
+{tmode1} .blue {{ color: #2222A0 }}
+{tmode1} .purple {{ color: #A022A0 }}
+{tmode1} .cyan {{ color: #22A0A0 }}
+{tmode1} .gray {{ color: Gray }}
+
+/* dark theme */
+
+body{tmode2} {{
+  background: #222;
+  color: #eee;
+}}
+{tmode2} .red {{ color: #D95555 }}
+{tmode2} .green {{ color: #55D055 }}
+{tmode2} .orange {{ color: #D0D055 }}
+{tmode2} .blue {{ color: #68A0E8 }}
+{tmode2} .purple {{ color: #D077D0 }}
+{tmode2} .cyan {{ color: Turquoise }}
+{tmode2} .gray {{ color: Gray }}
+
+div {{
+  position: absolute;
+  top: -1px;
+  left: 0;
+}}
+
+#mode a {{
+  padding: .5rem 1rem;
+}}
+
+#light-mode {{
+  color: #2222A0;
+  background: #ddd;
+}}
+#light-mode:hover, #light-mode:focus {{ background: #ccc; }}
+
+#dark-mode {{
+  color: #68a0E8;
+  background: #222;
+}}
+#dark-mode:hover, #dark-mode:focus {{ background: #333; }}
+
+#{mode1}-mode {{ display: none }}
+#{mode2}-mode {{ display: inline-block }}
+#{mode2}:target #{mode2}-mode {{ display: none }}
+#{mode2}:target #{mode1}-mode {{ display: inline-block }}
+
+</style></head><body id="{mode2}">
+<p id="mode"><a id="{mode2}-mode" href="#{mode2}">Switch to {mode2} mode</a><a id="{mode1}-mode" href="#{mode1}">Switch to {mode1} mode</a></p>
+<pre>''')
+        sys.stdout.write(output)
+        sys.stdout.write('</pre></body></html>')
     else:
-        add_new_line = False
-        for theme in args.themes_or_colors:
-            if add_new_line:
-                print('\n')
-            add_new_line = True
-
-            # read json theme file
-            try:
-                if theme == '-':
-                    data = json.load(sys.stdin)
-                else:
-                    with open(theme) as f:
-                        data = json.load(f)
-            except OSError as e:
-                print(f'\x1b[31m{e}\x1b[m', file=sys.stderr)
-                continue
-
-            run(data,
-                args.min_luminance,
-                args.max_luminance,
-                add_luminance,
-                add_percent_luminance,
-                not args.no_borders,
-                not args.no_custom_styles,
-                not args.no_standard_styles,
-                args.bg and set(args.bg),
-                args.language and set(args.language),
-            )
+        sys.stdout.write(output)
 
     # flush output here to force SIGPIPE to be triggered
     sys.stdout.flush()

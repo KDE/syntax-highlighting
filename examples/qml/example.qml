@@ -4,10 +4,11 @@
     SPDX-License-Identifier: MIT
 */
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
-import org.kde.syntaxhighlighting 1.0
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import org.kde.kirigami as Kirigami
+import org.kde.syntaxhighlighting
 
 ApplicationWindow {
     visible: true
@@ -16,7 +17,13 @@ ApplicationWindow {
 
     ColumnLayout {
         anchors.fill: parent
+        spacing: Kirigami.Units.smallSpacing
         RowLayout {
+            spacing: Kirigami.Units.smallSpacing
+            Layout.fillWidth: true
+            Layout.topMargin: Kirigami.Units.smallSpacing
+            Layout.leftMargin: Kirigami.Units.smallSpacing
+            Layout.rightMargin: Kirigami.Units.smallSpacing
             Label { text: "Syntax" }
             ComboBox {
                 Layout.fillWidth: true
@@ -27,6 +34,10 @@ ApplicationWindow {
             }
         }
         RowLayout {
+            spacing: Kirigami.Units.smallSpacing
+            Layout.fillWidth: true
+            Layout.leftMargin: Kirigami.Units.smallSpacing
+            Layout.rightMargin: Kirigami.Units.smallSpacing
             Label { text: "Theme" }
             ComboBox {
                 Layout.fillWidth: true
@@ -44,26 +55,36 @@ ApplicationWindow {
                 onClicked: highlighter.theme = Repository.DarkTheme
             }
         }
-        TextArea {
+        ScrollView {
             Layout.fillHeight: true
             Layout.fillWidth: true
-            id: myText
 
-            text: "Text {\n text: \"Hello World!\"\n width: 42\n}"
-            wrapMode: TextEdit.Wrap
-            Kirigami.SpellCheck.enabled: false
+            TextArea {
+                id: myText
 
-            SyntaxHighlighter {
-                id: highlighter
-                textEdit: myText
-                repository: Repository
-                // work around for QML not repainting a re-highlighted document...
-                onDefinitionChanged: { myText.selectAll(); myText.deselect(); }
-                onThemeChanged: { myText.selectAll(); myText.deselect(); }
+                font.family: "monospace"
+                wrapMode: TextEdit.Wrap
+                text: `\
+Text {
+    text: "Hello World!"
+    width: 42
+}\
+`
+                Kirigami.SpellCheck.enabled: false
+
+                SyntaxHighlighter {
+                    id: highlighter
+                    textEdit: myText
+                    repository: Repository
+                }
             }
         }
         Label {
-            text: "Syntax: " + highlighter.definition.translatedSection + "/" + highlighter.definition.translatedName + "  Theme: " + highlighter.theme.translatedName
+            Layout.fillWidth: true
+            Layout.margins: Kirigami.Units.smallSpacing
+            Layout.topMargin: 0
+            elide: Text.ElideRight
+            text: `Syntax: ${highlighter.definition.translatedSection}/${highlighter.definition.translatedName}. Theme: ${highlighter.theme.translatedName}`
         }
     }
 

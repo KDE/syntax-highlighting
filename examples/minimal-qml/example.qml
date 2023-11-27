@@ -4,22 +4,26 @@
     SPDX-License-Identifier: MIT
 */
 
-import QtQuick 2.6
-import QtQuick.Controls 2.0
-import org.kde.syntaxhighlighting 1.0
+import QtQuick
+import QtQuick.Controls as QQC2
+import org.kde.syntaxhighlighting
 
-TextArea {
-    id: myText
-
+QQC2.ScrollView {
     width: 250
     height: 250
 
-    text: "int foo = 0;"
-    wrapMode: TextEdit.Wrap
-    Kirigami.SpellCheck.enabled: false
+    QQC2.TextArea {
+        id: myText
 
-    SyntaxHighlighter {
-        textEdit: myText
-        definition: "C++"
+        text: "int foo = 0;"
+        wrapMode: TextEdit.Wrap
+        focus: true
+
+        Kirigami.SpellCheck.enabled: false
+
+        SyntaxHighlighter {
+            textEdit: myText
+            definition: "C++"
+        }
     }
 }

@@ -15,6 +15,7 @@ TextArea {
     height: 250
 
     text: "int foo = 0;"
+    wrapMode: TextEdit.Wrap
 
     SyntaxHighlighter {
         textEdit: myText

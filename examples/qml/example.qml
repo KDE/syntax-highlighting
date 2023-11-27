@@ -50,6 +50,7 @@ ApplicationWindow {
             id: myText
 
             text: "Text {\n text: \"Hello World!\"\n width: 42\n}"
+            wrapMode: TextEdit.Wrap
 
             SyntaxHighlighter {
                 id: highlighter

@@ -51,6 +51,7 @@ ApplicationWindow {
 
             text: "Text {\n text: \"Hello World!\"\n width: 42\n}"
             wrapMode: TextEdit.Wrap
+            Kirigami.SpellCheck.enabled: false
 
             SyntaxHighlighter {
                 id: highlighter

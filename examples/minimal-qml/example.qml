@@ -16,6 +16,7 @@ TextArea {
 
     text: "int foo = 0;"
     wrapMode: TextEdit.Wrap
+    Kirigami.SpellCheck.enabled: false
 
     SyntaxHighlighter {
         textEdit: myText

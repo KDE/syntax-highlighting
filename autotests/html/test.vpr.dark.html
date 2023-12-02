@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>test.vpr</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (Viper) - Theme (Breeze Dark)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="font-weight:bold">import </span><span style="color:#f44f4f">"foo.tdf"</span>
+<span style="font-weight:bold">import </span><span style="color:#f44f4f">"foo.txt"</span>
+<span style="font-weight:bold">import </span><span style="color:#f44f4f">"foo.txt"</span>
+
+<span style="font-weight:bold">domain</span> <span style="color:#8e44ad">Foo[T]</span> <span style="color:#3f8058">{</span>
+    <span style="font-weight:bold">axiom</span> <span style="color:#8e44ad">named</span> <span style="color:#3f8058">{</span> <span style="font-weight:bold">forall</span> x: <span style="color:#2980b9">Int</span>:: <span style="color:#3daee9">{</span><span style="font-style:italic">lookup(x)</span><span style="color:#3daee9">}</span> len(lookup(x)) == foobar(x) <span style="color:#3f8058">}</span>
+    <span style="font-weight:bold">axiom</span> <span style="color:#3f8058">{</span> <span style="font-weight:bold">forall</span> x: <span style="color:#2980b9">Int</span> :: <span style="color:#3daee9">{</span><span style="font-style:italic">lookup(x)</span><span style="color:#3daee9">}</span> <span style="color:#3daee9">{</span><span style="font-style:italic">len(lookup(x))</span><span style="color:#3daee9">}</span> len(lookup(x)) == foobar(x) <span style="color:#3f8058">}</span> <span style="color:#7a7c7d">// anonymous</span>
+<span style="color:#3f8058">}</span>
+
+<span style="color:#7a7c7d">// this is a comment</span>
+
+<span style="color:#7a7c7d">/* This is also</span>
+<span style="color:#7a7c7d"> * another multi-line comment</span>
+<span style="color:#7a7c7d"> * With a string "string" and</span>
+<span style="color:#7a7c7d"> * an import "foo.bar" inside */</span>
+
+<span style="color:#7a7c7d">// Any copyright is dedicated to the Public Domain.</span>
+<span style="color:#7a7c7d">// http://creativecommons.org/publicdomain/zero/1.0/</span>
+
+<span style="font-weight:bold">import </span><span style="color:#f44f4f">"empty.sil"</span>
+
+<span style="font-weight:bold">method</span> <span style="color:#8e44ad">test1</span>(xs: <span style="color:#2980b9">Seq</span>[<span style="color:#2980b9">Ref</span>]) <span style="color:#3f8058">{</span>
+  <span style="font-weight:bold">inhale</span> <span style="font-weight:bold">forall</span> i: <span style="color:#2980b9">Int</span> :: 0 &lt;= i &amp;&amp; i &lt; |xs| ==> xs[i]<span style="font-style:italic">.f</span> != <span style="color:#f67400">0</span>
+<span style="color:#3f8058">}</span>
+
+<span style="font-weight:bold">function</span> <span style="color:#8e44ad">$</span>(n: <span style="color:#2980b9">Ref</span>, m: <span style="color:#2980b9">Ref</span>): Node
+
+<span style="font-weight:bold">domain</span> <span style="color:#8e44ad">Foo[T]</span> <span style="color:#3f8058">{</span>
+    <span style="font-weight:bold">function</span> <span style="color:#8e44ad">enc</span>(arg: T): Foo[T]
+    <span style="font-weight:bold">function</span> <span style="color:#8e44ad">dec</span>(arg: Foo[T]): T
+
+    <span style="font-weight:bold">axiom</span> <span style="color:#8e44ad">ax_Dec</span> <span style="color:#3f8058">{</span>
+        <span style="font-weight:bold">forall</span> arg: T ::
+            dec( enc(arg) ) == arg
+    <span style="color:#3f8058">}</span>
+
+    <span style="font-weight:bold">axiom</span> <span style="color:#8e44ad">ax_Enc</span> <span style="color:#3f8058">{</span>
+        <span style="font-weight:bold">forall</span> arg: Foo[T] ::
+        <span style="color:#3daee9">{</span> <span style="font-style:italic">enc(</span> <span style="font-style:italic">dec(arg)</span> <span style="font-style:italic">),</span> <span style="font-style:italic">foo(bar,</span> <span style="font-style:italic">i)</span> <span style="color:#3daee9">}</span>
+            <span style="color:#3daee9">{</span>  <span style="font-style:italic">dec(arg)</span> <span style="color:#3daee9">}</span>
+                enc( dec(arg) ) == arg
+    <span style="color:#3f8058">}</span>
+<span style="color:#3f8058">}</span>
+
+<span style="font-weight:bold">function</span> <span style="color:#8e44ad">myFunc</span>(arg: <span style="color:#2980b9">Int</span>): <span style="color:#2980b9">Int</span>
+    <span style="font-weight:bold">requires</span> <span style="color:#27aeae;font-weight:bold">true</span> || <span style="color:#27aeae;font-weight:bold">false</span>
+    <span style="font-weight:bold">ensures</span> arg &lt;= <span style="color:#f67400">0</span> ==> <span style="font-weight:bold">result</span> == -<span style="color:#f67400">1</span>
+    <span style="font-weight:bold">ensures</span> arg > <span style="color:#f67400">0</span>  ==> <span style="font-weight:bold">result</span> == arg
+<span style="color:#3f8058">{</span>
+    arg > <span style="color:#f67400">0</span> ? arg : myFunc(arg - <span style="color:#f67400">1</span>)
+<span style="color:#3f8058">}</span>
+
+<span style="font-weight:bold">field</span> <span style="color:#8e44ad">value</span>: <span style="color:#2980b9">Int</span>
+<span style="font-weight:bold">field</span> <span style="color:#8e44ad">next</span>: <span style="color:#2980b9">Ref</span>
+
+<span style="font-weight:bold">predicate</span> <span style="color:#8e44ad">list</span>(xs: <span style="color:#2980b9">Ref</span>) <span style="color:#3f8058">{</span>
+    <span style="font-weight:bold">acc</span>(xs<span style="font-style:italic">.value</span>) &amp;&amp; <span style="font-weight:bold">acc</span>(xs<span style="font-style:italic">.next</span>)
+    &amp;&amp; ( list(xs<span style="font-style:italic">.next</span>) )
+<span style="color:#3f8058">}</span>
+
+<span style="font-weight:bold">define</span> <span style="color:#8e44ad">myPureMacro</span>(abc) abc
+
+<span style="font-weight:bold">define</span> <span style="color:#8e44ad">myStmtMacro</span>(abc) <span style="color:#3f8058">{</span>
+    <span style="font-weight:bold">inhale</span> abc
+    <span style="font-weight:bold">exhale</span> abc
+<span style="color:#3f8058">}</span>
+
+<span style="font-weight:bold">method</span> <span style="color:#8e44ad">smokeTest</span>() <span style="color:#3f8058">{</span>
+
+    <span style="font-weight:bold">inhale</span> <span style="color:#27aeae;font-weight:bold">false</span>; <span style="font-weight:bold">exhale</span> <span style="color:#27aeae;font-weight:bold">false</span>
+    <span style="font-weight:bold">assume</span> <span style="color:#27aeae;font-weight:bold">false</span>; <span style="font-weight:bold">assert</span> <span style="color:#27aeae;font-weight:bold">false</span>
+
+    <span style="color:#7a7c7d">//magic wands</span>
+    <span style="font-weight:bold">var</span> s: <span style="color:#2980b9">Set</span>[<span style="color:#2980b9">Int</span>]
+    <span style="font-weight:bold">assert</span> s <span style="color:#3f8058">setminus</span> s != s
+
+<span style="color:#3f8058">}</span>
+
+<span style="color:#7a7c7d">//:: special comment</span>
+<span style="color:#7a7c7d">/*</span>
+<span style="color:#7a7c7d">        gfdgfd</span>
+<span style="color:#7a7c7d">*/</span>
+
+<span style="font-weight:bold">method</span> <span style="color:#8e44ad">testHighlights</span>() <span style="font-weight:bold">returns</span> ( res: <span style="color:#2980b9">Set</span>[<span style="color:#2980b9">Seq</span>[<span style="color:#2980b9">Multiset</span>[Foo[<span style="color:#2980b9">Int</span>]]]] )
+    <span style="font-weight:bold">requires</span> <span style="color:#27aeae;font-weight:bold">true</span>
+    <span style="font-weight:bold">ensures</span> <span style="color:#27aeae;font-weight:bold">false</span>
+<span style="color:#3f8058">{</span>
+    <span style="font-weight:bold">var</span> a: <span style="color:#2980b9">Int</span>; <span style="font-weight:bold">var</span> b: <span style="color:#2980b9">Bool</span>; <span style="font-weight:bold">var</span> c: <span style="color:#2980b9">Ref</span>; <span style="font-weight:bold">var</span> d: <span style="color:#2980b9">Rational</span>; <span style="font-weight:bold">var</span> e: <span style="color:#2980b9">Perm</span>
+    <span style="font-weight:bold">var</span> x: <span style="color:#2980b9">Seq</span>[<span style="color:#2980b9">Int</span>]; <span style="font-weight:bold">var</span> y: <span style="color:#2980b9">Set</span>[<span style="color:#2980b9">Int</span>]; <span style="font-weight:bold">var</span> z: <span style="color:#2980b9">Multiset</span>[<span style="color:#2980b9">Int</span>]
+    <span style="font-weight:bold">var</span> t1: <span style="color:#2980b9">Set</span>[<span style="color:#2980b9">Int</span>] := <span style="color:#2980b9">Set</span>(a, <span style="color:#f67400">1</span>, <span style="color:#f67400">2</span>)
+    <span style="font-weight:bold">var</span> t2: <span style="color:#2980b9">Seq</span>[<span style="color:#2980b9">Int</span>] := <span style="color:#2980b9">Seq</span>(a, a, a)
+    <span style="font-weight:bold">var</span> t3: <span style="color:#2980b9">Multiset</span>[<span style="color:#2980b9">Int</span>] := <span style="color:#2980b9">Multiset</span>(a, a, <span style="color:#f67400">0</span>, <span style="color:#f67400">0</span>, <span style="color:#f67400">0</span>)
+
+    <span style="font-weight:bold">assert</span> myFunc(<span style="color:#f67400">331</span>) > -<span style="color:#f67400">2</span>
+
+    myStmtMacro( myFunc(<span style="color:#f67400">331</span>) == -<span style="color:#f67400">331</span> )
+
+    <span style="color:#fdbc4b;font-weight:bold">while</span> ( <span style="color:#27aeae;font-weight:bold">true</span> )
+        <span style="font-weight:bold">invariant</span> <span style="color:#27aeae;font-weight:bold">true</span>
+    <span style="color:#3f8058">{</span>
+        <span style="font-weight:bold">var</span> aa: <span style="color:#2980b9">Ref</span>
+        aa := <span style="color:#27aeae;font-weight:bold">null</span>
+        <span style="font-weight:bold">var</span> bb: <span style="color:#2980b9">Int</span>
+        bb := <span style="color:#f67400">33</span>
+    <span style="color:#3f8058">}</span>
+
+    <span style="color:#fdbc4b;font-weight:bold">if</span> ( <span style="color:#27aeae;font-weight:bold">true</span> ) <span style="color:#3f8058">{</span>
+        <span style="font-weight:bold">assert</span> <span style="color:#27aeae;font-weight:bold">true</span>
+    <span style="color:#3f8058">}</span> <span style="color:#fdbc4b;font-weight:bold">elseif</span> ( <span style="color:#27aeae;font-weight:bold">false</span> ) <span style="color:#3f8058">{</span>
+        <span style="font-weight:bold">assert</span> <span style="color:#27aeae;font-weight:bold">false</span>
+    <span style="color:#3f8058">}</span> <span style="color:#fdbc4b;font-weight:bold">else</span> <span style="color:#3f8058">{</span>
+        <span style="font-weight:bold">assert</span> <span style="color:#27aeae;font-weight:bold">true</span>
+    <span style="color:#3f8058">}</span>
+
+    <span style="color:#7a7c7d">//forperm r: Ref :: true</span>
+    <span style="color:#7a7c7d">//exists</span>
+    <span style="color:#7a7c7d">//forall</span>
+    <span style="font-weight:bold">assert</span> ! <span style="color:#27aeae;font-weight:bold">false</span>
+    <span style="font-weight:bold">assert</span> <span style="color:#f67400">0</span>  +<span style="color:#f67400">321</span> - <span style="color:#f67400">0</span> -<span style="color:#f67400">321</span> == <span style="color:#f67400">0</span>
+<span style="color:#3f8058">}</span>
+
+<span style="font-weight:bold">field</span> <span style="color:#8e44ad">f</span>:<span style="color:#2980b9">Int</span>
+
+<span style="font-weight:bold">method</span> <span style="color:#8e44ad">test02</span>(x: <span style="color:#2980b9">Ref</span>)
+  <span style="font-weight:bold">requires</span> <span style="font-weight:bold">acc</span>(x<span style="font-style:italic">.f</span>, <span style="font-weight:bold">write</span>)
+  <span style="font-weight:bold">ensures</span> <span style="font-weight:bold">acc</span>(x<span style="font-style:italic">.f</span>, <span style="font-weight:bold">write</span>)
+<span style="color:#3f8058">{</span>
+  <span style="font-weight:bold">define</span> <span style="color:#8e44ad">A</span> <span style="color:#27aeae;font-weight:bold">true</span>
+  <span style="font-weight:bold">define</span> <span style="color:#8e44ad">B</span> <span style="font-weight:bold">acc</span>(x<span style="font-style:italic">.f</span>, <span style="font-weight:bold">write</span>)
+
+  <span style="font-weight:bold">package</span> A --* B
+  <span style="font-weight:bold">wand</span> w := A --* B
+
+  <span style="color:#7a7c7d">//apply w</span>
+
+    <span style="color:#fdbc4b;font-weight:bold">label</span> my_lbl
+
+    <span style="color:#fdbc4b;font-weight:bold">goto</span> my_lbl
+
+    <span style="font-weight:bold">fresh</span> x
+
+    <span style="font-weight:bold">var</span> p: <span style="color:#2980b9">Perm</span>
+
+    <span style="font-weight:bold">var</span> r: <span style="color:#2980b9">Ref</span>; r := new (*)
+
+    <span style="font-weight:bold">constraining</span> ( p ) <span style="color:#3f8058">{</span>
+        <span style="font-weight:bold">exhale</span> <span style="font-weight:bold">acc</span>(x<span style="font-style:italic">.f</span>, p)
+    <span style="color:#3f8058">}</span>
+
+    <span style="font-weight:bold">assert</span> <span style="color:#f67400">0</span> == ( <span style="font-weight:bold">let</span> a == (<span style="color:#f67400">11</span> + <span style="color:#f67400">22</span>) <span style="font-weight:bold">in</span> a+a )
+<span style="color:#3f8058">}</span>
+</pre></body></html>

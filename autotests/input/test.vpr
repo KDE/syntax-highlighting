@@ -1,0 +1,151 @@
+import "foo.tdf"
+import "foo.txt"
+import "foo.txt"
+
+domain Foo[T] {
+    axiom named { forall x: Int:: {lookup(x)} len(lookup(x)) == foobar(x) }
+    axiom { forall x: Int :: {lookup(x)} {len(lookup(x))} len(lookup(x)) == foobar(x) } // anonymous
+}
+
+// this is a comment
+
+/* This is also
+ * another multi-line comment
+ * With a string "string" and
+ * an import "foo.bar" inside */
+
+// Any copyright is dedicated to the Public Domain.
+// http://creativecommons.org/publicdomain/zero/1.0/
+
+import "empty.sil"
+
+method test1(xs: Seq[Ref]) {
+  inhale forall i: Int :: 0 <= i && i < |xs| ==> xs[i].f != 0
+}
+
+function $(n: Ref, m: Ref): Node
+
+domain Foo[T] {
+    function enc(arg: T): Foo[T]
+    function dec(arg: Foo[T]): T
+
+    axiom ax_Dec {
+        forall arg: T ::
+            dec( enc(arg) ) == arg
+    }
+
+    axiom ax_Enc {
+        forall arg: Foo[T] ::
+        { enc( dec(arg) ), foo(bar, i) }
+            {  dec(arg) }
+                enc( dec(arg) ) == arg
+    }
+}
+
+function myFunc(arg: Int): Int
+    requires true || false
+    ensures arg <= 0 ==> result == -1
+    ensures arg > 0  ==> result == arg
+{
+    arg > 0 ? arg : myFunc(arg - 1)
+}
+
+field value: Int
+field next: Ref
+
+predicate list(xs: Ref) {
+    acc(xs.value) && acc(xs.next)
+    && ( list(xs.next) )
+}
+
+define myPureMacro(abc) abc
+
+define myStmtMacro(abc) {
+    inhale abc
+    exhale abc
+}
+
+method smokeTest() {
+
+    inhale false; exhale false
+    assume false; assert false
+
+    //magic wands
+    var s: Set[Int]
+    assert s setminus s != s
+
+}
+
+//:: special comment
+/*
+        gfdgfd
+*/
+
+method testHighlights() returns ( res: Set[Seq[Multiset[Foo[Int]]]] )
+    requires true
+    ensures false
+{
+    var a: Int; var b: Bool; var c: Ref; var d: Rational; var e: Perm
+    var x: Seq[Int]; var y: Set[Int]; var z: Multiset[Int]
+    var t1: Set[Int] := Set(a, 1, 2)
+    var t2: Seq[Int] := Seq(a, a, a)
+    var t3: Multiset[Int] := Multiset(a, a, 0, 0, 0)
+
+    assert myFunc(331) > -2
+
+    myStmtMacro( myFunc(331) == -331 )
+
+    while ( true )
+        invariant true
+    {
+        var aa: Ref
+        aa := null
+        var bb: Int
+        bb := 33
+    }
+
+    if ( true ) {
+        assert true
+    } elseif ( false ) {
+        assert false
+    } else {
+        assert true
+    }
+
+    //forperm r: Ref :: true
+    //exists
+    //forall
+    assert ! false
+    assert 0  +321 - 0 -321 == 0
+}
+
+field f:Int
+
+method test02(x: Ref)
+  requires acc(x.f, write)
+  ensures acc(x.f, write)
+{
+  define A true
+  define B acc(x.f, write)
+
+  package A --* B
+  wand w := A --* B
+
+  //apply w
+
+    label my_lbl
+
+    goto my_lbl
+
+    fresh x
+
+    var p: Perm
+
+    var r: Ref; r := new (*)
+
+    constraining ( p ) {
+        exhale acc(x.f, p)
+    }
+
+    assert 0 == ( let a == (11 + 22) in a+a )
+}

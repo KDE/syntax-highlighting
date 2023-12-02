@@ -1,0 +1,151 @@
+import "foo.tdf"
+import "foo.txt"
+import "foo.txt"
+
+domain Foo[T] <beginfold id='1'>{</beginfold id='1'>
+    axiom named <beginfold id='1'>{</beginfold id='1'> forall x: Int:: {lookup(x)} len(lookup(x)) == foobar(x) <endfold id='1'>}</endfold id='1'>
+    axiom <beginfold id='1'>{</beginfold id='1'> forall x: Int :: {lookup(x)} {len(lookup(x))} len(lookup(x)) == foobar(x) <endfold id='1'>}</endfold id='1'> // anonymous
+<endfold id='1'>}</endfold id='1'>
+
+// this is a comment
+
+/* This is also
+ * another multi-line comment
+ * With a string "string" and
+ * an import "foo.bar" inside */
+
+// Any copyright is dedicated to the Public Domain.
+// http://creativecommons.org/publicdomain/zero/1.0/
+
+import "empty.sil"
+
+method test1(xs: Seq[Ref]) <beginfold id='1'>{</beginfold id='1'>
+  inhale forall i: Int :: 0 <= i && i < |xs| ==> xs[i].f != 0
+<endfold id='1'>}</endfold id='1'>
+
+function $(n: Ref, m: Ref): Node
+
+domain Foo[T] <beginfold id='1'>{</beginfold id='1'>
+    function enc(arg: T): Foo[T]
+    function dec(arg: Foo[T]): T
+
+    axiom ax_Dec <beginfold id='1'>{</beginfold id='1'>
+        forall arg: T ::
+            dec( enc(arg) ) == arg
+    <endfold id='1'>}</endfold id='1'>
+
+    axiom ax_Enc <beginfold id='1'>{</beginfold id='1'>
+        forall arg: Foo[T] ::
+        { enc( dec(arg) ), foo(bar, i) }
+            {  dec(arg) }
+                enc( dec(arg) ) == arg
+    <endfold id='1'>}</endfold id='1'>
+<endfold id='1'>}</endfold id='1'>
+
+function myFunc(arg: Int): Int
+    requires true || false
+    ensures arg <= 0 ==> result == -1
+    ensures arg > 0  ==> result == arg
+<beginfold id='1'>{</beginfold id='1'>
+    arg > 0 ? arg : myFunc(arg - 1)
+<endfold id='1'>}</endfold id='1'>
+
+field value: Int
+field next: Ref
+
+predicate list(xs: Ref) <beginfold id='1'>{</beginfold id='1'>
+    acc(xs.value) && acc(xs.next)
+    && ( list(xs.next) )
+<endfold id='1'>}</endfold id='1'>
+
+define myPureMacro(abc) abc
+
+define myStmtMacro(abc) <beginfold id='1'>{</beginfold id='1'>
+    inhale abc
+    exhale abc
+<endfold id='1'>}</endfold id='1'>
+
+method smokeTest() <beginfold id='1'>{</beginfold id='1'>
+
+    inhale false; exhale false
+    assume false; assert false
+
+    //magic wands
+    var s: Set[Int]
+    assert s setminus s != s
+
+<endfold id='1'>}</endfold id='1'>
+
+//:: special comment
+/*
+        gfdgfd
+*/
+
+method testHighlights() returns ( res: Set[Seq[Multiset[Foo[Int]]]] )
+    requires true
+    ensures false
+<beginfold id='1'>{</beginfold id='1'>
+    var a: Int; var b: Bool; var c: Ref; var d: Rational; var e: Perm
+    var x: Seq[Int]; var y: Set[Int]; var z: Multiset[Int]
+    var t1: Set[Int] := Set(a, 1, 2)
+    var t2: Seq[Int] := Seq(a, a, a)
+    var t3: Multiset[Int] := Multiset(a, a, 0, 0, 0)
+
+    assert myFunc(331) > -2
+
+    myStmtMacro( myFunc(331) == -331 )
+
+    while ( true )
+        invariant true
+    <beginfold id='1'>{</beginfold id='1'>
+        var aa: Ref
+        aa := null
+        var bb: Int
+        bb := 33
+    <endfold id='1'>}</endfold id='1'>
+
+    if ( true ) <beginfold id='1'>{</beginfold id='1'>
+        assert true
+    <endfold id='1'>}</endfold id='1'> elseif ( false ) <beginfold id='1'>{</beginfold id='1'>
+        assert false
+    <endfold id='1'>}</endfold id='1'> else <beginfold id='1'>{</beginfold id='1'>
+        assert true
+    <endfold id='1'>}</endfold id='1'>
+
+    //forperm r: Ref :: true
+    //exists
+    //forall
+    assert ! false
+    assert 0  +321 - 0 -321 == 0
+<endfold id='1'>}</endfold id='1'>
+
+field f:Int
+
+method test02(x: Ref)
+  requires acc(x.f, write)
+  ensures acc(x.f, write)
+<beginfold id='1'>{</beginfold id='1'>
+  define A true
+  define B acc(x.f, write)
+
+  package A --* B
+  wand w := A --* B
+
+  //apply w
+
+    label my_lbl
+
+    goto my_lbl
+
+    fresh x
+
+    var p: Perm
+
+    var r: Ref; r := new (*)
+
+    constraining ( p ) <beginfold id='1'>{</beginfold id='1'>
+        exhale acc(x.f, p)
+    <endfold id='1'>}</endfold id='1'>
+
+    assert 0 == ( let a == (11 + 22) in a+a )
+<endfold id='1'>}</endfold id='1'>

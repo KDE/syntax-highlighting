@@ -1,4 +1,4 @@
-version: 49
+version: 50
 
 global-properties:
     - ALLOW_DUPLICATE_CUSTOM_TARGETS
@@ -166,6 +166,12 @@ target-properties:
     - CUDA_STANDARD
     - CUDA_STANDARD_REQUIRED
     - CXX_EXTENSIONS
+    - CXX_MODULE_DIRS                                       # Since 3.28
+    - CXX_MODULE_DIRS_<NAME>                                # Since 3.28
+    - CXX_MODULE_SET                                        # Since 3.28
+    - CXX_MODULE_SET_<NAME>                                 # Since 3.28
+    - CXX_MODULE_SETS                                       # Since 3.28
+    - CXX_SCAN_FOR_MODULES                                  # Since 3.28
     - CXX_STANDARD
     - CXX_STANDARD_REQUIRED
     # - DEBUG_POSTFIX                                       # NOTE: Handled by `<CONFIG>_POSTFIX`
@@ -244,6 +250,7 @@ target-properties:
     - INTERFACE_COMPILE_DEFINITIONS
     - INTERFACE_COMPILE_FEATURES
     - INTERFACE_COMPILE_OPTIONS
+    - INTERFACE_CXX_MODULE_SETS                             # Since 3.28
     - INTERFACE_HEADER_SETS                                 # Since 3.23
     - INTERFACE_HEADER_SETS_TO_VERIFY                       # Since 3.24
     - INTERFACE_INCLUDE_DIRECTORIES
@@ -458,12 +465,14 @@ test-properties:
     - FIXTURES_CLEANUP
     - FIXTURES_REQUIRED
     - FIXTURES_SETUP
+    - GENERATED_RESOURCE_SPEC_FILE                          # Since 3.28
     - LABELS
     - MEASUREMENT
     - PASS_REGULAR_EXPRESSION
     - PROCESSOR_AFFINITY                                    # Since 3.12
     - PROCESSORS
     - REQUIRED_FILES
+    - RESOURCE_GROUPS                                       # Since 3.16
     - RESOURCE_LOCK
     - RUN_SERIAL
     - SKIP_REGULAR_EXPRESSION                               # Since 3.16
@@ -482,6 +491,7 @@ source-properties:
     - COMPILE_DEFINITIONS
     - COMPILE_FLAGS
     - COMPILE_OPTIONS                                       # Since 3.11
+    - CXX_SCAN_FOR_MODULES                                  # Since 3.28
     - EXTERNAL_OBJECT
     - Fortran_FORMAT
     - Fortran_PREPROCESS                                    # Since 3.18
@@ -1098,9 +1108,10 @@ variables:
     - CMAKE_<CONFIG>_POSTFIX
     - CMAKE_CROSS_CONFIGS                                   # Since 3.17
     - CMAKE_CTEST_ARGUMENTS                                 # Since 3.17
-    - CMAKE_CUDA_SEPARABLE_COMPILATION                      # Since 3.11
     - CMAKE_CUDA_RESOLVE_DEVICE_SYMBOLS                     # Since 3.16
     - CMAKE_CUDA_RUNTIME_LIBRARY                            # Since 3.17
+    - CMAKE_CUDA_SEPARABLE_COMPILATION                      # Since 3.11
+    - CMAKE_CXX_SCAN_FOR_MODULES                            # Since 3.28
     - CMAKE_DEBUG_POSTFIX
     - CMAKE_DEFAULT_BUILD_TYPE                              # Since 3.17
     - CMAKE_DEFAULT_CONFIGS                                 # Since 3.17
@@ -1131,7 +1142,6 @@ variables:
     - CMAKE_INSTALL_RPATH_USE_LINK_PATH
     - CMAKE_INTERPROCEDURAL_OPTIMIZATION
     - CMAKE_INTERPROCEDURAL_OPTIMIZATION_<CONFIG>
-    - CMAKE_IOS_INSTALL_COMBINED
     - CMAKE_<LANG>_CLANG_TIDY
     - CMAKE_<LANG>_CLANG_TIDY_EXPORT_FIXES_DIR              # Since 3.26
     - CMAKE_<LANG>_COMPILER_LAUNCHER
@@ -1254,6 +1264,7 @@ variables:
     - CMAKE_Fortran_MODOUT_FLAG
     - CMAKE_HIP_ARCHITECTURES                               # Since 3.21
     - CMAKE_HIP_EXTENSIONS                                  # Since 3.21
+    - CMAKE_HIP_PLATFORM                                    # Since 3.28
     - CMAKE_HIP_STANDARD                                    # Since 3.21
     - CMAKE_HIP_STANDARD_REQUIRED                           # Since 3.21
     - CMAKE_ISPC_HEADER_DIRECTORY                           # Since 3.19
@@ -2122,6 +2133,7 @@ variables:
     - CUPS_INCLUDE_DIR
     # - FindCURL
     - CURL_NO_CURL_CMAKE
+    - CURL_USE_STATIC_LIBS                                  # Since 3.28
     # - FindCurses
     - CURSES_CFLAGS
     - CURSES_HAVE_CURSES_H
@@ -2148,6 +2160,7 @@ variables:
     # - FindEnvModules
     - EnvModules_COMMAND
     # - FindEXPAT
+    - EXPAT_USE_STATIC_LIBS                                 # Since 3.28
     # - FindFLEX
     - FLEX_EXECUTABLE
     # - FindFLTK
@@ -2751,6 +2764,8 @@ deprecated-or-internal-variables:
     - CMAKE_SYSTEM_ARCH
     # Superseded by `CMAKE_EXECUTABLE_ENABLE_EXPORTS`
     - CMAKE_ENABLE_EXPORTS
+    - CMAKE_IOS_INSTALL_COMBINED                            # Since 3.28
+
 
 
 # https://cmake.org/cmake/help/latest/manual/cmake-env-variables.7.html
@@ -2768,6 +2783,7 @@ environment-variables:
     - CMAKE_COLOR_DIAGNOSTICS                               # Since 3.24
     - CMAKE_CONFIGURATION_TYPES                             # Since 3.22
     - CMAKE_CONFIG_TYPE
+    - CMAKE_CROSSCOMPILING_EMULATOR                         # Since 3.28
     - CMAKE_EXPORT_COMPILE_COMMANDS                         # Since 3.17
     - CMAKE_GENERATOR
     - CMAKE_GENERATOR_INSTANCE
@@ -2887,6 +2903,7 @@ scripting-commands:
           , OS_RELEASE
           , OS_VERSION
           , OS_PLATFORM
+          , MSYSTEM_PREFIX                                  # Since 3.28
             # Since 3.22
           , DISTRIB_INFO
           , DISTRIB_<name>
@@ -3678,6 +3695,7 @@ project-commands:
           , COMMENT
           , DEPFILE
           , JOB_POOL                                        # Since 3.15
+          , JOB_SERVER_AWARE                                # Since 3.28
           , VERBATIM
           , APPEND
           , USES_TERMINAL
@@ -3702,6 +3720,7 @@ project-commands:
           , COMMENT
           , DEPFILE
           , JOB_POOL                                        # Since 3.15
+          , JOB_SERVER_AWARE                                # Since 3.28
           , VERBATIM
           , APPEND
           , USES_TERMINAL
@@ -3813,6 +3832,7 @@ project-commands:
         property-args: &get_target_property [target-properties]
     -
         name: get_test_property
+        named-args: [DIRECTORY]                             # Since 3.28
         property-args: &get_test_property [test-properties]
     -
         name: include_directories
@@ -3956,7 +3976,10 @@ project-commands:
         first-args-are-targets?: true                       # NOTE Multiple target args
     -
         name: set_tests_properties
-        named-args: [PROPERTIES]
+        named-args: [
+            DIRECTORY                                       # Since 3.28
+          , PROPERTIES
+          ]
         property-args: *get_test_property
     -
         name: source_group
@@ -4099,6 +4122,10 @@ project-commands:
           , TYPE
           , BASE_DIRS
           , FILES
+          ]
+        special-args: [
+            HEADERS
+          , CXX_MODULES                                     # Since 3.28
           ]
         first-arg-is-target?: true
     -
@@ -4944,6 +4971,7 @@ standard-module-commands:
             - BUILD_IN_SOURCE
             - BUILD_ALWAYS
             - BUILD_BYPRODUCTS
+            - BUILD_JOB_SERVER_AWARE                        # Since 3.28
             - INSTALL_COMMAND
             - TEST_COMMAND
             - TEST_BEFORE_INSTALL
@@ -4986,6 +5014,7 @@ standard-module-commands:
             - INDEPENDENT
             - BYPRODUCTS
             - ALWAYS
+            - JOB_SERVER_AWARE                              # Since 3.28
             - EXCLUDE_FROM_MAIN
             - WORKING_DIRECTORY
             - LOG
@@ -5073,7 +5102,10 @@ standard-module-commands:
             - UPDATE_DISCONNECTED
             - PATCH_COMMAND
             - SOURCE_SUBDIR
+            - OVERRIDE_FIND_PACKAGE
+            - FIND_PACKAGE_ARGS
             - SYSTEM
+            - EXCLUDE_FROM_ALL                              # Since 3.28
     -
         name: FetchContent_Populate
         named-args:
@@ -5425,6 +5457,7 @@ standard-module-commands:
         named-args: *pkgcm
     -
         name: pkg_get_variable
+        named-args: [DEFINE_VARIABLES]                      # Since 3.28
     # FindProtobuf
     -
         name: protobuf_generate_cpp

@@ -131,6 +131,7 @@ Group = group-name
 DynamicUser = true
 SupplementaryGroups = group1 group-two 100 \
   one-more-group
+SetLoginEnvironment = false
 PAMName =
 LoadCredential = some_id:/path/to/credential/data
 LoadCredentialEncrypted = some_id:/path/to/credential/data
@@ -328,8 +329,14 @@ ManagedOOMMemoryPressureLimit = 50%
 ManagedOOMPreference = omit
 MemoryPressureWatch = skip
 MemoryPressureThresholdSec = 50ms
+<<<<<<< Updated upstream
+=======
+CoredumpReceive = true
+>>>>>>> Stashed changes
 BPFProgram = bind6:/sys/fs/bpf/sock-addr-hook
 RestrictNetworkInterfaces = ~eth1 eth2
+NFTSet = cgroup:inet:filter:my_service \
+  user:inet:filter:serviceuser
 
 
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Socket]</beginfold id='1'>
@@ -393,6 +400,11 @@ Symlinks = /some/path /some/other/path
 FileDescriptorName = some_name
 TriggerLimitIntervalSec = 1s 500ms
 TriggerLimitBurst = 50
+<<<<<<< Updated upstream
+=======
+PollLimitIntervalSec = 1s 300ms
+PollLimitBurst = 120
+>>>>>>> Stashed changes
 # see [Service] for options from systemd.exec and systemd.kill
 
 
@@ -452,6 +464,7 @@ RefuseManualStart = false
 RefuseManualStop = true
 AllowIsolate = true
 DefaultDependencies = no
+SurviveFinalKillSignal = yes
 CollectMode = inactive
 FailureAction = reboot
 SuccessAction = none
@@ -2011,6 +2024,25 @@ MountFlags = invalid
 MountFlags = shared slave
 
 
+###### nft set list
+<endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
+NFTSet = cgroup:arp::filter::my_service
+NFTSet = cgroup:bridge::filter::my_service
+NFTSet = cgroup:inet::filter::my_service
+NFTSet = cgroup:ip::filter::my_service
+NFTSet = cgroup:ip6::filter::my_service
+NFTSet = cgroup:ip::filter::my_service
+NFTSet = cgroup:netdev::filter::my_service
+NFTSet = group:inet::filter::my_service
+NFTSet = user:inet::filter::my_service
+## multiple sets
+NFTSet = cgroup:inet:filter:my_service \
+  user:inet:filter:serviceuser
+## invalid values
+NFTSet = invalid:inet::filter::my_service
+NFTSet = cgroup::invalid::filter::my_service
+
+
 ###### nice level
 <endfold id='1'></endfold id='1'><beginfold id='1'>[Service]</beginfold id='1'>
 Nice = -1
@@ -2272,6 +2304,7 @@ SecureBits = invalid
 ConditionSecurity = apparmor
 ConditionSecurity = audit
 ConditionSecurity = ima
+ConditionSecurity = measured-uki
 ConditionSecurity = selinux
 ConditionSecurity = smack
 ConditionSecurity = tomoyo

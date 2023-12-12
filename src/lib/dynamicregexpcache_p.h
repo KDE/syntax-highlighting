@@ -21,12 +21,12 @@ class DynamicRegexpCache
 public:
     const QRegularExpression &compileRegexp(QString &&pattern, QRegularExpression::PatternOptions patternOptions)
     {
-        auto key = std::pair{std::move(pattern), patternOptions};
-        auto *regexp = m_cache.object(key);
-        if (!regexp) {
-            regexp = new QRegularExpression(key.first, patternOptions);
-            m_cache.insert(key, regexp);
+        const auto key = std::pair{std::move(pattern), patternOptions};
+        if (const auto regexp = m_cache.object(key)) {
+            return *regexp;
         }
+        auto regexp = new QRegularExpression(key.first, patternOptions);
+        m_cache.insert(key, regexp);
         return *regexp;
     }
 

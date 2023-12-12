@@ -1976,8 +1976,8 @@ private:
 
         private:
             int m_i = 0;
-            int m_i2;
-            int m_end;
+            int m_i2 = 0;
+            const int m_end;
             const QList<ObservableRule> &m_rules;
             const QList<const Context::Rule *> *m_includedRules = nullptr;
         };

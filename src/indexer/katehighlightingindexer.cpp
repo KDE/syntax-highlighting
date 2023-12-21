@@ -515,7 +515,7 @@ private:
                 QString content;
                 int line;
 
-                friend uint qHash(const Item &item, uint seed = 0)
+                friend size_t qHash(const Item &item, size_t seed = 0)
                 {
                     return qHash(item.content, seed);
                 }
@@ -901,7 +901,7 @@ private:
             QString name;
             int line;
 
-            friend uint qHash(const Style &style, uint seed = 0)
+            friend size_t qHash(const Style &style, size_t seed = 0)
             {
                 return qHash(style.name, seed);
             }

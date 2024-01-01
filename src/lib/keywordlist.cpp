@@ -47,7 +47,7 @@ bool KeywordList::contains(QStringView str, Qt::CaseSensitivity caseSensitive) c
     /**
      * search with right predicate
      */
-    return std::binary_search(vectorToSearch.begin(), vectorToSearch.end(), QStringView(str), KeywordComparator{caseSensitive});
+    return std::binary_search(vectorToSearch.begin(), vectorToSearch.end(), str, KeywordComparator{caseSensitive});
 }
 
 void KeywordList::load(QXmlStreamReader &reader)

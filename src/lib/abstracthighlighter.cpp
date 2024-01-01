@@ -237,7 +237,8 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
         bool isLookAhead = false;
         int newOffset = 0;
         const Format *newFormat = nullptr;
-        for (const auto &rule : stateData->topContext()->rules()) {
+        for (const auto &ruleShared : stateData->topContext()->rules()) {
+            auto rule = ruleShared.get();
             /**
              * filter out rules that require a specific column
              */
@@ -277,7 +278,7 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
                 if (rule->isDynamic() && (capturesForLastDynamicSkipOffset != stateData->topCaptures())) {
                     skipOffsets.clear();
                 } else {
-                    currentSkipOffset = getSkipOffsetValue(rule.get());
+                    currentSkipOffset = getSkipOffsetValue(rule);
                     if (currentSkipOffset < 0 || currentSkipOffset > offset) {
                         continue;
                     }
@@ -291,7 +292,7 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
              * update skip offset if new one rules out any later match or is larger than current one
              */
             if (newResult.skipOffset() < 0 || newResult.skipOffset() > currentSkipOffset) {
-                insertSkipOffset(rule.get(), newResult.skipOffset());
+                insertSkipOffset(rule, newResult.skipOffset());
 
                 // remember new captures, if dynamic to enforce proper reset above on change!
                 if (rule->isDynamic()) {

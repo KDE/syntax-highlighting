@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>test.odin</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (Odin) - Theme (Breeze Light)"/>
+</head><body style="background-color:#ffffff;color:#1f1c1b"><pre>
+<span style="color:#898887">// This is from Odin examples:</span>
+<span style="color:#898887">// https://github.com/odin-lang/examples/blob/master/by_example/dir_info/main.odin</span>
+
+<span style="color:#ff5500">package</span> main
+
+<span style="color:#ff5500">import</span> <span style="color:#bf0303">"core:fmt"</span>
+<span style="color:#ff5500">import</span> <span style="color:#bf0303">"core:os"</span>
+<span style="color:#ff5500">import</span> <span style="color:#bf0303">"core:path/filepath"</span>
+<span style="color:#ff5500">import</span> <span style="color:#bf0303">"core:strings"</span>
+
+<span style="color:#644a9b">print_file_info </span><span style="color:#ca60ca">::</span><span style="color:#644a9b"> </span><span style="font-weight:bold">proc</span><span style="color:#ca60ca">(</span>fi<span style="color:#ca60ca">:</span> os<span style="color:#ca60ca">.</span>File_Info<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">{</span>
+    <span style="color:#898887">// Split the path into directory and filename</span>
+<span style="color:#0057ae">    _, filename </span><span style="color:#ca60ca">:=</span> filepath<span style="color:#ca60ca">.</span>split<span style="color:#ca60ca">(</span>fi<span style="color:#ca60ca">.</span>fullpath<span style="color:#ca60ca">)</span>
+
+    SIZE_WIDTH <span style="color:#ca60ca">::</span> <span style="color:#b08000">12</span>
+<span style="color:#0057ae">    buf</span><span style="color:#ca60ca">:</span> <span style="color:#ca60ca">[</span>SIZE_WIDTH<span style="color:#ca60ca">]</span><span style="color:#0057ae">u8</span>
+
+    <span style="color:#898887">// Print size to string backed by buf on stack, no need to free</span>
+<span style="color:#0057ae">    _size </span><span style="color:#ca60ca">:=</span> <span style="color:#bf0303">"-"</span> <span style="font-weight:bold">if</span> fi<span style="color:#ca60ca">.</span>is_dir <span style="font-weight:bold">else</span> fmt<span style="color:#ca60ca">.</span>bprintf<span style="color:#ca60ca">(</span>buf<span style="color:#ca60ca">[:],</span> <span style="color:#bf0303">"%v"</span><span style="color:#ca60ca">,</span> fi<span style="color:#ca60ca">.</span>size<span style="color:#ca60ca">)</span>
+
+    <span style="color:#898887">// Right-justify size for display, heap allocated</span>
+<span style="color:#0057ae">    size  </span><span style="color:#ca60ca">:=</span> strings<span style="color:#ca60ca">.</span>right_justify<span style="color:#ca60ca">(</span>_size<span style="color:#ca60ca">,</span> SIZE_WIDTH<span style="color:#ca60ca">,</span> <span style="color:#bf0303">" "</span><span style="color:#ca60ca">)</span>
+    <span style="font-weight:bold">defer</span> delete<span style="color:#ca60ca">(</span>size<span style="color:#ca60ca">)</span>
+
+    <span style="font-weight:bold">if</span> fi<span style="color:#ca60ca">.</span>is_dir <span style="color:#ca60ca">{</span>
+        fmt<span style="color:#ca60ca">.</span>printf<span style="color:#ca60ca">(</span><span style="color:#bf0303">"%v [%v]\n"</span><span style="color:#ca60ca">,</span> size<span style="color:#ca60ca">,</span> filename<span style="color:#ca60ca">)</span>
+    <span style="color:#ca60ca">}</span> <span style="font-weight:bold">else</span> <span style="color:#ca60ca">{</span>
+        fmt<span style="color:#ca60ca">.</span>printf<span style="color:#ca60ca">(</span><span style="color:#bf0303">"%v %v\n"</span><span style="color:#ca60ca">,</span> size<span style="color:#ca60ca">,</span> filename<span style="color:#ca60ca">)</span>
+    <span style="color:#ca60ca">}</span>
+<span style="color:#ca60ca">}</span>
+
+<span style="color:#644a9b">main </span><span style="color:#ca60ca">::</span><span style="color:#644a9b"> </span><span style="font-weight:bold">proc</span><span style="color:#ca60ca">()</span> <span style="color:#ca60ca">{</span>
+<span style="color:#0057ae">    cwd </span><span style="color:#ca60ca">:=</span> os<span style="color:#ca60ca">.</span>get_current_directory<span style="color:#ca60ca">()</span>
+    fmt<span style="color:#ca60ca">.</span>println<span style="color:#ca60ca">(</span><span style="color:#bf0303">"Current working directory:"</span><span style="color:#ca60ca">,</span> cwd<span style="color:#ca60ca">)</span>
+
+<span style="color:#0057ae">    f, err </span><span style="color:#ca60ca">:=</span> os<span style="color:#ca60ca">.</span>open<span style="color:#ca60ca">(</span>cwd<span style="color:#ca60ca">)</span>
+    <span style="font-weight:bold">defer</span> os<span style="color:#ca60ca">.</span>close<span style="color:#ca60ca">(</span>f<span style="color:#ca60ca">)</span>
+
+    <span style="font-weight:bold">if</span> err <span style="color:#ca60ca">!=</span> os<span style="color:#ca60ca">.</span>ERROR_NONE <span style="color:#ca60ca">{</span>
+        <span style="color:#898887">// Print error to stderr and exit with errorcode</span>
+        fmt<span style="color:#ca60ca">.</span>eprintln<span style="color:#ca60ca">(</span><span style="color:#bf0303">"Could not open directory for reading"</span><span style="color:#ca60ca">,</span> err<span style="color:#ca60ca">)</span>
+        os<span style="color:#ca60ca">.</span>exit<span style="color:#ca60ca">(</span><span style="color:#b08000">1</span><span style="color:#ca60ca">)</span>
+    <span style="color:#ca60ca">}</span>
+
+<span style="color:#0057ae">    fis</span><span style="color:#ca60ca">:</span> <span style="color:#ca60ca">[]</span>os<span style="color:#ca60ca">.</span>File_Info
+    <span style="font-weight:bold">defer</span> os<span style="color:#ca60ca">.</span>file_info_slice_delete<span style="color:#ca60ca">(</span>fis<span style="color:#ca60ca">)</span> <span style="color:#898887">// fis is a slice, we need to remember to free it</span>
+
+    fis<span style="color:#ca60ca">,</span> err <span style="color:#ca60ca">=</span> os<span style="color:#ca60ca">.</span>read_dir<span style="color:#ca60ca">(</span>f<span style="color:#ca60ca">,</span> <span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">)</span> <span style="color:#898887">// -1 reads all file infos</span>
+    <span style="font-weight:bold">if</span> err <span style="color:#ca60ca">!=</span> os<span style="color:#ca60ca">.</span>ERROR_NONE <span style="color:#ca60ca">{</span>
+        fmt<span style="color:#ca60ca">.</span>eprintln<span style="color:#ca60ca">(</span><span style="color:#bf0303">"Could not read directory"</span><span style="color:#ca60ca">,</span> err<span style="color:#ca60ca">)</span>
+        os<span style="color:#ca60ca">.</span>exit<span style="color:#ca60ca">(</span><span style="color:#b08000">2</span><span style="color:#ca60ca">)</span>
+    <span style="color:#ca60ca">}</span>
+
+    <span style="font-weight:bold">for</span> fi <span style="font-weight:bold">in</span> fis <span style="color:#ca60ca">{</span>
+        print_file_info<span style="color:#ca60ca">(</span>fi<span style="color:#ca60ca">)</span>
+    <span style="color:#ca60ca">}</span>
+<span style="color:#ca60ca">}</span>
+</pre></body></html>

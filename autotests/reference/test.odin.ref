@@ -1,0 +1,57 @@
+<Comment>// This is from Odin examples:</Comment><br/>
+<Comment>// https://github.com/odin-lang/examples/blob/master/by_example/dir_info/main.odin</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Use>package</Use><Normal Text> main</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Use>import</Use><Normal Text> </Normal Text><String>"core:fmt"</String><br/>
+<Use>import</Use><Normal Text> </Normal Text><String>"core:os"</String><br/>
+<Use>import</Use><Normal Text> </Normal Text><String>"core:path/filepath"</String><br/>
+<Use>import</Use><Normal Text> </Normal Text><String>"core:strings"</String><br/>
+<Normal Text></Normal Text><br/>
+<Function>print_file_info </Function><Operator>::</Operator><Function> </Function><Keyword>proc</Keyword><Operator>(</Operator><Normal Text>fi</Normal Text><Operator>:</Operator><Normal Text> os</Normal Text><Operator>.</Operator><Normal Text>File_Info</Normal Text><Operator>)</Operator><Normal Text> </Normal Text><Operator>{</Operator><br/>
+<Normal Text>    </Normal Text><Comment>// Split the path into directory and filename</Comment><br/>
+<Variable>    _, filename </Variable><Operator>:=</Operator><Normal Text> filepath</Normal Text><Operator>.</Operator><Normal Text>split</Normal Text><Operator>(</Operator><Normal Text>fi</Normal Text><Operator>.</Operator><Normal Text>fullpath</Normal Text><Operator>)</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    SIZE_WIDTH </Normal Text><Operator>::</Operator><Normal Text> </Normal Text><Float>12</Float><br/>
+<Variable>    buf</Variable><Operator>:</Operator><Normal Text> </Normal Text><Operator>[</Operator><Normal Text>SIZE_WIDTH</Normal Text><Operator>]</Operator><Data Type>u8</Data Type><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Comment>// Print size to string backed by buf on stack, no need to free</Comment><br/>
+<Variable>    _size </Variable><Operator>:=</Operator><Normal Text> </Normal Text><String>"-"</String><Normal Text> </Normal Text><Control Flow>if</Control Flow><Normal Text> fi</Normal Text><Operator>.</Operator><Normal Text>is_dir </Normal Text><Control Flow>else</Control Flow><Normal Text> fmt</Normal Text><Operator>.</Operator><Normal Text>bprintf</Normal Text><Operator>(</Operator><Normal Text>buf</Normal Text><Operator>[:],</Operator><Normal Text> </Normal Text><String>"%v"</String><Operator>,</Operator><Normal Text> fi</Normal Text><Operator>.</Operator><Normal Text>size</Normal Text><Operator>)</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Comment>// Right-justify size for display, heap allocated</Comment><br/>
+<Variable>    size  </Variable><Operator>:=</Operator><Normal Text> strings</Normal Text><Operator>.</Operator><Normal Text>right_justify</Normal Text><Operator>(</Operator><Normal Text>_size</Normal Text><Operator>,</Operator><Normal Text> SIZE_WIDTH</Normal Text><Operator>,</Operator><Normal Text> </Normal Text><String>" "</String><Operator>)</Operator><br/>
+<Normal Text>    </Normal Text><Keyword>defer</Keyword><Normal Text> delete</Normal Text><Operator>(</Operator><Normal Text>size</Normal Text><Operator>)</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Control Flow>if</Control Flow><Normal Text> fi</Normal Text><Operator>.</Operator><Normal Text>is_dir </Normal Text><Operator>{</Operator><br/>
+<Normal Text>        fmt</Normal Text><Operator>.</Operator><Normal Text>printf</Normal Text><Operator>(</Operator><String>"%v [%v]\n"</String><Operator>,</Operator><Normal Text> size</Normal Text><Operator>,</Operator><Normal Text> filename</Normal Text><Operator>)</Operator><br/>
+<Normal Text>    </Normal Text><Operator>}</Operator><Normal Text> </Normal Text><Control Flow>else</Control Flow><Normal Text> </Normal Text><Operator>{</Operator><br/>
+<Normal Text>        fmt</Normal Text><Operator>.</Operator><Normal Text>printf</Normal Text><Operator>(</Operator><String>"%v %v\n"</String><Operator>,</Operator><Normal Text> size</Normal Text><Operator>,</Operator><Normal Text> filename</Normal Text><Operator>)</Operator><br/>
+<Normal Text>    </Normal Text><Operator>}</Operator><br/>
+<Operator>}</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Function>main </Function><Operator>::</Operator><Function> </Function><Keyword>proc</Keyword><Operator>()</Operator><Normal Text> </Normal Text><Operator>{</Operator><br/>
+<Variable>    cwd </Variable><Operator>:=</Operator><Normal Text> os</Normal Text><Operator>.</Operator><Normal Text>get_current_directory</Normal Text><Operator>()</Operator><br/>
+<Normal Text>    fmt</Normal Text><Operator>.</Operator><Normal Text>println</Normal Text><Operator>(</Operator><String>"Current working directory:"</String><Operator>,</Operator><Normal Text> cwd</Normal Text><Operator>)</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Variable>    f, err </Variable><Operator>:=</Operator><Normal Text> os</Normal Text><Operator>.</Operator><Normal Text>open</Normal Text><Operator>(</Operator><Normal Text>cwd</Normal Text><Operator>)</Operator><br/>
+<Normal Text>    </Normal Text><Keyword>defer</Keyword><Normal Text> os</Normal Text><Operator>.</Operator><Normal Text>close</Normal Text><Operator>(</Operator><Normal Text>f</Normal Text><Operator>)</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Control Flow>if</Control Flow><Normal Text> err </Normal Text><Operator>!=</Operator><Normal Text> os</Normal Text><Operator>.</Operator><Normal Text>ERROR_NONE </Normal Text><Operator>{</Operator><br/>
+<Normal Text>        </Normal Text><Comment>// Print error to stderr and exit with errorcode</Comment><br/>
+<Normal Text>        fmt</Normal Text><Operator>.</Operator><Normal Text>eprintln</Normal Text><Operator>(</Operator><String>"Could not open directory for reading"</String><Operator>,</Operator><Normal Text> err</Normal Text><Operator>)</Operator><br/>
+<Normal Text>        os</Normal Text><Operator>.</Operator><Normal Text>exit</Normal Text><Operator>(</Operator><Float>1</Float><Operator>)</Operator><br/>
+<Normal Text>    </Normal Text><Operator>}</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Variable>    fis</Variable><Operator>:</Operator><Normal Text> </Normal Text><Operator>[]</Operator><Normal Text>os</Normal Text><Operator>.</Operator><Normal Text>File_Info</Normal Text><br/>
+<Normal Text>    </Normal Text><Keyword>defer</Keyword><Normal Text> os</Normal Text><Operator>.</Operator><Normal Text>file_info_slice_delete</Normal Text><Operator>(</Operator><Normal Text>fis</Normal Text><Operator>)</Operator><Normal Text> </Normal Text><Comment>// fis is a slice, we need to remember to free it</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    fis</Normal Text><Operator>,</Operator><Normal Text> err </Normal Text><Operator>=</Operator><Normal Text> os</Normal Text><Operator>.</Operator><Normal Text>read_dir</Normal Text><Operator>(</Operator><Normal Text>f</Normal Text><Operator>,</Operator><Normal Text> </Normal Text><Operator>-</Operator><Float>1</Float><Operator>)</Operator><Normal Text> </Normal Text><Comment>// -1 reads all file infos</Comment><br/>
+<Normal Text>    </Normal Text><Control Flow>if</Control Flow><Normal Text> err </Normal Text><Operator>!=</Operator><Normal Text> os</Normal Text><Operator>.</Operator><Normal Text>ERROR_NONE </Normal Text><Operator>{</Operator><br/>
+<Normal Text>        fmt</Normal Text><Operator>.</Operator><Normal Text>eprintln</Normal Text><Operator>(</Operator><String>"Could not read directory"</String><Operator>,</Operator><Normal Text> err</Normal Text><Operator>)</Operator><br/>
+<Normal Text>        os</Normal Text><Operator>.</Operator><Normal Text>exit</Normal Text><Operator>(</Operator><Float>2</Float><Operator>)</Operator><br/>
+<Normal Text>    </Normal Text><Operator>}</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Control Flow>for</Control Flow><Normal Text> fi </Normal Text><Control Flow>in</Control Flow><Normal Text> fis </Normal Text><Operator>{</Operator><br/>
+<Normal Text>        print_file_info</Normal Text><Operator>(</Operator><Normal Text>fi</Normal Text><Operator>)</Operator><br/>
+<Normal Text>    </Normal Text><Operator>}</Operator><br/>
+<Operator>}</Operator><br/>

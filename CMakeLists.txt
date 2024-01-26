@@ -145,7 +145,8 @@ install(FILES "${ksyntaxhighlighting_version_header}"
         DESTINATION "${KDE_INSTALL_INCLUDEDIR_KF}/KSyntaxHighlighting"
         COMPONENT Devel)
 
-feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)
+include(ECMFeatureSummary)
+ecm_feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)
 
 # add target to update kate-editor.org syntax page + update site
 add_custom_target(update_kate_editor_org

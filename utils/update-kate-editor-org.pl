@@ -48,7 +48,7 @@ if (-d "kate-editor-org") {
 my $currentVersion;
 open (my $list, "<$sourceDir/CMakeLists.txt");
 for (<$list>) {
-    if ((my $version) = /^set\(KF_VERSION "[0-9]+\.([0-9]+)\.[0-9]+"\)/) {
+    if ((my $version) = /^set\(KF_VERSION "6.([0-9]+)\.[0-9]+"\)/) {
        $currentVersion = $version;
        last;
     }
@@ -59,7 +59,7 @@ if (!defined($currentVersion)) {
 }
 
 # current maximal version
-print "Current version of syntax-highlighting: 5.$currentVersion\n";
+print "Current version of syntax-highlighting: 6.$currentVersion\n";
 
 # purge old data in kate-editor.org clone
 my $staticSyntaxPath = "kate-editor-org/static/syntax";
@@ -146,32 +146,34 @@ foreach my $xmlFile (<data/syntax/*.xml>) {
 
 # now: generate all needed update-*.xml files
 print "Generating XML update-*.xml files...\n";
-my $minorVersion = 0;
-while ($minorVersion <= $currentVersion) {
-    # generate one update file
-    my $cVersion = "5.$minorVersion";
-    #print "Generation update-$cVersion.xml...\n";
-    open (my $update, ">update-$cVersion.xml");
-    print $update "<!DOCTYPE DEFINITIONS>\n";
-    print $update "<DEFINITIONS>\n";
-    foreach my $def (sort keys %metaInfo) {
-        # is this definition allowed here?
-        $_ = $metaInfo{$def}{kateversion};
-        if ((my $version) = /[0-9]+\.([0-9]+)/) {
-           next if ($version > $minorVersion);
-        } else {
-            next;
+for (my $majorVersion = 5; $majorVersion <= 6; ++$majorVersion) {
+    my $minorVersion = 0;
+    while ($minorVersion <= (($majorVersion == 6) ? $currentVersion : 256)) {
+        # generate one update file
+        my $cVersion = "$majorVersion.$minorVersion";
+        #print "Generation update-$cVersion.xml...\n";
+        open (my $update, ">update-$cVersion.xml");
+        print $update "<!DOCTYPE DEFINITIONS>\n";
+        print $update "<DEFINITIONS>\n";
+        foreach my $def (sort keys %metaInfo) {
+            # is this definition allowed here?
+            $_ = $metaInfo{$def}{kateversion};
+            if ((my $major, my $minor) = /([0-9]+)\.([0-9]+)/) {
+                next if (($major > $majorVersion) || ($major == $majorVersion && $minor > $minorVersion));
+            } else {
+                next;
+            }
+            print $update "<Definition name=\"$metaInfo{$def}{name}\" url=\"https://kate-editor.org/syntax/$def\" version=\"$metaInfo{$def}{version}\"/>\n";
         }
-        print $update "<Definition name=\"$metaInfo{$def}{name}\" url=\"https://kate-editor.org/syntax/$def\" version=\"$metaInfo{$def}{version}\"/>\n";
+        print $update "</DEFINITIONS>\n";
+        close $update;
+
+        # add to git
+        system("git add update-$cVersion.xml") == 0 || die "Failed to add update-$cVersion.xml to git!\n";
+
+        # next one
+        ++$minorVersion;
     }
-    print $update "</DEFINITIONS>\n";
-    close $update;
-
-    # add to git
-    system("git add update-$cVersion.xml") == 0 || die "Failed to add update-$cVersion.xml to git!\n";
-
-    # next one
-    ++$minorVersion;
 }
 
 # parse the html files to match them to the highlighting they belong to

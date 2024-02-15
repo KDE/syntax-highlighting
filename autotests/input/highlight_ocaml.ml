@@ -31,7 +31,7 @@ declare where value
 
 (* There's no way to reliably highlight all OCaml type expressions,
    (they can be very complex) so just the built-in type names are highlighted.*)
-exn lazy_t format unit int real char string ref array bool list option
+exn lazy_t format unit int float char string ref array bool list option
 
 
 let integers : int list = [
@@ -50,7 +50,7 @@ let integers : int list = [
     0b_0100_1010_1010_1101;
 ];;
 
-let floats : real list = [
+let floats : float list = [
     12345.6789;
     -1.23456789e4;      (* All variations of the exponent form *)
     1.23456789e+4;

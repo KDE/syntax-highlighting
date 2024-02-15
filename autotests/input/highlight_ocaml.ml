@@ -48,6 +48,7 @@ let integers : int list = [
     -0O1234567;             (* octal *)
     0B01001010101010;       (* binary *)
     -123_456_789;           (* Underscores are allowed in numeric constants. *)
+    0x123n;456L;0o77l;0b11l (* int32,int64 and nativeint constants *)
     0x_abce_df01_2345_6789;
     -0o12_34_567;
     0b_0100_1010_1010_1101;
@@ -63,6 +64,7 @@ let floats : float list = [
     12_345.6789;       (* Underscores are allowed in numeric constants. *)
     -1.23_456_789e+4;
     12_345.6789;
+    0x1p-52            (* hexadecimal floating-point literals *)
 ];;
 
 let characters : char list = [

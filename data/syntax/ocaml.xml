@@ -12,6 +12,7 @@
 <!ENTITY IDENT  "[&LETTER;_][&LETTER;0-9_']*">  <!-- All OCaml identifiers. -->
 <!ENTITY ESC    "(\\[ntbr'&quot; \\]|\\[0-9]{3}|\\x[0-9A-Fa-f]{2}|\\o[0-3][0-7]{2})"> <!-- OCaml character code escapes. -->
 <!ENTITY DEC    "[0-9][0-9_]*">                                     <!-- Decimal digits with underscores. -->
+<!ENTITY HEX    "0[xX][0-9A-Fa-f][0-9A-Fa-f_]*">                    <!-- Integer hex literals. -->
 ]>
 <language name="Objective Caml"
           extensions="*.ml;*.mli"
@@ -415,11 +416,11 @@
 
         <!-- Numeric constants. -->
         <!-- Note that they may contain underscores. -->
-        <RegExpr String="-?0[xX][0-9A-Fa-f_]+" context="#stay" attribute="Hexadecimal" />
-        <RegExpr String="-?0[oO][0-7_]+" context="#stay" attribute="Octal" />
-        <RegExpr String="-?0[bB][01_]+" context="#stay" attribute="Binary" />
-        <RegExpr String="-?&DEC;(\.&DEC;([eE][-+]?&DEC;)?|[eE][-+]?&DEC;)" context="#stay" attribute="Float" />
-        <RegExpr String="-?&DEC;" context="#stay" attribute="Decimal" />
+        <RegExpr String="-?0[oO][0-7][0-7_]*[lLn]?" context="#stay" attribute="Octal" />
+        <RegExpr String="-?0[bB][01][01_]*[lLn]?" context="#stay" attribute="Binary" />
+        <RegExpr String="-?(&DEC;(\.&DEC;([eE][-+]?&DEC;)?|[eE][-+]?&DEC;)|&HEX;(\.[0-9A-Fa-f_]+)?[pP][+-]&DEC;)" context="#stay" attribute="Float" />
+        <RegExpr String="-?&HEX;[lLn]?" context="#stay" attribute="Hexadecimal" />
+        <RegExpr String="-?&DEC;[lLn]?" context="#stay" attribute="Decimal" />
 
         <IncludeRules context="Unmatched Closing Brackets" />
       </context>

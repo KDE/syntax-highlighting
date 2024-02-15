@@ -97,6 +97,7 @@ let strings : string list = [
     "A\\B"; "A\'B"; "A'B";  "A\"B";  (* Quote character escapes. *)
     "A multiline\
     string";
+    "\u{207A}"; (* Unicode escapes *)
     {|Simple quoted string, we can have " and ' inside, and even {|};
     {another|quoted string|another};
     {foo|More complicated quoted string where we can have {| inside|foo}

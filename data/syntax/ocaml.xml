@@ -376,11 +376,6 @@
 
       <context name="Code" lineEndContext="#stay" attribute="Operator">
 
-        <!-- ] and ]} close code samples in Ocamldoc, so -->
-        <!-- nested [ ] and { } brackets have to be allowed for: -->
-        <DetectChar char="[" context="Nested Code 1" attribute="Operator" />
-        <DetectChar char="{" context="Nested Code 2" attribute="Operator" />
-
         <!-- Comments. -->
         <!-- A (** begins a special comment with Ocamldoc documentation markup. -->
         <StringDetect String="(**)"      context="#stay"    attribute="Comment" />
@@ -398,9 +393,15 @@
         <!-- Note: If you must modify the pattern for characters be precise:  -->
         <!-- single quotes have several meanings in Ocaml.                    -->
         <DetectChar char="&quot;" context="String" attribute="String" />
+        <RegExpr String="{[a-z_]*\|" context="Quoted String" attribute="Quoted String" />
         <RegExpr String="'(&ESC;|[^'])'" context="#stay" attribute="Character" />
         <Detect2Chars char="&lt;" char1="&lt;" context="Camlp4 Quotation" attribute="Camlp4 Quotation" />
         <RegExpr String="&lt;:&IDENT;&lt;" context="Camlp4 Quotation" attribute="Camlp4 Quotation" />
+
+        <!-- ] and ]} close code samples in Ocamldoc, so -->
+        <!-- nested [ ] and { } brackets have to be allowed for: -->
+        <DetectChar char="[" context="Nested Code 1" attribute="Operator" />
+        <DetectChar char="{" context="Nested Code 2" attribute="Operator" />
 
         <!-- Identifiers and keywords. -->
         <keyword String="Keywords"                 context="#stay" attribute="Keyword" />
@@ -470,6 +471,10 @@
       <context name="String in Comment" lineEndContext="#stay" attribute="String in Comment">
         <DetectChar char="&quot;" context="#pop" attribute="String in Comment" />
         <IncludeRules context="String" />
+      </context>
+
+      <context name="Quoted String" lineEndContext="#stay" attribute="Quoted String">
+        <RegExpr String="\|[a-z_]*}" context="#pop" attribute="Quoted String" />
       </context>
 
       <!-- Camlp4 Quotations. These are source code literals used by the Campl4 preprocessor.           -->
@@ -592,6 +597,7 @@
         <Detect2Chars char="]" char1="}" context="#stay" attribute="Mismatched Brackets" />
         <Detect2Chars char="%" char1="}" context="#stay" attribute="Mismatched Brackets" />
         <AnyChar      String="]}"        context="#stay" attribute="Mismatched Brackets" />
+        <RegExpr String="\|[a-z_]*}"      context="#pop" attribute="Mismatched Brackets" />
       </context>
     </contexts>
 
@@ -620,6 +626,7 @@
 
       <itemData name="Character"               defStyleNum="dsChar"     />
       <itemData name="String"                  defStyleNum="dsString"   />
+      <itemData name="Quoted String"           defStyleNum="dsString"   />
       <itemData name="Camlp4 Quotation"        defStyleNum="dsString"   />
       <itemData name="Escaped Characters"      defStyleNum="dsChar"     />
 

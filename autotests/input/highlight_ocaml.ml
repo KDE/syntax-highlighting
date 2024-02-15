@@ -33,6 +33,9 @@ declare where value
    (they can be very complex) so just the built-in type names are highlighted.*)
 exn lazy_t format unit int float char string ref array bool list option
 
+type poly = [ `A | `BX ]
+
+let _unused = "still an identifier"
 
 let integers : int list = [
     123456789;              (* decimal *)
@@ -70,6 +73,7 @@ let characters : char list = [
     '\000'; '\128';            (* Decimal character codes. These are always 3 digits. *)
     '\x02'; '\xff'; '\xFF';    (* Hexadecimal character codes. These are always 3 digits. *)
     '\\'; '\''; '\"'; '"'      (* Quote character escapes. *)
+    ;'\ '; '\o377'
 ];;
 
 (* Quotes used to mark constants in parsers should

@@ -393,4 +393,7 @@ generated quantities {
   real Y;
   // rng function
   Y = normal_rng(0., 1.);
+
+  tuple(real, int) tupl = (1.5, 2);
+  complex_matrix C_mike = mike;
 }

@@ -44,6 +44,9 @@ public:
     // sorted map to have deterministic iteration order for e.g. definitionsForFileName
     QMap<QString, Definition> m_defs;
 
+    // map relating all names and alternative names, case insensitively to the correct definition.
+    QMap<QString, Definition> m_fullDefs;
+
     // this vector is sorted by translated sections/names
     QList<Definition> m_sortedDefs;
 

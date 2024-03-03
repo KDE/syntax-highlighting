@@ -119,7 +119,7 @@ Repository::~Repository()
 
 Definition Repository::definitionForName(const QString &defName) const
 {
-    return d->m_defs.value(defName);
+    return d->m_fullDefs.value(defName.toLower());
 }
 
 Definition Repository::definitionForFileName(const QString &fileName) const
@@ -252,6 +252,13 @@ void RepositoryPrivate::load(Repository *repo)
         }
         return comparison < 0;
     });
+
+    for (auto it = m_sortedDefs.constBegin(); it != m_sortedDefs.constEnd(); ++it) {
+        m_fullDefs.insert(it->name().toLower(), *it);
+        for (const auto &altName : it->alternativeNames()) {
+            m_fullDefs.insert(altName.toLower(), *it);
+        }
+    }
 
     // load themes
 
@@ -387,6 +394,7 @@ void Repository::reload()
     }
     d->m_defs.clear();
     d->m_sortedDefs.clear();
+    d->m_fullDefs.clear();
 
     d->m_themes.clear();
 

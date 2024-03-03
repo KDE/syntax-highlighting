@@ -86,6 +86,11 @@ QString Definition::name() const
     return d->name;
 }
 
+QStringList Definition::alternativeNames() const
+{
+    return d->alternativeNames;
+}
+
 QString Definition::translatedName() const
 {
     if (d->translatedName.isEmpty()) {
@@ -455,6 +460,9 @@ bool DefinitionData::loadMetaData(const QString &file, const QCborMap &obj)
     hidden = obj.value(QLatin1String("hidden")).toBool();
     fileName = file;
 
+    const auto names = obj.value(QLatin1String("alternativeNames")).toString();
+    alternativeNames = names.split(QLatin1Char(';'), Qt::SkipEmptyParts);
+
     const auto exts = obj.value(QLatin1String("extensions")).toString();
     extensions = exts.split(QLatin1Char(';'), Qt::SkipEmptyParts);
 
@@ -474,6 +482,10 @@ bool DefinitionData::loadLanguage(QXmlStreamReader &reader)
     }
 
     name = reader.attributes().value(QLatin1String("name")).toString();
+    const auto names = reader.attributes().value(QLatin1String("alternativeNames"));
+    for (const auto &n : names.split(QLatin1Char(';'), Qt::SkipEmptyParts)) {
+        alternativeNames.push_back(n.toString());
+    }
     section = reader.attributes().value(QLatin1String("section")).toString();
     // toFloat instead of toInt for backward compatibility with old Kate files
     version = reader.attributes().value(QLatin1String("version")).toFloat();

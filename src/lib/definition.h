@@ -163,6 +163,13 @@ public:
     QString name() const;
 
     /**
+     * Alternate names the syntax can be referred to by.
+     *
+     * @since 6.1
+     */
+    QStringList alternativeNames() const;
+
+    /**
      * Translated name for display.
      */
     QString translatedName() const;

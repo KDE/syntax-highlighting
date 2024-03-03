@@ -102,6 +102,7 @@ public:
 
     QString fileName;
     QString name = QStringLiteral(QT_TRANSLATE_NOOP("Language", "None"));
+    QStringList alternativeNames;
     QByteArray nameUtf8;
     mutable QString translatedName;
     QString section;

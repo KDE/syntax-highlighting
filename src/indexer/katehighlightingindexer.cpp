@@ -2817,9 +2817,9 @@ int main(int argc, char *argv[])
     }
 
     // text attributes
-    const QStringList textAttributes = QStringList() << QStringLiteral("name") << QStringLiteral("section") << QStringLiteral("mimetype")
-                                                     << QStringLiteral("extensions") << QStringLiteral("style") << QStringLiteral("author")
-                                                     << QStringLiteral("license") << QStringLiteral("indenter");
+    const QStringList textAttributes = QStringList() << QStringLiteral("name") << QStringLiteral("alternativeNames") << QStringLiteral("section")
+                                                     << QStringLiteral("mimetype") << QStringLiteral("extensions") << QStringLiteral("style")
+                                                     << QStringLiteral("author") << QStringLiteral("license") << QStringLiteral("indenter");
 
     // index all given highlightings
     HlFilesChecker filesChecker;

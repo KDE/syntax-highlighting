@@ -1,4 +1,4 @@
-version: 50
+version: 51
 
 global-properties:
     - ALLOW_DUPLICATE_CUSTOM_TARGETS
@@ -358,10 +358,13 @@ target-properties:
     - STATIC_LIBRARY_FLAGS
     - STATIC_LIBRARY_OPTIONS                                # Since 3.13
     - SUFFIX
+    - Swift_COMPILATION_MODE                                # Since 3.29
     - Swift_DEPENDENCIES_FILE                               # Since 3.15
+    - Swift_LANGUAGE_VERSION                                # Since 3.16
     - Swift_MODULE_DIRECTORY                                # Since 3.15
     - Swift_MODULE_NAME                                     # Since 3.15
     - SYSTEM                                                # Since 3.25
+    - TEST_LAUNCHER                                         # Since 3.29
     - TYPE
     - UNITY_BUILD                                           # Since 3.16
     - UNITY_BUILD_BATCH_SIZE                                # Since 3.16
@@ -788,6 +791,10 @@ variables:
     - CMAKE_JOB_POOLS                                       # Since 3.11
     - CMAKE_<LANG>_COMPILER_AR
     - CMAKE_<LANG>_COMPILER_FRONTEND_VARIANT                # Since 3.14
+    - CMAKE_<LANG>_COMPILER_LINKER                          # Since 3.29
+    - CMAKE_<LANG>_COMPILER_LINKER_FRONTEND_VARIANT         # Since 3.29
+    - CMAKE_<LANG>_COMPILER_LINKER_ID                       # Since 3.29
+    - CMAKE_<LANG>_COMPILER_LINKER_VERSION                  # Since 3.29
     - CMAKE_<LANG>_COMPILER_RANLIB
     - CMAKE_LINK_LIBRARY_SUFFIX
     - CMAKE_LINK_SEARCH_END_STATIC
@@ -827,7 +834,10 @@ variables:
     - CMAKE_SOURCE_DIR
     - CMAKE_STATIC_LIBRARY_PREFIX
     - CMAKE_STATIC_LIBRARY_SUFFIX
+    - CMAKE_Swift_COMPILATION_MODE                          # Since 3.29
     - CMAKE_Swift_MODULE_DIRECTORY                          # Since 3.15
+    - CMAKE_Swift_NUM_THREADS                               # Since 3.15
+    - CMAKE_TEST_LAUNCHER                                   # Since 3.29
     - CMAKE_TOOLCHAIN_FILE
     - CMAKE_TWEAK_VERSION
     - CMAKE_VERBOSE_MAKEFILE
@@ -955,6 +965,7 @@ variables:
     - CMAKE_PROJECT_TOP_LEVEL_INCLUDES                      # Since 3.24
     - CMAKE_REQUIRE_FIND_PACKAGE_<PackageName>              # Since 3.22
     - CMAKE_SKIP_INSTALL_ALL_DEPENDENCY
+    - CMAKE_SKIP_TEST_ALL_DEPENDENCY                        # Since 3.29
     - CMAKE_STAGING_PREFIX
     - CMAKE_SUBLIME_TEXT_2_ENV_SETTINGS
     - CMAKE_SUBLIME_TEXT_2_EXCLUDE_BUILD_TREE
@@ -1148,14 +1159,16 @@ variables:
     - CMAKE_<LANG>_CPPCHECK                                 # Since 3.10
     - CMAKE_<LANG>_CPPLINT
     - CMAKE_<LANG>_INCLUDE_WHAT_YOU_USE
-    - CMAKE_<LANG>_LINK_LIBRARY_USING_<FEATURE>             # Since 3.24
-    - CMAKE_<LANG>_LINK_LIBRARY_USING_<FEATURE>_SUPPORTED   # Since 3.24
-    - CMAKE_<LANG>_LINKER_LAUNCHER                          # Since 3.21
     - CMAKE_<LANG>_LINK_GROUP_USING_<FEATURE>               # Since 3.24
     - CMAKE_<LANG>_LINK_GROUP_USING_<FEATURE>_SUPPORTED     # Since 3.24
     - CMAKE_<LANG>_LINK_LIBRARY_FILE_FLAG                   # Since 3.16
     - CMAKE_<LANG>_LINK_LIBRARY_FLAG                        # Since 3.16
+    - CMAKE_<LANG>_LINK_LIBRARY_USING_<FEATURE>             # Since 3.24
+    - CMAKE_<LANG>_LINK_LIBRARY_USING_<FEATURE>_SUPPORTED   # Since 3.24
     - CMAKE_<LANG>_LINK_WHAT_YOU_USE_FLAG                   # Since 3.22
+    - CMAKE_<LANG>_LINKER_LAUNCHER                          # Since 3.21
+    - CMAKE_<LANG>_USING_LINKER_MODE                        # Since 3.29
+    - CMAKE_<LANG>_USING_LINKER_<TYPE>                      # Since 3.29
     - CMAKE_<LANG>_VISIBILITY_PRESET
     - CMAKE_LIBRARY_OUTPUT_DIRECTORY
     - CMAKE_LIBRARY_OUTPUT_DIRECTORY_<CONFIG>
@@ -1172,6 +1185,7 @@ variables:
     - CMAKE_LINK_LIBRARY_USING_<FEATURE>_SUPPORTED          # Since 3.24
     - CMAKE_LINK_WHAT_YOU_USE
     - CMAKE_LINK_WHAT_YOU_USE_CHECK                         # Since 3.22
+    - CMAKE_LINKER_TYPE                                     # Since 3.29
     - CMAKE_MACOSX_BUNDLE
     - CMAKE_MACOSX_RPATH
     - CMAKE_MAP_IMPORTED_CONFIG_<CONFIG>
@@ -2025,6 +2039,7 @@ variables:
     - CPACK_WIX_CUSTOM_XMLNS                                # Since 3.19
     - CPACK_WIX_SKIP_WIX_UI_EXTENSION                       # Since 3.23
     - CPACK_WIX_ARCHITECTURE                                # Since 3.24
+    - CPACK_WIX_INSTALL_SCOPE                               # Since 3.29
     # - CTest
     # - Dart
     - BUILD_TESTING
@@ -2790,6 +2805,7 @@ environment-variables:
     - CMAKE_GENERATOR_PLATFORM
     - CMAKE_GENERATOR_TOOLSET
     - CMAKE_INSTALL_MODE                                    # Since 3.22
+    - CMAKE_INSTALL_PREFIX                                  # Since 3.29
     - CMAKE_<LANG>_COMPILER_LAUNCHER                        # Since 3.17
     - CMAKE_<LANG>_LINKER_LAUNCHER                          # Since 3.21
     - CMAKE_MSVCIDE_RUN_PATH
@@ -2935,6 +2951,8 @@ scripting-commands:
           , SUPPORTED_METHODS
             # Since 3.25
           , GET_MESSAGE_LOG_LEVEL
+            # Since 3.29
+          , EXIT
           ]
         # Since 3.24
         special-args: [FIND_PACKAGE, FETCHCONTENT_MAKEAVAILABLE_SERIAL]
@@ -3026,6 +3044,9 @@ scripting-commands:
           , TARGET
           , TEST
           , EXISTS
+          , IS_READABLE                                     # Since 3.29
+          , IS_WRITABLE                                     # Since 3.29
+          , IS_EXECUTABLE                                   # Since 3.29
           , IS_NEWER_THAN
           , IS_DIRECTORY
           , IS_SYMLINK
@@ -3814,7 +3835,23 @@ project-commands:
         name: enable_testing
     -
         name: export
-        named-args: [EXPORT, NAMESPACE, FILE, TARGETS, APPEND, EXPORT_LINK_INTERFACE_LIBRARIES, ANDROID_MK]
+        named-args: [
+            EXPORT
+          , NAMESPACE
+          , FILE
+          , TARGETS
+          , APPEND
+          , EXPORT_LINK_INTERFACE_LIBRARIES
+          , ANDROID_MK
+            # Since 3.29
+          , SETUP
+          , PACKAGE_DEPENDENCY
+          , ENABLED
+          , AUTO
+          , TARGET
+          , XCFRAMEWORK_LOCATION
+          ]
+        # TODO Need to update generator to accept an array here!
         has-target-names-after-kw: TARGETS
     -
         name: fltk_wrap_ui
@@ -4259,6 +4296,8 @@ ctest-commands:
           , INCLUDE
           , EXCLUDE_LABEL
           , INCLUDE_LABEL
+          , EXCLUDE_FROM_FILE                               # Since 3.29
+          , INCLUDE_FROM_FILE                               # Since 3.29
           , EXCLUDE_FIXTURE
           , EXCLUDE_FIXTURE_SETUP
           , EXCLUDE_FIXTURE_CLEANUP
@@ -4741,6 +4780,32 @@ standard-module-commands:
             - COMPATIBILITY
             - ARCH_INDEPENDENT
         special-args: [AnyNewerVersion, SameMajorVersion, SameMinorVersion, ExactVersion]
+    -
+        # Since 3.29
+        name: generate_apple_platform_selection_file
+        named-args:
+            - INSTALL_DESTINATION
+            - INSTALL_PREFIX
+            - MACOS_INCLUDE_FILE
+            - IOS_INCLUDE_FILE
+            - IOS_SIMULATOR_INCLUDE_FILE
+            - TVOS_INCLUDE_FILE
+            - TVOS_SIMULATOR_INCLUDE_FILE
+            - WATCHOS_INCLUDE_FILE
+            - WATCHOS_SIMULATOR_INCLUDE_FILE
+            - VISIONOS_INCLUDE_FILE
+            - VISIONOS_SIMULATOR_INCLUDE_FILE
+    -
+        name: generate_apple_architecture_selection_file
+        named-args:
+            - INSTALL_DESTINATION
+            - INSTALL_PREFIX
+            - SINGLE_ARCHITECTURES
+            - SINGLE_ARCHITECTURE_INCLUDE_FILES
+            - UNIVERSAL_ARCHITECTURES
+            - UNIVERSAL_INCLUDE_FILE
+            - ERROR_VARIABLE
+
     # CMakePrintHelpers
     -
         name: cmake_print_properties

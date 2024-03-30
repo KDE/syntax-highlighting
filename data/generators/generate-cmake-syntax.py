@@ -327,7 +327,13 @@ def transform_command(cmd):
         can_be_nulary = False
 
     if 'has-target-names-after-kw' in cmd:
-        cmd['has_target_names_after_kw'] = cmd['has-target-names-after-kw']
+        match cmd['has-target-names-after-kw']:
+            case str():
+                cmd['has_target_names_after_kw'] = [cmd['has-target-names-after-kw']]
+            case list():
+                cmd['has_target_names_after_kw'] = cmd['has-target-names-after-kw']
+            case _:
+                raise TypeError('Unexpected type for `has-target-names-after-kw`')
         can_be_nulary = False
 
     if 'second-arg-is-target?' in cmd:

@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # Generate Kate syntax file for CMake
 #
-# SPDX-FileCopyrightText: 2017-2023 Alex Turbov <i.zaufi@gmail.com>
+# SPDX-FileCopyrightText: 2017-2024 Alex Turbov <i.zaufi@gmail.com>
 #
 # To install prerequisites:
 #
@@ -156,14 +155,18 @@ class RegexCollection:
 
     def update_tree(self, name_parts: list[str]) -> RegexCollection:
         safe_var_ref = _VAR_REF_ENTITY.replace('_', '%')
-        current = functools.reduce(
+        functools.reduce(
             lambda current, part: (
                 self.re_tree if current is None else current.children
               ).setdefault(part, RePartNode())
-          , safe_var_ref.join(name_parts).replace(f'{safe_var_ref}_{safe_var_ref}', safe_var_ref).split('_')
+          , (
+                safe_var_ref
+                  .join(name_parts)
+                  .replace(f'{safe_var_ref}_{safe_var_ref}', safe_var_ref)
+                  .split('_')
+              )
           , None
-          )
-        current.is_leaf = True
+          ).is_leaf = True
         return self
 
 
@@ -354,33 +357,30 @@ def transform_command(cmd):
     return cmd
 
 
-def remove_duplicate_list_nodes(contexts, highlighting):
+def remove_duplicate_list_nodes(root):
     remap = {}
-
     items_by_kws = {}
+
     # extract duplicate keyword list
-    for items in highlighting:
-        if items.tag != 'list':
-            break
-        k = '<'.join(item.text for item in items)
+    for items in root.iterfind('highlighting/list'):
+        key = '<'.join(item.text for item in items)
         name = items.attrib['name']
-        rename = items_by_kws.get(k)
-        if rename:
+        if rename := items_by_kws.get(key):
             remap[name] = rename
-            highlighting.remove(items)
+            items.getparent().remove(items)
         else:
-            items_by_kws[k] = name
+            items_by_kws[key] = name
 
     # update keyword list name referenced by each rule
-    for context in contexts:
-        for rule in context:
-            if rule.tag == 'keyword':
-                name = rule.attrib['String']
-                rule.attrib['String'] = remap.get(name, name)
+    for rule in root.iterfind('highlighting/contexts/context/keyword'):
+        name = rule.attrib['String']
+        rule.attrib['String'] = remap.get(name, name)
 
 
-def remove_duplicate_context_nodes(contexts):
+def remove_duplicate_context_nodes(root):
+    contexts = root[0].find('contexts')
     # 3 levels: ctx, ctx_op and ctx_op_nested
+    # TODO Refactor it!
     for _ in range(3):
         remap = {}
         duplicated = {}
@@ -408,12 +408,9 @@ def remove_duplicate_context_nodes(contexts):
 def remove_duplicate_nodes(xml_string):
     parser = etree.XMLParser(resolve_entities=False, collect_ids=False)
     root = etree.fromstring(xml_string.encode(), parser=parser)
-    highlighting = root[0]
 
-    contexts = highlighting.find('contexts')
-
-    remove_duplicate_list_nodes(contexts, highlighting)
-    remove_duplicate_context_nodes(contexts)
+    remove_duplicate_list_nodes(root)
+    remove_duplicate_context_nodes(root)
 
     # reformat comments
     xml = etree.tostring(root)
@@ -432,12 +429,12 @@ def remove_duplicate_nodes(xml_string):
     return f'{doctype}{xml.decode()}{last_comment}'
 
 
-#BEGIN Jinja filters
+# BEGIN Jinja filters
 
 def cmd_is_nulary(cmd):
     return cmd.setdefault('nulary?', False)
 
-#END Jinja filters
+# END Jinja filters
 
 
 @click.command()

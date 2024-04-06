@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>test.cash</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (CashScript) - Theme (Breeze Light)"/>
+</head><body style="background-color:#ffffff;color:#1f1c1b"><pre>
+<span style="color:#898887">/* The below does not represent a functional lock/unlock script.</span>
+<span style="color:#898887"> * It is intended to test KDE's Syntax Highlighting framework.</span>
+<span style="color:#898887"> */</span>
+
+<span style="color:#898887">// Pragma comment.</span>
+<span style="font-weight:bold">pragma</span> <span style="color:#644a9b;font-weight:bold">cashscript</span> ^0.9.2;
+
+<span style="color:#898887">// Locking Script/Function.</span>
+<span style="font-weight:bold">contract</span> TestContract<span style="color:#ca60ca">(</span>
+	<span style="color:#0057ae">address</span> addressExampple<span style="color:#ca60ca">,</span>
+	<span style="color:#0057ae">int</span> intExample<span style="color:#ca60ca">,</span>
+	<span style="color:#0057ae">bool</span> boolExample<span style="color:#ca60ca">,</span>
+	<span style="color:#0057ae">string</span> stringExample<span style="color:#ca60ca">,</span>
+	<span style="color:#0057ae">pubkey</span> pubkeyExample<span style="color:#ca60ca">,</span>
+	<span style="color:#0057ae">sig</span> sigExample<span style="color:#ca60ca">,</span>
+	<span style="color:#0057ae">datasig</span> datasigExample
+<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">{</span>
+	<span style="color:#898887">// Unlocking Script/Function.</span>
+	<span style="font-weight:bold">function</span> testUnlock<span style="color:#ca60ca">(</span>
+		<span style="color:#0057ae">byte</span> singleByte<span style="color:#ca60ca">,</span>
+		<span style="color:#0057ae">bytes</span> bytesUnspecifiedLength<span style="color:#ca60ca">,</span>
+		<span style="color:#0057ae">bytes1</span> bytes1Length<span style="color:#ca60ca">,</span>
+		<span style="color:#0057ae">bytes99</span> bytes99Length
+	<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">{</span>
+		<span style="color:#898887">// General.</span>
+		<span style="color:#644a9b;font-weight:bold">require</span><span style="color:#ca60ca">(</span>singleByte <span style="color:#ca60ca">==</span> bytes1Length<span style="color:#ca60ca">);</span>
+
+		<span style="color:#898887">// Arithmetic.</span>
+		<span style="color:#0057ae">int</span> resultAbs <span style="color:#ca60ca">=</span> <span style="color:#644a9b;font-weight:bold">abs</span><span style="color:#ca60ca">(</span>intExample<span style="color:#ca60ca">);</span>
+		<span style="color:#0057ae">int</span> resultMin <span style="color:#ca60ca">=</span> <span style="color:#644a9b;font-weight:bold">min</span><span style="color:#ca60ca">(</span>intExample<span style="color:#ca60ca">,</span> <span style="color:#b08000">100</span><span style="color:#ca60ca">);</span>
+		<span style="color:#0057ae">int</span> resultMax <span style="color:#ca60ca">=</span> <span style="color:#644a9b;font-weight:bold">max</span><span style="color:#ca60ca">(</span>intExample<span style="color:#ca60ca">,</span> <span style="color:#b08000">100</span><span style="color:#ca60ca">);</span>
+		<span style="color:#0057ae">int</span> resultWithin <span style="color:#ca60ca">=</span> <span style="color:#644a9b;font-weight:bold">within</span><span style="color:#ca60ca">(</span>intExample<span style="color:#ca60ca">,</span> <span style="color:#b08000">0</span><span style="color:#ca60ca">,</span> <span style="color:#b08000">100</span><span style="color:#ca60ca">);</span>
+
+		<span style="color:#898887">// Hashing.</span>
+		<span style="color:#0057ae">bool</span> resultHash160 <span style="color:#ca60ca">=</span> <span style="color:#644a9b;font-weight:bold">hash160</span><span style="color:#ca60ca">(</span>bytesUnspecifiedLength<span style="color:#ca60ca">);</span>
+		<span style="color:#0057ae">bool</span> resultHash256 <span style="color:#ca60ca">=</span> <span style="color:#644a9b;font-weight:bold">hash256</span><span style="color:#ca60ca">(</span>bytesUnspecifiedLength<span style="color:#ca60ca">);</span>
+		<span style="color:#0057ae">bool</span> resultRipeMd160 <span style="color:#ca60ca">=</span> <span style="color:#644a9b;font-weight:bold">ripemd160</span><span style="color:#ca60ca">(</span>bytesUnspecifiedLength<span style="color:#ca60ca">);</span>
+		<span style="color:#0057ae">bool</span> resultSha1 <span style="color:#ca60ca">=</span> <span style="color:#644a9b;font-weight:bold">sha1</span><span style="color:#ca60ca">(</span>bytesUnspecifiedLength<span style="color:#ca60ca">);</span>
+		<span style="color:#0057ae">bool</span> resultSha256 <span style="color:#ca60ca">=</span> <span style="color:#644a9b;font-weight:bold">sha256</span><span style="color:#ca60ca">(</span>bytesUnspecifiedLength<span style="color:#ca60ca">);</span>
+
+		<span style="color:#898887">// Signature checking.</span>
+		<span style="color:#0057ae">bool</span> resultChecksig <span style="color:#ca60ca">=</span> <span style="color:#644a9b;font-weight:bold">checkSig</span><span style="color:#ca60ca">(</span>sigExample<span style="color:#ca60ca">,</span> pubkeyExample<span style="color:#ca60ca">);</span>
+		<span style="color:#0057ae">bool</span> resultCheckMultiSig <span style="color:#ca60ca">=</span> <span style="color:#644a9b;font-weight:bold">checkMultiSig</span><span style="color:#ca60ca">([</span>sigExample<span style="color:#ca60ca">],</span> <span style="color:#ca60ca">[</span>pubkeyExample<span style="color:#ca60ca">]);</span>
+		<span style="color:#0057ae">bool</span> resultCheckDataSig <span style="color:#ca60ca">=</span> <span style="color:#644a9b;font-weight:bold">checkDataSig</span><span style="color:#ca60ca">(</span>datasigExample<span style="color:#ca60ca">,</span> bytesUnspecifiedLength<span style="color:#ca60ca">,</span> pubkeyExample<span style="color:#ca60ca">);</span>
+
+		<span style="color:#898887">// Locking Bytecode.</span>
+		<span style="color:#0057ae">bytes</span> p2pkh <span style="color:#ca60ca">=</span> <span style="font-weight:bold">new</span> <span style="color:#644a9b;font-weight:bold">LockingBytecodeP2PKH</span><span style="color:#ca60ca">(</span>bytesUnspecifiedLength<span style="color:#ca60ca">);</span>
+		<span style="color:#0057ae">bytes</span> p2sh20 <span style="color:#ca60ca">=</span> <span style="font-weight:bold">new</span> <span style="color:#644a9b;font-weight:bold">LockingBytecodeP2SH20</span><span style="color:#ca60ca">(</span>bytesUnspecifiedLength<span style="color:#ca60ca">);</span>
+		<span style="color:#0057ae">bytes</span> p2sh32 <span style="color:#ca60ca">=</span> <span style="font-weight:bold">new</span> <span style="color:#644a9b;font-weight:bold">LockingBytecodeP2SH32</span><span style="color:#ca60ca">(</span>bytesUnspecifiedLength<span style="color:#ca60ca">);</span>
+		<span style="color:#0057ae">bytes</span> nullData <span style="color:#ca60ca">=</span> <span style="font-weight:bold">new</span> <span style="color:#644a9b;font-weight:bold">LockingBytecodeNullData</span><span style="color:#ca60ca">(</span>bytesUnspecifiedLength<span style="color:#ca60ca">);</span>
+
+		<span style="color:#898887">// Keywods.</span>
+		<span style="color:#0057ae">bool</span> exampleTrue <span style="color:#ca60ca">=</span> <span style="font-weight:bold">true</span><span style="color:#ca60ca">;</span>
+		<span style="color:#0057ae">bool</span> exampleFalse <span style="color:#ca60ca">=</span> <span style="font-weight:bold">false</span><span style="color:#ca60ca">;</span>
+
+		<span style="color:#898887">// Control structures.</span>
+		<span style="font-weight:bold">if</span> <span style="color:#ca60ca">(</span>exampleTrue<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">{</span>
+			<span style="color:#644a9b;font-weight:bold">require</span><span style="color:#ca60ca">(</span>singleByte <span style="color:#ca60ca">==</span> bytes1Length<span style="color:#ca60ca">);</span>
+		<span style="color:#ca60ca">}</span> <span style="font-weight:bold">else</span> <span style="font-weight:bold">if</span> <span style="color:#ca60ca">(</span>exampleFalse<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">{</span>
+			<span style="color:#644a9b;font-weight:bold">require</span><span style="color:#ca60ca">(</span>singleByte <span style="color:#ca60ca">==</span> bytes1Length<span style="color:#ca60ca">);</span>
+		<span style="color:#ca60ca">}</span> <span style="font-weight:bold">else</span> <span style="color:#ca60ca">{</span>
+			<span style="color:#644a9b;font-weight:bold">require</span><span style="color:#ca60ca">(</span>singleByte <span style="color:#ca60ca">==</span> bytes1Length<span style="color:#ca60ca">);</span>
+		<span style="color:#ca60ca">}</span>
+
+		<span style="color:#898887">// Units.</span>
+		<span style="color:#0057ae">int</span> exampleSatoshis <span style="color:#ca60ca">=</span> <span style="color:#b08000">1</span> <span style="color:#aa5500">satoshis</span><span style="color:#ca60ca">;</span>
+		<span style="color:#0057ae">int</span> exampleSats <span style="color:#ca60ca">=</span> <span style="color:#b08000">1</span> <span style="color:#aa5500">sats</span><span style="color:#ca60ca">;</span>
+		<span style="color:#0057ae">int</span> exampleFinney <span style="color:#ca60ca">=</span> <span style="color:#b08000">1</span> <span style="color:#aa5500">finney</span><span style="color:#ca60ca">;</span>
+		<span style="color:#0057ae">int</span> exampleBits <span style="color:#ca60ca">=</span> <span style="color:#b08000">1</span> <span style="color:#aa5500">bits</span><span style="color:#ca60ca">;</span>
+		<span style="color:#0057ae">int</span> exampleBitcoin <span style="color:#ca60ca">=</span> <span style="color:#b08000">1</span> <span style="color:#aa5500">bitcoin</span><span style="color:#ca60ca">;</span>
+		<span style="color:#0057ae">int</span> exampleSeconds <span style="color:#ca60ca">=</span> <span style="color:#b08000">1</span> <span style="color:#aa5500">seconds</span><span style="color:#ca60ca">;</span>
+		<span style="color:#0057ae">int</span> exampleMinutes <span style="color:#ca60ca">=</span> <span style="color:#b08000">1</span> <span style="color:#aa5500">minutes</span><span style="color:#ca60ca">;</span>
+		<span style="color:#0057ae">int</span> exampleHours <span style="color:#ca60ca">=</span> <span style="color:#b08000">1</span> <span style="color:#aa5500">hours</span><span style="color:#ca60ca">;</span>
+		<span style="color:#0057ae">int</span> exampleDays <span style="color:#ca60ca">=</span> <span style="color:#b08000">1</span> <span style="color:#aa5500">days</span><span style="color:#ca60ca">;</span>
+		<span style="color:#0057ae">int</span> exampleWeeks <span style="color:#ca60ca">=</span> <span style="color:#b08000">1</span> <span style="color:#aa5500">weeks</span><span style="color:#ca60ca">;</span>
+
+		<span style="color:#898887">// Misc.</span>
+		<span style="color:#0057ae">string</span> exampleString <span style="color:#ca60ca">=</span> <span style="color:#bf0303">"This is an example string"</span><span style="color:#ca60ca">;</span>
+		<span style="color:#0057ae">bytes</span> exampleHex <span style="color:#ca60ca">=</span> <span style="color:#b08000">0xaabbccddeeff</span><span style="color:#ca60ca">;</span>
+	<span style="color:#ca60ca">}</span>
+<span style="color:#ca60ca">}</span>
+</pre></body></html>

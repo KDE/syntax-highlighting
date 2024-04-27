@@ -4,7 +4,7 @@
   MapCSS: https://wiki.openstreetmap.org/wiki/MapCSS/0.2
   layer selector extension: https://wiki.openstreetmap.org/wiki/MapCSS/0.2/Proposal_layer_selector
 -->
-<language name="MapCSS" section="Markup" version="2" kateversion="5.0" extensions="*.mapcss" author="Volker Krause (vkrause@kde.org)" license="MIT">
+<language name="MapCSS" section="Markup" version="3" kateversion="5.0" extensions="*.mapcss" author="Volker Krause (vkrause@kde.org)" license="MIT">
   <highlighting>
     <list name="listKeywords">
       <item>@import</item>
@@ -114,7 +114,8 @@
         <keyword String="listFunctions" attribute="Function"/>
         <keyword String="listObjects" attribute="Type"/>
         <DetectChar char="*" attribute="Type"/>
-        <DetectChar attribute="String" context="ctxString" char="&quot;"/>
+        <DetectChar attribute="String" context="ctxDoubleQuoteString" char="&quot;"/>
+        <DetectChar attribute="String" context="ctxSingleQuoteString" char="'"/>
         <Detect2Chars attribute="Comment" context="ctxSingleLineComment" char="/" char1="/"/>
         <Detect2Chars attribute="Comment" context="ctxComment" char="/" char1="*" beginRegion="RegionComment"/>
         <RegExpr String="::\w+" context="#stay" attribute="Layer"/>
@@ -125,7 +126,8 @@
       <context name="ctxCondition" lineEndContext="#stay" attribute="Normal">
         <Float attribute="Float"/>
         <Int attribute="Decimal"/>
-        <DetectChar attribute="String" context="ctxString" char="&quot;"/>
+        <DetectChar attribute="String" context="ctxDoubleQuoteString" char="&quot;"/>
+        <DetectChar attribute="String" context="ctxSingleQuoteString" char="'"/>
         <DetectChar char="]" context="#pop"/>
       </context>
 
@@ -135,7 +137,8 @@
         <keyword String="listFunctions" attribute="Function"/>
         <keyword String="listObjects" attribute="Type"/>
         <keyword String="listProperties" attribute="Properties" context="ctxDeclaration"/>
-        <DetectChar attribute="String" context="ctxString" char="&quot;"/>
+        <DetectChar attribute="String" context="ctxDoubleQuoteString" char="&quot;"/>
+        <DetectChar attribute="String" context="ctxSingleQuoteString" char="'"/>
         <Detect2Chars attribute="Comment" context="ctxSingleLineComment" char="/" char1="/"/>
         <Detect2Chars attribute="Comment" context="ctxComment" char="/" char1="*" beginRegion="RegionComment"/>
         <RegExpr String="\.\w+" context="#stay" attribute="Class"/>
@@ -146,7 +149,8 @@
         <keyword String="listFunctions" attribute="Function"/>
         <Float attribute="Float"/>
         <Int attribute="Decimal"/>
-        <DetectChar attribute="String" context="ctxString" char="&quot;"/>
+        <DetectChar attribute="String" context="ctxDoubleQuoteString" char="&quot;"/>
+        <DetectChar attribute="String" context="ctxSingleQuoteString" char="'"/>
         <RegExpr String="#[0-9A-Fa-f]{3,8}" attribute="Color"/>
         <keyword String="listConstants" attribute="Constant"/>
         <keyword String="listUnits" attribute="Keyword"/>
@@ -155,9 +159,13 @@
         <RegExpr String="(?&lt;=-)\d+" attribute="Decimal"/>
       </context>
 
-      <context name="ctxString" attribute="String" lineEndContext="#pop">
+      <context name="ctxDoubleQuoteString" attribute="String" lineEndContext="#pop">
         <HlCStringChar attribute="Special Character" context="#stay"/>
         <DetectChar attribute="String" context="#pop" char="&quot;"/>
+      </context>
+      <context name="ctxSingleQuoteString" attribute="String" lineEndContext="#pop">
+        <HlCStringChar attribute="Special Character" context="#stay"/>
+        <DetectChar attribute="String" context="#pop" char="'"/>
       </context>
 
       <context name="ctxSingleLineComment" attribute="Comment" lineEndContext="#pop">

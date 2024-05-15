@@ -141,7 +141,7 @@ int main(int argc, char **argv)
 
     if (parser.isSet(updateDefs)) {
         DefinitionDownloader downloader(&repo);
-        QObject::connect(&downloader, &DefinitionDownloader::informationMessage, [](const QString &msg) {
+        QObject::connect(&downloader, &DefinitionDownloader::informationMessage, &app, [](const QString &msg) {
             std::cout << qPrintable(msg) << std::endl;
         });
         QObject::connect(&downloader, &DefinitionDownloader::done, &app, &QCoreApplication::quit);

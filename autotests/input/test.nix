@@ -45,4 +45,9 @@ in {
         inherit (import ./.);
         x = a;
     };
+
+    var5 = {
+        inherit a b c;
+        inherit (expr) a b c;
+    };
 }

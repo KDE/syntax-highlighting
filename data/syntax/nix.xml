@@ -4,7 +4,7 @@
 ]>
 
 <!--
-    SPDX-FileCopyrightText: 2021 Marco Rebhan <me@dblsaiko.net>
+    SPDX-FileCopyrightText: 2024 Marco Rebhan <me@dblsaiko.net>
     SPDX-FileContributor: Tuan Le <webmaster@michivi.com>
 
     SPDX-License-Identifier: MIT
@@ -172,8 +172,18 @@
                 <IncludeRules context="Comment Rules" />
             </context>
             <context name="Inherit" attribute="Normal Text" lineEndContext="#stay">
-                <DetectChar char=";" attribute="Symbol" context="#pop" />
-                <IncludeRules context="Single Expression" />
+                <DetectChar char="(" attribute="Symbol" context="Inherit - Source" />
+                <DetectIdentifier attribute="Identifier" context="Inherit - Keys" />
+            </context>
+            <context name="Inherit - Source" attribute="Normal Text" lineEndContext="#stay">
+                <DetectChar char=")" attribute="Symbol" context="#pop!Inherit - Keys" />
+
+                <IncludeRules context="Parentheses" />
+            </context>
+            <context name="Inherit - Keys" attribute="Normal Text" lineEndContext="#stay">
+                <DetectChar char=";" attribute="Symbol" context="#pop#pop" />
+                <DetectChar char="(" attribute="Error" />
+                <DetectIdentifier attribute="Identifier" />
             </context>
 
             <context name="Set" attribute="Normal Text" lineEndContext="#stay">

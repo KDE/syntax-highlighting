@@ -50,4 +50,10 @@ in {
         inherit a b c;
         inherit (expr) a b c;
     };
+
+    var6 = {
+        ${foo} = bar;
+        ${bar} = baz;
+        a.${b} = c;
+    };
 }

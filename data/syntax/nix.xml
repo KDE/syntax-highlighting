@@ -73,9 +73,14 @@
                 <RegExpr String="[a-zA-Z0-9-_.]*(/[a-zA-Z0-9-_.]+)+" attribute="Path" />
                 <Float attribute="Float" />
                 <Int attribute="Int" />
+                <DetectChar char="." attribute="Symbol" context="Set Access" />
                 <WordDetect String="true" attribute="Constant" />
                 <WordDetect String="false" attribute="Constant" />
                 <WordDetect String="null" attribute="Constant" />
+            </context>
+            <context name="Set Access" attribute="Normal Text" lineEndContext="#stay">
+                <Detect2Chars char="$" char1="{" attribute="Special Char" context="#pop!Interpolated String" />
+                <DetectIdentifier context="#pop" />
             </context>
             <context name="Parentheses" attribute="Normal Text" lineEndContext="#stay">
                 <DetectChar char=")" attribute="Symbol" context="#pop" />
@@ -129,6 +134,7 @@
                 <DetectChar char="=" attribute="Operator" context="Any Brace - Set Value" />
                 <DetectChar char="&quot;" attribute="String" context="Any Brace - String" />
                 <Detect2Chars char="'" char1="'" attribute="String" context="Any Brace - String2" />
+                <Detect2Chars char="$" char1="{" attribute="Special Char" context="Any Brace - Interpolated String" />
 
                 <DetectChar char="," attribute="Symbol" context="#pop!Set Expansion" />
                 <DetectChar char="?" attribute="Symbol" context="Any Brace - Default Value" />
@@ -158,6 +164,10 @@
                 <DetectChar char=";" attribute="Symbol" context="#pop#pop!Set" />
                 <IncludeRules context="Inherit" />
             </context>
+            <context name="Any Brace - Interpolated String" attribute="Normal Text">
+                <DetectChar char="}" attribute="Special Char" context="#pop!Set" />
+                <IncludeRules context="Interpolated String" />
+            </context>
             <context name="Any Brace - Default Value" attribute="Normal Text" lineEndContext="#stay">
                 <DetectChar char="," attribute="Symbol" context="#pop#pop!Set Expansion" />
                 <IncludeRules context="Default Value" />
@@ -168,6 +178,7 @@
                 <DetectChar char="&quot;" attribute="String" context="String" />
                 <Detect2Chars char="'" char1="'" attribute="String" context="String2" />
                 <DetectChar char="=" attribute="Operator" context="Set Value" />
+                <Detect2Chars char="$" char1="{" attribute="Special Char" context="Interpolated String" />
                 <RegExpr String="&ident;" attribute="Identifier" />
                 <IncludeRules context="Comment Rules" />
             </context>

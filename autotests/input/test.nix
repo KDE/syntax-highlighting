@@ -56,4 +56,9 @@ in {
         ${bar} = baz;
         a.${b} = c;
     };
+
+    var7 = {
+        "first" = 1;
+        "second" = 2;
+    };
 }

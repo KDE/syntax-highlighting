@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>test.typ</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (Typst) - Theme (Breeze Light)"/>
+</head><body style="background-color:#ffffff;color:#1f1c1b"><pre>
+<span style="color:#898887">// Copied from https://github.com/typst/templates</span>
+<span style="color:#898887">//</span>
+<span style="color:#898887">// MIT No Attribution</span>
+<span style="color:#898887">//</span>
+<span style="color:#898887">// Permission is hereby granted, free of charge, to any person obtaining a copy of this</span>
+<span style="color:#898887">// software and associated documentation files (the "Software"), to deal in the Software</span>
+<span style="color:#898887">// without restriction, including without limitation the rights to use, copy, modify,</span>
+<span style="color:#898887">// merge, publish, distribute, sublicense, and/or sell copies of the Software, and to</span>
+<span style="color:#898887">// permit persons to whom the Software is furnished to do so.</span>
+<span style="color:#898887">//</span>
+<span style="color:#898887">// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,</span>
+<span style="color:#898887">// INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A</span>
+<span style="color:#898887">// PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT</span>
+<span style="color:#898887">// HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION</span>
+<span style="color:#898887">// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE</span>
+<span style="color:#898887">// SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</span>
+
+<span style="color:#898887">// unequivocal-ams/template/main.typ</span>
+
+<span style="color:#898887">// Sizes used across the template.</span>
+<span style="font-weight:bold">#let</span> <span style="color:#0057ae">script-size</span> <span style="color:#ca60ca">=</span> <span style="color:#b08000">7.97224pt</span>
+<span style="font-weight:bold">#let</span> <span style="color:#0057ae">footnote-size</span> <span style="color:#ca60ca">=</span> <span style="color:#b08000">8.50012pt</span>
+<span style="font-weight:bold">#let</span> <span style="color:#0057ae">small-size</span> <span style="color:#ca60ca">=</span> <span style="color:#b08000">9.24994pt</span>
+<span style="font-weight:bold">#let</span> <span style="color:#0057ae">normal-size</span> <span style="color:#ca60ca">=</span> <span style="color:#b08000">10.00002pt</span>
+<span style="font-weight:bold">#let</span> <span style="color:#0057ae">large-size</span> <span style="color:#ca60ca">=</span> <span style="color:#b08000">11.74988pt</span>
+
+<span style="color:#898887">// Workaround for the lack of an `std` scope.</span>
+<span style="font-weight:bold">#let</span> <span style="color:#0057ae">std-bibliography</span> <span style="color:#ca60ca">=</span> bibliography
+
+<span style="color:#898887">// This function gets your whole document as its `body` and formats</span>
+<span style="color:#898887">// it as an article in the style of the American Mathematical Society.</span>
+<span style="font-weight:bold">#let</span> <span style="color:#0057ae">ams-article</span><span style="color:#ca60ca">(</span>
+  <span style="color:#898887">// The article's title.</span>
+  title<span style="color:#ca60ca">:</span> <span style="color:#ca60ca">[</span>Paper title<span style="color:#ca60ca">],</span>
+
+  <span style="color:#898887">// An array of authors. For each author you can specify a name,</span>
+  <span style="color:#898887">// department, organization, location, and email. Everything but</span>
+  <span style="color:#898887">// but the name is optional.</span>
+  authors<span style="color:#ca60ca">:</span> <span style="color:#ca60ca">(),</span>
+
+  <span style="color:#898887">// Your article's abstract. Can be omitted if you don't have one.</span>
+  abstract<span style="color:#ca60ca">:</span> <span style="color:#644a9b;font-weight:bold">none</span><span style="color:#ca60ca">,</span>
+
+  <span style="color:#898887">// The article's paper size. Also affects the margins.</span>
+  paper-size<span style="color:#ca60ca">:</span> <span style="color:#bf0303">"us-letter"</span><span style="color:#ca60ca">,</span>
+
+  <span style="color:#898887">// The result of a call to the `bibliography` function or `none`.</span>
+  bibliography<span style="color:#ca60ca">:</span> <span style="color:#644a9b;font-weight:bold">none</span><span style="color:#ca60ca">,</span>
+
+  <span style="color:#898887">// The document's content.</span>
+  body<span style="color:#ca60ca">,</span>
+<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">=</span> <span style="color:#ca60ca">{</span>
+  <span style="color:#898887">// Formats the author's names in a list with commas and a</span>
+  <span style="color:#898887">// final "and".</span>
+  <span style="font-weight:bold">let</span> <span style="color:#0057ae">names</span> <span style="color:#ca60ca">=</span> authors<span style="color:#ca60ca">.</span>map<span style="color:#ca60ca">(</span>author <span style="color:#ca60ca">=></span> author<span style="color:#ca60ca">.</span>name<span style="color:#ca60ca">)</span>
+  <span style="font-weight:bold">let</span> <span style="color:#0057ae">author-string</span> <span style="color:#ca60ca">=</span> <span style="font-weight:bold">if</span> authors<span style="color:#ca60ca">.</span>len<span style="color:#ca60ca">()</span> <span style="color:#ca60ca">==</span> <span style="color:#b08000">2</span> <span style="color:#ca60ca">{</span>
+    names<span style="color:#ca60ca">.</span>join<span style="color:#ca60ca">(</span><span style="color:#bf0303">" and "</span><span style="color:#ca60ca">)</span>
+  <span style="color:#ca60ca">}</span> <span style="font-weight:bold">else</span> <span style="color:#ca60ca">{</span>
+    names<span style="color:#ca60ca">.</span>join<span style="color:#ca60ca">(</span><span style="color:#bf0303">", "</span><span style="color:#ca60ca">,</span> last<span style="color:#ca60ca">:</span> <span style="color:#bf0303">", and "</span><span style="color:#ca60ca">)</span>
+  <span style="color:#ca60ca">}</span>
+
+  <span style="color:#898887">// Set document metadata.</span>
+  <span style="font-weight:bold">set</span> <span style="color:#0057ae">document</span><span style="color:#ca60ca">(</span>title<span style="color:#ca60ca">:</span> title<span style="color:#ca60ca">,</span> author<span style="color:#ca60ca">:</span> names<span style="color:#ca60ca">)</span>
+
+  <span style="color:#898887">// Set the body font. AMS uses the LaTeX font.</span>
+  <span style="font-weight:bold">set</span> <span style="color:#0057ae">text</span><span style="color:#ca60ca">(</span>size<span style="color:#ca60ca">:</span> normal-size<span style="color:#ca60ca">,</span> font<span style="color:#ca60ca">:</span> <span style="color:#bf0303">"New Computer Modern"</span><span style="color:#ca60ca">)</span>
+
+  <span style="color:#898887">// Configure the page.</span>
+  <span style="font-weight:bold">set</span> <span style="color:#0057ae">page</span><span style="color:#ca60ca">(</span>
+    paper<span style="color:#ca60ca">:</span> paper-size<span style="color:#ca60ca">,</span>
+    <span style="color:#898887">// The margins depend on the paper size.</span>
+    margin<span style="color:#ca60ca">:</span> <span style="font-weight:bold">if</span> paper-size <span style="color:#ca60ca">!=</span> <span style="color:#bf0303">"a4"</span> <span style="color:#ca60ca">{</span>
+      <span style="color:#ca60ca">(</span>
+        top: <span style="color:#ca60ca">(</span><span style="color:#b08000">116pt</span> / <span style="color:#b08000">279mm</span><span style="color:#ca60ca">)</span> * <span style="color:#b08000">100%</span><span style="color:#ca60ca">,</span>
+        left: <span style="color:#ca60ca">(</span><span style="color:#b08000">126pt</span> / <span style="color:#b08000">216mm</span><span style="color:#ca60ca">)</span> * <span style="color:#b08000">100%</span><span style="color:#ca60ca">,</span>
+        right: <span style="color:#ca60ca">(</span><span style="color:#b08000">128pt</span> / <span style="color:#b08000">216mm</span><span style="color:#ca60ca">)</span> * <span style="color:#b08000">100%</span><span style="color:#ca60ca">,</span>
+        bottom: <span style="color:#ca60ca">(</span><span style="color:#b08000">94pt</span> / <span style="color:#b08000">279mm</span><span style="color:#ca60ca">)</span> * <span style="color:#b08000">100%</span><span style="color:#ca60ca">,</span>
+      <span style="color:#ca60ca">)</span>
+    <span style="color:#ca60ca">}</span> <span style="font-weight:bold">else</span> <span style="color:#ca60ca">{</span>
+      <span style="color:#ca60ca">(</span>
+        top: <span style="color:#b08000">117pt</span><span style="color:#ca60ca">,</span>
+        left: <span style="color:#b08000">118pt</span><span style="color:#ca60ca">,</span>
+        right: <span style="color:#b08000">119pt</span><span style="color:#ca60ca">,</span>
+        bottom: <span style="color:#b08000">96pt</span><span style="color:#ca60ca">,</span>
+      <span style="color:#ca60ca">)</span>
+    <span style="color:#ca60ca">},</span>
+
+    <span style="color:#898887">// The page header should show the page number and list of</span>
+    <span style="color:#898887">// authors, except on the first page. The page number is on</span>
+    <span style="color:#898887">// the left for even pages and on the right for odd pages.</span>
+    header-ascent<span style="color:#ca60ca">:</span> <span style="color:#b08000">14pt</span><span style="color:#ca60ca">,</span>
+    header<span style="color:#ca60ca">:</span> locate<span style="color:#ca60ca">(</span>loc <span style="color:#ca60ca">=></span> <span style="color:#ca60ca">{</span>
+      <span style="font-weight:bold">let</span> <span style="color:#0057ae">i</span> <span style="color:#ca60ca">=</span> counter<span style="color:#ca60ca">(</span>page<span style="color:#ca60ca">).</span>at<span style="color:#ca60ca">(</span>loc<span style="color:#ca60ca">).</span>first<span style="color:#ca60ca">()</span>
+      <span style="font-weight:bold">if</span> i <span style="color:#ca60ca">==</span> <span style="color:#b08000">1</span> <span style="color:#ca60ca">{</span> <span style="font-weight:bold">return</span> <span style="color:#ca60ca">}</span>
+      <span style="font-weight:bold">set</span> <span style="color:#0057ae">text</span><span style="color:#ca60ca">(</span>size<span style="color:#ca60ca">:</span> script-size<span style="color:#ca60ca">)</span>
+      grid<span style="color:#ca60ca">(</span>
+        columns<span style="color:#ca60ca">:</span> <span style="color:#ca60ca">(</span><span style="color:#b08000">6em</span><span style="color:#ca60ca">,</span> <span style="color:#b08000">1fr</span><span style="color:#ca60ca">,</span> <span style="color:#b08000">6em</span><span style="color:#ca60ca">),</span>
+        <span style="font-weight:bold">if</span> calc<span style="color:#ca60ca">.</span>even<span style="color:#ca60ca">(</span>i<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">[</span><span style="font-weight:bold">#</span>i<span style="color:#ca60ca">],</span>
+        align<span style="color:#ca60ca">(</span>center<span style="color:#ca60ca">,</span> upper<span style="color:#ca60ca">(</span>
+          <span style="font-weight:bold">if</span> calc<span style="color:#ca60ca">.</span>odd<span style="color:#ca60ca">(</span>i<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">{</span> title <span style="color:#ca60ca">}</span> <span style="font-weight:bold">else</span> <span style="color:#ca60ca">{</span> author-string <span style="color:#ca60ca">}</span>
+        <span style="color:#ca60ca">)),</span>
+        <span style="font-weight:bold">if</span> calc<span style="color:#ca60ca">.</span>odd<span style="color:#ca60ca">(</span>i<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">{</span> align<span style="color:#ca60ca">(</span>right<span style="color:#ca60ca">)[</span><span style="font-weight:bold">#</span>i<span style="color:#ca60ca">]</span> <span style="color:#ca60ca">}</span>
+      <span style="color:#ca60ca">)</span>
+    <span style="color:#ca60ca">}),</span>
+
+    <span style="color:#898887">// On the first page, the footer should contain the page number.</span>
+    footer-descent<span style="color:#ca60ca">:</span> <span style="color:#b08000">12pt</span><span style="color:#ca60ca">,</span>
+    footer<span style="color:#ca60ca">:</span> locate<span style="color:#ca60ca">(</span>loc <span style="color:#ca60ca">=></span> <span style="color:#ca60ca">{</span>
+      <span style="font-weight:bold">let</span> <span style="color:#0057ae">i</span> <span style="color:#ca60ca">=</span> counter<span style="color:#ca60ca">(</span>page<span style="color:#ca60ca">).</span>at<span style="color:#ca60ca">(</span>loc<span style="color:#ca60ca">).</span>first<span style="color:#ca60ca">()</span>
+      <span style="font-weight:bold">if</span> i <span style="color:#ca60ca">==</span> <span style="color:#b08000">1</span> <span style="color:#ca60ca">{</span>
+        align<span style="color:#ca60ca">(</span>center<span style="color:#ca60ca">,</span> text<span style="color:#ca60ca">(</span>size<span style="color:#ca60ca">:</span> script-size<span style="color:#ca60ca">,</span> <span style="color:#ca60ca">[</span><span style="font-weight:bold">#</span>i<span style="color:#ca60ca">]))</span>
+      <span style="color:#ca60ca">}</span>
+    <span style="color:#ca60ca">})</span>
+  <span style="color:#ca60ca">)</span>
+
+  <span style="color:#898887">// Configure headings.</span>
+  <span style="font-weight:bold">set</span> <span style="color:#0057ae">heading</span><span style="color:#ca60ca">(</span>numbering<span style="color:#ca60ca">:</span> <span style="color:#bf0303">"1."</span><span style="color:#ca60ca">)</span>
+  <span style="font-weight:bold">show</span> heading<span style="color:#ca60ca">:</span> it <span style="color:#ca60ca">=></span> <span style="color:#ca60ca">{</span>
+    <span style="color:#898887">// Create the heading numbering.</span>
+    <span style="font-weight:bold">let</span> <span style="color:#0057ae">number</span> <span style="color:#ca60ca">=</span> <span style="font-weight:bold">if</span> it<span style="color:#ca60ca">.</span>numbering <span style="color:#ca60ca">!=</span> <span style="color:#644a9b;font-weight:bold">none</span> <span style="color:#ca60ca">{</span>
+      counter<span style="color:#ca60ca">(</span>heading<span style="color:#ca60ca">).</span>display<span style="color:#ca60ca">(</span>it<span style="color:#ca60ca">.</span>numbering<span style="color:#ca60ca">)</span>
+      h<span style="color:#ca60ca">(</span><span style="color:#b08000">7pt</span><span style="color:#ca60ca">,</span> weak<span style="color:#ca60ca">:</span> <span style="color:#644a9b;font-weight:bold">true</span><span style="color:#ca60ca">)</span>
+    <span style="color:#ca60ca">}</span>
+
+    <span style="color:#898887">// Level 1 headings are centered and smallcaps.</span>
+    <span style="color:#898887">// The other ones are run-in.</span>
+    <span style="font-weight:bold">set</span> <span style="color:#0057ae">text</span><span style="color:#ca60ca">(</span>size<span style="color:#ca60ca">:</span> normal-size<span style="color:#ca60ca">,</span> weight<span style="color:#ca60ca">:</span> <span style="color:#b08000">400</span><span style="color:#ca60ca">)</span>
+    <span style="font-weight:bold">if</span> it<span style="color:#ca60ca">.</span>level <span style="color:#ca60ca">==</span> <span style="color:#b08000">1</span> <span style="color:#ca60ca">{</span>
+      <span style="font-weight:bold">set</span> <span style="color:#0057ae">align</span><span style="color:#ca60ca">(</span>center<span style="color:#ca60ca">)</span>
+      <span style="font-weight:bold">set</span> <span style="color:#0057ae">text</span><span style="color:#ca60ca">(</span>size<span style="color:#ca60ca">:</span> normal-size<span style="color:#ca60ca">)</span>
+      smallcaps<span style="color:#ca60ca">[</span>
+        <span style="font-weight:bold">#</span>v<span style="color:#ca60ca">(</span><span style="color:#b08000">15pt</span><span style="color:#ca60ca">,</span> weak<span style="color:#ca60ca">:</span> <span style="color:#644a9b;font-weight:bold">true</span><span style="color:#ca60ca">)</span>
+        <span style="font-weight:bold">#</span>number
+        <span style="font-weight:bold">#</span>it<span style="color:#ca60ca">.</span>body
+        <span style="font-weight:bold">#</span>v<span style="color:#ca60ca">(</span>normal-size<span style="color:#ca60ca">,</span> weak<span style="color:#ca60ca">:</span> <span style="color:#644a9b;font-weight:bold">true</span><span style="color:#ca60ca">)</span>
+      <span style="color:#ca60ca">]</span>
+      counter<span style="color:#ca60ca">(</span>figure<span style="color:#ca60ca">.</span>where<span style="color:#ca60ca">(</span>kind<span style="color:#ca60ca">:</span> <span style="color:#bf0303">"theorem"</span><span style="color:#ca60ca">)).</span>update<span style="color:#ca60ca">(</span><span style="color:#b08000">0</span><span style="color:#ca60ca">)</span>
+    <span style="color:#ca60ca">}</span> <span style="font-weight:bold">else</span> <span style="color:#ca60ca">{</span>
+      v<span style="color:#ca60ca">(</span><span style="color:#b08000">11pt</span><span style="color:#ca60ca">,</span> weak<span style="color:#ca60ca">:</span> <span style="color:#644a9b;font-weight:bold">true</span><span style="color:#ca60ca">)</span>
+      number
+      <span style="font-weight:bold">let</span> <span style="color:#0057ae">styled</span> <span style="color:#ca60ca">=</span> <span style="font-weight:bold">if</span> it<span style="color:#ca60ca">.</span>level <span style="color:#ca60ca">==</span> <span style="color:#b08000">2</span> <span style="color:#ca60ca">{</span> strong <span style="color:#ca60ca">}</span> <span style="font-weight:bold">else</span> <span style="color:#ca60ca">{</span> emph <span style="color:#ca60ca">}</span>
+      styled<span style="color:#ca60ca">(</span>it<span style="color:#ca60ca">.</span>body <span style="color:#ca60ca">+</span> <span style="color:#ca60ca">[</span>. <span style="color:#ca60ca">])</span>
+      h<span style="color:#ca60ca">(</span><span style="color:#b08000">7pt</span><span style="color:#ca60ca">,</span> weak<span style="color:#ca60ca">:</span> <span style="color:#644a9b;font-weight:bold">true</span><span style="color:#ca60ca">)</span>
+    <span style="color:#ca60ca">}</span>
+  <span style="color:#ca60ca">}</span>
+
+  <span style="color:#898887">// Configure lists and links.</span>
+  <span style="font-weight:bold">set</span> <span style="color:#0057ae">list</span><span style="color:#ca60ca">(</span>indent<span style="color:#ca60ca">:</span> <span style="color:#b08000">24pt</span><span style="color:#ca60ca">,</span> body-indent<span style="color:#ca60ca">:</span> <span style="color:#b08000">5pt</span><span style="color:#ca60ca">)</span>
+  <span style="font-weight:bold">set</span> <span style="color:#0057ae">enum</span><span style="color:#ca60ca">(</span>indent<span style="color:#ca60ca">:</span> <span style="color:#b08000">24pt</span><span style="color:#ca60ca">,</span> body-indent<span style="color:#ca60ca">:</span> <span style="color:#b08000">5pt</span><span style="color:#ca60ca">)</span>
+  <span style="font-weight:bold">show</span> link<span style="color:#ca60ca">:</span> <span style="font-weight:bold">set</span> <span style="color:#0057ae">text</span><span style="color:#ca60ca">(</span>font<span style="color:#ca60ca">:</span> <span style="color:#bf0303">"New Computer Modern Mono"</span><span style="color:#ca60ca">)</span>
+
+  <span style="color:#898887">// Configure equations.</span>
+  <span style="font-weight:bold">show</span> math<span style="color:#ca60ca">.</span>equation<span style="color:#ca60ca">:</span> <span style="font-weight:bold">set</span> <span style="color:#0057ae">block</span><span style="color:#ca60ca">(</span>below<span style="color:#ca60ca">:</span> <span style="color:#b08000">8pt</span><span style="color:#ca60ca">,</span> above<span style="color:#ca60ca">:</span> <span style="color:#b08000">9pt</span><span style="color:#ca60ca">)</span>
+  <span style="font-weight:bold">show</span> math<span style="color:#ca60ca">.</span>equation<span style="color:#ca60ca">:</span> <span style="font-weight:bold">set</span> <span style="color:#0057ae">text</span><span style="color:#ca60ca">(</span>weight<span style="color:#ca60ca">:</span> <span style="color:#b08000">400</span><span style="color:#ca60ca">)</span>
+
+  <span style="color:#898887">// Configure citation and bibliography styles.</span>
+  <span style="font-weight:bold">set</span> <span style="color:#0057ae">std-bibliography</span><span style="color:#ca60ca">(</span>style<span style="color:#ca60ca">:</span> <span style="color:#bf0303">"springer-mathphys"</span><span style="color:#ca60ca">,</span> title<span style="color:#ca60ca">:</span> <span style="color:#ca60ca">[</span>References<span style="color:#ca60ca">])</span>
+
+  <span style="font-weight:bold">show</span> figure<span style="color:#ca60ca">:</span> it <span style="color:#ca60ca">=></span> <span style="color:#ca60ca">{</span>
+    <span style="font-weight:bold">show</span><span style="color:#ca60ca">:</span> pad<span style="color:#ca60ca">.</span>with<span style="color:#ca60ca">(</span>x<span style="color:#ca60ca">:</span> <span style="color:#b08000">23pt</span><span style="color:#ca60ca">)</span>
+    <span style="font-weight:bold">set</span> <span style="color:#0057ae">align</span><span style="color:#ca60ca">(</span>center<span style="color:#ca60ca">)</span>
+
+    v<span style="color:#ca60ca">(</span><span style="color:#b08000">12.5pt</span><span style="color:#ca60ca">,</span> weak<span style="color:#ca60ca">:</span> <span style="color:#644a9b;font-weight:bold">true</span><span style="color:#ca60ca">)</span>
+
+    <span style="color:#898887">// Display the figure's body.</span>
+    it<span style="color:#ca60ca">.</span>body
+
+    <span style="color:#898887">// Display the figure's caption.</span>
+    <span style="font-weight:bold">if</span> it<span style="color:#ca60ca">.</span>has<span style="color:#ca60ca">(</span><span style="color:#bf0303">"caption"</span><span style="color:#ca60ca">)</span> <span style="color:#ca60ca">{</span>
+      <span style="color:#898887">// Gap defaults to 17pt.</span>
+      v<span style="color:#ca60ca">(</span><span style="font-weight:bold">if</span> it<span style="color:#ca60ca">.</span>has<span style="color:#ca60ca">(</span><span style="color:#bf0303">"gap"</span><span style="color:#ca60ca">)</span> <span style="color:#ca60ca">{</span> it<span style="color:#ca60ca">.</span>gap <span style="color:#ca60ca">}</span> <span style="font-weight:bold">else</span> <span style="color:#ca60ca">{</span> <span style="color:#b08000">17pt</span> <span style="color:#ca60ca">},</span> weak<span style="color:#ca60ca">:</span> <span style="color:#644a9b;font-weight:bold">true</span><span style="color:#ca60ca">)</span>
+      smallcaps<span style="color:#ca60ca">(</span>it<span style="color:#ca60ca">.</span>supplement<span style="color:#ca60ca">)</span>
+      <span style="font-weight:bold">if</span> it<span style="color:#ca60ca">.</span>numbering <span style="color:#ca60ca">!=</span> <span style="color:#644a9b;font-weight:bold">none</span> <span style="color:#ca60ca">{</span>
+        <span style="color:#ca60ca">[</span> <span style="color:#ca60ca">]</span>
+        it<span style="color:#ca60ca">.</span>counter<span style="color:#ca60ca">.</span>display<span style="color:#ca60ca">(</span>it<span style="color:#ca60ca">.</span>numbering<span style="color:#ca60ca">)</span>
+      <span style="color:#ca60ca">}</span>
+      <span style="color:#ca60ca">[</span>. <span style="color:#ca60ca">]</span>
+      it<span style="color:#ca60ca">.</span>caption<span style="color:#ca60ca">.</span>body
+    <span style="color:#ca60ca">}</span>
+
+    v<span style="color:#ca60ca">(</span><span style="color:#b08000">15pt</span><span style="color:#ca60ca">,</span> weak<span style="color:#ca60ca">:</span> <span style="color:#644a9b;font-weight:bold">true</span><span style="color:#ca60ca">)</span>
+  <span style="color:#ca60ca">}</span>
+
+  <span style="color:#898887">// Theorems.</span>
+  <span style="font-weight:bold">show</span> figure<span style="color:#ca60ca">.</span>where<span style="color:#ca60ca">(</span>kind<span style="color:#ca60ca">:</span> <span style="color:#bf0303">"theorem"</span><span style="color:#ca60ca">):</span> it <span style="color:#ca60ca">=></span> block<span style="color:#ca60ca">(</span>above<span style="color:#ca60ca">:</span> <span style="color:#b08000">11.5pt</span><span style="color:#ca60ca">,</span> below<span style="color:#ca60ca">:</span> <span style="color:#b08000">11.5pt</span><span style="color:#ca60ca">,</span> <span style="color:#ca60ca">{</span>
+    strong<span style="color:#ca60ca">({</span>
+      it<span style="color:#ca60ca">.</span>supplement
+      <span style="font-weight:bold">if</span> it<span style="color:#ca60ca">.</span>numbering <span style="color:#ca60ca">!=</span> <span style="color:#644a9b;font-weight:bold">none</span> <span style="color:#ca60ca">{</span>
+        <span style="color:#ca60ca">[</span> <span style="color:#ca60ca">]</span>
+        counter<span style="color:#ca60ca">(</span>heading<span style="color:#ca60ca">).</span>display<span style="color:#ca60ca">()</span>
+        it<span style="color:#ca60ca">.</span>counter<span style="color:#ca60ca">.</span>display<span style="color:#ca60ca">(</span>it<span style="color:#ca60ca">.</span>numbering<span style="color:#ca60ca">)</span>
+      <span style="color:#ca60ca">}</span>
+      <span style="color:#ca60ca">[</span>.<span style="color:#ca60ca">]</span>
+    <span style="color:#ca60ca">})</span>
+    emph<span style="color:#ca60ca">(</span>it<span style="color:#ca60ca">.</span>body<span style="color:#ca60ca">)</span>
+  <span style="color:#ca60ca">})</span>
+
+  <span style="color:#898887">// Display the title and authors.</span>
+  v<span style="color:#ca60ca">(</span><span style="color:#b08000">35pt</span><span style="color:#ca60ca">,</span> weak<span style="color:#ca60ca">:</span> <span style="color:#644a9b;font-weight:bold">true</span><span style="color:#ca60ca">)</span>
+  align<span style="color:#ca60ca">(</span>center<span style="color:#ca60ca">,</span> upper<span style="color:#ca60ca">({</span>
+    text<span style="color:#ca60ca">(</span>size<span style="color:#ca60ca">:</span> large-size<span style="color:#ca60ca">,</span> weight<span style="color:#ca60ca">:</span> <span style="color:#b08000">700</span><span style="color:#ca60ca">,</span> title<span style="color:#ca60ca">)</span>
+    v<span style="color:#ca60ca">(</span><span style="color:#b08000">25pt</span><span style="color:#ca60ca">,</span> weak<span style="color:#ca60ca">:</span> <span style="color:#644a9b;font-weight:bold">true</span><span style="color:#ca60ca">)</span>
+    text<span style="color:#ca60ca">(</span>size<span style="color:#ca60ca">:</span> footnote-size<span style="color:#ca60ca">,</span> author-string<span style="color:#ca60ca">)</span>
+  <span style="color:#ca60ca">}))</span>
+
+  <span style="color:#898887">// Configure paragraph properties.</span>
+  <span style="font-weight:bold">set</span> <span style="color:#0057ae">par</span><span style="color:#ca60ca">(</span>first-line-indent<span style="color:#ca60ca">:</span> <span style="color:#b08000">1.2em</span><span style="color:#ca60ca">,</span> justify<span style="color:#ca60ca">:</span> <span style="color:#644a9b;font-weight:bold">true</span><span style="color:#ca60ca">,</span> leading<span style="color:#ca60ca">:</span> <span style="color:#b08000">0.58em</span><span style="color:#ca60ca">)</span>
+  <span style="font-weight:bold">show</span> par<span style="color:#ca60ca">:</span> <span style="font-weight:bold">set</span> <span style="color:#0057ae">block</span><span style="color:#ca60ca">(</span>spacing<span style="color:#ca60ca">:</span> <span style="color:#b08000">0.58em</span><span style="color:#ca60ca">)</span>
+
+  <span style="color:#898887">// Display the abstract</span>
+  <span style="font-weight:bold">if</span> abstract <span style="color:#ca60ca">!=</span> <span style="color:#644a9b;font-weight:bold">none</span> <span style="color:#ca60ca">{</span>
+    v<span style="color:#ca60ca">(</span><span style="color:#b08000">20pt</span><span style="color:#ca60ca">,</span> weak<span style="color:#ca60ca">:</span> <span style="color:#644a9b;font-weight:bold">true</span><span style="color:#ca60ca">)</span>
+    <span style="font-weight:bold">set</span> <span style="color:#0057ae">text</span><span style="color:#ca60ca">(</span>script-size<span style="color:#ca60ca">)</span>
+    <span style="font-weight:bold">show</span><span style="color:#ca60ca">:</span> pad<span style="color:#ca60ca">.</span>with<span style="color:#ca60ca">(</span>x<span style="color:#ca60ca">:</span> <span style="color:#b08000">35pt</span><span style="color:#ca60ca">)</span>
+    smallcaps<span style="color:#ca60ca">[</span>Abstract. <span style="color:#ca60ca">]</span>
+    abstract
+  <span style="color:#ca60ca">}</span>
+
+  <span style="color:#898887">// Display the article's contents.</span>
+  v<span style="color:#ca60ca">(</span><span style="color:#b08000">29pt</span><span style="color:#ca60ca">,</span> weak<span style="color:#ca60ca">:</span> <span style="color:#644a9b;font-weight:bold">true</span><span style="color:#ca60ca">)</span>
+  body
+
+  <span style="color:#898887">// Display the bibliography, if any is given.</span>
+  <span style="font-weight:bold">if</span> bibliography <span style="color:#ca60ca">!=</span> <span style="color:#644a9b;font-weight:bold">none</span> <span style="color:#ca60ca">{</span>
+    <span style="font-weight:bold">show</span> std-bibliography<span style="color:#ca60ca">:</span> <span style="font-weight:bold">set</span> <span style="color:#0057ae">text</span><span style="color:#ca60ca">(</span>footnote-size<span style="color:#ca60ca">)</span>
+    <span style="font-weight:bold">show</span> std-bibliography<span style="color:#ca60ca">:</span> pad<span style="color:#ca60ca">.</span>with<span style="color:#ca60ca">(</span>x<span style="color:#ca60ca">:</span> <span style="color:#b08000">0.5pt</span><span style="color:#ca60ca">)</span>
+    bibliography
+  <span style="color:#ca60ca">}</span>
+
+  <span style="color:#898887">// The thing ends with details about the authors.</span>
+  <span style="font-weight:bold">show</span><span style="color:#ca60ca">:</span> pad<span style="color:#ca60ca">.</span>with<span style="color:#ca60ca">(</span>x<span style="color:#ca60ca">:</span> <span style="color:#b08000">11.5pt</span><span style="color:#ca60ca">)</span>
+  <span style="font-weight:bold">set</span> <span style="color:#0057ae">par</span><span style="color:#ca60ca">(</span>first-line-indent<span style="color:#ca60ca">:</span> <span style="color:#b08000">0pt</span><span style="color:#ca60ca">)</span>
+  <span style="font-weight:bold">set</span> <span style="color:#0057ae">text</span><span style="color:#ca60ca">(</span>script-size<span style="color:#ca60ca">)</span>
+
+  <span style="font-weight:bold">for</span> author <span style="font-weight:bold">in</span> authors <span style="color:#ca60ca">{</span>
+    <span style="font-weight:bold">let</span> <span style="color:#0057ae">keys</span> <span style="color:#ca60ca">=</span> <span style="color:#ca60ca">(</span><span style="color:#bf0303">"department"</span><span style="color:#ca60ca">,</span> <span style="color:#bf0303">"organization"</span><span style="color:#ca60ca">,</span> <span style="color:#bf0303">"location"</span><span style="color:#ca60ca">)</span>
+
+    <span style="font-weight:bold">let</span> <span style="color:#0057ae">dept-str</span> <span style="color:#ca60ca">=</span> keys
+      .filter<span style="color:#ca60ca">(</span>key <span style="color:#ca60ca">=></span> key <span style="color:#ca60ca">in</span> author<span style="color:#ca60ca">)</span>
+      .map<span style="color:#ca60ca">(</span>key <span style="color:#ca60ca">=></span> author<span style="color:#ca60ca">.</span>at<span style="color:#ca60ca">(</span>key<span style="color:#ca60ca">))</span>
+      .join<span style="color:#ca60ca">(</span><span style="color:#bf0303">", "</span><span style="color:#ca60ca">)</span>
+
+    smallcaps<span style="color:#ca60ca">(</span>dept-str<span style="color:#ca60ca">)</span>
+    linebreak<span style="color:#ca60ca">()</span>
+
+    <span style="font-weight:bold">if</span> <span style="color:#bf0303">"email"</span> <span style="color:#ca60ca">in</span> author <span style="color:#ca60ca">[</span>
+      <span style="font-style:italic">_Email address:_</span> <span style="font-weight:bold">#</span>link<span style="color:#ca60ca">(</span><span style="color:#bf0303">"mailto:"</span> <span style="color:#ca60ca">+</span> author<span style="color:#ca60ca">.</span>email<span style="color:#ca60ca">)</span> <span style="color:#3daee9">\</span>
+    <span style="color:#ca60ca">]</span>
+
+    <span style="font-weight:bold">if</span> <span style="color:#bf0303">"url"</span> <span style="color:#ca60ca">in</span> author <span style="color:#ca60ca">[</span>
+      <span style="font-style:italic">_URL:_</span> <span style="font-weight:bold">#</span>link<span style="color:#ca60ca">(</span>author<span style="color:#ca60ca">.</span>url<span style="color:#ca60ca">)</span>
+    <span style="color:#ca60ca">]</span>
+
+    v<span style="color:#ca60ca">(</span><span style="color:#b08000">12pt</span><span style="color:#ca60ca">,</span> weak<span style="color:#ca60ca">:</span> <span style="color:#644a9b;font-weight:bold">true</span><span style="color:#ca60ca">)</span>
+  <span style="color:#ca60ca">}</span>
+<span style="color:#ca60ca">}</span>
+
+<span style="color:#898887">// The ASM template also provides a theorem function.</span>
+<span style="font-weight:bold">#let</span> <span style="color:#0057ae">theorem</span><span style="color:#ca60ca">(</span>body<span style="color:#ca60ca">,</span> numbered<span style="color:#ca60ca">:</span> <span style="color:#644a9b;font-weight:bold">true</span><span style="color:#ca60ca">)</span> <span style="color:#ca60ca">=</span> figure<span style="color:#ca60ca">(</span>
+  body<span style="color:#ca60ca">,</span>
+  kind<span style="color:#ca60ca">:</span> <span style="color:#bf0303">"theorem"</span><span style="color:#ca60ca">,</span>
+  supplement<span style="color:#ca60ca">:</span> <span style="color:#ca60ca">[</span>Theorem<span style="color:#ca60ca">],</span>
+  numbering<span style="color:#ca60ca">:</span> <span style="font-weight:bold">if</span> numbered <span style="color:#ca60ca">{</span> <span style="color:#bf0303">"1"</span> <span style="color:#ca60ca">},</span>
+<span style="color:#ca60ca">)</span>
+
+<span style="color:#898887">// And a function for a proof.</span>
+<span style="font-weight:bold">#let</span> <span style="color:#0057ae">proof</span><span style="color:#ca60ca">(</span>body<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">=</span> block<span style="color:#ca60ca">(</span>spacing<span style="color:#ca60ca">:</span> <span style="color:#b08000">11.5pt</span><span style="color:#ca60ca">,</span> <span style="color:#ca60ca">{</span>
+  emph<span style="color:#ca60ca">[</span>Proof.<span style="color:#ca60ca">]</span>
+  <span style="color:#ca60ca">[</span> <span style="color:#ca60ca">]</span> <span style="color:#ca60ca">+</span> body
+  h<span style="color:#ca60ca">(</span><span style="color:#b08000">1fr</span><span style="color:#ca60ca">)</span>
+  box<span style="color:#ca60ca">(</span>scale<span style="color:#ca60ca">(</span><span style="color:#b08000">160%</span><span style="color:#ca60ca">,</span> origin<span style="color:#ca60ca">:</span> bottom <span style="color:#ca60ca">+</span> right<span style="color:#ca60ca">,</span> sym<span style="color:#ca60ca">.</span>square<span style="color:#ca60ca">.</span>stroked<span style="color:#ca60ca">))</span>
+<span style="color:#ca60ca">})</span>
+
+<span style="color:#898887">// unequivocal-ams/lib.typ</span>
+
+<span style="font-weight:bold">#</span><span style="color:#ff5500">import</span> <span style="color:#bf0303">"@preview/unequivocal-ams:0.1.0"</span><span style="color:#ca60ca">:</span> ams-article<span style="color:#ca60ca">,</span> theorem<span style="color:#ca60ca">,</span> proof
+
+<span style="font-weight:bold">#show</span><span style="color:#ca60ca">:</span> ams-article<span style="color:#ca60ca">.</span>with<span style="color:#ca60ca">(</span>
+  title<span style="color:#ca60ca">:</span> <span style="color:#ca60ca">[</span>Mathematical Theorems<span style="color:#ca60ca">],</span>
+  authors<span style="color:#ca60ca">:</span> <span style="color:#ca60ca">(</span>
+    <span style="color:#ca60ca">(</span>
+      name: <span style="color:#bf0303">"Ralph Howard"</span><span style="color:#ca60ca">,</span>
+      department: <span style="color:#ca60ca">[</span>Department of Mathematics<span style="color:#ca60ca">],</span>
+      organization: <span style="color:#ca60ca">[</span>University of South Carolina<span style="color:#ca60ca">],</span>
+      location: <span style="color:#ca60ca">[</span>Columbia, SC 29208<span style="color:#ca60ca">],</span>
+      email: <span style="color:#bf0303">"howard@math.sc.edu"</span><span style="color:#ca60ca">,</span>
+      url: <span style="color:#bf0303">"www.math.sc.edu/~howard"</span>
+    <span style="color:#ca60ca">),</span>
+  <span style="color:#ca60ca">),</span>
+  abstract<span style="color:#ca60ca">:</span> lorem<span style="color:#ca60ca">(</span><span style="color:#b08000">100</span><span style="color:#ca60ca">),</span>
+  bibliography<span style="color:#ca60ca">:</span> bibliography<span style="color:#ca60ca">(</span><span style="color:#bf0303">"refs.bib"</span><span style="color:#ca60ca">),</span>
+<span style="color:#ca60ca">)</span>
+
+Call me Ishmael. Some years ago --- never mind how long precisely ---
+having little or no money in my purse, and nothing particular to
+interest me on shore, I thought I would sail about a little and see
+the watery part of the world. It is a way I have of driving off the
+spleen, and regulating the circulation.  Whenever I find myself
+growing grim about the mouth; whenever it is a damp, drizzly November
+in my soul; whenever I find myself involuntarily pausing before coffin
+warehouses, and bringing up the rear of every funeral I meet; and
+especially whenever my hypos get such an upper hand of me, that it
+requires a strong moral principle to prevent me from deliberately
+stepping into the street, and methodically knocking people's hats off
+<span style="font-weight:bold">-</span>-- then, I account it high time to get to sea as soon as I can. This
+is my substitute for pistol and ball. With a philosophical flourish
+Cato throws himself upon his sword; I quietly take to the ship. There
+is nothing surprising in this. If they but knew it, almost all men in
+their degree, some time or other, cherish very nearly the same
+feelings towards the ocean with me. <span style="color:#0057ae">@netwok2020</span>
+
+There now is your insular city of the Manhattoes, belted round by
+wharves as Indian isles by coral reefs - commerce surrounds it with
+her surf. Right and left, the streets take you waterward. Its extreme
+down-town is the battery, where that noble mole is washed by waves,
+and cooled by breezes, which a few hours previous were out of sight of
+land. Look at the crowds of water-gazers there.
+
+Anyone caught using formulas such as <span style="color:#ff5500">$sqrt(x+y)=sqrt(x)+sqrt(y)$</span>
+or <span style="color:#ff5500">$1/(x+y) = 1/x + 1/y$</span> will fail.
+
+The binomial theorem is
+<span style="color:#ff5500">$ (x+y)^n=sum_(k=0)^n binom(n, k) x^k y^(n-k). $</span>
+
+A favorite sum of most mathematicians is
+<span style="color:#ff5500">$ sum_(n=1)^oo 1/n^2 = pi^2 / 6. $</span>
+
+Likewise a popular integral is
+<span style="color:#ff5500">$ integral_(-oo)^oo e^(-x^2) dif x = sqrt(pi) $</span>
+
+<span style="font-weight:bold">#</span>theorem<span style="color:#ca60ca">[</span>
+  The square of any real number is non-negative.
+<span style="color:#ca60ca">]</span>
+
+<span style="font-weight:bold">#</span>proof<span style="color:#ca60ca">[</span>
+  Any real number <span style="color:#ff5500">$x$</span> satisfies <span style="color:#ff5500">$x > 0$</span>, <span style="color:#ff5500">$x = 0$</span>, or <span style="color:#ff5500">$x &lt; 0$</span>. If <span style="color:#ff5500">$x = 0$</span>,
+  then <span style="color:#ff5500">$x^2 = 0 >= 0$</span>. If <span style="color:#ff5500">$x > 0$</span> then as a positive time a positive is
+  positive we have <span style="color:#ff5500">$x^2 = x x > 0$</span>. If <span style="color:#ff5500">$x &lt; 0$</span> then <span style="color:#ff5500">$−x > 0$</span> and so by
+  what we have just done <span style="color:#ff5500">$x^2 = (−x)^2 > 0$</span>. So in all cases <span style="color:#ff5500">$x^2 ≥ 0$</span>.
+<span style="color:#ca60ca">]</span>
+
+<span style="color:#644a9b;font-weight:bold">= Introduction</span>
+This is a new section.
+You can use tables like <span style="color:#0057ae">@solids</span>.
+
+<span style="font-weight:bold">#</span>figure<span style="color:#ca60ca">(</span>
+  table<span style="color:#ca60ca">(</span>
+    columns<span style="color:#ca60ca">:</span> <span style="color:#ca60ca">(</span><span style="color:#b08000">1fr</span><span style="color:#ca60ca">,</span> <span style="color:#644a9b;font-weight:bold">auto</span><span style="color:#ca60ca">,</span> <span style="color:#644a9b;font-weight:bold">auto</span><span style="color:#ca60ca">),</span>
+    inset<span style="color:#ca60ca">:</span> <span style="color:#b08000">5pt</span><span style="color:#ca60ca">,</span>
+    align<span style="color:#ca60ca">:</span> horizon<span style="color:#ca60ca">,</span>
+    <span style="color:#ca60ca">[],</span> <span style="color:#ca60ca">[</span><span style="font-weight:bold">*Area*</span><span style="color:#ca60ca">],</span> <span style="color:#ca60ca">[</span><span style="font-weight:bold">*Parameters*</span><span style="color:#ca60ca">],</span>
+    <span style="color:#ca60ca">[</span><span style="font-weight:bold">*Cylinder*</span><span style="color:#ca60ca">],</span>
+    <span style="color:#ff5500">$ pi h (D^2 - d^2) / 4 $</span><span style="color:#ca60ca">,</span>
+    <span style="color:#ca60ca">[</span><span style="color:#ff5500">$h$</span>: height <span style="color:#3daee9">\</span>
+     <span style="color:#ff5500">$D$</span>: outer radius <span style="color:#3daee9">\</span>
+     <span style="color:#ff5500">$d$</span>: inner radius<span style="color:#ca60ca">],</span>
+    <span style="color:#ca60ca">[</span><span style="font-weight:bold">*Tetrahedron*</span><span style="color:#ca60ca">],</span>
+    <span style="color:#ff5500">$ sqrt(2) / 12 a^3 $</span><span style="color:#ca60ca">,</span>
+    <span style="color:#ca60ca">[</span><span style="color:#ff5500">$a$</span>: edge length<span style="color:#ca60ca">]</span>
+  <span style="color:#ca60ca">),</span>
+  caption<span style="color:#ca60ca">:</span> <span style="color:#bf0303">"Solids"</span><span style="color:#ca60ca">,</span>
+<span style="color:#ca60ca">)</span> <span style="color:#0057ae">&lt;solids></span>
+
+<span style="color:#644a9b;font-weight:bold">== Things that need to be done</span>
+Prove theorems.
+
+<span style="color:#644a9b;font-weight:bold">= Background</span>
+<span style="font-weight:bold">#</span>lorem<span style="color:#ca60ca">(</span><span style="color:#b08000">40</span><span style="color:#ca60ca">)</span>
+</pre></body></html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>test.opsiscript</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (opsi-script) - Theme (Breeze Dark)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="color:#7a7c7d">; opsiscript syntax highlighting test</span>
+<span style="color:#7a7c7d">;</span>
+<span style="color:#7a7c7d">;    SPDX-FileCopyrightText: 2024 Stefan Staeglich &lt;sstaeglich@kdemail.net></span>
+<span style="color:#7a7c7d">;</span>
+<span style="color:#7a7c7d">;    SPDX-License-Identifier: LGPL</span>
+
+
+
+
+<span style="color:#2980b9">[Actions]</span>
+<span style="color:#7f8c8d">requiredWinstVersion</span> <span style="color:#3f8058">>=</span> <span style="color:#f44f4f">"4.12.8"</span>
+<span style="color:#7f8c8d">ScriptErrorMessages</span><span style="color:#3f8058">=</span>off
+<span style="color:#7f8c8d">setLogLevel</span> <span style="color:#3f8058">=</span> 7
+
+
+<span style="font-weight:bold">DefVar</span> <span style="color:#27aeae">$OS$</span> <span style="color:#3f8058">=</span> <span style="color:#7f8c8d">GetOS</span>
+<span style="font-weight:bold">DefVar</span> <span style="color:#27aeae">$ProductId$</span> <span style="color:#3f8058">=</span> <span style="color:#f44f4f">"test"</span>
+
+<span style="font-weight:bold">DefVar</span> <span style="color:#27aeae">$filename$</span> <span style="color:#3f8058">=</span> <span style="color:#7f8c8d">GetProductProperty</span>(<span style="color:#f44f4f">"filename"</span>, <span style="color:#f44f4f">"/tmp/testfile.txt"</span>)
+
+<span style="color:#7f8c8d">comment</span> <span style="color:#f44f4f">"Show product picture"</span>
+<span style="color:#7f8c8d">ShowBitmap</span> <span style="color:#f44f4f">"</span><span style="color:#27aeae">%ScriptPath%</span><span style="color:#f44f4f">\"</span> <span style="color:#3f8058">+</span> <span style="color:#27aeae">$ProductId$</span> <span style="color:#3f8058">+</span> <span style="color:#f44f4f">".png"</span> <span style="color:#27aeae">$ProductId$</span>
+
+<span style="color:#fdbc4b;font-weight:bold">Switch</span> <span style="color:#27aeae">$OS$</span>
+<span style="color:#fdbc4b;font-weight:bold">	case</span> <span style="color:#f44f4f">"Linux"</span>
+		<span style="color:#7f8c8d">Message</span> <span style="color:#f44f4f">"Try to install "</span> <span style="color:#3f8058">+</span> <span style="color:#27aeae">$ProductId$</span> <span style="color:#f44f4f">" on "</span> <span style="color:#3f8058">+</span> <span style="color:#27aeae">$OS$</span>
+<span style="color:#8e44ad">		sub_main_linux</span>
+<span style="color:#fdbc4b;font-weight:bold">	EndCase</span>
+<span style="color:#fdbc4b;font-weight:bold">	case</span> <span style="color:#f44f4f">"Windows_NT"</span>
+		<span style="color:#7f8c8d">Message</span> <span style="color:#f44f4f">"Try to install "</span> <span style="color:#3f8058">+</span> <span style="color:#27aeae">$ProductId$</span> <span style="color:#f44f4f">" on "</span> <span style="color:#3f8058">+</span> <span style="color:#27aeae">$OS$</span>
+<span style="color:#8e44ad">		sub_main_windows</span>
+<span style="color:#fdbc4b;font-weight:bold">	EndCase</span>
+<span style="color:#fdbc4b;font-weight:bold">	DefaultCase</span>
+		<span style="color:#7f8c8d">Message</span> <span style="color:#27aeae">$OS$</span> <span style="color:#3f8058">+</span> <span style="color:#f44f4f">" is not supported"</span>
+<span style="color:#fdbc4b;font-weight:bold">	EndCase</span>
+<span style="color:#fdbc4b;font-weight:bold">EndSwitch</span>
+
+<span style="color:#2980b9">[sub_main_linux]</span>
+<span style="font-weight:bold">DefVar</span> <span style="color:#27aeae">$distrotype$</span> <span style="color:#3f8058">=</span> <span style="color:#7f8c8d">getLinuxDistroType</span>
+<span style="font-weight:bold">DefStringList</span> <span style="color:#27aeae">$linuxInfo$</span> <span style="color:#3f8058">=</span> <span style="color:#7f8c8d">getLinuxVersionMap</span>
+<span style="font-weight:bold">DefVar</span> <span style="color:#27aeae">$distCodeName$</span> <span style="color:#3f8058">=</span> <span style="color:#7f8c8d">getValue</span>(<span style="color:#f44f4f">"Codename"</span>, <span style="color:#27aeae">$linuxInfo$</span>)
+<span style="font-weight:bold">DefVar</span> <span style="color:#27aeae">$distRelease$</span> <span style="color:#3f8058">=</span> <span style="color:#7f8c8d">getValue</span>(<span style="color:#f44f4f">"Release"</span>, <span style="color:#27aeae">$linuxInfo$</span>)
+<span style="font-weight:bold">DefVar</span> <span style="color:#27aeae">$distroName$</span>  <span style="color:#3f8058">=</span> <span style="color:#7f8c8d">getValue</span>(<span style="color:#f44f4f">"Distributor ID"</span>, <span style="color:#27aeae">$linuxInfo$</span>)
+
+<span style="color:#fdbc4b;font-weight:bold">if</span> <span style="color:#3f8058">not</span> (<span style="color:#27aeae">$distrotype$</span> <span style="color:#3f8058">=</span> <span style="color:#f44f4f">'debian'</span>)
+	<span style="color:#7f8c8d">LogError</span> <span style="color:#f44f4f">"Product: "</span> <span style="color:#3f8058">+</span> <span style="color:#27aeae">$ProductId$</span> <span style="color:#3f8058">+</span> <span style="color:#f44f4f">"is desinged for Debian/Ubuntu"</span>
+	<span style="color:#7f8c8d">isFatalError</span> <span style="color:#f44f4f">"Wrong Distrotype"</span>
+<span style="color:#fdbc4b;font-weight:bold">endif</span>
+
+<span style="color:#7f8c8d">Message</span> <span style="color:#f44f4f">"Try to get Package Lock..."</span>
+<span style="color:#fdbc4b;font-weight:bold">if</span> waitForPackageLock(<span style="color:#f44f4f">"60"</span>,<span style="color:#f44f4f">"false"</span>)
+	<span style="color:#7f8c8d">comment</span> <span style="color:#f44f4f">"we got the package lock."</span>
+<span style="color:#fdbc4b;font-weight:bold">else</span>
+	<span style="color:#7f8c8d">LogError</span> <span style="color:#f44f4f">"could not get Package Lock"</span>
+	<span style="color:#7f8c8d">isFatalError</span> <span style="color:#f44f4f">"package lock failed"</span>
+<span style="color:#fdbc4b;font-weight:bold">endif</span>
+
+<span style="color:#8e44ad">ShellInAnIcon_install_linux</span>
+<span style="color:#fdbc4b;font-weight:bold">if</span> <span style="color:#3f8058">not</span>(<span style="color:#f44f4f">"0"</span> <span style="color:#3f8058">=</span> <span style="color:#7f8c8d">getLastExitCode</span>)
+	<span style="color:#7f8c8d">LogError</span> <span style="color:#f44f4f">"failed ShellInAnIcon_install_linux"</span>
+	<span style="color:#7f8c8d">isFatalError</span> <span style="color:#f44f4f">"ShellInAnIcon_install_linux"</span>
+<span style="color:#fdbc4b;font-weight:bold">endif</span>
+
+<span style="color:#8e44ad">Patches_config_systemd </span><span style="color:#f44f4f">"/etc/systemd/system/test.service.d/override.conf"</span>
+<span style="color:#fdbc4b;font-weight:bold">if</span> <span style="color:#3f8058">not</span>(<span style="color:#f44f4f">"0"</span> <span style="color:#3f8058">=</span> <span style="color:#7f8c8d">getLastExitCode</span>)
+	<span style="color:#7f8c8d">Message</span> <span style="color:#f44f4f">"failed Patches_config_systemd"</span>
+	<span style="color:#7f8c8d">LogError</span> <span style="color:#f44f4f">"failed Patches_config_systemd"</span>
+	<span style="color:#7f8c8d">isFatalError</span> <span style="color:#f44f4f">"config_systemd"</span>
+<span style="color:#fdbc4b;font-weight:bold">endif</span>
+
+<span style="color:#7f8c8d">Message</span> <span style="color:#f44f4f">"Patch config file ..."</span>
+<span style="color:#8e44ad">XML2_config </span><span style="color:#f44f4f">"/etc/test.conf"</span>
+<span style="color:#fdbc4b;font-weight:bold">if</span> <span style="color:#3f8058">not</span>(<span style="color:#f44f4f">"0"</span> <span style="color:#3f8058">=</span> <span style="color:#7f8c8d">getLastExitCode</span>)
+	<span style="color:#7f8c8d">Message</span> <span style="color:#f44f4f">"failed XML2_config"</span>
+	<span style="color:#7f8c8d">LogError</span> <span style="color:#f44f4f">"failed XML2_config"</span>
+	<span style="color:#7f8c8d">isFatalError</span> <span style="color:#f44f4f">"XML2_config"</span>
+<span style="color:#fdbc4b;font-weight:bold">endif</span>
+
+<span style="color:#8e44ad">PatchTextFile_config </span><span style="color:#f44f4f">"/etc/test.conf"</span>
+<span style="color:#fdbc4b;font-weight:bold">if</span> <span style="color:#3f8058">not</span>(<span style="color:#f44f4f">"0"</span> <span style="color:#3f8058">=</span> <span style="color:#7f8c8d">getLastExitCode</span>)
+	<span style="color:#7f8c8d">Message</span> <span style="color:#f44f4f">"failed PatchTextFile_config"</span>
+	<span style="color:#7f8c8d">LogError</span> <span style="color:#f44f4f">"failed PatchTextFile_config"</span>
+	<span style="color:#7f8c8d">isFatalError</span> <span style="color:#f44f4f">"XML2_config"</span>
+<span style="color:#fdbc4b;font-weight:bold">endif</span>
+
+<span style="color:#2980b9">[ShellInAnIcon_install_linux]</span>
+<span style="color:#7f8c8d">set</span> -x
+<span style="color:#7f8c8d">export</span> PATH<span style="color:#3f8058">=</span>/usr/<span style="color:#7f8c8d">local</span>/bin:/usr/bin:/bin:/usr/<span style="color:#7f8c8d">local</span>/sbin:/usr/sbin:/sbin
+<span style="color:#7f8c8d">export</span> DEBIAN_FRONTEND<span style="color:#3f8058">=</span>noninteractive
+EXITCODE<span style="color:#3f8058">=</span>0
+apt-get --<span style="color:#8e44ad">yes</span> <span style="color:#8e44ad">install</span> <span style="color:#7f8c8d">test</span>
+<span style="font-weight:bold">if</span> [ <span style="color:#27aeae">$?</span> -ne 0 ]<span style="color:#3f8058">;</span> <span style="font-weight:bold">then</span> EXITCODE<span style="color:#3f8058">=</span>1<span style="color:#3f8058">;</span> <span style="font-weight:bold">fi</span>
+<span style="color:#7f8c8d">exit</span> <span style="color:#27aeae">$EXITCODE</span>
+
+<span style="color:#2980b9">[XML2_config]</span>
+<span style="color:#7f8c8d">openNode</span> <span style="color:#f44f4f">'file'</span>
+<span style="color:#7f8c8d">SetAttribute</span> <span style="color:#f44f4f">"name"</span> <span style="color:#f44f4f">"</span><span style="color:#27aeae">$filename$</span><span style="color:#f44f4f">"</span>
+
+<span style="color:#2980b9">[PatchTextFile_config]</span>
+<span style="color:#7f8c8d">FindLine_Containing</span> <span style="color:#f44f4f">"</span><span style="color:#27aeae">$filename$</span><span style="color:#f44f4f">"</span>
+<span style="color:#7f8c8d">DeleteTheLine</span>
+<span style="color:#7f8c8d">SaveToFile</span> <span style="color:#f44f4f">"/etc/test2.conf"</span>
+
+<span style="color:#2980b9">[Patches_config_systemd]</span>
+<span style="color:#7f8c8d">delsec</span> [Service]
+<span style="color:#7f8c8d">set</span> [Service] Restart<span style="color:#3f8058">=</span>on-failure
+</pre></body></html>

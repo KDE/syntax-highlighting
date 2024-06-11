@@ -1,0 +1,106 @@
+; opsiscript syntax highlighting test
+;
+;    SPDX-FileCopyrightText: 2024 Stefan Staeglich <sstaeglich@kdemail.net>
+;
+;    SPDX-License-Identifier: LGPL
+
+
+
+
+<endfold id='1'></endfold id='1'><beginfold id='1'>[Actions]</beginfold id='1'>
+requiredWinstVersion >= "4.12.8"
+ScriptErrorMessages=off
+setLogLevel = 7
+
+
+DefVar $OS$ = GetOS
+DefVar $ProductId$ = "test"
+
+DefVar $filename$ = GetProductProperty("filename", "/tmp/testfile.txt")
+
+comment "Show product picture"
+ShowBitmap "%ScriptPath%\" + $ProductId$ + ".png" $ProductId$
+
+<beginfold id='2'>Switch</beginfold id='2'> $OS$
+<beginfold id='3'>	case</beginfold id='3'> "Linux"
+		Message "Try to install " + $ProductId$ " on " + $OS$
+		sub_main_linux
+<endfold id='3'>	EndCase</endfold id='3'>
+<beginfold id='3'>	case</beginfold id='3'> "Windows_NT"
+		Message "Try to install " + $ProductId$ " on " + $OS$
+		sub_main_windows
+<endfold id='3'>	EndCase</endfold id='3'>
+<beginfold id='3'>	DefaultCase</beginfold id='3'>
+		Message $OS$ + " is not supported"
+<endfold id='3'>	EndCase</endfold id='3'>
+<endfold id='2'>EndSwitch</endfold id='2'>
+
+<endfold id='1'></endfold id='1'><beginfold id='1'>[sub_main_linux]</beginfold id='1'>
+DefVar $distrotype$ = getLinuxDistroType
+DefStringList $linuxInfo$ = getLinuxVersionMap
+DefVar $distCodeName$ = getValue("Codename", $linuxInfo$)
+DefVar $distRelease$ = getValue("Release", $linuxInfo$)
+DefVar $distroName$  = getValue("Distributor ID", $linuxInfo$)
+
+<beginfold id='4'>if</beginfold id='4'> not ($distrotype$ = 'debian')
+	LogError "Product: " + $ProductId$ + "is desinged for Debian/Ubuntu"
+	isFatalError "Wrong Distrotype"
+<endfold id='4'>endif</endfold id='4'>
+
+Message "Try to get Package Lock..."
+<beginfold id='4'>if</beginfold id='4'> waitForPackageLock("60","false")
+	comment "we got the package lock."
+else
+	LogError "could not get Package Lock"
+	isFatalError "package lock failed"
+<endfold id='4'>endif</endfold id='4'>
+
+ShellInAnIcon_install_linux
+<beginfold id='4'>if</beginfold id='4'> not("0" = getLastExitCode)
+	LogError "failed ShellInAnIcon_install_linux"
+	isFatalError "ShellInAnIcon_install_linux"
+<endfold id='4'>endif</endfold id='4'>
+
+Patches_config_systemd "/etc/systemd/system/test.service.d/override.conf"
+<beginfold id='4'>if</beginfold id='4'> not("0" = getLastExitCode)
+	Message "failed Patches_config_systemd"
+	LogError "failed Patches_config_systemd"
+	isFatalError "config_systemd"
+<endfold id='4'>endif</endfold id='4'>
+
+Message "Patch config file ..."
+XML2_config "/etc/test.conf"
+<beginfold id='4'>if</beginfold id='4'> not("0" = getLastExitCode)
+	Message "failed XML2_config"
+	LogError "failed XML2_config"
+	isFatalError "XML2_config"
+<endfold id='4'>endif</endfold id='4'>
+
+PatchTextFile_config "/etc/test.conf"
+<beginfold id='4'>if</beginfold id='4'> not("0" = getLastExitCode)
+	Message "failed PatchTextFile_config"
+	LogError "failed PatchTextFile_config"
+	isFatalError "XML2_config"
+<endfold id='4'>endif</endfold id='4'>
+
+<endfold id='1'></endfold id='1'><beginfold id='1'>[ShellInAnIcon_install_linux]</beginfold id='1'>
+set -x
+export PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin
+export DEBIAN_FRONTEND=noninteractive
+EXITCODE=0
+apt-get --yes install test
+if [ $? -ne 0 ]; then EXITCODE=1; fi
+exit $EXITCODE
+
+<endfold id='1'></endfold id='1'><beginfold id='1'>[XML2_config]</beginfold id='1'>
+openNode 'file'
+SetAttribute "name" "$filename$"
+
+<endfold id='1'></endfold id='1'><beginfold id='1'>[PatchTextFile_config]</beginfold id='1'>
+FindLine_Containing "$filename$"
+DeleteTheLine
+SaveToFile "/etc/test2.conf"
+
+<endfold id='1'></endfold id='1'><beginfold id='1'>[Patches_config_systemd]</beginfold id='1'>
+delsec [Service]
+set [Service] Restart=on-failure

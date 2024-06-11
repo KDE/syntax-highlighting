@@ -1,0 +1,106 @@
+<Comment>; opsiscript syntax highlighting test</Comment><br/>
+<Comment>;</Comment><br/>
+<Comment>;    SPDX-FileCopyrightText: 2024 Stefan Staeglich <sstaeglich@kdemail.net></Comment><br/>
+<Comment>;</Comment><br/>
+<Comment>;    SPDX-License-Identifier: LGPL</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Section>[Actions]</Section><br/>
+<Builtin Function>requiredWinstVersion</Builtin Function><Normal Text> </Normal Text><Operator>>=</Operator><Normal Text> </Normal Text><String>"4.12.8"</String><br/>
+<Builtin Function>ScriptErrorMessages</Builtin Function><Operator>=</Operator><Normal Text>off</Normal Text><br/>
+<Builtin Function>setLogLevel</Builtin Function><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> 7</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>DefVar</Keyword><Normal Text> </Normal Text><Variable>$OS$</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Builtin Function>GetOS</Builtin Function><br/>
+<Keyword>DefVar</Keyword><Normal Text> </Normal Text><Variable>$ProductId$</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><String>"test"</String><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>DefVar</Keyword><Normal Text> </Normal Text><Variable>$filename$</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Builtin Function>GetProductProperty</Builtin Function><Normal Text>(</Normal Text><String>"filename"</String><Normal Text>, </Normal Text><String>"/tmp/testfile.txt"</String><Normal Text>)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Builtin Function>comment</Builtin Function><Normal Text> </Normal Text><String>"Show product picture"</String><br/>
+<Builtin Function>ShowBitmap</Builtin Function><Normal Text> </Normal Text><String>"</String><Variable>%ScriptPath%</Variable><String>\"</String><Normal Text> </Normal Text><Operator>+</Operator><Normal Text> </Normal Text><Variable>$ProductId$</Variable><Normal Text> </Normal Text><Operator>+</Operator><Normal Text> </Normal Text><String>".png"</String><Normal Text> </Normal Text><Variable>$ProductId$</Variable><br/>
+<Normal Text></Normal Text><br/>
+<Control Structures>Switch</Control Structures><Normal Text> </Normal Text><Variable>$OS$</Variable><br/>
+<Control Structures>	case</Control Structures><Normal Text> </Normal Text><String>"Linux"</String><br/>
+<Normal Text>		</Normal Text><Builtin Function>Message</Builtin Function><Normal Text> </Normal Text><String>"Try to install "</String><Normal Text> </Normal Text><Operator>+</Operator><Normal Text> </Normal Text><Variable>$ProductId$</Variable><Normal Text> </Normal Text><String>" on "</String><Normal Text> </Normal Text><Operator>+</Operator><Normal Text> </Normal Text><Variable>$OS$</Variable><br/>
+<Function>		sub_main_linux</Function><br/>
+<Control Structures>	EndCase</Control Structures><br/>
+<Control Structures>	case</Control Structures><Normal Text> </Normal Text><String>"Windows_NT"</String><br/>
+<Normal Text>		</Normal Text><Builtin Function>Message</Builtin Function><Normal Text> </Normal Text><String>"Try to install "</String><Normal Text> </Normal Text><Operator>+</Operator><Normal Text> </Normal Text><Variable>$ProductId$</Variable><Normal Text> </Normal Text><String>" on "</String><Normal Text> </Normal Text><Operator>+</Operator><Normal Text> </Normal Text><Variable>$OS$</Variable><br/>
+<Function>		sub_main_windows</Function><br/>
+<Control Structures>	EndCase</Control Structures><br/>
+<Control Structures>	DefaultCase</Control Structures><br/>
+<Normal Text>		</Normal Text><Builtin Function>Message</Builtin Function><Normal Text> </Normal Text><Variable>$OS$</Variable><Normal Text> </Normal Text><Operator>+</Operator><Normal Text> </Normal Text><String>" is not supported"</String><br/>
+<Control Structures>	EndCase</Control Structures><br/>
+<Control Structures>EndSwitch</Control Structures><br/>
+<Normal Text></Normal Text><br/>
+<Section>[sub_main_linux]</Section><br/>
+<Keyword>DefVar</Keyword><Normal Text> </Normal Text><Variable>$distrotype$</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Builtin Function>getLinuxDistroType</Builtin Function><br/>
+<Keyword>DefStringList</Keyword><Normal Text> </Normal Text><Variable>$linuxInfo$</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Builtin Function>getLinuxVersionMap</Builtin Function><br/>
+<Keyword>DefVar</Keyword><Normal Text> </Normal Text><Variable>$distCodeName$</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Builtin Function>getValue</Builtin Function><Normal Text>(</Normal Text><String>"Codename"</String><Normal Text>, </Normal Text><Variable>$linuxInfo$</Variable><Normal Text>)</Normal Text><br/>
+<Keyword>DefVar</Keyword><Normal Text> </Normal Text><Variable>$distRelease$</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Builtin Function>getValue</Builtin Function><Normal Text>(</Normal Text><String>"Release"</String><Normal Text>, </Normal Text><Variable>$linuxInfo$</Variable><Normal Text>)</Normal Text><br/>
+<Keyword>DefVar</Keyword><Normal Text> </Normal Text><Variable>$distroName$</Variable><Normal Text>  </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Builtin Function>getValue</Builtin Function><Normal Text>(</Normal Text><String>"Distributor ID"</String><Normal Text>, </Normal Text><Variable>$linuxInfo$</Variable><Normal Text>)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Control Structures>if</Control Structures><Normal Text> </Normal Text><Operator>not</Operator><Normal Text> (</Normal Text><Variable>$distrotype$</Variable><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><String>'debian'</String><Normal Text>)</Normal Text><br/>
+<Normal Text>	</Normal Text><Builtin Function>LogError</Builtin Function><Normal Text> </Normal Text><String>"Product: "</String><Normal Text> </Normal Text><Operator>+</Operator><Normal Text> </Normal Text><Variable>$ProductId$</Variable><Normal Text> </Normal Text><Operator>+</Operator><Normal Text> </Normal Text><String>"is desinged for Debian/Ubuntu"</String><br/>
+<Normal Text>	</Normal Text><Builtin Function>isFatalError</Builtin Function><Normal Text> </Normal Text><String>"Wrong Distrotype"</String><br/>
+<Control Structures>endif</Control Structures><br/>
+<Normal Text></Normal Text><br/>
+<Builtin Function>Message</Builtin Function><Normal Text> </Normal Text><String>"Try to get Package Lock..."</String><br/>
+<Control Structures>if</Control Structures><Normal Text> waitForPackageLock(</Normal Text><String>"60"</String><Normal Text>,</Normal Text><String>"false"</String><Normal Text>)</Normal Text><br/>
+<Normal Text>	</Normal Text><Builtin Function>comment</Builtin Function><Normal Text> </Normal Text><String>"we got the package lock."</String><br/>
+<Control Structures>else</Control Structures><br/>
+<Normal Text>	</Normal Text><Builtin Function>LogError</Builtin Function><Normal Text> </Normal Text><String>"could not get Package Lock"</String><br/>
+<Normal Text>	</Normal Text><Builtin Function>isFatalError</Builtin Function><Normal Text> </Normal Text><String>"package lock failed"</String><br/>
+<Control Structures>endif</Control Structures><br/>
+<Normal Text></Normal Text><br/>
+<Function>ShellInAnIcon_install_linux</Function><br/>
+<Control Structures>if</Control Structures><Normal Text> </Normal Text><Operator>not</Operator><Normal Text>(</Normal Text><String>"0"</String><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Builtin Function>getLastExitCode</Builtin Function><Normal Text>)</Normal Text><br/>
+<Normal Text>	</Normal Text><Builtin Function>LogError</Builtin Function><Normal Text> </Normal Text><String>"failed ShellInAnIcon_install_linux"</String><br/>
+<Normal Text>	</Normal Text><Builtin Function>isFatalError</Builtin Function><Normal Text> </Normal Text><String>"ShellInAnIcon_install_linux"</String><br/>
+<Control Structures>endif</Control Structures><br/>
+<Normal Text></Normal Text><br/>
+<Function>Patches_config_systemd </Function><String>"/etc/systemd/system/test.service.d/override.conf"</String><br/>
+<Control Structures>if</Control Structures><Normal Text> </Normal Text><Operator>not</Operator><Normal Text>(</Normal Text><String>"0"</String><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Builtin Function>getLastExitCode</Builtin Function><Normal Text>)</Normal Text><br/>
+<Normal Text>	</Normal Text><Builtin Function>Message</Builtin Function><Normal Text> </Normal Text><String>"failed Patches_config_systemd"</String><br/>
+<Normal Text>	</Normal Text><Builtin Function>LogError</Builtin Function><Normal Text> </Normal Text><String>"failed Patches_config_systemd"</String><br/>
+<Normal Text>	</Normal Text><Builtin Function>isFatalError</Builtin Function><Normal Text> </Normal Text><String>"config_systemd"</String><br/>
+<Control Structures>endif</Control Structures><br/>
+<Normal Text></Normal Text><br/>
+<Builtin Function>Message</Builtin Function><Normal Text> </Normal Text><String>"Patch config file ..."</String><br/>
+<Function>XML2_config </Function><String>"/etc/test.conf"</String><br/>
+<Control Structures>if</Control Structures><Normal Text> </Normal Text><Operator>not</Operator><Normal Text>(</Normal Text><String>"0"</String><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Builtin Function>getLastExitCode</Builtin Function><Normal Text>)</Normal Text><br/>
+<Normal Text>	</Normal Text><Builtin Function>Message</Builtin Function><Normal Text> </Normal Text><String>"failed XML2_config"</String><br/>
+<Normal Text>	</Normal Text><Builtin Function>LogError</Builtin Function><Normal Text> </Normal Text><String>"failed XML2_config"</String><br/>
+<Normal Text>	</Normal Text><Builtin Function>isFatalError</Builtin Function><Normal Text> </Normal Text><String>"XML2_config"</String><br/>
+<Control Structures>endif</Control Structures><br/>
+<Normal Text></Normal Text><br/>
+<Function>PatchTextFile_config </Function><String>"/etc/test.conf"</String><br/>
+<Control Structures>if</Control Structures><Normal Text> </Normal Text><Operator>not</Operator><Normal Text>(</Normal Text><String>"0"</String><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Builtin Function>getLastExitCode</Builtin Function><Normal Text>)</Normal Text><br/>
+<Normal Text>	</Normal Text><Builtin Function>Message</Builtin Function><Normal Text> </Normal Text><String>"failed PatchTextFile_config"</String><br/>
+<Normal Text>	</Normal Text><Builtin Function>LogError</Builtin Function><Normal Text> </Normal Text><String>"failed PatchTextFile_config"</String><br/>
+<Normal Text>	</Normal Text><Builtin Function>isFatalError</Builtin Function><Normal Text> </Normal Text><String>"XML2_config"</String><br/>
+<Control Structures>endif</Control Structures><br/>
+<Normal Text></Normal Text><br/>
+<Section>[ShellInAnIcon_install_linux]</Section><br/>
+<Builtin Function>set</Builtin Function><Normal Text> -x</Normal Text><br/>
+<Builtin Function>export</Builtin Function><Normal Text> PATH</Normal Text><Operator>=</Operator><Normal Text>/usr/</Normal Text><Builtin Function>local</Builtin Function><Normal Text>/bin:/usr/bin:/bin:/usr/</Normal Text><Builtin Function>local</Builtin Function><Normal Text>/sbin:/usr/sbin:/sbin</Normal Text><br/>
+<Builtin Function>export</Builtin Function><Normal Text> DEBIAN_FRONTEND</Normal Text><Operator>=</Operator><Normal Text>noninteractive</Normal Text><br/>
+<Normal Text>EXITCODE</Normal Text><Operator>=</Operator><Normal Text>0</Normal Text><br/>
+<Normal Text>apt-get --</Normal Text><Function>yes</Function><Normal Text> </Normal Text><Function>install</Function><Normal Text> </Normal Text><Builtin Function>test</Builtin Function><br/>
+<Keyword>if</Keyword><Normal Text> [ </Normal Text><Variable>$?</Variable><Normal Text> -ne 0 ]</Normal Text><Operator>;</Operator><Normal Text> </Normal Text><Keyword>then</Keyword><Normal Text> EXITCODE</Normal Text><Operator>=</Operator><Normal Text>1</Normal Text><Operator>;</Operator><Normal Text> </Normal Text><Keyword>fi</Keyword><br/>
+<Builtin Function>exit</Builtin Function><Normal Text> </Normal Text><Variable>$EXITCODE</Variable><br/>
+<Normal Text></Normal Text><br/>
+<Section>[XML2_config]</Section><br/>
+<Builtin Function>openNode</Builtin Function><Normal Text> </Normal Text><String>'file'</String><br/>
+<Builtin Function>SetAttribute</Builtin Function><Normal Text> </Normal Text><String>"name"</String><Normal Text> </Normal Text><String>"</String><Variable>$filename$</Variable><String>"</String><br/>
+<Normal Text></Normal Text><br/>
+<Section>[PatchTextFile_config]</Section><br/>
+<Builtin Function>FindLine_Containing</Builtin Function><Normal Text> </Normal Text><String>"</String><Variable>$filename$</Variable><String>"</String><br/>
+<Builtin Function>DeleteTheLine</Builtin Function><br/>
+<Builtin Function>SaveToFile</Builtin Function><Normal Text> </Normal Text><String>"/etc/test2.conf"</String><br/>
+<Normal Text></Normal Text><br/>
+<Section>[Patches_config_systemd]</Section><br/>
+<Builtin Function>delsec</Builtin Function><Normal Text> [Service]</Normal Text><br/>
+<Builtin Function>set</Builtin Function><Normal Text> [Service] Restart</Normal Text><Operator>=</Operator><Normal Text>on-failure</Normal Text><br/>

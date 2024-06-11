@@ -1,0 +1,106 @@
+; opsiscript syntax highlighting test
+;
+;    SPDX-FileCopyrightText: 2024 Stefan Staeglich <sstaeglich@kdemail.net>
+;
+;    SPDX-License-Identifier: LGPL
+
+
+
+
+[Actions]
+requiredWinstVersion >= "4.12.8"
+ScriptErrorMessages=off
+setLogLevel = 7
+
+
+DefVar $OS$ = GetOS
+DefVar $ProductId$ = "test"
+
+DefVar $filename$ = GetProductProperty("filename", "/tmp/testfile.txt")
+
+comment "Show product picture"
+ShowBitmap "%ScriptPath%\" + $ProductId$ + ".png" $ProductId$
+
+Switch $OS$
+	case "Linux"
+		Message "Try to install " + $ProductId$ " on " + $OS$
+		sub_main_linux
+	EndCase
+	case "Windows_NT"
+		Message "Try to install " + $ProductId$ " on " + $OS$
+		sub_main_windows
+	EndCase
+	DefaultCase
+		Message $OS$ + " is not supported"
+	EndCase
+EndSwitch
+
+[sub_main_linux]
+DefVar $distrotype$ = getLinuxDistroType
+DefStringList $linuxInfo$ = getLinuxVersionMap
+DefVar $distCodeName$ = getValue("Codename", $linuxInfo$)
+DefVar $distRelease$ = getValue("Release", $linuxInfo$)
+DefVar $distroName$  = getValue("Distributor ID", $linuxInfo$)
+
+if not ($distrotype$ = 'debian')
+	LogError "Product: " + $ProductId$ + "is desinged for Debian/Ubuntu"
+	isFatalError "Wrong Distrotype"
+endif
+
+Message "Try to get Package Lock..."
+if waitForPackageLock("60","false")
+	comment "we got the package lock."
+else
+	LogError "could not get Package Lock"
+	isFatalError "package lock failed"
+endif
+
+ShellInAnIcon_install_linux
+if not("0" = getLastExitCode)
+	LogError "failed ShellInAnIcon_install_linux"
+	isFatalError "ShellInAnIcon_install_linux"
+endif
+
+Patches_config_systemd "/etc/systemd/system/test.service.d/override.conf"
+if not("0" = getLastExitCode)
+	Message "failed Patches_config_systemd"
+	LogError "failed Patches_config_systemd"
+	isFatalError "config_systemd"
+endif
+
+Message "Patch config file ..."
+XML2_config "/etc/test.conf"
+if not("0" = getLastExitCode)
+	Message "failed XML2_config"
+	LogError "failed XML2_config"
+	isFatalError "XML2_config"
+endif
+
+PatchTextFile_config "/etc/test.conf"
+if not("0" = getLastExitCode)
+	Message "failed PatchTextFile_config"
+	LogError "failed PatchTextFile_config"
+	isFatalError "XML2_config"
+endif
+
+[ShellInAnIcon_install_linux]
+set -x
+export PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin
+export DEBIAN_FRONTEND=noninteractive
+EXITCODE=0
+apt-get --yes install test
+if [ $? -ne 0 ]; then EXITCODE=1; fi
+exit $EXITCODE
+
+[XML2_config]
+openNode 'file'
+SetAttribute "name" "$filename$"
+
+[PatchTextFile_config]
+FindLine_Containing "$filename$"
+DeleteTheLine
+SaveToFile "/etc/test2.conf"
+
+[Patches_config_systemd]
+delsec [Service]
+set [Service] Restart=on-failure

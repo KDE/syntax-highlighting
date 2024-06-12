@@ -23,6 +23,8 @@
 <Normal></Normal><br/>
 <Section Header>[Mount]</Section Header><br/>
 <Option Name>What</Option Name><Normal> = /dev/disk/by-uuid/444c-0d9d-411e-a973-015b31acaa</Normal><br/>
+<Comment># </Comment><Alert Level 3>NOTE</Alert Level 3><Comment>: Since systemd version 256 fstab-style identifiers are supported too.</Comment><br/>
+<Option Name>What</Option Name><Normal> = UUID=444c-0d9d-411e-a973-015b31acaa</Normal><br/>
 <Option Name>Where</Option Name><Normal> = /the/mount/directory</Normal><br/>
 <Option Name>Type</Option Name><Normal> = </Normal><Constant>btrfs</Constant><br/>
 <Option Name>Options</Option Name><Normal> = subvol=some_name,compress=lzo,noatime,noauto,nodev,nosuid</Normal><br/>
@@ -303,6 +305,7 @@
 <Option Name>MemorySwapMax</Option Name><Normal> = </Normal><Number>10</Number><Measurement Unit>G</Measurement Unit><br/>
 <Option Name>StartupMemorySwapMax</Option Name><Normal> = </Normal><Number>5</Number><Measurement Unit>G</Measurement Unit><br/>
 <Option Name>MemoryZSwapMax</Option Name><Normal> = </Normal><Number>2</Number><Measurement Unit>G</Measurement Unit><br/>
+<Option Name>MemoryZSwapWriteback</Option Name><Normal> = </Normal><Constant>false</Constant><br/>
 <Option Name>StartupMemoryZSwapMax</Option Name><Normal> = </Normal><Number>1500</Number><Normal>k</Normal><br/>
 <Option Name>TasksAccounting</Option Name><Normal> = </Normal><Constant>on</Constant><br/>
 <Option Name>TasksMax</Option Name><Normal> = </Normal><Number>50</Number><Measurement Unit>%</Measurement Unit><br/>
@@ -334,6 +337,11 @@
 <Option Name>RestrictNetworkInterfaces</Option Name><Normal> = </Normal><Prefix>~</Prefix><Normal>eth1 eth2</Normal><br/>
 <Option Name>NFTSet</Option Name><Normal> = </Normal><Constant>cgroup</Constant><Normal>:</Normal><Constant>inet</Constant><Normal>:filter:my_service </Normal><Continuation>\</Continuation><br/>
 <Normal>  </Normal><Constant>user</Constant><Normal>:</Normal><Constant>inet</Constant><Normal>:filter:serviceuser</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Section Header>[Slice]</Section Header><br/>
+<Comment># The Slice section may include options of the resource-control option group.</Comment><br/>
+<Comment># See [Service] for available options of systemd.resource-control.</Comment><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Section Header>[Socket]</Section Header><br/>
@@ -399,11 +407,14 @@
 <Option Name>TriggerLimitBurst</Option Name><Normal> = </Normal><Number>50</Number><br/>
 <Option Name>PollLimitIntervalSec</Option Name><Normal> = </Normal><Number>1</Number><Measurement Unit>s</Measurement Unit><Normal> </Normal><Number>300</Number><Measurement Unit>ms</Measurement Unit><br/>
 <Option Name>PollLimitBurst</Option Name><Normal> = </Normal><Number>120</Number><br/>
+<Option Name>PassFileDescriptorsToExec</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
 <Comment># see [Service] for options from systemd.exec and systemd.kill</Comment><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Section Header>[Swap]</Section Header><br/>
 <Option Name>What</Option Name><Normal> = /dev/disk/by-uuid/5db77-fde6-424e-a1bb-e88e8996c</Normal><br/>
+<Comment># </Comment><Alert Level 3>NOTE</Alert Level 3><Comment>: Since systemd version 256 fstab-style identifiers are supported too.</Comment><br/>
+<Option Name>What</Option Name><Normal> = UUID=5db77-fde6-424e-a1bb-e88e8996c</Normal><br/>
 <Option Name>Priority</Option Name><Normal> = </Normal><Number>123</Number><br/>
 <Option Name>Options</Option Name><Normal> = some,device,options</Normal><br/>
 <Option Name>TimeoutSec</Option Name><Normal> = </Normal><Number>1</Number><Measurement Unit>m</Measurement Unit><Normal> </Normal><Number>20</Number><Measurement Unit>s</Measurement Unit><br/>
@@ -450,6 +461,7 @@
 <Option Name>PropagatesStopTo</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service </Unit Extension><Unit Name>some-other</Unit Name><Unit Extension>.service</Unit Extension><br/>
 <Option Name>StopPropagatedFrom</Option Name><Normal> = </Normal><Unit Name>some</Unit Name><Unit Extension>.service </Unit Extension><Unit Name>some-other</Unit Name><Unit Extension>.service</Unit Extension><br/>
 <Option Name>RequiresMountsFor</Option Name><Normal> = /tmp /var/log </Normal><Specifier>%h</Specifier><br/>
+<Option Name>WantsMountsFor</Option Name><Normal> = /tmp /var/log </Normal><Specifier>%h</Specifier><br/>
 <Option Name>OnFailureJobMode</Option Name><Normal> = </Normal><Constant>fail</Constant><br/>
 <Option Name>OnSuccessJobMode</Option Name><Normal> = </Normal><Constant>replace</Constant><br/>
 <Option Name>IgnoreOnIsolate</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
@@ -539,7 +551,7 @@
 <Comment>###### invalid sections</Comment><br/>
 <Normal>[Device]</Normal><br/>
 <Normal>[Invalid]</Normal><br/>
-<Normal>[Slice]</Normal><br/>
+<Section Header>[Slice]</Section Header><br/>
 <Normal>[Target]</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
@@ -2171,7 +2183,7 @@
 <Option Name>OpenFile</Option Name><Normal> = /some/path/</Normal><Separator>:</Separator><File Descriptor Name>some-name</File Descriptor Name><Separator>:</Separator><Normal>some,invalid,options</Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### percent</Comment><br/>
-<Normal>[Slice]</Normal><br/>
+<Section Header>[Slice]</Section Header><br/>
 <Option Name>CPUQuota</Option Name><Normal> = </Normal><Number>0.1</Number><Measurement Unit>%</Measurement Unit><br/>
 <Option Name>CPUQuota</Option Name><Normal> = </Normal><Number>12</Number><Normal> </Normal><Measurement Unit>%</Measurement Unit><br/>
 <Option Name>CPUQuota</Option Name><Normal> = </Normal><Number>123.4</Number><Measurement Unit>%</Measurement Unit><br/>
@@ -2840,6 +2852,7 @@
 <Option Name>ConditionVirtualization</Option Name><Normal> = </Normal><Constant>bhyve</Constant><br/>
 <Option Name>ConditionVirtualization</Option Name><Normal> = </Normal><Constant>bochs</Constant><br/>
 <Option Name>ConditionVirtualization</Option Name><Normal> = </Normal><Constant>docker</Constant><br/>
+<Option Name>ConditionVirtualization</Option Name><Normal> = </Normal><Constant>google</Constant><br/>
 <Option Name>ConditionVirtualization</Option Name><Normal> = </Normal><Constant>kvm</Constant><br/>
 <Option Name>ConditionVirtualization</Option Name><Normal> = </Normal><Constant>lxc</Constant><br/>
 <Option Name>ConditionVirtualization</Option Name><Normal> = </Normal><Constant>lxc-libvirt</Constant><br/>

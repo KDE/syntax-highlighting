@@ -29,6 +29,8 @@
 
 <span style="font-weight:bold">[Mount]</span>
 <span style="color:#0057ae">What</span> = /dev/disk/by-uuid/444c-0d9d-411e-a973-015b31acaa
+<span style="color:#898887"># </span><span style="color:#81ca2d;background-color:#f7e6e6;font-weight:bold">NOTE</span><span style="color:#898887">: Since systemd version 256 fstab-style identifiers are supported too.</span>
+<span style="color:#0057ae">What</span> = UUID=444c-0d9d-411e-a973-015b31acaa
 <span style="color:#0057ae">Where</span> = /the/mount/directory
 <span style="color:#0057ae">Type</span> = <span style="color:#aa5500">btrfs</span>
 <span style="color:#0057ae">Options</span> = subvol=some_name,compress=lzo,noatime,noauto,nodev,nosuid
@@ -309,6 +311,7 @@
 <span style="color:#0057ae">MemorySwapMax</span> = <span style="color:#b08000">10</span><span style="font-style:italic">G</span>
 <span style="color:#0057ae">StartupMemorySwapMax</span> = <span style="color:#b08000">5</span><span style="font-style:italic">G</span>
 <span style="color:#0057ae">MemoryZSwapMax</span> = <span style="color:#b08000">2</span><span style="font-style:italic">G</span>
+<span style="color:#0057ae">MemoryZSwapWriteback</span> = <span style="color:#aa5500">false</span>
 <span style="color:#0057ae">StartupMemoryZSwapMax</span> = <span style="color:#b08000">1500</span>k
 <span style="color:#0057ae">TasksAccounting</span> = <span style="color:#aa5500">on</span>
 <span style="color:#0057ae">TasksMax</span> = <span style="color:#b08000">50</span><span style="font-style:italic">%</span>
@@ -340,6 +343,11 @@
 <span style="color:#0057ae">RestrictNetworkInterfaces</span> = <span style="color:#ff5500">~</span>eth1 eth2
 <span style="color:#0057ae">NFTSet</span> = <span style="color:#aa5500">cgroup</span>:<span style="color:#aa5500">inet</span>:filter:my_service <span style="font-weight:bold">\</span>
   <span style="color:#aa5500">user</span>:<span style="color:#aa5500">inet</span>:filter:serviceuser
+
+
+<span style="font-weight:bold">[Slice]</span>
+<span style="color:#898887"># The Slice section may include options of the resource-control option group.</span>
+<span style="color:#898887"># See [Service] for available options of systemd.resource-control.</span>
 
 
 <span style="font-weight:bold">[Socket]</span>
@@ -405,11 +413,14 @@
 <span style="color:#0057ae">TriggerLimitBurst</span> = <span style="color:#b08000">50</span>
 <span style="color:#0057ae">PollLimitIntervalSec</span> = <span style="color:#b08000">1</span><span style="font-style:italic">s</span> <span style="color:#b08000">300</span><span style="font-style:italic">ms</span>
 <span style="color:#0057ae">PollLimitBurst</span> = <span style="color:#b08000">120</span>
+<span style="color:#0057ae">PassFileDescriptorsToExec</span> = <span style="color:#aa5500">true</span>
 <span style="color:#898887"># see [Service] for options from systemd.exec and systemd.kill</span>
 
 
 <span style="font-weight:bold">[Swap]</span>
 <span style="color:#0057ae">What</span> = /dev/disk/by-uuid/5db77-fde6-424e-a1bb-e88e8996c
+<span style="color:#898887"># </span><span style="color:#81ca2d;background-color:#f7e6e6;font-weight:bold">NOTE</span><span style="color:#898887">: Since systemd version 256 fstab-style identifiers are supported too.</span>
+<span style="color:#0057ae">What</span> = UUID=5db77-fde6-424e-a1bb-e88e8996c
 <span style="color:#0057ae">Priority</span> = <span style="color:#b08000">123</span>
 <span style="color:#0057ae">Options</span> = some,device,options
 <span style="color:#0057ae">TimeoutSec</span> = <span style="color:#b08000">1</span><span style="font-style:italic">m</span> <span style="color:#b08000">20</span><span style="font-style:italic">s</span>
@@ -456,6 +467,7 @@
 <span style="color:#0057ae">PropagatesStopTo</span> = <span style="color:#006e28">some</span><span style="color:#006e28;font-style:italic">.service </span><span style="color:#006e28">some-other</span><span style="color:#006e28;font-style:italic">.service</span>
 <span style="color:#0057ae">StopPropagatedFrom</span> = <span style="color:#006e28">some</span><span style="color:#006e28;font-style:italic">.service </span><span style="color:#006e28">some-other</span><span style="color:#006e28;font-style:italic">.service</span>
 <span style="color:#0057ae">RequiresMountsFor</span> = /tmp /var/log <span style="color:#3daee9">%h</span>
+<span style="color:#0057ae">WantsMountsFor</span> = /tmp /var/log <span style="color:#3daee9">%h</span>
 <span style="color:#0057ae">OnFailureJobMode</span> = <span style="color:#aa5500">fail</span>
 <span style="color:#0057ae">OnSuccessJobMode</span> = <span style="color:#aa5500">replace</span>
 <span style="color:#0057ae">IgnoreOnIsolate</span> = <span style="color:#aa5500">true</span>
@@ -545,7 +557,7 @@
 <span style="color:#898887">###### invalid sections</span>
 [Device]
 [Invalid]
-[Slice]
+<span style="font-weight:bold">[Slice]</span>
 [Target]
 
 
@@ -2177,7 +2189,7 @@ WantedBy = some.service some.socket
 <span style="color:#0057ae">OpenFile</span> = /some/path/<span style="color:#ff5500">:</span><span style="font-style:italic">some-name</span><span style="color:#ff5500">:</span>some,invalid,options
 
 <span style="color:#898887">###### percent</span>
-[Slice]
+<span style="font-weight:bold">[Slice]</span>
 <span style="color:#0057ae">CPUQuota</span> = <span style="color:#b08000">0.1</span><span style="font-style:italic">%</span>
 <span style="color:#0057ae">CPUQuota</span> = <span style="color:#b08000">12</span> <span style="font-style:italic">%</span>
 <span style="color:#0057ae">CPUQuota</span> = <span style="color:#b08000">123.4</span><span style="font-style:italic">%</span>
@@ -2846,6 +2858,7 @@ WantedBy = some.service some.socket
 <span style="color:#0057ae">ConditionVirtualization</span> = <span style="color:#aa5500">bhyve</span>
 <span style="color:#0057ae">ConditionVirtualization</span> = <span style="color:#aa5500">bochs</span>
 <span style="color:#0057ae">ConditionVirtualization</span> = <span style="color:#aa5500">docker</span>
+<span style="color:#0057ae">ConditionVirtualization</span> = <span style="color:#aa5500">google</span>
 <span style="color:#0057ae">ConditionVirtualization</span> = <span style="color:#aa5500">kvm</span>
 <span style="color:#0057ae">ConditionVirtualization</span> = <span style="color:#aa5500">lxc</span>
 <span style="color:#0057ae">ConditionVirtualization</span> = <span style="color:#aa5500">lxc-libvirt</span>

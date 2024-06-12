@@ -23,6 +23,8 @@ DefaultInstance = id
 
 [Mount]
 What = /dev/disk/by-uuid/444c-0d9d-411e-a973-015b31acaa
+# NOTE: Since systemd version 256 fstab-style identifiers are supported too.
+What = UUID=444c-0d9d-411e-a973-015b31acaa
 Where = /the/mount/directory
 Type = btrfs
 Options = subvol=some_name,compress=lzo,noatime,noauto,nodev,nosuid
@@ -303,6 +305,7 @@ StartupMemoryMax = 55%
 MemorySwapMax = 10G
 StartupMemorySwapMax = 5G
 MemoryZSwapMax = 2G
+MemoryZSwapWriteback = false
 StartupMemoryZSwapMax = 1500k
 TasksAccounting = on
 TasksMax = 50%
@@ -334,6 +337,11 @@ BPFProgram = bind6:/sys/fs/bpf/sock-addr-hook
 RestrictNetworkInterfaces = ~eth1 eth2
 NFTSet = cgroup:inet:filter:my_service \
   user:inet:filter:serviceuser
+
+
+[Slice]
+# The Slice section may include options of the resource-control option group.
+# See [Service] for available options of systemd.resource-control.
 
 
 [Socket]
@@ -399,11 +407,14 @@ TriggerLimitIntervalSec = 1s 500ms
 TriggerLimitBurst = 50
 PollLimitIntervalSec = 1s 300ms
 PollLimitBurst = 120
+PassFileDescriptorsToExec = true
 # see [Service] for options from systemd.exec and systemd.kill
 
 
 [Swap]
 What = /dev/disk/by-uuid/5db77-fde6-424e-a1bb-e88e8996c
+# NOTE: Since systemd version 256 fstab-style identifiers are supported too.
+What = UUID=5db77-fde6-424e-a1bb-e88e8996c
 Priority = 123
 Options = some,device,options
 TimeoutSec = 1m 20s
@@ -450,6 +461,7 @@ JoinsNamespaceOf = some.service
 PropagatesStopTo = some.service some-other.service
 StopPropagatedFrom = some.service some-other.service
 RequiresMountsFor = /tmp /var/log %h
+WantsMountsFor = /tmp /var/log %h
 OnFailureJobMode = fail
 OnSuccessJobMode = replace
 IgnoreOnIsolate = true
@@ -2840,6 +2852,7 @@ ConditionVirtualization = acrn
 ConditionVirtualization = bhyve
 ConditionVirtualization = bochs
 ConditionVirtualization = docker
+ConditionVirtualization = google
 ConditionVirtualization = kvm
 ConditionVirtualization = lxc
 ConditionVirtualization = lxc-libvirt

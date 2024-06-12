@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created for systemd version 255. -->
+<!-- Created for systemd version 256. -->
 <!DOCTYPE language [
 <!ENTITY alp "A-Za-z">
 <!ENTITY aln "&alp;0-9">
 <!ENTITY end "(?:\s+|$)">
 <!ENTITY escaped "\\x[0-9a-f]{2}">
 <!ENTITY hex "0-9A-Fa-f">
-<!ENTITY specifier "&#x0025;[&#x0025;ABCEGHIJLMNPSTUVWYabdfghijlmnopqstuvwy]">
+<!ENTITY specifier "&#x0025;[&#x0025;ABCDEGHIJLMNPSTUVWYabdfghijlmnopqstuvwy]">
 <!ENTITY name "(?:[-\w]|&specifier;)+@?(?:[-.@\:\w]|&escaped;|&specifier;)*">
 <!ENTITY extension "automount|device|mount|path|service|slice|socket|swap|target|timer">
 <!ENTITY unit "&name;\.(?:&extension;)&end;">
@@ -23,7 +23,7 @@
 <!ENTITY tsp_unit "&tsp_year;|&tsp_month;|&tsp_week;|&tsp_day;|&tsp_hour;|&tsp_sec;|&tsp_msec;|&tsp_usec;|&tsp_min;">
 <!ENTITY tsp "\d+(?:\.\d+)?\h*(?=(&tsp_unit;)?)">
 ]>
-<language author="Andreas Gratzer" version="15" extensions="*.automount;*.device;*.mount;*.path;*.service;*.slice;*.socket;*.swap;*.target;*.timer" kateversion="5.0" license="MIT" mimetype="text/x-systemd-unit" name="systemd unit" section="Configuration">
+<language version="16" author="Andreas Gratzer" extensions="*.automount;*.device;*.mount;*.path;*.service;*.slice;*.socket;*.swap;*.target;*.timer" kateversion="5.0" license="MIT" mimetype="text/x-systemd-unit" name="systemd unit" section="Configuration">
   <highlighting>
     <list name="boolean">
       <!-- 0, 1, t, f, y, n are also valid, but handled using AnyChar. -->
@@ -552,6 +552,7 @@
       <item>configfs</item>
       <item>btrfs</item>
       <item>binfmt_misc</item>
+      <item>bcachefs</item>
     </list>
     <list name="io scheduling class">
       <item>realtime</item>
@@ -928,6 +929,7 @@
       <item>lxc-libvirt</item>
       <item>lxc</item>
       <item>kvm</item>
+      <item>google</item>
       <item>docker</item>
       <item>container</item>
       <item>bochs</item>
@@ -1028,6 +1030,7 @@
       <item>RebootArgument</item>
       <item>RequiresMountsFor</item>
       <item>SourcePath</item>
+      <item>WantsMountsFor</item>
     </list>
     <contexts>
       <context name="start" attribute="Normal" lineEndContext="#stay">
@@ -1509,6 +1512,7 @@
         <StringDetect String="[Install]" firstNonSpace="true" attribute="Section Header" context="#pop!section install" endRegion="section" beginRegion="section"/>
         <StringDetect String="[Mount]" firstNonSpace="true" attribute="Section Header" context="#pop!section mount" endRegion="section" beginRegion="section"/>
         <StringDetect String="[Path]" firstNonSpace="true" attribute="Section Header" context="#pop!section path" endRegion="section" beginRegion="section"/>
+        <StringDetect String="[Slice]" firstNonSpace="true" attribute="Section Header" context="#pop!section slice" endRegion="section" beginRegion="section"/>
         <StringDetect String="[Service]" firstNonSpace="true" attribute="Section Header" context="#pop!section service" endRegion="section" beginRegion="section"/>
         <StringDetect String="[Socket]" firstNonSpace="true" attribute="Section Header" context="#pop!section socket" endRegion="section" beginRegion="section"/>
         <StringDetect String="[Swap]" firstNonSpace="true" attribute="Section Header" context="#pop!section swap" endRegion="section" beginRegion="section"/>
@@ -1860,6 +1864,7 @@
         <WordDetect String="MemoryPressureWatch" firstNonSpace="true" attribute="Option Name" context="memory pressure watch"/>
         <WordDetect String="MemorySwapMax" firstNonSpace="true" attribute="Option Name" context="cardinal KMGT infinity"/>
         <WordDetect String="MemoryZSwapMax" firstNonSpace="true" attribute="Option Name" context="cardinal KMGT infinity"/>
+        <WordDetect String="MemoryZSwapWriteback" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="NFTSet" firstNonSpace="true" attribute="Option Name" context="nft set list"/>
         <WordDetect String="RestrictNetworkInterfaces" firstNonSpace="true" attribute="Option Name" context="~ text"/>
         <WordDetect String="Slice" firstNonSpace="true" attribute="Option Name" context="unit slice"/>
@@ -1944,6 +1949,7 @@
         <WordDetect String="MessageQueueMessageSize" firstNonSpace="true" attribute="Option Name" context="cardinal"/>
         <WordDetect String="NoDelay" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="PassCredentials" firstNonSpace="true" attribute="Option Name" context="boolean"/>
+        <WordDetect String="PassFileDescriptorsToExec" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="PassPacketInfo" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="PassSecurity" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="PipeSize" firstNonSpace="true" attribute="Option Name" context="cardinal KMGT"/>
@@ -2104,11 +2110,16 @@
         <IncludeRules context="section"/>
         <IncludeRules context="options exec"/>
         <IncludeRules context="options kill"/>
+        <IncludeRules context="options resource-control"/>
         <IncludeRules context="options mount"/>
       </context>
       <context name="section path" attribute="Normal" lineEndContext="#stay">
         <IncludeRules context="section"/>
         <IncludeRules context="options path"/>
+      </context>
+      <context name="section slice" attribute="Normal" lineEndContext="#stay">
+        <IncludeRules context="section"/>
+        <IncludeRules context="options resource-control"/>
       </context>
       <context name="section service" attribute="Normal" lineEndContext="#stay">
         <IncludeRules context="section"/>
@@ -2121,12 +2132,14 @@
         <IncludeRules context="section"/>
         <IncludeRules context="options exec"/>
         <IncludeRules context="options kill"/>
+        <IncludeRules context="options resource-control"/>
         <IncludeRules context="options socket"/>
       </context>
       <context name="section swap" attribute="Normal" lineEndContext="#stay">
         <IncludeRules context="section"/>
         <IncludeRules context="options exec"/>
         <IncludeRules context="options kill"/>
+        <IncludeRules context="options resource-control"/>
         <IncludeRules context="options swap"/>
       </context>
       <context name="section timer" attribute="Normal" lineEndContext="#stay">

@@ -77,6 +77,9 @@ static inline TextStyleData readThemeData(const QJsonObject &obj)
 
 bool ThemeData::load(const QString &filePath)
 {
+    // flag first as done for the error cases
+    m_completelyLoaded = true;
+
     QFile loadFile(filePath);
     if (!loadFile.open(QIODevice::ReadOnly)) {
         return false;
@@ -100,6 +103,9 @@ bool ThemeData::load(const QString &filePath)
     }
 
     m_filePath = filePath;
+
+    // we need more data later
+    m_completelyLoaded = false;
 
     // read metadata
     QJsonObject metadata = jsonDoc.object();

@@ -171,19 +171,22 @@
 			<DetectChar attribute="Symbol" context="#stay" char="{" beginRegion="curly brackets" />
 			<DetectChar attribute="Symbol" context="#stay" char="}" endRegion="curly brackets" />
 			<AnyChar String="#:!,.+-*/%&lt;=&gt;|&amp;" attribute="Symbol" context="#stay" />
-			<AnyChar String=";?&apos;~^$" attribute="Error" context="#stay" />
+			<AnyChar String=";?&apos;~^$\" attribute="Error" context="#stay" />
 		</context>
 		<context attribute="Normal Text" lineEndContext="#pop" name="number suffix error" fallthroughContext="#pop" >
 			<RegExpr attribute="Error" String="\w+" context="#pop"/>
 		</context>
 		<context attribute="String" lineEndContext="#stay" name="string" >
-			<RegExpr attribute="EscapeSequence" context="#stay" String="\\[efnrt&quot;\\]" />
-			<RegExpr attribute="EscapeSequence" context="#stay" String="\\u\{[0-9a-fA-F]{1,6}\}" />
-			<RegExpr attribute="Error" context="#stay" String="\\u\{.*\}" />
-			<RegExpr attribute="Error" context="#stay" String="\\[^efnrt&quot;\\]" />
+			<LineContinue attribute="Error" context="#stay" />
+			<DetectChar attribute="EscapeSequence" context="escape sequence" char="\" />
 			<DetectChar attribute="String" context="#pop" char="&quot;" endRegion="quotes" />
 		</context>
-		<context attribute="BitArray" lineEndContext="#stay" name="bitarray" >
+		<context attribute="EscapeSequence" lineEndContext="#pop!error" fallthroughContext="#pop!error" name="escape sequence" >
+			<AnyChar attribute="EscapeSequence" context="#pop" String="efnrt&quot;\" />
+			<RegExpr attribute="EscapeSequence" context="#pop" String="u\{[0-9a-fA-F]{1,6}\}" />
+			<RegExpr attribute="Error" context="#pop" String="u\{[^}]*\}|[^efnrt&quot;\\]" />
+		</context>
+		<context attribute="Normal Text" lineEndContext="#stay" name="bitarray" >
 			<keyword attribute="BitArrayOption" context="#stay" String="bitarrayoptions" />
 			<Detect2Chars attribute="Symbol" context="#pop" char="&gt;" char1="&gt;" endRegion="chevrons" />
 			<IncludeRules context="normal text" />
@@ -192,9 +195,9 @@
 		</context>
 		<context attribute="Documentation" lineEndContext="#pop" name="documentation" >
 		</context>
-		<context attribute="Normal Text" lineEndContext="#stay" lineEmptyContext="#stay"  name="import" fallthroughContext="error" >
+		<context attribute="Normal Text" lineEndContext="#stay" lineEmptyContext="#stay"  name="import" fallthroughContext="#pop!error" >
 			<DetectSpaces attribute="Normal Text" />
-			<RegExpr attribute="Module" context="import suffix" String="&name;(?:/&name;)*" />
+			<RegExpr attribute="Module" context="import suffix" String="&name;(?:/&name;)*\b" />
 		</context>
 		<context attribute="Normal Text" lineEndContext="#stay" name="import suffix" fallthroughContext="#pop#pop" >
 			<DetectSpaces attribute="Normal Text" />
@@ -209,7 +212,7 @@
 			<DetectSpaces attribute="Normal Text" />
 			<RegExpr attribute="Module" context="#pop#pop#pop" String="&name;(?:/&name;)*" />
 		</context>
-		<context attribute="Error" lineEndContext="#stay" name="error" >
+		<context attribute="Error" lineEndContext="#pop" name="error" >
 		</context>
 	</contexts>
 	<itemDatas>
@@ -229,9 +232,7 @@
 		<itemData name="Attribute" defStyleNum="dsAttribute" />
 		<itemData name="Module" defStyleNum="dsImport" />
 		<itemData name="Function" defStyleNum="dsFunction" />
-		<itemData name="BuiltIn" defStyleNum="dsBuiltIn" />
 		<itemData name="Type" defStyleNum="dsDataType" />
-		<itemData name="Variable" defStyleNum="dsVariable" />
 		<!-- Numbers -->
 		<itemData name="Binary" defStyleNum="dsBaseN" />
 		<itemData name="Octal" defStyleNum="dsBaseN" />

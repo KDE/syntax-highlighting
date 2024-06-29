@@ -32,7 +32,8 @@
 -->
 <!DOCTYPE language
 [
-	<!ENTITY name "[_a-z][_0-9a-z]*">
+	<!ENTITY camel_case "[A-Z][0-9a-zA-Z]*">
+	<!ENTITY snake_case "[_a-z][_0-9a-z]*">
 	<!ENTITY binary_digits "[01]+(?:_[01]+)*">
 	<!ENTITY octal_digits "[0-7]+(?:_[0-7]+)*">
 	<!ENTITY decimal_digits "[0-9]+(?:_[0-9]+)*">
@@ -156,7 +157,8 @@
 			<keyword attribute="Attribute" context="#stay" String="attributes" />
 			<RegExpr attribute="Error" context="#stay" String="@\w*\b" />
 			<keyword attribute="Type" context="#stay" String="types" />
-			<RegExpr attribute="Function" context="#stay" String="\b[a-z_][a-z0-9_]*(?=\()\b" />
+			<RegExpr attribute="Type" context="#stay" String="\b&camel_case;\b" />
+			<RegExpr attribute="Function" context="#stay" String="\b&snake_case;(?=\()" />
 			<!-- Numbers -->
 			<RegExpr attribute="Float" context="number suffix error" String="&decimal_digits;\.(?:&decimal_digits;)?(?:e-?&decimal_digits;)?" />
 			<RegExpr attribute="Binary" context="number suffix error" String="\b0[bB]&binary_digits;" />
@@ -197,7 +199,7 @@
 		</context>
 		<context attribute="Normal Text" lineEndContext="#stay" lineEmptyContext="#stay"  name="import" fallthroughContext="#pop!error" >
 			<DetectSpaces attribute="Normal Text" />
-			<RegExpr attribute="Module" context="import suffix" String="&name;(?:/&name;)*\b" />
+			<RegExpr attribute="Module" context="import suffix" String="&snake_case;(?:/&snake_case;)*\b" />
 		</context>
 		<context attribute="Normal Text" lineEndContext="#stay" name="import suffix" fallthroughContext="#pop#pop" >
 			<DetectSpaces attribute="Normal Text" />
@@ -208,9 +210,14 @@
 			<DetectChar attribute="Symbol" context="#pop" char="}" endRegion="curly brackets" />
 			<IncludeRules context="normal text" />
 		</context>
-		<context attribute="Normal Text" lineEndContext="#stay" lineEmptyContext="#stay" name="renamed import" fallthroughContext="error" >
+		<context attribute="Normal Text" lineEndContext="#stay" lineEmptyContext="#stay" name="renamed import" fallthroughContext="#pop#pop#pop!error" >
 			<DetectSpaces attribute="Normal Text" />
-			<RegExpr attribute="Module" context="#pop#pop#pop" String="&name;(?:/&name;)*" />
+			<StringDetect attribute="Documentation" context="documentation" String="///" />
+			<Detect2Chars attribute="Comment" context="comment" char="/" char1="/" />
+			<keyword attribute="Error" context="#pop#pop#pop" String="keywords" />
+			<keyword attribute="Error" context="#pop#pop#pop" String="reserved keywords" />
+			<WordDetect attribute="Error" context="#pop#pop#pop" String="import" />
+			<RegExpr attribute="Module" context="#pop#pop#pop" String="&snake_case;\b" />
 		</context>
 		<context attribute="Error" lineEndContext="#pop" name="error" >
 		</context>

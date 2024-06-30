@@ -125,7 +125,7 @@ fn mascots() -> Dict(String, String) {
 type UserId =
   Int
 
-@external(javascript, "./ffi.mjs", "ext")
-fn ext(id: UserId) -> String {
-  todo as "fun not implemented for this target"
+@external(javascript, "./ffi.mjs", "call")
+fn call(id: UserId) -> String {
+  todo as "call not implemented for this target"
 }

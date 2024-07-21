@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE language
-[
-    <!ENTITY space " ">
-    <!ENTITY end "&#59;">
-]>
+<!DOCTYPE language>
 <!--
   Copyright (c) 2012-2014 by Alex Turbov (i.zaufi@gmail.com)
   -->
@@ -143,31 +139,28 @@
     </context>
 
     <context name="Booleans" attribute="Comment" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
-      <DetectSpaces />
-      <keyword String="True" attribute="Option ON" context="#stay" />
-      <keyword String="False" attribute="Option OFF" context="#stay" />
-      <DetectChar char="&end;" context="#pop" attribute="Variable" />
+      <IncludeRules context="SpacesEnd"/>
+      <keyword String="True" attribute="Option ON" context="#pop!SpacesEnd" />
+      <keyword String="False" attribute="Option OFF" context="#pop!SpacesEnd" />
     </context>
 
     <context name="Integrals" attribute="Comment" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
-      <DetectSpaces />
-      <Int attribute="Number" context="#stay" />
-      <DetectChar char="&end;" context="#pop" attribute="Variable" />
+      <IncludeRules context="SpacesEnd"/>
+      <Int attribute="Number" context="#pop!SpacesEnd" />
     </context>
 
     <context name="Strings" attribute="String" lineEndContext="#pop">
-      <DetectSpaces />
-      <RegExpr String="[^&end;&space;]" context="#stay" />
-      <DetectChar char="&end;" context="#pop" attribute="Variable" />
+      <IncludeRules context="SpacesEnd"/>
     </context>
 
     <context name="RemoveSpaces" attribute="Comment" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
-      <DetectSpaces />
-      <keyword String="RemoveSpacesOptions" attribute="Value" context="#pop!RemoveSpacesEnd" />
-      <DetectChar char="&end;" context="#pop" attribute="Variable" />
+      <IncludeRules context="SpacesEnd"/>
+      <keyword String="RemoveSpacesOptions" attribute="Value" context="#pop!SpacesEnd" />
     </context>
-    <context name="RemoveSpacesEnd" attribute="Comment" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
-      <DetectChar char="&end;" context="#pop" attribute="Variable" />
+
+    <context name="SpacesEnd" attribute="Comment" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+      <DetectSpaces/>
+      <DetectChar char=";" context="#pop" attribute="Variable" />
     </context>
 
   </contexts>

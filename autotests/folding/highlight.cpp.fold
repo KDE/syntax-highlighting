@@ -367,6 +367,15 @@ static float floatQualifier = 0xf.p-1f;
 4s. count()
 4s .count() // ok
 
+// float suffix
+1.2f
+1.2f3
+1.2f32 // C++23
+12f32
+12BF32
+12BF16
+12.BF16 // C++23
+
 static bool yes = true;
 static bool no = false;
 

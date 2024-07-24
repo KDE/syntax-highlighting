@@ -53,7 +53,7 @@
 <!-- v2.07 add support for %prog and co, see bug 142832 -->
 <!-- v2.08 add missing overloaders, new Python 3 statements, builtins, and keywords -->
 <!-- v2.29 recognize escape sequenzes correctly -->
-<language name="Python" alternativeNames="Py" version="28" style="python" indenter="python" kateversion="5.0" section="Scripts" extensions="*.py;*.pyw;*.pyi;SConstruct;SConscript;*.FCMacro" mimetype="application/x-python;text/x-python;text/x-python3" casesensitive="1" author="Michael Bueker" license="">
+<language name="Python" alternativeNames="Py" version="29" style="python" indenter="python" kateversion="5.0" section="Scripts" extensions="*.py;*.pyw;*.pyi;SConstruct;SConscript;*.FCMacro" mimetype="application/x-python;text/x-python;text/x-python3" casesensitive="1" author="Michael Bueker" license="">
 	<highlighting>
 		<list name="import">
 			<item>import</item>
@@ -202,10 +202,13 @@
 			<item>False</item>
 			<item>NotImplemented</item>
 			<item>Ellipsis</item>
+			<item>__all__</item>
+			<item>__class__</item>
 			<item>__debug__</item>
 			<item>__file__</item>
 			<item>__name__</item>
 			<item>__qualname__</item>
+			<item>__slots__</item>
 		</list>
 		<list name="bindings">
 			<item>SIGNAL</item>
@@ -445,9 +448,10 @@
 
 				<Int attribute="Error"/>
 			</context>
+			<!-- a string at the beginning of lines is a comment, MultiLineExpr prevents this -->
 			<context name="MultiLineExpr" attribute="Normal Text" lineEndContext="#pop" fallthrough="1" fallthroughContext="#pop">
 				<DetectSpaces attribute="Normal Text"/>
-				<IncludeRules context="StringVariants" />
+				<IncludeRules context="StringVariants"/>
 			</context>
 
 			<!-- https://docs.python.org/2/reference/lexical_analysis.html#integer-and-long-integer-literals -->
@@ -467,7 +471,7 @@
 				<RegExpr attribute="Float" String="(?:&digitPart;(?:\.(?:&digitPart;)?)?|\.&digitPart;)[eE][\+\-]?&digitPart;|&digitPart;\.(?:&digitPart;)?|\.&digitPart;" context="CheckSuffixError"/>
 				<!-- Decimal: 123 ; 000 -->
 				<!-- l and L are python2 suffixes -->
-				<RegExpr attribute="Int" String="(?:[1-9](?:_?\d)*|0(?:_?0)*)[lL]?" context="CheckSuffixError"/>
+				<RegExpr attribute="Int" String="(?:[1-9](?:_?[0-9])*|0(?:_?0)*)[lL]?" context="CheckSuffixError"/>
 			</context>
 			<context name="CheckSuffixError" attribute="Normal Text" lineEndContext="#pop#pop" fallthrough="1" fallthroughContext="#pop#pop">
 				<RegExpr attribute="Error" String="[\w\d]+" context="#pop#pop"/>
@@ -487,17 +491,6 @@
 				-->
 				<RegExpr attribute="Flow Control Keyword" String="\w++(?=\s+(?!(?:if|for)\b)[\w'&quot;~]|\s*+(?![.:=\]),]|(?:if|for)\b)((?:&string;|[^#;(){}]|\(\)|\((?1)\)|\{\}|\{(\s*+(?:(?:&string;|[a-zA-Z0-9.]++)\s*+:\s*+(?:&string;|[^#;(){},]|\(\)|\((?1)\)|\{\}|\{(?2)\})++,?)*+)\})+?):)|" context="#pop"/>
 				<DetectIdentifier attribute="Normal Text" context="#pop"/>
-			</context>
-
-			<context name="#CheckForString" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
-				<DetectSpaces/>
-				<LineContinue attribute="Normal Text" context="#pop!CheckForStringNext"/>
-			</context>
-
-			<context name="CheckForStringNext" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
-				<DetectSpaces/>
-				<LineContinue attribute="Normal Text" context="#stay"/>
-				<IncludeRules context="StringVariants"/>
 			</context>
 
 			<!-- https://docs.python.org/2/reference/lexical_analysis.html#string-literals -->
@@ -677,7 +670,7 @@
 				<DetectIdentifier attribute="String"/>
 				<IncludeRules context="stringescape"/>
 				<IncludeRules context="stringformat"/>
-				<StringDetect attribute="String" String="'''" context="#pop!#CheckForString" endRegion="Triple A-region"/>
+				<StringDetect attribute="String" String="'''" context="#pop" endRegion="Triple A-region"/>
 				<LineContinue attribute="String Char" context="#stay"/>
 			</context>
 
@@ -687,7 +680,7 @@
 				<Detect2Chars attribute="Raw String" char="\" char1="'"/>
 				<Detect2Chars attribute="Raw String" char="\" char1="\"/>
 				<IncludeRules context="stringformat"/>
-				<StringDetect attribute="Raw String" String="'''" context="#pop!#CheckForString" endRegion="Triple A-region"/>
+				<StringDetect attribute="Raw String" String="'''" context="#pop" endRegion="Triple A-region"/>
 			</context>
 
 			<context name="Triple A-F-String" attribute="F-String" lineEndContext="#stay" noIndentationBasedFolding="true">
@@ -695,7 +688,7 @@
 				<DetectIdentifier attribute="F-String"/>
 				<IncludeRules context="stringescape"/>
 				<IncludeRules context="stringinterpolation"/>
-				<StringDetect attribute="F-String" String="'''" context="#pop!#CheckForString" endRegion="Triple A-region"/>
+				<StringDetect attribute="F-String" String="'''" context="#pop" endRegion="Triple A-region"/>
 				<LineContinue attribute="String Char" context="#stay"/>
 			</context>
 
@@ -705,20 +698,20 @@
 				<Detect2Chars attribute="Raw F-String" char="\" char1="'"/>
 				<Detect2Chars attribute="Raw F-String" char="\" char1="\"/>
 				<IncludeRules context="stringinterpolation"/>
-				<StringDetect attribute="Raw F-String" String="'''" context="#pop!#CheckForString" endRegion="Triple A-region"/>
+				<StringDetect attribute="Raw F-String" String="'''" context="#pop" endRegion="Triple A-region"/>
 			</context>
 
 			<context name="Triple A-B-String" attribute="B-String" lineEndContext="#stay" noIndentationBasedFolding="true">
 				<RegExpr attribute="B-String" String="([\x20-\x26\x28-\x5B\x5D-\x7E]++|\\(?=[^\\'&quot;abfnrtvx0-7])|\\x(?![0-9a-fA-F]{2})|'(?!''))++"/>
 				<IncludeRules context="bytesescape"/>
-				<StringDetect attribute="B-String" String="'''" context="#pop!#CheckForString" endRegion="Triple A-region"/>
+				<StringDetect attribute="B-String" String="'''" context="#pop" endRegion="Triple A-region"/>
 				<LineContinue attribute="String Char" context="#stay"/>
 				<RegExpr attribute="Error" String="."/>
 			</context>
 
 			<context name="Raw Triple A-B-String" attribute="Raw B-String" lineEndContext="#stay" noIndentationBasedFolding="true">
 				<RegExpr attribute="Raw B-String" String="([\x20-\x26\x28-\x5B\x5D-\x7E]++|\\.?|'(?!''))++"/>
-				<StringDetect attribute="Raw B-String" String="'''" context="#pop!#CheckForString" endRegion="Triple A-region"/>
+				<StringDetect attribute="Raw B-String" String="'''" context="#pop" endRegion="Triple A-region"/>
 				<RegExpr attribute="Error" String="."/>
 			</context>
 
@@ -728,7 +721,7 @@
 				<DetectIdentifier attribute="String"/>
 				<IncludeRules context="stringescape"/>
 				<IncludeRules context="stringformat"/>
-				<StringDetect attribute="String" String="&quot;&quot;&quot;" context="#pop!#CheckForString" endRegion="Triple Q-region"/>
+				<StringDetect attribute="String" String="&quot;&quot;&quot;" context="#pop" endRegion="Triple Q-region"/>
 				<LineContinue attribute="String Char" context="#stay"/>
 			</context>
 
@@ -738,7 +731,7 @@
 				<Detect2Chars attribute="Raw String" char="\" char1="&quot;"/>
 				<Detect2Chars attribute="Raw String" char="\" char1="\"/>
 				<IncludeRules context="stringformat"/>
-				<StringDetect attribute="Raw String" String="&quot;&quot;&quot;" context="#pop!#CheckForString" endRegion="Triple Q-region"/>
+				<StringDetect attribute="Raw String" String="&quot;&quot;&quot;" context="#pop" endRegion="Triple Q-region"/>
 			</context>
 
 			<context name="Triple Q-F-String" attribute="F-String" lineEndContext="#stay" noIndentationBasedFolding="true">
@@ -746,7 +739,7 @@
 				<DetectIdentifier attribute="F-String"/>
 				<IncludeRules context="stringescape"/>
 				<IncludeRules context="stringinterpolation"/>
-				<StringDetect attribute="F-String" String="&quot;&quot;&quot;" context="#pop!#CheckForString" endRegion="Triple Q-region"/>
+				<StringDetect attribute="F-String" String="&quot;&quot;&quot;" context="#pop" endRegion="Triple Q-region"/>
 				<LineContinue attribute="String Char" context="#stay"/>
 			</context>
 
@@ -756,20 +749,20 @@
 				<Detect2Chars attribute="Raw F-String" char="\" char1="&quot;"/>
 				<Detect2Chars attribute="Raw F-String" char="\" char1="\"/>
 				<IncludeRules context="stringinterpolation"/>
-				<StringDetect attribute="Raw F-String" String="&quot;&quot;&quot;" context="#pop!#CheckForString" endRegion="Triple Q-region"/>
+				<StringDetect attribute="Raw F-String" String="&quot;&quot;&quot;" context="#pop" endRegion="Triple Q-region"/>
 			</context>
 
 			<context name="Triple Q-B-String" attribute="B-String" lineEndContext="#stay" noIndentationBasedFolding="true">
 				<RegExpr attribute="B-String" String="([\x20\x21\x23-\x5B\x5D-\x7E]++|\\(?=[^\\'&quot;abfnrtvx0-7])|\\x(?![0-9a-fA-F]{2})|&quot;(?!&quot;&quot;))++"/>
 				<IncludeRules context="bytesescape"/>
-				<StringDetect attribute="B-String" String="&quot;&quot;&quot;" context="#pop!#CheckForString" endRegion="Triple Q-region"/>
+				<StringDetect attribute="B-String" String="&quot;&quot;&quot;" context="#pop" endRegion="Triple Q-region"/>
 				<LineContinue attribute="String Char" context="#stay"/>
 				<RegExpr attribute="Error" String="."/>
 			</context>
 
 			<context name="Raw Triple Q-B-String" attribute="Raw B-String" lineEndContext="#stay" noIndentationBasedFolding="true">
 				<RegExpr attribute="Raw B-String" String="([\x20\x21\x23-\x5B\x5D-\x7E]++|\\.?|&quot;(?!&quot;&quot;))++"/>
-				<StringDetect attribute="Raw B-String" String="&quot;&quot;&quot;" context="#pop!#CheckForString" endRegion="Triple Q-region"/>
+				<StringDetect attribute="Raw B-String" String="&quot;&quot;&quot;" context="#pop" endRegion="Triple Q-region"/>
 				<RegExpr attribute="Error" String="."/>
 			</context>
 
@@ -780,7 +773,7 @@
 				<DetectIdentifier attribute="String"/>
 				<IncludeRules context="stringescape"/>
 				<IncludeRules context="stringformat"/>
-				<DetectChar attribute="String" char="'" context="#pop!#CheckForString"/>
+				<DetectChar attribute="String" char="'" context="#pop"/>
 				<LineContinue attribute="String Char" context="#stay"/>
 			</context>
 
@@ -790,7 +783,7 @@
 				<Detect2Chars attribute="Raw String" char="\" char1="'"/>
 				<Detect2Chars attribute="Raw String" char="\" char1="\"/>
 				<IncludeRules context="stringformat"/>
-				<DetectChar attribute="Raw String" char="'" context="#pop!#CheckForString"/>
+				<DetectChar attribute="Raw String" char="'" context="#pop"/>
 				<LineContinue attribute="Raw String" context="#stay"/>
 			</context>
 
@@ -799,7 +792,7 @@
 				<DetectIdentifier attribute="F-String"/>
 				<IncludeRules context="stringescape"/>
 				<IncludeRules context="stringinterpolation"/>
-				<DetectChar attribute="F-String" char="'" context="#pop!#CheckForString"/>
+				<DetectChar attribute="F-String" char="'" context="#pop"/>
 				<LineContinue attribute="String Char" context="#stay"/>
 			</context>
 
@@ -809,21 +802,21 @@
 				<Detect2Chars attribute="Raw F-String" char="\" char1="'"/>
 				<Detect2Chars attribute="Raw F-String" char="\" char1="\"/>
 				<IncludeRules context="stringinterpolation"/>
-				<DetectChar attribute="Raw F-String" char="'" context="#pop!#CheckForString"/>
+				<DetectChar attribute="Raw F-String" char="'" context="#pop"/>
 				<LineContinue attribute="Raw F-String" context="#stay"/>
 			</context>
 
 			<context name="Single A-B-String" attribute="B-String" lineEndContext="#pop!UnfinishedStringError">
 				<RegExpr attribute="B-String" String="([\x20-\x26\x28-\x5B\x5D-\x7E]++|\\(?=[^\\'&quot;abfnrtvx0-7])|\\x(?![0-9a-fA-F]{2}))++"/>
 				<IncludeRules context="bytesescape"/>
-				<DetectChar attribute="B-String" char="'" context="#pop!#CheckForString"/>
+				<DetectChar attribute="B-String" char="'" context="#pop"/>
 				<LineContinue attribute="String Char" context="#stay"/>
 				<RegExpr attribute="Error" String="."/>
 			</context>
 
 			<context name="Raw A-B-String" attribute="Raw B-String" lineEndContext="#pop!UnfinishedStringError">
 				<RegExpr attribute="Raw B-String" String="([\x20-\x26\x28-\x5B\x5D-\x7E]++|\\.)++"/>
-				<DetectChar attribute="Raw B-String" char="'" context="#pop!#CheckForString"/>
+				<DetectChar attribute="Raw B-String" char="'" context="#pop"/>
 				<LineContinue attribute="Raw B-String" context="#stay"/>
 				<RegExpr attribute="Error" String="."/>
 			</context>
@@ -834,7 +827,7 @@
 				<DetectIdentifier attribute="String"/>
 				<IncludeRules context="stringescape"/>
 				<IncludeRules context="stringformat"/>
-				<DetectChar attribute="String" char="&quot;" context="#pop!#CheckForString"/>
+				<DetectChar attribute="String" char="&quot;" context="#pop"/>
 				<LineContinue attribute="String Char" context="#stay"/>
 			</context>
 
@@ -844,7 +837,7 @@
 				<Detect2Chars attribute="Raw String" char="\" char1="&quot;"/>
 				<Detect2Chars attribute="Raw String" char="\" char1="\"/>
 				<IncludeRules context="stringformat"/>
-				<DetectChar attribute="Raw String" char="&quot;" context="#pop!#CheckForString"/>
+				<DetectChar attribute="Raw String" char="&quot;" context="#pop"/>
 				<LineContinue attribute="Raw String" context="#stay"/>
 			</context>
 
@@ -853,7 +846,7 @@
 				<DetectIdentifier attribute="F-String"/>
 				<IncludeRules context="stringescape"/>
 				<IncludeRules context="stringinterpolation"/>
-				<DetectChar attribute="F-String" char="&quot;" context="#pop!#CheckForString"/>
+				<DetectChar attribute="F-String" char="&quot;" context="#pop"/>
 				<LineContinue attribute="String Char" context="#stay"/>
 			</context>
 
@@ -863,21 +856,21 @@
 				<Detect2Chars attribute="Raw F-String" char="\" char1="&quot;"/>
 				<Detect2Chars attribute="Raw F-String" char="\" char1="\"/>
 				<IncludeRules context="stringinterpolation"/>
-				<DetectChar attribute="Raw F-String" char="&quot;" context="#pop!#CheckForString"/>
+				<DetectChar attribute="Raw F-String" char="&quot;" context="#pop"/>
 				<LineContinue attribute="Raw F-String" context="#stay"/>
 			</context>
 
 			<context name="Single Q-B-String" attribute="B-String" lineEndContext="#pop!UnfinishedStringError">
 				<RegExpr attribute="B-String" String="([\x20\x21\x23-\x5B\x5D-\x7E]++|\\(?=[^\\'&quot;abfnrtvx0-7])|\\x(?![0-9a-fA-F]{2}))++"/>
 				<IncludeRules context="bytesescape"/>
-				<DetectChar attribute="B-String" char="&quot;" context="#pop!#CheckForString"/>
+				<DetectChar attribute="B-String" char="&quot;" context="#pop"/>
 				<LineContinue attribute="String Char" context="#stay"/>
 				<RegExpr attribute="Error" String="."/>
 			</context>
 
 			<context name="Raw Q-B-String" attribute="Raw B-String" lineEndContext="#pop!UnfinishedStringError">
 				<RegExpr attribute="Raw B-String" String="([\x20\x21\x23-\x5B\x5D-\x7E]++|\\.)++"/>
-				<DetectChar attribute="Raw B-String" char="&quot;" context="#pop!#CheckForString"/>
+				<DetectChar attribute="Raw B-String" char="&quot;" context="#pop"/>
 				<Detect2Chars attribute="Raw B-String" char="\" char1="\"/>
 				<LineContinue attribute="Raw B-String" context="#stay"/>
 				<RegExpr attribute="Error" String="."/>

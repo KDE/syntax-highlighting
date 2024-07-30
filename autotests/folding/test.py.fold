@@ -55,18 +55,397 @@ a = <beginfold id='1'>u'''</beginfold id='1'>\'<endfold id='1'>'''</endfold id='
 a = b'\u1234a\xffé\12k\n\g\
 s\
 \"\ '
-a = rb'\u1234aé\n\g\
+a = Rb'\u1234aé\n\g\
 '
 a = <beginfold id='3'>b"""</beginfold id='3'><endfold id='3'>"""</endfold id='3'>
 a = <beginfold id='3'>b"""</beginfold id='3'>\"<endfold id='3'>"""</endfold id='3'>
 a = 'a' \
     u'\x12'
 a = b"t\e's\t"
-a = rb"t\e's\t"
-a = r"\\" \
-rb'\\' \
-<beginfold id='3'>rf"""</beginfold id='3'>\\<endfold id='3'>"""</endfold id='3'> \
-<beginfold id='1'>ur'''</beginfold id='1'>\\<endfold id='1'>'''</endfold id='1'>
+a = Rb"t\e's\t"
+a = R"\\" \
+Rb'\\' \
+<beginfold id='3'>Rf"""</beginfold id='3'>\\<endfold id='3'>"""</endfold id='3'> \
+<beginfold id='1'>uR'''</beginfold id='1'>\\<endfold id='1'>'''</endfold id='1'>
+
+# regex (re and regex package)
+#{
+# r'...'
+patt = r'a+é??a?*a{x,}a{,}a{1}a{1,}a{,2}a{1,2}\g<12>\L<name>\g<name>\w.\'\b\\a#$'
+             # ~~ invalid, but ok
+patt = r'\p{H}\x12\u1234\1\023\0234\123\1234\12'
+patt = r'(a)(?:a)(?=a)(?R)(?r)(?a-m:a)(?oups)(?P<name>a)(?|a|b)(?#comment\)\'\")(?>=a)\
+    (?(1)a|b))a(?(?!a)a|b)'
+      # oups ~
+patt = r'[^xy-z]|[]xy[:alpha:]z]|[[\wa(){}\b\]\[\..]|[[a-z]--[c]]'
+                                          # regex V1 ~~~~~~~~~~~~
+patt = r'(((a)))(?:(?!(?<a>a("\'\"))))'
+patt = r'(?:(?!(?<a>a(\
+.' # break
+
+# r"..."
+patt = r"a+é??a?*a{x,}a{,}a{1}a{1,}a{,2}a{1,2}\g<12>\L<name>\g<name>\w.\"\b\\a#$"
+             # ~~ invalid, but ok
+patt = r"\p{H}\x12\u1234\1\023\0234\123\1234\12"
+patt = r"(a)(?:a)(?=a)(?R)(?r)(?a-m:a)(?oups)(?P<name>a)(?|a|b)(?#comment\)\'\")\
+    (?>=a)(?(1)a|b))a(?(?!a)a|b)"
+            # oups ~
+patt = r"[^xy-z]|[]xy[:alpha:]z]|[[\wa(){}\b\]\[\..]|[[a-z]--[c]]"
+                                          # regex V1 ~~~~~~~~~~~~
+patt = r"(((a)))(?:(?!(?<a>a(\'\"'))))"
+patt = r"(?:(?!(?<a>a(\
+." # break
+
+# r'''...'''
+</indentfold>patt = <beginfold id='1'>r'''</beginfold id='1'>
+    a+é??a?*
+        # ~~ invalid, but ok
+    a{x,}a{{,}}a{1}a{1,}a{,2}a{1,2}  # bla bla
+    \g<12>\L<name>\g<name>
+    \w.''\'\b\\a\#\p{H}\x12\u1234\1\023\0234\123\1234\12$
+<indentfold><endfold id='1'>'''</endfold id='1'>
+</indentfold>patt = <beginfold id='1'>r'''</beginfold id='1'>
+    <beginfold id='6'>(</beginfold id='6'>a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(?:</beginfold id='6'>a<endfold id='6'>)</endfold id='6'>
+    <beginfold id='6'>(</beginfold id='6'>?=a<endfold id='6'>)</endfold id='6'>(?R)(?r)<beginfold id='6'>(</beginfold id='6'>?a-m:a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?ou\
+        ps<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?P<name>a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?|a|b<endfold id='6'>)</endfold id='6'>
+    a<beginfold id='6'>(?#</beginfold id='6'>comment\)\'\"''""<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?>=a<endfold id='6'>)</endfold id='6'>
+    <beginfold id='6'>(?#</beginfold id='6'>bla
+     bla<endfold id='6'>)</endfold id='6'>abc
+    <beginfold id='6'>(</beginfold id='6'>?<beginfold id='6'>(</beginfold id='6'>1<endfold id='6'>)</endfold id='6'>a|b<endfold id='6'>)</endfold id='6'>)a<beginfold id='6'>(</beginfold id='6'>?<beginfold id='6'>(</beginfold id='6'>?!a<endfold id='6'>)</endfold id='6'>a|b<endfold id='6'>)</endfold id='6'>
+      # oups ~
+<indentfold><endfold id='1'>'''</endfold id='1'>
+</indentfold>patt = <beginfold id='1'>r'''</beginfold id='1'>
+    [^xy-\
+        z]
+    []xy[:alpha:]
+    z]
+    [[\wa(){}\b\]\[\..]
+    [[a-z]--[c]] # regex V1
+<indentfold><endfold id='1'>'''</endfold id='1'>
+</indentfold>patt = <beginfold id='1'>r'''</beginfold id='1'><beginfold id='6'>(</beginfold id='6'>
+    <beginfold id='6'>(</beginfold id='6'>
+        <beginfold id='6'>(</beginfold id='6'>
+            a # bla
+        <endfold id='6'>)</endfold id='6'>
+    <endfold id='6'>)</endfold id='6'>
+<endfold id='6'>)</endfold id='6'><beginfold id='6'>(?:</beginfold id='6'>
+    <beginfold id='6'>(</beginfold id='6'>?!
+        <beginfold id='6'>(</beginfold id='6'>?<a>a<beginfold id='6'>(</beginfold id='6'>
+            '" # bla
+            abc\
+                z
+        <endfold id='6'>)</endfold id='6'><endfold id='6'>)</endfold id='6'>
+    <endfold id='6'>)</endfold id='6'>
+<indentfold><endfold id='6'>)</endfold id='6'><endfold id='1'>'''</endfold id='1'>
+</indentfold>patt = <beginfold id='1'>r'''</beginfold id='1'>
+    <beginfold id='6'>(?:</beginfold id='6'>
+         <beginfold id='6'>(</beginfold id='6'>?!
+            <beginfold id='6'>(</beginfold id='6'>?<a>a<beginfold id='6'>(</beginfold id='6'>
+<indentfold>.<endfold id='6'></endfold id='6'><endfold id='6'></endfold id='6'><endfold id='6'></endfold id='6'><endfold id='6'></endfold id='6'><endfold id='1'>'''</endfold id='1'> # break
+
+# r"""..."""
+</indentfold>patt = <beginfold id='3'>r"""</beginfold id='3'>
+    a+é??a?*
+        # ~~ invalid, but ok
+    a{x,}a{{,}}a{1}a{1,}a{,2}a{1,2}  # bla bla
+    \g<12>\L<name>\g<name>
+    \w.""\"\b\\a\#\p{H}\x12\u1234\1\023\0234\123\1234\12$
+<indentfold><endfold id='3'>"""</endfold id='3'>
+</indentfold>patt = <beginfold id='3'>r"""</beginfold id='3'>
+    <beginfold id='6'>(</beginfold id='6'>a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(?:</beginfold id='6'>a<endfold id='6'>)</endfold id='6'>
+    <beginfold id='6'>(</beginfold id='6'>?=a<endfold id='6'>)</endfold id='6'>(?R)(?r)<beginfold id='6'>(</beginfold id='6'>?a-m:a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?ou\
+        ps<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?P<name>a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?|a|b<endfold id='6'>)</endfold id='6'>
+    a<beginfold id='6'>(?#</beginfold id='6'>comment\)\'\"<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?>=a<endfold id='6'>)</endfold id='6'>
+    <beginfold id='6'>(?#</beginfold id='6'>bla
+     bla<endfold id='6'>)</endfold id='6'>abc
+    <beginfold id='6'>(</beginfold id='6'>?<beginfold id='6'>(</beginfold id='6'>1<endfold id='6'>)</endfold id='6'>a|b<endfold id='6'>)</endfold id='6'>)a<beginfold id='6'>(</beginfold id='6'>?<beginfold id='6'>(</beginfold id='6'>?!a<endfold id='6'>)</endfold id='6'>a|b<endfold id='6'>)</endfold id='6'>
+      # oups ~
+<indentfold><endfold id='3'>"""</endfold id='3'>
+</indentfold>patt = <beginfold id='3'>r"""</beginfold id='3'>
+    [^xy-\
+        z]
+    []xy[:alpha:]
+    z]
+    [[\wa(){}\b\]\[\..] # bla bla
+    [[a-z]--[c]] # regex V1
+<indentfold><endfold id='3'>"""</endfold id='3'>
+</indentfold>patt = <beginfold id='3'>r"""</beginfold id='3'><beginfold id='6'>(</beginfold id='6'>
+    <beginfold id='6'>(</beginfold id='6'>
+        <beginfold id='6'>(</beginfold id='6'>
+            a # bla
+        <endfold id='6'>)</endfold id='6'>
+    <endfold id='6'>)</endfold id='6'>
+<endfold id='6'>)</endfold id='6'><beginfold id='6'>(?:</beginfold id='6'>
+    <beginfold id='6'>(</beginfold id='6'>?!
+        <beginfold id='6'>(</beginfold id='6'>?<a>a<beginfold id='6'>(</beginfold id='6'>
+            '" # bla
+            abc\
+                z
+        <endfold id='6'>)</endfold id='6'><endfold id='6'>)</endfold id='6'>
+    <endfold id='6'>)</endfold id='6'>
+<indentfold><endfold id='6'>)</endfold id='6'><endfold id='3'>"""</endfold id='3'>
+</indentfold>patt = <beginfold id='3'>r"""</beginfold id='3'>
+    <beginfold id='6'>(?:</beginfold id='6'>
+         <beginfold id='6'>(</beginfold id='6'>?!
+            <beginfold id='6'>(</beginfold id='6'>?<a>a<beginfold id='6'>(</beginfold id='6'>
+<indentfold>.<endfold id='6'></endfold id='6'><endfold id='6'></endfold id='6'><endfold id='6'></endfold id='6'><endfold id='6'></endfold id='6'><endfold id='3'>"""</endfold id='3'> # break
+
+# rb'...'
+patt = rb'a+é??a?*a{x,}a{,}a{1}a{1,}a{,2}a{1,2}\g<12>\L<name>\g<name>\w.\'\b\\a#$'
+     # oups ~   ~~ invalid, but ok
+patt = rb'\p{H}\x12\u1234\1\023\0234\123\1234\12'
+        # ~~ oups  ~~
+</indentfold>patt = br'(a)(?:a)(?=a)(?R)(?r)(?a-m:a)(?oups)(?P<name>a)(?|a|b)(?#comment\)\'\")\
+<indentfold>    (?>=a)(?(1)a|b))a(?(?!a)a|b)'
+            # oups ~
+patt = rb'[^xy-z]|[]xy[:alpha:]z]|[[\wa(){}\b\]\[\..]|[[a-z]--[c]]'
+                                           # regex V1 ~~~~~~~~~~~~
+patt = br'(((a)))(?:(?!(?<a>a("\'\"))))'
+patt = rb'(?:(?!(?<a>a(\
+.' # break
+
+# rb"..."
+patt = rb"a+é??a?*a{x,}a{,}a{1}a{1,}a{,2}a{1,2}\g<12>\L<name>\g<name>\w.\"\b\\a#$"
+     # oups ~   ~~ invalid, but ok
+patt = rb"\p{H}\x12\u1234\1\023\0234\123\1234\12"
+        # ~~ oups  ~~
+patt = br"(a)(?:a)(?=a)(?R)(?r)(?a-m:a)(?oups)(?P<name>a)(?|a|b)(?#comment\)\'\")\
+    (?>=a)(?(1)a|b))a(?(?!a)a|b)"
+            # oups ~
+patt = rb"[^xy-z]|[]xy[:alpha:]z]|[[\wa(){}\b\]\[\..]|[[a-z]--[c]]"
+                                           # regex V1 ~~~~~~~~~~~~
+patt = br"(((a)))(?:(?!(?<a>a(\'\"'))))"
+patt = rb"(?:(?!(?<a>a(\
+." # break
+
+
+# rb'''...'''
+</indentfold>patt = <beginfold id='1'>rb'''</beginfold id='1'>
+    a+é??a?*
+        # ~~ invalid, but ok
+    a{x,}a{,}a{1}a{1,}a{,2}a{1,2}  # bla bla
+    \g<12>\L<name>\g<name>
+    \w.''\'\b\\a\#\p{H}\x12\u1234\1\023\0234\123\1234\12$
+<indentfold><endfold id='1'>'''</endfold id='1'>
+</indentfold>patt = <beginfold id='1'>br'''</beginfold id='1'>
+    <beginfold id='6'>(</beginfold id='6'>a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(?:</beginfold id='6'>a<endfold id='6'>)</endfold id='6'>
+    <beginfold id='6'>(</beginfold id='6'>?=a<endfold id='6'>)</endfold id='6'>(?R)(?r)<beginfold id='6'>(</beginfold id='6'>?a-m:a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?ou\
+        ps<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?P<name>a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?|a|b<endfold id='6'>)</endfold id='6'>
+    a<beginfold id='6'>(?#</beginfold id='6'>comment\)\'\"''""<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?>=a<endfold id='6'>)</endfold id='6'>
+    <beginfold id='6'>(?#</beginfold id='6'>bla
+     bla<endfold id='6'>)</endfold id='6'>abc
+    <beginfold id='6'>(</beginfold id='6'>?<beginfold id='6'>(</beginfold id='6'>1<endfold id='6'>)</endfold id='6'>a|b<endfold id='6'>)</endfold id='6'>)a<beginfold id='6'>(</beginfold id='6'>?<beginfold id='6'>(</beginfold id='6'>?!a<endfold id='6'>)</endfold id='6'>a|b<endfold id='6'>)</endfold id='6'>
+      # oups ~
+<indentfold><endfold id='1'>'''</endfold id='1'>
+</indentfold>patt = <beginfold id='1'>rb'''</beginfold id='1'>
+    [^xy-\
+        z]
+    []xy[:alpha:]
+    z]
+    [[\wa(){}\b\]\[\..]
+    [[a-z]--[c]] # regex V1
+<indentfold><endfold id='1'>'''</endfold id='1'>
+</indentfold>patt = <beginfold id='1'>br'''</beginfold id='1'><beginfold id='6'>(</beginfold id='6'>
+    <beginfold id='6'>(</beginfold id='6'>
+        <beginfold id='6'>(</beginfold id='6'>
+            a # bla
+        <endfold id='6'>)</endfold id='6'>
+    <endfold id='6'>)</endfold id='6'>
+<endfold id='6'>)</endfold id='6'><beginfold id='6'>(?:</beginfold id='6'>
+    <beginfold id='6'>(</beginfold id='6'>?!
+        <beginfold id='6'>(</beginfold id='6'>?<a>a<beginfold id='6'>(</beginfold id='6'>
+            '" # bla
+            abc\
+                z
+        <endfold id='6'>)</endfold id='6'><endfold id='6'>)</endfold id='6'>
+    <endfold id='6'>)</endfold id='6'>
+<indentfold><endfold id='6'>)</endfold id='6'><endfold id='1'>'''</endfold id='1'>
+</indentfold>patt = <beginfold id='1'>rb'''</beginfold id='1'>
+    <beginfold id='6'>(?:</beginfold id='6'>
+         <beginfold id='6'>(</beginfold id='6'>?!
+            <beginfold id='6'>(</beginfold id='6'>?<a>a<beginfold id='6'>(</beginfold id='6'>
+<indentfold>.<endfold id='6'></endfold id='6'><endfold id='6'></endfold id='6'><endfold id='6'></endfold id='6'><endfold id='6'></endfold id='6'><endfold id='1'>'''</endfold id='1'> # break
+
+# rb"""..."""
+</indentfold>patt = <beginfold id='3'>rb"""</beginfold id='3'>
+    a+é??a?*
+        # ~~ invalid, but ok
+    a{x,}a{,}a{1}a{1,}a{,2}a{1,2}  # bla bla
+    \g<12>\L<name>\g<name>
+    \w.""\"\b\\a\#\p{H}\x12\u1234\1\023\0234\123\1234\12$
+<indentfold><endfold id='3'>"""</endfold id='3'>
+</indentfold>patt = <beginfold id='3'>br"""</beginfold id='3'>
+    <beginfold id='6'>(</beginfold id='6'>a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(?:</beginfold id='6'>a<endfold id='6'>)</endfold id='6'>
+    <beginfold id='6'>(</beginfold id='6'>?=a<endfold id='6'>)</endfold id='6'>(?R)(?r)<beginfold id='6'>(</beginfold id='6'>?a-m:a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?ou\
+        ps<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?P<name>a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?|a|b<endfold id='6'>)</endfold id='6'>
+    a<beginfold id='6'>(?#</beginfold id='6'>comment\)\'\"<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?>=a<endfold id='6'>)</endfold id='6'>
+    <beginfold id='6'>(?#</beginfold id='6'>bla
+     bla<endfold id='6'>)</endfold id='6'>abc
+    <beginfold id='6'>(</beginfold id='6'>?<beginfold id='6'>(</beginfold id='6'>1<endfold id='6'>)</endfold id='6'>a|b<endfold id='6'>)</endfold id='6'>)a<beginfold id='6'>(</beginfold id='6'>?<beginfold id='6'>(</beginfold id='6'>?!a<endfold id='6'>)</endfold id='6'>a|b<endfold id='6'>)</endfold id='6'>
+      # oups ~
+<indentfold><endfold id='3'>"""</endfold id='3'>
+</indentfold>patt = <beginfold id='3'>rb"""</beginfold id='3'>
+    [^xy-\
+        z]
+    []xy[:alpha:]
+    z]
+    [[\wa(){}\b\]\[\..] # bla bla
+    [[a-z]--[c]] # regex V1
+<indentfold><endfold id='3'>"""</endfold id='3'>
+</indentfold>patt = <beginfold id='3'>br"""</beginfold id='3'><beginfold id='6'>(</beginfold id='6'>
+    <beginfold id='6'>(</beginfold id='6'>
+        <beginfold id='6'>(</beginfold id='6'>
+            a # bla
+        <endfold id='6'>)</endfold id='6'>
+    <endfold id='6'>)</endfold id='6'>
+<endfold id='6'>)</endfold id='6'><beginfold id='6'>(?:</beginfold id='6'>
+    <beginfold id='6'>(</beginfold id='6'>?!
+        <beginfold id='6'>(</beginfold id='6'>?<a>a<beginfold id='6'>(</beginfold id='6'>
+            '" # bla
+            abc\
+                z
+        <endfold id='6'>)</endfold id='6'><endfold id='6'>)</endfold id='6'>
+    <endfold id='6'>)</endfold id='6'>
+<indentfold><endfold id='6'>)</endfold id='6'><endfold id='3'>"""</endfold id='3'>
+</indentfold>patt = <beginfold id='3'>rb"""</beginfold id='3'>
+    <beginfold id='6'>(?:</beginfold id='6'>
+         <beginfold id='6'>(</beginfold id='6'>?!
+            <beginfold id='6'>(</beginfold id='6'>?<a>a<beginfold id='6'>(</beginfold id='6'>
+<indentfold>.<endfold id='6'></endfold id='6'><endfold id='6'></endfold id='6'><endfold id='6'></endfold id='6'><endfold id='6'></endfold id='6'><endfold id='3'>"""</endfold id='3'> # break
+
+# rf'...'
+patt = rf'a+é??a?*\L<name>\L<{name}>\g<name>\g<{name}>\g<12>\w.\'\b\\a#'
+              # ~~ invalid, but ok
+patt = rf'\p{{H}}\p{name}\p{{{name}}}\x12\u1234\1\023\0234\123\1234\12$'
+patt = rf'a{n}a{{x,}}a{{,}}a{{1}}a{{1,}}a{{,2}}a{{1,2}}a{{{n}}}a{{{n},}}a{{,{n}}}a{{{n},{n}}}'
+patt = fr'(a)(?:a)(?=a)(?R)(?r)(?a-m:a)(?oups)(?P<name>a)(?|a|b)(?#comment\)\'\")\
+    (?>=a)(?(1)a|b))a(?(?!a)a|b)'
+            # oups ~
+patt = fr'({x})(?={x})(?{x})(?{x}:a)(?oups)(?P<{x}>a)(?({x})a|b))a(?(?!{x}){y}|{y})'
+                                                         # oups ~
+patt = rf'[^x${x}y-z]|[]xy[:alpha:]z]|[[\wa}(){{}}\b\]\[\..]|[[a-z]--[c]]'
+                                                  # regex V1 ~~~~~~~~~~~~
+patt = fr'(((a)))(?:(?!(?<a>${x}a("\'\"))))'
+patt = rf'(?:(?!(?<a>a(\
+.${x}' # break
+
+# rf"..."
+patt = rf"a+é??a?*\L<name>\L<{name}>\g<name>\g<{name}>\g<12>\w.\'\b\\a#"
+              # ~~ invalid, but ok
+patt = rf"\p{{H}}\p{name}\p{{{name}}}\x12\u1234\1\023\0234\123\1234\12$"
+patt = rf"a{n}a{{x,}}a{{,}}a{{1}}a{{1,}}a{{,2}}a{{1,2}}a{{{n}}}a{{{n},}}a{{,{n}}}a{{{n},{n}}}"
+patt = fr"(a)(?:a)(?=a)(?R)(?r)(?a-m:a)(?oups)(?P<name>a)(?|a|b)(?#comment\)\'\")\
+    (?>=a)(?(1)a|b))a(?(?!a)a|b)"
+            # oups ~
+patt = fr"({x})(?={x})(?{x})(?{x}:a)(?oups)(?P<{x}>a)(?({x})a|b))a(?(?!{x}){y}|{y})"
+                                                         # oups ~
+patt = rf"[^x${x}y-z]|[]xy[:alpha:]z]|[[\wa}(){{}}\b\]\[\..]|[[a-z]--[c]]"
+                                                  # regex V1 ~~~~~~~~~~~~
+patt = fr"(((a)))(?:(?!(?<a>${x}a('\"'))))"
+patt = rf"(?:(?!(?<a>a(\
+.${x}" # break
+
+
+# rf'''...'''
+</indentfold>patt = <beginfold id='1'>rf'''</beginfold id='1'>
+    a+é??a?*
+        # ~~ invalid, but ok
+    a{n}a{{x,}}a{{,}}a{{1}}a{{1,}}a{{,2}}a{{1,2}}  # bla bla
+    a{{{n}}}a{{{n},}}a{{,{n}}}a{{{n},{n}}}
+    \L<name>\L<{name}>\g<name>\g<{name}>\g<12>
+    \w.''\'\b\\a\#\p{{H}}\p{name}\p{{{name}}}\x12\u1234\1\023\0234\123\1234\12$
+<indentfold><endfold id='1'>'''</endfold id='1'>
+</indentfold>patt = <beginfold id='1'>fr'''</beginfold id='1'>
+    <beginfold id='6'>(</beginfold id='6'>a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(?:</beginfold id='6'>a<endfold id='6'>)</endfold id='6'>
+    <beginfold id='6'>(</beginfold id='6'>?=a<endfold id='6'>)</endfold id='6'>(?R)(?r)<beginfold id='6'>(</beginfold id='6'>?a-m:a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?ou\
+        ps<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?P<name>a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?|a|b<endfold id='6'>)</endfold id='6'>
+    a<beginfold id='6'>(?#</beginfold id='6'>comment\)\'\"''""<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?>=a<endfold id='6'>)</endfold id='6'>
+    <beginfold id='6'>(?#</beginfold id='6'>bla {} {a} {{a}} }
+     bla<endfold id='6'>)</endfold id='6'>abc
+    <beginfold id='6'>(</beginfold id='6'>?<beginfold id='6'>(</beginfold id='6'>1<endfold id='6'>)</endfold id='6'>a|b<endfold id='6'>)</endfold id='6'>)a<beginfold id='6'>(</beginfold id='6'>?<beginfold id='6'>(</beginfold id='6'>?!a<endfold id='6'>)</endfold id='6'>a|b<endfold id='6'>)</endfold id='6'>
+      # oups ~
+    <beginfold id='6'>(</beginfold id='6'>{x}<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?={x}<endfold id='6'>)</endfold id='6'>(?{x})<beginfold id='6'>(</beginfold id='6'>?{x}:a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?oups<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?P<{x}>a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?<beginfold id='6'>(</beginfold id='6'>{x}<endfold id='6'>)</endfold id='6'>a|b<endfold id='6'>)</endfold id='6'>)a<beginfold id='6'>(</beginfold id='6'>?<beginfold id='6'>(</beginfold id='6'>?!{x}<endfold id='6'>)</endfold id='6'>{y}|{y}<endfold id='6'>)</endfold id='6'>
+                                                   # oups ~
+<indentfold><endfold id='1'>'''</endfold id='1'>
+</indentfold>patt = <beginfold id='1'>rf'''</beginfold id='1'>
+    [^x${x}y-\
+        z]
+    []xy[:alpha:]
+    z]
+    [[\wa}(){{}}\b\]\[\..]
+    [[a-z]--[c]] # regex V1
+<indentfold><endfold id='1'>'''</endfold id='1'>
+</indentfold>patt = <beginfold id='1'>fr'''</beginfold id='1'><beginfold id='6'>(</beginfold id='6'>
+    <beginfold id='6'>(</beginfold id='6'>
+        <beginfold id='6'>(</beginfold id='6'>
+            a # bla
+        <endfold id='6'>)</endfold id='6'>
+    <endfold id='6'>)</endfold id='6'>
+<endfold id='6'>)</endfold id='6'><beginfold id='6'>(?:</beginfold id='6'>
+    <beginfold id='6'>(</beginfold id='6'>?!
+        <beginfold id='6'>(</beginfold id='6'>?<a>a<beginfold id='6'>(</beginfold id='6'>
+            '" # bla
+            abc\
+                z
+        <endfold id='6'>)</endfold id='6'><endfold id='6'>)</endfold id='6'>
+    <endfold id='6'>)</endfold id='6'>
+<indentfold><endfold id='6'>)</endfold id='6'><endfold id='1'>'''</endfold id='1'>
+</indentfold>patt = <beginfold id='1'>rf'''</beginfold id='1'>
+    <beginfold id='6'>(?:</beginfold id='6'>
+         <beginfold id='6'>(</beginfold id='6'>?!
+            <beginfold id='6'>(</beginfold id='6'>?<a>${x}a<beginfold id='6'>(</beginfold id='6'>
+<indentfold>.<endfold id='6'></endfold id='6'><endfold id='6'></endfold id='6'><endfold id='6'></endfold id='6'><endfold id='6'></endfold id='6'><endfold id='1'>'''</endfold id='1'> # break
+
+# rf"""..."""
+</indentfold>patt = <beginfold id='3'>rf"""</beginfold id='3'>
+    a+é??a?*
+        # ~~ invalid, but ok
+    a{n}a{{x,}}a{{,}}a{{1}}a{{1,}}a{{,2}}a{{1,2}}  # bla bla
+    a{{{n}}}a{{{n},}}a{{,{n}}}a{{{n},{n}}}
+    \L<name>\L<{name}>\g<name>\g<{name}>\g<12>
+    \w.""\"\b\\a\#\p{{H}}\p{name}\p{{{name}}}\x12\u1234\1\023\0234\123\1234\12$
+<indentfold><endfold id='3'>"""</endfold id='3'>
+</indentfold>patt = <beginfold id='3'>fr"""</beginfold id='3'>
+    <beginfold id='6'>(</beginfold id='6'>a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(?:</beginfold id='6'>a<endfold id='6'>)</endfold id='6'>
+    <beginfold id='6'>(</beginfold id='6'>?=a<endfold id='6'>)</endfold id='6'>(?R)(?r)<beginfold id='6'>(</beginfold id='6'>?a-m:a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?ou\
+        ps<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?P<name>a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?|a|b<endfold id='6'>)</endfold id='6'>
+    a<beginfold id='6'>(?#</beginfold id='6'>comment\)\'\"<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?>=a<endfold id='6'>)</endfold id='6'>
+    <beginfold id='6'>(?#</beginfold id='6'>bla {} {a} {{a}} }
+     bla<endfold id='6'>)</endfold id='6'>abc
+    <beginfold id='6'>(</beginfold id='6'>?<beginfold id='6'>(</beginfold id='6'>1<endfold id='6'>)</endfold id='6'>a|b<endfold id='6'>)</endfold id='6'>)a<beginfold id='6'>(</beginfold id='6'>?<beginfold id='6'>(</beginfold id='6'>?!a<endfold id='6'>)</endfold id='6'>a|b<endfold id='6'>)</endfold id='6'>
+      # oups ~
+    <beginfold id='6'>(</beginfold id='6'>{x}<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?={x}<endfold id='6'>)</endfold id='6'>(?{x})<beginfold id='6'>(</beginfold id='6'>?{x}:a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?oups<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?P<{x}>a<endfold id='6'>)</endfold id='6'><beginfold id='6'>(</beginfold id='6'>?<beginfold id='6'>(</beginfold id='6'>{x}<endfold id='6'>)</endfold id='6'>a|b<endfold id='6'>)</endfold id='6'>)a<beginfold id='6'>(</beginfold id='6'>?<beginfold id='6'>(</beginfold id='6'>?!{x}<endfold id='6'>)</endfold id='6'>{y}|{y}<endfold id='6'>)</endfold id='6'>
+                                                   # oups ~
+<indentfold><endfold id='3'>"""</endfold id='3'>
+</indentfold>patt = <beginfold id='3'>rf"""</beginfold id='3'>
+    [^x${x}y-\
+        z]
+    []xy[:alpha:]
+    z]
+    [[\wa}(){{}}\b\]\[\..] # bla bla
+    [[a-z]--[c]] # regex V1
+<indentfold><endfold id='3'>"""</endfold id='3'>
+</indentfold>patt = <beginfold id='3'>fr"""</beginfold id='3'><beginfold id='6'>(</beginfold id='6'>
+    <beginfold id='6'>(</beginfold id='6'>
+        <beginfold id='6'>(</beginfold id='6'>
+            a # bla
+        <endfold id='6'>)</endfold id='6'>
+    <endfold id='6'>)</endfold id='6'>
+<endfold id='6'>)</endfold id='6'><beginfold id='6'>(?:</beginfold id='6'>
+    <beginfold id='6'>(</beginfold id='6'>?!
+        <beginfold id='6'>(</beginfold id='6'>?<a>a<beginfold id='6'>(</beginfold id='6'>
+            '" # bla
+            abc\
+                z
+        <endfold id='6'>)</endfold id='6'><endfold id='6'>)</endfold id='6'>
+    <endfold id='6'>)</endfold id='6'>
+<indentfold><endfold id='6'>)</endfold id='6'><endfold id='3'>"""</endfold id='3'>
+</indentfold>patt = <beginfold id='3'>rf"""</beginfold id='3'>
+    <beginfold id='6'>(?:</beginfold id='6'>
+         <beginfold id='6'>(</beginfold id='6'>?!
+            <beginfold id='6'>(</beginfold id='6'>?<a>${x}a<beginfold id='6'>(</beginfold id='6'>
+<indentfold>.<endfold id='6'></endfold id='6'><endfold id='6'></endfold id='6'><endfold id='6'></endfold id='6'><endfold id='6'></endfold id='6'><endfold id='3'>"""</endfold id='3'> # break
+#}
 
 "Escapes in Doc/Comment String \u1234 \xAb \"\\"
 <beginfold id='1'>'''</beginfold id='1'> Doc/Comment String \N{123} \'<endfold id='1'>'''</endfold id='1'>
@@ -136,11 +515,11 @@ print<beginfold id='2'>(</beginfold id='2'>'dsdsa' \
 </indentfold>      'dsdasw'
 <indentfold>      'dsadsa'<endfold id='2'>)</endfold id='2'>
 
-"\\\\\\\\\\ENSURE THAT THIS AND THE FOLLOWING LINES ARE AT THE <endfold id='6'>END</endfold id='6'> OF THE FILE\\\\\\\\\\ \
+"\\\\\\\\\\ENSURE THAT THIS AND THE FOLLOWING LINES ARE AT THE <endfold id='7'>END</endfold id='7'> OF THE FILE\\\\\\\\\\ \
 "
 </indentfold>a = 'otherwise the next line will be
 <indentfold>stuck on the Error attribute'
-br"Strings delimited by single quotes (' or ")
+BR"Strings delimited by single quotes (' or ")
 can NOT be defined across multiple lines
 unless escaped with \
 </indentfold>"

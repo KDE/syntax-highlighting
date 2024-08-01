@@ -93,16 +93,15 @@ int main(int argc, char **argv)
                                  app.translate("SyntaxHighlightingCLI", "theme"));
     parser.addOption(themeName);
 
-    QCommandLineOption outputFormatOption(
-        QStringList() << QStringLiteral("f") << QStringLiteral("output-format"),
-        app.translate("SyntaxHighlightingCLI", "Use the specified format instead of html. Must be html, ansi or ansi256Colors."),
-        app.translate("SyntaxHighlightingCLI", "format"),
-        QStringLiteral("html"));
+    QCommandLineOption outputFormatOption(QStringList() << QStringLiteral("f") << QStringLiteral("output-format"),
+                                          app.translate("SyntaxHighlightingCLI", "Use the specified format instead of html. Must be html, ansi or ansi256."),
+                                          app.translate("SyntaxHighlightingCLI", "format"),
+                                          QStringLiteral("html"));
     parser.addOption(outputFormatOption);
 
     QCommandLineOption traceOption(QStringList() << QStringLiteral("syntax-trace"),
                                    app.translate("SyntaxHighlightingCLI",
-                                                 "Add information to debug a syntax file. Only works with --output-format=ansi or ansi256Colors. Possible "
+                                                 "Add information to debug a syntax file. Only works with --output-format=ansi or ansi256. Possible "
                                                  "values are format, region, context, stackSize and all."),
                                    app.translate("SyntaxHighlightingCLI", "type"));
     parser.addOption(traceOption);
@@ -112,7 +111,7 @@ int main(int argc, char **argv)
     parser.addOption(noAnsiEditorBg);
 
     QCommandLineOption unbufferedAnsi(QStringList() << QStringLiteral("U") << QStringLiteral("unbuffered"),
-                                      app.translate("SyntaxHighlightingCLI", "For ansi and ansi256Colors formats, flush the output buffer on each line."));
+                                      app.translate("SyntaxHighlightingCLI", "For ansi and ansi256 formats, flush the output buffer on each line."));
     parser.addOption(unbufferedAnsi);
 
     QCommandLineOption titleOption(
@@ -196,7 +195,8 @@ int main(int argc, char **argv)
         applyHighlighter(highlighter, parser, fromFileName, inFileName, outputName, title);
     } else {
         auto AnsiFormat = AnsiHighlighter::AnsiFormat::TrueColor;
-        if (0 == outputFormat.compare(QLatin1String("ansi256Colors"), Qt::CaseInsensitive)) {
+        // compatible with the old ansi256Colors value
+        if (outputFormat.startsWith(QLatin1String("ansi256"), Qt::CaseInsensitive)) {
             AnsiFormat = AnsiHighlighter::AnsiFormat::XTerm256Color;
         } else if (0 != outputFormat.compare(QLatin1String("ansi"), Qt::CaseInsensitive)) {
             std::cerr << "Unknown output format." << std::endl;

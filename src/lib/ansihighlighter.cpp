@@ -1207,6 +1207,7 @@ public:
     QStringView currentLine;
     // pairs of startColor / resetColor
     std::vector<QPair<QString, QString>> ansiStyles;
+    Theme::EditorColorRole bgRole = Theme::BackgroundColor;
 };
 
 AnsiHighlighter::AnsiHighlighter()
@@ -1215,6 +1216,12 @@ AnsiHighlighter::AnsiHighlighter()
 }
 
 AnsiHighlighter::~AnsiHighlighter() = default;
+
+void KSyntaxHighlighting::AnsiHighlighter::setBackgroundRole(Theme::EditorColorRole bgRole)
+{
+    Q_D(AnsiHighlighter);
+    d->bgRole = bgRole;
+}
 
 void AnsiHighlighter::setOutputFile(const QString &fileName)
 {
@@ -1273,12 +1280,26 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, Options o
     QLatin1String backgroundDefaultColor;
 
     const bool useEditorBackground = options.testFlag(Option::UseEditorBackground);
+    const bool useSelectedText = useEditorBackground && d->bgRole == Theme::TextSelection;
+
+    const auto toRGB = [](QRgb argb) {
+        return argb & 0xff'ff'ffu;
+    };
+
+    const QRgb foregroundColor = [&] {
+        if (useSelectedText) {
+            const auto fg = theme.selectedTextColor(Theme::Normal);
+            if (fg) {
+                return toRGB(fg);
+            }
+        }
+        return useEditorBackground ? toRGB(theme.textColor(Theme::Normal)) : 0;
+    }();
+    const QRgb backgroundColor = useEditorBackground ? toRGB(theme.editorColor(d->bgRole)) : 0;
 
     // https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_parameters
 
     if (useEditorBackground) {
-        const QRgb foregroundColor = theme.textColor(Theme::Normal);
-        const QRgb backgroundColor = theme.editorColor(Theme::BackgroundColor);
         foregroundColorBuffer.appendForeground(foregroundColor, is256Colors, colorCache);
         backgroundColorBuffer.append(QLatin1String("\x1b["));
         backgroundColorBuffer.appendBackground(backgroundColor, is256Colors, colorCache);
@@ -1303,20 +1324,22 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, Options o
 
             buffer.append(QLatin1String("\x1b["));
 
-            const bool hasFg = format.hasTextColor(theme);
-            const bool hasBg = format.hasBackgroundColor(theme);
+            const auto fg = useSelectedText ? format.selectedTextColor(theme).rgba() : format.textColor(theme).rgba();
+            const auto bg = useSelectedText ? format.selectedBackgroundColor(theme).rgba() : format.backgroundColor(theme).rgba();
+            const bool hasFg = fg && (!useEditorBackground || toRGB(fg) != foregroundColor);
+            const bool hasBg = bg && (!useEditorBackground || toRGB(bg) != backgroundColor);
             const bool hasBold = format.isBold(theme);
             const bool hasItalic = format.isItalic(theme);
             const bool hasUnderline = format.isUnderline(theme);
             const bool hasStrikeThrough = format.isStrikeThrough(theme);
 
             if (hasFg) {
-                buffer.appendForeground(format.textColor(theme).rgb(), is256Colors, colorCache);
+                buffer.appendForeground(toRGB(fg), is256Colors, colorCache);
             } else {
                 buffer.append(foregroundDefaultColor);
             }
             if (hasBg) {
-                buffer.appendBackground(format.backgroundColor(theme).rgb(), is256Colors, colorCache);
+                buffer.appendBackground(toRGB(bg), is256Colors, colorCache);
             }
             if (hasBold) {
                 buffer.append(QLatin1String("1;"));

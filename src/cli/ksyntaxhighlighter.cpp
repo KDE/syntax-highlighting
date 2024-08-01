@@ -110,6 +110,11 @@ int main(int argc, char **argv)
                                       app.translate("SyntaxHighlightingCLI", "Disable ANSI background for the default color."));
     parser.addOption(noAnsiEditorBg);
 
+    QCommandLineOption bgRole(QStringList() << QStringLiteral("B") << QStringLiteral("background-role"),
+                              app.translate("SyntaxHighlightingCLI", "Select background color role from theme."),
+                              app.translate("SyntaxHighlightingCLI", "role"));
+    parser.addOption(bgRole);
+
     QCommandLineOption unbufferedAnsi(QStringList() << QStringLiteral("U") << QStringLiteral("unbuffered"),
                                       app.translate("SyntaxHighlightingCLI", "For ansi and ansi256 formats, flush the output buffer on each line."));
     parser.addOption(unbufferedAnsi);
@@ -136,6 +141,69 @@ int main(int argc, char **argv)
             std::cout << qPrintable(theme.name()) << std::endl;
         }
         return 0;
+    }
+
+    Theme::EditorColorRole bgColorRole = Theme::BackgroundColor;
+
+    if (parser.isSet(bgRole)) {
+        /*
+         * Theme::EditorColorRole contains border, foreground and background colors.
+         * To ensure that only the background colors used in text editing are used,
+         * QMetaEnum is avoided and values are listed in hard.
+         */
+
+        struct BgRole {
+            QStringView name;
+            Theme::EditorColorRole role;
+            // name for display
+            const char *asciiName;
+        };
+
+#define BG_ROLE(role)                                                                                                                                          \
+    BgRole                                                                                                                                                     \
+    {                                                                                                                                                          \
+        QStringView(u"" #role, sizeof(#role) - 1), Theme::role, #role                                                                                          \
+    }
+        constexpr BgRole bgRoles[] = {
+            BG_ROLE(BackgroundColor),
+            BG_ROLE(TextSelection),
+            BG_ROLE(CurrentLine),
+            BG_ROLE(SearchHighlight),
+            BG_ROLE(ReplaceHighlight),
+            BG_ROLE(BracketMatching),
+            BG_ROLE(CodeFolding),
+            BG_ROLE(MarkBookmark),
+            BG_ROLE(MarkBreakpointActive),
+            BG_ROLE(MarkBreakpointReached),
+            BG_ROLE(MarkBreakpointDisabled),
+            BG_ROLE(MarkExecution),
+            BG_ROLE(MarkWarning),
+            BG_ROLE(MarkError),
+            BG_ROLE(TemplateBackground),
+            BG_ROLE(TemplatePlaceholder),
+            BG_ROLE(TemplateFocusedPlaceholder),
+            BG_ROLE(TemplateReadOnlyPlaceholder),
+        };
+#undef BG_ROLE
+
+        const auto role = parser.value(bgRole);
+        bool ok = false;
+        for (const auto &def : bgRoles) {
+            if (def.name == role) {
+                bgColorRole = def.role;
+                ok = true;
+                break;
+            }
+        }
+
+        if (!ok) {
+            std::cerr << "Unknown background role. Expected:\n";
+            for (const auto &def : bgRoles) {
+                std::cerr << "  - " << def.asciiName << "\n";
+            }
+            std::cerr.flush();
+            return 1;
+        }
     }
 
     if (parser.isSet(updateDefs)) {
@@ -191,6 +259,7 @@ int main(int argc, char **argv)
 
         HtmlHighlighter highlighter;
         highlighter.setDefinition(def);
+        highlighter.setBackgroundRole(bgColorRole);
         highlighter.setTheme(theme(repo, parser.value(themeName), Repository::LightTheme));
         applyHighlighter(highlighter, parser, fromFileName, inFileName, outputName, title);
     } else {
@@ -228,6 +297,7 @@ int main(int argc, char **argv)
 
         AnsiHighlighter highlighter;
         highlighter.setDefinition(def);
+        highlighter.setBackgroundRole(bgColorRole);
         highlighter.setTheme(theme(repo, parser.value(themeName), Repository::DarkTheme));
         applyHighlighter(highlighter, parser, fromFileName, inFileName, outputName, AnsiFormat, options);
     }

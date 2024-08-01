@@ -35,7 +35,7 @@ parser.add_argument('-H', '--no-legend', action='store_true',
                     help='do not display legend')
 
 parser.add_argument('-M', '--min-luminance', metavar='LUMINANCE', type=float, default=0,
-                    help='only displays colors with a lower luminance')
+                    help='only displays colors with a higher luminance')
 parser.add_argument('-L', '--max-luminance', metavar='LUMINANCE', type=float, default=110.0,
                     help='only displays colors with a lower luminance')
 

@@ -567,6 +567,8 @@ if not args.no_legend:
 
 Luminance adjustement: {args.add_percent_luminance:+}% {args.add_luminance:+}  (see -p and -a)
 
+Color space: {args.color_space}
+
 ''')
 
 add_luminance = args.add_luminance

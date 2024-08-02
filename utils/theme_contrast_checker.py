@@ -6,6 +6,10 @@ import argparse
 import json
 import sys
 
+def parse_scores(s: str) -> list[int]:
+    return [int(x) for x in s.split(',')]
+
+
 parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                  description='''Contrast checker for themes
 
@@ -43,6 +47,8 @@ parser.add_argument('-a', '--add-luminance', metavar='LUMINANCE', type=float, de
                     help='add fixed value for luminance')
 parser.add_argument('-p', '--add-percent-luminance', metavar='LUMINANCE', type=float, default=0,
                     help='add percent luminance. Apply before --add-luminance')
+parser.add_argument('-S', '--scores', metavar='SCORES', type=parse_scores,
+                    help='modify ratings values. Expects a comma-separated list of numbers. The order of the list is the same as in the legend.')
 
 # sRGB is W3 in APCA
 parser.add_argument('-C', '--color-space', default='sRGB',
@@ -261,6 +267,15 @@ NORMAL_LUMINANCE     = (90, 75, 60, 45, 35)
 BOLD_LUMINANCE       = (80, 65, 50, 38, 30)
 SPELL_LUMINANCE      = (70, 55, 40, 30, 25)
 DECORATION_LUMINANCE = (60, 45, 30, 15, 10)
+
+if args.scores:
+    scores_update_len = min(20, len(args.scores))
+    scores = [*NORMAL_LUMINANCE, *BOLD_LUMINANCE, *SPELL_LUMINANCE, *DECORATION_LUMINANCE]
+    scores[:scores_update_len] = args.scores[:scores_update_len]
+    NORMAL_LUMINANCE = scores[0:5]
+    BOLD_LUMINANCE = scores[5:10]
+    SPELL_LUMINANCE = scores[10:15]
+    DECORATION_LUMINANCE = scores[15:20]
 
 BOLD_TEXT = (BOLD_LUMINANCE, True, 'Text. ▐')
 NORMAL_TEXT = (NORMAL_LUMINANCE, False, 'Text. ▐')

@@ -44,7 +44,9 @@ This library uses Kate syntax definition files for the actual highlighting,
 the file format is documented [here](https://docs.kde.org/?application=katepart&branch=stable5&path=highlight.html).
 
 More than 300 syntax definition files are included, that are located
-in **data/syntax/** and have the **.xml** extension. Additional ones are
+in **data/syntax/** and have the **.xml** extension. Some files are
+generated at compile time, all xml files are available
+[here](https://kate-editor.org/syntax/). Additional ones are
 picked up from the file system if present, so you can easily extend this
 by application-specific syntax definitions for example.
 
@@ -188,6 +190,12 @@ All files shall contain a proper "SPDX-License-Identifier: MIT" identifier insid
     * [Kate Part (KF5): New Default Styles for better Color Schemes (Kate Editor Website)](https://kate-editor.org/2014/03/07/kate-part-kf5-new-default-styles-for-better-color-schemes/)
 
 * While writing syntax, you can use `ksyntaxhighlighter6` (previously named `kate-syntax-highlighter`) to display the style or others informations associated with each part of text. For example `ksyntaxhighlighter6 --output-format=ansi --syntax-trace=format test.cpp`.
+
+  On Linux and Unix systems, you can isolate the syntax files to be modified by using the `XDG_DATA_DIRS`
+  environment variable to point to a folder containing `org.kde.syntax-highlighting/syntax/`
+  in which you will put all the files required for a syntax:
+
+  `XDG_DATA_DIRS=mydir ksyntaxhighlighter6 ...`.
 
 * Add test files, these are found in **autotests/input/**.
   If you are going to add a new syntax XML file, create a new test file; if you

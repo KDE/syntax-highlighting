@@ -17,7 +17,6 @@
 
 #include <QColor>
 #include <QFile>
-#include <QFileInfo>
 #include <QHash>
 #include <QIODevice>
 #include <QTextStream>
@@ -1246,7 +1245,6 @@ void AnsiHighlighter::setOutputFile(FILE *fileHandle)
 
 void AnsiHighlighter::highlightFile(const QString &fileName, AnsiFormat format, Options options)
 {
-    QFileInfo fi(fileName);
     QFile f(fileName);
     if (!f.open(QFile::ReadOnly)) {
         qCWarning(Log) << "Failed to open input file" << fileName << ":" << f.errorString();

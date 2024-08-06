@@ -67,7 +67,6 @@ void HtmlHighlighter::setOutputFile(FILE *fileHandle)
 
 void HtmlHighlighter::highlightFile(const QString &fileName, const QString &title)
 {
-    QFileInfo fi(fileName);
     QFile f(fileName);
     if (!f.open(QFile::ReadOnly)) {
         qCWarning(Log) << "Failed to open input file" << fileName << ":" << f.errorString();
@@ -75,6 +74,7 @@ void HtmlHighlighter::highlightFile(const QString &fileName, const QString &titl
     }
 
     if (title.isEmpty()) {
+        QFileInfo fi(fileName);
         highlightData(&f, fi.fileName());
     } else {
         highlightData(&f, title);

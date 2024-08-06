@@ -7,7 +7,6 @@
 #include "repository.h"
 #include "definition.h"
 #include "definition_p.h"
-#include "ksyntaxhighlighting_logging.h"
 #include "repository_p.h"
 #include "theme.h"
 #include "themedata_p.h"
@@ -62,7 +61,7 @@ auto anyMimeTypeEquals(QStringView mimeTypeName)
 // The two function templates below take defs - a map sorted by highlighting name - to be deterministic and independent of translations.
 
 template<typename UnaryPredicate>
-Definition findHighestPriorityDefinitionIf(const QMap<QString, Definition> &defs, UnaryPredicate predicate)
+Definition findHighestPriorityDefinitionIf(const QList<Definition> &defs, UnaryPredicate predicate)
 {
     const Definition *match = nullptr;
     auto matchPriority = std::numeric_limits<int>::lowest();
@@ -77,7 +76,7 @@ Definition findHighestPriorityDefinitionIf(const QMap<QString, Definition> &defs
 }
 
 template<typename UnaryPredicate>
-QList<Definition> findDefinitionsIf(const QMap<QString, Definition> &defs, UnaryPredicate predicate)
+QList<Definition> findDefinitionsIf(const QList<Definition> &defs, UnaryPredicate predicate)
 {
     QList<Definition> matches;
     std::copy_if(defs.cbegin(), defs.cend(), std::back_inserter(matches), predicate);
@@ -112,7 +111,7 @@ Repository::~Repository()
 {
     // reset repo so we can detect in still alive definition instances
     // that the repo was deleted
-    for (const auto &def : std::as_const(d->m_sortedDefs)) {
+    for (const auto &def : std::as_const(d->m_flatDefs)) {
         DefinitionData::get(def)->repo = nullptr;
     }
 }
@@ -124,22 +123,22 @@ Definition Repository::definitionForName(const QString &defName) const
 
 Definition Repository::definitionForFileName(const QString &fileName) const
 {
-    return findHighestPriorityDefinitionIf(d->m_defs, anyWildcardMatches(fileNameFromFilePath(fileName)));
+    return findHighestPriorityDefinitionIf(d->m_flatDefs, anyWildcardMatches(fileNameFromFilePath(fileName)));
 }
 
 QList<Definition> Repository::definitionsForFileName(const QString &fileName) const
 {
-    return findDefinitionsIf(d->m_defs, anyWildcardMatches(fileNameFromFilePath(fileName)));
+    return findDefinitionsIf(d->m_flatDefs, anyWildcardMatches(fileNameFromFilePath(fileName)));
 }
 
 Definition Repository::definitionForMimeType(const QString &mimeType) const
 {
-    return findHighestPriorityDefinitionIf(d->m_defs, anyMimeTypeEquals(mimeType));
+    return findHighestPriorityDefinitionIf(d->m_flatDefs, anyMimeTypeEquals(mimeType));
 }
 
 QList<Definition> Repository::definitionsForMimeType(const QString &mimeType) const
 {
-    return findDefinitionsIf(d->m_defs, anyMimeTypeEquals(mimeType));
+    return findDefinitionsIf(d->m_flatDefs, anyMimeTypeEquals(mimeType));
 }
 
 QList<Definition> Repository::definitions() const
@@ -208,7 +207,7 @@ Theme Repository::themeForPalette(const QPalette &palette) const
 void RepositoryPrivate::load(Repository *repo)
 {
     // always add invalid default "None" highlighting
-    addDefinition(Definition());
+    m_defs.emplace(QString(), Definition());
 
     // do lookup in standard paths, if not disabled
 #ifndef NO_STANDARD_PATHS
@@ -241,10 +240,12 @@ void RepositoryPrivate::load(Repository *repo)
         loadSyntaxFolder(repo, path + QStringLiteral("/syntax"));
     }
 
-    m_sortedDefs.reserve(m_defs.size());
-    for (auto it = m_defs.constBegin(); it != m_defs.constEnd(); ++it) {
-        m_sortedDefs.push_back(it.value());
+    m_flatDefs.reserve(m_defs.size());
+    for (const auto &[_, def] : m_defs) {
+        m_flatDefs.push_back(def);
     }
+
+    m_sortedDefs = m_flatDefs;
     std::sort(m_sortedDefs.begin(), m_sortedDefs.end(), [](const Definition &left, const Definition &right) {
         auto comparison = left.translatedSection().compare(right.translatedSection(), Qt::CaseInsensitive);
         if (comparison == 0) {
@@ -253,10 +254,11 @@ void RepositoryPrivate::load(Repository *repo)
         return comparison < 0;
     });
 
-    for (auto it = m_sortedDefs.constBegin(); it != m_sortedDefs.constEnd(); ++it) {
-        m_fullDefs.insert(it->name().toLower(), *it);
-        for (const auto &altName : it->alternativeNames()) {
-            m_fullDefs.insert(altName.toLower(), *it);
+    for (const auto &def : std::as_const(m_sortedDefs)) {
+        m_fullDefs.insert(def.name().toLower(), def);
+        const auto &alternativeNames = def.alternativeNames();
+        for (const auto &altName : alternativeNames) {
+            m_fullDefs.insert(altName.toLower(), def);
         }
     }
 
@@ -291,7 +293,7 @@ void RepositoryPrivate::loadSyntaxFolder(Repository *repo, const QString &path)
         auto defData = DefinitionData::get(def);
         defData->repo = repo;
         if (defData->loadMetaData(it.next())) {
-            addDefinition(def);
+            addDefinition(std::move(def));
         }
     }
 }
@@ -315,25 +317,24 @@ bool RepositoryPrivate::loadSyntaxFolderFromIndex(Repository *repo, const QStrin
         auto defData = DefinitionData::get(def);
         defData->repo = repo;
         if (defData->loadMetaData(fileName, defMap)) {
-            addDefinition(def);
+            addDefinition(std::move(def));
         }
     }
 
     return true;
 }
 
-void RepositoryPrivate::addDefinition(const Definition &def)
+void RepositoryPrivate::addDefinition(Definition &&def)
 {
-    const auto it = m_defs.constFind(def.name());
-    if (it == m_defs.constEnd()) {
-        m_defs.insert(def.name(), def);
+    const auto [it, inserted] = m_defs.try_emplace(def.name(), std::move(def));
+    if (inserted) {
         return;
     }
 
-    if (it.value().version() >= def.version()) {
+    if (it->second.version() >= def.version()) {
         return;
     }
-    m_defs.insert(def.name(), def);
+    it->second = std::move(def);
 }
 
 void RepositoryPrivate::loadThemeFolder(const QString &path)
@@ -389,10 +390,11 @@ void Repository::reload()
 {
     Q_EMIT aboutToReload();
 
-    for (const auto &def : std::as_const(d->m_sortedDefs)) {
+    for (const auto &def : std::as_const(d->m_flatDefs)) {
         DefinitionData::get(def)->clear();
     }
     d->m_defs.clear();
+    d->m_flatDefs.clear();
     d->m_sortedDefs.clear();
     d->m_fullDefs.clear();
 

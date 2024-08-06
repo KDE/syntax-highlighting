@@ -448,6 +448,9 @@ bool DefinitionData::loadMetaData(const QString &definitionFileName)
 bool DefinitionData::loadMetaData(const QString &file, const QCborMap &obj)
 {
     name = obj.value(QLatin1String("name")).toString();
+    if (name.isEmpty()) {
+        return false;
+    }
     nameUtf8 = obj.value(QLatin1String("name")).toByteArray();
     section = obj.value(QLatin1String("section")).toString();
     sectionUtf8 = obj.value(QLatin1String("section")).toByteArray();
@@ -482,6 +485,9 @@ bool DefinitionData::loadLanguage(QXmlStreamReader &reader)
     }
 
     name = reader.attributes().value(QLatin1String("name")).toString();
+    if (name.isEmpty()) {
+        return false;
+    }
     const auto names = reader.attributes().value(QLatin1String("alternativeNames"));
     for (const auto &n : names.split(QLatin1Char(';'), Qt::SkipEmptyParts)) {
         alternativeNames.push_back(n.toString());

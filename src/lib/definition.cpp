@@ -26,6 +26,7 @@
 #include <QCborMap>
 #include <QCoreApplication>
 #include <QFile>
+#include <QStringTokenizer>
 #include <QXmlStreamReader>
 
 #include <algorithm>
@@ -489,7 +490,7 @@ bool DefinitionData::loadLanguage(QXmlStreamReader &reader)
         return false;
     }
     const auto names = reader.attributes().value(QLatin1String("alternativeNames"));
-    for (const auto &n : names.split(QLatin1Char(';'), Qt::SkipEmptyParts)) {
+    for (const auto &n : QStringTokenizer(names, u';', Qt::SkipEmptyParts)) {
         alternativeNames.push_back(n.toString());
     }
     section = reader.attributes().value(QLatin1String("section")).toString();
@@ -502,11 +503,11 @@ bool DefinitionData::loadLanguage(QXmlStreamReader &reader)
     author = reader.attributes().value(QLatin1String("author")).toString();
     license = reader.attributes().value(QLatin1String("license")).toString();
     const auto exts = reader.attributes().value(QLatin1String("extensions"));
-    for (const auto &ext : exts.split(QLatin1Char(';'), Qt::SkipEmptyParts)) {
+    for (const auto &ext : QStringTokenizer(exts, u';', Qt::SkipEmptyParts)) {
         extensions.push_back(ext.toString());
     }
     const auto mts = reader.attributes().value(QLatin1String("mimetype"));
-    for (const auto &mt : mts.split(QLatin1Char(';'), Qt::SkipEmptyParts)) {
+    for (const auto &mt : QStringTokenizer(mts, u';', Qt::SkipEmptyParts)) {
         mimetypes.push_back(mt.toString());
     }
     if (reader.attributes().hasAttribute(QLatin1String("casesensitive"))) {

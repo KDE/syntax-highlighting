@@ -240,27 +240,7 @@ void RepositoryPrivate::load(Repository *repo)
         loadSyntaxFolder(repo, path + QStringLiteral("/syntax"));
     }
 
-    m_flatDefs.reserve(m_defs.size());
-    for (const auto &[_, def] : m_defs) {
-        m_flatDefs.push_back(def);
-    }
-
-    m_sortedDefs = m_flatDefs;
-    std::sort(m_sortedDefs.begin(), m_sortedDefs.end(), [](const Definition &left, const Definition &right) {
-        auto comparison = left.translatedSection().compare(right.translatedSection(), Qt::CaseInsensitive);
-        if (comparison == 0) {
-            comparison = left.translatedName().compare(right.translatedName(), Qt::CaseInsensitive);
-        }
-        return comparison < 0;
-    });
-
-    for (const auto &def : std::as_const(m_sortedDefs)) {
-        m_fullDefs.insert(def.name().toLower(), def);
-        const auto &alternativeNames = def.alternativeNames();
-        for (const auto &altName : alternativeNames) {
-            m_fullDefs.insert(altName.toLower(), def);
-        }
-    }
+    computeAlternativeDefLists();
 
     // load themes
 
@@ -282,6 +262,33 @@ void RepositoryPrivate::load(Repository *repo)
     // user given extra paths
     for (const auto &path : std::as_const(m_customSearchPaths)) {
         loadThemeFolder(path + QStringLiteral("/themes"));
+    }
+}
+
+void RepositoryPrivate::computeAlternativeDefLists()
+{
+    m_flatDefs.clear();
+    m_flatDefs.reserve(m_defs.size());
+    for (const auto &[_, def] : m_defs) {
+        m_flatDefs.push_back(def);
+    }
+
+    m_sortedDefs = m_flatDefs;
+    std::sort(m_sortedDefs.begin(), m_sortedDefs.end(), [](const Definition &left, const Definition &right) {
+        auto comparison = left.translatedSection().compare(right.translatedSection(), Qt::CaseInsensitive);
+        if (comparison == 0) {
+            comparison = left.translatedName().compare(right.translatedName(), Qt::CaseInsensitive);
+        }
+        return comparison < 0;
+    });
+
+    m_fullDefs.clear();
+    for (const auto &def : std::as_const(m_sortedDefs)) {
+        m_fullDefs.insert(def.name().toLower(), def);
+        const auto &alternativeNames = def.alternativeNames();
+        for (const auto &altName : alternativeNames) {
+            m_fullDefs.insert(altName.toLower(), def);
+        }
     }
 }
 
@@ -412,8 +419,14 @@ void Repository::reload()
 
 void Repository::addCustomSearchPath(const QString &path)
 {
+    Q_EMIT aboutToReload();
+
     d->m_customSearchPaths.append(path);
-    reload();
+    d->loadThemeFolder(path + QStringLiteral("/themes"));
+    d->loadSyntaxFolder(this, path + QStringLiteral("/syntax"));
+    d->computeAlternativeDefLists();
+
+    Q_EMIT reloaded();
 }
 
 QList<QString> Repository::customSearchPaths() const

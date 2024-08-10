@@ -31,6 +31,7 @@ public:
     void load(Repository *repo);
     void loadSyntaxFolder(Repository *repo, const QString &path);
     bool loadSyntaxFolderFromIndex(Repository *repo, const QString &path);
+    void computeAlternativeDefLists();
 
     void addDefinition(Definition &&def);
 

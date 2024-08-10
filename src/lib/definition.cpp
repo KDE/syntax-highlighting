@@ -312,7 +312,7 @@ KeywordList *DefinitionData::keywordList(const QString &wantedName)
     return (it == keywordLists.end()) ? nullptr : &it.value();
 }
 
-Format DefinitionData::formatByName(const QString &wantedName) const
+Format DefinitionData::formatByName(QStringView wantedName) const
 {
     const auto it = formats.constFind(wantedName);
     if (it != formats.constEnd()) {

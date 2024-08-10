@@ -71,7 +71,7 @@ public:
     Context *initialContext();
     Context *contextByName(QStringView name);
 
-    Format formatByName(const QString &name) const;
+    Format formatByName(QStringView name) const;
 
     quint16 foldingRegionId(const QString &foldName);
 
@@ -83,7 +83,7 @@ public:
     Repository *repo = nullptr;
     QHash<QString, KeywordList> keywordLists;
     std::vector<Context> contexts;
-    QHash<QString, Format> formats;
+    QHash<QStringView, Format> formats;
     // data loaded from xml file and emptied after loading contexts
     QList<HighlightingContextData> contextDatas;
     // Definition referenced by IncludeRules and ContextSwitch

@@ -75,7 +75,12 @@ public:
 
     quint16 foldingRegionId(const QString &foldName);
 
-    void addImmediateIncludedDefinition(const Definition &def);
+    struct ResolvedContext {
+        DefinitionData *def;
+        Context *context;
+    };
+
+    ResolvedContext resolveIncludedContext(QStringView defName, QStringView contextName);
 
     DefinitionRef q;
     uint64_t id = 0;

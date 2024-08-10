@@ -850,14 +850,30 @@ quint16 DefinitionData::foldingRegionId(const QString &foldName)
     return RepositoryPrivate::get(repo)->foldingRegionId(name, foldName);
 }
 
-void DefinitionData::addImmediateIncludedDefinition(const Definition &def)
+DefinitionData::ResolvedContext DefinitionData::resolveIncludedContext(QStringView defName, QStringView contextName)
 {
-    if (get(def) != this) {
-        DefinitionRef defRef(def);
-        if (!immediateIncludedDefinitions.contains(defRef)) {
-            immediateIncludedDefinitions.push_back(std::move(defRef));
+    if (defName.isEmpty()) {
+        return {this, contextByName(contextName)};
+    }
+
+    auto d = repo->definitionForName(defName.toString());
+    if (d.isValid()) {
+        auto *resolvedDef = get(d);
+        if (resolvedDef != this) {
+            DefinitionRef defRef(d);
+            if (!immediateIncludedDefinitions.contains(defRef)) {
+                immediateIncludedDefinitions.push_back(std::move(defRef));
+                resolvedDef->load();
+            }
+        }
+        if (contextName.isEmpty()) {
+            return {resolvedDef, resolvedDef->initialContext()};
+        } else {
+            return {resolvedDef, resolvedDef->contextByName(contextName)};
         }
     }
+
+    return {nullptr, nullptr};
 }
 
 DefinitionRef::DefinitionRef() = default;

@@ -97,7 +97,7 @@ static QString replaceCaptures(const QString &pattern, const QStringList &captur
 
 static MatchResult matchString(QStringView pattern, QStringView text, int offset, Qt::CaseSensitivity caseSensitivity)
 {
-    if (offset + pattern.size() <= text.size() && text.mid(offset, pattern.size()).compare(pattern, caseSensitivity) == 0) {
+    if (offset + pattern.size() <= text.size() && text.sliced(offset, pattern.size()).compare(pattern, caseSensitivity) == 0) {
         return offset + pattern.size();
     }
     return offset;
@@ -533,7 +533,7 @@ MatchResult KeywordListRule::doMatch(QStringView text, int offset, const QString
         return offset;
     }
 
-    if (m_keywordList.contains(text.mid(offset, newOffset - offset), m_caseSensitivity)) {
+    if (m_keywordList.contains(text.sliced(offset, newOffset - offset), m_caseSensitivity)) {
         return newOffset;
     }
 
@@ -741,7 +741,7 @@ MatchResult WordDetect::doMatch(QStringView text, int offset, const QStringList 
         return offset;
     }
 
-    if (text.mid(offset, m_word.size()).compare(m_word, m_caseSensitivity) != 0) {
+    if (text.sliced(offset, m_word.size()).compare(m_word, m_caseSensitivity) != 0) {
         return offset;
     }
 

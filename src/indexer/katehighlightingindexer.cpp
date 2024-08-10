@@ -186,8 +186,7 @@ using KSyntaxHighlighting::Xml::attrToBool;
 class HlFilesChecker
 {
 public:
-    template<typename T>
-    void setDefinition(const T &verStr, const QString &filename, const QString &name)
+    void setDefinition(QStringView verStr, const QString &filename, const QString &name)
     {
         m_currentDefinition = &*m_definitions.insert(name, Definition{});
         m_currentDefinition->languageName = name;
@@ -201,7 +200,7 @@ public:
             qWarning() << filename << "invalid kateversion" << verStr;
             m_success = false;
         } else {
-            m_currentDefinition->kateVersion = {verStr.left(idx).toInt(), verStr.mid(idx + 1).toInt()};
+            m_currentDefinition->kateVersion = {verStr.sliced(0, idx).toInt(), verStr.sliced(idx + 1).toInt()};
         }
     }
 
@@ -1719,8 +1718,8 @@ private:
             auto it = definition.keywordsList.find(include.content);
             containsKeywordName = (it != definition.keywordsList.end());
         } else {
-            auto defName = include.content.mid(idx + 2);
-            auto listName = include.content.left(idx);
+            auto defName = include.content.sliced(idx + 2);
+            auto listName = include.content.sliced(0, idx);
             auto it = m_definitions.find(defName);
             if (it == m_definitions.end()) {
                 qWarning() << definition.filename << "line" << include.line << "unknown definition in" << include.content;
@@ -2283,7 +2282,7 @@ private:
                 if (rule.dynamic == XmlBool::True) {
                     static const QRegularExpression dynamicPosition(QStringLiteral(R"(^(?:[^%]*|%(?![1-9]))*)"));
                     auto result = dynamicPosition.match(rule.string);
-                    s = s.left(result.capturedLength());
+                    s = s.sliced(0, result.capturedLength());
                 }
 
                 QString sanitizedRegex;
@@ -2295,7 +2294,7 @@ private:
                     const qsizetype result = regularChars.match(rule.string).capturedLength();
                     const qsizetype pos = qMin(result, s.size());
                     if (rule.string.indexOf(QLatin1Char('|'), pos) < pos) {
-                        sanitizedRegex = rule.string.left(qMin(result, s.size()));
+                        sanitizedRegex = rule.string.sliced(0, qMin(result, s.size()));
                         sanitizedRegex.replace(sanitizeChars, QStringLiteral("\\1"));
                         s = sanitizedRegex;
                     } else {
@@ -2635,7 +2634,7 @@ private:
         if (name.isEmpty()) {
             contextName.stay = true;
         } else if (name.startsWith(QStringLiteral("#stay"))) {
-            name = name.mid(5);
+            name = name.sliced(5);
             contextName.stay = true;
             contextName.context = &context;
             if (!name.isEmpty()) {
@@ -2644,13 +2643,13 @@ private:
             }
         } else {
             while (name.startsWith(QStringLiteral("#pop"))) {
-                name = name.mid(4);
+                name = name.sliced(4);
                 ++contextName.popCount;
             }
 
             if (contextName.popCount && !name.isEmpty()) {
                 if (name.startsWith(QLatin1Char('!')) && name.size() > 1) {
-                    name = name.mid(1);
+                    name = name.sliced(1);
                 } else {
                     qWarning() << definition.filename << "line" << line << "'!' missing between '#pop' and context name" << context.name;
                     m_success = false;
@@ -2665,10 +2664,10 @@ private:
                         contextName.context = &*it;
                     }
                 } else {
-                    auto defName = name.mid(idx + 2);
+                    auto defName = name.sliced(idx + 2);
                     auto it = m_definitions.find(defName.toString());
                     if (it != m_definitions.end()) {
-                        auto listName = name.left(idx).toString();
+                        auto listName = name.sliced(0, idx).toString();
                         definition.referencedDefinitions.insert(&*it);
                         auto ctxIt = it->contexts.find(listName.isEmpty() ? it->firstContextName : listName);
                         if (ctxIt != it->contexts.end()) {

@@ -238,7 +238,7 @@ void HtmlHighlighter::applyFormat(int offset, int length, const Format &format)
         *d->out << htmlStyle;
     }
 
-    for (QChar ch : QStringView(d->currentLine).mid(offset, length)) {
+    for (QChar ch : QStringView(d->currentLine).sliced(offset, length)) {
         if (ch == u'<')
             *d->out << QStringLiteral("&lt;");
         else if (ch == u'&')

@@ -82,12 +82,12 @@ void Context::resolveIncludes(DefinitionData &def)
         DefinitionData *defData = &def;
 
         const auto &contextName = includeRules->contextName();
-        const int idx = contextName.indexOf(QLatin1String("##"));
+        const qsizetype idx = contextName.indexOf(QLatin1String("##"));
 
         if (idx == -1) { // local include
             context = def.contextByName(contextName);
         } else {
-            auto definitionName = contextName.mid(idx + 2);
+            auto definitionName = contextName.sliced(idx + 2);
             auto includedDef = def.repo->definitionForName(definitionName);
             if (!includedDef.isValid()) {
                 qCWarning(Log) << "Unable to resolve external include rule for definition" << definitionName << "in" << def.name;
@@ -100,7 +100,7 @@ void Context::resolveIncludes(DefinitionData &def)
             if (idx == 0) {
                 context = defData->initialContext();
             } else {
-                context = defData->contextByName(QStringView(contextName).left(idx));
+                context = defData->contextByName(QStringView(contextName).sliced(0, idx));
             }
         }
 

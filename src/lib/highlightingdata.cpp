@@ -333,10 +333,10 @@ HighlightingContextData::ContextSwitch::ContextSwitch(QStringView str)
     while (str.startsWith(QStringLiteral("#pop"))) {
         ++m_popCount;
         if (str.size() > 4 && str.at(4) == QLatin1Char('!')) {
-            str = str.mid(5);
+            str = str.sliced(5);
             break;
         }
-        str = str.mid(4);
+        str = str.sliced(4);
     }
 
     if (str.isEmpty()) {
@@ -357,7 +357,7 @@ QStringView HighlightingContextData::ContextSwitch::contextName() const
     if (m_defNameIndex == -1) {
         return m_contextAndDefName;
     }
-    return QStringView(m_contextAndDefName).left(m_defNameIndex);
+    return QStringView(m_contextAndDefName).sliced(0, m_defNameIndex);
 }
 
 QStringView HighlightingContextData::ContextSwitch::defName() const
@@ -365,7 +365,7 @@ QStringView HighlightingContextData::ContextSwitch::defName() const
     if (m_defNameIndex == -1) {
         return QStringView();
     }
-    return QStringView(m_contextAndDefName).mid(m_defNameIndex + 2);
+    return QStringView(m_contextAndDefName).sliced(m_defNameIndex + 2);
 }
 
 void HighlightingContextData::load(const QString &defName, QXmlStreamReader &reader)

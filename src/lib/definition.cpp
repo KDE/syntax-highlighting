@@ -833,8 +833,8 @@ bool DefinitionData::checkKateVersion(QStringView verStr)
         qCWarning(Log) << "Skipping" << fileName << "due to having no valid kateversion attribute:" << verStr;
         return false;
     }
-    const auto major = verStr.left(idx).toInt();
-    const auto minor = verStr.mid(idx + 1).toInt();
+    const auto major = verStr.sliced(0, idx).toInt();
+    const auto minor = verStr.sliced(idx + 1).toInt();
 
     if (major > KSYNTAXHIGHLIGHTING_VERSION_MAJOR || (major == KSYNTAXHIGHLIGHTING_VERSION_MAJOR && minor > KSYNTAXHIGHLIGHTING_VERSION_MINOR)) {
         qCWarning(Log) << "Skipping" << fileName << "due to being too new, version:" << verStr;

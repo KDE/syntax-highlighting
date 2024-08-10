@@ -716,7 +716,7 @@ void fillString(QString &s, int n, QStringView fill)
         for (; n > fill.size(); n -= fill.size()) {
             s += fill;
         }
-        s += fill.left(n);
+        s += fill.sliced(0, n);
     }
 }
 
@@ -727,8 +727,8 @@ struct GraphLine {
     int labelLineLength = 0;
     int nextLabelOffset = 0;
 
-    template<class String>
-    void pushLabel(int offset, String const &s, int numberDisplayableChar)
+    template<class StringBuilder>
+    void pushLabel(int offset, StringBuilder const &s, int numberDisplayableChar)
     {
         Q_ASSERT(offset >= labelLineLength);
         const int n = offset - labelLineLength;
@@ -738,20 +738,20 @@ struct GraphLine {
         nextLabelOffset = labelLineLength;
     }
 
-    template<class String>
-    void pushGraph(int offset, String const &s, int numberDisplayableChar)
+    template<class StringBuilder>
+    void pushGraph(int offset, StringBuilder const &s, int numberDisplayableChar)
     {
         Q_ASSERT(offset >= graphLineLength);
         const int n = offset - graphLineLength;
         graphLineLength += numberDisplayableChar + n;
         fillLine(graphLine, n);
-        const int ps1 = graphLine.size();
+        const qsizetype ps1 = graphLine.size();
         graphLine += s;
         if (offset >= labelLineLength) {
             const int n2 = offset - labelLineLength;
             labelLineLength += n2 + 1;
             fillLine(labelLine, n2);
-            labelLine += QStringView(graphLine).right(graphLine.size() - ps1);
+            labelLine += QStringView(graphLine).sliced(ps1);
         }
     }
 
@@ -851,7 +851,7 @@ public:
 
             for (const auto &fragment : m_highlightedFragments) {
                 auto const &ansiStyle = ansiStyles[fragment.formatId];
-                out << ansiStyle.first << QStringView(currentLine).mid(fragment.offset, fragment.length) << ansiStyle.second;
+                out << ansiStyle.first << QStringView(currentLine).sliced(fragment.offset, fragment.length) << ansiStyle.second;
             }
 
             out << QStringLiteral("\x1b[K\n");
@@ -954,7 +954,7 @@ private:
             m_contextCapture.offsetNext = 0;
             m_contextCapture.lengthNext = 0;
             // truncate the line to deduce the context from the format
-            const auto lineFragment = currentLine.mid(0, fragment.offset + fragment.length + 1);
+            const auto lineFragment = currentLine.sliced(0, fragment.offset + fragment.length + 1);
             newState = m_contextCapture.highlightLine(lineFragment, state);
 
             // Deduced context does not start at the position of the format.
@@ -1302,7 +1302,7 @@ void AnsiHighlighter::highlightData(QIODevice *dev, AnsiFormat format, Options o
         backgroundColorBuffer.append(QLatin1String("\x1b["));
         backgroundColorBuffer.appendBackground(backgroundColor, is256Colors, colorCache);
         foregroundDefaultColor = foregroundColorBuffer.latin1();
-        backgroundDefaultColor = backgroundColorBuffer.latin1().mid(2);
+        backgroundDefaultColor = backgroundColorBuffer.latin1().sliced(2);
     }
 
     int maxId = 0;
@@ -1439,5 +1439,5 @@ void AnsiHighlighter::applyFormat(int offset, int length, const Format &format)
 {
     Q_D(AnsiHighlighter);
     auto const &ansiStyle = d->ansiStyles[format.id()];
-    d->out << ansiStyle.first << d->currentLine.mid(offset, length) << ansiStyle.second;
+    d->out << ansiStyle.first << d->currentLine.sliced(offset, length) << ansiStyle.second;
 }

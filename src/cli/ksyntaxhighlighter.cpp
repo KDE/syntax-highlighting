@@ -17,7 +17,7 @@
 #include <QCoreApplication>
 #include <QFile>
 
-#include <iostream>
+#include <cstdio>
 
 using namespace KSyntaxHighlighting;
 
@@ -131,14 +131,14 @@ int main(int argc, char **argv)
 
     if (parser.isSet(listDefs)) {
         for (const auto &def : repo.definitions()) {
-            std::cout << qPrintable(def.name()) << std::endl;
+            fprintf(stdout, "%s\n", qPrintable(def.name()));
         }
         return 0;
     }
 
     if (parser.isSet(listThemes)) {
         for (const auto &theme : repo.themes()) {
-            std::cout << qPrintable(theme.name()) << std::endl;
+            fprintf(stdout, "%s\n", qPrintable(theme.name()));
         }
         return 0;
     }
@@ -197,11 +197,10 @@ int main(int argc, char **argv)
         }
 
         if (!ok) {
-            std::cerr << "Unknown background role. Expected:\n";
+            fprintf(stderr, "Unknown background role. Expected:\n");
             for (const auto &def : bgRoles) {
-                std::cerr << "  - " << def.asciiName << "\n";
+                fprintf(stderr, "  - %s\n", def.asciiName);
             }
-            std::cerr.flush();
             return 1;
         }
     }
@@ -209,7 +208,7 @@ int main(int argc, char **argv)
     if (parser.isSet(updateDefs)) {
         DefinitionDownloader downloader(&repo);
         QObject::connect(&downloader, &DefinitionDownloader::informationMessage, &app, [](const QString &msg) {
-            std::cout << qPrintable(msg) << std::endl;
+            fprintf(stdout, "%s\n", qPrintable(msg));
         });
         QObject::connect(&downloader, &DefinitionDownloader::done, &app, &QCoreApplication::quit);
         downloader.start();
@@ -246,7 +245,7 @@ int main(int argc, char **argv)
     }
 
     if (!def.isValid()) {
-        std::cerr << "Unknown syntax." << std::endl;
+        fprintf(stderr, "Unknown syntax.\n");
         return 1;
     }
 
@@ -268,7 +267,7 @@ int main(int argc, char **argv)
         if (outputFormat.startsWith(QLatin1String("ansi256"), Qt::CaseInsensitive)) {
             AnsiFormat = AnsiHighlighter::AnsiFormat::XTerm256Color;
         } else if (0 != outputFormat.compare(QLatin1String("ansi"), Qt::CaseInsensitive)) {
-            std::cerr << "Unknown output format." << std::endl;
+            fprintf(stderr, "Unknown output format.\n");
             return 2;
         }
 
@@ -289,7 +288,7 @@ int main(int argc, char **argv)
                 } else if (option == QStringLiteral("all")) {
                     options |= AnsiHighlighter::Option::TraceAll;
                 } else {
-                    std::cerr << "Unknown trace name." << std::endl;
+                    fprintf(stderr, "Unknown trace name.\n");
                     return 2;
                 }
             }

@@ -362,8 +362,8 @@ bool DefinitionData::load(OnlyKeywords onlyKeywords)
         }
     }
 
-    for (auto it = keywordLists.begin(); it != keywordLists.end(); ++it) {
-        it->setCaseSensitivity(caseSensitive);
+    for (auto &kw : keywordLists) {
+        kw.setCaseSensitivity(caseSensitive);
     }
 
     resolveContexts();
@@ -558,8 +558,8 @@ void DefinitionData::resolveIncludeKeywords()
 
     keywordIsLoaded = true;
 
-    for (auto it = keywordLists.begin(); it != keywordLists.end(); ++it) {
-        it->resolveIncludeKeywords(*this);
+    for (auto &kw : keywordLists) {
+        kw.resolveIncludeKeywords(*this);
     }
 }
 

@@ -169,21 +169,11 @@ bool Definition::isWordWrapDelimiter(QChar c) const
 
 bool Definition::foldingEnabled() const
 {
-    d->load();
-    if (d->hasFoldingRegions || indentationBasedFoldingEnabled()) {
-        return true;
+    if (d->foldingRegionsState == DefinitionData::FoldingRegionsState::Undetermined) {
+        d->load();
     }
 
-    // check included definitions
-    const auto defs = includedDefinitions();
-    for (const auto &def : defs) {
-        if (def.foldingEnabled()) {
-            d->hasFoldingRegions = true;
-            break;
-        }
-    }
-
-    return d->hasFoldingRegions;
+    return d->foldingRegionsState == DefinitionData::FoldingRegionsState::ContainsFoldingRegions || d->indentationBasedFolding;
 }
 
 bool Definition::indentationBasedFoldingEnabled() const
@@ -395,7 +385,7 @@ void DefinitionData::clear()
     wordDelimiters = WordDelimiters();
     wordWrapDelimiters = wordDelimiters;
     keywordIsLoaded = false;
-    hasFoldingRegions = false;
+    foldingRegionsState = FoldingRegionsState::Undetermined;
     indentationBasedFolding = false;
     foldingIgnoreList.clear();
     singleLineCommentMarker.clear();
@@ -631,6 +621,11 @@ void DefinitionData::resolveContexts()
     for (auto &context : contexts) {
         context.resolveIncludes(*this);
     }
+
+    // when a context includes a folding region this value is Yes, otherwise it remains undetermined
+    if (foldingRegionsState == FoldingRegionsState::Undetermined) {
+        foldingRegionsState = FoldingRegionsState::NoFoldingRegions;
+    }
 }
 
 void DefinitionData::loadItemData(QXmlStreamReader &reader)
@@ -848,7 +843,7 @@ bool DefinitionData::checkKateVersion(QStringView verStr)
 
 quint16 DefinitionData::foldingRegionId(const QString &foldName)
 {
-    hasFoldingRegions = true;
+    foldingRegionsState = FoldingRegionsState::ContainsFoldingRegions;
     return RepositoryPrivate::get(repo)->foldingRegionId(name, foldName);
 }
 
@@ -865,6 +860,9 @@ DefinitionData::ResolvedContext DefinitionData::resolveIncludedContext(QStringVi
             if (std::find(immediateIncludedDefinitions.begin(), immediateIncludedDefinitions.end(), resolvedDef) == immediateIncludedDefinitions.end()) {
                 immediateIncludedDefinitions.push_back(resolvedDef);
                 resolvedDef->load();
+                if (resolvedDef->foldingRegionsState == FoldingRegionsState::ContainsFoldingRegions) {
+                    foldingRegionsState = FoldingRegionsState::ContainsFoldingRegions;
+                }
             }
         }
         if (contextName.isEmpty()) {

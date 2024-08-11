@@ -83,6 +83,12 @@ public:
 
     ResolvedContext resolveIncludedContext(QStringView defName, QStringView contextName);
 
+    enum class FoldingRegionsState : uint8_t {
+        Undetermined,
+        ContainsFoldingRegions,
+        NoFoldingRegions,
+    };
+
     std::weak_ptr<DefinitionData> q;
     uint64_t id = 0;
 
@@ -97,7 +103,7 @@ public:
     WordDelimiters wordDelimiters;
     WordDelimiters wordWrapDelimiters;
     bool keywordIsLoaded = false;
-    bool hasFoldingRegions = false;
+    FoldingRegionsState foldingRegionsState = FoldingRegionsState::Undetermined;
     bool indentationBasedFolding = false;
     QStringList foldingIgnoreList;
     QString singleLineCommentMarker;

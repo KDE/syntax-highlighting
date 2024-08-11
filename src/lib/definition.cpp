@@ -574,8 +574,7 @@ void DefinitionData::loadContexts(QXmlStreamReader &reader)
         switch (reader.tokenType()) {
         case QXmlStreamReader::StartElement:
             if (reader.name() == QLatin1String("context")) {
-                contextDatas.push_back(HighlightingContextData());
-                contextDatas.back().load(name, reader);
+                contextDatas.emplace_back().load(name, reader);
             }
             reader.readNext();
             break;

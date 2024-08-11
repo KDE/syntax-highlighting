@@ -97,7 +97,7 @@ public:
     std::vector<Context> contexts;
     QHash<QStringView, Format> formats;
     // data loaded from xml file and emptied after loading contexts
-    QList<HighlightingContextData> contextDatas;
+    std::vector<HighlightingContextData> contextDatas;
     // Definition referenced by IncludeRules and ContextSwitch
     QVarLengthArray<const DefinitionData *, 4> immediateIncludedDefinitions;
     WordDelimiters wordDelimiters;

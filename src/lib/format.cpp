@@ -7,7 +7,6 @@
 
 #include "format.h"
 #include "definition.h"
-#include "definitionref_p.h"
 #include "format_p.h"
 #include "textstyledata_p.h"
 #include "themedata_p.h"

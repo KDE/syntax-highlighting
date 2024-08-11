@@ -9,7 +9,6 @@
 
 #include "definition.h"
 #include "definition_p.h"
-#include "definitionref_p.h"
 
 #include "context_p.h"
 #include "format.h"
@@ -45,7 +44,7 @@ DefinitionData::~DefinitionData() = default;
 Definition::Definition()
     : d(std::make_shared<DefinitionData>())
 {
-    d->q = *this;
+    d->q = d;
 }
 
 Definition::Definition(Definition &&other) noexcept = default;
@@ -54,12 +53,9 @@ Definition::~Definition() = default;
 Definition &Definition::operator=(Definition &&other) noexcept = default;
 Definition &Definition::operator=(const Definition &) = default;
 
-Definition::Definition(std::shared_ptr<DefinitionData> &&dd)
-    : d(std::move(dd))
+Definition::Definition(const DefinitionData &defData)
+    : d(defData.q.lock())
 {
-    if (!d) {
-        Definition().d.swap(d);
-    }
 }
 
 bool Definition::operator==(const Definition &other) const
@@ -242,26 +238,32 @@ QList<Format> Definition::formats() const
 
 QList<Definition> Definition::includedDefinitions() const
 {
-    d->load();
+    QList<Definition> definitions;
 
-    // init worklist and result used as guard with this definition
-    QList<const DefinitionData *> queue{d.get()};
-    QList<Definition> definitions{*this};
-    while (!queue.empty()) {
-        const auto *def = queue.back();
-        queue.pop_back();
-        for (const auto &defRef : std::as_const(def->immediateIncludedDefinitions)) {
-            const auto definition = defRef.definition();
-            if (!definitions.contains(definition)) {
-                definitions.push_back(definition);
-                queue.push_back(definition.d.get());
+    if (isValid()) {
+        d->load();
+
+        // init worklist and result used as guard with this definition
+        QVarLengthArray<const DefinitionData *, 4> queue{d.get()};
+        definitions.push_back(*this);
+        while (!queue.empty()) {
+            const auto *def = queue.back();
+            queue.pop_back();
+            for (const auto *defData : def->immediateIncludedDefinitions) {
+                auto pred = [defData](const Definition &def) {
+                    return DefinitionData::get(def) == defData;
+                };
+                if (std::find_if(definitions.begin(), definitions.end(), pred) == definitions.end()) {
+                    definitions.push_back(Definition(*defData));
+                    queue.push_back(defData);
+                }
             }
         }
-    }
 
-    // remove the 1st entry, since it is this Definition
-    definitions.front() = std::move(definitions.back());
-    definitions.pop_back();
+        // remove the 1st entry, since it is this Definition
+        definitions.front() = std::move(definitions.back());
+        definitions.pop_back();
+    }
 
     return definitions;
 }
@@ -860,9 +862,8 @@ DefinitionData::ResolvedContext DefinitionData::resolveIncludedContext(QStringVi
     if (d.isValid()) {
         auto *resolvedDef = get(d);
         if (resolvedDef != this) {
-            DefinitionRef defRef(d);
-            if (!immediateIncludedDefinitions.contains(defRef)) {
-                immediateIncludedDefinitions.push_back(std::move(defRef));
+            if (std::find(immediateIncludedDefinitions.begin(), immediateIncludedDefinitions.end(), resolvedDef) == immediateIncludedDefinitions.end()) {
+                immediateIncludedDefinitions.push_back(resolvedDef);
                 resolvedDef->load();
             }
         }
@@ -874,34 +875,6 @@ DefinitionData::ResolvedContext DefinitionData::resolveIncludedContext(QStringVi
     }
 
     return {nullptr, nullptr};
-}
-
-DefinitionRef::DefinitionRef() = default;
-
-DefinitionRef::DefinitionRef(const Definition &def) noexcept
-    : d(def.d)
-{
-}
-
-DefinitionRef &DefinitionRef::operator=(const Definition &def) noexcept
-{
-    d = def.d;
-    return *this;
-}
-
-Definition DefinitionRef::definition() const
-{
-    return Definition(d.lock());
-}
-
-bool DefinitionRef::operator==(const DefinitionRef &other) const
-{
-    return !d.owner_before(other.d) && !other.d.owner_before(d);
-}
-
-bool DefinitionRef::operator==(const Definition &other) const
-{
-    return !d.owner_before(other.d) && !other.d.owner_before(d);
 }
 
 #include "moc_definition.cpp"

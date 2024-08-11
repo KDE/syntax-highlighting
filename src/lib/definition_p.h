@@ -8,7 +8,7 @@
 #ifndef KSYNTAXHIGHLIGHTING_DEFINITION_P_H
 #define KSYNTAXHIGHLIGHTING_DEFINITION_P_H
 
-#include "definitionref_p.h"
+#include "definition.h"
 #include "highlightingdata_p.hpp"
 #include "state.h"
 #include "worddelimiters_p.h"
@@ -17,6 +17,7 @@
 #include <QList>
 #include <QSet>
 #include <QString>
+#include <QVarLengthArray>
 
 #include <vector>
 
@@ -82,7 +83,7 @@ public:
 
     ResolvedContext resolveIncludedContext(QStringView defName, QStringView contextName);
 
-    DefinitionRef q;
+    std::weak_ptr<DefinitionData> q;
     uint64_t id = 0;
 
     Repository *repo = nullptr;
@@ -92,7 +93,7 @@ public:
     // data loaded from xml file and emptied after loading contexts
     QList<HighlightingContextData> contextDatas;
     // Definition referenced by IncludeRules and ContextSwitch
-    QList<DefinitionRef> immediateIncludedDefinitions;
+    QVarLengthArray<const DefinitionData *, 4> immediateIncludedDefinitions;
     WordDelimiters wordDelimiters;
     WordDelimiters wordWrapDelimiters;
     bool keywordIsLoaded = false;

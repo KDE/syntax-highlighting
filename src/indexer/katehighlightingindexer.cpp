@@ -186,7 +186,7 @@ using KSyntaxHighlighting::Xml::attrToBool;
 class HlFilesChecker
 {
 public:
-    void setDefinition(QStringView verStr, const QString &filename, const QString &name)
+    void setDefinition(QStringView verStr, const QString &filename, const QString &name, const QStringList &alternativeNames)
     {
         m_currentDefinition = &*m_definitions.insert(name, Definition{});
         m_currentDefinition->languageName = name;
@@ -201,6 +201,20 @@ public:
             m_success = false;
         } else {
             m_currentDefinition->kateVersion = {verStr.sliced(0, idx).toInt(), verStr.sliced(idx + 1).toInt()};
+        }
+
+        auto checkName = [this, &filename](char const *nameType, const QString &name) {
+            auto it = m_names.find(name);
+            if (it != m_names.end()) {
+                qWarning() << filename << "duplicate" << nameType << "with" << it.value();
+                m_success = false;
+            } else {
+                m_names.insert(name, filename);
+            }
+        };
+        checkName("name", name);
+        for (auto alternativeName : alternativeNames) {
+            checkName("alternative name", alternativeName);
         }
     }
 
@@ -2688,6 +2702,7 @@ private:
     }
 
     QMap<QString, Definition> m_definitions;
+    QHash<QString, QString> m_names;
     Definition *m_currentDefinition = nullptr;
     Keywords *m_currentKeywords = nullptr;
     Context *m_currentContext = nullptr;
@@ -2893,8 +2908,12 @@ int main(int argc, char *argv[])
         hls[QFileInfo(hlFile).fileName()] = hl;
 
         const QString hlName = hl[QStringLiteral("name")].toString();
+        const QString hlAlternativeNames = hl[QStringLiteral("alternativeNames")].toString();
 
-        filesChecker.setDefinition(xml.attributes().value(QStringLiteral("kateversion")), hlFilename, hlName);
+        filesChecker.setDefinition(xml.attributes().value(QStringLiteral("kateversion")),
+                                   hlFilename,
+                                   hlName,
+                                   hlAlternativeNames.split(u';', Qt::SkipEmptyParts));
 
         // scan for broken regex or keywords with spaces
         while (!xml.atEnd()) {

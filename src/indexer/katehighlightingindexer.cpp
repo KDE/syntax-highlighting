@@ -13,6 +13,7 @@
 #include <QMutableMapIterator>
 #include <QRegularExpression>
 #include <QScopeGuard>
+#include <QString>
 #include <QVariant>
 #include <QXmlStreamReader>
 
@@ -182,6 +183,7 @@ void init_parser(SAX2XMLReaderImpl &parser)
 
 using KSyntaxHighlighting::WordDelimiters;
 using KSyntaxHighlighting::Xml::attrToBool;
+using Qt::operator""_s;
 
 class HlFilesChecker
 {
@@ -1241,6 +1243,7 @@ private:
             }
 
             reg.replace(QStringLiteral("{1}"), QString());
+            reg.replace(QStringLiteral("{1,1}"), QString());
 
             // is DetectSpaces
             // optional ^ then \s, [\s], [\t ], [ \t] possibly in (...) or (?:...) followed by *, +
@@ -1283,6 +1286,28 @@ private:
                 qWarning() << rule.filename << "line" << rule.line << "RegExpr should be replaced by LineContinue:" << rule.string << extra;
                 return false;
             }
+
+#define REG_DIGIT uR"((\[(0-9|\\d)\]|\\d))"
+#define REG_DIGITS REG_DIGIT u"([+]|" REG_DIGIT u"[*])"
+#define REG_DOT uR"((\\[.]|\[.\]))"
+            // is Int, check \b[0-9]+
+            static const QRegularExpression isInt(uR"(^(\((\?:)?)*\\b(\((\?:)?)*)" REG_DIGITS uR"(\)*$)"_s);
+            if (reg.contains(isInt)) {
+                qWarning() << rule.filename << "line" << rule.line << "RegExpr should be replaced by Int:" << rule.string;
+                return false;
+            }
+
+            // is Float, check (\b[0-9]+\.[0-9]*|\.[0-9]+)([eE][-+]?[0-9]+)?
+            static const QRegularExpression isFloat(
+                uR"(^(\\b|\((\?:)?)*)" REG_DIGITS REG_DOT
+                    REG_DIGIT u"[*][|]" REG_DOT REG_DIGITS uR"(\)+\((\?:)?\[[eE]+\]\[(\\?-\\?\+|\\?\+\\?-)\]\?)" REG_DIGITS uR"(\)\?\)*$)"_s);
+            if (reg.contains(isFloat)) {
+                qWarning() << rule.filename << "line" << rule.line << "RegExpr should be replaced by Float:" << rule.string;
+                return false;
+            }
+#undef REG_DOT
+#undef REG_DIGIT
+#undef REG_DIGITS
 
             // replace \c, \xhhh, \x{hhh...}, \0dd, \o{ddd}, \uhhhh, with _
             static const QRegularExpression sanitize1(QStringLiteral(REG_ESCAPE_CHAR));

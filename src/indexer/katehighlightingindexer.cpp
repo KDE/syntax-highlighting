@@ -778,10 +778,10 @@ private:
                     // clang-format on
 
                     success = parser.checkIfExtracted(isExtracted);
+                }
 
-                    if (type == Type::LineContinue && char0 == QLatin1Char('\0')) {
-                        char0 = QLatin1Char('\\');
-                    }
+                if (type == Type::LineContinue && char0 == QLatin1Char('\0')) {
+                    char0 = QLatin1Char('\\');
                 }
 
                 return success;
@@ -2679,10 +2679,8 @@ private:
         if (name.isEmpty()) {
             contextName.stay = true;
         } else if (name.startsWith(QStringLiteral("#stay"))) {
-            name = name.sliced(5);
             contextName.stay = true;
-            contextName.context = &context;
-            if (!name.isEmpty()) {
+            if (name.size() > 5) {
                 qWarning() << definition.filename << "line" << line << "invalid context in" << context.name;
                 m_success = false;
             }

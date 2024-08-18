@@ -326,12 +326,12 @@ std::atomic<uint64_t> definitionId{1};
 
 bool DefinitionData::load(OnlyKeywords onlyKeywords)
 {
-    if (fileName.isEmpty()) {
-        return false;
-    }
-
     if (isLoaded()) {
         return true;
+    }
+
+    if (fileName.isEmpty()) {
+        return false;
     }
 
     if (bool(onlyKeywords) && keywordIsLoaded) {
@@ -376,6 +376,7 @@ bool DefinitionData::load(OnlyKeywords onlyKeywords)
 void DefinitionData::clear()
 {
     // keep only name and repo, so we can re-lookup to make references persist over repo reloads
+    // see AbstractHighlighterPrivate::ensureDefinitionLoaded()
     id = 0;
     keywordLists.clear();
     contexts.clear();

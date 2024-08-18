@@ -432,7 +432,7 @@ cat a'a';cat
 echo '' 'a' '\' "" "a" "\\" "$a" "a""a"'a''a' a'b'c a"b"c a$'\n'c
 echo a!bc a{a}b a{b,c}d a{b,{d,e}}d a\ b
 echo a$bc a$b/c a${b}c a$((b-3))c a$(b)c a$(a b c)c
-echo ${a[*]} ${a[@]} ${a[${b}]} ${a:-x$z} ${a-x} ${a/g} ${a//f/f} ${a//f*/f*}
+echo ${a[*]} ${a[@]} ${a[${b}]} ${a:-x$z} ${a-x} ${a/g} ${a//f/f} ${a//f*/f*} ${x/pat/a&b}
 echo ${a^^l*} ${a,} ${!a} ${#a[1]} ${a:1:$b} $((++i,i--))
 echo "${var#lo+(r)em}" x "${var#+(r)em}" x
 echo "${var#refs/heads}" x "${var#refs}" x

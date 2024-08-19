@@ -1235,6 +1235,12 @@ private:
                 }
             }
 
+            if (rule.lookAhead == XmlBool::True && (rule.string.endsWith(QStringLiteral(".*$")) || rule.string.endsWith(QStringLiteral(".*")))
+                && -1 == rule.string.indexOf(u'|')) {
+                qWarning() << rule.filename << "line" << rule.line << "RegExpr with lookAhead=1 doesn't need to end with '.*' or '.*$':" << rule.string;
+                return false;
+            }
+
             auto reg = (rule.lookAhead == XmlBool::True) ? rule.sanitizedString : rule.string;
             if (rule.lookAhead == XmlBool::True) {
                 static const QRegularExpression removeAllSuffix(QStringLiteral(

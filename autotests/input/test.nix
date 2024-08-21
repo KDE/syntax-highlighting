@@ -61,4 +61,6 @@ in {
         "first" = 1;
         "second" = 2;
     };
+
+    abc."cde".fgh = abc."cde".fgh;
 }

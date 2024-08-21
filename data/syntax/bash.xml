@@ -56,8 +56,8 @@
 
     <!ENTITY arithmetic_as_subshell "\(((?:[^`'&quot;()$]++|\$\{[^`'&quot;(){}$]+\}|\$(?=[^{`'&quot;()])|`[^`]*+`|\((?1)(?:[)]|(?=['&quot;])))++)(?:[)](?=$|[^)])|[&quot;'])">
 
-    <!ENTITY unary_operators  "-[abcdefghkprstuwxGLNOSovRnz]&eos;">
-    <!ENTITY binary_operators "(?:-(?:e[fq]|[nolg]t|[nlg]e)|==?|!=)&eos;">
+    <!ENTITY unary_operators  "-[abcdefghkprstuwxGLNOSovRnz](?=\\?$|[ &tab;])">
+    <!ENTITY binary_operators "(?:-(?:e[fq]|[nolg]t|[nlg]e)|==?|!=)(?=\\?$|[ &tab;])">
 
     <!ENTITY dblbracket_close "\]\](?=($|[ &tab;;|&amp;)]))">
 
@@ -66,7 +66,7 @@
 
 <language
     name="Bash"
-    version="51"
+    version="52"
     kateversion="5.79"
     section="Scripts"
     extensions="*.sh;*.bash;*.ebuild;*.eclass;*.exlib;*.exheres-0;.bashrc;.bash_profile;.bash_login;.profile;PKGBUILD;APKBUILD"
@@ -1495,13 +1495,19 @@
         <IncludeRules context="FindNormalText"/>
       </context>
 
-      <context attribute="Normal Text" lineEndContext="#stay" name="ExprBracketParam2" fallthroughContext="ExprBracketValue">
+      <context attribute="Normal Text" lineEndContext="#stay" name="ExprBracketParam2" fallthroughContext="#pop!ExprBracketParam2_Value">
+        <LineContinue attribute="Escape" context="SkipSpaces"/>
+      </context>
+      <context attribute="Normal Text" lineEndContext="#stay" name="ExprBracketParam2_Value" fallthroughContext="ExprBracketValue">
         <DetectSpaces attribute="Normal Text" context="#pop!ExprBracketParam3"/>
         <AnyChar context="TestMaybeBinary" String="-=!" lookAhead="1"/>
         <IncludeRules context="FindExprBracketEnd"/>
       </context>
 
-      <context attribute="Normal Text" lineEndContext="ExprBracketFinal" name="ExprBracketParam3" fallthroughContext="ExprBracketValue">
+      <context attribute="Normal Text" lineEndContext="ExprBracketFinal" name="ExprBracketParam3" fallthroughContext="#pop!ExprBracketParam3_Value">
+        <LineContinue attribute="Escape" context="SkipSpaces"/>
+      </context>
+      <context attribute="Normal Text" lineEndContext="ExprBracketFinal" name="ExprBracketParam3_Value" fallthroughContext="ExprBracketValue">
         <DetectSpaces attribute="Normal Text" context="#pop!ExprBracketFinal"/>
         <IncludeRules context="FindExprBracketEnd"/>
       </context>
@@ -1523,6 +1529,10 @@
       </context>
       <context attribute="Normal Text" lineEndContext="#pop" name="TestMaybeBinary" fallthroughContext="#pop!ExprBracketValue">
         <RegExpr attribute="Expression" context="#pop" String="&binary_operators;"/>
+      </context>
+
+      <context attribute="Normal Text" lineEndContext="#pop" name="SkipSpaces" fallthroughContext="#pop">
+        <DetectSpaces context="#pop"/>
       </context>
 
 
@@ -1641,7 +1651,10 @@
         <DetectChar attribute="Operator" context="ExprDblBracketValuePattern" char=")" endRegion="expression" beginRegion="subshell"/>
       </context>
 
-      <context attribute="Normal Text" lineEndContext="#stay" name="ExprDblBracketParam2" fallthroughContext="ExprDblBracketValuePattern">
+      <context attribute="Normal Text" lineEndContext="#stay" name="ExprDblBracketParam2" fallthroughContext="#pop!ExprDblBracketParam2_Value">
+        <LineContinue attribute="Escape" context="SkipSpaces"/>
+      </context>
+      <context attribute="Normal Text" lineEndContext="#stay" name="ExprDblBracketParam2_Value" fallthroughContext="ExprDblBracketValuePattern">
         <DetectSpaces attribute="Normal Text" context="#pop!ExprDblBracketParam3"/>
         <AnyChar context="TestMaybeBinary2" String="-=!" lookAhead="1"/>
         <AnyChar attribute="Expression" context="#pop!ExprDblBracketParam3Spe" String="&lt;>"/>
@@ -1657,7 +1670,10 @@
         <DetectSpaces attribute="Normal Text" context="#pop!ExprDblBracketParam3"/>
       </context>
 
-      <context attribute="Normal Text" lineEndContext="#stay" name="ExprDblBracketParam3" fallthroughContext="ExprDblBracketValuePattern">
+      <context attribute="Normal Text" lineEndContext="#stay" name="ExprDblBracketParam3" fallthroughContext="#pop!ExprDblBracketParam3_Value">
+        <LineContinue attribute="Escape" context="SkipSpaces"/>
+      </context>
+      <context attribute="Normal Text" lineEndContext="#stay" name="ExprDblBracketParam3_Value" fallthroughContext="ExprDblBracketValuePattern">
         <DetectSpaces attribute="Normal Text" context="#pop!ExprDblBracketFinal"/>
         <IncludeRules context="FindExprDblBracketEnd"/>
         <AnyChar attribute="Error" context="#stay" String="&lt;>"/>

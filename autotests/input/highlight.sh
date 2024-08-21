@@ -276,6 +276,16 @@ pacman -syu --needed intel-ucode grub
    1 == 1 # comment 2
    # comment 3
 ]]
+# Line continuation in Braces (bug 487978)
+[[ \
+ x \
+ = \
+ "y" # bla bla
+ ]]
+[ \
+ x \
+ = \
+ "y" ]
 
 rm /data/{hello1,hello2}/input/{bye1,$bye2}/si{a,${b},c{k,p{e,a}}}/*.non
 rm /data/{aa,{e,i}t{b,c} # Not closed

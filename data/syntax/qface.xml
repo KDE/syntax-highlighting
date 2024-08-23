@@ -42,8 +42,7 @@
         <DetectChar attribute="Annotation" context="Annotation" char="@" />
         <DetectChar attribute="String" context="String" char="&quot;" />
         <StringDetect attribute="Documentation" context="Documentation" String="/**" beginRegion="Documentation" />
-        <Detect2Chars attribute="Comment" context="Comment" char="/" char1="/" beginRegion="Comment" />
-        <Detect2Chars attribute="Comment" context="Comment" char="/" char1="*" beginRegion="Comment" />
+        <IncludeRules context="Comment" />
       </context>
       <context attribute="Module" lineEndContext="#pop" name="Module">
         <DetectSpaces/>
@@ -106,12 +105,22 @@
         <DetectChar attribute="Normal Text" char="}" endRegion="Brace" context="#pop#pop" />
         <IncludeRules context="Basic" />
       </context>
-       <context attribute="Comment" lineEndContext="#stay" name="Comment">
+      <context name="Comment" attribute="Comment" lineEndContext="#stay">
+        <Detect2Chars attribute="Comment" context="CommentStar" char="/" char1="*" beginRegion="comment" />
+        <Detect2Chars attribute="Comment" context="CommentSlash" char="/" char1="/" />
+      </context>
+      <context name="CommentStar" attribute="Comment" lineEndContext="#stay">
+        <DetectSpaces />
+        <Detect2Chars attribute="Comment" context="#pop" char="*" char1="/" endRegion="comment" />
+        <IncludeRules context="##Comments" />
+        <DetectIdentifier/>
+      </context>
+      <context name="CommentSlash" attribute="Comment" lineEndContext="#pop">
         <DetectSpaces />
         <IncludeRules context="##Comments" />
         <DetectIdentifier/>
-        <Detect2Chars attribute="Comment" context="#pop" char="*" char1="/" endRegion="Comment" />
       </context>
+
       <context attribute="Documentation" lineEndContext="#stay" name="Documentation">
         <DetectSpaces />
         <Detect2Chars attribute="Documentation" context="#pop" char="*" char1="/" endRegion="Documentation" />

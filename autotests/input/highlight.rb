@@ -441,37 +441,51 @@ result = 10//regexp//20/foo//regexp//20
 
 # test cases for general delimited input
 # quoted strings
-%Q|this is a string|
-%Q{this is a string}
-%Q(this is a string)
-%Q<this is a string>
-%Q[this is a string]
+%Q_this is a string \n#{123} [<({nested})>]_
+%Q|this is a string \n#{123} [<({nested})>]|
+%Q{this is a string \n#{123} [<({nested})>]}
+%Q(this is a string \n#{123} [<({nested})>])
+%Q<this is a string \n#{123} [<({nested})>]>
+%Q[this is a string \n#{123} [<({nested})>]]
 
-%|also a string|
-%{also a string}
-%(also a string)
-%<also a string>
-%[also a string]
+%_also a string \n#{123} [<({nested})>]_
+%|also a string \n#{123} [<({nested})>]|
+%{also a string \n#{123} [<({nested})>]}
+%(also a string \n#{123} [<({nested})>])
+%<also a string \n#{123} [<({nested})>]>
+%[also a string \n#{123} [<({nested})>]]
+
+# array
+%W_this is a string \n#{123} [<({nested})>]_
+%W|this is a string \n#{123} [<({nested})>]|
+%W{this is a string \n#{123} [<({nested})>]}
+%W(this is a string \n#{123} [<({nested})>])
+%W<this is a string \n#{123} [<({nested})>]>
+%W[this is a string \n#{123} [<({nested})>]]
 
 # apostrophed strings
-%q|apostrophed|
-%q{apostrophed}
-%q(apostrophed)
-%q<apostrophed>
-%q[apostrophed]
+%q_apostrophed \n#{123} [<({nested})>]_
+%q|apostrophed \n#{123} [<({nested})>]|
+%q{apostrophed \n#{123} [<({nested})>]}
+%q(apostrophed \n#{123} [<({nested})>])
+%q<apostrophed \n#{123} [<({nested})>]>
+%q[apostrophed \n#{123} [<({nested})>]]
 
 # regular expressions
-%r{expression}
-%r(expression)
-%r<expression>
-%r[expression]
-%r|expression|
+%r_expression \n#{123} [<({nested})>]_
+%r|expression \n#{123} [<({nested})>]|
+%r{expression \n#{123} [<({nested})>]}
+%r(expression \n#{123} [<({nested})>])
+%r<expression \n#{123} [<({nested})>]>
+%r[expression \n#{123} [<({nested})>]]
 
 # shell commands
-%x{ls -l}
-%x(ls -l)
-%x<ls -l>
-%x[ls -l]
+%x_ls -l \n#{123} [<({nested})>]_
+%x|ls -l \n#{123} [<({nested})>]|
+%x{ls -l \n#{123} [<({nested})>]}
+%x(ls -l \n#{123} [<({nested})>])
+%x<ls -l \n#{123} [<({nested})>]>
+%x[ls -l \n#{123} [<({nested})>]]
 
 # sometimes it's useful to have the command on multiple lines
 %x{ls -l |
@@ -482,10 +496,51 @@ grep test }
 `echo ' '`
 
 # token array
-%w{one two three}
-%w(one two three)
-%w<one two three>
-%w[one two three]
+%w_one two three \n#{123} [<({nested})>]_
+%w|one two three \n#{123} [<({nested})>]|
+%w{one two three \n#{123} [<({nested})>]}
+%w(one two three \n#{123} [<({nested})>])
+%w<one two three \n#{123} [<({nested})>]>
+%w[one two three \n#{123} [<({nested})>]]
+
+# symbol array
+%s_one two three \n#{123} [<({nested})>]_
+%s|one two three \n#{123} [<({nested})>]|
+%s{one two three \n#{123} [<({nested})>]}
+%s(one two three \n#{123} [<({nested})>])
+%s<one two three \n#{123} [<({nested})>]>
+%s[one two three \n#{123} [<({nested})>]]
+
+# number
+# binary
+0b001
+0B1101_13 # bad
+# octal
+0123
+01238 # bad
+# decimal
+0 10 0d10 120_12 0d23_23
+0_1_2 0_1_ # bad
+# hex
+0x218 0x1a_23
+0x218g 0x1a_23g # bad
+# complex
+0i 12i 03i 12.3i
+012_i 12.3_i 123ia # bad
+# rational
+0r 12r 03r 12.3r
+012_r 12.3_r 123ra # bad
+# rational
+0ri 12ri 03ri 12.3ri
+012_ri 12.3_ri 123ir 123ria # bad
+
+# Global constant
+ABC ABC1 ABC1ABC ABC_ABC_ ___12 _1 _1ABC
+# Contant
+Abc A1b Ab1 ABC1a
+# ident
+ABC? ABC1? ABC1ABC? ABC_ABC_? ___12? _1? _1ABC?
+Abc? A1b? Ab1? ABC1a?
 
 # snippet from Net::IMAP
 # I object to putting String, Integer and Array into kernel methods.
@@ -592,3 +647,19 @@ class MyClass
 end
 
 puts MyClass.method_using_refinement
+
+class Path
+  def +(other) end
+  alias / +
+end
+
+test_ok(if $x == $x then true else false end)
+
+foo?(?a ? 1 : :a) # or
+foo??a?1: :a
+foo?(?a ? 1 : 2) # or
+foo??a?1: 2
+
+"#{{a:}}"
+# break substitution
+"#{1+1+?};if}"

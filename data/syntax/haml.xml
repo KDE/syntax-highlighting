@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language>
-<language name="Haml" version="15" kateversion="5.79" section="Markup"
+<language name="Haml" version="16" kateversion="5.79" section="Markup"
           extensions="*.haml"
           author="Cies Breijs (cies_at_kde_nl)" license="LGPL"
           mimetype="text/x-haml">
@@ -142,13 +142,13 @@
       <context attribute="Escaped Text" lineEndContext="#pop" name="escaped">
       </context>
 
-      <context name="rubysourceline" attribute="Ruby embedded in haml" lineEndContext="#pop">
+      <context name="rubysourceline" attribute="Ruby embedded in haml" lineEndContext="#pop" fallthroughContext="Expr##Ruby">
         <!-- ruby ignores newline after \ -->
         <LineContinue attribute="Ruby Normal Text" context="#stay"/>
         <!-- HAML allows lines ending with `,` to continue to the next line -->
         <LineContinue attribute="Ruby Normal Text" context="#stay" char="," />
 
-        <IncludeRules context="##Ruby" />
+        <IncludeRules context="Ruby##Ruby" />
       </context>
 
       <context name="csssourceline" attribute="Other code embedded in haml" lineEndContext="#pop">
@@ -176,10 +176,10 @@
       </context>
 
       <!-- Substitutions can be nested -->
-      <context name="Subst" attribute="Ruby Normal Text" lineEndContext="#stay">
+      <context name="Subst" attribute="Ruby Normal Text" lineEndContext="#stay" fallthroughContext="Expr##Ruby">
         <DetectChar attribute="Substitution" char="}" context="#pop"/>
         <!-- Highlight substitution as code. -->
-        <IncludeRules context="##Ruby"/>
+        <IncludeRules context="Ruby##Ruby"/>
       </context>
 
       <context name="Short Subst" attribute="Substitution" lineEndContext="#pop">

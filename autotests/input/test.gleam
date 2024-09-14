@@ -4,15 +4,34 @@
 //// well written Gleam, but it does compile correctly appart from an error
 //// for the absent file "./ffi.mjs" and some warnings.
 ////
-//// top module documentation comment
+////
+////
+//// ## Top module documentation comment with markdown formatting
+////
+//// Formats: _italic text_, **bold text**, `monospace text`, ~~strikeout~~
+////
+//// Bullet list:
+////
+//// - item 1
+//// - item 2
+////
+//// Numbered list:
+////
+//// 1. item 1
+//// 2. item 2
+////
+//// [link](https://example.com)
+
+// SPDX-FileCopyrightText: 2024 Louis Guichard <glpda+kde@pm.me>
+// SPDX-License-Identifier: MIT
 
 import gleam/bit_array as bit_string
 import gleam/bool
 import gleam/dict.{type Dict, delete, get, insert}
 import gleam/io
 
-/// function documentation comment
-/// spanning multiple lines
+// BEGIN
+
 pub fn main() {
   let assert Ok(prefix) = bit_string.to_string(prefix)
   let name: String = "Kate \u{1F3F3}\u{FE0F}\u{200D}\u{1F308} "
@@ -37,9 +56,15 @@ fn number(int) {
   }
 }
 
+/// Documentation for a custom type with 3 variants
 pub opaque type CustomType(a) {
+  /// first variant
   Var1(x: a)
+
+  /// second variant
   Var2(x: a, y: a)
+
+  /// third variant
   Var3(x: a, y: a, z: a)
 }
 
@@ -69,6 +94,19 @@ pub type ListError {
   ListTooLong
 }
 
+/// Converts a `List(a)` to a `Result(CustomType(a))`, empty list and list
+/// longer than 3 will return an error.
+///
+/// ## Examples
+///
+/// ```gleam
+/// from_list([1, 2, 3])
+/// // -> Ok(Var3(1, 2, 3))
+///
+/// from_list([1, 2, 3, 4, 5])
+/// // -> Error(ListTooLong)
+/// ```
+///
 pub fn from_list(l: List(a)) -> Result(CustomType(a), ListError) {
   case l {
     [x] -> Ok(Var1(x))
@@ -93,7 +131,8 @@ fn mascots() -> Dict(String, String) {
 type UserId =
   Int
 
-@external(javascript, "./ffi.mjs", "ext")
-fn ext(id: UserId) -> String {
-  todo as "fun not implemented for this target"
+@external(javascript, "./ffi.mjs", "call")
+fn call(id: UserId) -> String {
+  todo as "call not implemented for this target"
 }
+// END

@@ -5,6 +5,7 @@
 //// for the absent file "./ffi.mjs" and some warnings.
 ////
 ////
+////
 //// ## Top module documentation comment with markdown formatting
 ////
 //// Formats: _italic text_, **bold text**, `monospace text`, ~~strikeout~~
@@ -21,10 +22,15 @@
 ////
 //// [link](https://example.com)
 
+// SPDX-FileCopyrightText: 2024 Louis Guichard <glpda+kde@pm.me>
+// SPDX-License-Identifier: MIT
+
 import gleam/bit_array as bit_string
 import gleam/bool
 import gleam/dict.{type Dict, delete, get, insert}
 import gleam/io
+
+// BEGIN
 
 pub fn main() {
   let assert Ok(prefix) = bit_string.to_string(prefix)
@@ -50,7 +56,7 @@ fn number(int) {
   }
 }
 
-/// Documention for a custom type with 3 variants
+/// Documentation for a custom type with 3 variants
 pub opaque type CustomType(a) {
   /// first variant
   Var1(x: a)
@@ -129,3 +135,4 @@ type UserId =
 fn call(id: UserId) -> String {
   todo as "call not implemented for this target"
 }
+// END

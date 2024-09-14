@@ -4,7 +4,7 @@
   <!ENTITY symbols ":!&#37;&amp;()+,-/.*&lt;=&gt;?[]|~^;">
 ]>
 <language name="Odin" section="Sources"
-          version="1" kateversion="5.79"
+          version="3" kateversion="5.79"
           indenter="cstyle"
           extensions="*.odin"
           priority="1"
@@ -122,7 +122,7 @@
       <item>u128be</item>
     </list>
 
-    <list name="function">
+    <list name="procedure">
       <item>proc</item>
     </list>
 
@@ -142,13 +142,16 @@
         <keyword attribute="Keyword" context="#stay" String="keywords" />
         <keyword attribute="Data Type" context="#stay" String="types" />
         <RegExpr attribute="Attribute" context="#stay" String="@\w+"/>
-        <RegExpr attribute="Function" firstNonSpace="true" context="Function" String="\w{1,}\s{0,}::\s{0,}(?=proc)" lookAhead="true"/>
+        <RegExpr attribute="Procedure" firstNonSpace="true" context="Procedure" String="\w{1,}\s{0,}::\s{0,}(?=proc)" lookAhead="true"/>
+        <RegExpr attribute="Procedure" context="#stay" String="[A-Za-z_]*(?=\()" />
         <RegExpr attribute="Variable" context="#stay" firstNonSpace="true" String="\s{0,}\w{1,},{0,1}\s{0,}\w{0,}\s{0,}(?=:\=|:)(?!::)"/>
+        <RegExpr attribute="Variable" context="#stay" String="[A-Za-z_]*(?=\.)"/>
         <RegExpr attribute="Float" context="#stay" String="\b(\d(\d|_)*(.\d(\d|_)*)?)((e|E)(\+|-)?\d+)?[ijk]?\b" />
         <RegExpr attribute="Decimal" context="#stay" String="\b((0b(0|1|_)+)|(0o(\d|_)+)|(0d(\d|_)+)|(0[xXh](\h|_)+))[ijk]?\b" />
         <AnyChar attribute="Operator" context="#stay" String="&symbols;" />
         <DetectChar attribute="Operator" context="#stay" char="{" beginRegion="Brace1" />
         <DetectChar attribute="Operator" context="#stay" char="}" endRegion="Brace1" />
+        <DetectChar attribute="RawString" context="RawString" char="`" />
         <keyword attribute="Use" context="#stay" String="import"/>
 
       </context>
@@ -167,10 +170,14 @@
           <AnyChar attribute="String" context="#pop" String="&quot;&apos;"/>
       </context>
 
-      <context name="Function" attribute="Function" lineEndContext="#pop">
+      <context name="RawString" attribute="RawString" lineEndContext="#stay">
+          <DetectChar attribute="RawString" context="#pop" char="`" />
+      </context>
+
+      <context name="Procedure" attribute="Procedure" lineEndContext="#pop">
         <Detect2Chars attribute="Operator" char=":" char1=":" context="#stay"/>
         <StringDetect attribute="Keyword" context="#stay" String="proc" />
-        <AnyChar attribute="Function" context="#pop" lookAhead="true" String="\("/>
+        <AnyChar attribute="Procedure" context="#pop" lookAhead="true" String="\("/>
       </context>
 
     </contexts>
@@ -181,9 +188,10 @@
       <itemData name="Keyword"      defStyleNum="dsKeyword" spellChecking="false"/>
       <itemData name="Data Type"    defStyleNum="dsDataType" spellChecking="false"/>
       <itemData name="Attribute"       defStyleNum="dsAttribute"/>
-      <itemData name="Function"       defStyleNum="dsFunction"/>
+      <itemData name="Procedure"       defStyleNum="dsFunction"/>
       <itemData name="Operator"       defStyleNum="dsOperator"/>
       <itemData name="String"       defStyleNum="dsString"/>
+      <itemData name="RawString"       defStyleNum="dsSpecialString"/>
       <itemData name="Comment"      defStyleNum="dsComment"/>
       <itemData name="Decimal" defStyleNum="dsDecVal"/>
       <itemData name="Float" defStyleNum="dsFloat"/>

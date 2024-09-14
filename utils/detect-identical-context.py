@@ -7,10 +7,10 @@ from xml.etree.ElementTree import ElementTree
 
 import sys
 
-if len(sys.argv) < 2:
-    print(sys.argv[0], 'syntax.xml...', file=sys.stderr)
-    exit(1)
 
+def print_usage_and_exit():
+    print(sys.argv[0], '[-p] syntax.xml...\n  -p  show duplicate content', file=sys.stderr)
+    exit(1)
 
 def normalize_bool_or_remove_if_false(d: dict[str, str], key: str) -> None:
     value = d.get(key)
@@ -26,7 +26,18 @@ def remove_if_stay(d: dict[str, str], key: str) -> None:
         d.pop(key)
 
 
-for filename in sys.argv[1:]:
+if len(sys.argv) < 2 or sys.argv[1] in {'-h', '--help'}:
+    print_usage_and_exit()
+
+iarg = 1
+show_content = sys.argv[1] == '-p'
+
+if show_content:
+    iarg += 1
+    if len(sys.argv) < 3:
+        print_usage_and_exit()
+
+for filename in sys.argv[iarg:]:
     tree = ElementTree()
     tree.parse(filename)
 
@@ -43,7 +54,7 @@ for filename in sys.argv[1:]:
                 attrib.update(context[0].attrib)
                 normalize_bool_or_remove_if_false(attrib, 'includeAttrib')
 
-            s = '\n'.join(sorted(f'{k}={v}' for k,v in attrib.items()))
+            s = '\x01'.join(sorted(f'{k}={v}' for k,v in attrib.items()))
             identical_contexts.setdefault(s, []).append(name)
         else:
             rules = set()
@@ -55,11 +66,13 @@ for filename in sys.argv[1:]:
                 normalize_bool_or_remove_if_false(attrib, 'includeAttrib')
                 normalize_bool_or_remove_if_false(attrib, 'firstNonSpace')
                 normalize_bool_or_remove_if_false(attrib, 'lookAhead')
-                s = '\n'.join(f'{k}={v}' for k,v in sorted(attrib.items()))
-                rules.add(f'{rule.tag}\n{s}')
+                s = '\x01'.join(f'{k}={v}' for k,v in sorted(attrib.items()))
+                rules.add(f'{rule.tag}\x01{s}')
 
             identical_contexts.setdefault('\n'.join(sorted(rules)), []).append(context.attrib['name'])
 
-    for names in identical_contexts.values():
+    for content, names in identical_contexts.items():
         if len(names) > 1:
             print(f'{filename}: {names}')
+            if show_content:
+                print(' ', content.replace('\x01', ' ').replace('\n', '\n  '))

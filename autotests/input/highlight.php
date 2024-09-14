@@ -95,6 +95,7 @@ echo " $var-> {$var->} ${var->} ";
 echo " $var->$mem {$var->$mem} ${var->$mem} ";
 echo " ${$x->{'mem'}} ";
 echo "\n \t \\ \xff \x";
+echo "\{$x}";
 
 echo <<<HTML
 <p>bla $var \$var bla\'</p>

@@ -81,8 +81,8 @@
 -->
 
 <language name="AppArmor Security Profile"
-          version="16"
-          kateversion="5.0"
+          version="17"
+          kateversion="5.79"
           section="Markup"
           extensions="usr.bin.*;usr.sbin.*;bin.*;sbin.*;usr.lib.*;usr.lib64.*;usr.lib32.*;usr.libx32.*;usr.libexec.*;usr.local.bin.*;usr.local.sbin.*;usr.local.lib*;opt.*;etc.cron.*;snap.*;snap-update-ns.*;snap-confine.*"
           priority="0"
@@ -891,7 +891,7 @@
 		     Highlight the name of the profile.
 		     The profile name label is written after the hat character (^) or a profile keyword.
 		     AppArmor 3.0 deprecates the use of pathnames as the profiles name. -->
-		<context name="_profile_name" attribute="Profile Name" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop">
+		<context name="_profile_name" attribute="Profile Name" lineEndContext="#stay" fallthroughContext="#pop">
 			<DetectSpaces context="#stay" attribute="Normal Text"/>
 			<!-- Not highlighting paths and paths quoted.
 			     NOTE: Some profile labels may contain "/" (like [/]). These cases are not considered. -->
@@ -1001,28 +1001,28 @@
 		</context>
 
 		<!-- Find path after a variable -->
-		<context name="_find_path_after_variable" attribute="Path" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!_path_content">
+		<context name="_find_path_after_variable" attribute="Path" lineEndContext="#pop" fallthroughContext="#pop!_path_content">
 			<DetectSpaces context="#pop" lookAhead="true"/>
 			<AnyChar context="#pop" String="&noPathCharWithoutSpace;]}=" lookAhead="true"/>
 			<RegExpr context="#pop" String="[[:cntrl:]]" lookAhead="true"/> <!-- It is necessary? -->
 		</context>
-		<context name="_parentheses_find_path_after_variable" attribute="Path" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!_parentheses_path_content">
+		<context name="_parentheses_find_path_after_variable" attribute="Path" lineEndContext="#pop" fallthroughContext="#pop!_parentheses_path_content">
 			<DetectChar context="#pop" char="," lookAhead="true"/>
 			<IncludeRules context="_find_path_after_variable"/>
 		</context>
 
 		<!-- @{VARIABLE} = A B C -->
-		<context name="_variable_assignment" attribute="Variable" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+		<context name="_variable_assignment" attribute="Variable" lineEndContext="#pop" fallthroughContext="#pop">
 			<RegExpr context="#pop!_variable_assignment_operator" attribute="Variable" String="&variable;"/>
 			<DetectChar context="#pop" attribute="Error" char="@"/>
 		</context>
-		<context name="_variable_assignment_operator" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!_path_content">
+		<context name="_variable_assignment_operator" attribute="Normal Text" lineEndContext="#pop" fallthroughContext="#pop!_path_content">
 			<!-- After the operator, highlighting as "Path" the entire line -->
 			<RegExpr context="#pop!_variable_assignment_line" attribute="Operator 1" String="\s*\+?\="/>
 			<DetectChar context="#pop!_path_content" attribute="Error" char="+"/>
 			<IncludeRules context="_find_path_after_variable"/>
 		</context>
-		<context name="_variable_assignment_line" attribute="Path" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!_variable_assignment_line_content">
+		<context name="_variable_assignment_line" attribute="Path" lineEndContext="#pop" fallthroughContext="#pop!_variable_assignment_line_content">
 			<DetectChar context="#pop!_variable_assignment_line_content" attribute="Error" char="#"/> <!-- Comment -->
 		</context>
 		<context name="_variable_assignment_line_content" attribute="Path" lineEndContext="#pop">
@@ -1039,10 +1039,10 @@
 			     character after a space is highlighted as "Error". Check this when the bug has been fixed. -->
 			<RegExpr context="_comment_variable_assignment_line" attribute="Path" String="\s(?=#)"/>
 		</context>
-		<context name="_comment_variable_assignment_line" attribute="Error" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+		<context name="_comment_variable_assignment_line" attribute="Error" lineEndContext="#pop" fallthroughContext="#pop">
 			<DetectChar context="#pop" attribute="Error" char="#"/>
 		</context>
-		<context name="_variable_assignment_line_general" attribute="Path" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!_variable_assignment_line">
+		<context name="_variable_assignment_line_general" attribute="Path" lineEndContext="#pop" fallthroughContext="#pop!_variable_assignment_line">
 			<keyword context="#pop!_variable_assignment_line" attribute="Other Option" String="boolean" insensitive="true"/>
 			<DetectSpaces context="#stay"/>
 		</context>
@@ -1052,12 +1052,12 @@
 			<RegExpr context="#pop!_variable_assignment_error_operator" attribute="Variable" String="&variable;"/>
 			<DetectChar context="#pop" attribute="Error" char="@"/>
 		</context>
-		<context name="_variable_assignment_error_operator" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!_find_path_after_variable">
+		<context name="_variable_assignment_error_operator" attribute="Normal Text" lineEndContext="#pop" fallthroughContext="#pop!_find_path_after_variable">
 			<DetectChar context="#pop!_find_path_after_variable" attribute="Error" char="="/>
 			<Detect2Chars context="#pop!_find_path_after_variable" attribute="Error" char="+" char1="="/>
 			<RegExpr context="#pop!_variable_assignment_error_operator_after_spaces" String="\s+(?=\+?\=)"/>
 		</context>
-		<context name="_variable_assignment_error_operator_after_spaces" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+		<context name="_variable_assignment_error_operator_after_spaces" attribute="Normal Text" lineEndContext="#pop" fallthroughContext="#pop">
 			<DetectChar context="#pop" attribute="Error" char="="/>
 			<Detect2Chars context="#pop" attribute="Error" char="+" char1="="/>
 		</context>
@@ -1245,7 +1245,7 @@
 		</context>
 
 		<!-- Rlimit Rule -->
-		<context name="_rule_set" attribute="Normal Text" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop">
+		<context name="_rule_set" attribute="Normal Text" lineEndContext="#stay" fallthroughContext="#pop">
 			<keyword context="#pop!_rule_rlimit" attribute="Rule" String="rule_name_rlimit" beginRegion="Rule"/>
 			<DetectSpaces context="#stay" attribute="Normal Text"/>
 			<RegExpr context="_comment" attribute="Comment" String="#(?!include)" insensitive="true"/>
@@ -1254,12 +1254,12 @@
 			<keyword context="#stay" attribute="Data" String="rule_rlimit"/>
 			<Detect2Chars context="#stay" attribute="Operator 2" char="&lt;" char1="="/>
 			<RegExpr context="#stay" attribute="Number" String="\-(?:20|1?\d)\b"/>
-			<RegExpr context="_number_unit" attribute="Number" String="\b\d+"/> <!-- Rules Int don't use '-' as a delimiter -->
+			<Int context="_number_unit" attribute="Number" additionalDeliminator="!+-%*?~&amp;"/>
 			<WordDetect context="#stay" attribute="Number" String="infinity"/>
 			<RegExpr context="#stay" attribute="Numerical Unit" String="\b(?:[KMG]B?|[shd]|us|ms|min|sec|(?:minute|day|hour|week|second)(?:s?)|(?:milli|micro)second(?:s?))\b"/>
 			<IncludeRules context="_default_rule"/>
 		</context>
-		<context name="_number_unit" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+		<context name="_number_unit" attribute="Normal Text" lineEndContext="#pop" fallthroughContext="#pop">
 			<RegExpr context="#pop" attribute="Numerical Unit" String="(?:[KMG]B?|[shd]|us|ms|min|sec|(?:minute|day|hour|week|second)(?:s?)|(?:milli|micro)second(?:s?))\b"/>
 		</context>
 
@@ -1285,7 +1285,7 @@
 
 		<!-- Profile Transition:
 		     Highlight the profile name in File Rules (Execute Mode) and Change Profile Rules. -->
-		<context name="_profile_transition" attribute="Transition Profile Name" lineEndContext="#stay" fallthrough="true" fallthroughContext="#pop">
+		<context name="_profile_transition" attribute="Transition Profile Name" lineEndContext="#stay" fallthroughContext="#pop">
 			<DetectSpaces context="#stay" attribute="Normal Text"/>
 			<!-- Not highlighting paths and paths quoted -->
 			<RegExpr context="#pop!_default_rule_with_comments" String="&path;" lookAhead="1"/>
@@ -1478,7 +1478,7 @@
 			<IncludeRules context="_default_path"/>
 			<IncludeRules context="_default_curly_brackets"/>
 		</context>
-		<context name="_square_brackets" attribute="Globbing Brackets" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop!_square_brackets_content">
+		<context name="_square_brackets" attribute="Globbing Brackets" lineEndContext="#pop" fallthroughContext="#pop!_square_brackets_content">
 			<RegExpr context="#pop!_square_brackets_content" attribute="Globbing Char of Brackets" String="\^(?=[^\s\]&quot;])"/>
 		</context>
 		<context name="_square_brackets_content" attribute="Globbing Brackets" lineEndContext="#pop">
@@ -1503,7 +1503,7 @@
 			<IncludeRules context="_default_quoted"/>
 			<IncludeRules context="_default_curly_brackets"/>
 		</context>
-		<context name="_square_brackets_quoted" attribute="Globbing Brackets" lineEndContext="#pop!_square_brackets_content_quoted" fallthrough="true" fallthroughContext="#pop!_square_brackets_content_quoted">
+		<context name="_square_brackets_quoted" attribute="Globbing Brackets" lineEndContext="#pop!_square_brackets_content_quoted" fallthroughContext="#pop!_square_brackets_content_quoted">
 			<RegExpr context="#pop!_square_brackets_content_quoted" attribute="Globbing Char of Brackets" String="\^(?=[^\]&quot;])"/>
 		</context>
 		<context name="_square_brackets_content_quoted" attribute="Globbing Brackets" lineEndContext="#stay">

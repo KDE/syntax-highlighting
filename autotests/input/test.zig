@@ -161,6 +161,8 @@ test "switch on non-exhaustive enum" {
     };
     try expect(is_one);
 
+    const array_ptr = array[0..array.len];
+
     if (a != b) {
         try expect(true);
     } else if (a == 9) {

@@ -411,8 +411,7 @@ public:
 
 private:
     friend class DefinitionData;
-    friend class DefinitionRef;
-    KSYNTAXHIGHLIGHTING_NO_EXPORT explicit Definition(std::shared_ptr<DefinitionData> &&dd);
+    KSYNTAXHIGHLIGHTING_NO_EXPORT explicit Definition(const DefinitionData &defData);
     std::shared_ptr<DefinitionData> d;
 };
 

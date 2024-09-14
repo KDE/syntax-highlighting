@@ -15,6 +15,7 @@ print_file_info :: proc(fi: os.File_Info) {
     SIZE_WIDTH :: 12
     buf: [SIZE_WIDTH]u8
 
+    raw_str := `this_is raw ;';@@""\\\' string`
     // Print size to string backed by buf on stack, no need to free
     _size := "-" if fi.is_dir else fmt.bprintf(buf[:], "%v", fi.size)
 

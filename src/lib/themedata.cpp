@@ -96,7 +96,7 @@ bool ThemeData::load(const QString &filePath)
     }
 
     QJsonParseError parseError;
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData.mid(start, (end + 1) - start), &parseError);
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData.sliced(start, (end + 1) - start), &parseError);
     if (parseError.error != QJsonParseError::NoError) {
         qCWarning(Log) << "Failed to parse theme file" << filePath << ":" << parseError.errorString();
         return false;

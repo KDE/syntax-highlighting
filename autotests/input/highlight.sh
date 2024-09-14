@@ -276,6 +276,16 @@ pacman -syu --needed intel-ucode grub
    1 == 1 # comment 2
    # comment 3
 ]]
+# Line continuation in Braces (bug 487978)
+[[ \
+ x \
+ = \
+ "y" # bla bla
+ ]]
+[ \
+ x \
+ = \
+ "y" ]
 
 rm /data/{hello1,hello2}/input/{bye1,$bye2}/si{a,${b},c{k,p{e,a}}}/*.non
 rm /data/{aa,{e,i}t{b,c} # Not closed
@@ -422,7 +432,7 @@ cat a'a';cat
 echo '' 'a' '\' "" "a" "\\" "$a" "a""a"'a''a' a'b'c a"b"c a$'\n'c
 echo a!bc a{a}b a{b,c}d a{b,{d,e}}d a\ b
 echo a$bc a$b/c a${b}c a$((b-3))c a$(b)c a$(a b c)c
-echo ${a[*]} ${a[@]} ${a[${b}]} ${a:-x$z} ${a-x} ${a/g} ${a//f/f} ${a//f*/f*}
+echo ${a[*]} ${a[@]} ${a[${b}]} ${a:-x$z} ${a-x} ${a/g} ${a//f/f} ${a//f*/f*} ${x/pat/a&b}
 echo ${a^^l*} ${a,} ${!a} ${#a[1]} ${a:1:$b} $((++i,i--))
 echo "${var#lo+(r)em}" x "${var#+(r)em}" x
 echo "${var#refs/heads}" x "${var#refs}" x

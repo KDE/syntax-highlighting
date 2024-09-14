@@ -13,6 +13,7 @@
 #include <QMutableMapIterator>
 #include <QRegularExpression>
 #include <QScopeGuard>
+#include <QString>
 #include <QVariant>
 #include <QXmlStreamReader>
 
@@ -182,12 +183,12 @@ void init_parser(SAX2XMLReaderImpl &parser)
 
 using KSyntaxHighlighting::WordDelimiters;
 using KSyntaxHighlighting::Xml::attrToBool;
+using Qt::operator""_s;
 
 class HlFilesChecker
 {
 public:
-    template<typename T>
-    void setDefinition(const T &verStr, const QString &filename, const QString &name)
+    void setDefinition(QStringView verStr, const QString &filename, const QString &name, const QStringList &alternativeNames)
     {
         m_currentDefinition = &*m_definitions.insert(name, Definition{});
         m_currentDefinition->languageName = name;
@@ -201,7 +202,21 @@ public:
             qWarning() << filename << "invalid kateversion" << verStr;
             m_success = false;
         } else {
-            m_currentDefinition->kateVersion = {verStr.left(idx).toInt(), verStr.mid(idx + 1).toInt()};
+            m_currentDefinition->kateVersion = {verStr.sliced(0, idx).toInt(), verStr.sliced(idx + 1).toInt()};
+        }
+
+        auto checkName = [this, &filename](char const *nameType, const QString &name) {
+            auto it = m_names.find(name);
+            if (it != m_names.end()) {
+                qWarning() << filename << "duplicate" << nameType << "with" << it.value();
+                m_success = false;
+            } else {
+                m_names.insert(name, filename);
+            }
+        };
+        checkName("name", name);
+        for (auto alternativeName : alternativeNames) {
+            checkName("alternative name", alternativeName);
         }
     }
 
@@ -1220,6 +1235,12 @@ private:
                 }
             }
 
+            if (rule.lookAhead == XmlBool::True && (rule.string.endsWith(QStringLiteral(".*$")) || rule.string.endsWith(QStringLiteral(".*")))
+                && -1 == rule.string.indexOf(u'|')) {
+                qWarning() << rule.filename << "line" << rule.line << "RegExpr with lookAhead=1 doesn't need to end with '.*' or '.*$':" << rule.string;
+                return false;
+            }
+
             auto reg = (rule.lookAhead == XmlBool::True) ? rule.sanitizedString : rule.string;
             if (rule.lookAhead == XmlBool::True) {
                 static const QRegularExpression removeAllSuffix(QStringLiteral(
@@ -1228,6 +1249,7 @@ private:
             }
 
             reg.replace(QStringLiteral("{1}"), QString());
+            reg.replace(QStringLiteral("{1,1}"), QString());
 
             // is DetectSpaces
             // optional ^ then \s, [\s], [\t ], [ \t] possibly in (...) or (?:...) followed by *, +
@@ -1270,6 +1292,28 @@ private:
                 qWarning() << rule.filename << "line" << rule.line << "RegExpr should be replaced by LineContinue:" << rule.string << extra;
                 return false;
             }
+
+#define REG_DIGIT uR"((\[(0-9|\\d)\]|\\d))"
+#define REG_DIGITS REG_DIGIT u"([+]|" REG_DIGIT u"[*])"
+#define REG_DOT uR"((\\[.]|\[.\]))"
+            // is Int, check \b[0-9]+
+            static const QRegularExpression isInt(uR"(^(\((\?:)?)*\\b(\((\?:)?)*)" REG_DIGITS uR"(\)*$)"_s);
+            if (reg.contains(isInt)) {
+                qWarning() << rule.filename << "line" << rule.line << "RegExpr should be replaced by Int:" << rule.string;
+                return false;
+            }
+
+            // is Float, check (\b[0-9]+\.[0-9]*|\.[0-9]+)([eE][-+]?[0-9]+)?
+            static const QRegularExpression isFloat(
+                uR"(^(\\b|\((\?:)?)*)" REG_DIGITS REG_DOT
+                    REG_DIGIT u"[*][|]" REG_DOT REG_DIGITS uR"(\)+\((\?:)?\[[eE]+\]\[(\\?-\\?\+|\\?\+\\?-)\]\?)" REG_DIGITS uR"(\)\?\)*$)"_s);
+            if (reg.contains(isFloat)) {
+                qWarning() << rule.filename << "line" << rule.line << "RegExpr should be replaced by Float:" << rule.string;
+                return false;
+            }
+#undef REG_DOT
+#undef REG_DIGIT
+#undef REG_DIGITS
 
             // replace \c, \xhhh, \x{hhh...}, \0dd, \o{ddd}, \uhhhh, with _
             static const QRegularExpression sanitize1(QStringLiteral(REG_ESCAPE_CHAR));
@@ -1719,8 +1763,8 @@ private:
             auto it = definition.keywordsList.find(include.content);
             containsKeywordName = (it != definition.keywordsList.end());
         } else {
-            auto defName = include.content.mid(idx + 2);
-            auto listName = include.content.left(idx);
+            auto defName = include.content.sliced(idx + 2);
+            auto listName = include.content.sliced(0, idx);
             auto it = m_definitions.find(defName);
             if (it == m_definitions.end()) {
                 qWarning() << definition.filename << "line" << include.line << "unknown definition in" << include.content;
@@ -2283,7 +2327,7 @@ private:
                 if (rule.dynamic == XmlBool::True) {
                     static const QRegularExpression dynamicPosition(QStringLiteral(R"(^(?:[^%]*|%(?![1-9]))*)"));
                     auto result = dynamicPosition.match(rule.string);
-                    s = s.left(result.capturedLength());
+                    s = s.sliced(0, result.capturedLength());
                 }
 
                 QString sanitizedRegex;
@@ -2295,7 +2339,7 @@ private:
                     const qsizetype result = regularChars.match(rule.string).capturedLength();
                     const qsizetype pos = qMin(result, s.size());
                     if (rule.string.indexOf(QLatin1Char('|'), pos) < pos) {
-                        sanitizedRegex = rule.string.left(qMin(result, s.size()));
+                        sanitizedRegex = rule.string.sliced(0, qMin(result, s.size()));
                         sanitizedRegex.replace(sanitizeChars, QStringLiteral("\\1"));
                         s = sanitizedRegex;
                     } else {
@@ -2635,7 +2679,7 @@ private:
         if (name.isEmpty()) {
             contextName.stay = true;
         } else if (name.startsWith(QStringLiteral("#stay"))) {
-            name = name.mid(5);
+            name = name.sliced(5);
             contextName.stay = true;
             contextName.context = &context;
             if (!name.isEmpty()) {
@@ -2644,13 +2688,13 @@ private:
             }
         } else {
             while (name.startsWith(QStringLiteral("#pop"))) {
-                name = name.mid(4);
+                name = name.sliced(4);
                 ++contextName.popCount;
             }
 
             if (contextName.popCount && !name.isEmpty()) {
                 if (name.startsWith(QLatin1Char('!')) && name.size() > 1) {
-                    name = name.mid(1);
+                    name = name.sliced(1);
                 } else {
                     qWarning() << definition.filename << "line" << line << "'!' missing between '#pop' and context name" << context.name;
                     m_success = false;
@@ -2665,10 +2709,10 @@ private:
                         contextName.context = &*it;
                     }
                 } else {
-                    auto defName = name.mid(idx + 2);
+                    auto defName = name.sliced(idx + 2);
                     auto it = m_definitions.find(defName.toString());
                     if (it != m_definitions.end()) {
-                        auto listName = name.left(idx).toString();
+                        auto listName = name.sliced(0, idx).toString();
                         definition.referencedDefinitions.insert(&*it);
                         auto ctxIt = it->contexts.find(listName.isEmpty() ? it->firstContextName : listName);
                         if (ctxIt != it->contexts.end()) {
@@ -2689,6 +2733,7 @@ private:
     }
 
     QMap<QString, Definition> m_definitions;
+    QHash<QString, QString> m_names;
     Definition *m_currentDefinition = nullptr;
     Keywords *m_currentKeywords = nullptr;
     Context *m_currentContext = nullptr;
@@ -2894,8 +2939,12 @@ int main(int argc, char *argv[])
         hls[QFileInfo(hlFile).fileName()] = hl;
 
         const QString hlName = hl[QStringLiteral("name")].toString();
+        const QString hlAlternativeNames = hl[QStringLiteral("alternativeNames")].toString();
 
-        filesChecker.setDefinition(xml.attributes().value(QStringLiteral("kateversion")), hlFilename, hlName);
+        filesChecker.setDefinition(xml.attributes().value(QStringLiteral("kateversion")),
+                                   hlFilename,
+                                   hlName,
+                                   hlAlternativeNames.split(u';', Qt::SkipEmptyParts));
 
         // scan for broken regex or keywords with spaces
         while (!xml.atEnd()) {

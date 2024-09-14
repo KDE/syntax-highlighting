@@ -99,6 +99,7 @@ else
   }
   $file =~ s/<language([^>]+)mimetype="[^"]*"/<language$1mimetype="$mimetype"/s;
   $file =~ s/<language([^>]+)name="([^"]*)"/<language$1name="$2\/$language"$extra/s;
+  $file =~ s/<language([^>]+)alternativeNames="([^"]*)"/<language$1alternativeNames="$2\/$language"/s;
   $file =~ s/<language([^>]+)extensions="[^"]*"/<language$1extensions="$extensions"/s;
 }
 

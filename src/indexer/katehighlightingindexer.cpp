@@ -1253,6 +1253,7 @@ private:
                 }
                 success = checkLookAhead(rule) && success;
                 success = checkStringDetect(rule) && success;
+                success = checkWordDetect(rule) && success;
                 success = checkKeyword(definition, rule) && success;
                 success = checkRegExpr(filename, rule, context) && success;
                 success = checkDelimiters(definition, rule) && success;
@@ -1766,6 +1767,18 @@ private:
                     qWarning() << rule.filename << "line" << rule.line << "broken regex:" << rule.string << "problem: dynamic=true but no %\\d+ placeholder";
                     return false;
                 }
+            }
+        }
+        return true;
+    }
+
+    //! Check that WordDetect does not contain spaces at the beginning and end of text.
+    bool checkWordDetect(const Context::Rule &rule) const
+    {
+        if (rule.type == Context::Rule::Type::WordDetect) {
+            if (!rule.string.isEmpty() && (rule.string.front().isSpace() || rule.string.back().isSpace())) {
+                qWarning() << rule.filename << "line" << rule.line << "contains a space at the beginning or end of the string:" << rule.string;
+                return false;
             }
         }
         return true;

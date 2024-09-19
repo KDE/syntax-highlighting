@@ -2393,6 +2393,11 @@ private:
                     static const QRegularExpression dynamicPosition(QStringLiteral(R"(^(?:[^%]*|%(?![1-9]))*)"));
                     auto result = dynamicPosition.match(rule.string);
                     s = s.sliced(0, result.capturedLength());
+                    // check if hidden by DetectChar/AnyChar
+                    if (s.size() + 2 <= rule.string.size()) {
+                        auto tables = CharTableArray(dynamicDetectChars, rule);
+                        updateUnreachable1(tables.find(s.data()[s.size() + 2]));
+                    }
                 }
 
                 QString sanitizedRegex;
@@ -2420,6 +2425,20 @@ private:
                     } else {
                         QChar c2[]{s[0].toLower(), s[0].toUpper()};
                         updateUnreachable2(t.find(QStringView(c2, 2)));
+                    }
+
+                    // StringDetect is a DetectChar
+                    if (rule.type == Context::Rule::Type::StringDetect && rule.string.size() == 1) {
+                        auto tables = CharTableArray(detectChars, rule);
+                        auto c = rule.string[0];
+                        if (rule.insensitive != XmlBool::True) {
+                            c = c.toLower();
+                            tables.removeNonSpecialWhenSpecial();
+                            tables.append(c, rule);
+                            c = c.toUpper();
+                        }
+                        tables.removeNonSpecialWhenSpecial();
+                        tables.append(c, rule);
                     }
                 }
 
@@ -2545,7 +2564,7 @@ private:
                     }
 
                     case Context::Rule::Type::DetectChar: {
-                        auto &chars4 = (rule.dynamic != XmlBool::True) ? detectChars : dynamicDetectChars;
+                        auto &chars4 = (rule2.dynamic != XmlBool::True) ? detectChars : dynamicDetectChars;
                         auto tables = CharTableArray(chars4, rule2);
                         tables.removeNonSpecialWhenSpecial();
                         tables.append(rule2.char0, rule2, &rule);
@@ -2597,8 +2616,18 @@ private:
                         }
                         break;
 
+                    case Context::Rule::Type::StringDetect: {
+                        // StringDetect is a DetectChar
+                        if (rule2.string.size() == 1 || (rule2.string.size() == 2 && rule2.dynamic == XmlBool::True)) {
+                            auto &chars4 = (rule2.dynamic != XmlBool::True) ? detectChars : dynamicDetectChars;
+                            auto tables = CharTableArray(chars4, rule2);
+                            tables.removeNonSpecialWhenSpecial();
+                            tables.append(rule2.string.back(), rule2, &rule);
+                        }
+                        break;
+                    }
+
                     case Context::Rule::Type::WordDetect:
-                    case Context::Rule::Type::StringDetect:
                     case Context::Rule::Type::Detect2Chars:
                     case Context::Rule::Type::IncludeRules:
                     case Context::Rule::Type::DetectIdentifier:
@@ -2688,11 +2717,18 @@ private:
             };
 
             switch (rule1.type) {
+            // request to merge StringDetect with AnyChar
+            case Context::Rule::Type::StringDetect:
+                if (rule1.string.size() != 1 || rule1.dynamic == XmlBool::True) {
+                    break;
+                }
+                Q_FALLTHROUGH();
             // request to merge AnyChar/DetectChar
             case Context::Rule::Type::AnyChar:
             case Context::Rule::Type::DetectChar:
-                if ((rule2.type == Context::Rule::Type::AnyChar || rule2.type == Context::Rule::Type::DetectChar) && isCommonCompatible()
-                    && rule1.column == rule2.column) {
+                if ((rule2.type == Context::Rule::Type::AnyChar || rule2.type == Context::Rule::Type::DetectChar
+                     || (rule2.type == Context::Rule::Type::StringDetect && rule2.dynamic != XmlBool::True && rule2.string.size() == 1))
+                    && isCommonCompatible() && rule1.column == rule2.column) {
                     qWarning() << filename << "line" << rule2.line << "can be merged as AnyChar with the previous rule";
                     success = false;
                 }
@@ -2716,7 +2752,6 @@ private:
             case Context::Rule::Type::Float:
             case Context::Rule::Type::LineContinue:
             case Context::Rule::Type::WordDetect:
-            case Context::Rule::Type::StringDetect:
             case Context::Rule::Type::Detect2Chars:
             case Context::Rule::Type::IncludeRules:
             case Context::Rule::Type::DetectIdentifier:

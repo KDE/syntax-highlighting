@@ -685,3 +685,12 @@ let commandLineArguments = [
 let deprecatedArguments = Descriptors.all.compactMap {
     $0.isDeprecated ? $0.argumentName : nil
 }
+
+protocol Foo {
+    func foo()
+    func bar()
+}
+
+// something
+class FooImpl: Foo {
+}

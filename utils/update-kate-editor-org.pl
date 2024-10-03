@@ -74,9 +74,9 @@ if (! -d $staticSyntaxPathData) {
 }
 
 # collect all known syntax files from the generated resource file and copy them over
-open my $resourceFile, "<$buildDir/data/syntax-data.qrc";
+open my $resourceFile, "<$buildDir/data/syntax-data-xml.qrc";
 while (<$resourceFile>) {
-    if ((my $file) = />(.*\.xml)<\/file>/) {
+    if ((my $file) = /<file>(.*\.xml)<\/file>/) {
         copy($file, $staticSyntaxPathData) or die "Copy failed: $!";
     }
 }

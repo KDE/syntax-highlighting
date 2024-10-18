@@ -1,131 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language>
-<!-- /*
-    SPDX-FileCopyrightText: 2024 Younes A <dev@younes.io>    
-    SPDX-License-Identifier: MIT
-*/ -->
-<language name="TLA+"
-          version="1"
-          kateversion="5.0"
-          section="Sources"
-          extensions="*.tla"
-          author="Younes A (dev@younes.io)"
-          license="MIT">
+<language name="TLA+" version="1" kateversion="5.0" section="Sources" extensions="*.tla" mimetype="text/x-tlaplus" priority="5" author="Younes (dev@younes.io)">
   <highlighting>
     <list name="keywords">
-      <item>ACTION</item>
       <item>ASSUME</item>
       <item>ASSUMPTION</item>
       <item>AXIOM</item>
-      <item>BY</item>
       <item>CASE</item>
       <item>CHOOSE</item>
       <item>CONSTANT</item>
       <item>CONSTANTS</item>
-      <item>COROLLARY</item>
-      <item>DEF</item>
-      <item>DEFINE</item>
-      <item>DEFS</item>
       <item>DOMAIN</item>
       <item>ELSE</item>
       <item>ENABLED</item>
       <item>EXCEPT</item>
       <item>EXTENDS</item>
-      <item>HAVE</item>
-      <item>HIDE</item>
       <item>IF</item>
       <item>IN</item>
       <item>INSTANCE</item>
-      <item>LAMBDA</item>
       <item>LET</item>
-      <item>LEMMA</item>
       <item>LOCAL</item>
       <item>MODULE</item>
-      <item>NEW</item>
-      <item>OBVIOUS</item>
-      <item>OMITTED</item>
-      <item>ONLY</item>
       <item>OTHER</item>
-      <item>PICK</item>
-      <item>PROOF</item>
-      <item>PROPOSITION</item>
-      <item>PROVE</item>
-      <item>QED</item>
-      <item>RECURSIVE</item>
-      <item>SF_</item>
-      <item>STATE</item>
       <item>SUBSET</item>
-      <item>SUFFICES</item>
-      <item>TAKE</item>
-      <item>TEMPORAL</item>
       <item>THEN</item>
       <item>THEOREM</item>
       <item>UNCHANGED</item>
+      <item>UNION</item>
       <item>VARIABLE</item>
       <item>VARIABLES</item>
-      <item>UNION</item>
-      <item>USE</item>
       <item>WITH</item>
-      <item>WITNESS</item>
-      <item>WF_</item>
-      <item>TRUE</item>
-      <item>FALSE</item>
     </list>
     <list name="operators">
-      <item>land</item>
-      <item>lnot</item>
-      <item>neg</item>
-      <item>leq</item>
-      <item>ll</item>
-      <item>doteq</item>
-      <item>\/</item>
       <item>/\</item>
+      <item>\/</item>
       <item>~</item>
-      <item>|-&gt;</item>
+      <!-- <item>=></item> -->
       <item>=&gt;</item>
-      <item>=</item>
-      <item>&gt;</item>
-      <item>&lt;</item>
-      <item>..</item>
-      <item>[]</item>
-      <item>-</item>
-      <item>+</item>
-      <item>*</item>
-      <item>/</item>
-      <item>^</item>
-      <item>%</item>
+      <!-- <item><=></item> -->
+      <item>&lt;=&gt;</item>
+      <item>\E</item>
+      <item>\A</item>
+      <item>\in</item>
+      <item>\notin</item>
+      <item>\subset</item>
+      <item>\subseteq</item>
+      <item>\supset</item>
+      <item>\supseteq</item>
+      <item>\union</item>
+      <item>\intersect</item>
+      <item>\setminus</item>
     </list>
     <contexts>
-      <context name="MatchComment" attribute="Normal Text">
-        <Detect2Chars attribute="Comment" context="SingleLineComment" char="\" char1="*" />
-        <Detect2Chars attribute="Comment" context="MultiLineComment" char="(" char1="*" />
-      </context>
-      <context name="SingleLineComment" attribute="Comment" lineEndContext="#pop">
-      </context>
-      <context name="MultiLineComment" attribute="Comment">
-        <Detect2Chars attribute="Comment" context="#pop" char="*" char1=")" />
-      </context>
-      <context name="Normal" attribute="Normal Text" lineEndContext="#stay">
+      <context attribute="Normal Text" lineEndContext="#stay" name="Normal">
         <keyword attribute="Keyword" context="#stay" String="keywords"/>
         <keyword attribute="Operator" context="#stay" String="operators"/>
-        <RegExpr attribute="Number" context="#stay" String="\\b((0(x|X)[0-9a-fA-F]*)|(([0-9]+\\.?[0-9]*)|(\\.[0-9]+))((e|E)(\\+|-)?[0-9]+)?)(L|l|UL|ul|u|U|F|f|ll|LL|ull|ULL)?\\b"/>
-        <RegExpr attribute="String" context="#stay" String="&quot;[^\&quot;]*&quot;"/>
-        <RegExpr attribute="Comment" context="#stay" String="\\(\\*.*?\\*\\)"/>
+        <Float attribute="Float" context="#stay"/>
+        <Int attribute="Decimal" context="#stay"/>
+        <DetectChar attribute="String" context="String" char="&quot;"/>
+        <DetectChar attribute="Comment" context="SingleLineComment" char="*" beginRegion="Comment"/>
+        <Detect2Chars attribute="Comment" context="MultiLineComment" char="(" char1="*" beginRegion="Comment"/>
+      </context>
+      <context attribute="String" lineEndContext="#pop" name="String">
+        <DetectChar attribute="String" context="#pop" char="&quot;"/>
+      </context>
+      <context attribute="Comment" lineEndContext="#pop" name="SingleLineComment">
+        <DetectSpaces/>
+        <IncludeRules context="##Alerts"/>
+        <DetectIdentifier/>
+      </context>
+      <context attribute="Comment" lineEndContext="#stay" name="MultiLineComment">
+        <Detect2Chars attribute="Comment" context="#pop" char="*" char1=")" endRegion="Comment"/>
+        <DetectSpaces/>
+        <IncludeRules context="##Alerts"/>
+        <DetectIdentifier/>
       </context>
     </contexts>
     <itemDatas>
+      <itemData name="Normal Text" defStyleNum="dsNormal"/>
       <itemData name="Keyword" defStyleNum="dsKeyword"/>
-      <itemData name="Operator" defStyleNum="dsDataType"/>
-      <itemData name="Number" defStyleNum="dsDecVal"/>
+      <itemData name="Operator" defStyleNum="dsOperator"/>
+      <itemData name="Float" defStyleNum="dsFloat"/>
+      <itemData name="Decimal" defStyleNum="dsDecVal"/>
       <itemData name="String" defStyleNum="dsString"/>
       <itemData name="Comment" defStyleNum="dsComment"/>
     </itemDatas>
   </highlighting>
   <general>
     <comments>
-      <comment name="singleLine" start="\*" />
-      <comment name="multiLine" start="(*" end="*)" region="Comment" />
+      <comment name="singleLine" start="*"/>
+      <comment name="multiLine" start="(*" end="*)"/>
     </comments>
-    <keywords weakDeliminator="\"/>
+    <keywords casesensitive="1"/>
   </general>
 </language>

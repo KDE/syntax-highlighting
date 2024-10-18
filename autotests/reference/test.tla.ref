@@ -1,0 +1,201 @@
+<Comment>(* Example taken from https://github.com/tlaplus/Examples/blob/master/specifications/echo/Echo.tla *)</Comment><br/>
+<Normal Text>-------------------------------- </Normal Text><Keyword>MODULE</Keyword><Normal Text> Echo --------------------------------</Normal Text><br/>
+<Comment>(***************************************************************************)</Comment><br/>
+<Comment>(* The Echo algorithm for constructing a spanning tree in an undirected    *)</Comment><br/>
+<Comment>(* graph starting from a single initiator, as a PlusCal algorithm.         *)</Comment><br/>
+<Comment>(***************************************************************************)</Comment><br/>
+<Keyword>EXTENDS</Keyword><Normal Text> Naturals, FiniteSets, Relation, TLC</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>CONSTANTS</Keyword><Normal Text> Node,      </Normal Text><Comment>\* set of nodes</Comment><br/>
+<Normal Text>          initiator, </Normal Text><Comment>\* single initiator, will be the root of the tree</Comment><br/>
+<Normal Text>          R          </Normal Text><Comment>\* neighborhood relation, represented as a Boolean function over nodes </Comment><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>ASSUME</Keyword><Normal Text> /\ initiator \in Node</Normal Text><br/>
+<Normal Text>       /\ R \in [Node \X Node -> BOOLEAN]</Normal Text><br/>
+<Normal Text>       </Normal Text><Comment>\* No edge from a node to itself (self-loops).</Comment><br/>
+<Normal Text>       /\ IsIrreflexive(R, Node)</Normal Text><br/>
+<Normal Text>       </Normal Text><Comment>\* Undirected graph (there exists an edge from b </Comment><br/>
+<Normal Text>       </Normal Text><Comment>\* to a if there exists an edge from a to b).</Comment><br/>
+<Normal Text>       /\ IsSymmetric(R, Node)</Normal Text><br/>
+<Normal Text>       </Normal Text><Comment>\* There exists a spanning tree consisting of *all* nodes.</Comment><br/>
+<Normal Text>       </Normal Text><Comment>\* (no forest of spanning trees). </Comment><br/>
+<Normal Text>       /\ IsConnected(R, Node)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>NoNode == </Normal Text><Keyword>CHOOSE</Keyword><Normal Text> x : x \notin Node</Normal Text><br/>
+<Normal Text>neighbors(n) == { m \in Node : R[m,n] }</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment>(**</Comment><br/>
+<Comment>--algorithm Echo {</Comment><br/>
+<Comment>    variable inbox = [n \in Node |-> {}];  \* model communication between nodes</Comment><br/>
+<Comment>    define { \* sending and receiving messages</Comment><br/>
+<Comment>      \* network obtained from net when p sends message of kind knd to q</Comment><br/>
+<Comment>      send(net, p, q, knd) == [net EXCEPT ![q] = @ \cup {[kind |-> knd, sndr |-> p]}]</Comment><br/>
+<Comment>      \* network obtained from net when p receives a message</Comment><br/>
+<Comment>      receive(net, p, msg) == [net EXCEPT ![p] = @ \ {msg}]</Comment><br/>
+<Comment>      \* network obtained from net when p send message of kind knd to all nodes in dest</Comment><br/>
+<Comment>      multicast(net, p, dest, knd) ==</Comment><br/>
+<Comment>        [m \in Node |-> IF m \in dest THEN net[m] \cup {[kind |-> knd, sndr |-> p]}</Comment><br/>
+<Comment>                        ELSE net[m]]</Comment><br/>
+<Comment>    }</Comment><br/>
+<Comment></Comment><br/>
+<Comment>  process (node \in Node) </Comment><br/>
+<Comment>    variables parent = NoNode,</Comment><br/>
+<Comment>              children = {},</Comment><br/>
+<Comment>              rcvd = 0,</Comment><br/>
+<Comment>              nbrs = neighbors(self);        {</Comment><br/>
+<Comment>  n0: if (self = initiator) {</Comment><br/>
+<Comment>         \* initiator sends first message to all its neighbors</Comment><br/>
+<Comment>         inbox := multicast(inbox, self, nbrs, "m")</Comment><br/>
+<Comment>      };</Comment><br/>
+<Comment>  n1: while (rcvd < Cardinality(nbrs)) {</Comment><br/>
+<Comment>         \* receive some message from a neighbor</Comment><br/>
+<Comment>         with (msg \in inbox[self],</Comment><br/>
+<Comment>               net = receive(inbox, self, msg)) {</Comment><br/>
+<Comment>            rcvd := rcvd+1;</Comment><br/>
+<Comment>            if (self # initiator /\ rcvd = 1) {</Comment><br/>
+<Comment>               assert(msg.kind = "m");  \* the first received message is always of type "m"</Comment><br/>
+<Comment>               \* note the sender as the node's parent and send an "m" message to all remaining neighbors</Comment><br/>
+<Comment>               parent := msg.sndr;</Comment><br/>
+<Comment>               inbox := multicast(net, self, nbrs \ {msg.sndr}, "m")</Comment><br/>
+<Comment>            }</Comment><br/>
+<Comment>            else {</Comment><br/>
+<Comment>               \* subsequent messages are counted but don't give rise to another message</Comment><br/>
+<Comment>               inbox := net</Comment><br/>
+<Comment>            };</Comment><br/>
+<Comment>            if (msg.kind = "c") { children := children \cup {msg.sndr} }</Comment><br/>
+<Comment>         }  \* end with</Comment><br/>
+<Comment>      }; \* end while</Comment><br/>
+<Comment>  n2: if (self # initiator) {</Comment><br/>
+<Comment>         \* when non-initiator has received messages from all neighbors, acknowledge</Comment><br/>
+<Comment>         \* child relationship to the parent</Comment><br/>
+<Comment>         assert(parent \in nbrs);</Comment><br/>
+<Comment>         inbox := send(inbox, self, parent, "c")</Comment><br/>
+<Comment>      }</Comment><br/>
+<Comment>  } \* end process</Comment><br/>
+<Comment>}</Comment><br/>
+<Comment>**)</Comment><br/>
+<Comment>\* </Comment><Region Marker>BEGIN</Region Marker><Comment> TRANSLATION</Comment><br/>
+<Keyword>VARIABLES</Keyword><Normal Text> inbox, pc</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment>(* define statement *)</Comment><br/>
+<Normal Text>send(net, p, q, knd) == [net </Normal Text><Keyword>EXCEPT</Keyword><Normal Text> ![q] = @ \cup {[kind |-> knd, sndr |-> p]}]</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>receive(net, p, msg) == [net </Normal Text><Keyword>EXCEPT</Keyword><Normal Text> ![p] = @ \ {msg}]</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>multicast(net, p, dest, knd) ==</Normal Text><br/>
+<Normal Text>  [m \in Node |-> </Normal Text><Keyword>IF</Keyword><Normal Text> m \in dest </Normal Text><Keyword>THEN</Keyword><Normal Text> net[m] \cup {[kind |-> knd, sndr |-> p]}</Normal Text><br/>
+<Normal Text>                  </Normal Text><Keyword>ELSE</Keyword><Normal Text> net[m]]</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>VARIABLES</Keyword><Normal Text> parent, children, rcvd, nbrs</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>vars == << inbox, pc, parent, children, rcvd, nbrs >></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>ProcSet == (Node)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Init == </Normal Text><Comment>(* Global variables *)</Comment><br/>
+<Normal Text>        /\ inbox = [n \in Node |-> {}]</Normal Text><br/>
+<Normal Text>        </Normal Text><Comment>(* Process node *)</Comment><br/>
+<Normal Text>        /\ parent = [self \in Node |-> NoNode]</Normal Text><br/>
+<Normal Text>        /\ children = [self \in Node |-> {}]</Normal Text><br/>
+<Normal Text>        /\ rcvd = [self \in Node |-> </Normal Text><Decimal>0</Decimal><Normal Text>]</Normal Text><br/>
+<Normal Text>        /\ nbrs = [self \in Node |-> neighbors(self)]</Normal Text><br/>
+<Normal Text>        /\ pc = [self \in ProcSet |-> </Normal Text><String>"n0"</String><Normal Text>]</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>n0(self) == /\ pc[self] = </Normal Text><String>"n0"</String><br/>
+<Normal Text>            /\ </Normal Text><Keyword>IF</Keyword><Normal Text> self = initiator</Normal Text><br/>
+<Normal Text>                  </Normal Text><Keyword>THEN</Keyword><Normal Text> /\ inbox' = multicast(inbox, self, nbrs[self], </Normal Text><String>"m"</String><Normal Text>)</Normal Text><br/>
+<Normal Text>                  </Normal Text><Keyword>ELSE</Keyword><Normal Text> /\ TRUE</Normal Text><br/>
+<Normal Text>                       /\ inbox' = inbox</Normal Text><br/>
+<Normal Text>            /\ pc' = [pc </Normal Text><Keyword>EXCEPT</Keyword><Normal Text> ![self] = </Normal Text><String>"n1"</String><Normal Text>]</Normal Text><br/>
+<Normal Text>            /\ </Normal Text><Keyword>UNCHANGED</Keyword><Normal Text> << parent, children, rcvd, nbrs >></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>n1(self) == /\ pc[self] = </Normal Text><String>"n1"</String><br/>
+<Normal Text>            /\ </Normal Text><Keyword>IF</Keyword><Normal Text> rcvd[self] < Cardinality(nbrs[self])</Normal Text><br/>
+<Normal Text>                  </Normal Text><Keyword>THEN</Keyword><Normal Text> /\ \E msg \in inbox[self]:</Normal Text><br/>
+<Normal Text>                            </Normal Text><Keyword>LET</Keyword><Normal Text> net == receive(inbox, self, msg) </Normal Text><Keyword>IN</Keyword><br/>
+<Normal Text>                              /\ rcvd' = [rcvd </Normal Text><Keyword>EXCEPT</Keyword><Normal Text> ![self] = rcvd[self]+</Normal Text><Decimal>1</Decimal><Normal Text>]</Normal Text><br/>
+<Normal Text>                              /\ </Normal Text><Keyword>IF</Keyword><Normal Text> self # initiator /\ rcvd'[self] = </Normal Text><Decimal>1</Decimal><br/>
+<Normal Text>                                    </Normal Text><Keyword>THEN</Keyword><Normal Text> /\ Assert((msg.kind = </Normal Text><String>"m"</String><Normal Text>), </Normal Text><br/>
+<Normal Text>                                                   </Normal Text><String>"Failure of assertion at line 50, column 16."</String><Normal Text>)</Normal Text><br/>
+<Normal Text>                                         /\ parent' = [parent </Normal Text><Keyword>EXCEPT</Keyword><Normal Text> ![self] = msg.sndr]</Normal Text><br/>
+<Normal Text>                                         /\ inbox' = multicast(net, self, nbrs[self] \ {msg.sndr}, </Normal Text><String>"m"</String><Normal Text>)</Normal Text><br/>
+<Normal Text>                                    </Normal Text><Keyword>ELSE</Keyword><Normal Text> /\ inbox' = net</Normal Text><br/>
+<Normal Text>                                         /\ </Normal Text><Keyword>UNCHANGED</Keyword><Normal Text> parent</Normal Text><br/>
+<Normal Text>                              /\ </Normal Text><Keyword>IF</Keyword><Normal Text> msg.kind = </Normal Text><String>"c"</String><br/>
+<Normal Text>                                    </Normal Text><Keyword>THEN</Keyword><Normal Text> /\ children' = [children </Normal Text><Keyword>EXCEPT</Keyword><Normal Text> ![self] = children[self] \cup {msg.sndr}]</Normal Text><br/>
+<Normal Text>                                    </Normal Text><Keyword>ELSE</Keyword><Normal Text> /\ TRUE</Normal Text><br/>
+<Normal Text>                                         /\ </Normal Text><Keyword>UNCHANGED</Keyword><Normal Text> children</Normal Text><br/>
+<Normal Text>                       /\ pc' = [pc </Normal Text><Keyword>EXCEPT</Keyword><Normal Text> ![self] = </Normal Text><String>"n1"</String><Normal Text>]</Normal Text><br/>
+<Normal Text>                  </Normal Text><Keyword>ELSE</Keyword><Normal Text> /\ pc' = [pc </Normal Text><Keyword>EXCEPT</Keyword><Normal Text> ![self] = </Normal Text><String>"n2"</String><Normal Text>]</Normal Text><br/>
+<Normal Text>                       /\ </Normal Text><Keyword>UNCHANGED</Keyword><Normal Text> << inbox, parent, children, rcvd >></Normal Text><br/>
+<Normal Text>            /\ nbrs' = nbrs</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>n2(self) == /\ pc[self] = </Normal Text><String>"n2"</String><br/>
+<Normal Text>            /\ </Normal Text><Keyword>IF</Keyword><Normal Text> self # initiator</Normal Text><br/>
+<Normal Text>                  </Normal Text><Keyword>THEN</Keyword><Normal Text> /\ Assert((parent[self] \in nbrs[self]), </Normal Text><br/>
+<Normal Text>                                 </Normal Text><String>"Failure of assertion at line 65, column 10."</String><Normal Text>)</Normal Text><br/>
+<Normal Text>                       /\ inbox' = send(inbox, self, parent[self], </Normal Text><String>"c"</String><Normal Text>)</Normal Text><br/>
+<Normal Text>                  </Normal Text><Keyword>ELSE</Keyword><Normal Text> /\ TRUE</Normal Text><br/>
+<Normal Text>                       /\ inbox' = inbox</Normal Text><br/>
+<Normal Text>            /\ pc' = [pc </Normal Text><Keyword>EXCEPT</Keyword><Normal Text> ![self] = </Normal Text><String>"Done"</String><Normal Text>]</Normal Text><br/>
+<Normal Text>            /\ </Normal Text><Keyword>UNCHANGED</Keyword><Normal Text> << parent, children, rcvd, nbrs >></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>node(self) == n0(self) \/ n1(self) \/ n2(self)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment>(* Allow infinite stuttering to prevent deadlock on termination. *)</Comment><br/>
+<Normal Text>Terminating == /\ \A self \in ProcSet: pc[self] = </Normal Text><String>"Done"</String><br/>
+<Normal Text>               /\ </Normal Text><Keyword>UNCHANGED</Keyword><Normal Text> vars</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Next == (\E self \in Node: node(self))</Normal Text><br/>
+<Normal Text>           \/ Terminating</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Spec == Init /\ [][Next]_vars</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>Termination == <>(\A self \in ProcSet: pc[self] = </Normal Text><String>"Done"</String><Normal Text>)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment>\* </Comment><Region Marker>END</Region Marker><Comment> TRANSLATION</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Comment>(***************************************************************************)</Comment><br/>
+<Comment>(* Correctness properties.                                                 *)</Comment><br/>
+<Comment>(***************************************************************************)</Comment><br/>
+<Normal Text>TypeOK ==</Normal Text><br/>
+<Normal Text>  /\ parent \in [Node -> (Node \cup {NoNode})]</Normal Text><br/>
+<Normal Text>  /\ children \in [Node -> </Normal Text><Keyword>SUBSET</Keyword><Normal Text> Node]</Normal Text><br/>
+<Normal Text>  /\ rcvd \in [Node -> Nat]</Normal Text><br/>
+<Normal Text>  /\ nbrs \in [Node -> </Normal Text><Keyword>SUBSET</Keyword><Normal Text> Node]</Normal Text><br/>
+<Normal Text>  /\ \A n \in Node : nbrs[n] = neighbors(n) /\ rcvd[n] <= Cardinality(nbrs[n])</Normal Text><br/>
+<Normal Text>  /\ inbox \in [Node -> </Normal Text><Keyword>SUBSET</Keyword><Normal Text> [kind : {</Normal Text><String>"m"</String><Normal Text>,</Normal Text><String>"c"</String><Normal Text>}, sndr : Node]]</Normal Text><br/>
+<Normal Text>  /\ \A n \in Node : \A msg \in inbox[n] : msg.sndr \in nbrs[n]</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment>(* The initiator never has a parent *)</Comment><br/>
+<Normal Text>InitiatorNoParent == parent[initiator] = NoNode</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment>(* If a node has a parent, it is a neighbor node *)</Comment><br/>
+<Normal Text>ParentIsNeighbor == \A n \in Node : parent[n] \in neighbors(n) \cup {NoNode}</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment>(* A node n is a child of node m only if m is the parent of n.</Comment><br/>
+<Comment>   At the end of the computation, this is "if and only if". *)</Comment><br/>
+<Normal Text>ParentChild == \A m,n \in Node :</Normal Text><br/>
+<Normal Text>  /\ n \in children[m] => m = parent[n]</Normal Text><br/>
+<Normal Text>  /\ m = parent[n] /\ pc[m] = </Normal Text><String>"Done"</String><Normal Text> => n \in children[m]</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment>(* Compute the ancestor relation *)</Comment><br/>
+<Normal Text>IsParent == [m,n \in Node |-> n = parent[m]]</Normal Text><br/>
+<Normal Text>IsAncestor == TransitiveClosure(IsParent, Node)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment>(* At the end of the computation, the initiator is an ancestor of every other node</Comment><br/>
+<Comment>   and the ancestor relation is acyclic.</Comment><br/>
+<Comment>   Beware: evaluating this property over any but tiny graphs is costly.</Comment><br/>
+<Comment>*)</Comment><br/>
+<Normal Text>AncestorProperties ==</Normal Text><br/>
+<Normal Text>  (\A n \in Node : pc[n] = </Normal Text><String>"Done"</String><Normal Text>)</Normal Text><br/>
+<Normal Text>  => </Normal Text><Keyword>LET</Keyword><Normal Text> anc == IsAncestor</Normal Text><br/>
+<Normal Text>     </Normal Text><Keyword>IN</Keyword><Normal Text>  /\ \A n \in Node \ {initiator} : anc[n, initiator]</Normal Text><br/>
+<Normal Text>         /\ IsIrreflexive(anc, Node)</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>=============================================================================</Normal Text><br/>
+<Comment>\* Modification History</Comment><br/>
+<Comment>\* Last modified Wed Jun 17 09:23:17 PDT 2020 by markus</Comment><br/>
+<Comment>\* Last modified Sun Jun 14 17:11:39 CEST 2020 by merz</Comment><br/>
+<Comment>\* Created Tue Apr 26 09:42:23 CEST 2016 by merz</Comment><br/>

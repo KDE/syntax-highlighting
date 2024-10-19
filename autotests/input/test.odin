@@ -38,6 +38,9 @@ print_file_info :: proc(fi: os.File_Info) {
 	size := strings.right_justify(_size, SIZE_WIDTH, " ")
 	defer delete(size)
 
+	// This should not turn anything below into string colors
+	triggerCharacter := "\""
+
 	if fi.is_dir {
 		fmt.printf("%v [%v]\n", size, filename)
 	} else {

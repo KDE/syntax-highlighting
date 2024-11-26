@@ -2,9 +2,15 @@
 <!DOCTYPE language
 [
   <!ENTITY symbols ":!&#37;&amp;()+,-/.*&lt;=&gt;?[]|~^;">
+  <!ENTITY bin_int "(?:[01]+(?:_[01]+)*)">
+  <!ENTITY oct_int "(?:[0-7]+(?:_[0-7]+)*)">
+  <!ENTITY dec_int "(?:[0-9]+(?:_[0-9]+)*)">
+  <!ENTITY hex_int "(?:[0-9A-Fa-f]+(?:_[0-9A-Fa-f]+)*)">
+  <!ENTITY exp_float "(?:[eE][+-]?&dec_int;)">
+  <!ENTITY exp_hexfloat "(?:[pP][-+]?&dec_int;)">
 ]>
 <language name="Odin" section="Sources"
-          version="5" kateversion="5.79"
+          version="6" kateversion="5.79"
           indenter="cstyle"
           extensions="*.odin"
           priority="1"
@@ -38,7 +44,6 @@
       <item>defer</item>
       <item>asm</item>
       <item>distinct</item>
-      <item>context</item>
       <item>nil</item>
       <item>true</item>
       <item>false</item>
@@ -60,6 +65,10 @@
       <item>type_of</item>
       <item>type_info_of</item>
       <item>typeid_of</item>
+    </list>
+
+    <list name="context">
+      <item>context</item>
     </list>
 
     <list name="types">
@@ -133,6 +142,35 @@
       <item>foreign</item>
     </list>
 
+    <list name="attributes">
+      <item>private</item>
+      <item>require</item>
+      <item>link_name</item>
+      <item>link_prefix</item>
+      <item>linkage</item>
+      <item>default_calling_convention</item>
+      <item>link_section</item>
+      <item>extra_linker_flags</item>
+      <item>deferred_in</item>
+      <item>deferred_out</item>
+      <item>deferred_in_out</item>
+      <item>deferred_none</item>
+      <item>deprecated</item>
+      <item>require_results</item>
+      <item>disabled</item>
+      <item>init</item>
+      <item>cold</item>
+      <item>optimization_mode</item>
+      <item>test</item>
+      <item>static</item>
+      <item>thread_local</item>
+      <item>builtin</item>
+      <item>objc_type</item>
+      <item>objc_is_class_method</item>
+      <item>require_target_feature</item>
+      <item>enable_target_feature</item>
+    </list>
+
     <contexts>
       <context attribute="Normal Text" lineEndContext="#stay" name="Normal Text" >
         <Detect2Chars attribute="Comment" char="/" char1="/" context="SingleLineComment"/>
@@ -142,14 +180,13 @@
         <keyword attribute="Control Flow" context="#stay" String="controlflow" />
         <keyword attribute="Keyword" context="#stay" String="keywords" />
         <keyword attribute="Data Type" context="#stay" String="types" />
-        <DetectChar attribute="Attribute" context="#stay" char='@' column="0"/>
+        <keyword String="context" attribute="Context Variable" context="#stay"/>
+        <DetectChar attribute="Attribute" context="AttributeContext" char='@' column="0"/>
+        <AnyChar context="Number" String="0123456789" lookAhead="1" />
         <RegExpr attribute="Directive" context="#stay" String="\#\w+"/>
         <RegExpr attribute="Procedure" firstNonSpace="true" context="Procedure" String="\w{1,}\s{0,}::\s{0,}(?=proc)" lookAhead="true"/>
-        <RegExpr attribute="Procedure" context="#stay" String="[A-Za-z_]*(?=\()" />
-        <RegExpr attribute="Variable" context="#stay" firstNonSpace="true" String="\s{0,}\w{1,},{0,1}\s{0,}\w{0,}\s{0,}(?=:\=|:)(?!::)"/>
-        <RegExpr attribute="Variable" context="#stay" String="[A-Za-z_]*(?=\.)"/>
-        <RegExpr attribute="Float" context="#stay" String="\b(\d(\d|_)*(.\d(\d|_)*)?)((e|E)(\+|-)?\d+)?[ijk]?\b" />
-        <RegExpr attribute="Decimal" context="#stay" String="\b((0b(0|1|_)+)|(0o(\d|_)+)|(0d(\d|_)+)|(0[xXh](\h|_)+))[ijk]?\b" />
+        <RegExpr attribute="Procedure" context="#stay" String="[A-Za-z_0-9]*\s*(?=\()" />
+        <RegExpr attribute="Variable" context="#stay" firstNonSpace="true" String="\w{1,},{0,1}\s{0,}\w{0,}\s{0,}(?=:\=|:\s{0,}\w{1,}\s{0,}\=)(?!::)"/> <!--TODO this is too expensive-->
         <AnyChar attribute="Operator" context="#stay" String="&symbols;" />
         <DetectChar attribute="Operator" context="#stay" char="{" beginRegion="Brace1" />
         <DetectChar attribute="Operator" context="#stay" char="}" endRegion="Brace1" />
@@ -168,7 +205,7 @@
       </context>
 
       <context name="String" attribute="String" lineEndContext="#stay">
-          <RegExpr attribute="RawString" String="\\." context="#stay"/>
+          <RegExpr attribute="String Char" context="#stay" String="\\([nrt'&quot;\\]|x[0-9a-fA-F]{2}|[0-7]{3}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})"/>
           <AnyChar attribute="String" context="#pop" String="&quot;&apos;"/>
       </context>
 
@@ -178,8 +215,31 @@
 
       <context name="Procedure" attribute="Procedure" lineEndContext="#pop">
         <Detect2Chars attribute="Operator" char=":" char1=":" context="#stay"/>
-        <StringDetect attribute="Keyword" context="#stay" String="proc" />
-        <AnyChar attribute="Procedure" context="#pop" lookAhead="true" String="\("/>
+        <WordDetect attribute="Keyword" context="#stay" String="proc" />
+        <AnyChar attribute="String" context="String" String="&quot;&apos;"/> <!--e.g, "contextless" | "c" -->
+        <AnyChar attribute="Symbol" context="#pop" lookAhead="true" String="\("/>
+      </context>
+
+      <context name="AttributeContext" attribute="Normal Text" lineEndContext="#pop">
+        <DetectChar attribute="Symbol" context="#stay" char='('/>
+        <DetectSpaces />
+        <keyword attribute="Attribute" context="#pop" String="attributes" />
+      </context>
+
+      <!-- Integer / Float -->
+      <context name="Number" attribute="Normal Text" lineEndContext="#pop">
+          <RegExpr attribute="Float" context="#pop!SuffixNumber" String="&dec_int;(\.&dec_int;&exp_float;?|&exp_float;)"/>
+          <RegExpr attribute="Decimal" context="#pop!SuffixNumber" String="0(?=[^xob]|$)|(?=0[xob])|&dec_int;"/>
+          <RegExpr attribute="Hex" context="#pop!SuffixNumber" String="0x&hex_int;"/>
+          <RegExpr attribute="Octal" context="#pop!SuffixNumber" String="0o&oct_int;"/>
+          <RegExpr attribute="Binary" context="#pop!SuffixNumber" String="0b&bin_int;"/>
+          <DetectChar attribute="Decimal" context="#pop!SuffixNumber" char="0"/>
+      </context>
+      <context name="SuffixNumber" attribute="Normal Text" lineEndContext="#pop" fallthroughContext="#pop">
+          <DetectChar attribute="Symbol" char=':' context="#pop"/> <!-- in `[0:a]` -->
+          <StringDetect attribute="Symbol" String=".." context="#pop"/> <!-- in `0..a` -->
+          <AnyChar attribute="Error" String=".0123456789" context="#pop"/>
+          <DetectIdentifier attribute="Error" context="#pop"/>
       </context>
 
     </contexts>
@@ -196,9 +256,16 @@
       <itemData name="String"       defStyleNum="dsString"/>
       <itemData name="RawString"       defStyleNum="dsSpecialString"/>
       <itemData name="Comment"      defStyleNum="dsComment"/>
-      <itemData name="Decimal" defStyleNum="dsDecVal"/>
-      <itemData name="Float" defStyleNum="dsFloat"/>
-      <itemData name="Use" defStyleNum="dsImport"/>
+      <itemData name="Binary"       defStyleNum="dsBaseN"  spellChecking="false"/>
+      <itemData name="Octal"        defStyleNum="dsBaseN"  spellChecking="false"/>
+      <itemData name="Hex"          defStyleNum="dsBaseN"  spellChecking="false"/>
+      <itemData name="Decimal"      defStyleNum="dsDecVal" spellChecking="false"/>
+      <itemData name="Float"        defStyleNum="dsFloat"  spellChecking="false"/>
+      <itemData name="Use"          defStyleNum="dsImport"/>
+      <itemData name="Error"        defStyleNum="dsError" spellChecking="false"/>
+      <itemData name="Context Variable" defStyleNum="dsKeyword" spellChecking="0"/>
+      <itemData name="Symbol"       defStyleNum="dsOperator" spellChecking="false"/>
+      <itemData name="String Char"  defStyleNum="dsSpecialChar"/>
     </itemDatas>
   </highlighting>
   <general>

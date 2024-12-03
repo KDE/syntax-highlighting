@@ -58,6 +58,9 @@ print_file_info :: proc(fi: os.File_Info) {
 	// Print size to string backed by buf on stack, no need to free
 	_size := "-" if fi.is_dir else fmt.bprintf(buf[:], "%v", fi.size)
 
+	a: u8 = cast(u8)'"'
+	b: u8 = '"'
+
 	// Right-justify size for display, heap allocated
 	size := strings.right_justify(_size, SIZE_WIDTH, " ")
 	defer delete(size)

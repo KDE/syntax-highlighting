@@ -10,7 +10,7 @@
   <!ENTITY exp_hexfloat "(?:[pP][-+]?&dec_int;)">
 ]>
 <language name="Odin" section="Sources"
-          version="6" kateversion="5.79"
+          version="7" kateversion="5.79"
           indenter="cstyle"
           extensions="*.odin"
           priority="1"
@@ -176,7 +176,8 @@
         <Detect2Chars attribute="Comment" char="/" char1="/" context="SingleLineComment"/>
         <Detect2Chars attribute="Comment" context="MultiLineComment" char="/" char1="*" lookAhead="true" beginRegion="Comment1" />
         <Detect2Chars attribute="Operator" char=":" char1=":" context="#stay"/>
-        <AnyChar attribute="String" context="String" String="&quot;&apos;"/>
+        <DetectChar attribute="String" context="DoubleQuoteString" char="&quot;"/>
+        <DetectChar attribute="Character" context="Character" char="'"/>
         <keyword attribute="Control Flow" context="#stay" String="controlflow" />
         <keyword attribute="Keyword" context="#stay" String="keywords" />
         <keyword attribute="Data Type" context="#stay" String="types" />
@@ -204,9 +205,16 @@
         <Detect2Chars attribute="Comment" context="#pop" char="*" char1="/" endRegion="Comment1"/>
       </context>
 
-      <context name="String" attribute="String" lineEndContext="#stay">
-          <RegExpr attribute="String Char" context="#stay" String="\\([nrt'&quot;\\]|x[0-9a-fA-F]{2}|[0-7]{3}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})"/>
-          <AnyChar attribute="String" context="#pop" String="&quot;&apos;"/>
+      <context attribute="String" lineEndContext="#pop" name="DoubleQuoteString">
+          <DetectChar context="EscapeChar" char="\" lookAhead="1"/>
+          <DetectChar attribute="String" context="#pop" char="&quot;"/>
+      </context>
+      <context attribute="Character" lineEndContext="#pop" name="Character">
+          <DetectChar context="EscapeChar" char="\" lookAhead="1"/>
+          <DetectChar attribute="Character" context="#pop" char="'"/>
+      </context>
+      <context name="EscapeChar" attribute="String Char" lineEndContext="#pop">
+          <RegExpr attribute="String Char" context="#pop" String="\\([nrt'&quot;\\]|x[0-9a-fA-F]{2}|[0-7]{3}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})"/>
       </context>
 
       <context name="RawString" attribute="RawString" lineEndContext="#stay">
@@ -216,8 +224,12 @@
       <context name="Procedure" attribute="Procedure" lineEndContext="#pop">
         <Detect2Chars attribute="Operator" char=":" char1=":" context="#stay"/>
         <WordDetect attribute="Keyword" context="#stay" String="proc" />
-        <AnyChar attribute="String" context="String" String="&quot;&apos;"/> <!--e.g, "contextless" | "c" -->
+        <DetectChar attribute="String" context="SimpleDoubleQuoteString" char="&quot;"/> <!--e.g, "contextless" | "c" -->
         <AnyChar attribute="Symbol" context="#pop" lookAhead="true" String="\("/>
+      </context>
+
+      <context attribute="String" lineEndContext="#pop" name="SimpleDoubleQuoteString">
+          <DetectChar attribute="String" context="#pop" char="&quot;"/>
       </context>
 
       <context name="AttributeContext" attribute="Normal Text" lineEndContext="#pop">
@@ -266,6 +278,7 @@
       <itemData name="Context Variable" defStyleNum="dsKeyword" spellChecking="0"/>
       <itemData name="Symbol"       defStyleNum="dsOperator" spellChecking="false"/>
       <itemData name="String Char"  defStyleNum="dsSpecialChar"/>
+      <itemData name="Character" defStyleNum="dsChar" spellChecking="false"/>
     </itemDatas>
   </highlighting>
   <general>

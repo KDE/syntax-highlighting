@@ -119,6 +119,7 @@
 <Option Name>RootHashSignature</Option Name><Normal> =</Normal><br/>
 <Option Name>RootVerity</Option Name><Normal> = /some/path</Normal><br/>
 <Option Name>MountAPIVFS</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
+<Option Name>BindLogSockets</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
 <Option Name>ProcSubset</Option Name><Normal> = </Normal><Constant>pid</Constant><br/>
 <Option Name>BindPaths</Option Name><Normal> = /source/path,/destination/path,</Normal><Constant>rbind</Constant><Normal> </Normal><Continuation>\</Continuation><br/>
 <Normal>  /source/path2,/destination/path2,</Normal><Constant>norbind</Constant><Normal> </Normal><Continuation>\</Continuation><br/>
@@ -213,6 +214,7 @@
 <Option Name>PrivateDevices</Option Name><Normal> = </Normal><Constant>on</Constant><br/>
 <Option Name>PrivateNetwork</Option Name><Normal> = </Normal><Constant>no</Constant><br/>
 <Option Name>NetworkNamespacePath</Option Name><Normal> = /some/path</Normal><br/>
+<Option Name>PrivatePIDs</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
 <Option Name>PrivateUsers</Option Name><Normal> = </Normal><Constant>off</Constant><br/>
 <Option Name>ProtectHostname</Option Name><Normal> = </Normal><Constant>false</Constant><br/>
 <Option Name>ProtectClock</Option Name><Normal> = </Normal><Constant>no</Constant><br/>
@@ -329,6 +331,7 @@
 <Option Name>ManagedOOMSwap</Option Name><Normal> = </Normal><Constant>auto</Constant><br/>
 <Option Name>ManagedOOMMemoryPressure</Option Name><Normal> = </Normal><Constant>kill</Constant><br/>
 <Option Name>ManagedOOMMemoryPressureLimit</Option Name><Normal> = </Normal><Number>50</Number><Measurement Unit>%</Measurement Unit><br/>
+<Option Name>ManagedOOMMemoryPressureDurationSec</Option Name><Normal> = </Normal><Number>1</Number><Measurement Unit>s</Measurement Unit><Normal> </Normal><Number>50</Number><Measurement Unit>ms</Measurement Unit><br/>
 <Option Name>ManagedOOMPreference</Option Name><Normal> = </Normal><Constant>omit</Constant><br/>
 <Option Name>MemoryPressureWatch</Option Name><Normal> = </Normal><Constant>skip</Constant><br/>
 <Option Name>MemoryPressureThresholdSec</Option Name><Normal> = </Normal><Number>50</Number><Measurement Unit>ms</Measurement Unit><br/>
@@ -431,6 +434,7 @@
 <Option Name>AccuracySec</Option Name><Normal> = </Normal><Number>1</Number><Measurement Unit>min</Measurement Unit><Normal> </Normal><Number>10</Number><Measurement Unit>sec</Measurement Unit><br/>
 <Option Name>RandomizedDelaySec</Option Name><Normal> = </Normal><Number>30</Number><Measurement Unit>s</Measurement Unit><br/>
 <Option Name>FixedRandomDelay</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
+<Option Name>DeferReactivation</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
 <Option Name>OnClockChange</Option Name><Normal> = </Normal><Constant>false</Constant><br/>
 <Option Name>OnTimezoneChange</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
 <Option Name>Unit</Option Name><Normal> = </Normal><Unit Name>some_timed</Unit Name><Unit Extension>.service</Unit Extension><br/>
@@ -2010,11 +2014,18 @@
 <Comment>###### memory pressure watch</Comment><br/>
 <Section Header>[Service]</Section Header><br/>
 <Option Name>MemoryPressureWatch</Option Name><Normal> = </Normal><Constant>auto</Constant><br/>
-<Option Name>MemoryPressureWatch</Option Name><Normal> = </Normal><Constant>off</Constant><br/>
-<Option Name>MemoryPressureWatch</Option Name><Normal> = </Normal><Constant>on</Constant><br/>
 <Option Name>MemoryPressureWatch</Option Name><Normal> = </Normal><Constant>skip</Constant><br/>
+<Comment>## should accept any boolean value</Comment><br/>
+<Option Name>MemoryPressureWatch</Option Name><Normal> = </Normal><Constant>on</Constant><br/>
+<Option Name>MemoryPressureWatch</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
+<Option Name>MemoryPressureWatch</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
+<Option Name>MemoryPressureWatch</Option Name><Normal> = </Normal><Constant>1</Constant><br/>
+<Option Name>MemoryPressureWatch</Option Name><Normal> = </Normal><Constant>off</Constant><br/>
+<Option Name>MemoryPressureWatch</Option Name><Normal> = </Normal><Constant>no</Constant><br/>
+<Option Name>MemoryPressureWatch</Option Name><Normal> = </Normal><Constant>false</Constant><br/>
+<Option Name>MemoryPressureWatch</Option Name><Normal> = </Normal><Constant>0</Constant><br/>
 <Comment>## invalid values</Comment><br/>
-<Option Name>MemoryPressureWatch</Option Name><Normal> = invalid</Normal><br/>
+<Option Name>MemoryPressureWatch</Option Name><Normal> = i</Normal><Constant>n</Constant><Normal>valid</Normal><br/>
 <Comment># multiple values</Comment><br/>
 <Option Name>MemoryPressureWatch</Option Name><Normal> = </Normal><Constant>auto</Constant><Normal> skip</Normal><br/>
 <Normal></Normal><br/>
@@ -2216,6 +2227,43 @@
 <Option Name>Personality</Option Name><Normal> = </Normal><Constant>x86-64</Constant><Normal> s390x</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
+<Comment>###### private tmp</Comment><br/>
+<Section Header>[Service]</Section Header><br/>
+<Option Name>PrivateTmp</Option Name><Normal> = </Normal><Constant>disconnected</Constant><br/>
+<Comment>## should accept any boolean value</Comment><br/>
+<Option Name>PrivateTmp</Option Name><Normal> = </Normal><Constant>on</Constant><br/>
+<Option Name>PrivateTmp</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
+<Option Name>PrivateTmp</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
+<Option Name>PrivateTmp</Option Name><Normal> = </Normal><Constant>1</Constant><br/>
+<Option Name>PrivateTmp</Option Name><Normal> = </Normal><Constant>off</Constant><br/>
+<Option Name>PrivateTmp</Option Name><Normal> = </Normal><Constant>no</Constant><br/>
+<Option Name>PrivateTmp</Option Name><Normal> = </Normal><Constant>false</Constant><br/>
+<Option Name>PrivateTmp</Option Name><Normal> = </Normal><Constant>0</Constant><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>PrivateTmp</Option Name><Normal> = i</Normal><Constant>n</Constant><Normal>valid</Normal><br/>
+<Comment># multiple values</Comment><br/>
+<Option Name>PrivateTmp</Option Name><Normal> = </Normal><Constant>disconnected</Constant><Normal> true</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Comment>###### private users</Comment><br/>
+<Section Header>[Service]</Section Header><br/>
+<Option Name>PrivateUsers</Option Name><Normal> = </Normal><Constant>identity</Constant><br/>
+<Option Name>PrivateUsers</Option Name><Normal> = </Normal><Constant>self</Constant><br/>
+<Comment>## should accept any boolean value</Comment><br/>
+<Option Name>PrivateUsers</Option Name><Normal> = </Normal><Constant>on</Constant><br/>
+<Option Name>PrivateUsers</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
+<Option Name>PrivateUsers</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
+<Option Name>PrivateUsers</Option Name><Normal> = </Normal><Constant>1</Constant><br/>
+<Option Name>PrivateUsers</Option Name><Normal> = </Normal><Constant>off</Constant><br/>
+<Option Name>PrivateUsers</Option Name><Normal> = </Normal><Constant>no</Constant><br/>
+<Option Name>PrivateUsers</Option Name><Normal> = </Normal><Constant>false</Constant><br/>
+<Option Name>PrivateUsers</Option Name><Normal> = </Normal><Constant>0</Constant><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>PrivateUsers</Option Name><Normal> = i</Normal><Constant>n</Constant><Normal>valid</Normal><br/>
+<Comment># multiple values</Comment><br/>
+<Option Name>PrivateUsers</Option Name><Normal> = </Normal><Constant>identity</Constant><Normal> self</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
 <Comment>###### proc subset</Comment><br/>
 <Section Header>[Service]</Section Header><br/>
 <Option Name>ProcSubset</Option Name><Normal> = </Normal><Constant>all</Constant><br/>
@@ -2224,6 +2272,25 @@
 <Option Name>ProcSubset</Option Name><Normal> = invalid</Normal><br/>
 <Comment># multiple values</Comment><br/>
 <Option Name>ProcSubset</Option Name><Normal> = </Normal><Constant>all</Constant><Normal> pid</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Comment>###### protect control groups</Comment><br/>
+<Section Header>[Service]</Section Header><br/>
+<Option Name>ProtectControlGroups</Option Name><Normal> = </Normal><Constant>private</Constant><br/>
+<Option Name>ProtectControlGroups</Option Name><Normal> = </Normal><Constant>strict</Constant><br/>
+<Comment>## should accept any boolean value</Comment><br/>
+<Option Name>ProtectControlGroups</Option Name><Normal> = </Normal><Constant>on</Constant><br/>
+<Option Name>ProtectControlGroups</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
+<Option Name>ProtectControlGroups</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
+<Option Name>ProtectControlGroups</Option Name><Normal> = </Normal><Constant>1</Constant><br/>
+<Option Name>ProtectControlGroups</Option Name><Normal> = </Normal><Constant>off</Constant><br/>
+<Option Name>ProtectControlGroups</Option Name><Normal> = </Normal><Constant>no</Constant><br/>
+<Option Name>ProtectControlGroups</Option Name><Normal> = </Normal><Constant>false</Constant><br/>
+<Option Name>ProtectControlGroups</Option Name><Normal> = </Normal><Constant>0</Constant><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>ProtectControlGroups</Option Name><Normal> = </Normal><Constant>private</Constant><br/>
+<Comment># multiple values</Comment><br/>
+<Option Name>ProtectControlGroups</Option Name><Normal> = </Normal><Constant>private</Constant><Normal> strict</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### protect home</Comment><br/>
@@ -2270,6 +2337,7 @@
 <Normal></Normal><br/>
 <Comment>###### restart mode</Comment><br/>
 <Section Header>[Service]</Section Header><br/>
+<Option Name>RestartMode</Option Name><Normal> = </Normal><Constant>debug</Constant><br/>
 <Option Name>RestartMode</Option Name><Normal> = </Normal><Constant>direct</Constant><br/>
 <Option Name>RestartMode</Option Name><Normal> = </Normal><Constant>normal</Constant><br/>
 <Comment>## invalid values</Comment><br/>

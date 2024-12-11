@@ -119,6 +119,7 @@ RootHash = 0xABCDEF
 RootHashSignature =
 RootVerity = /some/path
 MountAPIVFS = true
+BindLogSockets = true
 ProcSubset = pid
 BindPaths = /source/path,/destination/path,rbind \
   /source/path2,/destination/path2,norbind \
@@ -213,6 +214,7 @@ PrivateTmp = yes
 PrivateDevices = on
 PrivateNetwork = no
 NetworkNamespacePath = /some/path
+PrivatePIDs = true
 PrivateUsers = off
 ProtectHostname = false
 ProtectClock = no
@@ -329,6 +331,7 @@ DisableControllers = cpu io
 ManagedOOMSwap = auto
 ManagedOOMMemoryPressure = kill
 ManagedOOMMemoryPressureLimit = 50%
+ManagedOOMMemoryPressureDurationSec = 1s 50ms
 ManagedOOMPreference = omit
 MemoryPressureWatch = skip
 MemoryPressureThresholdSec = 50ms
@@ -431,6 +434,7 @@ OnCalendar = daily
 AccuracySec = 1min 10sec
 RandomizedDelaySec = 30s
 FixedRandomDelay = yes
+DeferReactivation = true
 OnClockChange = false
 OnTimezoneChange = true
 Unit = some_timed.service
@@ -2010,9 +2014,16 @@ CoredumpFilter = private-file-backed, shared-dax
 ###### memory pressure watch
 [Service]
 MemoryPressureWatch = auto
-MemoryPressureWatch = off
-MemoryPressureWatch = on
 MemoryPressureWatch = skip
+## should accept any boolean value
+MemoryPressureWatch = on
+MemoryPressureWatch = yes
+MemoryPressureWatch = true
+MemoryPressureWatch = 1
+MemoryPressureWatch = off
+MemoryPressureWatch = no
+MemoryPressureWatch = false
+MemoryPressureWatch = 0
 ## invalid values
 MemoryPressureWatch = invalid
 # multiple values
@@ -2216,6 +2227,43 @@ Personality = m68k
 Personality = x86-64 s390x
 
 
+###### private tmp
+[Service]
+PrivateTmp = disconnected
+## should accept any boolean value
+PrivateTmp = on
+PrivateTmp = yes
+PrivateTmp = true
+PrivateTmp = 1
+PrivateTmp = off
+PrivateTmp = no
+PrivateTmp = false
+PrivateTmp = 0
+## invalid values
+PrivateTmp = invalid
+# multiple values
+PrivateTmp = disconnected true
+
+
+###### private users
+[Service]
+PrivateUsers = identity
+PrivateUsers = self
+## should accept any boolean value
+PrivateUsers = on
+PrivateUsers = yes
+PrivateUsers = true
+PrivateUsers = 1
+PrivateUsers = off
+PrivateUsers = no
+PrivateUsers = false
+PrivateUsers = 0
+## invalid values
+PrivateUsers = invalid
+# multiple values
+PrivateUsers = identity self
+
+
 ###### proc subset
 [Service]
 ProcSubset = all
@@ -2224,6 +2272,25 @@ ProcSubset = pid
 ProcSubset = invalid
 # multiple values
 ProcSubset = all pid
+
+
+###### protect control groups
+[Service]
+ProtectControlGroups = private
+ProtectControlGroups = strict
+## should accept any boolean value
+ProtectControlGroups = on
+ProtectControlGroups = yes
+ProtectControlGroups = true
+ProtectControlGroups = 1
+ProtectControlGroups = off
+ProtectControlGroups = no
+ProtectControlGroups = false
+ProtectControlGroups = 0
+## invalid values
+ProtectControlGroups = private
+# multiple values
+ProtectControlGroups = private strict
 
 
 ###### protect home
@@ -2270,6 +2337,7 @@ Restart = no on-abort
 
 ###### restart mode
 [Service]
+RestartMode = debug
 RestartMode = direct
 RestartMode = normal
 ## invalid values

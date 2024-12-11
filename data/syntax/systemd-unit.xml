@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created for systemd version 256. -->
+<!-- Created for systemd version 257. -->
 <!DOCTYPE language [
 <!ENTITY alp "A-Za-z">
 <!ENTITY aln "&alp;0-9">
@@ -23,7 +23,7 @@
 <!ENTITY tsp_unit "&tsp_year;|&tsp_month;|&tsp_week;|&tsp_day;|&tsp_hour;|&tsp_sec;|&tsp_msec;|&tsp_usec;|&tsp_min;">
 <!ENTITY tsp "\d+(?:\.\d+)?\h*(?=(&tsp_unit;)?)">
 ]>
-<language version="16" author="Andreas Gratzer" extensions="*.automount;*.device;*.mount;*.path;*.service;*.slice;*.socket;*.swap;*.target;*.timer" kateversion="5.0" license="MIT" mimetype="text/x-systemd-unit" name="systemd unit" section="Configuration">
+<language version="17" author="Andreas Gratzer" extensions="*.automount;*.device;*.mount;*.path;*.service;*.slice;*.socket;*.swap;*.target;*.timer" kateversion="5.0" license="MIT" mimetype="text/x-systemd-unit" name="systemd unit" section="Configuration">
   <highlighting>
     <list name="boolean">
       <!-- 0, 1, t, f, y, n are also valid, but handled using AnyChar. -->
@@ -643,8 +643,6 @@
     </list>
     <list name="memory pressure watch">
       <item>skip</item>
-      <item>on</item>
-      <item>off</item>
       <item>auto</item>
     </list>
     <list name="mount flag">
@@ -721,9 +719,20 @@
       <item>arm-be</item>
       <item>arm</item>
     </list>
+    <list name="private tmp">
+      <item>disconnected</item>
+    </list>
+    <list name="private users">
+      <item>self</item>
+      <item>identity</item>
+    </list>
     <list name="proc subset">
       <item>pid</item>
       <item>all</item>
+    </list>
+    <list name="protect control groups">
+      <item>strict</item>
+      <item>private</item>
     </list>
     <list name="protect home">
       <item>tmpfs</item>
@@ -745,6 +754,7 @@
     <list name="restart mode">
       <item>normal</item>
       <item>direct</item>
+      <item>debug</item>
     </list>
     <list name="runtime directory preserve">
       <item>restart</item>
@@ -822,6 +832,7 @@
     <list name="socket protocol">
       <item>udplite</item>
       <item>sctp</item>
+      <item>mptcp</item>
     </list>
     <list name="standard input">
       <item>tty-force</item>
@@ -1422,6 +1433,7 @@
       </context>
       <context name="memory pressure watch" attribute="Normal" lineEndContext="#pop">
         <keyword String="memory pressure watch" attribute="Constant" context="#pop"/>
+        <IncludeRules context="boolean"/>
       </context>
       <context name="mount flag" attribute="Normal" lineEndContext="#pop">
         <keyword String="mount flag" attribute="Constant" context="#pop"/>
@@ -1484,8 +1496,20 @@
       <context name="personality" attribute="Normal" lineEndContext="#pop">
         <keyword String="personality" attribute="Constant" context="#pop"/>
       </context>
+      <context name="private tmp" attribute="Normal" lineEndContext="#pop">
+        <keyword String="private tmp" attribute="Constant" context="#pop"/>
+        <IncludeRules context="boolean"/>
+      </context>
+      <context name="private users" attribute="Normal" lineEndContext="#pop">
+        <keyword String="private users" attribute="Constant" context="#pop"/>
+        <IncludeRules context="boolean"/>
+      </context>
       <context name="proc subset" attribute="Normal" lineEndContext="#pop">
         <keyword String="proc subset" attribute="Constant" context="#pop"/>
+      </context>
+      <context name="protect control groups" attribute="Normal" lineEndContext="#pop">
+        <keyword String="protect control groups" attribute="Constant" context="#pop"/>
+        <IncludeRules context="boolean"/>
       </context>
       <context name="protect home" attribute="Normal" lineEndContext="#pop">
         <keyword String="protect home" attribute="Constant" context="#pop"/>
@@ -1678,6 +1702,7 @@
         <keyword String="options exec" firstNonSpace="true" attribute="Option Name" context="text"/>
         <WordDetect String="AmbientCapabilities" firstNonSpace="true" attribute="Option Name" context="~ capability list"/>
         <WordDetect String="AppArmorProfile" firstNonSpace="true" attribute="Option Name" context="- text"/>
+        <WordDetect String="BindLogSockets" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="BindPaths" firstNonSpace="true" attribute="Option Name" context="bind list"/>
         <WordDetect String="BindReadOnlyPaths" firstNonSpace="true" attribute="Option Name" context="bind list"/>
         <WordDetect String="CPUAffinity" firstNonSpace="true" attribute="Option Name" context="cpu affinity"/>
@@ -1735,11 +1760,12 @@
         <WordDetect String="PrivateIPC" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="PrivateMounts" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="PrivateNetwork" firstNonSpace="true" attribute="Option Name" context="boolean"/>
-        <WordDetect String="PrivateTmp" firstNonSpace="true" attribute="Option Name" context="boolean"/>
-        <WordDetect String="PrivateUsers" firstNonSpace="true" attribute="Option Name" context="boolean"/>
+        <WordDetect String="PrivatePIDs" firstNonSpace="true" attribute="Option Name" context="boolean"/>
+        <WordDetect String="PrivateTmp" firstNonSpace="true" attribute="Option Name" context="private tmp"/>
+        <WordDetect String="PrivateUsers" firstNonSpace="true" attribute="Option Name" context="private users"/>
         <WordDetect String="ProcSubset" firstNonSpace="true" attribute="Option Name" context="proc subset"/>
         <WordDetect String="ProtectClock" firstNonSpace="true" attribute="Option Name" context="boolean"/>
-        <WordDetect String="ProtectControlGroups" firstNonSpace="true" attribute="Option Name" context="boolean"/>
+        <WordDetect String="ProtectControlGroups" firstNonSpace="true" attribute="Option Name" context="protect control groups"/>
         <WordDetect String="ProtectHome" firstNonSpace="true" attribute="Option Name" context="protect home"/>
         <WordDetect String="ProtectHostname" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="ProtectKernelLogs" firstNonSpace="true" attribute="Option Name" context="boolean"/>
@@ -1852,6 +1878,7 @@
         <WordDetect String="IPAddressAllow" firstNonSpace="true" attribute="Option Name" context="ip address list"/>
         <WordDetect String="IPAddressDeny" firstNonSpace="true" attribute="Option Name" context="ip address list"/>
         <WordDetect String="ManagedOOMMemoryPressure" firstNonSpace="true" attribute="Option Name" context="oom behavior"/>
+        <WordDetect String="ManagedOOMMemoryPressureDurationSec" firstNonSpace="true" attribute="Option Name" context="time span"/>
         <WordDetect String="ManagedOOMMemoryPressureLimit" firstNonSpace="true" attribute="Option Name" context="percent"/>
         <WordDetect String="ManagedOOMPreference" firstNonSpace="true" attribute="Option Name" context="oom preference"/>
         <WordDetect String="ManagedOOMSwap" firstNonSpace="true" attribute="Option Name" context="oom behavior"/>
@@ -1980,6 +2007,7 @@
       </context>
       <context name="options timer" attribute="Normal" lineEndContext="#stay">
         <WordDetect String="AccuracySec" firstNonSpace="true" attribute="Option Name" context="time span"/>
+        <WordDetect String="DeferReactivation" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="FixedRandomDelay" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="OnActiveSec" firstNonSpace="true" attribute="Option Name" context="time span"/>
         <WordDetect String="OnBootSec" firstNonSpace="true" attribute="Option Name" context="time span"/>

@@ -1,0 +1,150 @@
+; SPDX-FileCopyrightText: 2025 Leo Marušić <leomarusic7@gmail.com>
+; SPDX-License-Identifier: MIT
+MAIN:
+ MOV SP, #0x10000       ; stack initialization
+ LDR R0, MEM            ; pointer to the address of the operands
+ LDR R12, REZ           ; pointer for the result address
+MAINLOOP:
+ ADD R0, R0, #0x8       ; point to the operation in the operand block
+ LDR R1, [R0]           ; save the operation code in R1
+ CMP R1, #0x0           ; check for subtraction
+ BEQ SUBTRACT
+ CMP R1, #0x1           ; check for addition
+ BEQ ADDLOOP
+ CMP R1, #0x2           ; check for multiplication
+ BEQ MULLOOP
+ CMP R1, #0x3           ; check for division
+ BEQ DIVIDEOP
+ MVN R2, #0x0           ; put 0xFFFFFFFF in R2
+ CMP R1, R2             ; check for the end
+ BEQ FINISH
+ B MAINLOOP             ; go back to the loop
+
+SUBTRACT:
+ SUB R0, R0, #0x8   ; go back to the beginning of the operand block
+ LDR R1, [R0]       ; load the first operand
+ LDR R2, [R0, #0x4] ; load the second operand
+ SUB R3, R1, R2     ; subtract
+ STR R3, [R12]      ; save the result
+ ADD R12, R12, #0x4 ; move the result address pointer
+ ADD R0, R0, #0xC   ; move the operand address pointer
+ B MAINLOOP
+
+ADDLOOP:
+ SUB R0, R0, #0x8   ; go back to the beginning of the operand block
+ LDR R1, [R0]       ; load the first operand
+ LDR R2, [R0, #0x4] ; load the second operand
+ ADD R3, R1, R2     ; add
+ STR R3, [R12]      ; save the result
+ ADD R12, R12, #0x4 ; move the result address pointer
+ ADD R0, R0, #0xC   ; move the operand address pointer
+ B MAINLOOP
+
+MULLOOP:
+ SUB R0, R0, #0x8   ; go back to the beginning of the operand block
+ LDR R1, [R0]       ; load the first operand
+ LDR R2, [R0, #0x4] ; load the second operand
+ MUL R3, R1, R2     ; multiply
+ STR R3, [R12]      ; save the result
+ ADD R12, R12, #0x4 ; move the result address pointer
+ ADD R0, R0, #0xC   ; move the operand address pointer
+ B MAINLOOP
+
+DIVIDEOP:
+ SUB R0, R0, #0x8   ; go back to the beginning of the operand block
+ LDR R1, [R0]       ; load the first operand
+ LDR R2, [R0, #0x4] ; load the second operand
+ SUB SP, SP, #0x4   ; space for the result
+ STMFD SP!, {R1-R2} ; put the operands on the stack
+ BL DIVIDE
+ ADD SP, SP, #0x8   ; stack cleanup
+ LDMFD SP!, {R3}    ; retrieve the result
+ STR R3, [R12]      ; save the result
+ ADD R12, R12, #0x4 ; move the result address pointer
+ ADD R0, R0, #0xC   ; move the operand address pointer
+ B MAINLOOP
+
+DIVIDE:
+ STMFD SP!, {R3-R5}       ; save the context
+ LDR R3, [SP, #12]        ; load the numerator
+ LDR R4, [SP, #16]        ; load the denominator
+ MOV R5, #0               ; quotient
+ CMP R4, #0x0             ; check for division by zero
+ BEQ ZERO
+
+ CMP R3, #0               ; check if the numerator is negative
+ MVNLT R3, R3             ; 1's complement
+ ADDLT R3, R3, #1         ; 2's complement
+ CMP R4, #0               ; check if the denominator is negative
+ MVNLT R4, R4             ; 1's complement
+ ADDLT R4, R4 , #1        ; 2's complement
+
+LOOP1:
+ CMP R3, R4         ; compare the numerator and the denominator
+ BLT DONE           ; if the numerator is less than the denominator, the division is finished
+ SUB R3, R3, R4     ; subtract the denominator from the numerator
+ ADD R5, R5, #1     ; increment the quotient
+ B LOOP1
+
+DONE:
+ CMP R1, #0         ; check the sign of the original numerator
+ MVNLT R5, R5       ; 1's complement the quotient
+ ADDLT R5, R5, #1   ; 2's complement the quotient
+ CMP R2, #0         ; check the sign of the original denominator
+ MVNLT R5, R5       ; 1's complement the quotient
+ ADDLT R5, R5 , #1  ; 2's complement the quotient
+ STR R5, [SP, #20]  ; put the result on the stack
+ LDMFD SP!, {R3-R5} ; restore the context
+ MOV PC, LR
+
+ZERO:
+ STR R5, [SP, #20]  ; save zero as the result on the stack
+ LDMFD SP!, {R3-R5} ; restore the context
+ MOV PC, LR
+
+FINISH:
+ MVN R11, #0x0      ; marker for the end of the output
+ STR R11, [R12]     ; save the marker at the end of the output
+ SWI 0x123456
+
+MEM: DW 0x600       ; Memory for the operands
+ ORG 0x600
+ DW 0xFFFFFEFF
+ DW 0x00000010
+ DW 0x00000003
+
+ DW 0x000001F4
+ DW 0xFFFFFD44
+ DW 0x00000000
+
+ DW 0x00000003
+ DW 0xFFFFFFEC
+ DW 0x00000001
+
+ DW 0xFFFFFFFE
+ DW 0x0000000A
+ DW 0x00000002
+
+ DW 0xFFFFF000
+ DW 0xFFFFFFC0
+ DW 0x00000003
+
+ DW 0x00000001
+ DW 0x00000004
+ DW 0xFFFFFFFF
+
+RES: DW 0x2000       ; memory for the result
+ ORG 0x2000
+ DW 0x0000
+ DW 0x0000
+ DW 0x0000
+ DW 0x0000
+ DW 0x0000
+ DW 0x0000
+ DW 0x0000
+ DW 0x0000
+ DW 0x0000
+ DW 0x0000
+ DW 0x0000
+ DW 0x0000
+ DW 0x0000

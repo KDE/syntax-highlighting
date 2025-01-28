@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>highlight.asm-arm</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (ARM Assembler) - Theme (Breeze Dark)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="color:#7a7c7d">; </span><span style="color:#3f8058;font-style:italic">SPDX-FileCopyrightText:</span><span style="color:#7a7c7d"> 2025 Leo Marušić &lt;leomarusic7@gmail.com></span>
+<span style="color:#7a7c7d">; </span><span style="color:#3f8058;font-style:italic">SPDX-License-Identifier:</span><span style="color:#3f8058;font-style:italic"> </span><span style="color:#3f8058;font-style:italic">MIT</span>
+<span style="color:#fdbc4b;font-weight:bold">MAIN:</span>
+ <span style="color:#8e44ad">MOV</span> <span style="color:#2980b9">SP</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x10000</span>       <span style="color:#7a7c7d">; stack initialization</span>
+ <span style="color:#8e44ad">LDR</span> <span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> MEM            <span style="color:#7a7c7d">; pointer to the address of the operands</span>
+ <span style="color:#8e44ad">LDR</span> <span style="color:#2980b9">R12</span><span style="color:#3f8058">,</span> REZ           <span style="color:#7a7c7d">; pointer for the result address</span>
+<span style="color:#fdbc4b;font-weight:bold">MAINLOOP:</span>
+ <span style="color:#8e44ad">ADD</span> <span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x8</span>       <span style="color:#7a7c7d">; point to the operation in the operand block</span>
+ <span style="color:#8e44ad">LDR</span> <span style="color:#2980b9">R1</span><span style="color:#3f8058">,</span> <span style="color:#3f8058">[</span><span style="color:#2980b9">R0</span><span style="color:#3f8058">]</span>           <span style="color:#7a7c7d">; save the operation code in R1</span>
+ <span style="color:#8e44ad">CMP</span> <span style="color:#2980b9">R1</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x0</span>           <span style="color:#7a7c7d">; check for subtraction</span>
+ <span style="color:#fdbc4b;font-weight:bold">BEQ</span> SUBTRACT
+ <span style="color:#8e44ad">CMP</span> <span style="color:#2980b9">R1</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x1</span>           <span style="color:#7a7c7d">; check for addition</span>
+ <span style="color:#fdbc4b;font-weight:bold">BEQ</span> ADDLOOP
+ <span style="color:#8e44ad">CMP</span> <span style="color:#2980b9">R1</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x2</span>           <span style="color:#7a7c7d">; check for multiplication</span>
+ <span style="color:#fdbc4b;font-weight:bold">BEQ</span> MULLOOP
+ <span style="color:#8e44ad">CMP</span> <span style="color:#2980b9">R1</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x3</span>           <span style="color:#7a7c7d">; check for division</span>
+ <span style="color:#fdbc4b;font-weight:bold">BEQ</span> DIVIDEOP
+ <span style="color:#8e44ad">MVN</span> <span style="color:#2980b9">R2</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x0</span>           <span style="color:#7a7c7d">; put 0xFFFFFFFF in R2</span>
+ <span style="color:#8e44ad">CMP</span> <span style="color:#2980b9">R1</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R2</span>             <span style="color:#7a7c7d">; check for the end</span>
+ <span style="color:#fdbc4b;font-weight:bold">BEQ</span> FINISH
+ <span style="color:#fdbc4b;font-weight:bold">B</span> MAINLOOP             <span style="color:#7a7c7d">; go back to the loop</span>
+
+<span style="color:#fdbc4b;font-weight:bold">SUBTRACT:</span>
+ <span style="color:#8e44ad">SUB</span> <span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x8</span>   <span style="color:#7a7c7d">; go back to the beginning of the operand block</span>
+ <span style="color:#8e44ad">LDR</span> <span style="color:#2980b9">R1</span><span style="color:#3f8058">,</span> <span style="color:#3f8058">[</span><span style="color:#2980b9">R0</span><span style="color:#3f8058">]</span>       <span style="color:#7a7c7d">; load the first operand</span>
+ <span style="color:#8e44ad">LDR</span> <span style="color:#2980b9">R2</span><span style="color:#3f8058">,</span> <span style="color:#3f8058">[</span><span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x4</span><span style="color:#3f8058">]</span> <span style="color:#7a7c7d">; load the second operand</span>
+ <span style="color:#8e44ad">SUB</span> <span style="color:#2980b9">R3</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R1</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R2</span>     <span style="color:#7a7c7d">; subtract</span>
+ <span style="color:#8e44ad">STR</span> <span style="color:#2980b9">R3</span><span style="color:#3f8058">,</span> <span style="color:#3f8058">[</span><span style="color:#2980b9">R12</span><span style="color:#3f8058">]</span>      <span style="color:#7a7c7d">; save the result</span>
+ <span style="color:#8e44ad">ADD</span> <span style="color:#2980b9">R12</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R12</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x4</span> <span style="color:#7a7c7d">; move the result address pointer</span>
+ <span style="color:#8e44ad">ADD</span> <span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0xC</span>   <span style="color:#7a7c7d">; move the operand address pointer</span>
+ <span style="color:#fdbc4b;font-weight:bold">B</span> MAINLOOP
+
+<span style="color:#fdbc4b;font-weight:bold">ADDLOOP:</span>
+ <span style="color:#8e44ad">SUB</span> <span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x8</span>   <span style="color:#7a7c7d">; go back to the beginning of the operand block</span>
+ <span style="color:#8e44ad">LDR</span> <span style="color:#2980b9">R1</span><span style="color:#3f8058">,</span> <span style="color:#3f8058">[</span><span style="color:#2980b9">R0</span><span style="color:#3f8058">]</span>       <span style="color:#7a7c7d">; load the first operand</span>
+ <span style="color:#8e44ad">LDR</span> <span style="color:#2980b9">R2</span><span style="color:#3f8058">,</span> <span style="color:#3f8058">[</span><span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x4</span><span style="color:#3f8058">]</span> <span style="color:#7a7c7d">; load the second operand</span>
+ <span style="color:#8e44ad">ADD</span> <span style="color:#2980b9">R3</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R1</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R2</span>     <span style="color:#7a7c7d">; add</span>
+ <span style="color:#8e44ad">STR</span> <span style="color:#2980b9">R3</span><span style="color:#3f8058">,</span> <span style="color:#3f8058">[</span><span style="color:#2980b9">R12</span><span style="color:#3f8058">]</span>      <span style="color:#7a7c7d">; save the result</span>
+ <span style="color:#8e44ad">ADD</span> <span style="color:#2980b9">R12</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R12</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x4</span> <span style="color:#7a7c7d">; move the result address pointer</span>
+ <span style="color:#8e44ad">ADD</span> <span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0xC</span>   <span style="color:#7a7c7d">; move the operand address pointer</span>
+ <span style="color:#fdbc4b;font-weight:bold">B</span> MAINLOOP
+
+<span style="color:#fdbc4b;font-weight:bold">MULLOOP:</span>
+ <span style="color:#8e44ad">SUB</span> <span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x8</span>   <span style="color:#7a7c7d">; go back to the beginning of the operand block</span>
+ <span style="color:#8e44ad">LDR</span> <span style="color:#2980b9">R1</span><span style="color:#3f8058">,</span> <span style="color:#3f8058">[</span><span style="color:#2980b9">R0</span><span style="color:#3f8058">]</span>       <span style="color:#7a7c7d">; load the first operand</span>
+ <span style="color:#8e44ad">LDR</span> <span style="color:#2980b9">R2</span><span style="color:#3f8058">,</span> <span style="color:#3f8058">[</span><span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x4</span><span style="color:#3f8058">]</span> <span style="color:#7a7c7d">; load the second operand</span>
+ <span style="color:#8e44ad">MUL</span> <span style="color:#2980b9">R3</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R1</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R2</span>     <span style="color:#7a7c7d">; multiply</span>
+ <span style="color:#8e44ad">STR</span> <span style="color:#2980b9">R3</span><span style="color:#3f8058">,</span> <span style="color:#3f8058">[</span><span style="color:#2980b9">R12</span><span style="color:#3f8058">]</span>      <span style="color:#7a7c7d">; save the result</span>
+ <span style="color:#8e44ad">ADD</span> <span style="color:#2980b9">R12</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R12</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x4</span> <span style="color:#7a7c7d">; move the result address pointer</span>
+ <span style="color:#8e44ad">ADD</span> <span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0xC</span>   <span style="color:#7a7c7d">; move the operand address pointer</span>
+ <span style="color:#fdbc4b;font-weight:bold">B</span> MAINLOOP
+
+<span style="color:#fdbc4b;font-weight:bold">DIVIDEOP:</span>
+ <span style="color:#8e44ad">SUB</span> <span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x8</span>   <span style="color:#7a7c7d">; go back to the beginning of the operand block</span>
+ <span style="color:#8e44ad">LDR</span> <span style="color:#2980b9">R1</span><span style="color:#3f8058">,</span> <span style="color:#3f8058">[</span><span style="color:#2980b9">R0</span><span style="color:#3f8058">]</span>       <span style="color:#7a7c7d">; load the first operand</span>
+ <span style="color:#8e44ad">LDR</span> <span style="color:#2980b9">R2</span><span style="color:#3f8058">,</span> <span style="color:#3f8058">[</span><span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x4</span><span style="color:#3f8058">]</span> <span style="color:#7a7c7d">; load the second operand</span>
+ <span style="color:#8e44ad">SUB</span> <span style="color:#2980b9">SP</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">SP</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x4</span>   <span style="color:#7a7c7d">; space for the result</span>
+ <span style="color:#8e44ad">STMFD</span> <span style="color:#2980b9">SP</span><span style="color:#3f8058">!,</span> <span style="color:#3f8058">{</span><span style="color:#2980b9">R1</span><span style="color:#3f8058">-</span><span style="color:#2980b9">R2</span><span style="color:#3f8058">}</span> <span style="color:#7a7c7d">; put the operands on the stack</span>
+ <span style="color:#fdbc4b;font-weight:bold">BL</span> DIVIDE
+ <span style="color:#8e44ad">ADD</span> <span style="color:#2980b9">SP</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">SP</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x8</span>   <span style="color:#7a7c7d">; stack cleanup</span>
+ <span style="color:#8e44ad">LDMFD</span> <span style="color:#2980b9">SP</span><span style="color:#3f8058">!,</span> <span style="color:#3f8058">{</span><span style="color:#2980b9">R3</span><span style="color:#3f8058">}</span>    <span style="color:#7a7c7d">; retrieve the result</span>
+ <span style="color:#8e44ad">STR</span> <span style="color:#2980b9">R3</span><span style="color:#3f8058">,</span> <span style="color:#3f8058">[</span><span style="color:#2980b9">R12</span><span style="color:#3f8058">]</span>      <span style="color:#7a7c7d">; save the result</span>
+ <span style="color:#8e44ad">ADD</span> <span style="color:#2980b9">R12</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R12</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x4</span> <span style="color:#7a7c7d">; move the result address pointer</span>
+ <span style="color:#8e44ad">ADD</span> <span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R0</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0xC</span>   <span style="color:#7a7c7d">; move the operand address pointer</span>
+ <span style="color:#fdbc4b;font-weight:bold">B</span> MAINLOOP
+
+<span style="color:#fdbc4b;font-weight:bold">DIVIDE:</span>
+ <span style="color:#8e44ad">STMFD</span> <span style="color:#2980b9">SP</span><span style="color:#3f8058">!,</span> <span style="color:#3f8058">{</span><span style="color:#2980b9">R3</span><span style="color:#3f8058">-</span><span style="color:#2980b9">R5</span><span style="color:#3f8058">}</span>       <span style="color:#7a7c7d">; save the context</span>
+ <span style="color:#8e44ad">LDR</span> <span style="color:#2980b9">R3</span><span style="color:#3f8058">,</span> <span style="color:#3f8058">[</span><span style="color:#2980b9">SP</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">12</span><span style="color:#3f8058">]</span>        <span style="color:#7a7c7d">; load the numerator</span>
+ <span style="color:#8e44ad">LDR</span> <span style="color:#2980b9">R4</span><span style="color:#3f8058">,</span> <span style="color:#3f8058">[</span><span style="color:#2980b9">SP</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">16</span><span style="color:#3f8058">]</span>        <span style="color:#7a7c7d">; load the denominator</span>
+ <span style="color:#8e44ad">MOV</span> <span style="color:#2980b9">R5</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0</span>               <span style="color:#7a7c7d">; quotient</span>
+ <span style="color:#8e44ad">CMP</span> <span style="color:#2980b9">R4</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x0</span>             <span style="color:#7a7c7d">; check for division by zero</span>
+ <span style="color:#fdbc4b;font-weight:bold">BEQ</span> ZERO
+
+ <span style="color:#8e44ad">CMP</span> <span style="color:#2980b9">R3</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0</span>               <span style="color:#7a7c7d">; check if the numerator is negative</span>
+ <span style="color:#8e44ad">MVNLT</span> <span style="color:#2980b9">R3</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R3</span>             <span style="color:#7a7c7d">; 1's complement</span>
+ <span style="color:#8e44ad">ADDLT</span> <span style="color:#2980b9">R3</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R3</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">1</span>         <span style="color:#7a7c7d">; 2's complement</span>
+ <span style="color:#8e44ad">CMP</span> <span style="color:#2980b9">R4</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0</span>               <span style="color:#7a7c7d">; check if the denominator is negative</span>
+ <span style="color:#8e44ad">MVNLT</span> <span style="color:#2980b9">R4</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R4</span>             <span style="color:#7a7c7d">; 1's complement</span>
+ <span style="color:#8e44ad">ADDLT</span> <span style="color:#2980b9">R4</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R4</span> <span style="color:#3f8058">,</span> #<span style="color:#f67400">1</span>        <span style="color:#7a7c7d">; 2's complement</span>
+
+<span style="color:#fdbc4b;font-weight:bold">LOOP1:</span>
+ <span style="color:#8e44ad">CMP</span> <span style="color:#2980b9">R3</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R4</span>         <span style="color:#7a7c7d">; compare the numerator and the denominator</span>
+ <span style="color:#fdbc4b;font-weight:bold">BLT</span> DONE           <span style="color:#7a7c7d">; if the numerator is less than the denominator, the division is finished</span>
+ <span style="color:#8e44ad">SUB</span> <span style="color:#2980b9">R3</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R3</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R4</span>     <span style="color:#7a7c7d">; subtract the denominator from the numerator</span>
+ <span style="color:#8e44ad">ADD</span> <span style="color:#2980b9">R5</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R5</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">1</span>     <span style="color:#7a7c7d">; increment the quotient</span>
+ <span style="color:#fdbc4b;font-weight:bold">B</span> LOOP1
+
+<span style="color:#fdbc4b;font-weight:bold">DONE:</span>
+ <span style="color:#8e44ad">CMP</span> <span style="color:#2980b9">R1</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0</span>         <span style="color:#7a7c7d">; check the sign of the original numerator</span>
+ <span style="color:#8e44ad">MVNLT</span> <span style="color:#2980b9">R5</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R5</span>       <span style="color:#7a7c7d">; 1's complement the quotient</span>
+ <span style="color:#8e44ad">ADDLT</span> <span style="color:#2980b9">R5</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R5</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">1</span>   <span style="color:#7a7c7d">; 2's complement the quotient</span>
+ <span style="color:#8e44ad">CMP</span> <span style="color:#2980b9">R2</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0</span>         <span style="color:#7a7c7d">; check the sign of the original denominator</span>
+ <span style="color:#8e44ad">MVNLT</span> <span style="color:#2980b9">R5</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R5</span>       <span style="color:#7a7c7d">; 1's complement the quotient</span>
+ <span style="color:#8e44ad">ADDLT</span> <span style="color:#2980b9">R5</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">R5</span> <span style="color:#3f8058">,</span> #<span style="color:#f67400">1</span>  <span style="color:#7a7c7d">; 2's complement the quotient</span>
+ <span style="color:#8e44ad">STR</span> <span style="color:#2980b9">R5</span><span style="color:#3f8058">,</span> <span style="color:#3f8058">[</span><span style="color:#2980b9">SP</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">20</span><span style="color:#3f8058">]</span>  <span style="color:#7a7c7d">; put the result on the stack</span>
+ <span style="color:#8e44ad">LDMFD</span> <span style="color:#2980b9">SP</span><span style="color:#3f8058">!,</span> <span style="color:#3f8058">{</span><span style="color:#2980b9">R3</span><span style="color:#3f8058">-</span><span style="color:#2980b9">R5</span><span style="color:#3f8058">}</span> <span style="color:#7a7c7d">; restore the context</span>
+ <span style="color:#8e44ad">MOV</span> <span style="color:#2980b9">PC</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">LR</span>
+
+<span style="color:#fdbc4b;font-weight:bold">ZERO:</span>
+ <span style="color:#8e44ad">STR</span> <span style="color:#2980b9">R5</span><span style="color:#3f8058">,</span> <span style="color:#3f8058">[</span><span style="color:#2980b9">SP</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">20</span><span style="color:#3f8058">]</span>  <span style="color:#7a7c7d">; save zero as the result on the stack</span>
+ <span style="color:#8e44ad">LDMFD</span> <span style="color:#2980b9">SP</span><span style="color:#3f8058">!,</span> <span style="color:#3f8058">{</span><span style="color:#2980b9">R3</span><span style="color:#3f8058">-</span><span style="color:#2980b9">R5</span><span style="color:#3f8058">}</span> <span style="color:#7a7c7d">; restore the context</span>
+ <span style="color:#8e44ad">MOV</span> <span style="color:#2980b9">PC</span><span style="color:#3f8058">,</span> <span style="color:#2980b9">LR</span>
+
+<span style="color:#fdbc4b;font-weight:bold">FINISH:</span>
+ <span style="color:#8e44ad">MVN</span> <span style="color:#2980b9">R11</span><span style="color:#3f8058">,</span> #<span style="color:#f67400">0x0</span>      <span style="color:#7a7c7d">; marker for the end of the output</span>
+ <span style="color:#8e44ad">STR</span> <span style="color:#2980b9">R11</span><span style="color:#3f8058">,</span> <span style="color:#3f8058">[</span><span style="color:#2980b9">R12</span><span style="color:#3f8058">]</span>     <span style="color:#7a7c7d">; save the marker at the end of the output</span>
+ <span style="color:#8e44ad">SWI</span> 0x123456
+
+<span style="color:#fdbc4b;font-weight:bold">MEM:</span> <span style="font-weight:bold">DW</span> 0x600       <span style="color:#7a7c7d">; Memory for the operands</span>
+ <span style="font-weight:bold">ORG</span> 0x600
+ <span style="font-weight:bold">DW</span> 0xFFFFFEFF
+ <span style="font-weight:bold">DW</span> 0x00000010
+ <span style="font-weight:bold">DW</span> 0x00000003
+
+ <span style="font-weight:bold">DW</span> 0x000001F4
+ <span style="font-weight:bold">DW</span> 0xFFFFFD44
+ <span style="font-weight:bold">DW</span> 0x00000000
+
+ <span style="font-weight:bold">DW</span> 0x00000003
+ <span style="font-weight:bold">DW</span> 0xFFFFFFEC
+ <span style="font-weight:bold">DW</span> 0x00000001
+
+ <span style="font-weight:bold">DW</span> 0xFFFFFFFE
+ <span style="font-weight:bold">DW</span> 0x0000000A
+ <span style="font-weight:bold">DW</span> 0x00000002
+
+ <span style="font-weight:bold">DW</span> 0xFFFFF000
+ <span style="font-weight:bold">DW</span> 0xFFFFFFC0
+ <span style="font-weight:bold">DW</span> 0x00000003
+
+ <span style="font-weight:bold">DW</span> 0x00000001
+ <span style="font-weight:bold">DW</span> 0x00000004
+ <span style="font-weight:bold">DW</span> 0xFFFFFFFF
+
+<span style="color:#fdbc4b;font-weight:bold">RES:</span> <span style="font-weight:bold">DW</span> 0x2000       <span style="color:#7a7c7d">; memory for the result</span>
+ <span style="font-weight:bold">ORG</span> 0x2000
+ <span style="font-weight:bold">DW</span> 0x0000
+ <span style="font-weight:bold">DW</span> 0x0000
+ <span style="font-weight:bold">DW</span> 0x0000
+ <span style="font-weight:bold">DW</span> 0x0000
+ <span style="font-weight:bold">DW</span> 0x0000
+ <span style="font-weight:bold">DW</span> 0x0000
+ <span style="font-weight:bold">DW</span> 0x0000
+ <span style="font-weight:bold">DW</span> 0x0000
+ <span style="font-weight:bold">DW</span> 0x0000
+ <span style="font-weight:bold">DW</span> 0x0000
+ <span style="font-weight:bold">DW</span> 0x0000
+ <span style="font-weight:bold">DW</span> 0x0000
+ <span style="font-weight:bold">DW</span> 0x0000
+</pre></body></html>

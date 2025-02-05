@@ -151,7 +151,6 @@
         <DetectChar attribute="Comment" context="Match Comments and Docs" char="#" lookAhead="true" />
         <DetectIdentifier attribute="User Function/Macro" context="User Function" />
         <RegExpr attribute="@Variable Substitution" context="@VarSubst" String="@&var_ref_re;@" lookAhead="true" />
-        <IncludeRules context="LineError" />
       </context>
       <!--[- macro render_command_parsers(commands) ]-->
       <!--[ for command in commands -]-->
@@ -165,7 +164,6 @@
         <RegExpr attribute="Aliased Targets" context="<!--{command.name}-->_ctx_op" String="&tgt_name_re;::&tgt_name_re;(?:\:\:&tgt_name_re;)*" />
         <RegExpr attribute="Targets" context="<!--{command.name}-->_ctx_op" String="&tgt_name_re;" />
         <IncludeRules context="User Function Opened" />
-        <IncludeRules context="LineError" />
       </context>
         <!--[- endif ]-->
         <!--[- if command.first_args_are_targets ]-->
@@ -180,7 +178,6 @@
         <IncludeRules context="Detect Aliased Targets" />
         <IncludeRules context="Detect Targets" />
         <IncludeRules context="User Function Opened" />
-        <IncludeRules context="LineError" />
       </context>
         <!--[- endif ]-->
         <!--[- if not command.first_args_are_targets or (command.named_args and command.named_args.kw) ]-->
@@ -236,7 +233,6 @@
         <IncludeRules context="Detect Aliased Targets" />
         <IncludeRules context="Detect Targets" />
         <IncludeRules context="User Function Args" />
-        <IncludeRules context="LineError" />
       </context>
         <!--[- endif ]-->
         <!--[- if command.nested_parentheses ]-->
@@ -336,15 +332,10 @@
         <RegExpr attribute="Aliased Targets" context="#pop" String="&tgt_name_re;::&tgt_name_re;(?:\:\:&tgt_name_re;)*" />
         <IncludeRules context="Detect Targets" />
         <IncludeRules context="User Function Opened" />
-        <IncludeRules context="LineError" />
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="Detect Targets">
         <RegExpr attribute="Targets" context="#stay" String="&tgt_name_re;" />
-      </context>
-
-      <context attribute="Normal Text" lineEndContext="#stay" name="LineError">
-        <RegExpr attribute="Error" context="#stay" String=".*" />
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="User Function Args">
@@ -484,7 +475,6 @@
       <itemData name="Standard Module" defStyleNum="dsImport" spellChecking="false" />
       <itemData name="Deprecated Module" defStyleNum="dsImport" spellChecking="false" />
       <itemData name="Region Marker" defStyleNum="dsRegionMarker" spellChecking="false" />
-      <itemData name="Error" defStyleNum="dsError" spellChecking="false" />
     </itemDatas>
 
   </highlighting>

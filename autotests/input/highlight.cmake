@@ -131,3 +131,7 @@ add_test(
 # nested parentheses
 if( true AND ( false OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") ) )
 endif()
+
+if(NOT TARGET Boost::${lib})
+    add_library(Boost::${lib} INTERFACE IMPORTED)
+endif()

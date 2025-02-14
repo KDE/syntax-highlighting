@@ -138,10 +138,14 @@ transformed data {
 parameters {
   real hotel;
   real<offset = 0., multiplier = 1.> alpha;
+  sum_to_zero_vector[3] zero_sum_game;
 }
 transformed parameters {
   real juliette;
   juliette = hotel * 2.;
+
+  // increment log-determinant of the jacobian
+  jacobian += 1.;
 }
 model {
   real x;
@@ -198,6 +202,9 @@ model {
   // print statement
   print("print statement ", x_real);
   print("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_~@#$%^&*`'-+={}[].,;: ");
+
+  // fatal_error statement (hard exit)
+  fatal_error("fatal error statement", x_real);
 
   // increment log probability statements;
   target += 1.;

@@ -14,3 +14,5 @@ target_link_libraries(kquicksyntaxhighlightingplugin PRIVATE
 )
 
 ecm_finalize_qml_module(kquicksyntaxhighlightingplugin DESTINATION ${KDE_INSTALL_QMLDIR})
+
+ecm_generate_qdoc(kquicksyntaxhighlightingplugin ksyntaxhighlightingqml.qdocconf)

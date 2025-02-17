@@ -90,26 +90,5 @@ install(FILES
     DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF}/KSyntaxHighlighting/KSyntaxHighlighting
 )
 
-if(BUILD_QCH)
-    ecm_add_qch(
-        KF6SyntaxHighlighting_QCH
-        NAME KSyntaxHighlighting
-        BASE_NAME KF6SyntaxHighlighting
-        VERSION ${KF_VERSION}
-        ORG_DOMAIN org.kde
-        SOURCES # using only public headers, to cover only public API
-            ${SyntaxHighlighting_HEADERS}
-        MD_MAINPAGE "${CMAKE_SOURCE_DIR}/README.md"
-        LINK_QCHS
-            Qt6Core_QCH
-            Qt6Gui_QCH
-        INCLUDE_DIRS
-            ${CMAKE_CURRENT_BINARY_DIR}
-        BLANK_MACROS
-            KSYNTAXHIGHLIGHTING_EXPORT
-            KSYNTAXHIGHLIGHTING_DEPRECATED
-        TAGFILE_INSTALL_DESTINATION ${KDE_INSTALL_QTQCHDIR}
-        QCH_INSTALL_DESTINATION ${KDE_INSTALL_QTQCHDIR}
-        COMPONENT Devel
-    )
-endif()
+
+ecm_generate_qdoc(KF6SyntaxHighlighting ksyntaxhighlighting.qdocconf)

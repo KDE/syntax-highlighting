@@ -20,6 +20,11 @@ class Repository;
 class SyntaxHighlighter;
 }
 
+/*!
+ * \class KSyntaxHighlighting::KQuickSyntaxHighlighter
+ *
+ * \inmodule KSyntaxHighlighting
+ */
 class KQuickSyntaxHighlighter : public QObject
 {
     Q_OBJECT
@@ -30,28 +35,56 @@ class KQuickSyntaxHighlighter : public QObject
     Q_PROPERTY(KSyntaxHighlighting::Repository *repository READ repository WRITE setRepository NOTIFY repositoryChanged)
 
 public:
+    /*!
+    */
     explicit KQuickSyntaxHighlighter(QObject *parent = nullptr);
     ~KQuickSyntaxHighlighter() override;
 
+    /*!
+    */
     QObject *textEdit() const;
+    /*!
+    */
     void setTextEdit(QObject *textEdit);
 
+    /*!
+    */
     QVariant definition() const;
+    /*!
+    */
     void setDefinition(const QVariant &definition);
 
+    /*!
+    */
     QVariant theme() const;
+    /*!
+    */
     void setTheme(const QVariant &theme);
 
+    /*!
+    */
     KSyntaxHighlighting::Repository *repository() const;
+    /*!
+    */
     void setRepository(KSyntaxHighlighting::Repository *repository);
 
 Q_SIGNALS:
+    /*!
+    */
     void textEditChanged() const;
+    /*!
+    */
     void definitionChanged() const;
+    /*!
+    */
     void themeChanged();
+    /*!
+    */
     void repositoryChanged();
 
 private:
+    /*!
+    */
     KSyntaxHighlighting::Repository *unwrappedRepository() const;
 
     QObject *m_textEdit;

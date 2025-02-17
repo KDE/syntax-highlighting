@@ -10,6 +10,11 @@
 #include <QQmlEngine>
 #include <QQmlExtensionPlugin>
 
+/*!
+ * \class KQuickSyntaxHighlightingPlugin
+ *
+ * \inmodule KSyntaxHighlighting
+ */
 class KQuickSyntaxHighlightingPlugin : public QQmlExtensionPlugin
 {
     Q_OBJECT

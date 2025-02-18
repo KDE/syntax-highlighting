@@ -1805,6 +1805,16 @@ private:
                 success = checkKeywordInclude(definition, include) && success;
             }
 
+            // Check that keyword list items do not have duplicated entries
+            QSet<QString> entries;
+            for (const auto &keyword : keywordsIt.value().items.keywords) {
+                if (entries.contains(keyword.content)) {
+                    qWarning() << definition.filename << "line" << keyword.line << "duplicated keyword" << keyword.content;
+                    success = false;
+                }
+                entries.insert(keyword.content);
+            }
+
             // Check that keyword list items do not have deliminator character
 #if 0
             for (const auto& keyword : keywordsIt.value().items.keywords) {

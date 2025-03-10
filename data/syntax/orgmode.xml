@@ -33,7 +33,7 @@
 
 <!-- org syntax spec: https://orgmode.org/worg/dev/org-syntax.html -->
 <!-- syntax highlight: https://docs.kde.org/stable5/en/kate/katepart/highlight.html -->
-<language name="Org Mode" version="6" kateversion="5.79" section="Markup" extensions="*.org" priority="15" author="Gary Wang" license="MIT">
+<language name="Org Mode" version="8" kateversion="5.79" section="Markup" extensions="*.org" priority="15" author="Gary Wang" license="MIT">
   <highlighting>
     <list name="org-todo-keywords-todo">
       <item>TODO</item>
@@ -100,7 +100,7 @@
         <StringDetect context="#pop" attribute="Block" String="#+END%1" dynamic="true" endRegion="RegionBlock" column="0"/>
       </context>
       <!-- Source Code Syntax Highlighting Blocks -->
-      <context name="find-src-block" attribute="Block" lineEndContext="#stay">
+      <context name="find-src-block" attribute="Block" lineEndContext="#pop">
         <RegExpr attribute="Block" context="#pop!bash-code" String="\s*(?:bash(?:rc|_profile|_login|_logout)?|shell|sh|profile|PKGBUILD|APKBUILD|ebuild|eclass|nix)" insensitive="true"/>
         <RegExpr attribute="Block" context="#pop!zsh-code" String="\s*(?:zsh)" insensitive="true" beginRegion="code-block"/>
         <RegExpr attribute="Block" context="#pop!cpp-code" String="\s*(?:[ch]pp|[ch]\+\+|[ch]xx|h?cc|hh|cuh?|ino|pde|moc)" insensitive="true" beginRegion="code-block"/>
@@ -129,8 +129,9 @@
         <RegExpr attribute="Block" context="#pop!r-code" String="\s*(?:r|rprofile|rscript).?\n" insensitive="true" beginRegion="code-block"/>
         <RegExpr attribute="Block" context="#pop!raku-code" String="\s*(?:raku(?:mod|doc|test)?|perl6|p[lm]?6|pod6|nqp)" insensitive="true" beginRegion="code-block"/>
         <RegExpr attribute="Block" context="#pop!rest-code" String="\s*(?:rst|rest|restructuredtext)" insensitive="true" beginRegion="code-block"/> <!-- Included in the CMake definition -->
-        <RegExpr attribute="Block" context="#pop!ruby-code" String="\s*(?:ruby|rbx?|rjs|rake|f?cgi|gemspec|irbrc|ru|prawn|Appraisals|(?:Rake|Cap|Chef|Gem|Guard|Hobo|Vagrant||Rant|Berks|Thor|Puppet)file|rxml|(?:xml|js)\.erb)" insensitive="true" beginRegion="code-block"/>
         <RegExpr attribute="Block" context="#pop!rust-code" String="\s*(?:rust|rs)" insensitive="true" beginRegion="code-block"/>
+        <RegExpr attribute="Block" context="#pop!ruby-code" String="\s*(?:ruby|rbx?|rjs|rake|f?cgi|gemspec|irbrc|ru|prawn|Appraisals|(?:Rake|Cap|Chef|Gem|Guard|Hobo|Vagrant||Rant|Berks|Thor|Puppet)file|rxml)" insensitive="true" beginRegion="code-block"/>
+        <RegExpr attribute="Block" context="#pop!rhtml-code" String="\s*(?:xml\.|js\.)?erb" insensitive="true" beginRegion="code-block"/>
         <RegExpr attribute="Block" context="#pop!mysql-code" String="\s*(?:mysql|sql|ddl)" insensitive="true" beginRegion="code-block"/> <!-- Included in the PHP definition -->
         <RegExpr attribute="Block" context="#pop!nim-code" String="\s*(?:nims?)" insensitive="true" beginRegion="code-block"/>
         <RegExpr attribute="Block" context="#pop!typescript-code" String="\s*(?:typescript|ts)" insensitive="true" beginRegion="code-block"/>
@@ -175,143 +176,147 @@
 
       <!-- Source Code Syntax Highlighting -->
       <context attribute="Normal Text" lineEndContext="#stay" name="bash-code" fallthroughContext="Command##Bash">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##Bash" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="zsh-code" fallthroughContext="Command##Zsh">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##Zsh" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="cmake-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##CMake" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="c-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##C" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="cpp-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##C++" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="csharp-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##C#" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="css-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##CSS" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="doxygen-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="BlockComment##Doxygen" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="email-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##Email" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="go-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##Go" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="hamlet-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##Hamlet" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="haskell-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##Haskell" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="html-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##HTML" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="java-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##Java" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="javascript-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="Normal##JavaScript" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="jsx-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="Normal##JavaScript React (JSX)" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="json-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##JSON" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="yaml-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##YAML" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="markdown-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="Normal Text##Markdown"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="matlab-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##Matlab" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="mustache-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##Mustache/Handlebars (HTML)" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="perl-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##Perl" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="php-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="phpsource##PHP/PHP" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="python-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##Python" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="qml-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="Normal##QML" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="r-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##R Script" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="raku-code" fallthroughContext="term##Raku">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="base##Raku" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="rest-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##reStructuredText" includeAttrib="true"/>
       </context>
-      <context attribute="Normal Text" lineEndContext="#stay" name="ruby-code">
-        <IncludeRules context="find-src-block"/>
-        <IncludeRules context="##Ruby" includeAttrib="true"/>
+      <context attribute="Normal Text" lineEndContext="#stay" name="ruby-code" fallthroughContext="Expr##Ruby">
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
+        <IncludeRules context="Ruby##Ruby" includeAttrib="true"/>
+      </context>
+      <context attribute="Normal Text" lineEndContext="#stay" name="rhtml-code">
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
+        <IncludeRules context="##Ruby/Rails/RHTML" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="rust-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##Rust" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="mysql-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##SQL (MySQL)" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="nim-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##Nim" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="typescript-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="Normal##TypeScript" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="xml-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##XML" includeAttrib="true"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="odin-code">
-        <IncludeRules context="find-src-block"/>
+        <StringDetect context="#pop" attribute="Block" String="#+END_SRC" endRegion="RegionBlock" column="0"/>
         <IncludeRules context="##Odin" includeAttrib="true"/>
       </context>
 

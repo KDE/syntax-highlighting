@@ -24,7 +24,7 @@
 
   <!ENTITY url "(http:|https:|ftp:|mailto:)[^]|) ]*(?=$|[]|\s|\)])">
 ]>
-<language name="Jira" section="Markup" version="13" kateversion="5.79" extensions="*.jira" mimetype="" license="FDL" >
+<language name="Jira" section="Markup" version="14" kateversion="5.79" extensions="*.jira" mimetype="" license="FDL" >
   <highlighting>
 
     <!--
@@ -147,7 +147,8 @@
         <RegExpr String=":(?= *(php|title=[- \w]*\.php) *[|}])" attribute="Special Character" context="PhpCodeStartTagContent" />
         <RegExpr String=":(?= *(powershell|title=[- \w]*\.(ps1|psm1|psd1)) *[|}])" attribute="Special Character" context="PowerShellCodeStartTagContent" />
         <RegExpr String=":(?= *(python|title=[- \w]*\.py) *[|}])" attribute="Special Character" context="PythonCodeStartTagContent" />
-        <RegExpr String=":(?= *(ruby|title=([- \w]*\.(rb|erb|rake|gemspec)|Rakefile|Gemfile|Vagrantfile)) *[|}])" attribute="Special Character" context="RubyCodeStartTagContent" />
+        <RegExpr String=":(?= *(ruby|title=([- \w]*\.(rb|rake|gemspec)|Rakefile|Gemfile|Vagrantfile)) *[|}])" attribute="Special Character" context="RubyCodeStartTagContent" />
+        <RegExpr String=":(?= *(ruby|title=([- \w]*\.erv)) *[|}])" attribute="Special Character" context="RHTMLCodeStartTagContent" />
         <RegExpr String=":(?= *(scala|title=[- \w]*\.(scala|sbt)) *[|}])" attribute="Special Character" context="ScalaCodeStartTagContent" />
         <RegExpr String=":(?= *(sql|title=[- \w]*\.sql) *[|}])" attribute="Special Character" context="SqlCodeStartTagContent" />
         <RegExpr String=":(?= *(swift|title=[- \w]*\.swift) *[|}])" attribute="Special Character" context="SwiftCodeStartTagContent" />
@@ -361,9 +362,18 @@
         <DetectChar char="}" attribute="Special Character" context="RubyCodeContent" />
         <IncludeRules context="FindCodeAttributes" />
       </context>
-      <context name="RubyCodeContent" attribute="Normal" lineEndContext="#stay">
+      <context name="RubyCodeContent" attribute="Normal" lineEndContext="#stay" fallthroughContext="Expr##Ruby">
         <IncludeRules context="FindEndCode" />
-        <IncludeRules context="##Ruby" />
+        <IncludeRules context="Ruby##Ruby" />
+      </context>
+
+      <context name="RHTMLCodeStartTagContent" attribute="Normal" lineEndContext="#stay">
+        <DetectChar char="}" attribute="Special Character" context="RHTMLCodeContent" />
+        <IncludeRules context="FindCodeAttributes" />
+      </context>
+      <context name="RHTMLCodeContent" attribute="Normal" lineEndContext="#stay">
+        <IncludeRules context="FindEndCode" />
+        <IncludeRules context="##Ruby/Rails/RHTML" />
       </context>
 
       <context name="ScalaCodeStartTagContent" attribute="Normal" lineEndContext="#stay">

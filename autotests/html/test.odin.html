@@ -14,52 +14,116 @@
 <span style="color:#ff5500">import</span> <span style="color:#bf0303">"core:path/filepath"</span>
 <span style="color:#ff5500">import</span> <span style="color:#bf0303">"core:strings"</span>
 
-<span style="color:#644a9b">print_file_info </span><span style="color:#ca60ca">::</span><span style="color:#644a9b"> </span><span style="font-weight:bold">proc</span><span style="color:#ca60ca">(</span>fi<span style="color:#ca60ca">:</span> <span style="color:#0057ae">os</span><span style="color:#ca60ca">.</span>File_Info<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">{</span>
-    <span style="color:#898887">// Split the path into directory and filename</span>
-<span style="color:#0057ae">    _, filename </span><span style="color:#ca60ca">:=</span> <span style="color:#0057ae">filepath</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">split</span><span style="color:#ca60ca">(</span><span style="color:#0057ae">fi</span><span style="color:#ca60ca">.</span>fullpath<span style="color:#ca60ca">)</span>
+<span style="color:#898887">/**</span>
+<span style="color:#898887"> * This is</span>
+<span style="color:#898887"> * a multiline</span>
+<span style="color:#898887"> * comment</span>
+<span style="color:#898887"> */</span>
 
-    SIZE_WIDTH <span style="color:#ca60ca">::</span> <span style="color:#b08000">12</span>
-<span style="color:#0057ae">    buf</span><span style="color:#ca60ca">:</span> <span style="color:#ca60ca">[</span>SIZE_WIDTH<span style="color:#ca60ca">]</span><span style="color:#0057ae">u8</span>
+packedDirective <span style="color:#ca60ca">::</span> <span style="font-weight:bold">struct</span> <span style="color:#006e28">#packed</span> <span style="color:#ca60ca">{</span>
+	x<span style="color:#ca60ca">:</span> <span style="color:#0057ae">u8</span><span style="color:#ca60ca">,</span>
+	y<span style="color:#ca60ca">:</span> <span style="color:#0057ae">i32</span><span style="color:#ca60ca">,</span>
+	z<span style="color:#ca60ca">:</span> <span style="color:#0057ae">u16</span><span style="color:#ca60ca">,</span>
+	w<span style="color:#ca60ca">:</span> <span style="color:#0057ae">u8</span><span style="color:#ca60ca">,</span>
+<span style="color:#ca60ca">}</span>
 
-<span style="color:#0057ae">    raw_str </span><span style="color:#ca60ca">:=</span> <span style="color:#ff5500">`this_is raw ;';@@""\\\' string`</span>
-    <span style="color:#898887">// Print size to string backed by buf on stack, no need to free</span>
-<span style="color:#0057ae">    _size </span><span style="color:#ca60ca">:=</span> <span style="color:#bf0303">"-"</span> <span style="font-weight:bold">if</span> <span style="color:#0057ae">fi</span><span style="color:#ca60ca">.</span>is_dir <span style="font-weight:bold">else</span> <span style="color:#0057ae">fmt</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">bprintf</span><span style="color:#ca60ca">(</span>buf<span style="color:#ca60ca">[:],</span> <span style="color:#bf0303">"%v"</span><span style="color:#ca60ca">,</span> <span style="color:#0057ae">fi</span><span style="color:#ca60ca">.</span>size<span style="color:#ca60ca">)</span>
+Foo <span style="color:#ca60ca">::</span> <span style="font-weight:bold">enum</span> <span style="color:#ca60ca">{</span>
+	A<span style="color:#ca60ca">,</span>
+	B<span style="color:#ca60ca">,</span>
+	C<span style="color:#ca60ca">,</span>
+	D<span style="color:#ca60ca">,</span>
+<span style="color:#ca60ca">}</span>
 
-    <span style="color:#898887">// Right-justify size for display, heap allocated</span>
-<span style="color:#0057ae">    size  </span><span style="color:#ca60ca">:=</span> <span style="color:#0057ae">strings</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">right_justify</span><span style="color:#ca60ca">(</span>_size<span style="color:#ca60ca">,</span> SIZE_WIDTH<span style="color:#ca60ca">,</span> <span style="color:#bf0303">" "</span><span style="color:#ca60ca">)</span>
-    <span style="font-weight:bold">defer</span> <span style="color:#644a9b">delete</span><span style="color:#ca60ca">(</span>size<span style="color:#ca60ca">)</span>
+<span style="color:#0057ae">@private</span>
+_SS_MAXSIZE   <span style="color:#ca60ca">::</span> <span style="color:#b08000">128</span>
 
-    <span style="font-weight:bold">if</span> <span style="color:#0057ae">fi</span><span style="color:#ca60ca">.</span>is_dir <span style="color:#ca60ca">{</span>
-        <span style="color:#0057ae">fmt</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">printf</span><span style="color:#ca60ca">(</span><span style="color:#bf0303">"%v [%v]\n"</span><span style="color:#ca60ca">,</span> size<span style="color:#ca60ca">,</span> filename<span style="color:#ca60ca">)</span>
-    <span style="color:#ca60ca">}</span> <span style="font-weight:bold">else</span> <span style="color:#ca60ca">{</span>
-        <span style="color:#0057ae">fmt</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">printf</span><span style="color:#ca60ca">(</span><span style="color:#bf0303">"%v %v\n"</span><span style="color:#ca60ca">,</span> size<span style="color:#ca60ca">,</span> filename<span style="color:#ca60ca">)</span>
-    <span style="color:#ca60ca">}</span>
+<span style="color:#0057ae">@require_results</span>
+<span style="color:#644a9b">some_proc</span><span style="color:#ca60ca">::</span><span style="font-weight:bold">proc</span><span style="color:#644a9b"> </span><span style="color:#bf0303">"contextless"</span><span style="color:#ca60ca">()</span> <span style="color:#ca60ca">-></span> <span style="color:#0057ae">i32</span><span style="color:#ca60ca">{</span>
+    <span style="font-weight:bold">return</span> <span style="color:#b08000">0</span>
+<span style="color:#ca60ca">}</span>
+
+<span style="color:#0057ae">@</span><span style="color:#ca60ca">(</span><span style="color:#0057ae">private</span> <span style="color:#ca60ca">=</span> <span style="color:#bf0303">"file"</span><span style="color:#ca60ca">)</span>
+<span style="color:#644a9b">print_file_info </span><span style="color:#ca60ca">::</span><span style="color:#644a9b"> </span><span style="font-weight:bold">proc</span><span style="color:#ca60ca">(</span>fi<span style="color:#ca60ca">:</span> os<span style="color:#ca60ca">.</span>File_Info<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">{</span>
+    <span style="font-weight:bold">context</span><span style="color:#ca60ca">.</span>user_index <span style="color:#ca60ca">=</span> <span style="color:#b08000">100</span>
+    <span style="color:#0057ae">flt </span><span style="color:#ca60ca">:=</span> <span style="color:#b08000">12.33</span>
+    <span style="color:#0057ae">flt_e </span><span style="color:#ca60ca">:=</span> <span style="color:#b08000">1e9</span>
+	<span style="color:#0057ae">bin_ok </span><span style="color:#ca60ca">:=</span> <span style="color:#b08000">0b110001</span>
+	<span style="color:#0057ae">bin_wrong </span><span style="color:#ca60ca">:=</span> <span style="color:#b08000">0b11</span><span style="color:#bf0303;text-decoration:underline">2</span><span style="color:#b08000">2001010123123</span>
+	<span style="color:#0057ae">oct </span><span style="color:#ca60ca">:=</span> <span style="color:#b08000">0o1237</span>
+	<span style="color:#0057ae">oct_wrong </span><span style="color:#ca60ca">:=</span> <span style="color:#b08000">0o123</span><span style="color:#bf0303;text-decoration:underline">9</span><span style="color:#b08000">999</span>
+	<span style="color:#0057ae">hex </span><span style="color:#ca60ca">:=</span> <span style="color:#b08000">0xFF123AC</span>
+	<span style="color:#0057ae">hex_wrong </span><span style="color:#ca60ca">:=</span> <span style="color:#b08000">0xFF123AC</span><span style="color:#bf0303;text-decoration:underline">HH</span>
+
+	<span style="color:#898887">// Split the path into directory and filename</span>
+	<span style="color:#0057ae">_, filename </span><span style="color:#ca60ca">:=</span> filepath<span style="color:#ca60ca">.</span><span style="color:#644a9b">split</span><span style="color:#ca60ca">(</span>fi<span style="color:#ca60ca">.</span>fullpath<span style="color:#ca60ca">)</span>
+
+	SIZE_WIDTH <span style="color:#ca60ca">::</span> <span style="color:#b08000">12</span>
+	buf<span style="color:#ca60ca">:</span> <span style="color:#ca60ca">[</span>SIZE_WIDTH<span style="color:#ca60ca">]</span><span style="color:#0057ae">u8</span>
+
+	<span style="color:#0057ae">raw_str </span><span style="color:#ca60ca">:=</span> <span style="color:#ff5500">`this_is raw ;';@@""\\\' string`</span>
+	<span style="color:#898887">// Print size to string backed by buf on stack, no need to free</span>
+	<span style="color:#0057ae">_size </span><span style="color:#ca60ca">:=</span> <span style="color:#bf0303">"-"</span> <span style="font-weight:bold">if</span> fi<span style="color:#ca60ca">.</span>is_dir <span style="font-weight:bold">else</span> fmt<span style="color:#ca60ca">.</span><span style="color:#644a9b">bprintf</span><span style="color:#ca60ca">(</span>buf<span style="color:#ca60ca">[:],</span> <span style="color:#bf0303">"%v"</span><span style="color:#ca60ca">,</span> fi<span style="color:#ca60ca">.</span>size<span style="color:#ca60ca">)</span>
+
+	<span style="color:#0057ae">a</span><span style="color:#ca60ca">:</span> <span style="color:#0057ae">u8</span> <span style="color:#ca60ca">=</span> <span style="font-weight:bold">cast</span><span style="color:#ca60ca">(</span><span style="color:#0057ae">u8</span><span style="color:#ca60ca">)</span><span style="color:#924c9d">'"'</span>
+	<span style="color:#0057ae">b</span><span style="color:#ca60ca">:</span> <span style="color:#0057ae">u8</span> <span style="color:#ca60ca">=</span> <span style="color:#924c9d">'"'</span>
+
+	<span style="color:#898887">// Right-justify size for display, heap allocated</span>
+	<span style="color:#0057ae">size </span><span style="color:#ca60ca">:=</span> strings<span style="color:#ca60ca">.</span><span style="color:#644a9b">right_justify</span><span style="color:#ca60ca">(</span>_size<span style="color:#ca60ca">,</span> SIZE_WIDTH<span style="color:#ca60ca">,</span> <span style="color:#bf0303">" "</span><span style="color:#ca60ca">)</span>
+	<span style="font-weight:bold">defer</span> <span style="color:#644a9b">delete</span><span style="color:#ca60ca">(</span>size<span style="color:#ca60ca">)</span>
+
+	<span style="color:#0057ae">val</span><span style="color:#ca60ca">:</span> <span style="color:#0057ae">i32</span> <span style="color:#ca60ca">=</span> <span style="color:#b08000">1</span>
+	<span style="font-weight:bold">switch</span><span style="color:#644a9b"> </span><span style="color:#ca60ca">(</span>val<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">{</span>
+	<span style="font-weight:bold">case</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">:</span>
+		val <span style="color:#ca60ca">=</span> <span style="color:#b08000">2</span>
+	<span style="font-weight:bold">case</span> <span style="color:#b08000">2</span><span style="color:#ca60ca">:</span>
+		val <span style="color:#ca60ca">=</span> <span style="color:#b08000">3</span>
+	<span style="font-weight:bold">case</span><span style="color:#ca60ca">:</span>
+		val <span style="color:#ca60ca">=</span> <span style="color:#b08000">0</span>
+	<span style="color:#ca60ca">}</span>
+
+	<span style="color:#898887">// This should not turn anything below into string colors</span>
+	<span style="color:#0057ae">triggerCharacter </span><span style="color:#ca60ca">:=</span> <span style="color:#bf0303">"</span><span style="color:#3daee9">\"</span><span style="color:#bf0303">"</span>
+
+	<span style="font-weight:bold">if</span> fi<span style="color:#ca60ca">.</span>is_dir <span style="color:#ca60ca">{</span>
+		fmt<span style="color:#ca60ca">.</span><span style="color:#644a9b">printf </span><span style="color:#ca60ca">(</span><span style="color:#bf0303">"%v [%v]</span><span style="color:#3daee9">\n</span><span style="color:#bf0303"> word"</span><span style="color:#ca60ca">,</span> size<span style="color:#ca60ca">,</span> filename<span style="color:#ca60ca">)</span>
+	<span style="color:#ca60ca">}</span> <span style="font-weight:bold">else</span> <span style="color:#ca60ca">{</span>
+		fmt<span style="color:#ca60ca">.</span><span style="color:#644a9b">printf</span><span style="color:#ca60ca">(</span><span style="color:#bf0303">"%v %v</span><span style="color:#3daee9">\n</span><span style="color:#bf0303">"</span><span style="color:#ca60ca">,</span> size<span style="color:#ca60ca">,</span> filename<span style="color:#ca60ca">)</span>
+	<span style="color:#ca60ca">}</span>
 <span style="color:#ca60ca">}</span>
 
 <span style="color:#644a9b">main </span><span style="color:#ca60ca">::</span><span style="color:#644a9b"> </span><span style="font-weight:bold">proc</span><span style="color:#ca60ca">()</span> <span style="color:#ca60ca">{</span>
-<span style="color:#0057ae">    cwd </span><span style="color:#ca60ca">:=</span> <span style="color:#0057ae">os</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">get_current_directory</span><span style="color:#ca60ca">()</span>
-    <span style="color:#0057ae">fmt</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">println</span><span style="color:#ca60ca">(</span><span style="color:#bf0303">"Current working directory:"</span><span style="color:#ca60ca">,</span> cwd<span style="color:#ca60ca">)</span>
+	<span style="color:#0057ae">cwd </span><span style="color:#ca60ca">:=</span> os<span style="color:#ca60ca">.</span><span style="color:#644a9b">get_current_directory</span><span style="color:#ca60ca">()</span>
+	fmt<span style="color:#ca60ca">.</span><span style="color:#644a9b">println</span><span style="color:#ca60ca">(</span><span style="color:#bf0303">"Current working directory:"</span><span style="color:#ca60ca">,</span> cwd<span style="color:#ca60ca">)</span>
 
-<span style="color:#0057ae">    f, err </span><span style="color:#ca60ca">:=</span> <span style="color:#0057ae">os</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">open</span><span style="color:#ca60ca">(</span>cwd<span style="color:#ca60ca">)</span>
-    <span style="font-weight:bold">defer</span> <span style="color:#0057ae">os</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">close</span><span style="color:#ca60ca">(</span>f<span style="color:#ca60ca">)</span>
+	<span style="color:#0057ae">f, err </span><span style="color:#ca60ca">:=</span> os<span style="color:#ca60ca">.</span><span style="color:#644a9b">open</span><span style="color:#ca60ca">(</span>cwd<span style="color:#ca60ca">)</span>
+	<span style="font-weight:bold">defer</span> os<span style="color:#ca60ca">.</span><span style="color:#644a9b">close</span><span style="color:#ca60ca">(</span>f<span style="color:#ca60ca">)</span>
 
-    <span style="font-weight:bold">if</span> err <span style="color:#ca60ca">!=</span> <span style="color:#0057ae">os</span><span style="color:#ca60ca">.</span>ERROR_NONE <span style="color:#ca60ca">{</span>
-        <span style="color:#898887">// Print error to stderr and exit with errorcode</span>
-        <span style="color:#0057ae">fmt</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">eprintln</span><span style="color:#ca60ca">(</span><span style="color:#bf0303">"Could not open directory for reading"</span><span style="color:#ca60ca">,</span> err<span style="color:#ca60ca">)</span>
-        <span style="color:#0057ae">os</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">exit</span><span style="color:#ca60ca">(</span><span style="color:#b08000">1</span><span style="color:#ca60ca">)</span>
-    <span style="color:#ca60ca">}</span>
+	<span style="font-weight:bold">if</span> err <span style="color:#ca60ca">!=</span> os<span style="color:#ca60ca">.</span>ERROR_NONE <span style="color:#ca60ca">{</span>
+		<span style="color:#898887">// Print error to stderr and exit with errorcode</span>
+		fmt<span style="color:#ca60ca">.</span><span style="color:#644a9b">eprintln</span><span style="color:#ca60ca">(</span><span style="color:#bf0303">"Could not open directory for reading"</span><span style="color:#ca60ca">,</span> err<span style="color:#ca60ca">)</span>
+		os<span style="color:#ca60ca">.</span><span style="color:#644a9b">exit</span><span style="color:#ca60ca">(</span><span style="color:#b08000">1</span><span style="color:#ca60ca">)</span>
+	<span style="color:#ca60ca">}</span>
 
-<span style="color:#0057ae">    fis</span><span style="color:#ca60ca">:</span> <span style="color:#ca60ca">[]</span><span style="color:#0057ae">os</span><span style="color:#ca60ca">.</span>File_Info
-    <span style="font-weight:bold">defer</span> <span style="color:#0057ae">os</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">file_info_slice_delete</span><span style="color:#ca60ca">(</span>fis<span style="color:#ca60ca">)</span> <span style="color:#898887">// fis is a slice, we need to remember to free it</span>
+	fis<span style="color:#ca60ca">:</span> <span style="color:#ca60ca">[]</span>os<span style="color:#ca60ca">.</span>File_Info
+	<span style="font-weight:bold">defer</span> os<span style="color:#ca60ca">.</span><span style="color:#644a9b">file_info_slice_delete</span><span style="color:#ca60ca">(</span>fis<span style="color:#ca60ca">)</span> <span style="color:#898887">// fis is a slice, we need to remember to free it</span>
 
-    fis<span style="color:#ca60ca">,</span> err <span style="color:#ca60ca">=</span> <span style="color:#0057ae">os</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">read_dir</span><span style="color:#ca60ca">(</span>f<span style="color:#ca60ca">,</span> <span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">)</span> <span style="color:#898887">// -1 reads all file infos</span>
-    <span style="font-weight:bold">if</span> err <span style="color:#ca60ca">!=</span> <span style="color:#0057ae">os</span><span style="color:#ca60ca">.</span>ERROR_NONE <span style="color:#ca60ca">{</span>
-        <span style="color:#0057ae">fmt</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">eprintln</span><span style="color:#ca60ca">(</span><span style="color:#bf0303">"Could not read directory"</span><span style="color:#ca60ca">,</span> err<span style="color:#ca60ca">)</span>
-        <span style="color:#0057ae">os</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">exit</span><span style="color:#ca60ca">(</span><span style="color:#b08000">2</span><span style="color:#ca60ca">)</span>
-    <span style="color:#ca60ca">}</span>
+	fis<span style="color:#ca60ca">,</span> err <span style="color:#ca60ca">=</span> os<span style="color:#ca60ca">.</span><span style="color:#644a9b">read_dir</span><span style="color:#ca60ca">(</span>f<span style="color:#ca60ca">,</span> <span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">)</span> <span style="color:#898887">// -1 reads all file infos</span>
+	<span style="font-weight:bold">if</span> err <span style="color:#ca60ca">!=</span> os<span style="color:#ca60ca">.</span>ERROR_NONE <span style="color:#ca60ca">{</span>
+		fmt<span style="color:#ca60ca">.</span><span style="color:#644a9b">eprintln</span><span style="color:#ca60ca">(</span><span style="color:#bf0303">"Could not read directory"</span><span style="color:#ca60ca">,</span> err<span style="color:#ca60ca">)</span>
+		os<span style="color:#ca60ca">.</span><span style="color:#644a9b">exit</span><span style="color:#ca60ca">(</span><span style="color:#b08000">2</span><span style="color:#ca60ca">)</span>
+	<span style="color:#ca60ca">}</span>
 
-    <span style="font-weight:bold">for</span> fi <span style="font-weight:bold">in</span> fis <span style="color:#ca60ca">{</span>
-        <span style="color:#644a9b">print_file_info</span><span style="color:#ca60ca">(</span>fi<span style="color:#ca60ca">)</span>
-    <span style="color:#ca60ca">}</span>
+	<span style="font-weight:bold">for</span> fi <span style="font-weight:bold">in</span> fis <span style="color:#ca60ca">{</span>
+		<span style="color:#644a9b">print_file_info</span><span style="color:#ca60ca">(</span>fi<span style="color:#ca60ca">)</span>
+	<span style="color:#ca60ca">}</span>
+
+	<span style="color:#0057ae">enumTest </span><span style="color:#ca60ca">:=</span> Foo<span style="color:#ca60ca">.</span>A
+	<span style="color:#006e28">#partial</span> <span style="font-weight:bold">switch</span> enumTest <span style="color:#ca60ca">{</span>
+	<span style="font-weight:bold">case</span> <span style="color:#ca60ca">.</span>A<span style="color:#ca60ca">:</span>
+		fmt<span style="color:#ca60ca">.</span><span style="color:#644a9b">println</span><span style="color:#ca60ca">(</span><span style="color:#bf0303">"A letter</span><span style="color:#3daee9">\n</span><span style="color:#bf0303"> nextline </span><span style="color:#3daee9">\xfe</span><span style="color:#bf0303"> </span><span style="color:#3daee9">\u200B</span><span style="color:#bf0303"> </span><span style="color:#3daee9">\000</span><span style="color:#bf0303"> </span><span style="color:#3daee9">\U0001f4ae</span><span style="color:#bf0303">"</span><span style="color:#ca60ca">)</span>
+	<span style="font-weight:bold">case</span> <span style="color:#ca60ca">.</span>D<span style="color:#ca60ca">:</span>
+		fmt<span style="color:#ca60ca">.</span><span style="color:#644a9b">println</span><span style="color:#ca60ca">(</span><span style="color:#bf0303">"D"</span><span style="color:#ca60ca">)</span>
+	<span style="color:#ca60ca">}</span>
 <span style="color:#ca60ca">}</span>
+
 </pre></body></html>

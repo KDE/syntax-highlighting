@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>test.tla</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (TLA+) - Theme (Breeze Light)"/>
+</head><body style="background-color:#ffffff;color:#1f1c1b"><pre>
+<span style="color:#898887">(* Example taken from https://github.com/tlaplus/Examples/blob/master/specifications/echo/Echo.tla *)</span>
+-------------------------------- <span style="font-weight:bold">MODULE</span> Echo --------------------------------
+<span style="color:#898887">(***************************************************************************)</span>
+<span style="color:#898887">(* The Echo algorithm for constructing a spanning tree in an undirected    *)</span>
+<span style="color:#898887">(* graph starting from a single initiator, as a PlusCal algorithm.         *)</span>
+<span style="color:#898887">(***************************************************************************)</span>
+<span style="font-weight:bold">EXTENDS</span> Naturals, FiniteSets, Relation, TLC
+
+<span style="font-weight:bold">CONSTANTS</span> Node,      <span style="color:#898887">\* set of nodes</span>
+          initiator, <span style="color:#898887">\* single initiator, will be the root of the tree</span>
+          R          <span style="color:#898887">\* neighborhood relation, represented as a Boolean function over nodes </span>
+
+<span style="font-weight:bold">ASSUME</span> /\ initiator \in Node
+       /\ R \in [Node \X Node -> BOOLEAN]
+       <span style="color:#898887">\* No edge from a node to itself (self-loops).</span>
+       /\ IsIrreflexive(R, Node)
+       <span style="color:#898887">\* Undirected graph (there exists an edge from b </span>
+       <span style="color:#898887">\* to a if there exists an edge from a to b).</span>
+       /\ IsSymmetric(R, Node)
+       <span style="color:#898887">\* There exists a spanning tree consisting of *all* nodes.</span>
+       <span style="color:#898887">\* (no forest of spanning trees). </span>
+       /\ IsConnected(R, Node)
+
+NoNode == <span style="font-weight:bold">CHOOSE</span> x : x \notin Node
+neighbors(n) == { m \in Node : R[m,n] }
+
+<span style="color:#898887">(**</span>
+<span style="color:#898887">--algorithm Echo {</span>
+<span style="color:#898887">    variable inbox = [n \in Node |-> {}];  \* model communication between nodes</span>
+<span style="color:#898887">    define { \* sending and receiving messages</span>
+<span style="color:#898887">      \* network obtained from net when p sends message of kind knd to q</span>
+<span style="color:#898887">      send(net, p, q, knd) == [net EXCEPT ![q] = @ \cup {[kind |-> knd, sndr |-> p]}]</span>
+<span style="color:#898887">      \* network obtained from net when p receives a message</span>
+<span style="color:#898887">      receive(net, p, msg) == [net EXCEPT ![p] = @ \ {msg}]</span>
+<span style="color:#898887">      \* network obtained from net when p send message of kind knd to all nodes in dest</span>
+<span style="color:#898887">      multicast(net, p, dest, knd) ==</span>
+<span style="color:#898887">        [m \in Node |-> IF m \in dest THEN net[m] \cup {[kind |-> knd, sndr |-> p]}</span>
+<span style="color:#898887">                        ELSE net[m]]</span>
+<span style="color:#898887">    }</span>
+
+<span style="color:#898887">  process (node \in Node) </span>
+<span style="color:#898887">    variables parent = NoNode,</span>
+<span style="color:#898887">              children = {},</span>
+<span style="color:#898887">              rcvd = 0,</span>
+<span style="color:#898887">              nbrs = neighbors(self);        {</span>
+<span style="color:#898887">  n0: if (self = initiator) {</span>
+<span style="color:#898887">         \* initiator sends first message to all its neighbors</span>
+<span style="color:#898887">         inbox := multicast(inbox, self, nbrs, "m")</span>
+<span style="color:#898887">      };</span>
+<span style="color:#898887">  n1: while (rcvd &lt; Cardinality(nbrs)) {</span>
+<span style="color:#898887">         \* receive some message from a neighbor</span>
+<span style="color:#898887">         with (msg \in inbox[self],</span>
+<span style="color:#898887">               net = receive(inbox, self, msg)) {</span>
+<span style="color:#898887">            rcvd := rcvd+1;</span>
+<span style="color:#898887">            if (self # initiator /\ rcvd = 1) {</span>
+<span style="color:#898887">               assert(msg.kind = "m");  \* the first received message is always of type "m"</span>
+<span style="color:#898887">               \* note the sender as the node's parent and send an "m" message to all remaining neighbors</span>
+<span style="color:#898887">               parent := msg.sndr;</span>
+<span style="color:#898887">               inbox := multicast(net, self, nbrs \ {msg.sndr}, "m")</span>
+<span style="color:#898887">            }</span>
+<span style="color:#898887">            else {</span>
+<span style="color:#898887">               \* subsequent messages are counted but don't give rise to another message</span>
+<span style="color:#898887">               inbox := net</span>
+<span style="color:#898887">            };</span>
+<span style="color:#898887">            if (msg.kind = "c") { children := children \cup {msg.sndr} }</span>
+<span style="color:#898887">         }  \* end with</span>
+<span style="color:#898887">      }; \* end while</span>
+<span style="color:#898887">  n2: if (self # initiator) {</span>
+<span style="color:#898887">         \* when non-initiator has received messages from all neighbors, acknowledge</span>
+<span style="color:#898887">         \* child relationship to the parent</span>
+<span style="color:#898887">         assert(parent \in nbrs);</span>
+<span style="color:#898887">         inbox := send(inbox, self, parent, "c")</span>
+<span style="color:#898887">      }</span>
+<span style="color:#898887">  } \* end process</span>
+<span style="color:#898887">}</span>
+<span style="color:#898887">**)</span>
+<span style="color:#898887">\* </span><span style="color:#0057ae;background-color:#e0e9f8">BEGIN</span><span style="color:#898887"> TRANSLATION</span>
+<span style="font-weight:bold">VARIABLES</span> inbox, pc
+
+<span style="color:#898887">(* define statement *)</span>
+send(net, p, q, knd) == [net <span style="font-weight:bold">EXCEPT</span> ![q] = @ \cup {[kind |-> knd, sndr |-> p]}]
+
+receive(net, p, msg) == [net <span style="font-weight:bold">EXCEPT</span> ![p] = @ \ {msg}]
+
+multicast(net, p, dest, knd) ==
+  [m \in Node |-> <span style="font-weight:bold">IF</span> m \in dest <span style="font-weight:bold">THEN</span> net[m] \cup {[kind |-> knd, sndr |-> p]}
+                  <span style="font-weight:bold">ELSE</span> net[m]]
+
+<span style="font-weight:bold">VARIABLES</span> parent, children, rcvd, nbrs
+
+vars == &lt;&lt; inbox, pc, parent, children, rcvd, nbrs >>
+
+ProcSet == (Node)
+
+Init == <span style="color:#898887">(* Global variables *)</span>
+        /\ inbox = [n \in Node |-> {}]
+        <span style="color:#898887">(* Process node *)</span>
+        /\ parent = [self \in Node |-> NoNode]
+        /\ children = [self \in Node |-> {}]
+        /\ rcvd = [self \in Node |-> <span style="color:#b08000">0</span>]
+        /\ nbrs = [self \in Node |-> neighbors(self)]
+        /\ pc = [self \in ProcSet |-> <span style="color:#bf0303">"n0"</span>]
+
+n0(self) == /\ pc[self] = <span style="color:#bf0303">"n0"</span>
+            /\ <span style="font-weight:bold">IF</span> self = initiator
+                  <span style="font-weight:bold">THEN</span> /\ inbox' = multicast(inbox, self, nbrs[self], <span style="color:#bf0303">"m"</span>)
+                  <span style="font-weight:bold">ELSE</span> /\ TRUE
+                       /\ inbox' = inbox
+            /\ pc' = [pc <span style="font-weight:bold">EXCEPT</span> ![self] = <span style="color:#bf0303">"n1"</span>]
+            /\ <span style="font-weight:bold">UNCHANGED</span> &lt;&lt; parent, children, rcvd, nbrs >>
+
+n1(self) == /\ pc[self] = <span style="color:#bf0303">"n1"</span>
+            /\ <span style="font-weight:bold">IF</span> rcvd[self] &lt; Cardinality(nbrs[self])
+                  <span style="font-weight:bold">THEN</span> /\ \E msg \in inbox[self]:
+                            <span style="font-weight:bold">LET</span> net == receive(inbox, self, msg) <span style="font-weight:bold">IN</span>
+                              /\ rcvd' = [rcvd <span style="font-weight:bold">EXCEPT</span> ![self] = rcvd[self]+<span style="color:#b08000">1</span>]
+                              /\ <span style="font-weight:bold">IF</span> self # initiator /\ rcvd'[self] = <span style="color:#b08000">1</span>
+                                    <span style="font-weight:bold">THEN</span> /\ Assert((msg.kind = <span style="color:#bf0303">"m"</span>), 
+                                                   <span style="color:#bf0303">"Failure of assertion at line 50, column 16."</span>)
+                                         /\ parent' = [parent <span style="font-weight:bold">EXCEPT</span> ![self] = msg.sndr]
+                                         /\ inbox' = multicast(net, self, nbrs[self] \ {msg.sndr}, <span style="color:#bf0303">"m"</span>)
+                                    <span style="font-weight:bold">ELSE</span> /\ inbox' = net
+                                         /\ <span style="font-weight:bold">UNCHANGED</span> parent
+                              /\ <span style="font-weight:bold">IF</span> msg.kind = <span style="color:#bf0303">"c"</span>
+                                    <span style="font-weight:bold">THEN</span> /\ children' = [children <span style="font-weight:bold">EXCEPT</span> ![self] = children[self] \cup {msg.sndr}]
+                                    <span style="font-weight:bold">ELSE</span> /\ TRUE
+                                         /\ <span style="font-weight:bold">UNCHANGED</span> children
+                       /\ pc' = [pc <span style="font-weight:bold">EXCEPT</span> ![self] = <span style="color:#bf0303">"n1"</span>]
+                  <span style="font-weight:bold">ELSE</span> /\ pc' = [pc <span style="font-weight:bold">EXCEPT</span> ![self] = <span style="color:#bf0303">"n2"</span>]
+                       /\ <span style="font-weight:bold">UNCHANGED</span> &lt;&lt; inbox, parent, children, rcvd >>
+            /\ nbrs' = nbrs
+
+n2(self) == /\ pc[self] = <span style="color:#bf0303">"n2"</span>
+            /\ <span style="font-weight:bold">IF</span> self # initiator
+                  <span style="font-weight:bold">THEN</span> /\ Assert((parent[self] \in nbrs[self]), 
+                                 <span style="color:#bf0303">"Failure of assertion at line 65, column 10."</span>)
+                       /\ inbox' = send(inbox, self, parent[self], <span style="color:#bf0303">"c"</span>)
+                  <span style="font-weight:bold">ELSE</span> /\ TRUE
+                       /\ inbox' = inbox
+            /\ pc' = [pc <span style="font-weight:bold">EXCEPT</span> ![self] = <span style="color:#bf0303">"Done"</span>]
+            /\ <span style="font-weight:bold">UNCHANGED</span> &lt;&lt; parent, children, rcvd, nbrs >>
+
+node(self) == n0(self) \/ n1(self) \/ n2(self)
+
+<span style="color:#898887">(* Allow infinite stuttering to prevent deadlock on termination. *)</span>
+Terminating == /\ \A self \in ProcSet: pc[self] = <span style="color:#bf0303">"Done"</span>
+               /\ <span style="font-weight:bold">UNCHANGED</span> vars
+
+Next == (\E self \in Node: node(self))
+           \/ Terminating
+
+Spec == Init /\ [][Next]_vars
+
+Termination == &lt;>(\A self \in ProcSet: pc[self] = <span style="color:#bf0303">"Done"</span>)
+
+<span style="color:#898887">\* </span><span style="color:#0057ae;background-color:#e0e9f8">END</span><span style="color:#898887"> TRANSLATION</span>
+
+<span style="color:#898887">(***************************************************************************)</span>
+<span style="color:#898887">(* Correctness properties.                                                 *)</span>
+<span style="color:#898887">(***************************************************************************)</span>
+TypeOK ==
+  /\ parent \in [Node -> (Node \cup {NoNode})]
+  /\ children \in [Node -> <span style="font-weight:bold">SUBSET</span> Node]
+  /\ rcvd \in [Node -> Nat]
+  /\ nbrs \in [Node -> <span style="font-weight:bold">SUBSET</span> Node]
+  /\ \A n \in Node : nbrs[n] = neighbors(n) /\ rcvd[n] &lt;= Cardinality(nbrs[n])
+  /\ inbox \in [Node -> <span style="font-weight:bold">SUBSET</span> [kind : {<span style="color:#bf0303">"m"</span>,<span style="color:#bf0303">"c"</span>}, sndr : Node]]
+  /\ \A n \in Node : \A msg \in inbox[n] : msg.sndr \in nbrs[n]
+
+
+<span style="color:#898887">(* The initiator never has a parent *)</span>
+InitiatorNoParent == parent[initiator] = NoNode
+
+<span style="color:#898887">(* If a node has a parent, it is a neighbor node *)</span>
+ParentIsNeighbor == \A n \in Node : parent[n] \in neighbors(n) \cup {NoNode}
+
+<span style="color:#898887">(* A node n is a child of node m only if m is the parent of n.</span>
+<span style="color:#898887">   At the end of the computation, this is "if and only if". *)</span>
+ParentChild == \A m,n \in Node :
+  /\ n \in children[m] => m = parent[n]
+  /\ m = parent[n] /\ pc[m] = <span style="color:#bf0303">"Done"</span> => n \in children[m]
+
+<span style="color:#898887">(* Compute the ancestor relation *)</span>
+IsParent == [m,n \in Node |-> n = parent[m]]
+IsAncestor == TransitiveClosure(IsParent, Node)
+
+<span style="color:#898887">(* At the end of the computation, the initiator is an ancestor of every other node</span>
+<span style="color:#898887">   and the ancestor relation is acyclic.</span>
+<span style="color:#898887">   Beware: evaluating this property over any but tiny graphs is costly.</span>
+<span style="color:#898887">*)</span>
+AncestorProperties ==
+  (\A n \in Node : pc[n] = <span style="color:#bf0303">"Done"</span>)
+  => <span style="font-weight:bold">LET</span> anc == IsAncestor
+     <span style="font-weight:bold">IN</span>  /\ \A n \in Node \ {initiator} : anc[n, initiator]
+         /\ IsIrreflexive(anc, Node)
+
+=============================================================================
+<span style="color:#898887">\* Modification History</span>
+<span style="color:#898887">\* Last modified Wed Jun 17 09:23:17 PDT 2020 by markus</span>
+<span style="color:#898887">\* Last modified Sun Jun 14 17:11:39 CEST 2020 by merz</span>
+<span style="color:#898887">\* Created Tue Apr 26 09:42:23 CEST 2016 by merz</span>
+</pre></body></html>

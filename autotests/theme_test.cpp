@@ -18,6 +18,7 @@
 #include <QDirIterator>
 #include <QFileInfo>
 #include <QJsonArray>
+#include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonParseError>
 #include <QObject>

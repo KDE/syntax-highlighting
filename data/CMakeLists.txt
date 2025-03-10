@@ -52,28 +52,45 @@ add_library(SyntaxHighlightingData OBJECT)
 target_sources(SyntaxHighlightingData PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/themes/theme-data.qrc)
 
 # generate the resource file
+set(compressed_xml_dir ${CMAKE_CURRENT_BINARY_DIR}/generated/compressed-syntax)
+set(qrc_xml_file ${CMAKE_CURRENT_BINARY_DIR}/syntax-data-xml.qrc)
 set(qrc_file ${CMAKE_CURRENT_BINARY_DIR}/syntax-data.qrc)
+set(qrc_xml_body "")
 set(qrc_body "")
 foreach(def ${defs})
     get_filename_component(def_name ${def} NAME)
-    string(APPEND qrc_body "<file alias=\"${def_name}\">${def}</file>\n")
+    string(APPEND qrc_body "<file alias=\"${def_name}\">${compressed_xml_dir}/${def_name}</file>\n")
+    string(APPEND qrc_xml_body "<file>${def}</file>\n")
+    set(compressedDefs ${compressedDefs} ${compressed_xml_dir}/${def_name})
 endforeach()
+write_file(${qrc_xml_file} "<!DOCTYPE RCC>\n<RCC>${qrc_xml_body}</RCC>")
 set(SYNTAX_DATA_QRC_FILES_STRING ${qrc_body})
 configure_file(syntax-data.qrc.in ${qrc_file} @ONLY)
 
+# compress xml files
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${compressed_xml_dir})
+
 # generate the index file
 add_custom_target(katesyntax DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/index.katesyntax")
-add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/index.katesyntax"
-    COMMAND katehighlightingindexer "${CMAKE_CURRENT_BINARY_DIR}/index.katesyntax" "${CMAKE_CURRENT_SOURCE_DIR}/schema/language.xsd" "${CMAKE_CURRENT_BINARY_DIR}/syntax-data.qrc"
-    DEPENDS katehighlightingindexer ${defs} ${CMAKE_CURRENT_SOURCE_DIR}/schema/language.xsd ${CMAKE_CURRENT_BINARY_DIR}/syntax-data.qrc
+add_custom_command(
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/index.katesyntax"
+    COMMAND katehighlightingindexer
+        "${CMAKE_CURRENT_BINARY_DIR}/index.katesyntax"
+        "${CMAKE_CURRENT_SOURCE_DIR}/schema/language.xsd"
+        "${qrc_xml_file}"
+        "${compressed_xml_dir}"
+    DEPENDS katehighlightingindexer
+        ${defs}
+        ${qrc_file}
+        ${CMAKE_CURRENT_SOURCE_DIR}/schema/language.xsd
 )
 
 # do we want syntax files bundled in the library?
 if (QRC_SYNTAX)
     # generate the qrc file manually, to make dependencies on generated files work...
     add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/qrc_syntax-data.cpp"
-        COMMAND Qt6::rcc --name syntax_data -o "${CMAKE_CURRENT_BINARY_DIR}/qrc_syntax-data.cpp" "${CMAKE_CURRENT_BINARY_DIR}/syntax-data.qrc"
-        DEPENDS ${defs} ${CMAKE_CURRENT_BINARY_DIR}/index.katesyntax
+        COMMAND Qt6::rcc --name syntax_data -o "${CMAKE_CURRENT_BINARY_DIR}/qrc_syntax-data.cpp" "${qrc_file}"
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/index.katesyntax
     )
     set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/qrc_syntax-data.cpp" PROPERTIES SKIP_AUTOMOC ON)
 
@@ -81,7 +98,7 @@ if (QRC_SYNTAX)
 else()
     add_dependencies(SyntaxHighlightingData katesyntax)
     # install the syntax files as normal files into the prefix
-    install (FILES "${CMAKE_CURRENT_BINARY_DIR}/index.katesyntax" ${defs} DESTINATION ${KDE_INSTALL_DATADIR}/org.kde.syntax-highlighting/syntax-bundled)
+    install (FILES "${CMAKE_CURRENT_BINARY_DIR}/index.katesyntax" ${compressedDefs} DESTINATION ${KDE_INSTALL_DATADIR}/org.kde.syntax-highlighting/syntax-bundled)
 endif()
 
 # set PIC to allow use in static and shared libs

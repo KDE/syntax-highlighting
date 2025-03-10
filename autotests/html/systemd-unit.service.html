@@ -125,6 +125,7 @@
 <span style="color:#0057ae">RootHashSignature</span> =
 <span style="color:#0057ae">RootVerity</span> = /some/path
 <span style="color:#0057ae">MountAPIVFS</span> = <span style="color:#aa5500">true</span>
+<span style="color:#0057ae">BindLogSockets</span> = <span style="color:#aa5500">true</span>
 <span style="color:#0057ae">ProcSubset</span> = <span style="color:#aa5500">pid</span>
 <span style="color:#0057ae">BindPaths</span> = /source/path,/destination/path,<span style="color:#aa5500">rbind</span> <span style="font-weight:bold">\</span>
   /source/path2,/destination/path2,<span style="color:#aa5500">norbind</span> <span style="font-weight:bold">\</span>
@@ -219,6 +220,7 @@
 <span style="color:#0057ae">PrivateDevices</span> = <span style="color:#aa5500">on</span>
 <span style="color:#0057ae">PrivateNetwork</span> = <span style="color:#aa5500">no</span>
 <span style="color:#0057ae">NetworkNamespacePath</span> = /some/path
+<span style="color:#0057ae">PrivatePIDs</span> = <span style="color:#aa5500">true</span>
 <span style="color:#0057ae">PrivateUsers</span> = <span style="color:#aa5500">off</span>
 <span style="color:#0057ae">ProtectHostname</span> = <span style="color:#aa5500">false</span>
 <span style="color:#0057ae">ProtectClock</span> = <span style="color:#aa5500">no</span>
@@ -335,6 +337,7 @@
 <span style="color:#0057ae">ManagedOOMSwap</span> = <span style="color:#aa5500">auto</span>
 <span style="color:#0057ae">ManagedOOMMemoryPressure</span> = <span style="color:#aa5500">kill</span>
 <span style="color:#0057ae">ManagedOOMMemoryPressureLimit</span> = <span style="color:#b08000">50</span><span style="font-style:italic">%</span>
+<span style="color:#0057ae">ManagedOOMMemoryPressureDurationSec</span> = <span style="color:#b08000">1</span><span style="font-style:italic">s</span> <span style="color:#b08000">50</span><span style="font-style:italic">ms</span>
 <span style="color:#0057ae">ManagedOOMPreference</span> = <span style="color:#aa5500">omit</span>
 <span style="color:#0057ae">MemoryPressureWatch</span> = <span style="color:#aa5500">skip</span>
 <span style="color:#0057ae">MemoryPressureThresholdSec</span> = <span style="color:#b08000">50</span><span style="font-style:italic">ms</span>
@@ -437,6 +440,7 @@
 <span style="color:#0057ae">AccuracySec</span> = <span style="color:#b08000">1</span><span style="font-style:italic">min</span> <span style="color:#b08000">10</span><span style="font-style:italic">sec</span>
 <span style="color:#0057ae">RandomizedDelaySec</span> = <span style="color:#b08000">30</span><span style="font-style:italic">s</span>
 <span style="color:#0057ae">FixedRandomDelay</span> = <span style="color:#aa5500">yes</span>
+<span style="color:#0057ae">DeferReactivation</span> = <span style="color:#aa5500">true</span>
 <span style="color:#0057ae">OnClockChange</span> = <span style="color:#aa5500">false</span>
 <span style="color:#0057ae">OnTimezoneChange</span> = <span style="color:#aa5500">true</span>
 <span style="color:#0057ae">Unit</span> = <span style="color:#006e28">some_timed</span><span style="color:#006e28;font-style:italic">.service</span>
@@ -2016,11 +2020,18 @@ WantedBy = some.service some.socket
 <span style="color:#898887">###### memory pressure watch</span>
 <span style="font-weight:bold">[Service]</span>
 <span style="color:#0057ae">MemoryPressureWatch</span> = <span style="color:#aa5500">auto</span>
-<span style="color:#0057ae">MemoryPressureWatch</span> = <span style="color:#aa5500">off</span>
-<span style="color:#0057ae">MemoryPressureWatch</span> = <span style="color:#aa5500">on</span>
 <span style="color:#0057ae">MemoryPressureWatch</span> = <span style="color:#aa5500">skip</span>
+<span style="color:#898887">## should accept any boolean value</span>
+<span style="color:#0057ae">MemoryPressureWatch</span> = <span style="color:#aa5500">on</span>
+<span style="color:#0057ae">MemoryPressureWatch</span> = <span style="color:#aa5500">yes</span>
+<span style="color:#0057ae">MemoryPressureWatch</span> = <span style="color:#aa5500">true</span>
+<span style="color:#0057ae">MemoryPressureWatch</span> = <span style="color:#aa5500">1</span>
+<span style="color:#0057ae">MemoryPressureWatch</span> = <span style="color:#aa5500">off</span>
+<span style="color:#0057ae">MemoryPressureWatch</span> = <span style="color:#aa5500">no</span>
+<span style="color:#0057ae">MemoryPressureWatch</span> = <span style="color:#aa5500">false</span>
+<span style="color:#0057ae">MemoryPressureWatch</span> = <span style="color:#aa5500">0</span>
 <span style="color:#898887">## invalid values</span>
-<span style="color:#0057ae">MemoryPressureWatch</span> = invalid
+<span style="color:#0057ae">MemoryPressureWatch</span> = i<span style="color:#aa5500">n</span>valid
 <span style="color:#898887"># multiple values</span>
 <span style="color:#0057ae">MemoryPressureWatch</span> = <span style="color:#aa5500">auto</span> skip
 
@@ -2222,6 +2233,43 @@ WantedBy = some.service some.socket
 <span style="color:#0057ae">Personality</span> = <span style="color:#aa5500">x86-64</span> s390x
 
 
+<span style="color:#898887">###### private tmp</span>
+<span style="font-weight:bold">[Service]</span>
+<span style="color:#0057ae">PrivateTmp</span> = <span style="color:#aa5500">disconnected</span>
+<span style="color:#898887">## should accept any boolean value</span>
+<span style="color:#0057ae">PrivateTmp</span> = <span style="color:#aa5500">on</span>
+<span style="color:#0057ae">PrivateTmp</span> = <span style="color:#aa5500">yes</span>
+<span style="color:#0057ae">PrivateTmp</span> = <span style="color:#aa5500">true</span>
+<span style="color:#0057ae">PrivateTmp</span> = <span style="color:#aa5500">1</span>
+<span style="color:#0057ae">PrivateTmp</span> = <span style="color:#aa5500">off</span>
+<span style="color:#0057ae">PrivateTmp</span> = <span style="color:#aa5500">no</span>
+<span style="color:#0057ae">PrivateTmp</span> = <span style="color:#aa5500">false</span>
+<span style="color:#0057ae">PrivateTmp</span> = <span style="color:#aa5500">0</span>
+<span style="color:#898887">## invalid values</span>
+<span style="color:#0057ae">PrivateTmp</span> = i<span style="color:#aa5500">n</span>valid
+<span style="color:#898887"># multiple values</span>
+<span style="color:#0057ae">PrivateTmp</span> = <span style="color:#aa5500">disconnected</span> true
+
+
+<span style="color:#898887">###### private users</span>
+<span style="font-weight:bold">[Service]</span>
+<span style="color:#0057ae">PrivateUsers</span> = <span style="color:#aa5500">identity</span>
+<span style="color:#0057ae">PrivateUsers</span> = <span style="color:#aa5500">self</span>
+<span style="color:#898887">## should accept any boolean value</span>
+<span style="color:#0057ae">PrivateUsers</span> = <span style="color:#aa5500">on</span>
+<span style="color:#0057ae">PrivateUsers</span> = <span style="color:#aa5500">yes</span>
+<span style="color:#0057ae">PrivateUsers</span> = <span style="color:#aa5500">true</span>
+<span style="color:#0057ae">PrivateUsers</span> = <span style="color:#aa5500">1</span>
+<span style="color:#0057ae">PrivateUsers</span> = <span style="color:#aa5500">off</span>
+<span style="color:#0057ae">PrivateUsers</span> = <span style="color:#aa5500">no</span>
+<span style="color:#0057ae">PrivateUsers</span> = <span style="color:#aa5500">false</span>
+<span style="color:#0057ae">PrivateUsers</span> = <span style="color:#aa5500">0</span>
+<span style="color:#898887">## invalid values</span>
+<span style="color:#0057ae">PrivateUsers</span> = i<span style="color:#aa5500">n</span>valid
+<span style="color:#898887"># multiple values</span>
+<span style="color:#0057ae">PrivateUsers</span> = <span style="color:#aa5500">identity</span> self
+
+
 <span style="color:#898887">###### proc subset</span>
 <span style="font-weight:bold">[Service]</span>
 <span style="color:#0057ae">ProcSubset</span> = <span style="color:#aa5500">all</span>
@@ -2230,6 +2278,25 @@ WantedBy = some.service some.socket
 <span style="color:#0057ae">ProcSubset</span> = invalid
 <span style="color:#898887"># multiple values</span>
 <span style="color:#0057ae">ProcSubset</span> = <span style="color:#aa5500">all</span> pid
+
+
+<span style="color:#898887">###### protect control groups</span>
+<span style="font-weight:bold">[Service]</span>
+<span style="color:#0057ae">ProtectControlGroups</span> = <span style="color:#aa5500">private</span>
+<span style="color:#0057ae">ProtectControlGroups</span> = <span style="color:#aa5500">strict</span>
+<span style="color:#898887">## should accept any boolean value</span>
+<span style="color:#0057ae">ProtectControlGroups</span> = <span style="color:#aa5500">on</span>
+<span style="color:#0057ae">ProtectControlGroups</span> = <span style="color:#aa5500">yes</span>
+<span style="color:#0057ae">ProtectControlGroups</span> = <span style="color:#aa5500">true</span>
+<span style="color:#0057ae">ProtectControlGroups</span> = <span style="color:#aa5500">1</span>
+<span style="color:#0057ae">ProtectControlGroups</span> = <span style="color:#aa5500">off</span>
+<span style="color:#0057ae">ProtectControlGroups</span> = <span style="color:#aa5500">no</span>
+<span style="color:#0057ae">ProtectControlGroups</span> = <span style="color:#aa5500">false</span>
+<span style="color:#0057ae">ProtectControlGroups</span> = <span style="color:#aa5500">0</span>
+<span style="color:#898887">## invalid values</span>
+<span style="color:#0057ae">ProtectControlGroups</span> = <span style="color:#aa5500">private</span>
+<span style="color:#898887"># multiple values</span>
+<span style="color:#0057ae">ProtectControlGroups</span> = <span style="color:#aa5500">private</span> strict
 
 
 <span style="color:#898887">###### protect home</span>
@@ -2276,6 +2343,7 @@ WantedBy = some.service some.socket
 
 <span style="color:#898887">###### restart mode</span>
 <span style="font-weight:bold">[Service]</span>
+<span style="color:#0057ae">RestartMode</span> = <span style="color:#aa5500">debug</span>
 <span style="color:#0057ae">RestartMode</span> = <span style="color:#aa5500">direct</span>
 <span style="color:#0057ae">RestartMode</span> = <span style="color:#aa5500">normal</span>
 <span style="color:#898887">## invalid values</span>

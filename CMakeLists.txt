@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
 
-set(KF_VERSION "6.7.0")
+set(KF_VERSION "6.13.0")
 project(KSyntaxHighlighting VERSION ${KF_VERSION})
 
-find_package(ECM 6.6.0 REQUIRED NO_MODULE)
+find_package(ECM 6.12.0 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 
 include(KDEInstallDirs)
@@ -38,7 +38,7 @@ set(EXCLUDE_DEPRECATED_BEFORE_AND_AT 0 CACHE STRING "Control the range of deprec
 #
 # Dependencies
 #
-set(REQUIRED_QT_VERSION 6.5.0)
+set(REQUIRED_QT_VERSION 6.6.0)
 find_package(Qt6 ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED COMPONENTS Core Network Test)
 option(KSYNTAXHIGHLIGHTING_USE_GUI "Build components depending on QtGui" ON)
 if(KSYNTAXHIGHLIGHTING_USE_GUI)
@@ -91,7 +91,7 @@ if (NO_STANDARD_PATHS)
 endif()
 
 ecm_set_disabled_deprecation_versions(
-    QT 6.5
+    QT 6.8.0
 )
 
 #

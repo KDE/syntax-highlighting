@@ -8,51 +8,115 @@
 <Use>import</Use><Normal Text> </Normal Text><String>"core:path/filepath"</String><br/>
 <Use>import</Use><Normal Text> </Normal Text><String>"core:strings"</String><br/>
 <Normal Text></Normal Text><br/>
-<Procedure>print_file_info </Procedure><Operator>::</Operator><Procedure> </Procedure><Keyword>proc</Keyword><Operator>(</Operator><Normal Text>fi</Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Variable>os</Variable><Operator>.</Operator><Normal Text>File_Info</Normal Text><Operator>)</Operator><Normal Text> </Normal Text><Operator>{</Operator><br/>
-<Normal Text>    </Normal Text><Comment>// Split the path into directory and filename</Comment><br/>
-<Variable>    _, filename </Variable><Operator>:=</Operator><Normal Text> </Normal Text><Variable>filepath</Variable><Operator>.</Operator><Procedure>split</Procedure><Operator>(</Operator><Variable>fi</Variable><Operator>.</Operator><Normal Text>fullpath</Normal Text><Operator>)</Operator><br/>
+<Comment>/**</Comment><br/>
+<Comment> * This is</Comment><br/>
+<Comment> * a multiline</Comment><br/>
+<Comment> * comment</Comment><br/>
+<Comment> */</Comment><br/>
 <Normal Text></Normal Text><br/>
-<Normal Text>    SIZE_WIDTH </Normal Text><Operator>::</Operator><Normal Text> </Normal Text><Float>12</Float><br/>
-<Variable>    buf</Variable><Operator>:</Operator><Normal Text> </Normal Text><Operator>[</Operator><Normal Text>SIZE_WIDTH</Normal Text><Operator>]</Operator><Data Type>u8</Data Type><br/>
+<Normal Text>packedDirective </Normal Text><Operator>::</Operator><Normal Text> </Normal Text><Keyword>struct</Keyword><Normal Text> </Normal Text><Directive>#packed</Directive><Normal Text> </Normal Text><Operator>{</Operator><br/>
+<Normal Text>	x</Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Data Type>u8</Data Type><Operator>,</Operator><br/>
+<Normal Text>	y</Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Data Type>i32</Data Type><Operator>,</Operator><br/>
+<Normal Text>	z</Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Data Type>u16</Data Type><Operator>,</Operator><br/>
+<Normal Text>	w</Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Data Type>u8</Data Type><Operator>,</Operator><br/>
+<Operator>}</Operator><br/>
 <Normal Text></Normal Text><br/>
-<Variable>    raw_str </Variable><Operator>:=</Operator><Normal Text> </Normal Text><RawString>`this_is raw ;';@@""\\\' string`</RawString><br/>
-<Normal Text>    </Normal Text><Comment>// Print size to string backed by buf on stack, no need to free</Comment><br/>
-<Variable>    _size </Variable><Operator>:=</Operator><Normal Text> </Normal Text><String>"-"</String><Normal Text> </Normal Text><Control Flow>if</Control Flow><Normal Text> </Normal Text><Variable>fi</Variable><Operator>.</Operator><Normal Text>is_dir </Normal Text><Control Flow>else</Control Flow><Normal Text> </Normal Text><Variable>fmt</Variable><Operator>.</Operator><Procedure>bprintf</Procedure><Operator>(</Operator><Normal Text>buf</Normal Text><Operator>[:],</Operator><Normal Text> </Normal Text><String>"%v"</String><Operator>,</Operator><Normal Text> </Normal Text><Variable>fi</Variable><Operator>.</Operator><Normal Text>size</Normal Text><Operator>)</Operator><br/>
+<Normal Text>Foo </Normal Text><Operator>::</Operator><Normal Text> </Normal Text><Keyword>enum</Keyword><Normal Text> </Normal Text><Operator>{</Operator><br/>
+<Normal Text>	A</Normal Text><Operator>,</Operator><br/>
+<Normal Text>	B</Normal Text><Operator>,</Operator><br/>
+<Normal Text>	C</Normal Text><Operator>,</Operator><br/>
+<Normal Text>	D</Normal Text><Operator>,</Operator><br/>
+<Operator>}</Operator><br/>
 <Normal Text></Normal Text><br/>
-<Normal Text>    </Normal Text><Comment>// Right-justify size for display, heap allocated</Comment><br/>
-<Variable>    size  </Variable><Operator>:=</Operator><Normal Text> </Normal Text><Variable>strings</Variable><Operator>.</Operator><Procedure>right_justify</Procedure><Operator>(</Operator><Normal Text>_size</Normal Text><Operator>,</Operator><Normal Text> SIZE_WIDTH</Normal Text><Operator>,</Operator><Normal Text> </Normal Text><String>" "</String><Operator>)</Operator><br/>
-<Normal Text>    </Normal Text><Keyword>defer</Keyword><Normal Text> </Normal Text><Procedure>delete</Procedure><Operator>(</Operator><Normal Text>size</Normal Text><Operator>)</Operator><br/>
+<Attribute>@private</Attribute><br/>
+<Normal Text>_SS_MAXSIZE   </Normal Text><Operator>::</Operator><Normal Text> </Normal Text><Decimal>128</Decimal><br/>
 <Normal Text></Normal Text><br/>
-<Normal Text>    </Normal Text><Control Flow>if</Control Flow><Normal Text> </Normal Text><Variable>fi</Variable><Operator>.</Operator><Normal Text>is_dir </Normal Text><Operator>{</Operator><br/>
-<Normal Text>        </Normal Text><Variable>fmt</Variable><Operator>.</Operator><Procedure>printf</Procedure><Operator>(</Operator><String>"%v [%v]\n"</String><Operator>,</Operator><Normal Text> size</Normal Text><Operator>,</Operator><Normal Text> filename</Normal Text><Operator>)</Operator><br/>
-<Normal Text>    </Normal Text><Operator>}</Operator><Normal Text> </Normal Text><Control Flow>else</Control Flow><Normal Text> </Normal Text><Operator>{</Operator><br/>
-<Normal Text>        </Normal Text><Variable>fmt</Variable><Operator>.</Operator><Procedure>printf</Procedure><Operator>(</Operator><String>"%v %v\n"</String><Operator>,</Operator><Normal Text> size</Normal Text><Operator>,</Operator><Normal Text> filename</Normal Text><Operator>)</Operator><br/>
-<Normal Text>    </Normal Text><Operator>}</Operator><br/>
+<Attribute>@require_results</Attribute><br/>
+<Procedure>some_proc</Procedure><Operator>::</Operator><Keyword>proc</Keyword><Procedure> </Procedure><String>"contextless"</String><Operator>()</Operator><Normal Text> </Normal Text><Operator>-></Operator><Normal Text> </Normal Text><Data Type>i32</Data Type><Operator>{</Operator><br/>
+<Normal Text>    </Normal Text><Control Flow>return</Control Flow><Normal Text> </Normal Text><Decimal>0</Decimal><br/>
+<Operator>}</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Attribute>@</Attribute><Symbol>(</Symbol><Attribute>private</Attribute><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><String>"file"</String><Operator>)</Operator><br/>
+<Procedure>print_file_info </Procedure><Operator>::</Operator><Procedure> </Procedure><Keyword>proc</Keyword><Operator>(</Operator><Normal Text>fi</Normal Text><Operator>:</Operator><Normal Text> os</Normal Text><Operator>.</Operator><Normal Text>File_Info</Normal Text><Operator>)</Operator><Normal Text> </Normal Text><Operator>{</Operator><br/>
+<Normal Text>    </Normal Text><Context Variable>context</Context Variable><Operator>.</Operator><Normal Text>user_index </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Decimal>100</Decimal><br/>
+<Normal Text>    </Normal Text><Variable>flt </Variable><Operator>:=</Operator><Normal Text> </Normal Text><Float>12.33</Float><br/>
+<Normal Text>    </Normal Text><Variable>flt_e </Variable><Operator>:=</Operator><Normal Text> </Normal Text><Float>1e9</Float><br/>
+<Normal Text>	</Normal Text><Variable>bin_ok </Variable><Operator>:=</Operator><Normal Text> </Normal Text><Binary>0b110001</Binary><br/>
+<Normal Text>	</Normal Text><Variable>bin_wrong </Variable><Operator>:=</Operator><Normal Text> </Normal Text><Binary>0b11</Binary><Error>2</Error><Decimal>2001010123123</Decimal><br/>
+<Normal Text>	</Normal Text><Variable>oct </Variable><Operator>:=</Operator><Normal Text> </Normal Text><Octal>0o1237</Octal><br/>
+<Normal Text>	</Normal Text><Variable>oct_wrong </Variable><Operator>:=</Operator><Normal Text> </Normal Text><Octal>0o123</Octal><Error>9</Error><Decimal>999</Decimal><br/>
+<Normal Text>	</Normal Text><Variable>hex </Variable><Operator>:=</Operator><Normal Text> </Normal Text><Hex>0xFF123AC</Hex><br/>
+<Normal Text>	</Normal Text><Variable>hex_wrong </Variable><Operator>:=</Operator><Normal Text> </Normal Text><Hex>0xFF123AC</Hex><Error>HH</Error><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>	</Normal Text><Comment>// Split the path into directory and filename</Comment><br/>
+<Normal Text>	</Normal Text><Variable>_, filename </Variable><Operator>:=</Operator><Normal Text> filepath</Normal Text><Operator>.</Operator><Procedure>split</Procedure><Operator>(</Operator><Normal Text>fi</Normal Text><Operator>.</Operator><Normal Text>fullpath</Normal Text><Operator>)</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>	SIZE_WIDTH </Normal Text><Operator>::</Operator><Normal Text> </Normal Text><Decimal>12</Decimal><br/>
+<Normal Text>	buf</Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Operator>[</Operator><Normal Text>SIZE_WIDTH</Normal Text><Operator>]</Operator><Data Type>u8</Data Type><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>	</Normal Text><Variable>raw_str </Variable><Operator>:=</Operator><Normal Text> </Normal Text><RawString>`this_is raw ;';@@""\\\' string`</RawString><br/>
+<Normal Text>	</Normal Text><Comment>// Print size to string backed by buf on stack, no need to free</Comment><br/>
+<Normal Text>	</Normal Text><Variable>_size </Variable><Operator>:=</Operator><Normal Text> </Normal Text><String>"-"</String><Normal Text> </Normal Text><Control Flow>if</Control Flow><Normal Text> fi</Normal Text><Operator>.</Operator><Normal Text>is_dir </Normal Text><Control Flow>else</Control Flow><Normal Text> fmt</Normal Text><Operator>.</Operator><Procedure>bprintf</Procedure><Operator>(</Operator><Normal Text>buf</Normal Text><Operator>[:],</Operator><Normal Text> </Normal Text><String>"%v"</String><Operator>,</Operator><Normal Text> fi</Normal Text><Operator>.</Operator><Normal Text>size</Normal Text><Operator>)</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>	</Normal Text><Variable>a</Variable><Operator>:</Operator><Normal Text> </Normal Text><Data Type>u8</Data Type><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Keyword>cast</Keyword><Operator>(</Operator><Data Type>u8</Data Type><Operator>)</Operator><Character>'"'</Character><br/>
+<Normal Text>	</Normal Text><Variable>b</Variable><Operator>:</Operator><Normal Text> </Normal Text><Data Type>u8</Data Type><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Character>'"'</Character><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>	</Normal Text><Comment>// Right-justify size for display, heap allocated</Comment><br/>
+<Normal Text>	</Normal Text><Variable>size </Variable><Operator>:=</Operator><Normal Text> strings</Normal Text><Operator>.</Operator><Procedure>right_justify</Procedure><Operator>(</Operator><Normal Text>_size</Normal Text><Operator>,</Operator><Normal Text> SIZE_WIDTH</Normal Text><Operator>,</Operator><Normal Text> </Normal Text><String>" "</String><Operator>)</Operator><br/>
+<Normal Text>	</Normal Text><Keyword>defer</Keyword><Normal Text> </Normal Text><Procedure>delete</Procedure><Operator>(</Operator><Normal Text>size</Normal Text><Operator>)</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>	</Normal Text><Variable>val</Variable><Operator>:</Operator><Normal Text> </Normal Text><Data Type>i32</Data Type><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Decimal>1</Decimal><br/>
+<Normal Text>	</Normal Text><Control Flow>switch</Control Flow><Procedure> </Procedure><Operator>(</Operator><Normal Text>val</Normal Text><Operator>)</Operator><Normal Text> </Normal Text><Operator>{</Operator><br/>
+<Normal Text>	</Normal Text><Keyword>case</Keyword><Normal Text> </Normal Text><Decimal>1</Decimal><Symbol>:</Symbol><br/>
+<Normal Text>		val </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Decimal>2</Decimal><br/>
+<Normal Text>	</Normal Text><Keyword>case</Keyword><Normal Text> </Normal Text><Decimal>2</Decimal><Symbol>:</Symbol><br/>
+<Normal Text>		val </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Decimal>3</Decimal><br/>
+<Normal Text>	</Normal Text><Keyword>case</Keyword><Operator>:</Operator><br/>
+<Normal Text>		val </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Decimal>0</Decimal><br/>
+<Normal Text>	</Normal Text><Operator>}</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>	</Normal Text><Comment>// This should not turn anything below into string colors</Comment><br/>
+<Normal Text>	</Normal Text><Variable>triggerCharacter </Variable><Operator>:=</Operator><Normal Text> </Normal Text><String>"</String><String Char>\"</String Char><String>"</String><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>	</Normal Text><Control Flow>if</Control Flow><Normal Text> fi</Normal Text><Operator>.</Operator><Normal Text>is_dir </Normal Text><Operator>{</Operator><br/>
+<Normal Text>		fmt</Normal Text><Operator>.</Operator><Procedure>printf </Procedure><Operator>(</Operator><String>"%v [%v]</String><String Char>\n</String Char><String> word"</String><Operator>,</Operator><Normal Text> size</Normal Text><Operator>,</Operator><Normal Text> filename</Normal Text><Operator>)</Operator><br/>
+<Normal Text>	</Normal Text><Operator>}</Operator><Normal Text> </Normal Text><Control Flow>else</Control Flow><Normal Text> </Normal Text><Operator>{</Operator><br/>
+<Normal Text>		fmt</Normal Text><Operator>.</Operator><Procedure>printf</Procedure><Operator>(</Operator><String>"%v %v</String><String Char>\n</String Char><String>"</String><Operator>,</Operator><Normal Text> size</Normal Text><Operator>,</Operator><Normal Text> filename</Normal Text><Operator>)</Operator><br/>
+<Normal Text>	</Normal Text><Operator>}</Operator><br/>
 <Operator>}</Operator><br/>
 <Normal Text></Normal Text><br/>
 <Procedure>main </Procedure><Operator>::</Operator><Procedure> </Procedure><Keyword>proc</Keyword><Operator>()</Operator><Normal Text> </Normal Text><Operator>{</Operator><br/>
-<Variable>    cwd </Variable><Operator>:=</Operator><Normal Text> </Normal Text><Variable>os</Variable><Operator>.</Operator><Procedure>get_current_directory</Procedure><Operator>()</Operator><br/>
-<Normal Text>    </Normal Text><Variable>fmt</Variable><Operator>.</Operator><Procedure>println</Procedure><Operator>(</Operator><String>"Current working directory:"</String><Operator>,</Operator><Normal Text> cwd</Normal Text><Operator>)</Operator><br/>
+<Normal Text>	</Normal Text><Variable>cwd </Variable><Operator>:=</Operator><Normal Text> os</Normal Text><Operator>.</Operator><Procedure>get_current_directory</Procedure><Operator>()</Operator><br/>
+<Normal Text>	fmt</Normal Text><Operator>.</Operator><Procedure>println</Procedure><Operator>(</Operator><String>"Current working directory:"</String><Operator>,</Operator><Normal Text> cwd</Normal Text><Operator>)</Operator><br/>
 <Normal Text></Normal Text><br/>
-<Variable>    f, err </Variable><Operator>:=</Operator><Normal Text> </Normal Text><Variable>os</Variable><Operator>.</Operator><Procedure>open</Procedure><Operator>(</Operator><Normal Text>cwd</Normal Text><Operator>)</Operator><br/>
-<Normal Text>    </Normal Text><Keyword>defer</Keyword><Normal Text> </Normal Text><Variable>os</Variable><Operator>.</Operator><Procedure>close</Procedure><Operator>(</Operator><Normal Text>f</Normal Text><Operator>)</Operator><br/>
+<Normal Text>	</Normal Text><Variable>f, err </Variable><Operator>:=</Operator><Normal Text> os</Normal Text><Operator>.</Operator><Procedure>open</Procedure><Operator>(</Operator><Normal Text>cwd</Normal Text><Operator>)</Operator><br/>
+<Normal Text>	</Normal Text><Keyword>defer</Keyword><Normal Text> os</Normal Text><Operator>.</Operator><Procedure>close</Procedure><Operator>(</Operator><Normal Text>f</Normal Text><Operator>)</Operator><br/>
 <Normal Text></Normal Text><br/>
-<Normal Text>    </Normal Text><Control Flow>if</Control Flow><Normal Text> err </Normal Text><Operator>!=</Operator><Normal Text> </Normal Text><Variable>os</Variable><Operator>.</Operator><Normal Text>ERROR_NONE </Normal Text><Operator>{</Operator><br/>
-<Normal Text>        </Normal Text><Comment>// Print error to stderr and exit with errorcode</Comment><br/>
-<Normal Text>        </Normal Text><Variable>fmt</Variable><Operator>.</Operator><Procedure>eprintln</Procedure><Operator>(</Operator><String>"Could not open directory for reading"</String><Operator>,</Operator><Normal Text> err</Normal Text><Operator>)</Operator><br/>
-<Normal Text>        </Normal Text><Variable>os</Variable><Operator>.</Operator><Procedure>exit</Procedure><Operator>(</Operator><Float>1</Float><Operator>)</Operator><br/>
-<Normal Text>    </Normal Text><Operator>}</Operator><br/>
+<Normal Text>	</Normal Text><Control Flow>if</Control Flow><Normal Text> err </Normal Text><Operator>!=</Operator><Normal Text> os</Normal Text><Operator>.</Operator><Normal Text>ERROR_NONE </Normal Text><Operator>{</Operator><br/>
+<Normal Text>		</Normal Text><Comment>// Print error to stderr and exit with errorcode</Comment><br/>
+<Normal Text>		fmt</Normal Text><Operator>.</Operator><Procedure>eprintln</Procedure><Operator>(</Operator><String>"Could not open directory for reading"</String><Operator>,</Operator><Normal Text> err</Normal Text><Operator>)</Operator><br/>
+<Normal Text>		os</Normal Text><Operator>.</Operator><Procedure>exit</Procedure><Operator>(</Operator><Decimal>1</Decimal><Operator>)</Operator><br/>
+<Normal Text>	</Normal Text><Operator>}</Operator><br/>
 <Normal Text></Normal Text><br/>
-<Variable>    fis</Variable><Operator>:</Operator><Normal Text> </Normal Text><Operator>[]</Operator><Variable>os</Variable><Operator>.</Operator><Normal Text>File_Info</Normal Text><br/>
-<Normal Text>    </Normal Text><Keyword>defer</Keyword><Normal Text> </Normal Text><Variable>os</Variable><Operator>.</Operator><Procedure>file_info_slice_delete</Procedure><Operator>(</Operator><Normal Text>fis</Normal Text><Operator>)</Operator><Normal Text> </Normal Text><Comment>// fis is a slice, we need to remember to free it</Comment><br/>
+<Normal Text>	fis</Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Operator>[]</Operator><Normal Text>os</Normal Text><Operator>.</Operator><Normal Text>File_Info</Normal Text><br/>
+<Normal Text>	</Normal Text><Keyword>defer</Keyword><Normal Text> os</Normal Text><Operator>.</Operator><Procedure>file_info_slice_delete</Procedure><Operator>(</Operator><Normal Text>fis</Normal Text><Operator>)</Operator><Normal Text> </Normal Text><Comment>// fis is a slice, we need to remember to free it</Comment><br/>
 <Normal Text></Normal Text><br/>
-<Normal Text>    fis</Normal Text><Operator>,</Operator><Normal Text> err </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Variable>os</Variable><Operator>.</Operator><Procedure>read_dir</Procedure><Operator>(</Operator><Normal Text>f</Normal Text><Operator>,</Operator><Normal Text> </Normal Text><Operator>-</Operator><Float>1</Float><Operator>)</Operator><Normal Text> </Normal Text><Comment>// -1 reads all file infos</Comment><br/>
-<Normal Text>    </Normal Text><Control Flow>if</Control Flow><Normal Text> err </Normal Text><Operator>!=</Operator><Normal Text> </Normal Text><Variable>os</Variable><Operator>.</Operator><Normal Text>ERROR_NONE </Normal Text><Operator>{</Operator><br/>
-<Normal Text>        </Normal Text><Variable>fmt</Variable><Operator>.</Operator><Procedure>eprintln</Procedure><Operator>(</Operator><String>"Could not read directory"</String><Operator>,</Operator><Normal Text> err</Normal Text><Operator>)</Operator><br/>
-<Normal Text>        </Normal Text><Variable>os</Variable><Operator>.</Operator><Procedure>exit</Procedure><Operator>(</Operator><Float>2</Float><Operator>)</Operator><br/>
-<Normal Text>    </Normal Text><Operator>}</Operator><br/>
+<Normal Text>	fis</Normal Text><Operator>,</Operator><Normal Text> err </Normal Text><Operator>=</Operator><Normal Text> os</Normal Text><Operator>.</Operator><Procedure>read_dir</Procedure><Operator>(</Operator><Normal Text>f</Normal Text><Operator>,</Operator><Normal Text> </Normal Text><Operator>-</Operator><Decimal>1</Decimal><Operator>)</Operator><Normal Text> </Normal Text><Comment>// -1 reads all file infos</Comment><br/>
+<Normal Text>	</Normal Text><Control Flow>if</Control Flow><Normal Text> err </Normal Text><Operator>!=</Operator><Normal Text> os</Normal Text><Operator>.</Operator><Normal Text>ERROR_NONE </Normal Text><Operator>{</Operator><br/>
+<Normal Text>		fmt</Normal Text><Operator>.</Operator><Procedure>eprintln</Procedure><Operator>(</Operator><String>"Could not read directory"</String><Operator>,</Operator><Normal Text> err</Normal Text><Operator>)</Operator><br/>
+<Normal Text>		os</Normal Text><Operator>.</Operator><Procedure>exit</Procedure><Operator>(</Operator><Decimal>2</Decimal><Operator>)</Operator><br/>
+<Normal Text>	</Normal Text><Operator>}</Operator><br/>
 <Normal Text></Normal Text><br/>
-<Normal Text>    </Normal Text><Control Flow>for</Control Flow><Normal Text> fi </Normal Text><Control Flow>in</Control Flow><Normal Text> fis </Normal Text><Operator>{</Operator><br/>
-<Normal Text>        </Normal Text><Procedure>print_file_info</Procedure><Operator>(</Operator><Normal Text>fi</Normal Text><Operator>)</Operator><br/>
-<Normal Text>    </Normal Text><Operator>}</Operator><br/>
+<Normal Text>	</Normal Text><Control Flow>for</Control Flow><Normal Text> fi </Normal Text><Control Flow>in</Control Flow><Normal Text> fis </Normal Text><Operator>{</Operator><br/>
+<Normal Text>		</Normal Text><Procedure>print_file_info</Procedure><Operator>(</Operator><Normal Text>fi</Normal Text><Operator>)</Operator><br/>
+<Normal Text>	</Normal Text><Operator>}</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>	</Normal Text><Variable>enumTest </Variable><Operator>:=</Operator><Normal Text> Foo</Normal Text><Operator>.</Operator><Normal Text>A</Normal Text><br/>
+<Normal Text>	</Normal Text><Directive>#partial</Directive><Normal Text> </Normal Text><Control Flow>switch</Control Flow><Normal Text> enumTest </Normal Text><Operator>{</Operator><br/>
+<Normal Text>	</Normal Text><Keyword>case</Keyword><Normal Text> </Normal Text><Operator>.</Operator><Normal Text>A</Normal Text><Operator>:</Operator><br/>
+<Normal Text>		fmt</Normal Text><Operator>.</Operator><Procedure>println</Procedure><Operator>(</Operator><String>"A letter</String><String Char>\n</String Char><String> nextline </String><String Char>\xfe</String Char><String> </String><String Char>\u200B</String Char><String> </String><String Char>\000</String Char><String> </String><String Char>\U0001f4ae</String Char><String>"</String><Operator>)</Operator><br/>
+<Normal Text>	</Normal Text><Keyword>case</Keyword><Normal Text> </Normal Text><Operator>.</Operator><Normal Text>D</Normal Text><Operator>:</Operator><br/>
+<Normal Text>		fmt</Normal Text><Operator>.</Operator><Procedure>println</Procedure><Operator>(</Operator><String>"D"</String><Operator>)</Operator><br/>
+<Normal Text>	</Normal Text><Operator>}</Operator><br/>
 <Operator>}</Operator><br/>
+<Normal Text></Normal Text><br/>

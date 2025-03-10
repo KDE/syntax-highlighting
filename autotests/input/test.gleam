@@ -22,7 +22,7 @@
 ////
 //// [link](https://example.com)
 
-// SPDX-FileCopyrightText: 2024 Louis Guichard <glpda+kde@pm.me>
+// SPDX-FileCopyrightText: 2024 Louis Guichard <kde@glpda.net>
 // SPDX-License-Identifier: MIT
 
 import gleam/bit_array as bit_string
@@ -36,7 +36,7 @@ pub fn main() {
   let assert Ok(prefix) = bit_string.to_string(prefix)
   let name: String = "Kate \u{1F3F3}\u{FE0F}\u{200D}\u{1F308} "
   let assert Ok(suffix) = get(mascots(), "Lucy")
-  io.println(prefix <> name <> suffix)
+  echo prefix <> name <> suffix
 }
 
 const prefix = <<"Hello":utf8, 44:size(8), 32:int>>

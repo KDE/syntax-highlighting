@@ -1,0 +1,58 @@
+<%!-- Examples From https://hexdocs.pm/phoenix_live_view/assigns-eex.html --%>
+<%!-- https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#sigil_H/2 --%>
+<h1>{expand_title(@title)}</h1>
+<div id={"user_#{@user.id}"}>
+  {@user.name}
+</div>
+{render("child_template.html", assigns)}
+<%!-- Function Components --%>
+<.show_name name={@user.name} />
+
+<%= for user <- Repo.all(User) do %>
+  {user.name}
+<% end %>
+<div class="card">
+  <.card_header {assigns} />
+  <.card_body {assigns} />
+  <.card_footer {assigns} />
+</div>
+<div class="card">
+  <.card_header title={@title} class={@title_class} />
+  <.card_body>
+    {render_slot(@inner_block)}
+  </.card_body>
+  <.card_footer on_close={@on_close} />
+</div>
+<%!-- Comprehensions --%>
+<section :for={post <- @posts>}>
+  <h1>{expand_title(post.title)}</h1>
+</section>
+<.form :let={f} for={@form} phx-change="validate" phx-submit="save">
+  <.input field={f[:username]} type="text" />
+</.form>
+<div title="My div" class={@class}>
+  <p>Hello {@name}</p>
+  <MyApp.Weather.city name="Kraków"/>
+</div>
+<table id="admin-table" :if={@admin?}>
+  <tr :for={user <- @users}>
+    <td>{user.name}</td>
+  </tr>
+<table>
+<%!-- Slots --%>
+<.table id="my-table" rows={@users}>
+  <:col :for={header <- @headers} :let={user}>
+    <td>{user[header]}</td>
+  </:col>
+</.table>
+
+<%!-- Script Tag --%>
+<script>
+window.URL = "<%= @my_url %>"
+</script>
+
+<.table id="my-table" rows={@users}>
+  <:col :for={header <- @headers} :let={user}>
+    <td>{user[header]}</td>
+  </:col>
+</.table>

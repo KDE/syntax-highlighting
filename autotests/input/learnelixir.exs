@@ -417,3 +417,69 @@ def function, do: {:ok, result}
   b: "b",
   c: "c"
 }
+
+# Numerics
+0xBE_EF
+0o777_1
+0b1010_0101_01
+01234
+1234_5678_9
+
+3.14_159
+1_23.00_00
+4.13e20
+6.12e-8
+
+
+"String Interpolation: #{inspect(nil)}"
+
+# Sigils
+~r/\bfoo_bar\b/g
+~s"asdf"
+~w[foo bar one two three]a
+~w(foo bar one two three)a
+
+~c'char lists are typed like this now'
+
+# Documentation
+@doc """
+## Documentation
+lorem ipsum dolor
+
+* a
+* b
+* c
+
+1. x
+2. y
+3. z
+"""
+
+# Module Attributes
+@compile {:inline, foo: 1}
+@custom_attribute [1, 2, 3, 4]
+
+# More Atoms
+:"@foo"
+:bar?
+:bar!
+%{
+  foo?: false,
+  "@bar": 1
+}
+:+
+:**
+:++
+:%{}
+
+# Interpolation in Atoms
+:"bar#{inspect(foo())}"
+
+# Character Literals
+[?a, ?b, ?c, ?z, ?1, ?-, ?+, ?., ?\s, ?\n]
+
+# Special Forms
+def foo(_, _opts) do
+  IO.inspect(__MODULE__)
+  %__MODULE__{}
+end

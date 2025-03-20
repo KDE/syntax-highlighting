@@ -81,7 +81,7 @@ constexpr DefinitionDataRow definitionsForFileNames[] = {
 
     {"*.desktop.cmake", "2_suffixes.desktop.cmake", ".desktop\nCMake"},
     {"*.per.err", "2_suffixes-but-one-a-better-match.per.err", "4GL\n4GL-PER"},
-    {"*.xml.eex", "2_suffixes-one-lang.xml.eex", "Elixir"},
+    {"*.xml.eex", "2_suffixes-one-lang.xml.eex", "Elixir/EEx"},
     {"fishd.*.fish", "fishd.prefix,suffix=one-lang.fish", "Fish"},
 
     {"usr.bin.*.ftl", "usr.bin.heterogenousPatternMatch.ftl", "AppArmor Security Profile\nFTL\nFluent"},

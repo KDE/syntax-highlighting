@@ -198,10 +198,12 @@ using KSyntaxHighlighting::Xml::attrToBool;
 
 using namespace Qt::Literals::StringLiterals;
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 10, 0)
 static constexpr QStringView operator""_sv(const char16_t *s, std::size_t n)
 {
     return QStringView(s, s + n);
 }
+#endif
 
 namespace
 {

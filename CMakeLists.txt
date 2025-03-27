@@ -146,7 +146,7 @@ install(FILES "${ksyntaxhighlighting_version_header}"
         COMPONENT Devel)
 
 include(ECMFeatureSummary)
-ecm_feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)
+ecm_feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
 
 # add target to update kate-editor.org syntax page + update site
 add_custom_target(update_kate_editor_org

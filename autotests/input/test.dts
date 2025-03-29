@@ -1,0 +1,64 @@
+/*
+ * DTS file test
+ *
+ * SPDX-FileCopyrightText: 2025 Artur Weber <knuxify@gmail.com>
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/dts-v1/;
+
+#include <gpio.h>
+#include "test.dtsi"
+
+// TODO comment FIXME comment
+
+/delete-node/ &bad_node;
+
+/ {
+	#address-cells = <1>;
+	#size-cells = <1>;
+
+	compatible = "foo,bar", "baz,quox";
+
+	memory@80000000 { reg = <0x80000000 0x10000000>; };
+
+	soc {
+		i2c1: i2c@4000 {
+			compatible = "foo,i2c-controller";
+			reg = <0x00004000 0x1c0>;
+			foo,int-property = <32>; // Side comment
+			foo,boolean;
+
+			#address-cells = <1>;
+			#size-cells = <0>;
+		};
+
+		pwm: pwm@6c00 {
+			reg = <0x00006c00 0x8a>;
+		};
+
+		gpio: gpio@7000 {
+			reg = <0x00007000 0x200>;
+			gpio-controller;
+			#gpio-cells = <2>;
+		};
+	};
+};
+
+&i2c1 {
+	sensor@10 {
+		compatible = "baz,sensor";
+		reg = <0x10>;
+		gpios = <&gpio 5 GPIO_ACTIVE_LOW>;
+		foo,u8-property = /bits/ 8 <0x1>;
+		foo,ref-property = <&pwm>;
+		foo,prop-with-macro = "a", 0x00, MY_MACRO(0x5a, 2, "test");
+
+		named-subnode {
+			foo,str-property = "test";
+			foo,multiline = "a", "b",
+					"c", "d";
+		};
+	};
+};

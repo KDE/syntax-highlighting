@@ -12,7 +12,7 @@
     SPDX-FileCopyrightText: 2004 Alexander Neundorf <neundorf@kde.org>
     SPDX-FileCopyrightText: 2005 Dominik Haumann <dhdev@gmx.de>
     SPDX-FileCopyrightText: 2007, 2008, 2013, 2014 Matthew Woehlke <mw_triad@users.sourceforge.net>
-    SPDX-FileCopyrightText: 2013-2015, 2017-2023 Alex Turbov <i.zaufi@gmail.com>
+    SPDX-FileCopyrightText: 2013-2015, 2017-2025 Alex Turbov <i.zaufi@gmail.com>
 
     SPDX-License-Identifier: LGPL-2.0-or-later
  -->

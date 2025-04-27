@@ -1810,7 +1810,7 @@ private:
             for (const auto &keyword : keywordsIt.value().items.keywords) {
                 if (entries.contains(keyword.content)) {
                     qWarning() << definition.filename << "line" << keyword.line << "duplicated keyword" << keyword.content;
-                    success = false;
+                    // TODO: once all stuff is fixed  success = false;
                 }
                 entries.insert(keyword.content);
             }

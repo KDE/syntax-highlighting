@@ -1,0 +1,57 @@
+<Comment>// Poisson's Equation</Comment><br/>
+<Comment>// Example taken from https://doc.freefem.org/examples/misc.html</Comment><br/>
+<Normal></Normal><br/>
+<Comment>// Parameters</Comment><br/>
+<Types>int</Types><Normal> nn </Normal><Operator>=</Operator><Normal> 20;</Normal><br/>
+<Types>real</Types><Normal> L </Normal><Operator>=</Operator><Normal> 1.;</Normal><br/>
+<Types>real</Types><Normal> H </Normal><Operator>=</Operator><Normal> 1.;</Normal><br/>
+<Types>real</Types><Normal> l </Normal><Operator>=</Operator><Normal> 0.5;</Normal><br/>
+<Types>real</Types><Normal> h </Normal><Operator>=</Operator><Normal> 0.5;</Normal><br/>
+<Normal></Normal><br/>
+<Types>func</Types><Normal> f </Normal><Operator>=</Operator><Normal> 1.;</Normal><br/>
+<Types>func</Types><Normal> g </Normal><Operator>=</Operator><Normal> 0.;</Normal><br/>
+<Normal></Normal><br/>
+<Types>int</Types><Normal> NAdapt </Normal><Operator>=</Operator><Normal> 10;</Normal><br/>
+<Normal></Normal><br/>
+<Comment>// Mesh</Comment><br/>
+<Types>border</Types><Normal> b1(t</Normal><Operator>=</Operator><Normal>0, L){</Normal><Global Variables>x</Global Variables><Operator>=</Operator><Normal>t; </Normal><Global Variables>y</Global Variables><Operator>=</Operator><Normal>0;};</Normal><br/>
+<Types>border</Types><Normal> b2(t</Normal><Operator>=</Operator><Normal>0, h){</Normal><Global Variables>x</Global Variables><Operator>=</Operator><Normal>L; </Normal><Global Variables>y</Global Variables><Operator>=</Operator><Normal>t;};</Normal><br/>
+<Types>border</Types><Normal> b3(t</Normal><Operator>=</Operator><Normal>L, l){</Normal><Global Variables>x</Global Variables><Operator>=</Operator><Normal>t; </Normal><Global Variables>y</Global Variables><Operator>=</Operator><Normal>h;};</Normal><br/>
+<Types>border</Types><Normal> b4(t</Normal><Operator>=</Operator><Normal>h, H){</Normal><Global Variables>x</Global Variables><Operator>=</Operator><Normal>l; </Normal><Global Variables>y</Global Variables><Operator>=</Operator><Normal>t;};</Normal><br/>
+<Types>border</Types><Normal> b5(t</Normal><Operator>=</Operator><Normal>l, 0){</Normal><Global Variables>x</Global Variables><Operator>=</Operator><Normal>t; </Normal><Global Variables>y</Global Variables><Operator>=</Operator><Normal>H;};</Normal><br/>
+<Types>border</Types><Normal> b6(t</Normal><Operator>=</Operator><Normal>H, 0){</Normal><Global Variables>x</Global Variables><Operator>=</Operator><Normal>0; </Normal><Global Variables>y</Global Variables><Operator>=</Operator><Normal>t;};</Normal><br/>
+<Normal></Normal><br/>
+<Types>mesh</Types><Normal> Th </Normal><Operator>=</Operator><Normal> </Normal><Functions>buildmesh</Functions><Normal>(b1(nn</Normal><Operator>*</Operator><Normal>L) </Normal><Operator>+</Operator><Normal> b2(nn</Normal><Operator>*</Operator><Normal>h) </Normal><Operator>+</Operator><Normal> b3(nn</Normal><Operator>*</Operator><Normal>(L</Normal><Operator>-</Operator><Normal>l)) </Normal><Operator>+</Operator><Normal> b4(nn</Normal><Operator>*</Operator><Normal>(H</Normal><Operator>-</Operator><Normal>h)) </Normal><Operator>+</Operator><Normal> b5(nn</Normal><Operator>*</Operator><Normal>l) </Normal><Operator>+</Operator><Normal> b6(nn</Normal><Operator>*</Operator><Normal>H));</Normal><br/>
+<Normal></Normal><br/>
+<Comment>// Fespace</Comment><br/>
+<Types>fespace</Types><Normal> Vh(Th, </Normal><FE Space>P1</FE Space><Normal>); </Normal><Comment>// Change P1 to P2 to test P2 finite element</Comment><br/>
+<Normal>Vh u, v;</Normal><br/>
+<Normal></Normal><br/>
+<Comment>// Macro</Comment><br/>
+<Types>macro</Types><Normal> grad(u) [</Normal><Functions>dx</Functions><Normal>(u), </Normal><Functions>dy</Functions><Normal>(u)] </Normal><Comment>//</Comment><br/>
+<Normal></Normal><br/>
+<Comment>// Problem</Comment><br/>
+<Types>problem</Types><Normal> Poisson (u, v, </Normal><Parameters>solver</Parameters><Operator>=</Operator><Global Variables>CG</Global Variables><Normal>, </Normal><Parameters>eps</Parameters><Operator>=-</Operator><Normal>1.e</Normal><Operator>-</Operator><Normal>6)</Normal><br/>
+<Normal>   </Normal><Operator>=</Operator><Normal> </Normal><Functions>int2d</Functions><Normal>(Th)(</Normal><br/>
+<Normal>        grad(u)</Normal><Operator>'</Operator><Normal> </Normal><Operator>*</Operator><Normal> grad(v)</Normal><br/>
+<Normal>   )</Normal><br/>
+<Normal>   </Normal><Operator>+</Operator><Normal> </Normal><Functions>int2d</Functions><Normal>(Th)(</Normal><br/>
+<Normal>        f </Normal><Operator>*</Operator><Normal> v</Normal><br/>
+<Normal>   )</Normal><br/>
+<Normal>   </Normal><Operator>+</Operator><Normal> </Normal><Functions>on</Functions><Normal>(b1, b2, b3, b4, b5, b6, u</Normal><Operator>=</Operator><Normal>g)</Normal><br/>
+<Normal>   ;</Normal><br/>
+<Normal></Normal><br/>
+<Comment>// Mesh adaptation iterations</Comment><br/>
+<Types>real</Types><Normal> error </Normal><Operator>=</Operator><Normal> 0.1;</Normal><br/>
+<Types>real</Types><Normal> </Normal><Parameters>coef</Parameters><Normal> </Normal><Operator>=</Operator><Normal> 0.1</Normal><Operator>^</Operator><Normal>(1</Normal><Operator>./</Operator><Normal>5.);</Normal><br/>
+<Loops>for</Loops><Normal> (</Normal><Types>int</Types><Normal> i </Normal><Operator>=</Operator><Normal> 0; i </Normal><Operator><</Operator><Normal> NAdapt; i</Normal><Operator>++</Operator><Normal>){</Normal><br/>
+<Normal>   </Normal><Comment>// Solve</Comment><br/>
+<Normal>   Poisson;</Normal><br/>
+<Normal></Normal><br/>
+<Normal>   </Normal><Comment>// Plot</Comment><br/>
+<Normal>   </Normal><Functions>plot</Functions><Normal>(Th, u);</Normal><br/>
+<Normal></Normal><br/>
+<Normal>   </Normal><Comment>// Adaptmesh</Comment><br/>
+<Normal>   Th </Normal><Operator>=</Operator><Normal> </Normal><Functions>adaptmesh</Functions><Normal>(Th, u, </Normal><Parameters>inquire</Parameters><Operator>=</Operator><Normal>1, </Normal><Parameters>err</Parameters><Operator>=</Operator><Normal>error);</Normal><br/>
+<Normal>   error </Normal><Operator>=</Operator><Normal> error </Normal><Operator>*</Operator><Normal> </Normal><Parameters>coef</Parameters><Normal>;</Normal><br/>
+<Normal>}</Normal><br/>

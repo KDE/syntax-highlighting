@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>freefem.edp</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (FreeFEM) - Theme (Breeze Light)"/>
+</head><body style="background-color:#ffffff;color:#1f1c1b"><pre>
+<span style="color:#898887">// Poisson's Equation</span>
+<span style="color:#898887">// Example taken from https://doc.freefem.org/examples/misc.html</span>
+
+<span style="color:#898887">// Parameters</span>
+<span style="font-weight:bold">int</span> nn <span style="color:#ca60ca">=</span> 20;
+<span style="font-weight:bold">real</span> L <span style="color:#ca60ca">=</span> 1.;
+<span style="font-weight:bold">real</span> H <span style="color:#ca60ca">=</span> 1.;
+<span style="font-weight:bold">real</span> l <span style="color:#ca60ca">=</span> 0.5;
+<span style="font-weight:bold">real</span> h <span style="color:#ca60ca">=</span> 0.5;
+
+<span style="font-weight:bold">func</span> f <span style="color:#ca60ca">=</span> 1.;
+<span style="font-weight:bold">func</span> g <span style="color:#ca60ca">=</span> 0.;
+
+<span style="font-weight:bold">int</span> NAdapt <span style="color:#ca60ca">=</span> 10;
+
+<span style="color:#898887">// Mesh</span>
+<span style="font-weight:bold">border</span> b1(t<span style="color:#ca60ca">=</span>0, L){<span style="color:#0057ae">x</span><span style="color:#ca60ca">=</span>t; <span style="color:#0057ae">y</span><span style="color:#ca60ca">=</span>0;};
+<span style="font-weight:bold">border</span> b2(t<span style="color:#ca60ca">=</span>0, h){<span style="color:#0057ae">x</span><span style="color:#ca60ca">=</span>L; <span style="color:#0057ae">y</span><span style="color:#ca60ca">=</span>t;};
+<span style="font-weight:bold">border</span> b3(t<span style="color:#ca60ca">=</span>L, l){<span style="color:#0057ae">x</span><span style="color:#ca60ca">=</span>t; <span style="color:#0057ae">y</span><span style="color:#ca60ca">=</span>h;};
+<span style="font-weight:bold">border</span> b4(t<span style="color:#ca60ca">=</span>h, H){<span style="color:#0057ae">x</span><span style="color:#ca60ca">=</span>l; <span style="color:#0057ae">y</span><span style="color:#ca60ca">=</span>t;};
+<span style="font-weight:bold">border</span> b5(t<span style="color:#ca60ca">=</span>l, 0){<span style="color:#0057ae">x</span><span style="color:#ca60ca">=</span>t; <span style="color:#0057ae">y</span><span style="color:#ca60ca">=</span>H;};
+<span style="font-weight:bold">border</span> b6(t<span style="color:#ca60ca">=</span>H, 0){<span style="color:#0057ae">x</span><span style="color:#ca60ca">=</span>0; <span style="color:#0057ae">y</span><span style="color:#ca60ca">=</span>t;};
+
+<span style="font-weight:bold">mesh</span> Th <span style="color:#ca60ca">=</span> <span style="color:#644a9b">buildmesh</span>(b1(nn<span style="color:#ca60ca">*</span>L) <span style="color:#ca60ca">+</span> b2(nn<span style="color:#ca60ca">*</span>h) <span style="color:#ca60ca">+</span> b3(nn<span style="color:#ca60ca">*</span>(L<span style="color:#ca60ca">-</span>l)) <span style="color:#ca60ca">+</span> b4(nn<span style="color:#ca60ca">*</span>(H<span style="color:#ca60ca">-</span>h)) <span style="color:#ca60ca">+</span> b5(nn<span style="color:#ca60ca">*</span>l) <span style="color:#ca60ca">+</span> b6(nn<span style="color:#ca60ca">*</span>H));
+
+<span style="color:#898887">// Fespace</span>
+<span style="font-weight:bold">fespace</span> Vh(Th, <span style="color:#644a9b;font-weight:bold">P1</span>); <span style="color:#898887">// Change P1 to P2 to test P2 finite element</span>
+Vh u, v;
+
+<span style="color:#898887">// Macro</span>
+<span style="font-weight:bold">macro</span> grad(u) [<span style="color:#644a9b">dx</span>(u), <span style="color:#644a9b">dy</span>(u)] <span style="color:#898887">//</span>
+
+<span style="color:#898887">// Problem</span>
+<span style="font-weight:bold">problem</span> Poisson (u, v, <span style="font-weight:bold">solver</span><span style="color:#ca60ca">=</span><span style="color:#0057ae">CG</span>, <span style="font-weight:bold">eps</span><span style="color:#ca60ca">=-</span>1.e<span style="color:#ca60ca">-</span>6)
+   <span style="color:#ca60ca">=</span> <span style="color:#644a9b">int2d</span>(Th)(
+        grad(u)<span style="color:#ca60ca">'</span> <span style="color:#ca60ca">*</span> grad(v)
+   )
+   <span style="color:#ca60ca">+</span> <span style="color:#644a9b">int2d</span>(Th)(
+        f <span style="color:#ca60ca">*</span> v
+   )
+   <span style="color:#ca60ca">+</span> <span style="color:#644a9b">on</span>(b1, b2, b3, b4, b5, b6, u<span style="color:#ca60ca">=</span>g)
+   ;
+
+<span style="color:#898887">// Mesh adaptation iterations</span>
+<span style="font-weight:bold">real</span> error <span style="color:#ca60ca">=</span> 0.1;
+<span style="font-weight:bold">real</span> <span style="font-weight:bold">coef</span> <span style="color:#ca60ca">=</span> 0.1<span style="color:#ca60ca">^</span>(1<span style="color:#ca60ca">./</span>5.);
+<span style="font-weight:bold">for</span> (<span style="font-weight:bold">int</span> i <span style="color:#ca60ca">=</span> 0; i <span style="color:#ca60ca">&lt;</span> NAdapt; i<span style="color:#ca60ca">++</span>){
+   <span style="color:#898887">// Solve</span>
+   Poisson;
+
+   <span style="color:#898887">// Plot</span>
+   <span style="color:#644a9b">plot</span>(Th, u);
+
+   <span style="color:#898887">// Adaptmesh</span>
+   Th <span style="color:#ca60ca">=</span> <span style="color:#644a9b">adaptmesh</span>(Th, u, <span style="font-weight:bold">inquire</span><span style="color:#ca60ca">=</span>1, <span style="font-weight:bold">err</span><span style="color:#ca60ca">=</span>error);
+   error <span style="color:#ca60ca">=</span> error <span style="color:#ca60ca">*</span> <span style="font-weight:bold">coef</span>;
+}
+</pre></body></html>

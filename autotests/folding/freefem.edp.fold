@@ -1,0 +1,57 @@
+// Poisson's Equation
+// Example taken from https://doc.freefem.org/examples/misc.html
+
+// Parameters
+int nn = 20;
+real L = 1.;
+real H = 1.;
+real l = 0.5;
+real h = 0.5;
+
+func f = 1.;
+func g = 0.;
+
+int NAdapt = 10;
+
+// Mesh
+border b1(t=0, L){x=t; y=0;};
+border b2(t=0, h){x=L; y=t;};
+border b3(t=L, l){x=t; y=h;};
+border b4(t=h, H){x=l; y=t;};
+border b5(t=l, 0){x=t; y=H;};
+border b6(t=H, 0){x=0; y=t;};
+
+mesh Th = buildmesh(b1(nn*L) + b2(nn*h) + b3(nn*(L-l)) + b4(nn*(H-h)) + b5(nn*l) + b6(nn*H));
+
+// Fespace
+fespace Vh(Th, P1); // Change P1 to P2 to test P2 finite element
+Vh u, v;
+
+// Macro
+macro grad(u) [dx(u), dy(u)] //
+
+// Problem
+problem Poisson (u, v, solver=CG, eps=-1.e-6)
+   = int2d(Th)(
+        grad(u)' * grad(v)
+   )
+   + int2d(Th)(
+        f * v
+   )
+   + on(b1, b2, b3, b4, b5, b6, u=g)
+   ;
+
+// Mesh adaptation iterations
+real error = 0.1;
+real coef = 0.1^(1./5.);
+for (int i = 0; i < NAdapt; i++){
+   // Solve
+   Poisson;
+
+   // Plot
+   plot(Th, u);
+
+   // Adaptmesh
+   Th = adaptmesh(Th, u, inquire=1, err=error);
+   error = error * coef;
+}

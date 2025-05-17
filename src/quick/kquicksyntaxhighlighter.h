@@ -21,70 +21,56 @@ class SyntaxHighlighter;
 }
 
 /*!
- * \class KSyntaxHighlighting::KQuickSyntaxHighlighter
- *
- * \inmodule KSyntaxHighlighting
+ * \qmltype SyntaxHighlighter
+ * \inqmlmodule org.kde.syntaxhighlighting
  */
 class KQuickSyntaxHighlighter : public QObject
 {
     Q_OBJECT
 
+    /*!
+     * \qmlproperty QtObject SyntaxHighlighter::textEdit
+     */
     Q_PROPERTY(QObject *textEdit READ textEdit WRITE setTextEdit NOTIFY textEditChanged)
+
+    /*!
+     * \qmlproperty variant SyntaxHighlighter::definition
+     */
     Q_PROPERTY(QVariant definition READ definition WRITE setDefinition NOTIFY definitionChanged)
+
+    /*!
+     * \qmlproperty variant SyntaxHighlighter::theme
+     */
     Q_PROPERTY(QVariant theme READ theme WRITE setTheme NOTIFY themeChanged)
+
+    /*!
+     * \qmlproperty Repository SyntaxHighlighter::repository
+     */
     Q_PROPERTY(KSyntaxHighlighting::Repository *repository READ repository WRITE setRepository NOTIFY repositoryChanged)
 
 public:
-    /*!
-    */
     explicit KQuickSyntaxHighlighter(QObject *parent = nullptr);
     ~KQuickSyntaxHighlighter() override;
 
-    /*!
-    */
     QObject *textEdit() const;
-    /*!
-    */
     void setTextEdit(QObject *textEdit);
 
-    /*!
-    */
     QVariant definition() const;
-    /*!
-    */
     void setDefinition(const QVariant &definition);
 
-    /*!
-    */
     QVariant theme() const;
-    /*!
-    */
     void setTheme(const QVariant &theme);
 
-    /*!
-    */
     KSyntaxHighlighting::Repository *repository() const;
-    /*!
-    */
     void setRepository(KSyntaxHighlighting::Repository *repository);
 
 Q_SIGNALS:
-    /*!
-    */
     void textEditChanged() const;
-    /*!
-    */
     void definitionChanged() const;
-    /*!
-    */
     void themeChanged();
-    /*!
-    */
     void repositoryChanged();
 
 private:
-    /*!
-    */
     KSyntaxHighlighting::Repository *unwrappedRepository() const;
 
     QObject *m_textEdit;

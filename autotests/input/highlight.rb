@@ -511,6 +511,8 @@ grep test }
 %s<one two three \n#{123} [<({nested})>]>
 %s[one two three \n#{123} [<({nested})>]]
 
+string_in_array = [%(#{x} test)]
+
 # number
 # binary
 0b001

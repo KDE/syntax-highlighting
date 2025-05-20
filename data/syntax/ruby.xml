@@ -21,6 +21,7 @@
 		<!-- https://docs.ruby-lang.org/en/master/globals_rdoc.html -->
 		<!-- $= $, $; are deprecated -->
 		<!ENTITY global_var "\$([!@~&amp;`'+/\\&lt;>._*$?:&quot;=,;]|[0-9]+|-\w|[[:alpha:]]\w*)">
+		<!ENTITY named_global_var "\$((?!(stdin|stdout|stderr|_|LOAD_PATH|LOADED_FEATURES|FILENAME|DEBUG|VERBOSE)\b)[[:alpha:]]\w*|[0-9]+|-(?![ailpFIvWwdx])\w)">
 
 		<!-- without ? : % / < = -->
 		<!ENTITY safe_op "(?:[-+*~^|&amp;]+|===?|&lt;(=>?|(?!&lt;))|[!>]=?|\.\.\.?)">
@@ -334,6 +335,15 @@ Notes:
 
 				<DetectChar attribute="Comment" char="#" context="General Comment"/>
 
+				<DetectChar char="@" context="AtVarMsgParamOrOp2" lookAhead="1"/>
+				<DetectChar char="$" context="VarMsgParamOrOp2" lookAhead="1"/>
+
+				<HlCChar attribute="Char"/>
+				<DetectChar attribute="String" char='"' context="DQuote"/>
+				<DetectChar attribute="Raw String" char="'" context="SQuote"/>
+				<DetectChar attribute="Command" char="`" context="Command String"/>
+				<DetectChar  lookAhead="1" char="." context="MsgParamOrOp2"/>
+
 				<RegExpr attribute="Normal Text" String="&ident_not_kw;" context="MsgParamOrOp2"/>
 
 				<!-- Detects key symbol in a hash
@@ -620,16 +630,30 @@ Notes:
 
 			<context name="Var" attribute="Normal Text" lineEndContext="#pop#pop">
 				<!-- (global) vars starting with $ -->
-				<RegExpr attribute="Global Variable" String="\$((?!(stdin|stdout|stderr|_|LOAD_PATH|LOADED_FEATURES|FILENAME|DEBUG|VERBOSE)\b)[[:alpha:]]\w*|[0-9]+|-(?![ailpFIvWwdx])\w)" context="#pop!Op1"/>
+				<RegExpr attribute="Global Variable" String="&named_global_var;" context="#pop!Op1"/>
 				<!-- special-character globals and other predefined variables -->
 				<RegExpr attribute="Default globals" String="&global_var;" context="#pop!Op1"/>
 				<DetectChar attribute="Error" char="$" context="#pop!Op1"/>
 			</context>
 
+			<context name="VarMsgParamOrOp2" attribute="Normal Text" lineEndContext="#pop">
+				<!-- (global) vars starting with $ -->
+				<RegExpr attribute="Global Variable" String="&named_global_var;" context="#pop!MsgParamOrOp2"/>
+				<!-- special-character globals and other predefined variables -->
+				<RegExpr attribute="Default globals" String="&global_var;" context="#pop!MsgParamOrOp2"/>
+				<DetectChar attribute="Error" char="$" context="#pop!MsgParamOrOp2"/>
+			</context>
+
 			<context name="AtVar" attribute="Normal Text" lineEndContext="#pop#pop">
 				<RegExpr attribute="Instance Variable" String="@&ident;" context="#pop!Op1"/>
 				<RegExpr attribute="Class Variable" String="@@&ident;" context="#pop!Op1"/>
-				<DetectChar attribute="Error" char="@"/>
+				<DetectChar attribute="Error" char="@" context="#pop!Op1"/>
+			</context>
+
+			<context name="AtVarMsgParamOrOp2" attribute="Normal Text" lineEndContext="#pop">
+				<RegExpr attribute="Instance Variable" String="@&ident;" context="#pop!MsgParamOrOp2"/>
+				<RegExpr attribute="Class Variable" String="@@&ident;" context="#pop!MsgParamOrOp2"/>
+				<DetectChar attribute="Error" char="@" context="#pop!MsgParamOrOp2"/>
 			</context>
 
 			<!-- def foo() block-statement

@@ -403,10 +403,13 @@ total/count/2   # both division
 total/(count/2) # both division
 
 @foo/10         # division
-@foo /10        # division
+@foo /10/       # reregexp
 
 "hello"/10      # division
 "hello" / 10    # division
+
+"a".match/10    # division
+"a".match /10/  # reg
 
 /regexp//10     # division
 /regexp/ / 10   # division
@@ -661,6 +664,8 @@ foo?(?a ? 1 : :a) # or
 foo??a?1: :a
 foo?(?a ? 1 : 2) # or
 foo??a?1: 2
+
+data = @hash.slice :key_one, :key_two
 
 "#{{a:}}"
 # break substitution

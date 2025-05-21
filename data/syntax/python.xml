@@ -505,7 +505,7 @@
 			<!-- https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals -->
 			<context name="StringVariants" attribute="Normal Text" lineEndContext="#stay">
 				<!-- fast path -->
-				<RegExpr String="(?:u|r|b|f|ur|fr|rf|br|rb)?['&quot;]" insensitive="true" context="AssumeStringVariants" lookAhead="1"/>
+				<RegExpr String="(?:u|r|b|f|t|ur|fr|rf|br|rb|tr|rt)?['&quot;]" insensitive="true" context="AssumeStringVariants" lookAhead="1"/>
 			</context>
 			<context name="AssumeStringVariants" attribute="Normal Text" lineEndContext="#stay">
 				<StringDetect attribute="String Deliminator" String="'''"                context="#pop!Triple A-string" beginRegion="Triple A-region"/>
@@ -574,6 +574,24 @@
 				<StringDetect attribute="Raw B-String Deliminator" String="rb'"                  insensitive="true" context="#pop!Raw A-B-String"/>
 				<StringDetect attribute="Raw B-String Deliminator" String="br&quot;"             insensitive="true" context="#pop!Raw Q-B-String"/>
 				<StringDetect attribute="Raw B-String Deliminator" String="rb&quot;"             insensitive="true" context="#pop!Raw Q-B-String"/>
+
+				<!-- Python 3.14 string template -->
+
+				<!-- t -->
+				<StringDetect attribute="T-String Deliminator" String="t'''"                insensitive="1" context="#pop!Triple A-T-String" beginRegion="Triple A-region"/>
+				<StringDetect attribute="T-String Deliminator" String="t&quot;&quot;&quot;" insensitive="1" context="#pop!Triple Q-T-String" beginRegion="Triple Q-region"/>
+				<StringDetect attribute="T-String Deliminator" String="t'"                  insensitive="1" context="#pop!Single A-T-String"/>
+				<StringDetect attribute="T-String Deliminator" String="t&quot;"             insensitive="1" context="#pop!Single Q-T-String"/>
+
+				<!-- rt / tr -->
+				<StringDetect attribute="Raw T-String Deliminator" String="tr'''" insensitive="1"                context="#pop!Raw Triple A-T-String" beginRegion="Triple A-region"/>
+				<StringDetect attribute="Raw T-String Deliminator" String="rt'''" insensitive="1"                context="#pop!Raw Triple A-T-String" beginRegion="Triple A-region"/>
+				<StringDetect attribute="Raw T-String Deliminator" String="tr&quot;&quot;&quot;" insensitive="1" context="#pop!Raw Triple Q-T-String" beginRegion="Triple Q-region"/>
+				<StringDetect attribute="Raw T-String Deliminator" String="rt&quot;&quot;&quot;" insensitive="1" context="#pop!Raw Triple Q-T-String" beginRegion="Triple Q-region"/>
+				<StringDetect attribute="Raw T-String Deliminator" String="tr'" insensitive="1"                  context="#pop!Raw A-T-String"/>
+				<StringDetect attribute="Raw T-String Deliminator" String="rt'" insensitive="1"                  context="#pop!Raw A-T-String"/>
+				<StringDetect attribute="Raw T-String Deliminator" String="tr&quot;" insensitive="1"             context="#pop!Raw Q-T-String"/>
+				<StringDetect attribute="Raw T-String Deliminator" String="rt&quot;" insensitive="1"             context="#pop!Raw Q-T-String"/>
 
 				<!-- Python 2 compatibility (unicode prefix) -->
 
@@ -774,6 +792,23 @@
 				<StringDetect attribute="Raw F-String Deliminator" String="'''" context="#pop" endRegion="Triple A-region"/>
 			</context>
 
+			<context name="Triple A-T-String" attribute="T-String" lineEndContext="#stay" noIndentationBasedFolding="true">
+				<DetectSpaces attribute="T-String"/>
+				<DetectIdentifier attribute="T-String"/>
+				<IncludeRules context="stringescape"/>
+				<IncludeRules context="stringinterpolation"/>
+				<StringDetect attribute="T-String Deliminator" String="'''" context="#pop" endRegion="Triple A-region"/>
+			</context>
+
+			<context name="Raw Triple A-T-String" attribute="Raw T-String" lineEndContext="#stay" noIndentationBasedFolding="true">
+				<DetectSpaces attribute="Raw T-String"/>
+				<DetectIdentifier attribute="Raw T-String"/>
+				<Detect2Chars attribute="Raw T-String" char="\" char1="'"/>
+				<Detect2Chars attribute="Raw T-String" char="\" char1="\"/>
+				<IncludeRules context="stringinterpolation"/>
+				<StringDetect attribute="Raw T-String Deliminator" String="'''" context="#pop" endRegion="Triple A-region"/>
+			</context>
+
 			<context name="Triple A-B-String" attribute="B-String" lineEndContext="#stay" noIndentationBasedFolding="true">
 				<RegExpr attribute="B-String" String="([\x20-\x26\x28-\x5B\x5D-\x7E]++|'(?!''))++"/>
 				<IncludeRules context="bytesescape"/>
@@ -820,6 +855,23 @@
 				<Detect2Chars attribute="Raw F-String" char="\" char1="\"/>
 				<IncludeRules context="stringinterpolation"/>
 				<StringDetect attribute="Raw F-String Deliminator" String="&quot;&quot;&quot;" context="#pop" endRegion="Triple Q-region"/>
+			</context>
+
+			<context name="Triple Q-T-String" attribute="T-String" lineEndContext="#stay" noIndentationBasedFolding="true">
+				<DetectSpaces attribute="T-String"/>
+				<DetectIdentifier attribute="T-String"/>
+				<IncludeRules context="stringescape"/>
+				<IncludeRules context="stringinterpolation"/>
+				<StringDetect attribute="T-String Deliminator" String="&quot;&quot;&quot;" context="#pop" endRegion="Triple Q-region"/>
+			</context>
+
+			<context name="Raw Triple Q-T-String" attribute="Raw T-String" lineEndContext="#stay" noIndentationBasedFolding="true">
+				<DetectSpaces attribute="Raw T-String"/>
+				<DetectIdentifier attribute="Raw T-String"/>
+				<Detect2Chars attribute="Raw T-String" char="\" char1="&quot;"/>
+				<Detect2Chars attribute="Raw T-String" char="\" char1="\"/>
+				<IncludeRules context="stringinterpolation"/>
+				<StringDetect attribute="Raw T-String Deliminator" String="&quot;&quot;&quot;" context="#pop" endRegion="Triple Q-region"/>
 			</context>
 
 			<context name="Triple Q-B-String" attribute="B-String" lineEndContext="#stay" noIndentationBasedFolding="true">
@@ -873,6 +925,24 @@
 				<LineContinue attribute="Raw F-String" context="#stay"/>
 			</context>
 
+			<context name="Single A-T-String" attribute="T-String" lineEndContext="#pop!UnfinishedStringError">
+				<DetectSpaces attribute="T-String"/>
+				<DetectIdentifier attribute="T-String"/>
+				<IncludeRules context="stringescape"/>
+				<IncludeRules context="stringinterpolation"/>
+				<DetectChar attribute="T-String Deliminator" char="'" context="#pop"/>
+			</context>
+
+			<context name="Raw A-T-String" attribute="Raw T-String" lineEndContext="#pop!UnfinishedStringError">
+				<DetectSpaces attribute="Raw T-String"/>
+				<DetectIdentifier attribute="Raw T-String"/>
+				<Detect2Chars attribute="Raw T-String" char="\" char1="'"/>
+				<Detect2Chars attribute="Raw T-String" char="\" char1="\"/>
+				<IncludeRules context="stringinterpolation"/>
+				<DetectChar attribute="Raw T-String Deliminator" char="'" context="#pop"/>
+				<LineContinue attribute="Raw T-String" context="#stay"/>
+			</context>
+
 			<context name="Single A-B-String" attribute="B-String" lineEndContext="#pop!UnfinishedStringError">
 				<RegExpr attribute="B-String" String="[\x20-\x26\x28-\x5B\x5D-\x7E]++"/>
 				<IncludeRules context="bytesescape"/>
@@ -922,6 +992,24 @@
 				<IncludeRules context="stringinterpolation"/>
 				<DetectChar attribute="Raw F-String Deliminator" char="&quot;" context="#pop"/>
 				<LineContinue attribute="Raw F-String" context="#stay"/>
+			</context>
+
+			<context name="Single Q-T-String" attribute="T-String" lineEndContext="#pop!UnfinishedStringError">
+				<DetectSpaces attribute="T-String"/>
+				<DetectIdentifier attribute="T-String"/>
+				<IncludeRules context="stringescape"/>
+				<IncludeRules context="stringinterpolation"/>
+				<DetectChar attribute="T-String Deliminator" char="&quot;" context="#pop"/>
+			</context>
+
+			<context name="Raw Q-T-String" attribute="Raw T-String" lineEndContext="#pop!UnfinishedStringError">
+				<DetectSpaces attribute="Raw T-String"/>
+				<DetectIdentifier attribute="Raw T-String"/>
+				<Detect2Chars attribute="Raw T-String" char="\" char1="&quot;"/>
+				<Detect2Chars attribute="Raw T-String" char="\" char1="\"/>
+				<IncludeRules context="stringinterpolation"/>
+				<DetectChar attribute="Raw T-String Deliminator" char="&quot;" context="#pop"/>
+				<LineContinue attribute="Raw T-String" context="#stay"/>
 			</context>
 
 			<context name="Single Q-B-String" attribute="B-String" lineEndContext="#pop!UnfinishedStringError">
@@ -2249,19 +2337,28 @@
 			<itemData name="Binary" defStyleNum="dsBaseN" spellChecking="false"/>
 			<itemData name="Complex" defStyleNum="dsOthers" spellChecking="false"/>
 			<itemData name="Comment" defStyleNum="dsComment"/>
+
 			<!-- String -->
 			<itemData name="String Deliminator" defStyleNum="dsString" spellChecking="false"/>
 			<itemData name="String" defStyleNum="dsString"/>
 			<itemData name="Raw String Deliminator" defStyleNum="dsVerbatimString" spellChecking="false"/>
 			<itemData name="Raw String" defStyleNum="dsVerbatimString"/>
+			<!-- f-string -->
 			<itemData name="F-String Deliminator" defStyleNum="dsSpecialString" spellChecking="false"/>
 			<itemData name="F-String" defStyleNum="dsSpecialString"/>
 			<itemData name="Raw F-String Deliminator" defStyleNum="dsVerbatimString" spellChecking="false"/>
 			<itemData name="Raw F-String" defStyleNum="dsVerbatimString"/>
+			<!-- b-string -->
 			<itemData name="B-String Deliminator" defStyleNum="dsString" spellChecking="false"/>
 			<itemData name="B-String" defStyleNum="dsString" spellChecking="false"/>
 			<itemData name="Raw B-String Deliminator" defStyleNum="dsVerbatimString" spellChecking="false"/>
 			<itemData name="Raw B-String" defStyleNum="dsVerbatimString" spellChecking="false"/>
+			<!-- t-string -->
+			<itemData name="T-String Deliminator" defStyleNum="dsSpecialString" spellChecking="false"/>
+			<itemData name="T-String" defStyleNum="dsSpecialString"/>
+			<itemData name="Raw T-String Deliminator" defStyleNum="dsVerbatimString" spellChecking="false"/>
+			<itemData name="Raw T-String" defStyleNum="dsVerbatimString"/>
+
 			<!-- Char -->
 			<itemData name="String Char" defStyleNum="dsChar" spellChecking="false"/>
 			<itemData name="String Substitution" defStyleNum="dsSpecialChar" spellChecking="false"/>

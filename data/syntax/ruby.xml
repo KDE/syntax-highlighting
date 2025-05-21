@@ -530,8 +530,8 @@ Notes:
 				<keyword attribute="Definition" String="definitions"/>
 
 				<!-- Generally a module or class name like "File", "MyModule_1", .. -->
-				<RegExpr attribute="Constant" String="&constant;" context="Op1"/>
-				<RegExpr attribute="Global Constant" String="&global_constant;" context="Op1"/>
+				<RegExpr attribute="Constant" String="&constant;" context="ExprSubClass"/>
+				<RegExpr attribute="Global Constant" String="&global_constant;" context="ExprSubClass"/>
 
 				<RegExpr attribute="Symbol" String=":((@@?|\$)&ident;|&ident;([?]|!(?!=)|=(?![=>~]))?|&sym_op;|(?=['&quot;])|&global_var;)" context="Op1"/>
 
@@ -821,19 +821,29 @@ Notes:
 			<context name="MemberAccess" attribute="Member" fallthroughContext="#pop!Op1">
 				<DetectSpaces attribute="Normal Text"/>
 				<!-- marks a message (being sent, not defined) -->
-				<RegExpr attribute="Message" String="&msg;" context="#pop!Op1"/>
-				<RegExpr attribute="Constant" String="&constant;" context="#pop!Op1"/>
-				<RegExpr attribute="Constant Value" String="&global_constant;" context="#pop!Op1"/>
+				<RegExpr attribute="Message" String="&msg;" context="SubClass"/>
+				<RegExpr attribute="Constant" String="&constant;" context="SubClass"/>
+				<RegExpr attribute="Constant Value" String="&global_constant;" context="SubClass"/>
 				<RegExpr attribute="Operator" String="&sym_op;" context="#pop"/>
+			</context>
+			<context name="SubClass" attribute="Normal Text" fallthroughContext="#pop#pop!Op1" lineEndContext="#pop#pop">
+				<StringDetect attribute="Operator" String="::" context="#pop"/>
+			</context>
+
+			<context name="ExprSubClass" attribute="Normal Text" fallthroughContext="#pop!Op1" lineEndContext="#pop">
+				<StringDetect attribute="Operator" String="::" context="#pop!MemberAccess"/>
 			</context>
 
 			<context name="MemberAccessCall" attribute="Member" fallthroughContext="#pop">
 				<DetectSpaces attribute="Normal Text"/>
 				<!-- marks a message (being sent, not defined) -->
-				<RegExpr attribute="Message" String="&msg;" context="#pop"/>
-				<RegExpr attribute="Constant" String="&constant;" context="#pop"/>
-				<RegExpr attribute="Constant Value" String="&global_constant;" context="#pop"/>
+				<RegExpr attribute="Message" String="&msg;" context="SubClassCall"/>
+				<RegExpr attribute="Constant" String="&constant;" context="SubClassCall"/>
+				<RegExpr attribute="Constant Value" String="&global_constant;" context="SubClassCall"/>
 				<RegExpr attribute="Operator" String="&sym_op;" context="#pop"/>
+			</context>
+			<context name="SubClassCall" attribute="Normal Text" fallthroughContext="#pop#pop" lineEndContext="#pop#pop">
+				<StringDetect attribute="Operator" String="::" context="#pop"/>
 			</context>
 
 			<context name="General Comment" attribute="Comment" lineEndContext="#pop">

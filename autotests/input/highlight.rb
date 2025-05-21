@@ -584,6 +584,8 @@ end
 
 # "member access"
 POP::Session.COUNT.attribute.calc_with(2){ |arg| puts arg }
+raise Module::Class
+Module::Class
 
 # snippet from Net::SMTP
 # This breaks the code folding. I think we would need to

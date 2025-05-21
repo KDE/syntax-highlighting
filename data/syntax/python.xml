@@ -16,23 +16,40 @@
 		[Special cases: %prog and %default - see http://docs.python.org/library/optparse.html]
 	-->
 	<!ENTITY strsubstitution_py2 "&#37;(?:(?:\([a-zA-Z0-9_]+\))?[#0\- +]?(?:[1-9][0-9]*|\*)?(?:\.(?:[1-9][0-9]*|\*))?[hlL]?[crsdiouxXeEfFgG&#37;]|prog|default)">
-	<!-- http://docs.python.org/3/library/string.html#format-string-syntax:
-	     replacement_field ::=  "{" [field_name] ["!" conversion] [":" format_spec] "}"
-	     field_name        ::=  arg_name ("." attribute_name | "[" element_index "]")*
-	     arg_name          ::=  [identifier | integer]
-	     attribute_name    ::=  identifier
-	     element_index     ::=  integer | index_string
-	     index_string      ::=  <any source character except "]"> +
-	     conversion        ::=  "r" | "s" | "a"
-	     format_spec       ::=  [[fill]align][sign][z][#][0][width][_,][.precision][type]
-	     fill              ::=  <any character>
-	     align             ::=  "<" | ">" | "=" | "^"
-	     sign              ::=  "+" | "-" | " "
-	     width             ::=  integer
-	     precision         ::=  integer
-	     type              ::=  "b" | "c" | "d" | "e" | "E" | "f" | "F" | "g" | "G" | "n" | "o" | "s" | "x" | "X" | "%"
+	<!--
+	(Based on 3.14)
+	http://docs.python.org/3/library/string.html#format-string-syntax:
+
+		replacement_field: "{" [field_name] ["!" conversion] [":" format_spec] "}"
+		field_name:        arg_name ("." attribute_name | "[" element_index "]")*
+		arg_name:          [identifier | digit+]
+		attribute_name:    identifier
+		element_index:     digit+ | index_string
+		index_string:      <any source character except "]"> +
+		conversion:        "r" | "s" | "a"
+		format_spec:       format-spec:format_spec
+
+	https://docs.python.org/3/library/string.html#format-specification-mini-language
+
+		format_spec:             [options][width_and_precision][type]
+		options:                 [[fill]align][sign]["z"]["#"]["0"]
+		fill:                    <any character>
+		align:                   "<" | ">" | "=" | "^"
+		sign:                    "+" | "-" | " "
+		width_and_precision:     [width_with_grouping][precision_with_grouping]
+		width_with_grouping:     [width][grouping]
+		precision_with_grouping: "." [precision][grouping]
+		width:                   digit+
+		precision:               digit+
+		grouping:                "," | "_"
+		type:                    "b" | "c" | "d" | "e" | "E" | "f" | "F" | "g"
+		                       | "G" | "n" | "o" | "s" | "x" | "X" | "%"
+
+		Note: precision_with_grouping should be
+			"." precision [grouping] | "." grouping
+			https://github.com/python/cpython/issues/134449
 	-->
-	<!ENTITY format_spec "(?:![rsa])?(?::(?:[^}]?[&lt;&gt;=^])?[ +-]?z?#?0?[0-9]*[_,]?(?:\.[0-9]+)?[bcdeEfFgGnosxX&#37;]?)?">
+	<!ENTITY format_spec "(?:![rsa])?(?::(?:[^}]?[&lt;&gt;=^])?[ +-]?z?#?0?[0-9]*[,_]?(?:\.[0-9]+[,_]?|\.[,_])?[bcdeEfFgGnosxX&#37;]?)?">
 	<!ENTITY strsubstitution_py3 "\{(?:(?:[a-zA-Z0-9_]+|[0-9]+)(?:\.[a-zA-Z0-9_]+|\[[^ \]]+\])*)?&format_spec;?\}">
 
 	<!ENTITY rawString "(?:ru|u?r|)(?:'(?:[^']++|\\')*+'|&quot;(?:[^&quot;]++|\\&quot;)*+&quot;)">

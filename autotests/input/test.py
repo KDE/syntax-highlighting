@@ -46,6 +46,12 @@ def test_f_literals():
     f'x{bar["baz"]!r}y\n'
     f'x{bar["baz"]:.2}y\n'
 
+    f'x{bar["baz"]:.2}y\n'
+    f'x{bar["baz"]:._f}y\n'
+    f'x{bar["baz"]:.3_f}y\n'
+    f'x{bar["baz"]:._3f}y\n' # bad format
+    f'x{bar["baz"]:.f}y\n' # bad format
+
     f'{{x{bar["baz"]:.2}}}} }} {{ {x!a}'
                         # ^ oups
 

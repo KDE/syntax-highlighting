@@ -8,7 +8,8 @@
  ** Samples: https://github.com/protocolbuffers/protobuf/tree/main/src/google/protobuf/testdata
  ***************************************************************************
 -->
-<language name="TextProto" section="Other" version="2" kateversion="5.62" extensions="*.textproto;*.textpb;*.pbtxt"
+<language name="TextProto" section="Other" version="3" kateversion="5.62"
+          extensions="*.txtpb;*.textproto;*.textpb;*.pbtxt"
           author="Alexander Potashev (aspotashev@gmail.com)" license="MIT">
   <highlighting>
     <list name="Constants">
@@ -21,8 +22,6 @@
     </list>
 
     <contexts>
-      <context name="Normal" lineEndContext="#stay" fallthroughContext="Message" attribute="Style_Normal"/>
-
       <context name="Message" lineEndContext="#stay" attribute="Style_Normal">
         <DetectSpaces context="#stay" attribute="Style_Normal"/>
         <DetectChar char="#" context="Comment" attribute="Style_Comment"/>
@@ -33,20 +32,21 @@
         <!-- Proto extension -->
         <DetectChar char="[" context="Extension_Key" attribute="Style_Normal" lookAhead="true"/>
 
-        <AnyChar String="}&gt;" context="#pop" lookAhead="true"/>
+        <AnyChar String="}&gt;" attribute="Style_Error"/>
       </context>
 
       <context name="Extension_Key" lineEndContext="#stay" attribute="Style_Error">
-        <DetectSpaces context="#stay" attribute="Style_Normal"/>
-        <RegExpr String="\[([a-zA-Z0-9\.\-]+/)?[a-zA-Z0-9\._]+\]" context="#pop!Field_Key"
+        <RegExpr String="\[[a-zA-Z0-9._]+(/[a-zA-Z0-9._]+)?\]" context="#pop!Field_Key"
                  attribute="Style_Extension_Type"/>
+        <RegExpr String="\[(\s+|[.\w]+)?" context="#pop!Field_Key"
+                 attribute="Style_Error"/>
       </context>
 
       <context name="Field_Key" lineEndContext="#stay" attribute="Style_Normal">
         <DetectSpaces context="#stay" attribute="Style_Normal"/>
 
         <DetectChar char=":" context="#pop!Value" attribute="Style_Separator_Pair"/>
-        <AnyChar String="{&lt;" context="#pop!Value" attribute="Style_Normal" lookAhead="true"/>
+        <AnyChar String="{&lt;[" context="#pop!Value" attribute="Style_Normal" lookAhead="true"/>
       </context>
 
       <context name="Value" lineEndContext="#stay" attribute="Style_Normal">
@@ -55,8 +55,9 @@
 
         <keyword String="Constants" context="#pop" attribute="Style_Keyword"/>
         <DetectIdentifier context="#pop" attribute="Style_Identifier_Value"/>
-        <RegExpr String="[\-\.0-9]" context="#pop!ScalarValue" lookAhead="true"/>
-        <DetectChar char="&quot;" context="#pop!String_Value" attribute="Style_String_Value"/>
+        <AnyChar String="-.0123456789" context="#pop!ScalarValue" lookAhead="true"/>
+        <DetectChar char="&quot;" context="#pop!StringDQ_Value" attribute="Style_String_Value"/>
+        <DetectChar char="'" context="#pop!StringSQ_Value" attribute="Style_String_Value"/>
         <DetectChar char="&lt;" context="#pop!PairAngle" beginRegion="Region_Message_Angle"
                     attribute="Style_Separator_Pair"/>
         <DetectChar char="{" context="#pop!PairBrace" beginRegion="Region_Message_Brace"
@@ -67,30 +68,42 @@
       </context>
 
       <context name="ScalarValue" lineEndContext="#stay" attribute="Style_Decimal">
-        <RegExpr String="-?[0-9]*\.?[0-9]*([eE]?[-+]?[0-9]+)?" context="#pop" attribute="Style_Decimal"
-                 insensitive="false" minimal="false"/>
+        <RegExpr String="-?(0x[0-9a-fA-F]+|[0-9]*+\.?[0-9]*+([eE]?[-+]?[0-9]+)?[fF]?)" context="#pop" attribute="Style_Decimal"/>
       </context>
 
       <!-- Messages formatted as < ... > -->
-      <context name="PairAngle" lineEndContext="#stay" fallthroughContext="Message" attribute="Style_Normal">
+      <context name="PairAngle" lineEndContext="#stay" attribute="Style_Normal">
         <DetectChar char="&gt;" context="#pop" endRegion="Region_Message_Angle" attribute="Style_Separator_Pair"/>
+        <IncludeRules context="Message"/>
       </context>
 
       <!-- Messages formatted as { ... } -->
-      <context name="PairBrace" lineEndContext="#stay" fallthroughContext="Message" attribute="Style_Normal">
+      <context name="PairBrace" lineEndContext="#stay" attribute="Style_Normal">
         <DetectChar char="}" context="#pop" endRegion="Region_Message_Brace" attribute="Style_Separator_Pair"/>
+        <IncludeRules context="Message"/>
       </context>
 
-      <context name="String_Value" lineEndContext="#stay" attribute="Style_String_Value">
+      <context name="StringDQ_Value" lineEndContext="#stay" attribute="Style_String_Value">
         <DetectChar char="&quot;" context="#pop!String_Value_End" attribute="Style_String_Value"/>
-        <HlCStringChar attribute="Style_String_Value_Char" context="#stay"/>
+        <DetectChar context="EscapeString" char="\" lookAhead="1"/>
+      </context>
+
+      <context name="StringSQ_Value" lineEndContext="#stay" attribute="Style_String_Value">
+        <DetectChar char="'" context="#pop!String_Value_End" attribute="Style_String_Value"/>
+        <DetectChar context="EscapeString" char="\" lookAhead="1"/>
+      </context>
+
+      <context attribute="Style_String_Value_Char" lineEndContext="#pop" name="EscapeString">
+        <RegExpr attribute="Style_String_Value_Char" context="#pop" String="\\([abfnrtv?\\'&quot;]|[xX][0-9a-fA-F]{1,2}|[0-7]{1,3}|u[0-9a-fA-F]{4}|U000[0-9a-fA-F]{5}|U0010[0-9a-fA-F]{4})"/>
+        <RegExpr attribute="Style_Error" context="#pop" String="\\([xX][0-9a-fA-F]?|u[0-9a-fA-F]{,3}|U(0(0(0[0-9a-fA-F]{,5}|1(0[0-9a-fA-F]{,4})?)?)?)?)?"/>
       </context>
 
       <!-- One string has ended, but there may be a continuation in another pair of quotes -->
       <context name="String_Value_End" lineEndContext="#stay" fallthroughContext="#pop" attribute="Style_Normal">
         <DetectSpaces context="#stay" attribute="Style_Normal"/>
         <DetectChar char="#" context="Comment" attribute="Style_Comment"/>
-        <DetectChar char="&quot;" context="#pop!String_Value" attribute="Style_String_Value"/>
+        <DetectChar char="&quot;" context="#pop!StringDQ_Value" attribute="Style_String_Value"/>
+        <DetectChar char="'" context="#pop!StringSQ_Value" attribute="Style_String_Value"/>
       </context>
 
       <context name="Array" lineEndContext="#stay" fallthroughContext="Value" attribute="Style_Normal">
@@ -101,7 +114,9 @@
       </context>
 
       <context name="Comment" lineEndContext="#pop" attribute="Style_Comment">
-        <IncludeRules context="##Comments" />
+        <DetectSpaces/>
+        <IncludeRules context="##Comments"/>
+        <DetectIdentifier/>
       </context>
     </contexts>
 

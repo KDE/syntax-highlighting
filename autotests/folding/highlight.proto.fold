@@ -11,16 +11,102 @@ message Object <beginfold id='1'>{</beginfold id='1'>
     LOCAL = 0;
     REMOTE = 1;
     NEITHER = 2;
+    default = 3; // no keyword
   <endfold id='1'>}</endfold id='1'>
 
   message ObjectData <beginfold id='1'>{</beginfold id='1'>
     required string number = 1;
     optional ObjectType type = 2 [default = NEITHER];
+    optional ObjectType other = 3 [default = default];
+    //                                       ^ no keyword
   <endfold id='1'>}</endfold id='1'>
 
   repeated ObjectData dataList = 4;
+
+  string string = 5;
+  //     ^ no data type
+  string default = 5;
+  //     ^ no keyword
 <endfold id='1'>}</endfold id='1'>
 
 message ObjectList <beginfold id='1'>{</beginfold id='1'>
   repeated Object object = 1;
+<endfold id='1'>}</endfold id='1'>
+
+enum EnumAllowingAlias <beginfold id='1'>{</beginfold id='1'>
+  option allow_alias = true;
+  EAA_UNSPECIFIED = 0;
+  EAA_STARTED = 1;
+  EAA_RUNNING = 1;
+  EAA_FINISHED = 2;
+<endfold id='1'>}</endfold id='1'>
+
+message SomeOtherMessage <beginfold id='1'>{</beginfold id='1'>
+  SearchResponse.Result result = 1;
+<endfold id='1'>}</endfold id='1'>
+
+package media;
+
+// A container message to hold stuff that a user has created.
+message UserContent <beginfold id='1'>{</beginfold id='1'>
+  // Set verification to `DECLARATION` to enforce extension declarations for all
+  // extensions in this range.
+  extensions 100 to 199 [verification = DECLARATION];
+<endfold id='1'>}</endfold id='1'>
+
+// A container message to hold stuff that a user has created.
+message UserContent <beginfold id='1'>{</beginfold id='1'>
+  extensions 100 to 199 [
+    declaration = <beginfold id='1'>{</beginfold id='1'>
+      number: 126,
+      full_name: ".kittens.kitten_videos",
+      type: ".kittens.Video",
+      repeated: true
+    <endfold id='1'>}</endfold id='1'>,
+    // Ensures all field numbers in this extension range are declarations.
+    verification = DECLARATION
+  ];
+<endfold id='1'>}</endfold id='1'>
+
+service SearchService <beginfold id='1'>{</beginfold id='1'>
+  rpc Search(SearchRequest) returns (SearchResponse);
+<endfold id='1'>}</endfold id='1'>
+
+message RequestType <beginfold id='1'>{</beginfold id='1'><endfold id='1'>}</endfold id='1'>
+message ResponseType <beginfold id='1'>{</beginfold id='1'><endfold id='1'>}</endfold id='1'>
+
+service MyService <beginfold id='1'>{</beginfold id='1'>
+  option (my_service_option) = FOO;
+
+  rpc MyMethod(RequestType) returns(ResponseType) <beginfold id='1'>{</beginfold id='1'>
+    // Note:  my_method_option has type MyMessage.  We can set each field
+    //   within it using a separate "option" line.
+    option (my_method_option).foo = 567;
+    option (my_method_option).bar = "Some string";
+  <endfold id='1'>}</endfold id='1'>
+<endfold id='1'>}</endfold id='1'>
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.EnumValueOptions <beginfold id='1'>{</beginfold id='1'>
+  string string_name = 123456789;
+<endfold id='1'>}</endfold id='1'>
+
+enum Data <beginfold id='1'>{</beginfold id='1'>
+  DATA_UNSPECIFIED = 0;
+  DATA_SEARCH = 1 [deprecated = true];
+  DATA_DISPLAY = 2 [
+    (string_name) = "x\uafe23\U000123456\nx\x433\xag\0123\u1xx\p\U0010ai"
+  ];
+<endfold id='1'>}</endfold id='1'>
+
+message Outer <beginfold id='1'>{</beginfold id='1'>
+  option (my_option).a = true;
+  message Inner <beginfold id='1'>{</beginfold id='1'>   // Level 2
+    required int64 ival = 1;
+  <endfold id='1'>}</endfold id='1'>
+  map<int32, string> my_map = 2;
+  extensions 20 to 30;
+  float n = .2;
+  float n = inf;
 <endfold id='1'>}</endfold id='1'>

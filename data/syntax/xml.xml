@@ -11,22 +11,24 @@
 <highlighting>
 <contexts>
   <context name="Start" attribute="Normal Text" lineEndContext="#stay">
-    <IncludeRules context="FindXML" />
-  </context>
-
-  <context name="FindXML" attribute="Normal Text" lineEndContext="#stay">
     <DetectSpaces />
     <DetectIdentifier />
+    <Int />
     <RegExpr attribute="Element Symbols" context="ElementTagName" String="&lt;(?=(&name;))" beginRegion="element" />
+    <RegExpr attribute="Element Symbols" context="El End TagName" String="&lt;/(?=(&name;))" />
     <StringDetect attribute="Comment" context="Comment" String="&lt;!--" beginRegion="comment" />
     <StringDetect attribute="CDATA" context="CDATAStart" String="&lt;![CDATA[" lookAhead="true" />
     <RegExpr attribute="Doctype Symbols" context="DoctypeTagName" String="&lt;!(?=DOCTYPE(\s|$))" beginRegion="doctype" />
-    <IncludeRules context="FindProcessingInstruction" />
     <IncludeRules context="FindEntityRefs" />
+    <IncludeRules context="FindProcessingInstruction" />
+    <IncludeRules context="FindReservedChar" />
   </context>
 
   <context name="FindEntityRefs" attribute="Other Text" lineEndContext="#stay">
     <RegExpr attribute="EntityRef" context="#stay" String="&entref;" />
+  </context>
+
+  <context name="FindReservedChar" attribute="Other Text" lineEndContext="#stay">
     <AnyChar attribute="Error" context="#stay" String="&amp;&lt;" />
   </context>
 
@@ -123,7 +125,7 @@
   </context>
   <context name="Element" attribute="Other Text" lineEndContext="#stay" fallthroughContext="ElementCommonError">
     <Detect2Chars attribute="Element Symbols" context="#pop" char="/" char1=">" endRegion="element" />
-    <DetectChar attribute="Element Symbols" context="El Content" char=">" />
+    <DetectChar attribute="Element Symbols" context="#pop" char=">" />
     <RegExpr attribute="Attribute" context="Attribute" String="(?:^|\s+)&name;" />
     <DetectSpaces attribute="Other Text"/>
 
@@ -137,16 +139,11 @@
     <RegExpr attribute="Error" context="Attribute" String="&name;" />
   </context>
 
-  <context name="El Content" attribute="Other Text" lineEndContext="#stay">
-    <RegExpr attribute="Element Symbols" context="El End TagName" String="&lt;/(?=(&name;))" />
-    <IncludeRules context="FindXML" />
-  </context>
-
   <context name="El End TagName" attribute="Other Text" lineEndContext="#pop!El End">
-    <StringDetect attribute="Element" context="#pop#pop#pop!El End" String="%1" dynamic="true" />
+    <StringDetect attribute="Element" context="El End" String="%1" dynamic="true" />
   </context>
   <context name="El End" attribute="Other Text" lineEndContext="#stay">
-    <DetectChar attribute="Element Symbols" context="#pop" char=">" endRegion="element" />
+    <DetectChar attribute="Element Symbols" context="#pop#pop" char=">" endRegion="element" />
     <DetectSpaces attribute="Other Text"/>
     <IncludeRules context="ElementCommonError"/>
   </context>
@@ -171,8 +168,8 @@
 
   <context name="FindAttributeCommonError" attribute="Error">
     <!-- attribute without value -->
-    <DetectChar attribute="Error" context="#pop!El Content" char=">" />
-    <StringDetect attribute="Error" context="#pop!El Content" String="/>" endRegion="element" />
+    <DetectChar attribute="Error" context="#pop#pop" char=">" />
+    <StringDetect attribute="Error" context="#pop#pop" String="/>" endRegion="element" />
     <!-- attribute without value, assume that '>' will be typed afterwards -->
     <DetectChar attribute="Error" context="#pop#pop" char="/" endRegion="element" />
     <!-- next word is an attribute -->
@@ -193,11 +190,13 @@
   <context name="Value DQ" attribute="Value" lineEndContext="#stay">
     <DetectChar attribute="Value" context="#pop#pop" char="&quot;" />
     <IncludeRules context="FindEntityRefs" />
+    <IncludeRules context="FindReservedChar" />
   </context>
 
   <context name="Value SQ" attribute="Value" lineEndContext="#stay">
     <DetectChar attribute="Value" context="#pop#pop" char="&apos;" />
     <IncludeRules context="FindEntityRefs" />
+    <IncludeRules context="FindReservedChar" />
   </context>
 
 </contexts>

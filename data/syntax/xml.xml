@@ -6,7 +6,7 @@
 	<!ENTITY name    "[[:alpha:]_:][\w.:_-]*">
 	<!ENTITY entref  "&amp;(?:#[0-9]+|#[xX][0-9A-Fa-f]+|&name;);">
 ]>
-<language name="XML" version="23" kateversion="5.62" section="Markup" extensions="*.page;*.docbook;*.xml;*ui.rc;*.daml;*.rdf;*.rss;*.xspf;*.xsd;*.svg;*.ui;*.kcfg;*.qrc;*.wsdl;*.scxml;*.xbel;*.dae;*.sch;*.brd;*.fb2" mimetype="text/xml;text/book;text/daml;text/rdf;application/rss+xml;application/xspf+xml;image/svg+xml;application/x-designer;application/x-xbel;application/xml;application/scxml+xml;application/vnd.oasis.opendocument.text-flat-xml;application/vnd.oasis.opendocument.graphics-flat-xml;application/vnd.oasis.opendocument.presentation-flat-xml;application/vnd.oasis.opendocument.spreadsheet-flat-xml;application/gpx+xml;application/x-fictionbook+xml" casesensitive="1" indenter="xml" author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL">
+<language name="XML" version="24" kateversion="5.62" section="Markup" extensions="*.page;*.docbook;*.xml;*ui.rc;*.daml;*.rdf;*.rss;*.xspf;*.xsd;*.svg;*.ui;*.kcfg;*.qrc;*.wsdl;*.scxml;*.xbel;*.dae;*.sch;*.brd;*.fb2" mimetype="text/xml;text/book;text/daml;text/rdf;application/rss+xml;application/xspf+xml;image/svg+xml;application/x-designer;application/x-xbel;application/xml;application/scxml+xml;application/vnd.oasis.opendocument.text-flat-xml;application/vnd.oasis.opendocument.graphics-flat-xml;application/vnd.oasis.opendocument.presentation-flat-xml;application/vnd.oasis.opendocument.spreadsheet-flat-xml;application/gpx+xml;application/x-fictionbook+xml" casesensitive="1" indenter="xml" author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL">
 
 <highlighting>
 <contexts>
@@ -74,8 +74,9 @@
   </context>
   <context name="PI-XML" attribute="Other Text" lineEndContext="#stay">
     <IncludeRules context="PI" />
-    <RegExpr attribute="Attribute" context="#stay" String="(?:^|\s+)&name;" />
+    <DetectSpaces attribute="Other Text"/>
     <DetectChar attribute="Attribute Separator" context="Value" char="=" />
+    <RegExpr attribute="Attribute" context="#stay" String="(?:^|(?&lt;=\s))&name;" />
   </context>
 
   <context name="DoctypeTagName" attribute="Other Text" lineEndContext="#pop">
@@ -129,8 +130,8 @@
   <context name="Element" attribute="Other Text" lineEndContext="#stay" fallthroughContext="ElementCommonError">
     <Detect2Chars attribute="Element Symbols" context="#pop" char="/" char1=">" endRegion="element" />
     <DetectChar attribute="Element Symbols" context="#pop" char=">" />
-    <RegExpr attribute="Attribute" context="Attribute" String="(?:^|\s+)&name;" />
     <DetectSpaces attribute="Other Text"/>
+    <RegExpr attribute="Attribute" context="Attribute" String="(?:^|(?&lt;=\s))&name;" />
 
     <!-- the following rules limit the number of characters or lines marked as an error,
       which can become very large -->
@@ -192,12 +193,18 @@
 
   <context name="Value DQ" attribute="Value" lineEndContext="#stay">
     <DetectChar attribute="Value" context="#pop#pop" char="&quot;" />
-    <IncludeRules context="FindEntityRefs" />
-    <IncludeRules context="FindReservedChar" />
+    <IncludeRules context="ValueQ" />
   </context>
 
   <context name="Value SQ" attribute="Value" lineEndContext="#stay">
     <DetectChar attribute="Value" context="#pop#pop" char="&apos;" />
+    <IncludeRules context="ValueQ" />
+  </context>
+
+  <context name="ValueQ" attribute="Value" lineEndContext="#stay">
+    <DetectIdentifier attribute="Value" />
+    <DetectSpaces attribute="Value" />
+    <Int attribute="Value" />
     <IncludeRules context="FindEntityRefs" />
     <IncludeRules context="FindReservedChar" />
   </context>

@@ -1,12 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language
 [
-	<!-- names must start with a letter, ideogram or underscore. \w matches any
-		 word character *or* a number, hence the lookahead -->
-	<!ENTITY name    "[[:alpha:]_:][\w.:_-]*">
-	<!ENTITY entref  "&amp;(?:#[0-9]+|#[xX][0-9A-Fa-f]+|&name;);">
+  <!ENTITY name    "[[:alpha:]_:][\w.:_-]*">
+  <!ENTITY entref  "&amp;(?:#[0-9]+|#[xX][0-9A-Fa-f]+|&name;);">
 ]>
-<language name="XML" version="24" kateversion="5.62" section="Markup" extensions="*.page;*.docbook;*.xml;*ui.rc;*.daml;*.rdf;*.rss;*.xspf;*.xsd;*.svg;*.ui;*.kcfg;*.qrc;*.wsdl;*.scxml;*.xbel;*.dae;*.sch;*.brd;*.fb2" mimetype="text/xml;text/book;text/daml;text/rdf;application/rss+xml;application/xspf+xml;image/svg+xml;application/x-designer;application/x-xbel;application/xml;application/scxml+xml;application/vnd.oasis.opendocument.text-flat-xml;application/vnd.oasis.opendocument.graphics-flat-xml;application/vnd.oasis.opendocument.presentation-flat-xml;application/vnd.oasis.opendocument.spreadsheet-flat-xml;application/gpx+xml;application/x-fictionbook+xml" casesensitive="1" indenter="xml" author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL">
+<language name="XML" version="25" kateversion="5.62" section="Markup" extensions="*.page;*.docbook;*.xml;*ui.rc;*.daml;*.rdf;*.rss;*.xspf;*.xsd;*.svg;*.ui;*.kcfg;*.qrc;*.wsdl;*.scxml;*.xbel;*.dae;*.sch;*.brd;*.fb2" mimetype="text/xml;text/book;text/daml;text/rdf;application/rss+xml;application/xspf+xml;image/svg+xml;application/x-designer;application/x-xbel;application/xml;application/scxml+xml;application/vnd.oasis.opendocument.text-flat-xml;application/vnd.oasis.opendocument.graphics-flat-xml;application/vnd.oasis.opendocument.presentation-flat-xml;application/vnd.oasis.opendocument.spreadsheet-flat-xml;application/gpx+xml;application/x-fictionbook+xml" casesensitive="1" indenter="xml" author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL">
+
+<!-- https://www.w3.org/TR/xml/ -->
+
+<!--
+  This file also serves as the basis for generating XSLT syntax.
+  Comments beginning with "XSLT:" are used by data/generators/generate-xslt.pl
+  to add specific rules based on the rule in the following line.
+
+  - 'XSLT: keytags': insert xslt functions.
+  - 'XSLT: copy': duplicate a context and modify the duplicated context.
+      The rules of the duplicated context also refer to an XSLT Context
+      (e.g <RegExpr context="#pop!Attribute" String="..."/> becomes
+      <RegExpr context="#pop!XSLT_Attribute" String="..."/>).
+  - 'XSLT: xattr': insert xslt attribute rule.
+  - 'XSLT: xvalue': insert xslt value rule.
+  - 'XSLT: nochange': Do not modify the following rule (only in a XSLT: copy).
+  - 'XSLT: attrvalue': change attribute="Value" to attribute="Attribute Value".
+  - 'XSLT: xpathDQ': insert xpathDQ rule.
+  - 'XSLT: xpathSQ': insert xpathSQ rule.
+-->
 
 <highlighting>
 <contexts>
@@ -15,7 +33,7 @@
     <DetectIdentifier />
     <Int />
     <RegExpr attribute="Element Symbols" context="ElementTagName" String="&lt;(?=(&name;))" beginRegion="element" />
-    <RegExpr attribute="Element Symbols" context="El End TagName" String="&lt;/(?=(&name;))" />
+    <RegExpr attribute="Element Symbols" context="El End TagName" String="&lt;/(?=(&name;))" endRegion="element" />
     <StringDetect attribute="Comment" context="Comment" String="&lt;!--" beginRegion="comment" />
     <StringDetect attribute="CDATA" context="CDATAStart" String="&lt;![CDATA[" lookAhead="true" />
     <RegExpr attribute="Doctype Symbols" context="DoctypeTagName" String="&lt;!(?=DOCTYPE(\s|$))" beginRegion="doctype" />
@@ -125,12 +143,15 @@
   </context>
 
   <context name="ElementTagName" attribute="Other Text" lineEndContext="#pop!Element">
+    <!-- XSLT: keytags -->
     <StringDetect attribute="Element" context="#pop!Element" String="%1" dynamic="true" />
   </context>
+  <!-- XSLT: copy -->
   <context name="Element" attribute="Other Text" lineEndContext="#stay" fallthroughContext="ElementCommonError">
     <Detect2Chars attribute="Element Symbols" context="#pop" char="/" char1=">" endRegion="element" />
     <DetectChar attribute="Element Symbols" context="#pop" char=">" />
     <DetectSpaces attribute="Other Text"/>
+    <!-- XSLT: xattr -->
     <RegExpr attribute="Attribute" context="Attribute" String="(?:^|(?&lt;=\s))&name;" />
 
     <!-- the following rules limit the number of characters or lines marked as an error,
@@ -140,36 +161,45 @@
     <!-- assume no attribute name, but value -->
     <DetectChar attribute="Error" context="Value" char="=" />
     <!-- assume attribute preceded by an invalid character, e.g. <tag foo="x"invalid="y"> -->
+    <!-- XSLT: xattr -->
     <RegExpr attribute="Error" context="Attribute" String="&name;" />
   </context>
 
   <context name="El End TagName" attribute="Other Text" lineEndContext="#pop!El End">
+    <!-- XSLT: keytags -->
     <StringDetect attribute="Element" context="El End" String="%1" dynamic="true" />
   </context>
   <context name="El End" attribute="Other Text" lineEndContext="#stay">
-    <DetectChar attribute="Element Symbols" context="#pop#pop" char=">" endRegion="element" />
+    <DetectChar attribute="Element Symbols" context="#pop#pop" char=">" />
     <DetectSpaces attribute="Other Text"/>
     <IncludeRules context="ElementCommonError"/>
   </context>
 
+  <!-- XSLT: copy -->
   <context name="Attribute" attribute="Other Text" lineEndContext="#stay">
     <DetectChar attribute="Attribute Separator" context="#pop!Value" char="=" />
     <DetectSpaces attribute="Other Text"/>
 
     <!-- the following rules limit the number of characters or lines marked as an error,
       which can become very large -->
+    <!-- XSLT: xvalue -->
     <DetectChar attribute="Error" context="Value DQ" char="&quot;" />
+    <!-- XSLT: xvalue -->
     <DetectChar attribute="Error" context="Value SQ" char="&apos;" />
     <IncludeRules context="FindAttributeCommonError"/>
   </context>
 
+  <!-- XSLT: copy -->
   <context name="Value" attribute="Other Text" lineEndContext="#stay">
+    <!-- XSLT: xvalue -->
     <DetectChar attribute="Value" context="Value DQ" char="&quot;" />
+    <!-- XSLT: xvalue -->
     <DetectChar attribute="Value" context="Value SQ" char="&apos;" />
     <DetectSpaces attribute="Other Text"/>
     <IncludeRules context="FindAttributeCommonError"/>
   </context>
 
+  <!-- XSLT: copy -->
   <context name="FindAttributeCommonError" attribute="Error">
     <!-- attribute without value -->
     <DetectChar attribute="Error" context="#pop#pop" char=">" />
@@ -177,7 +207,9 @@
     <!-- attribute without value, assume that '>' will be typed afterwards -->
     <DetectChar attribute="Error" context="#pop#pop" char="/" endRegion="element" />
     <!-- next word is an attribute -->
+    <!-- XSLT: xattr -->
     <RegExpr attribute="Error" context="#pop!Attribute" String="&name;(?=\s*=)" />
+    <!-- XSLT: nochange -->
     <IncludeRules context="ElementCommonError"/>
   </context>
 
@@ -185,22 +217,28 @@
     <!-- mark a "word" in error -->
     <RegExpr attribute="Error" context="#pop#pop" String="[-\w.:_=]+|[^-\w.:_=/&lt;>\s]+[-\w.:_]*|/>|[^&lt;]" />
     <!-- assume that '>' will be typed afterwards and find a new element -->
+    <!-- XSLT: keytags -->
     <RegExpr attribute="Error" context="#pop#pop!Element" String="&lt;&name;" />
     <StringDetect attribute="Error" context="#pop#pop!Comment" String="&lt;!--" beginRegion="comment" />
     <StringDetect attribute="Error" context="#pop#pop!CDATA" String="&lt;![CDATA[" beginRegion="cdata" />
     <DetectChar attribute="Error" context="#pop#pop" char="&lt;" />
   </context>
 
+  <!-- XSLT: attrvalue -->
   <context name="Value DQ" attribute="Value" lineEndContext="#stay">
+    <!-- XSLT: xpathDQ -->
     <DetectChar attribute="Value" context="#pop#pop" char="&quot;" />
     <IncludeRules context="ValueQ" />
   </context>
 
+  <!-- XSLT: attrvalue -->
   <context name="Value SQ" attribute="Value" lineEndContext="#stay">
+    <!-- XSLT: xpathSQ -->
     <DetectChar attribute="Value" context="#pop#pop" char="&apos;" />
     <IncludeRules context="ValueQ" />
   </context>
 
+  <!-- XSLT: attrvalue -->
   <context name="ValueQ" attribute="Value" lineEndContext="#stay">
     <DetectIdentifier attribute="Value" />
     <DetectSpaces attribute="Value" />

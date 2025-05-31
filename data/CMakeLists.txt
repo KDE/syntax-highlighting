@@ -41,6 +41,11 @@ generate_syntax_definition_with_html(twig typescript)
 # generate DoxygenLua definition
 generate_syntax_definition(generate-doxygenlua.pl doxygenlua.xml doxygen.xml)
 
+# generate XSLT definition
+generate_syntax_definition(generate-xslt.pl xslt.xml xml.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/generators/xslt.base.xml
+)
+
 # find all definitions
 file(GLOB src_defs "${CMAKE_CURRENT_SOURCE_DIR}/syntax/*.xml")
 set(defs ${src_defs} ${gen_defs})

@@ -19,7 +19,6 @@ include(CMakePackageConfigHelpers)
 include(ECMPoQmTools)
 include(ECMQtDeclareLoggingCategory)
 include(ECMMarkNonGuiExecutable)
-include(ECMAddQch)
 include(ECMOptionalAddSubdirectory)
 include(ECMGenerateExportHeader)
 include(ECMDeprecationSettings)
@@ -71,12 +70,6 @@ option(NO_STANDARD_PATHS "Skip lookup of syntax and theme definitions in QStanda
 add_feature_info(FEATURE_NO_STANDARD_PATHS ${NO_STANDARD_PATHS} "Skip lookup of syntax and theme definitions in QStandardPaths locations")
 
 #
-# API documentation
-#
-option(BUILD_QCH "Build API documentation in QCH format (for e.g. Qt Assistant, Qt Creator & KDevelop)" OFF)
-add_feature_info(QCH ${BUILD_QCH} "API documentation in QCH format (for e.g. Qt Assistant, Qt Creator & KDevelop)")
-
-#
 # Translations
 #
 ecm_install_po_files_as_qm(poqm)
@@ -112,16 +105,6 @@ endif()
 # CMake package config file generation
 #
 set(CMAKECONFIG_INSTALL_DIR "${KDE_INSTALL_CMAKEPACKAGEDIR}/KF6SyntaxHighlighting")
-
-if (BUILD_QCH)
-    ecm_install_qch_export(
-        TARGETS KF6SyntaxHighlighting_QCH
-        FILE KF6SyntaxHighlightingQchTargets.cmake
-        DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
-        COMPONENT Devel
-    )
-    set(PACKAGE_INCLUDE_QCHTARGETS "include(\"\${CMAKE_CURRENT_LIST_DIR}/KF6SyntaxHighlightingQchTargets.cmake\")")
-endif()
 
 configure_package_config_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/KF6SyntaxHighlightingConfig.cmake.in"

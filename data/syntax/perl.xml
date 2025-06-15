@@ -342,7 +342,8 @@
     </list>
     <contexts>
       <context name="normal" attribute="Normal Text" lineEndContext="#stay">
-        <RegExpr attribute="Keyword" context="#stay" String="^#!\/.*" column="0" />
+        <DetectSpaces />
+
         <StringDetect attribute="Keyword" context="data_handle" String="__DATA__" firstNonSpace="true" />
         <StringDetect attribute="Keyword" context="#stay" String="__END__" firstNonSpace="true"/>
         <RegExpr attribute="Keyword" context="sub_name_def" String="\bsub\s+" />
@@ -352,7 +353,8 @@
         <keyword attribute="Function" context="#stay" String="functions" />
         <keyword attribute="Pragma" context="#stay" String="pragmas" />
         <RegExpr attribute="Pod" context="pod" String="^\=\w+(\s|$)" column="0" beginRegion="POD"/>
-        <DetectSpaces />
+
+        <RegExpr attribute="Keyword" context="#stay" String="^#!/.*" column="0" />
         <DetectChar attribute="Comment" context="comment" char="#" />
 
         <!-- Numeric values. Note that we have to allow underscores between two digits (thus the creepy regular expressions). -->
@@ -374,10 +376,10 @@
 
         <RegExpr attribute="Keyword" context="#stay" String="&lt;[A-Z0-9_]+&gt;" />
 
-        <RegExpr attribute="Operator" context="find_here_document" String="\s*&lt;&lt;(?=\w+|\s*[&quot;'])" beginRegion="HereDocument" />
+        <RegExpr attribute="Operator" context="find_here_document" String="&lt;&lt;(?=\w+|\s*[&quot;'])" beginRegion="HereDocument" />
 
-        <RegExpr attribute="Normal Text" context="#stay" String="\s*\}\s*/{1,2}" endRegion="Block"/>
-        <RegExpr attribute="Normal Text" context="#stay" String="\s*[)\]]\s*/{1,2}" />
+        <RegExpr attribute="Normal Text" context="#stay" String="\}\s*/{1,2}" endRegion="Block"/>
+        <RegExpr attribute="Normal Text" context="#stay" String="[)\]]\s*/{1,2}" />
 
         <RegExpr attribute="Function" context="sub_name_def" String="\w+::" />
         <RegExpr attribute="Normal Text" context="#stay" String="\w+[=]" />
@@ -389,6 +391,8 @@
         <RegExpr attribute="Operator" context="find_pattern" String="\b(?:m|qr)(?=\s*[^\w\s\]})])" />
 
         <RegExpr attribute="Normal Text" context="#stay" String="[\w_]+\s*//?\=?|[&lt;&gt;&quot;':]//?\=?" />
+        <DetectIdentifier/>
+
         <!-- Avoid conflicts between operators / and // -->
         <StringDetect attribute="Normal Text" context="#stay" String="//=" />
         <Detect2Chars attribute="Normal Text" context="#stay" char="/" char1="/" />
@@ -803,9 +807,10 @@
       </context>
 
       <context name="sub_name_def" attribute="Normal Text" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop">
+        <DetectSpaces/>
+        <DetectChar attribute="Normal Text" context="sub_arg_definition" char="(" />
         <RegExpr attribute="Function" context="#stay" String="\w+" />
         <RegExpr attribute="Normal Text" context="find_variable" String="\$\S" lookAhead="true" />
-        <RegExpr attribute="Normal Text" context="sub_arg_definition" String="\s*\(" />
         <Detect2Chars attribute="Normal Text" context="#stay" char=":" char1=":" />
       </context>
 

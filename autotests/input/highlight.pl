@@ -9,6 +9,7 @@ sub prg($)
 	$var =~ s/bla/foo/igs;
 	$var =~ s!bla!foo!igs;
 	$var =~ s#bla#foo#igs;
+	$var =~ s#(.)#foo$1foo#igs;
 	$var =~ tr/a-z/A-Z/;
 	($match) = ($var =~ m/(.*?)/igs);
 

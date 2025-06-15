@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE language>
+<!DOCTYPE language [
+  <!ENTITY subst_flags "[cegimosxr]*">
+]>
 <!--
    This file is part of the KDE project
    Copyright (C) 2001, 2002, 2003, 2004 Anders Lund <anders@alweb.dk>
@@ -539,7 +541,7 @@
       <context name="subst_curlybrace_replace" attribute="String (interpolated)" lineEndContext="#stay">
         <IncludeRules context="ipstring_internal" />
         <DetectChar attribute="Normal Text" context="subst_curlybrace_replace_recursive" char="{" beginRegion="Block" />
-        <RegExpr attribute="Operator" context="#pop#pop#pop#pop" String="\}[cegimosx]*" endRegion="Replacement" />
+        <RegExpr attribute="Operator" context="#pop#pop#pop#pop" String="\}&subst_flags;" endRegion="Replacement" />
       </context>
       <context name="subst_curlybrace_replace_recursive" attribute="String (interpolated)" lineEndContext="#stay" >
         <DetectChar attribute="String (interpolated)" context="subst_curlybrace_replace_recursive" char="{" beginRegion="Block" />
@@ -565,7 +567,7 @@
       <context name="subst_paren_replace" attribute="String (interpolated)" lineEndContext="#stay">
         <IncludeRules context="ipstring_internal" />
         <DetectChar attribute="Operator" context="#stay" char="(" beginRegion="Replacement" />
-        <RegExpr attribute="Operator" context="#pop#pop#pop" String="\)[cegimosx]*" endRegion="Replacement" />
+        <RegExpr attribute="Operator" context="#pop#pop#pop" String="\)&subst_flags;" endRegion="Replacement" />
       </context>
       <context name="subst_paren_pattern_internal_recursive" attribute="Pattern" lineEndContext="#stay">
         <DetectChar attribute="Pattern Internal Operator" context="#pop" char=")" />
@@ -580,7 +582,7 @@
       <context name="subst_bracket_replace" attribute="String (interpolated)" lineEndContext="#stay">
         <IncludeRules context="ipstring_internal" />
         <DetectChar attribute="Operator" context="#stay" char="[" beginRegion="Replacement" />
-        <RegExpr attribute="Operator" context="#pop#pop#pop" String="\][cegimosx]*" endRegion="Replacement" />
+        <RegExpr attribute="Operator" context="#pop#pop#pop" String="\]&subst_flags;" endRegion="Replacement" />
       </context>
 
       <context name="subst_slash_pattern" attribute="Pattern" lineEndContext="#stay" dynamic="true">
@@ -589,9 +591,8 @@
         <IncludeRules context="regex_pattern_internal_ip" />
       </context>
       <context name="subst_slash_replace" attribute="String (interpolated)" lineEndContext="#stay" dynamic="true">
-        <RegExpr attribute="Operator" context="#pop#pop#pop" String="%1[cegimosx]*" dynamic="true" endRegion="Replacement" />
+        <RegExpr attribute="Operator" context="#pop#pop#pop" String="%1&subst_flags;" dynamic="true" endRegion="Replacement" />
         <IncludeRules context="ipstring_internal" />
-
       </context>
 
       <context name="subst_sq_pattern" attribute="Pattern" lineEndContext="#stay">
@@ -600,7 +601,7 @@
         <DetectChar attribute="Operator" context="subst_sq_replace" char="'" endRegion="Pattern" beginRegion="Pattern" />
       </context>
       <context name="subst_sq_replace" attribute="String" lineEndContext="#stay">
-        <RegExpr attribute="Operator" context="#pop#pop#pop" String="'[cegimosx]*" endRegion="Replacement" />
+        <RegExpr attribute="Operator" context="#pop#pop#pop" String="'&subst_flags;" endRegion="Replacement" />
       </context>
 
       <context name="tr" attribute="Pattern" lineEndContext="#pop" fallthrough="true" fallthroughContext="#pop" >

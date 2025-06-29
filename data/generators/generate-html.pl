@@ -136,6 +136,8 @@ $file =~ s/(<context\s[^>]*[^>\/])\s*\/>/$1>\n<IncludeRules context="$find_langu
 
 if ($language eq "PHP")
 {
+  $file =~ s/<StringDetect\b.*String="&lt;\?"[^>]*>//g;
+
   $findphp = "<context name=\"FindPHP\" attribute=\"Normal Text\" lineEndContext=\"#stay\">\n<Detect2Chars context=\"##PHP/PHP\" char=\"&lt;\" char1=\"?\" lookAhead=\"true\" />\n</context>\n";
   $file =~ s/(?=<\/contexts\s*>)/$findphp/;
 }

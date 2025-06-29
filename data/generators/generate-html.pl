@@ -130,9 +130,31 @@ if ($language eq "PHP")
   $find_language = "FindPHP";
 }
 
+# add IncludeRules only when the name of the context does not start with 'Find'
+sub insert_find_language
+{
+    my $ctx = $_[0];
+
+    if (not $ctx =~ /name="Find/)
+    {
+        if ($_[1])
+        {
+            return "$ctx\n<IncludeRules context=\"$find_language\" />";
+        }
+        return "$ctx>\n<IncludeRules context=\"$find_language\" />\n</context>";
+    }
+
+    if ($_[1])
+    {
+        return $ctx;
+    }
+
+    return $ctx . '/>';
+}
+
 $file =~ s/<IncludeRules\s([^>]*)context="([^"#]*)##(?!Alerts|Comments|Doxygen|Modelines)([^"]+)"/<IncludeRules $1context="$2##$3$language_suffix"/g;
-$file =~ s/(<context\s[^>]*[^>\/]>)/$1\n<IncludeRules context="$find_language" \/>/g;
-$file =~ s/(<context\s[^>]*[^>\/])\s*\/>/$1>\n<IncludeRules context="$find_language" \/>\n<\/context>/g;
+$file =~ s/(<context\s[^>]*[^>\/]>)/insert_find_language($1, 1)/ge;
+$file =~ s/(<context\s[^>]*[^>\/])\/>/insert_find_language($1, 0)/ge;
 
 if ($language eq "PHP")
 {

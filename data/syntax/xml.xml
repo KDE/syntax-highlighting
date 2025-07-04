@@ -4,7 +4,7 @@
   <!ENTITY name    "[[:alpha:]_:][\w.:_-]*">
   <!ENTITY entref  "&amp;(?:#[0-9]+|#[xX][0-9A-Fa-f]+|&name;);">
 ]>
-<language name="XML" version="26" kateversion="5.62" section="Markup" extensions="*.page;*.docbook;*.xml;*ui.rc;*.daml;*.rdf;*.rss;*.xspf;*.xsd;*.svg;*.ui;*.kcfg;*.qrc;*.wsdl;*.scxml;*.xbel;*.dae;*.sch;*.brd;*.fb2" mimetype="text/xml;text/book;text/daml;text/rdf;application/rss+xml;application/xspf+xml;image/svg+xml;application/x-designer;application/x-xbel;application/xml;application/scxml+xml;application/vnd.oasis.opendocument.text-flat-xml;application/vnd.oasis.opendocument.graphics-flat-xml;application/vnd.oasis.opendocument.presentation-flat-xml;application/vnd.oasis.opendocument.spreadsheet-flat-xml;application/gpx+xml;application/x-fictionbook+xml" casesensitive="1" indenter="xml" author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL">
+<language name="XML" version="27" kateversion="5.62" section="Markup" extensions="*.page;*.docbook;*.xml;*ui.rc;*.daml;*.rdf;*.rss;*.xspf;*.xsd;*.svg;*.ui;*.kcfg;*.qrc;*.wsdl;*.scxml;*.xbel;*.dae;*.sch;*.brd;*.fb2" mimetype="text/xml;text/book;text/daml;text/rdf;application/rss+xml;application/xspf+xml;image/svg+xml;application/x-designer;application/x-xbel;application/xml;application/scxml+xml;application/vnd.oasis.opendocument.text-flat-xml;application/vnd.oasis.opendocument.graphics-flat-xml;application/vnd.oasis.opendocument.presentation-flat-xml;application/vnd.oasis.opendocument.spreadsheet-flat-xml;application/gpx+xml;application/x-fictionbook+xml" casesensitive="1" indenter="xml" author="Wilbert Berendsen (wilbert@kde.nl)" license="LGPL">
 
 <!-- https://www.w3.org/TR/xml/ -->
 
@@ -29,18 +29,34 @@
 <highlighting>
 <contexts>
   <context name="Start" attribute="Normal Text" lineEndContext="#stay">
+    <IncludeRules context="FindText" />
+    <IncludeRules context="FindElement" />
+  </context>
+
+  <context name="FindText" attribute="Normal Text" lineEndContext="#stay">
     <DetectSpaces />
     <DetectIdentifier />
     <Int />
+  </context>
+
+  <context name="FindElement" attribute="Normal Text" lineEndContext="#stay">
     <RegExpr attribute="Element Symbols" context="ElementTagName" String="&lt;(?=(&name;))" beginRegion="element" />
     <RegExpr attribute="Element Symbols" context="El End TagName" String="&lt;/(?=(&name;))" endRegion="element" />
-    <StringDetect attribute="Comment" context="Comment" String="&lt;!--" beginRegion="comment" />
+    <IncludeRules context="FindComment" />
     <StringDetect attribute="CDATA" context="CDATAStart" String="&lt;![CDATA[" lookAhead="true" />
     <RegExpr attribute="Doctype Symbols" context="DoctypeTagName" String="&lt;!(?=DOCTYPE(\s|$))" beginRegion="doctype" />
     <IncludeRules context="FindEntityRefs" />
     <IncludeRules context="FindProcessingInstruction" />
+    <IncludeRules context="FindError" />
+  </context>
+
+  <context name="FindError" attribute="Other Text" lineEndContext="#stay">
     <IncludeRules context="FindReservedChar" />
     <StringDetect attribute="Error" String="]]>" />
+  </context>
+
+  <context name="FindComment" attribute="Other Text" lineEndContext="#stay">
+    <StringDetect attribute="Comment" context="Comment" String="&lt;!--" beginRegion="comment" />
   </context>
 
   <context name="FindEntityRefs" attribute="Other Text" lineEndContext="#stay">
@@ -113,7 +129,7 @@
     <DetectSpaces />
     <DetectChar attribute="Doctype Symbols" context="#pop" char="]" endRegion="int_subset" />
     <RegExpr attribute="Doctype Symbols" context="Doctype Markupdecl TagName" String="&lt;!(?=(ELEMENT|ENTITY|ATTLIST|NOTATION)\b)" />
-    <StringDetect attribute="Comment" context="Comment" String="&lt;!--" beginRegion="comment" />
+    <IncludeRules context="FindComment" />
     <IncludeRules context="FindProcessingInstruction" />
     <IncludeRules context="FindPEntityRefs" />
   </context>

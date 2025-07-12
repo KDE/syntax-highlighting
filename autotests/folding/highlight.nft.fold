@@ -1,0 +1,134 @@
+define int_if1 = eth0
+define int_ifs = <beginfold id='1'>{</beginfold id='1'> $int_if1, $int_if2 <endfold id='1'>}</endfold id='1'>
+redefine int_if2 = wlan0
+undefine int_if2
+
+filter input iif $int_ifs accept
+
+# create a new table.
+create table inet mytable
+
+# add a new base chain: get input packets
+add chain inet mytable myin <beginfold id='1'>{</beginfold id='1'> type filter hook input priority filter; <endfold id='1'>}</endfold id='1'>
+
+add rule ip nat prerouting dnat tcp dport map <beginfold id='1'>{</beginfold id='1'> 80 : 192.168.1.100, 8888 : 192.168.1.101 <endfold id='1'>}</endfold id='1'>
+
+add rule ip nat postrouting snat to ip saddr map <beginfold id='1'>{</beginfold id='1'> 192.168.1.0/24 : 10.0.0.1, 192.168.2.0/24 : 10.0.0.2 <endfold id='1'>}</endfold id='1'>
+
+add rule ip filter input ip protocol vmap <beginfold id='1'>{</beginfold id='1'> tcp : jump tcp-chain, udp : jump udp-chain , icmp : jump icmp-chain <endfold id='1'>}</endfold id='1'>
+
+table ip filter <beginfold id='1'>{</beginfold id='1'>
+    ct timeout customtimeout <beginfold id='1'>{</beginfold id='1'>
+        protocol tcp;
+        l3proto ip
+        policy = <beginfold id='1'>{</beginfold id='1'> established: 2m, close: 20s <endfold id='1'>}</endfold id='1'>
+    <endfold id='1'>}</endfold id='1'>
+
+    chain output <beginfold id='1'>{</beginfold id='1'>
+        type "ftp" protocol tcp
+        ct state invalid, untracked synproxy mss 1460 wscale 9 timestamp sack-perm
+        ct state invalid drop
+        ct timeout set "customtimeout"
+    <endfold id='1'>}</endfold id='1'>
+<endfold id='1'>}</endfold id='1'>
+
+table ip filter <beginfold id='1'>{</beginfold id='1'>
+    ct expectation expect <beginfold id='1'>{</beginfold id='1'>
+        protocol udp
+        dport 9876
+        timeout 2m
+        size 8
+        l3proto ip
+    <endfold id='1'>}</endfold id='1'>
+<endfold id='1'>}</endfold id='1'>
+
+# This also works with named maps and in combination with both concatenations and ranges:
+table ip nat <beginfold id='1'>{</beginfold id='1'>
+        map ipportmap <beginfold id='1'>{</beginfold id='1'>
+                typeof ip saddr : interval ip daddr . tcp dport
+                flags interval
+                elements = <beginfold id='1'>{</beginfold id='1'> 192.168.1.2 : 10.141.10.1-10.141.10.3 . 8888-8999, 192.168.2.0/24 : 10.141.11.5-10.141.11.20 . 8888-8999 <endfold id='1'>}</endfold id='1'>
+        <endfold id='1'>}</endfold id='1'>
+
+        chain prerouting <beginfold id='1'>{</beginfold id='1'>
+                type nat hook prerouting priority dstnat; policy accept;
+                ip protocol tcp dnat ip to ip saddr map @ipportmap
+        <endfold id='1'>}</endfold id='1'>
+<endfold id='1'>}</endfold id='1'>
+
+table ip6 x <beginfold id='1'>{</beginfold id='1'>
+    chain y <beginfold id='1'>{</beginfold id='1'>
+        type filter hook prerouting priority mangle; policy accept;
+        tcp dport ntp tproxy to [dead::beef] accept
+        udp dport ssh tproxy to :2222 accept
+        udp dport 155 tproxy ip6 to [dead::beef]:smux accept
+        tcp dport 99 tproxy ip to 1.1.1.1:999 accept
+    <endfold id='1'>}</endfold id='1'>
+<endfold id='1'>}</endfold id='1'>
+
+table inet x <beginfold id='1'>{</beginfold id='1'>
+    chain y <beginfold id='1'>{</beginfold id='1'>
+        type filter hook prerouting priority mangle; policy accept;
+        udp dport 9999 goto <beginfold id='1'>{</beginfold id='1'>
+            tproxy to :1234 log prefix "packet tproxied: " meta mark set 1 accept
+            log prefix "no socket on port 1234 or not transparent?: " drop
+        <endfold id='1'>}</endfold id='1'>
+    <endfold id='1'>}</endfold id='1'>
+<endfold id='1'>}</endfold id='1'>
+
+add quota filter user123 <beginfold id='1'>{</beginfold id='1'> over 20 mbytes <endfold id='1'>}</endfold id='1'>
+
+describe tcp flags
+
+filter input ether daddr 20:c9:d0:43:12:d9
+filter output ip daddr 127.0.0.1
+filter output ip daddr localhost
+filter output ip6 daddr ::1
+inet filter output rt ip6 nexthop fd00::1
+add rule inet nat prerouting dnat ip6 to fe80::dead
+
+ct event set new,related,destroy
+
+# without [] the port number (22) would be parsed as part of the
+# ipv6 address
+ip6 nat prerouting tcp dport 2222 dnat to [1ce::d0]:22
+
+# match if route exists
+filter input fib daddr . iif oif exists
+
+filter output icmpv6 type <beginfold id='1'>{</beginfold id='1'> echo-request, echo-reply <endfold id='1'>}</endfold id='1'>
+
+# match incoming packet from 03:00 to 14:00 local time
+raw prerouting meta hour "03:00"-"14:00" counter accept
+
+# outgoing packet will be encapsulated/encrypted by ipsec
+filter output rt ipsec exists
+
+# round-robin between 192.168.10.100 and 192.168.20.200:
+add rule nat prerouting dnat to numgen inc mod 2 map \
+        <beginfold id='1'>{</beginfold id='1'> 0 : 192.168.10.100, 1 : 192.168.20.200
+
+    inet filter input meta l4proto <beginfold id='1'>{</beginfold id='1'>tcp, udp<endfold id='1'>}</endfold id='1'> th dport <beginfold id='1'>{</beginfold id='1'> 53, 80 <endfold id='1'>}</endfold id='1'>
+
+    input meta iifname enp2s0 arp ptype 0x0800 arp htype 1 arp hlen 6 arp plen 4 @nh,192,32 0xc0a88f10 @nh,144,48 set 0x112233445566 accept
+
+    ip rule add fwmark 1 lookup 100
+    ip route add local 0.0.0.0/0 dev lo table 100
+
+    # copy raw frame to another interface
+    netdev ingress dup to "eth0"
+    dup to "eth0"
+<endfold id='1'>}</endfold id='1'>
+
+# declare a set to store the limit per saddr.
+# This must be separate from blackhole since the timeout is different
+add set ip filter flood \
+    <beginfold id='1'>{</beginfold id='1'> type ipv4_addr; flags dynamic; timeout 10s; size 128000; <endfold id='1'>}</endfold id='1'>
+
+# drop packets coming from blacklisted ip addresses.
+add rule ip filter input ip saddr @blackhole counter drop
+
+add @flood <beginfold id='1'>{</beginfold id='1'> ip saddr limit rate over 10/second <endfold id='1'>}</endfold id='1'>
+
+# inspect state of the sets.
+list set ip filter flood

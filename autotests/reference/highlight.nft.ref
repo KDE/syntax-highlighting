@@ -1,0 +1,134 @@
+<Symbolic Variable>define</Symbolic Variable><Normal> int_if1 </Normal><Assignment Operator>=</Assignment Operator><Normal> eth0</Normal><br/>
+<Symbolic Variable>define</Symbolic Variable><Normal> int_ifs </Normal><Assignment Operator>=</Assignment Operator><Normal> </Normal><Block Symbol>{</Block Symbol><Normal> </Normal><Variable>$int_if1</Variable><Normal>, </Normal><Variable>$int_if2</Variable><Normal> </Normal><Block Symbol>}</Block Symbol><br/>
+<Symbolic Variable>redefine</Symbolic Variable><Normal> int_if2 </Normal><Assignment Operator>=</Assignment Operator><Normal> wlan0</Normal><br/>
+<Symbolic Variable>undefine</Symbolic Variable><Normal> int_if2</Normal><br/>
+<Normal></Normal><br/>
+<Value>filter</Value><Normal> </Normal><Value>input</Value><Normal> </Normal><Specification>iif</Specification><Normal> </Normal><Variable>$int_ifs</Variable><Normal> </Normal><Accept>accept</Accept><br/>
+<Normal></Normal><br/>
+<Comment># create a new table.</Comment><br/>
+<Operation>create</Operation><Normal> </Normal><Statement>table</Statement><Normal> </Normal><Address Family>inet</Address Family><Normal> mytable</Normal><br/>
+<Normal></Normal><br/>
+<Comment># add a new base chain: get input packets</Comment><br/>
+<Operation>add</Operation><Normal> </Normal><Statement>chain</Statement><Normal> </Normal><Address Family>inet</Address Family><Normal> mytable myin </Normal><Block Symbol>{</Block Symbol><Normal> </Normal><Specification>type</Specification><Normal> </Normal><Value>filter</Value><Normal> </Normal><Specification>hook</Specification><Normal> </Normal><Value>input</Value><Normal> </Normal><Specification>priority</Specification><Normal> </Normal><Value>filter</Value><Symbol>;</Symbol><Normal> </Normal><Block Symbol>}</Block Symbol><br/>
+<Normal></Normal><br/>
+<Operation>add</Operation><Normal> </Normal><Statement>rule</Statement><Normal> </Normal><Address Family>ip</Address Family><Normal> nat </Normal><Value>prerouting</Value><Normal> </Normal><Statement>dnat</Statement><Normal> </Normal><Statement>tcp</Statement><Normal> </Normal><Specification>dport</Specification><Normal> </Normal><Statement>map</Statement><Normal> </Normal><Block Symbol>{</Block Symbol><Normal> </Normal><Number>80</Number><Normal> </Normal><Symbol>:</Symbol><Normal> </Normal><IP>192.168.1.100</IP><Normal>, </Normal><Number>8888</Number><Normal> </Normal><Symbol>:</Symbol><Normal> </Normal><IP>192.168.1.101</IP><Normal> </Normal><Block Symbol>}</Block Symbol><br/>
+<Normal></Normal><br/>
+<Operation>add</Operation><Normal> </Normal><Statement>rule</Statement><Normal> </Normal><Address Family>ip</Address Family><Normal> nat </Normal><Value>postrouting</Value><Normal> </Normal><Statement>snat</Statement><Normal> to </Normal><Address Family>ip</Address Family><Normal> </Normal><Specification>saddr</Specification><Normal> </Normal><Statement>map</Statement><Normal> </Normal><Block Symbol>{</Block Symbol><Normal> </Normal><IP>192.168.1.0</IP><Symbol>/</Symbol><Number>24</Number><Normal> </Normal><Symbol>:</Symbol><Normal> </Normal><IP>10.0.0.1</IP><Normal>, </Normal><IP>192.168.2.0</IP><Symbol>/</Symbol><Number>24</Number><Normal> </Normal><Symbol>:</Symbol><Normal> </Normal><IP>10.0.0.2</IP><Normal> </Normal><Block Symbol>}</Block Symbol><br/>
+<Normal></Normal><br/>
+<Operation>add</Operation><Normal> </Normal><Statement>rule</Statement><Normal> </Normal><Address Family>ip</Address Family><Normal> </Normal><Value>filter</Value><Normal> </Normal><Value>input</Value><Normal> </Normal><Address Family>ip</Address Family><Normal> </Normal><Specification>protocol</Specification><Normal> </Normal><Statement>vmap</Statement><Normal> </Normal><Block Symbol>{</Block Symbol><Normal> </Normal><Statement>tcp</Statement><Normal> </Normal><Symbol>:</Symbol><Normal> </Normal><Verdict>jump</Verdict><Normal> tcp</Normal><Symbol>-</Symbol><Normal>chain, </Normal><Statement>udp</Statement><Normal> </Normal><Symbol>:</Symbol><Normal> </Normal><Verdict>jump</Verdict><Normal> udp</Normal><Symbol>-</Symbol><Normal>chain , </Normal><Statement>icmp</Statement><Normal> </Normal><Symbol>:</Symbol><Normal> </Normal><Verdict>jump</Verdict><Normal> icmp</Normal><Symbol>-</Symbol><Normal>chain </Normal><Block Symbol>}</Block Symbol><br/>
+<Normal></Normal><br/>
+<Statement>table</Statement><Normal> </Normal><Address Family>ip</Address Family><Normal> </Normal><Value>filter</Value><Normal> </Normal><Block Symbol>{</Block Symbol><br/>
+<Normal>    </Normal><Statement>ct</Statement><Normal> </Normal><Option>timeout</Option><Normal> customtimeout </Normal><Block Symbol>{</Block Symbol><br/>
+<Normal>        </Normal><Specification>protocol</Specification><Normal> </Normal><Statement>tcp</Statement><Symbol>;</Symbol><br/>
+<Normal>        </Normal><Specification>l3proto</Specification><Normal> </Normal><Address Family>ip</Address Family><br/>
+<Normal>        </Normal><Specification>policy</Specification><Normal> </Normal><Assignment Operator>=</Assignment Operator><Normal> </Normal><Block Symbol>{</Block Symbol><Normal> </Normal><Value>established</Value><Symbol>:</Symbol><Normal> </Normal><Number>2</Number><Unit>m</Unit><Normal>, </Normal><Value>close</Value><Symbol>:</Symbol><Normal> </Normal><Number>20</Number><Unit>s</Unit><Normal> </Normal><Block Symbol>}</Block Symbol><br/>
+<Normal>    </Normal><Block Symbol>}</Block Symbol><br/>
+<Normal></Normal><br/>
+<Normal>    </Normal><Statement>chain</Statement><Normal> </Normal><Value>output</Value><Normal> </Normal><Block Symbol>{</Block Symbol><br/>
+<Normal>        </Normal><Specification>type</Specification><Normal> </Normal><String>"ftp"</String><Normal> </Normal><Specification>protocol</Specification><Normal> </Normal><Statement>tcp</Statement><br/>
+<Normal>        </Normal><Statement>ct</Statement><Normal> </Normal><Specification>state</Specification><Normal> </Normal><Value>invalid</Value><Normal>, </Normal><Value>untracked</Value><Normal> </Normal><Statement>synproxy</Statement><Normal> </Normal><Value>mss</Value><Normal> </Normal><Number>1460</Number><Normal> </Normal><Value>wscale</Value><Normal> </Normal><Number>9</Number><Normal> </Normal><Option>timestamp</Option><Normal> </Normal><Option>sack-perm</Option><br/>
+<Normal>        </Normal><Statement>ct</Statement><Normal> </Normal><Specification>state</Specification><Normal> </Normal><Value>invalid</Value><Normal> </Normal><Drop>drop</Drop><br/>
+<Normal>        </Normal><Statement>ct</Statement><Normal> </Normal><Option>timeout</Option><Normal> </Normal><Statement>set</Statement><Normal> </Normal><String>"customtimeout"</String><br/>
+<Normal>    </Normal><Block Symbol>}</Block Symbol><br/>
+<Block Symbol>}</Block Symbol><br/>
+<Normal></Normal><br/>
+<Statement>table</Statement><Normal> </Normal><Address Family>ip</Address Family><Normal> </Normal><Value>filter</Value><Normal> </Normal><Block Symbol>{</Block Symbol><br/>
+<Normal>    </Normal><Statement>ct</Statement><Normal> </Normal><Value>expectation</Value><Normal> expect </Normal><Block Symbol>{</Block Symbol><br/>
+<Normal>        </Normal><Specification>protocol</Specification><Normal> </Normal><Statement>udp</Statement><br/>
+<Normal>        </Normal><Specification>dport</Specification><Normal> </Normal><Number>9876</Number><br/>
+<Normal>        </Normal><Option>timeout</Option><Normal> </Normal><Number>2</Number><Unit>m</Unit><br/>
+<Normal>        </Normal><Specification>size</Specification><Normal> </Normal><Number>8</Number><br/>
+<Normal>        </Normal><Specification>l3proto</Specification><Normal> </Normal><Address Family>ip</Address Family><br/>
+<Normal>    </Normal><Block Symbol>}</Block Symbol><br/>
+<Block Symbol>}</Block Symbol><br/>
+<Normal></Normal><br/>
+<Comment># This also works with named maps and in combination with both concatenations and ranges:</Comment><br/>
+<Statement>table</Statement><Normal> </Normal><Address Family>ip</Address Family><Normal> nat </Normal><Block Symbol>{</Block Symbol><br/>
+<Normal>        </Normal><Statement>map</Statement><Normal> ipportmap </Normal><Block Symbol>{</Block Symbol><br/>
+<Normal>                </Normal><Specification>typeof</Specification><Normal> </Normal><Address Family>ip</Address Family><Normal> </Normal><Specification>saddr</Specification><Normal> </Normal><Symbol>:</Symbol><Normal> </Normal><Value>interval</Value><Normal> </Normal><Address Family>ip</Address Family><Normal> </Normal><Specification>daddr</Specification><Normal> . </Normal><Statement>tcp</Statement><Normal> </Normal><Specification>dport</Specification><br/>
+<Normal>                </Normal><Specification>flags</Specification><Normal> </Normal><Value>interval</Value><br/>
+<Normal>                </Normal><Specification>elements</Specification><Normal> </Normal><Assignment Operator>=</Assignment Operator><Normal> </Normal><Block Symbol>{</Block Symbol><Normal> </Normal><IP>192.168.1.2</IP><Normal> </Normal><Symbol>:</Symbol><Normal> </Normal><IP>10.141.10.1</IP><Symbol>-</Symbol><IP>10.141.10.3</IP><Normal> . </Normal><Number>8888</Number><Symbol>-</Symbol><Number>8999</Number><Normal>, </Normal><IP>192.168.2.0</IP><Symbol>/</Symbol><Number>24</Number><Normal> </Normal><Symbol>:</Symbol><Normal> </Normal><IP>10.141.11.5</IP><Symbol>-</Symbol><IP>10.141.11.20</IP><Normal> . </Normal><Number>8888</Number><Symbol>-</Symbol><Number>8999</Number><Normal> </Normal><Block Symbol>}</Block Symbol><br/>
+<Normal>        </Normal><Block Symbol>}</Block Symbol><br/>
+<Normal></Normal><br/>
+<Normal>        </Normal><Statement>chain</Statement><Normal> </Normal><Value>prerouting</Value><Normal> </Normal><Block Symbol>{</Block Symbol><br/>
+<Normal>                </Normal><Specification>type</Specification><Normal> nat </Normal><Specification>hook</Specification><Normal> </Normal><Value>prerouting</Value><Normal> </Normal><Specification>priority</Specification><Normal> </Normal><Value>dstnat</Value><Symbol>;</Symbol><Normal> </Normal><Specification>policy</Specification><Normal> </Normal><Accept>accept</Accept><Symbol>;</Symbol><br/>
+<Normal>                </Normal><Address Family>ip</Address Family><Normal> </Normal><Specification>protocol</Specification><Normal> </Normal><Statement>tcp</Statement><Normal> </Normal><Statement>dnat</Statement><Normal> </Normal><Address Family>ip</Address Family><Normal> to </Normal><Address Family>ip</Address Family><Normal> </Normal><Specification>saddr</Specification><Normal> </Normal><Statement>map</Statement><Normal> </Normal><Variable>@ipportmap</Variable><br/>
+<Normal>        </Normal><Block Symbol>}</Block Symbol><br/>
+<Block Symbol>}</Block Symbol><br/>
+<Normal></Normal><br/>
+<Statement>table</Statement><Normal> </Normal><Address Family>ip6</Address Family><Normal> x </Normal><Block Symbol>{</Block Symbol><br/>
+<Normal>    </Normal><Statement>chain</Statement><Normal> y </Normal><Block Symbol>{</Block Symbol><br/>
+<Normal>        </Normal><Specification>type</Specification><Normal> </Normal><Value>filter</Value><Normal> </Normal><Specification>hook</Specification><Normal> </Normal><Value>prerouting</Value><Normal> </Normal><Specification>priority</Specification><Normal> </Normal><Value>mangle</Value><Symbol>;</Symbol><Normal> </Normal><Specification>policy</Specification><Normal> </Normal><Accept>accept</Accept><Symbol>;</Symbol><br/>
+<Normal>        </Normal><Statement>tcp</Statement><Normal> </Normal><Specification>dport</Specification><Normal> ntp </Normal><Statement>tproxy</Statement><Normal> to </Normal><Symbol>[</Symbol><IP>dead::beef</IP><Symbol>]</Symbol><Normal> </Normal><Accept>accept</Accept><br/>
+<Normal>        </Normal><Statement>udp</Statement><Normal> </Normal><Specification>dport</Specification><Normal> ssh </Normal><Statement>tproxy</Statement><Normal> to </Normal><Symbol>:</Symbol><Number>2222</Number><Normal> </Normal><Accept>accept</Accept><br/>
+<Normal>        </Normal><Statement>udp</Statement><Normal> </Normal><Specification>dport</Specification><Normal> </Normal><Number>155</Number><Normal> </Normal><Statement>tproxy</Statement><Normal> </Normal><Address Family>ip6</Address Family><Normal> to </Normal><Symbol>[</Symbol><IP>dead::beef</IP><Symbol>]:</Symbol><Normal>smux </Normal><Accept>accept</Accept><br/>
+<Normal>        </Normal><Statement>tcp</Statement><Normal> </Normal><Specification>dport</Specification><Normal> </Normal><Number>99</Number><Normal> </Normal><Statement>tproxy</Statement><Normal> </Normal><Address Family>ip</Address Family><Normal> to </Normal><IP>1.1.1.1</IP><Symbol>:</Symbol><Number>999</Number><Normal> </Normal><Accept>accept</Accept><br/>
+<Normal>    </Normal><Block Symbol>}</Block Symbol><br/>
+<Block Symbol>}</Block Symbol><br/>
+<Normal></Normal><br/>
+<Statement>table</Statement><Normal> </Normal><Address Family>inet</Address Family><Normal> x </Normal><Block Symbol>{</Block Symbol><br/>
+<Normal>    </Normal><Statement>chain</Statement><Normal> y </Normal><Block Symbol>{</Block Symbol><br/>
+<Normal>        </Normal><Specification>type</Specification><Normal> </Normal><Value>filter</Value><Normal> </Normal><Specification>hook</Specification><Normal> </Normal><Value>prerouting</Value><Normal> </Normal><Specification>priority</Specification><Normal> </Normal><Value>mangle</Value><Symbol>;</Symbol><Normal> </Normal><Specification>policy</Specification><Normal> </Normal><Accept>accept</Accept><Symbol>;</Symbol><br/>
+<Normal>        </Normal><Statement>udp</Statement><Normal> </Normal><Specification>dport</Specification><Normal> </Normal><Number>9999</Number><Normal> </Normal><Verdict>goto</Verdict><Normal> </Normal><Block Symbol>{</Block Symbol><br/>
+<Normal>            </Normal><Statement>tproxy</Statement><Normal> to </Normal><Symbol>:</Symbol><Number>1234</Number><Normal> </Normal><Statement>log</Statement><Normal> </Normal><Option>prefix</Option><Normal> </Normal><String>"packet tproxied: "</String><Normal> </Normal><Statement>meta</Statement><Normal> </Normal><Specification>mark</Specification><Normal> </Normal><Statement>set</Statement><Normal> </Normal><Number>1</Number><Normal> </Normal><Accept>accept</Accept><br/>
+<Normal>            </Normal><Statement>log</Statement><Normal> </Normal><Option>prefix</Option><Normal> </Normal><String>"no socket on port 1234 or not transparent?: "</String><Normal> </Normal><Drop>drop</Drop><br/>
+<Normal>        </Normal><Block Symbol>}</Block Symbol><br/>
+<Normal>    </Normal><Block Symbol>}</Block Symbol><br/>
+<Block Symbol>}</Block Symbol><br/>
+<Normal></Normal><br/>
+<Operation>add</Operation><Normal> </Normal><Statement>quota</Statement><Normal> </Normal><Value>filter</Value><Normal> user123 </Normal><Block Symbol>{</Block Symbol><Normal> </Normal><Option>over</Option><Normal> </Normal><Number>20</Number><Normal> </Normal><Unit>mbytes</Unit><Normal> </Normal><Block Symbol>}</Block Symbol><br/>
+<Normal></Normal><br/>
+<Operation>describe</Operation><Normal> </Normal><Statement>tcp</Statement><Normal> </Normal><Specification>flags</Specification><br/>
+<Normal></Normal><br/>
+<Value>filter</Value><Normal> </Normal><Value>input</Value><Normal> </Normal><Statement>ether</Statement><Normal> </Normal><Specification>daddr</Specification><Normal> </Normal><IP>20:c9:d0:43:12:d9</IP><br/>
+<Value>filter</Value><Normal> </Normal><Value>output</Value><Normal> </Normal><Address Family>ip</Address Family><Normal> </Normal><Specification>daddr</Specification><Normal> </Normal><IP>127.0.0.1</IP><br/>
+<Value>filter</Value><Normal> </Normal><Value>output</Value><Normal> </Normal><Address Family>ip</Address Family><Normal> </Normal><Specification>daddr</Specification><Normal> </Normal><IP>localhost</IP><br/>
+<Value>filter</Value><Normal> </Normal><Value>output</Value><Normal> </Normal><Address Family>ip6</Address Family><Normal> </Normal><Specification>daddr</Specification><Normal> </Normal><IP>::1</IP><br/>
+<Address Family>inet</Address Family><Normal> </Normal><Value>filter</Value><Normal> </Normal><Value>output</Value><Normal> </Normal><Statement>rt</Statement><Normal> </Normal><Address Family>ip6</Address Family><Normal> </Normal><Specification>nexthop</Specification><Normal> </Normal><IP>fd00::1</IP><br/>
+<Operation>add</Operation><Normal> </Normal><Statement>rule</Statement><Normal> </Normal><Address Family>inet</Address Family><Normal> nat </Normal><Value>prerouting</Value><Normal> </Normal><Statement>dnat</Statement><Normal> </Normal><Address Family>ip6</Address Family><Normal> to </Normal><IP>fe80::dead</IP><br/>
+<Normal></Normal><br/>
+<Statement>ct</Statement><Normal> </Normal><Specification>event</Specification><Normal> </Normal><Statement>set</Statement><Normal> </Normal><Value>new</Value><Normal>,</Normal><Value>related</Value><Normal>,</Normal><Operation>destroy</Operation><br/>
+<Normal></Normal><br/>
+<Comment># without [] the port number (22) would be parsed as part of the</Comment><br/>
+<Comment># ipv6 address</Comment><br/>
+<Address Family>ip6</Address Family><Normal> nat </Normal><Value>prerouting</Value><Normal> </Normal><Statement>tcp</Statement><Normal> </Normal><Specification>dport</Specification><Normal> </Normal><Number>2222</Number><Normal> </Normal><Statement>dnat</Statement><Normal> to </Normal><Symbol>[</Symbol><IP>1ce::d0</IP><Symbol>]:</Symbol><Number>22</Number><br/>
+<Normal></Normal><br/>
+<Comment># match if route exists</Comment><br/>
+<Value>filter</Value><Normal> </Normal><Value>input</Value><Normal> </Normal><Statement>fib</Statement><Normal> </Normal><Specification>daddr</Specification><Normal> . </Normal><Specification>iif</Specification><Normal> </Normal><Specification>oif</Specification><Normal> </Normal><Value>exists</Value><br/>
+<Normal></Normal><br/>
+<Value>filter</Value><Normal> </Normal><Value>output</Value><Normal> </Normal><Statement>icmpv6</Statement><Normal> </Normal><Specification>type</Specification><Normal> </Normal><Block Symbol>{</Block Symbol><Normal> </Normal><Value>echo-request</Value><Normal>, </Normal><Value>echo-reply</Value><Normal> </Normal><Block Symbol>}</Block Symbol><br/>
+<Normal></Normal><br/>
+<Comment># match incoming packet from 03:00 to 14:00 local time</Comment><br/>
+<Value>raw</Value><Normal> </Normal><Value>prerouting</Value><Normal> </Normal><Statement>meta</Statement><Normal> </Normal><Specification>hour</Specification><Normal> </Normal><String>"03:00"</String><Symbol>-</Symbol><String>"14:00"</String><Normal> </Normal><Statement>counter</Statement><Normal> </Normal><Accept>accept</Accept><br/>
+<Normal></Normal><br/>
+<Comment># outgoing packet will be encapsulated/encrypted by ipsec</Comment><br/>
+<Value>filter</Value><Normal> </Normal><Value>output</Value><Normal> </Normal><Statement>rt</Statement><Normal> </Normal><Statement>ipsec</Statement><Normal> </Normal><Value>exists</Value><br/>
+<Normal></Normal><br/>
+<Comment># round-robin between 192.168.10.100 and 192.168.20.200:</Comment><br/>
+<Operation>add</Operation><Normal> </Normal><Statement>rule</Statement><Normal> nat </Normal><Value>prerouting</Value><Normal> </Normal><Statement>dnat</Statement><Normal> to </Normal><Statement>numgen</Statement><Normal> </Normal><Option>inc</Option><Normal> </Normal><Option>mod</Option><Normal> </Normal><Number>2</Number><Normal> </Normal><Statement>map</Statement><Normal> </Normal><Line Continuation>\</Line Continuation><br/>
+<Normal>        </Normal><Block Symbol>{</Block Symbol><Normal> </Normal><Number>0</Number><Normal> </Normal><Symbol>:</Symbol><Normal> </Normal><IP>192.168.10.100</IP><Normal>, </Normal><Number>1</Number><Normal> </Normal><Symbol>:</Symbol><Normal> </Normal><IP>192.168.20.200</IP><br/>
+<Normal></Normal><br/>
+<Normal>    </Normal><Address Family>inet</Address Family><Normal> </Normal><Value>filter</Value><Normal> </Normal><Value>input</Value><Normal> </Normal><Statement>meta</Statement><Normal> </Normal><Specification>l4proto</Specification><Normal> </Normal><Block Symbol>{</Block Symbol><Statement>tcp</Statement><Normal>, </Normal><Statement>udp</Statement><Block Symbol>}</Block Symbol><Normal> th </Normal><Specification>dport</Specification><Normal> </Normal><Block Symbol>{</Block Symbol><Normal> </Normal><Number>53</Number><Normal>, </Normal><Number>80</Number><Normal> </Normal><Block Symbol>}</Block Symbol><br/>
+<Normal></Normal><br/>
+<Normal>    </Normal><Value>input</Value><Normal> </Normal><Statement>meta</Statement><Normal> </Normal><Specification>iifname</Specification><Normal> enp2s0 </Normal><Address Family>arp</Address Family><Normal> </Normal><Header Expression>ptype</Header Expression><Normal> </Normal><Number>0x0800</Number><Normal> </Normal><Address Family>arp</Address Family><Normal> </Normal><Header Expression>htype</Header Expression><Normal> </Normal><Number>1</Number><Normal> </Normal><Address Family>arp</Address Family><Normal> </Normal><Header Expression>hlen</Header Expression><Normal> </Normal><Number>6</Number><Normal> </Normal><Address Family>arp</Address Family><Normal> </Normal><Header Expression>plen</Header Expression><Normal> </Normal><Number>4</Number><Normal> </Normal><Variable>@nh</Variable><Normal>,</Normal><Number>192</Number><Normal>,</Normal><Number>32</Number><Normal> </Normal><Number>0xc0a88f10</Number><Normal> </Normal><Variable>@nh</Variable><Normal>,</Normal><Number>144</Number><Normal>,</Normal><Number>48</Number><Normal> </Normal><Statement>set</Statement><Normal> </Normal><Number>0x112233445566</Number><Normal> </Normal><Accept>accept</Accept><br/>
+<Normal></Normal><br/>
+<Normal>    </Normal><Address Family>ip</Address Family><Normal> </Normal><Statement>rule</Statement><Normal> </Normal><Operation>add</Operation><Normal> fwmark </Normal><Number>1</Number><Normal> lookup </Normal><Number>100</Number><br/>
+<Normal>    </Normal><Address Family>ip</Address Family><Normal> </Normal><Statement>route</Statement><Normal> </Normal><Operation>add</Operation><Normal> local </Normal><IP>0.0.0.0</IP><Symbol>/</Symbol><Number>0</Number><Normal> dev lo </Normal><Statement>table</Statement><Normal> </Normal><Number>100</Number><br/>
+<Normal></Normal><br/>
+<Normal>    </Normal><Comment># copy raw frame to another interface</Comment><br/>
+<Normal>    </Normal><Address Family>netdev</Address Family><Normal> </Normal><Value>ingress</Value><Normal> </Normal><Statement>dup</Statement><Normal> to </Normal><String>"eth0"</String><br/>
+<Normal>    </Normal><Statement>dup</Statement><Normal> to </Normal><String>"eth0"</String><br/>
+<Block Symbol>}</Block Symbol><br/>
+<Normal></Normal><br/>
+<Comment># declare a set to store the limit per saddr.</Comment><br/>
+<Comment># This must be separate from blackhole since the timeout is different</Comment><br/>
+<Operation>add</Operation><Normal> </Normal><Statement>set</Statement><Normal> </Normal><Address Family>ip</Address Family><Normal> </Normal><Value>filter</Value><Normal> flood </Normal><Line Continuation>\</Line Continuation><br/>
+<Normal>    </Normal><Block Symbol>{</Block Symbol><Normal> </Normal><Specification>type</Specification><Normal> ipv4_addr</Normal><Symbol>;</Symbol><Normal> </Normal><Specification>flags</Specification><Normal> </Normal><Value>dynamic</Value><Symbol>;</Symbol><Normal> </Normal><Option>timeout</Option><Normal> </Normal><Number>10</Number><Unit>s</Unit><Symbol>;</Symbol><Normal> </Normal><Specification>size</Specification><Normal> </Normal><Number>128000</Number><Symbol>;</Symbol><Normal> </Normal><Block Symbol>}</Block Symbol><br/>
+<Normal></Normal><br/>
+<Comment># drop packets coming from blacklisted ip addresses.</Comment><br/>
+<Operation>add</Operation><Normal> </Normal><Statement>rule</Statement><Normal> </Normal><Address Family>ip</Address Family><Normal> </Normal><Value>filter</Value><Normal> </Normal><Value>input</Value><Normal> </Normal><Address Family>ip</Address Family><Normal> </Normal><Specification>saddr</Specification><Normal> </Normal><Variable>@blackhole</Variable><Normal> </Normal><Statement>counter</Statement><Normal> </Normal><Drop>drop</Drop><br/>
+<Normal></Normal><br/>
+<Operation>add</Operation><Normal> </Normal><Variable>@flood</Variable><Normal> </Normal><Block Symbol>{</Block Symbol><Normal> </Normal><Address Family>ip</Address Family><Normal> </Normal><Specification>saddr</Specification><Normal> </Normal><Statement>limit</Statement><Normal> rate </Normal><Option>over</Option><Normal> </Normal><Number>10</Number><Symbol>/</Symbol><Normal>second </Normal><Block Symbol>}</Block Symbol><br/>
+<Normal></Normal><br/>
+<Comment># inspect state of the sets.</Comment><br/>
+<Operation>list</Operation><Normal> </Normal><Statement>set</Statement><Normal> </Normal><Address Family>ip</Address Family><Normal> </Normal><Value>filter</Value><Normal> flood</Normal><br/>

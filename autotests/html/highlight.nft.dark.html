@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>highlight.nft</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (NFTables) - Theme (Breeze Dark)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="color:#7f8c8d">define</span> int_if1 <span style="color:#3f8058">=</span> eth0
+<span style="color:#7f8c8d">define</span> int_ifs <span style="color:#3f8058">=</span> { <span style="color:#27aeae">$int_if1</span>, <span style="color:#27aeae">$int_if2</span> }
+<span style="color:#7f8c8d">redefine</span> int_if2 <span style="color:#3f8058">=</span> wlan0
+<span style="color:#7f8c8d">undefine</span> int_if2
+
+<span style="color:#27aeae">filter</span> <span style="color:#27aeae">input</span> <span style="color:#c45b00">iif</span> <span style="color:#27aeae">$int_ifs</span> <span style="color:#0099ff;font-weight:bold">accept</span>
+
+<span style="color:#7a7c7d"># create a new table.</span>
+<span style="font-weight:bold">create</span> <span style="color:#8e44ad">table</span> <span style="color:#3f8058">inet</span> mytable
+
+<span style="color:#7a7c7d"># add a new base chain: get input packets</span>
+<span style="font-weight:bold">add</span> <span style="color:#8e44ad">chain</span> <span style="color:#3f8058">inet</span> mytable myin { <span style="color:#c45b00">type</span> <span style="color:#27aeae">filter</span> <span style="color:#c45b00">hook</span> <span style="color:#27aeae">input</span> <span style="color:#c45b00">priority</span> <span style="color:#27aeae">filter</span>; }
+
+<span style="font-weight:bold">add</span> <span style="color:#8e44ad">rule</span> <span style="color:#3f8058">ip</span> nat <span style="color:#27aeae">prerouting</span> <span style="color:#8e44ad">dnat</span> <span style="color:#8e44ad">tcp</span> <span style="color:#c45b00">dport</span> <span style="color:#8e44ad">map</span> { <span style="color:#f67400">80</span> : <span style="color:#f67400">192.168.1.100</span>, <span style="color:#f67400">8888</span> : <span style="color:#f67400">192.168.1.101</span> }
+
+<span style="font-weight:bold">add</span> <span style="color:#8e44ad">rule</span> <span style="color:#3f8058">ip</span> nat <span style="color:#27aeae">postrouting</span> <span style="color:#8e44ad">snat</span> to <span style="color:#3f8058">ip</span> <span style="color:#c45b00">saddr</span> <span style="color:#8e44ad">map</span> { <span style="color:#f67400">192.168.1.0</span>/<span style="color:#f67400">24</span> : <span style="color:#f67400">10.0.0.1</span>, <span style="color:#f67400">192.168.2.0</span>/<span style="color:#f67400">24</span> : <span style="color:#f67400">10.0.0.2</span> }
+
+<span style="font-weight:bold">add</span> <span style="color:#8e44ad">rule</span> <span style="color:#3f8058">ip</span> <span style="color:#27aeae">filter</span> <span style="color:#27aeae">input</span> <span style="color:#3f8058">ip</span> <span style="color:#c45b00">protocol</span> <span style="color:#8e44ad">vmap</span> { <span style="color:#8e44ad">tcp</span> : <span style="color:#fdbc4b;font-weight:bold">jump</span> tcp-chain, <span style="color:#8e44ad">udp</span> : <span style="color:#fdbc4b;font-weight:bold">jump</span> udp-chain , <span style="color:#8e44ad">icmp</span> : <span style="color:#fdbc4b;font-weight:bold">jump</span> icmp-chain }
+
+<span style="color:#8e44ad">table</span> <span style="color:#3f8058">ip</span> <span style="color:#27aeae">filter</span> {
+    <span style="color:#8e44ad">ct</span> <span style="color:#27ae60">timeout</span> customtimeout {
+        <span style="color:#c45b00">protocol</span> <span style="color:#8e44ad">tcp</span>;
+        <span style="color:#c45b00">l3proto</span> <span style="color:#3f8058">ip</span>
+        <span style="color:#c45b00">policy</span> <span style="color:#3f8058">=</span> { <span style="color:#27aeae">established</span>: <span style="color:#f67400">2</span><span style="color:#3daee9">m</span>, <span style="color:#27aeae">close</span>: <span style="color:#f67400">20</span><span style="color:#3daee9">s</span> }
+    }
+
+    <span style="color:#8e44ad">chain</span> <span style="color:#27aeae">output</span> {
+        <span style="color:#c45b00">type</span> <span style="color:#f44f4f">"ftp"</span> <span style="color:#c45b00">protocol</span> <span style="color:#8e44ad">tcp</span>
+        <span style="color:#8e44ad">ct</span> <span style="color:#c45b00">state</span> <span style="color:#27aeae">invalid</span>, <span style="color:#27aeae">untracked</span> <span style="color:#8e44ad">synproxy</span> <span style="color:#27aeae">mss</span> <span style="color:#f67400">1460</span> <span style="color:#27aeae">wscale</span> <span style="color:#f67400">9</span> <span style="color:#27ae60">timestamp</span> <span style="color:#27ae60">sack-perm</span>
+        <span style="color:#8e44ad">ct</span> <span style="color:#c45b00">state</span> <span style="color:#27aeae">invalid</span> <span style="color:#da4453;text-decoration:underline">drop</span>
+        <span style="color:#8e44ad">ct</span> <span style="color:#27ae60">timeout</span> <span style="color:#8e44ad">set</span> <span style="color:#f44f4f">"customtimeout"</span>
+    }
+}
+
+<span style="color:#8e44ad">table</span> <span style="color:#3f8058">ip</span> <span style="color:#27aeae">filter</span> {
+    <span style="color:#8e44ad">ct</span> <span style="color:#27aeae">expectation</span> expect {
+        <span style="color:#c45b00">protocol</span> <span style="color:#8e44ad">udp</span>
+        <span style="color:#c45b00">dport</span> <span style="color:#f67400">9876</span>
+        <span style="color:#27ae60">timeout</span> <span style="color:#f67400">2</span><span style="color:#3daee9">m</span>
+        <span style="color:#c45b00">size</span> <span style="color:#f67400">8</span>
+        <span style="color:#c45b00">l3proto</span> <span style="color:#3f8058">ip</span>
+    }
+}
+
+<span style="color:#7a7c7d"># This also works with named maps and in combination with both concatenations and ranges:</span>
+<span style="color:#8e44ad">table</span> <span style="color:#3f8058">ip</span> nat {
+        <span style="color:#8e44ad">map</span> ipportmap {
+                <span style="color:#c45b00">typeof</span> <span style="color:#3f8058">ip</span> <span style="color:#c45b00">saddr</span> : <span style="color:#27aeae">interval</span> <span style="color:#3f8058">ip</span> <span style="color:#c45b00">daddr</span> . <span style="color:#8e44ad">tcp</span> <span style="color:#c45b00">dport</span>
+                <span style="color:#c45b00">flags</span> <span style="color:#27aeae">interval</span>
+                <span style="color:#c45b00">elements</span> <span style="color:#3f8058">=</span> { <span style="color:#f67400">192.168.1.2</span> : <span style="color:#f67400">10.141.10.1</span>-<span style="color:#f67400">10.141.10.3</span> . <span style="color:#f67400">8888</span>-<span style="color:#f67400">8999</span>, <span style="color:#f67400">192.168.2.0</span>/<span style="color:#f67400">24</span> : <span style="color:#f67400">10.141.11.5</span>-<span style="color:#f67400">10.141.11.20</span> . <span style="color:#f67400">8888</span>-<span style="color:#f67400">8999</span> }
+        }
+
+        <span style="color:#8e44ad">chain</span> <span style="color:#27aeae">prerouting</span> {
+                <span style="color:#c45b00">type</span> nat <span style="color:#c45b00">hook</span> <span style="color:#27aeae">prerouting</span> <span style="color:#c45b00">priority</span> <span style="color:#27aeae">dstnat</span>; <span style="color:#c45b00">policy</span> <span style="color:#0099ff;font-weight:bold">accept</span>;
+                <span style="color:#3f8058">ip</span> <span style="color:#c45b00">protocol</span> <span style="color:#8e44ad">tcp</span> <span style="color:#8e44ad">dnat</span> <span style="color:#3f8058">ip</span> to <span style="color:#3f8058">ip</span> <span style="color:#c45b00">saddr</span> <span style="color:#8e44ad">map</span> <span style="color:#27aeae">@ipportmap</span>
+        }
+}
+
+<span style="color:#8e44ad">table</span> <span style="color:#3f8058">ip6</span> x {
+    <span style="color:#8e44ad">chain</span> y {
+        <span style="color:#c45b00">type</span> <span style="color:#27aeae">filter</span> <span style="color:#c45b00">hook</span> <span style="color:#27aeae">prerouting</span> <span style="color:#c45b00">priority</span> <span style="color:#27aeae">mangle</span>; <span style="color:#c45b00">policy</span> <span style="color:#0099ff;font-weight:bold">accept</span>;
+        <span style="color:#8e44ad">tcp</span> <span style="color:#c45b00">dport</span> ntp <span style="color:#8e44ad">tproxy</span> to [<span style="color:#f67400">dead::beef</span>] <span style="color:#0099ff;font-weight:bold">accept</span>
+        <span style="color:#8e44ad">udp</span> <span style="color:#c45b00">dport</span> ssh <span style="color:#8e44ad">tproxy</span> to :<span style="color:#f67400">2222</span> <span style="color:#0099ff;font-weight:bold">accept</span>
+        <span style="color:#8e44ad">udp</span> <span style="color:#c45b00">dport</span> <span style="color:#f67400">155</span> <span style="color:#8e44ad">tproxy</span> <span style="color:#3f8058">ip6</span> to [<span style="color:#f67400">dead::beef</span>]:smux <span style="color:#0099ff;font-weight:bold">accept</span>
+        <span style="color:#8e44ad">tcp</span> <span style="color:#c45b00">dport</span> <span style="color:#f67400">99</span> <span style="color:#8e44ad">tproxy</span> <span style="color:#3f8058">ip</span> to <span style="color:#f67400">1.1.1.1</span>:<span style="color:#f67400">999</span> <span style="color:#0099ff;font-weight:bold">accept</span>
+    }
+}
+
+<span style="color:#8e44ad">table</span> <span style="color:#3f8058">inet</span> x {
+    <span style="color:#8e44ad">chain</span> y {
+        <span style="color:#c45b00">type</span> <span style="color:#27aeae">filter</span> <span style="color:#c45b00">hook</span> <span style="color:#27aeae">prerouting</span> <span style="color:#c45b00">priority</span> <span style="color:#27aeae">mangle</span>; <span style="color:#c45b00">policy</span> <span style="color:#0099ff;font-weight:bold">accept</span>;
+        <span style="color:#8e44ad">udp</span> <span style="color:#c45b00">dport</span> <span style="color:#f67400">9999</span> <span style="color:#fdbc4b;font-weight:bold">goto</span> {
+            <span style="color:#8e44ad">tproxy</span> to :<span style="color:#f67400">1234</span> <span style="color:#8e44ad">log</span> <span style="color:#27ae60">prefix</span> <span style="color:#f44f4f">"packet tproxied: "</span> <span style="color:#8e44ad">meta</span> <span style="color:#c45b00">mark</span> <span style="color:#8e44ad">set</span> <span style="color:#f67400">1</span> <span style="color:#0099ff;font-weight:bold">accept</span>
+            <span style="color:#8e44ad">log</span> <span style="color:#27ae60">prefix</span> <span style="color:#f44f4f">"no socket on port 1234 or not transparent?: "</span> <span style="color:#da4453;text-decoration:underline">drop</span>
+        }
+    }
+}
+
+<span style="font-weight:bold">add</span> <span style="color:#8e44ad">quota</span> <span style="color:#27aeae">filter</span> user123 { <span style="color:#27ae60">over</span> <span style="color:#f67400">20</span> <span style="color:#3daee9">mbytes</span> }
+
+<span style="font-weight:bold">describe</span> <span style="color:#8e44ad">tcp</span> <span style="color:#c45b00">flags</span>
+
+<span style="color:#27aeae">filter</span> <span style="color:#27aeae">input</span> <span style="color:#8e44ad">ether</span> <span style="color:#c45b00">daddr</span> <span style="color:#f67400">20:c9:d0:43:12:d9</span>
+<span style="color:#27aeae">filter</span> <span style="color:#27aeae">output</span> <span style="color:#3f8058">ip</span> <span style="color:#c45b00">daddr</span> <span style="color:#f67400">127.0.0.1</span>
+<span style="color:#27aeae">filter</span> <span style="color:#27aeae">output</span> <span style="color:#3f8058">ip</span> <span style="color:#c45b00">daddr</span> <span style="color:#f67400">localhost</span>
+<span style="color:#27aeae">filter</span> <span style="color:#27aeae">output</span> <span style="color:#3f8058">ip6</span> <span style="color:#c45b00">daddr</span> <span style="color:#f67400">::1</span>
+<span style="color:#3f8058">inet</span> <span style="color:#27aeae">filter</span> <span style="color:#27aeae">output</span> <span style="color:#8e44ad">rt</span> <span style="color:#3f8058">ip6</span> <span style="color:#c45b00">nexthop</span> <span style="color:#f67400">fd00::1</span>
+<span style="font-weight:bold">add</span> <span style="color:#8e44ad">rule</span> <span style="color:#3f8058">inet</span> nat <span style="color:#27aeae">prerouting</span> <span style="color:#8e44ad">dnat</span> <span style="color:#3f8058">ip6</span> to <span style="color:#f67400">fe80::dead</span>
+
+<span style="color:#8e44ad">ct</span> <span style="color:#c45b00">event</span> <span style="color:#8e44ad">set</span> <span style="color:#27aeae">new</span>,<span style="color:#27aeae">related</span>,<span style="font-weight:bold">destroy</span>
+
+<span style="color:#7a7c7d"># without [] the port number (22) would be parsed as part of the</span>
+<span style="color:#7a7c7d"># ipv6 address</span>
+<span style="color:#3f8058">ip6</span> nat <span style="color:#27aeae">prerouting</span> <span style="color:#8e44ad">tcp</span> <span style="color:#c45b00">dport</span> <span style="color:#f67400">2222</span> <span style="color:#8e44ad">dnat</span> to [<span style="color:#f67400">1ce::d0</span>]:<span style="color:#f67400">22</span>
+
+<span style="color:#7a7c7d"># match if route exists</span>
+<span style="color:#27aeae">filter</span> <span style="color:#27aeae">input</span> <span style="color:#8e44ad">fib</span> <span style="color:#c45b00">daddr</span> . <span style="color:#c45b00">iif</span> <span style="color:#c45b00">oif</span> <span style="color:#27aeae">exists</span>
+
+<span style="color:#27aeae">filter</span> <span style="color:#27aeae">output</span> <span style="color:#8e44ad">icmpv6</span> <span style="color:#c45b00">type</span> { <span style="color:#27aeae">echo-request</span>, <span style="color:#27aeae">echo-reply</span> }
+
+<span style="color:#7a7c7d"># match incoming packet from 03:00 to 14:00 local time</span>
+<span style="color:#27aeae">raw</span> <span style="color:#27aeae">prerouting</span> <span style="color:#8e44ad">meta</span> <span style="color:#c45b00">hour</span> <span style="color:#f44f4f">"03:00"</span>-<span style="color:#f44f4f">"14:00"</span> <span style="color:#8e44ad">counter</span> <span style="color:#0099ff;font-weight:bold">accept</span>
+
+<span style="color:#7a7c7d"># outgoing packet will be encapsulated/encrypted by ipsec</span>
+<span style="color:#27aeae">filter</span> <span style="color:#27aeae">output</span> <span style="color:#8e44ad">rt</span> <span style="color:#8e44ad">ipsec</span> <span style="color:#27aeae">exists</span>
+
+<span style="color:#7a7c7d"># round-robin between 192.168.10.100 and 192.168.20.200:</span>
+<span style="font-weight:bold">add</span> <span style="color:#8e44ad">rule</span> nat <span style="color:#27aeae">prerouting</span> <span style="color:#8e44ad">dnat</span> to <span style="color:#8e44ad">numgen</span> <span style="color:#27ae60">inc</span> <span style="color:#27ae60">mod</span> <span style="color:#f67400">2</span> <span style="color:#8e44ad">map</span> <span style="color:#3f8058">\</span>
+        { <span style="color:#f67400">0</span> : <span style="color:#f67400">192.168.10.100</span>, <span style="color:#f67400">1</span> : <span style="color:#f67400">192.168.20.200</span>
+
+    <span style="color:#3f8058">inet</span> <span style="color:#27aeae">filter</span> <span style="color:#27aeae">input</span> <span style="color:#8e44ad">meta</span> <span style="color:#c45b00">l4proto</span> {<span style="color:#8e44ad">tcp</span>, <span style="color:#8e44ad">udp</span>} th <span style="color:#c45b00">dport</span> { <span style="color:#f67400">53</span>, <span style="color:#f67400">80</span> }
+
+    <span style="color:#27aeae">input</span> <span style="color:#8e44ad">meta</span> <span style="color:#c45b00">iifname</span> enp2s0 <span style="color:#3f8058">arp</span> <span style="color:#2980b9">ptype</span> <span style="color:#f67400">0x0800</span> <span style="color:#3f8058">arp</span> <span style="color:#2980b9">htype</span> <span style="color:#f67400">1</span> <span style="color:#3f8058">arp</span> <span style="color:#2980b9">hlen</span> <span style="color:#f67400">6</span> <span style="color:#3f8058">arp</span> <span style="color:#2980b9">plen</span> <span style="color:#f67400">4</span> <span style="color:#27aeae">@nh</span>,<span style="color:#f67400">192</span>,<span style="color:#f67400">32</span> <span style="color:#f67400">0xc0a88f10</span> <span style="color:#27aeae">@nh</span>,<span style="color:#f67400">144</span>,<span style="color:#f67400">48</span> <span style="color:#8e44ad">set</span> <span style="color:#f67400">0x112233445566</span> <span style="color:#0099ff;font-weight:bold">accept</span>
+
+    <span style="color:#3f8058">ip</span> <span style="color:#8e44ad">rule</span> <span style="font-weight:bold">add</span> fwmark <span style="color:#f67400">1</span> lookup <span style="color:#f67400">100</span>
+    <span style="color:#3f8058">ip</span> <span style="color:#8e44ad">route</span> <span style="font-weight:bold">add</span> local <span style="color:#f67400">0.0.0.0</span>/<span style="color:#f67400">0</span> dev lo <span style="color:#8e44ad">table</span> <span style="color:#f67400">100</span>
+
+    <span style="color:#7a7c7d"># copy raw frame to another interface</span>
+    <span style="color:#3f8058">netdev</span> <span style="color:#27aeae">ingress</span> <span style="color:#8e44ad">dup</span> to <span style="color:#f44f4f">"eth0"</span>
+    <span style="color:#8e44ad">dup</span> to <span style="color:#f44f4f">"eth0"</span>
+}
+
+<span style="color:#7a7c7d"># declare a set to store the limit per saddr.</span>
+<span style="color:#7a7c7d"># This must be separate from blackhole since the timeout is different</span>
+<span style="font-weight:bold">add</span> <span style="color:#8e44ad">set</span> <span style="color:#3f8058">ip</span> <span style="color:#27aeae">filter</span> flood <span style="color:#3f8058">\</span>
+    { <span style="color:#c45b00">type</span> ipv4_addr; <span style="color:#c45b00">flags</span> <span style="color:#27aeae">dynamic</span>; <span style="color:#27ae60">timeout</span> <span style="color:#f67400">10</span><span style="color:#3daee9">s</span>; <span style="color:#c45b00">size</span> <span style="color:#f67400">128000</span>; }
+
+<span style="color:#7a7c7d"># drop packets coming from blacklisted ip addresses.</span>
+<span style="font-weight:bold">add</span> <span style="color:#8e44ad">rule</span> <span style="color:#3f8058">ip</span> <span style="color:#27aeae">filter</span> <span style="color:#27aeae">input</span> <span style="color:#3f8058">ip</span> <span style="color:#c45b00">saddr</span> <span style="color:#27aeae">@blackhole</span> <span style="color:#8e44ad">counter</span> <span style="color:#da4453;text-decoration:underline">drop</span>
+
+<span style="font-weight:bold">add</span> <span style="color:#27aeae">@flood</span> { <span style="color:#3f8058">ip</span> <span style="color:#c45b00">saddr</span> <span style="color:#8e44ad">limit</span> rate <span style="color:#27ae60">over</span> <span style="color:#f67400">10</span>/second }
+
+<span style="color:#7a7c7d"># inspect state of the sets.</span>
+<span style="font-weight:bold">list</span> <span style="color:#8e44ad">set</span> <span style="color:#3f8058">ip</span> <span style="color:#27aeae">filter</span> flood
+</pre></body></html>

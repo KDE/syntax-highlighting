@@ -46,6 +46,9 @@ generate_syntax_definition(generate-xslt.pl xslt.xml xml.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/generators/xslt.base.xml
 )
 
+# generate JSONC definition
+generate_syntax_definition(generate-jsonc.pl jsonc.xml json.xml)
+
 # find all definitions
 file(GLOB src_defs "${CMAKE_CURRENT_SOURCE_DIR}/syntax/*.xml")
 set(defs ${src_defs} ${gen_defs})

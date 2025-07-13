@@ -1805,16 +1805,6 @@ private:
                 success = checkKeywordInclude(definition, include) && success;
             }
 
-            // Check that keyword list items do not have duplicated entries
-            QSet<QString> entries;
-            for (const auto &keyword : keywordsIt.value().items.keywords) {
-                if (entries.contains(keyword.content)) {
-                    qWarning() << definition.filename << "line" << keyword.line << "duplicated keyword" << keyword.content;
-                    success = false;
-                }
-                entries.insert(keyword.content);
-            }
-
             // Check that keyword list items do not have deliminator character
 #if 0
             for (const auto& keyword : keywordsIt.value().items.keywords) {
@@ -2938,7 +2928,14 @@ public:
                         writeXmlAttribute(out, attrName, value, tagName);
                     }
                 }
+            } else if (m_inList) {
+                m_inItem = true;
+                m_isIncludeItem = (tagName == u"include"_sv);
             } else {
+                if (tagName == u"list"_sv) {
+                    m_keywords.clear();
+                    m_inList = true;
+                }
                 m_data += u'<' % tagName;
                 const auto attrs = xml.attributes();
                 for (const auto &attr : attrs) {
@@ -2951,8 +2948,21 @@ public:
         }
 
         case QXmlStreamReader::EndElement: {
-            const auto name = xml.name();
-            if (m_inContexts && !m_contexts.empty() && name == u"contexts"_sv) {
+            const auto tagName = xml.name();
+            if (m_inItem) {
+                m_inItem = false;
+                m_hasElems.pop_back();
+                break;
+            } else if (m_inList) {
+                m_inList = false;
+                std::sort(m_keywords.begin(), m_keywords.end());
+                m_keywords.erase(std::unique(m_keywords.begin(), m_keywords.end()), m_keywords.end());
+                for (const auto &item : m_keywords) {
+                    m_data += item.isIncludeTag ? u"<include>"_sv : u"<item>"_sv;
+                    writeXmlText(m_data, item.text);
+                    m_data += item.isIncludeTag ? u"</include>"_sv : u"</item>"_sv;
+                }
+            } else if (m_inContexts && !m_contexts.empty() && tagName == u"contexts"_sv) {
                 m_inContexts = false;
                 // sorting contexts by the most used (ignore first context)
                 std::sort(m_contexts.begin() + 1, m_contexts.end(), [&](auto &ctx1, auto &ctx2) {
@@ -2971,7 +2981,7 @@ public:
 
             QString &out = m_inContexts && !m_contexts.empty() ? m_contexts.back().data : m_data;
             if (m_hasElems.back()) {
-                out += u"</"_sv % name % u'>';
+                out += u"</"_sv % tagName % u'>';
             } else {
                 out += u"/>"_sv;
             }
@@ -2981,9 +2991,8 @@ public:
 
         case QXmlStreamReader::EntityReference:
         case QXmlStreamReader::Characters:
-            if (!m_inContexts && !xml.isWhitespace()) {
-                closePreviousOpenTag(m_data);
-                writeXmlText(m_data, xml.text());
+            if (m_inItem) {
+                m_keywords.push_back({xml.text().toString(), m_isIncludeItem});
             }
             break;
 
@@ -3172,12 +3181,22 @@ private:
         QString name;
         QString data;
     };
+    struct Item {
+        QString text;
+        bool isIncludeTag;
+
+        std::strong_ordering operator<=>(const Item &other) const = default;
+    };
     QString m_data = u"<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE language>"_s;
     std::vector<Context> m_contexts;
     QHash<QString, int> m_contextRefs;
+    std::vector<Item> m_keywords;
     QVarLengthArray<bool, 8> m_hasElems;
     QString m_kateVersion;
     bool m_inContexts = false;
+    bool m_inList = false;
+    bool m_inItem = false;
+    bool m_isIncludeItem = false;
 };
 
 void printFileError(const QFile &file)

@@ -77,6 +77,23 @@ qr(aa(a(a(a(b|c)a)a)a)aa*b?);
 s{aaa {aaa} a \x{A2} *b?}{aa};
 s(aa(a(a(a(b|c)a)a)a)aa)(aa);
 
+# Bracket closures in RegExp replacement
+s(abc) # TODO bla bla
+    (aa{(b)}c)g;
+s(abc) # TODO bla bla
+    [aa{(b)}c]g;
+s(abc) # TODO bla bla
+    {aa{(b)}c}g;
+s[abc] # TODO bla bla
+    (aa{(b)}c);
+s{(abc)} # TODO bla bla
+    [aa{(b)}c]g;
+# any char for replacement
+s{abc} # TODO bla bla
+    +aa{(b)}c+g;
+s{abc} # TODO bla bla
+    ]aa{(b)}c]g; # this is fine
+
 # Strings as scalar references (bug #348765)
 $x = \'Reference of a String';
 $y = \"Reference of a String";

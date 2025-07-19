@@ -48,7 +48,7 @@
     - NOTE, FIXME, TODO alerts added on comments
     - improved highlighting
 -->
-<language name="Lua" version="20" indenter="cstyle" kateversion="5.79" section="Scripts" extensions="*.lua;*.rockspec" mimetype="text/x-lua">
+<language name="Lua" version="21" indenter="cstyle" kateversion="5.79" section="Scripts" extensions="*.lua;*.rockspec" mimetype="text/x-lua">
   <highlighting>
     <list name="keywords">
       <item>and</item>
@@ -553,14 +553,22 @@
         <IncludeRules context="Normal" />
       </context>
 
-      <context name="String_single" attribute="Strings"     lineEndContext="Error">
+      <context name="String_single" attribute="Strings"     lineEndContext="UnclosedString">
         <DetectChar   attribute="Strings"  context="Special_char"  char="\" lookAhead="true"/>
         <DetectChar   attribute="Strings"  context="#pop"  char="'"/>
       </context>
 
-      <context name="String_double" attribute="Strings"     lineEndContext="Error">
+      <context name="String_double" attribute="Strings"     lineEndContext="UnclosedString">
         <DetectChar   attribute="Strings"  context="Special_char"  char="\" lookAhead="true"/>
         <DetectChar   attribute="Strings"  context="#pop"  char="&quot;"/>
+      </context>
+
+      <context name="UnclosedString" attribute="Error" lineEndContext="#stay" fallthroughContext="#pop#pop">
+				<!-- A single string/comment reached the end of the line without a \ line escape -->
+				<!-- We set the following line (or part of it) to the "Error" attribute so that this error is easier to spot -->
+        <DetectSpaces attribute="Error" context="#pop#pop"/>
+        <DetectIdentifier attribute="Error" context="#pop#pop"/>
+				<RegExpr attribute="Error" String="^([^-[()&quot;'\s]|-(?!-)|\[(?!=))+" context="#pop#pop" column="0"/>
       </context>
 
       <context name="Special_char"  attribute="Error"       lineEndContext="#pop">
@@ -579,8 +587,6 @@
         <StringDetect attribute="RawStrings"    context="#pop"  String="]%1]" dynamic="true" />
       </context>
 
-      <context name="Error"         attribute="Error"       lineEndContext="#stay">
-      </context>
     </contexts>
 
     <itemDatas>

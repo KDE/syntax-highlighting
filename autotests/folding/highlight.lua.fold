@@ -82,6 +82,14 @@ a = [==[
 alo
 123"]==]
 
+-- unclosed string
+str = 'bla
+  -- oups :(
+str = 'bla
+str = 'bla
+-- the comment hides the error
+str = 'bla
+-value + 2
 
 -- Decimal
 3

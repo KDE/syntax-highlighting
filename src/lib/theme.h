@@ -137,7 +137,7 @@ public:
      *        Text style for normal comments.
      * \value Documentation
      *        Text style for comments that reflect API documentation, such as
-     *        doxygen \\/** *\\/ comments.
+     *        doxygen comments.
      * \value Annotation
      *        Text style for annotations in comments, such as \a in Doxygen
      *        or JavaDoc.

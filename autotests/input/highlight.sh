@@ -86,6 +86,13 @@ echo $(( cd << ed + 1 ))
 echo $(ls -l)
 echo `cat myfile`
 
+# command subst bash-5.3:
+v=${|ls;}
+v=${ ls -l }; }
+#          ^ ls parameter
+v=${
+  ls -l
+}
 
 # file subst:
 echo $(<$filename)

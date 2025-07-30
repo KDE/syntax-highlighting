@@ -48,3 +48,11 @@ gqe
 set b+1 [incr b]
 set {incr-b} ${b+1}
 puts ${incr-b}
+
+puts [expr 1+2];
+puts bla\x61bla;
+puts bla\1234bla;
+puts text\nbla;
+puts $array(1);
+puts "bla\x61bla\1234bla\nbla$abc $array(1) $a(1,$2)blabla${incr-b}"
+puts $1$a::e$d:e$é$$

@@ -1,0 +1,66 @@
+send_user "password?\ "
+expect_user -re "(.*)\n"
+for <beginfold id='1'>{</beginfold id='1'><endfold id='1'>}</endfold id='1'> 1 <beginfold id='1'>{</beginfold id='1'><endfold id='1'>}</endfold id='1'> <beginfold id='1'>{</beginfold id='1'>
+    if <beginfold id='1'>{</beginfold id='1'>[fork]!=0<endfold id='1'>}</endfold id='1'> <beginfold id='1'>{</beginfold id='1'>sleep 3600;continue<endfold id='1'>}</endfold id='1'>
+    disconnect
+    spawn priv_prog
+    expect Password:
+    send "$expect_out(1,string)\r"
+    exit
+<endfold id='1'>}</endfold id='1'>
+
+expect <beginfold id='1'>{</beginfold id='1'>
+    busy               <beginfold id='1'>{</beginfold id='1'>puts busy\n ; exp_continue<endfold id='1'>}</endfold id='1'>
+    -i $proc2 busy <beginfold id='1'>{</beginfold id='1'>puts busy\n ; exp_continue<endfold id='1'>}</endfold id='1'>
+    -re "failed|invalid password" abort
+    failed             abort
+    "invalid password" abort
+    timeout            abort
+    connected
+<endfold id='1'>}</endfold id='1'>
+
+set expect_out(0,string) cd
+set expect_out(buffer) abcd
+
+expect <beginfold id='1'>{</beginfold id='1'>
+    Password: <beginfold id='1'>{</beginfold id='1'>
+        stty -echo
+        send_user "password (for $user) on $host: "
+        expect_user -re "(.*)\n"
+        send_user "\n"
+        send "$expect_out(1,string)\r"
+        stty echo
+        exp_continue
+    <endfold id='1'>}</endfold id='1'> incorrect <beginfold id='1'>{</beginfold id='1'>
+        send_user "invalid password or account\n"
+        exit
+    <endfold id='1'>}</endfold id='1'> timeout <beginfold id='1'>{</beginfold id='1'>
+        send_user "connection to $host timed out\n"
+        exit
+    <endfold id='1'>}</endfold id='1'> eof <beginfold id='1'>{</beginfold id='1'>
+        send_user \
+            "connection to host failed: $expect_out(buffer)"
+        exit
+    <endfold id='1'>}</endfold id='1'> -re $prompt
+<endfold id='1'>}</endfold id='1'>
+
+stty raw -echo
+expect_after <beginfold id='1'>{</beginfold id='1'>
+    -i $user_spawn_id
+    "p" <beginfold id='1'>{</beginfold id='1'>send "\r\r\r"; exp_continue<endfold id='1'>}</endfold id='1'>
+    "+" <beginfold id='1'>{</beginfold id='1'>incr foo; exp_continue<endfold id='1'>}</endfold id='1'>
+    "i" <beginfold id='1'>{</beginfold id='1'>interact; exp_continue<endfold id='1'>}</endfold id='1'>
+    "quit" exit
+<endfold id='1'>}</endfold id='1'>
+
+set CTRLZ \032
+interact <beginfold id='1'>{</beginfold id='1'>
+    -reset $CTRLZ <beginfold id='1'>{</beginfold id='1'>exec kill -STOP [pid]<endfold id='1'>}</endfold id='1'>
+    \001   <beginfold id='1'>{</beginfold id='1'>send_user "you typed a control-A\n";
+            send "\001"
+           <endfold id='1'>}</endfold id='1'>
+    $      <beginfold id='1'>{</beginfold id='1'>send_user "The date is [clock format [clock seconds]]."<endfold id='1'>}</endfold id='1'>
+    \003   exit
+    foo    <beginfold id='1'>{</beginfold id='1'>send_user "bar"<endfold id='1'>}</endfold id='1'>
+    ~~
+<endfold id='1'>}</endfold id='1'>

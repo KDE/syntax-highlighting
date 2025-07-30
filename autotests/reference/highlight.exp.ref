@@ -1,0 +1,66 @@
+<Keyword>send_user</Keyword><Normal Text> </Normal Text><String>"password?</String><Char>\ </Char><String>"</String><br/>
+<Keyword>expect_user</Keyword><Normal Text> </Normal Text><Parameter>-re</Parameter><Normal Text> </Normal Text><String>"(.*)</String><Char>\n</Char><String>"</String><br/>
+<Control Flow>for</Control Flow><Normal Text> </Normal Text><Block Symbol>{}</Block Symbol><Normal Text> </Normal Text><Decimal>1</Decimal><Normal Text> </Normal Text><Block Symbol>{}</Block Symbol><Normal Text> </Normal Text><Block Symbol>{</Block Symbol><br/>
+<Normal Text>    </Normal Text><Control Flow>if</Control Flow><Normal Text> </Normal Text><Block Symbol>{</Block Symbol><Substitution Symbol>[</Substitution Symbol><Keyword>fork</Keyword><Substitution Symbol>]</Substitution Symbol><Operator>!=</Operator><Decimal>0</Decimal><Block Symbol>}</Block Symbol><Normal Text> </Normal Text><Block Symbol>{</Block Symbol><Keyword>sleep</Keyword><Normal Text> </Normal Text><Decimal>3600</Decimal><Separator Symbol>;</Separator Symbol><Control Flow>continue</Control Flow><Block Symbol>}</Block Symbol><br/>
+<Normal Text>    </Normal Text><Keyword>disconnect</Keyword><br/>
+<Normal Text>    </Normal Text><Keyword>spawn</Keyword><Normal Text> priv_prog</Normal Text><br/>
+<Normal Text>    </Normal Text><Keyword>expect</Keyword><Normal Text> Password</Normal Text><Operator>:</Operator><br/>
+<Normal Text>    </Normal Text><Keyword>send</Keyword><Normal Text> </Normal Text><String>"</String><Variable>$expect_out</Variable><Variable Index Symbol>(</Variable Index Symbol><String Variable Index>1,string</String Variable Index><Variable Index Symbol>)</Variable Index Symbol><Char>\r</Char><String>"</String><br/>
+<Normal Text>    </Normal Text><Control Flow>exit</Control Flow><br/>
+<Block Symbol>}</Block Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>expect</Keyword><Normal Text> </Normal Text><Block Symbol>{</Block Symbol><br/>
+<Normal Text>    busy               </Normal Text><Block Symbol>{</Block Symbol><Keyword>puts</Keyword><Normal Text> busy</Normal Text><Char>\n</Char><Normal Text> </Normal Text><Separator Symbol>;</Separator Symbol><Normal Text> </Normal Text><Control Flow>exp_continue</Control Flow><Block Symbol>}</Block Symbol><br/>
+<Normal Text>    </Normal Text><Parameter>-i</Parameter><Normal Text> </Normal Text><Variable>$proc2</Variable><Normal Text> busy </Normal Text><Block Symbol>{</Block Symbol><Keyword>puts</Keyword><Normal Text> busy</Normal Text><Char>\n</Char><Normal Text> </Normal Text><Separator Symbol>;</Separator Symbol><Normal Text> </Normal Text><Control Flow>exp_continue</Control Flow><Block Symbol>}</Block Symbol><br/>
+<Normal Text>    </Normal Text><Parameter>-re</Parameter><Normal Text> </Normal Text><String>"failed|invalid password"</String><Normal Text> abort</Normal Text><br/>
+<Normal Text>    failed             abort</Normal Text><br/>
+<Normal Text>    </Normal Text><String>"invalid password"</String><Normal Text> abort</Normal Text><br/>
+<Normal Text>    </Normal Text><Pattern>timeout</Pattern><Normal Text>            abort</Normal Text><br/>
+<Normal Text>    connected</Normal Text><br/>
+<Block Symbol>}</Block Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>set</Keyword><Normal Text> expect_out</Normal Text><Symbol>(</Symbol><Decimal>0</Decimal><Normal Text>,string</Normal Text><Symbol>)</Symbol><Normal Text> </Normal Text><Keyword>cd</Keyword><br/>
+<Keyword>set</Keyword><Normal Text> expect_out</Normal Text><Symbol>(</Symbol><Normal Text>buffer</Normal Text><Symbol>)</Symbol><Normal Text> abcd</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>expect</Keyword><Normal Text> </Normal Text><Block Symbol>{</Block Symbol><br/>
+<Normal Text>    Password</Normal Text><Operator>:</Operator><Normal Text> </Normal Text><Block Symbol>{</Block Symbol><br/>
+<Normal Text>        </Normal Text><Keyword>stty</Keyword><Normal Text> </Normal Text><Parameter>-echo</Parameter><br/>
+<Normal Text>        </Normal Text><Keyword>send_user</Keyword><Normal Text> </Normal Text><String>"password (for </String><Variable>$user</Variable><String>) on </String><Variable>$host</Variable><String>: "</String><br/>
+<Normal Text>        </Normal Text><Keyword>expect_user</Keyword><Normal Text> </Normal Text><Parameter>-re</Parameter><Normal Text> </Normal Text><String>"(.*)</String><Char>\n</Char><String>"</String><br/>
+<Normal Text>        </Normal Text><Keyword>send_user</Keyword><Normal Text> </Normal Text><String>"</String><Char>\n</Char><String>"</String><br/>
+<Normal Text>        </Normal Text><Keyword>send</Keyword><Normal Text> </Normal Text><String>"</String><Variable>$expect_out</Variable><Variable Index Symbol>(</Variable Index Symbol><String Variable Index>1,string</String Variable Index><Variable Index Symbol>)</Variable Index Symbol><Char>\r</Char><String>"</String><br/>
+<Normal Text>        </Normal Text><Keyword>stty</Keyword><Normal Text> echo</Normal Text><br/>
+<Normal Text>        </Normal Text><Control Flow>exp_continue</Control Flow><br/>
+<Normal Text>    </Normal Text><Block Symbol>}</Block Symbol><Normal Text> incorrect </Normal Text><Block Symbol>{</Block Symbol><br/>
+<Normal Text>        </Normal Text><Keyword>send_user</Keyword><Normal Text> </Normal Text><String>"invalid password or account</String><Char>\n</Char><String>"</String><br/>
+<Normal Text>        </Normal Text><Control Flow>exit</Control Flow><br/>
+<Normal Text>    </Normal Text><Block Symbol>}</Block Symbol><Normal Text> </Normal Text><Pattern>timeout</Pattern><Normal Text> </Normal Text><Block Symbol>{</Block Symbol><br/>
+<Normal Text>        </Normal Text><Keyword>send_user</Keyword><Normal Text> </Normal Text><String>"connection to </String><Variable>$host</Variable><String> timed out</String><Char>\n</Char><String>"</String><br/>
+<Normal Text>        </Normal Text><Control Flow>exit</Control Flow><br/>
+<Normal Text>    </Normal Text><Block Symbol>}</Block Symbol><Normal Text> </Normal Text><Pattern>eof</Pattern><Normal Text> </Normal Text><Block Symbol>{</Block Symbol><br/>
+<Normal Text>        </Normal Text><Keyword>send_user</Keyword><Normal Text> </Normal Text><Char>\</Char><br/>
+<Normal Text>            </Normal Text><String>"connection to host failed: </String><Variable>$expect_out</Variable><Variable Index Symbol>(</Variable Index Symbol><String Variable Index>buffer</String Variable Index><Variable Index Symbol>)</Variable Index Symbol><String>"</String><br/>
+<Normal Text>        </Normal Text><Control Flow>exit</Control Flow><br/>
+<Normal Text>    </Normal Text><Block Symbol>}</Block Symbol><Normal Text> </Normal Text><Parameter>-re</Parameter><Normal Text> </Normal Text><Variable>$prompt</Variable><br/>
+<Block Symbol>}</Block Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>stty</Keyword><Normal Text> raw </Normal Text><Parameter>-echo</Parameter><br/>
+<Keyword>expect_after</Keyword><Normal Text> </Normal Text><Block Symbol>{</Block Symbol><br/>
+<Normal Text>    </Normal Text><Parameter>-i</Parameter><Normal Text> </Normal Text><Variable>$user_spawn_id</Variable><br/>
+<Normal Text>    </Normal Text><String>"p"</String><Normal Text> </Normal Text><Block Symbol>{</Block Symbol><Keyword>send</Keyword><Normal Text> </Normal Text><String>"</String><Char>\r\r\r</Char><String>"</String><Separator Symbol>;</Separator Symbol><Normal Text> </Normal Text><Control Flow>exp_continue</Control Flow><Block Symbol>}</Block Symbol><br/>
+<Normal Text>    </Normal Text><String>"+"</String><Normal Text> </Normal Text><Block Symbol>{</Block Symbol><Keyword>incr</Keyword><Normal Text> foo</Normal Text><Separator Symbol>;</Separator Symbol><Normal Text> </Normal Text><Control Flow>exp_continue</Control Flow><Block Symbol>}</Block Symbol><br/>
+<Normal Text>    </Normal Text><String>"i"</String><Normal Text> </Normal Text><Block Symbol>{</Block Symbol><Keyword>interact</Keyword><Separator Symbol>;</Separator Symbol><Normal Text> </Normal Text><Control Flow>exp_continue</Control Flow><Block Symbol>}</Block Symbol><br/>
+<Normal Text>    </Normal Text><String>"quit"</String><Normal Text> </Normal Text><Control Flow>exit</Control Flow><br/>
+<Block Symbol>}</Block Symbol><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>set</Keyword><Normal Text> CTRLZ </Normal Text><Char>\032</Char><br/>
+<Keyword>interact</Keyword><Normal Text> </Normal Text><Block Symbol>{</Block Symbol><br/>
+<Normal Text>    </Normal Text><Parameter>-reset</Parameter><Normal Text> </Normal Text><Variable>$CTRLZ</Variable><Normal Text> </Normal Text><Block Symbol>{</Block Symbol><Keyword>exec</Keyword><Normal Text> kill </Normal Text><Parameter>-STOP</Parameter><Normal Text> </Normal Text><Substitution Symbol>[</Substitution Symbol><Keyword>pid</Keyword><Substitution Symbol>]</Substitution Symbol><Block Symbol>}</Block Symbol><br/>
+<Normal Text>    </Normal Text><Char>\001</Char><Normal Text>   </Normal Text><Block Symbol>{</Block Symbol><Keyword>send_user</Keyword><Normal Text> </Normal Text><String>"you typed a control-A</String><Char>\n</Char><String>"</String><Separator Symbol>;</Separator Symbol><br/>
+<Normal Text>            </Normal Text><Keyword>send</Keyword><Normal Text> </Normal Text><String>"</String><Char>\001</Char><String>"</String><br/>
+<Normal Text>           </Normal Text><Block Symbol>}</Block Symbol><br/>
+<Normal Text>    $      </Normal Text><Block Symbol>{</Block Symbol><Keyword>send_user</Keyword><Normal Text> </Normal Text><String>"The date is [clock format [clock seconds]]."</String><Block Symbol>}</Block Symbol><br/>
+<Normal Text>    </Normal Text><Char>\003</Char><Normal Text>   </Normal Text><Control Flow>exit</Control Flow><br/>
+<Normal Text>    foo    </Normal Text><Block Symbol>{</Block Symbol><Keyword>send_user</Keyword><Normal Text> </Normal Text><String>"bar"</String><Block Symbol>}</Block Symbol><br/>
+<Normal Text>    ~~</Normal Text><br/>
+<Block Symbol>}</Block Symbol><br/>

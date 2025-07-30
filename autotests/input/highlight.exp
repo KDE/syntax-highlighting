@@ -1,0 +1,66 @@
+send_user "password?\ "
+expect_user -re "(.*)\n"
+for {} 1 {} {
+    if {[fork]!=0} {sleep 3600;continue}
+    disconnect
+    spawn priv_prog
+    expect Password:
+    send "$expect_out(1,string)\r"
+    exit
+}
+
+expect {
+    busy               {puts busy\n ; exp_continue}
+    -i $proc2 busy {puts busy\n ; exp_continue}
+    -re "failed|invalid password" abort
+    failed             abort
+    "invalid password" abort
+    timeout            abort
+    connected
+}
+
+set expect_out(0,string) cd
+set expect_out(buffer) abcd
+
+expect {
+    Password: {
+        stty -echo
+        send_user "password (for $user) on $host: "
+        expect_user -re "(.*)\n"
+        send_user "\n"
+        send "$expect_out(1,string)\r"
+        stty echo
+        exp_continue
+    } incorrect {
+        send_user "invalid password or account\n"
+        exit
+    } timeout {
+        send_user "connection to $host timed out\n"
+        exit
+    } eof {
+        send_user \
+            "connection to host failed: $expect_out(buffer)"
+        exit
+    } -re $prompt
+}
+
+stty raw -echo
+expect_after {
+    -i $user_spawn_id
+    "p" {send "\r\r\r"; exp_continue}
+    "+" {incr foo; exp_continue}
+    "i" {interact; exp_continue}
+    "quit" exit
+}
+
+set CTRLZ \032
+interact {
+    -reset $CTRLZ {exec kill -STOP [pid]}
+    \001   {send_user "you typed a control-A\n";
+            send "\001"
+           }
+    $      {send_user "The date is [clock format [clock seconds]]."}
+    \003   exit
+    foo    {send_user "bar"}
+    ~~
+}

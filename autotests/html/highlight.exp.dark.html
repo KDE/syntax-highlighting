@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>highlight.exp</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (Expect) - Theme (Breeze Dark)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="font-weight:bold">send_user</span> <span style="color:#f44f4f">"password?</span><span style="color:#3daee9">\ </span><span style="color:#f44f4f">"</span>
+<span style="font-weight:bold">expect_user</span> <span style="color:#27ae60">-re</span> <span style="color:#f44f4f">"(.*)</span><span style="color:#3daee9">\n</span><span style="color:#f44f4f">"</span>
+<span style="color:#fdbc4b;font-weight:bold">for</span> <span style="font-weight:bold">{}</span> <span style="color:#f67400">1</span> <span style="font-weight:bold">{}</span> <span style="font-weight:bold">{</span>
+    <span style="color:#fdbc4b;font-weight:bold">if</span> <span style="font-weight:bold">{</span><span style="font-weight:bold">[</span><span style="font-weight:bold">fork</span><span style="font-weight:bold">]</span><span style="color:#3f8058">!=</span><span style="color:#f67400">0</span><span style="font-weight:bold">}</span> <span style="font-weight:bold">{</span><span style="font-weight:bold">sleep</span> <span style="color:#f67400">3600</span><span style="font-weight:bold">;</span><span style="color:#fdbc4b;font-weight:bold">continue</span><span style="font-weight:bold">}</span>
+    <span style="font-weight:bold">disconnect</span>
+    <span style="font-weight:bold">spawn</span> priv_prog
+    <span style="font-weight:bold">expect</span> Password<span style="color:#3f8058">:</span>
+    <span style="font-weight:bold">send</span> <span style="color:#f44f4f">"</span><span style="color:#2980b9">$expect_out</span><span style="color:#27aeae">(</span><span style="color:#da4453">1,string</span><span style="color:#27aeae">)</span><span style="color:#3daee9">\r</span><span style="color:#f44f4f">"</span>
+    <span style="color:#fdbc4b;font-weight:bold">exit</span>
+<span style="font-weight:bold">}</span>
+
+<span style="font-weight:bold">expect</span> <span style="font-weight:bold">{</span>
+    busy               <span style="font-weight:bold">{</span><span style="font-weight:bold">puts</span> busy<span style="color:#3daee9">\n</span> <span style="font-weight:bold">;</span> <span style="color:#fdbc4b;font-weight:bold">exp_continue</span><span style="font-weight:bold">}</span>
+    <span style="color:#27ae60">-i</span> <span style="color:#2980b9">$proc2</span> busy <span style="font-weight:bold">{</span><span style="font-weight:bold">puts</span> busy<span style="color:#3daee9">\n</span> <span style="font-weight:bold">;</span> <span style="color:#fdbc4b;font-weight:bold">exp_continue</span><span style="font-weight:bold">}</span>
+    <span style="color:#27ae60">-re</span> <span style="color:#f44f4f">"failed|invalid password"</span> abort
+    failed             abort
+    <span style="color:#f44f4f">"invalid password"</span> abort
+    <span style="color:#609ca0">timeout</span>            abort
+    connected
+<span style="font-weight:bold">}</span>
+
+<span style="font-weight:bold">set</span> expect_out(<span style="color:#f67400">0</span>,string) <span style="font-weight:bold">cd</span>
+<span style="font-weight:bold">set</span> expect_out(buffer) abcd
+
+<span style="font-weight:bold">expect</span> <span style="font-weight:bold">{</span>
+    Password<span style="color:#3f8058">:</span> <span style="font-weight:bold">{</span>
+        <span style="font-weight:bold">stty</span> <span style="color:#27ae60">-echo</span>
+        <span style="font-weight:bold">send_user</span> <span style="color:#f44f4f">"password (for </span><span style="color:#2980b9">$user</span><span style="color:#f44f4f">) on </span><span style="color:#2980b9">$host</span><span style="color:#f44f4f">: "</span>
+        <span style="font-weight:bold">expect_user</span> <span style="color:#27ae60">-re</span> <span style="color:#f44f4f">"(.*)</span><span style="color:#3daee9">\n</span><span style="color:#f44f4f">"</span>
+        <span style="font-weight:bold">send_user</span> <span style="color:#f44f4f">"</span><span style="color:#3daee9">\n</span><span style="color:#f44f4f">"</span>
+        <span style="font-weight:bold">send</span> <span style="color:#f44f4f">"</span><span style="color:#2980b9">$expect_out</span><span style="color:#27aeae">(</span><span style="color:#da4453">1,string</span><span style="color:#27aeae">)</span><span style="color:#3daee9">\r</span><span style="color:#f44f4f">"</span>
+        <span style="font-weight:bold">stty</span> echo
+        <span style="color:#fdbc4b;font-weight:bold">exp_continue</span>
+    <span style="font-weight:bold">}</span> incorrect <span style="font-weight:bold">{</span>
+        <span style="font-weight:bold">send_user</span> <span style="color:#f44f4f">"invalid password or account</span><span style="color:#3daee9">\n</span><span style="color:#f44f4f">"</span>
+        <span style="color:#fdbc4b;font-weight:bold">exit</span>
+    <span style="font-weight:bold">}</span> <span style="color:#609ca0">timeout</span> <span style="font-weight:bold">{</span>
+        <span style="font-weight:bold">send_user</span> <span style="color:#f44f4f">"connection to </span><span style="color:#2980b9">$host</span><span style="color:#f44f4f"> timed out</span><span style="color:#3daee9">\n</span><span style="color:#f44f4f">"</span>
+        <span style="color:#fdbc4b;font-weight:bold">exit</span>
+    <span style="font-weight:bold">}</span> <span style="color:#609ca0">eof</span> <span style="font-weight:bold">{</span>
+        <span style="font-weight:bold">send_user</span> <span style="color:#3daee9">\</span>
+            <span style="color:#f44f4f">"connection to host failed: </span><span style="color:#2980b9">$expect_out</span><span style="color:#27aeae">(</span><span style="color:#da4453">buffer</span><span style="color:#27aeae">)</span><span style="color:#f44f4f">"</span>
+        <span style="color:#fdbc4b;font-weight:bold">exit</span>
+    <span style="font-weight:bold">}</span> <span style="color:#27ae60">-re</span> <span style="color:#2980b9">$prompt</span>
+<span style="font-weight:bold">}</span>
+
+<span style="font-weight:bold">stty</span> raw <span style="color:#27ae60">-echo</span>
+<span style="font-weight:bold">expect_after</span> <span style="font-weight:bold">{</span>
+    <span style="color:#27ae60">-i</span> <span style="color:#2980b9">$user_spawn_id</span>
+    <span style="color:#f44f4f">"p"</span> <span style="font-weight:bold">{</span><span style="font-weight:bold">send</span> <span style="color:#f44f4f">"</span><span style="color:#3daee9">\r\r\r</span><span style="color:#f44f4f">"</span><span style="font-weight:bold">;</span> <span style="color:#fdbc4b;font-weight:bold">exp_continue</span><span style="font-weight:bold">}</span>
+    <span style="color:#f44f4f">"+"</span> <span style="font-weight:bold">{</span><span style="font-weight:bold">incr</span> foo<span style="font-weight:bold">;</span> <span style="color:#fdbc4b;font-weight:bold">exp_continue</span><span style="font-weight:bold">}</span>
+    <span style="color:#f44f4f">"i"</span> <span style="font-weight:bold">{</span><span style="font-weight:bold">interact</span><span style="font-weight:bold">;</span> <span style="color:#fdbc4b;font-weight:bold">exp_continue</span><span style="font-weight:bold">}</span>
+    <span style="color:#f44f4f">"quit"</span> <span style="color:#fdbc4b;font-weight:bold">exit</span>
+<span style="font-weight:bold">}</span>
+
+<span style="font-weight:bold">set</span> CTRLZ <span style="color:#3daee9">\032</span>
+<span style="font-weight:bold">interact</span> <span style="font-weight:bold">{</span>
+    <span style="color:#27ae60">-reset</span> <span style="color:#2980b9">$CTRLZ</span> <span style="font-weight:bold">{</span><span style="font-weight:bold">exec</span> kill <span style="color:#27ae60">-STOP</span> <span style="font-weight:bold">[</span><span style="font-weight:bold">pid</span><span style="font-weight:bold">]</span><span style="font-weight:bold">}</span>
+    <span style="color:#3daee9">\001</span>   <span style="font-weight:bold">{</span><span style="font-weight:bold">send_user</span> <span style="color:#f44f4f">"you typed a control-A</span><span style="color:#3daee9">\n</span><span style="color:#f44f4f">"</span><span style="font-weight:bold">;</span>
+            <span style="font-weight:bold">send</span> <span style="color:#f44f4f">"</span><span style="color:#3daee9">\001</span><span style="color:#f44f4f">"</span>
+           <span style="font-weight:bold">}</span>
+    $      <span style="font-weight:bold">{</span><span style="font-weight:bold">send_user</span> <span style="color:#f44f4f">"The date is [clock format [clock seconds]]."</span><span style="font-weight:bold">}</span>
+    <span style="color:#3daee9">\003</span>   <span style="color:#fdbc4b;font-weight:bold">exit</span>
+    foo    <span style="font-weight:bold">{</span><span style="font-weight:bold">send_user</span> <span style="color:#f44f4f">"bar"</span><span style="font-weight:bold">}</span>
+    ~~
+<span style="font-weight:bold">}</span>
+</pre></body></html>

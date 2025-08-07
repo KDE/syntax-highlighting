@@ -1,4 +1,4 @@
-version: 54
+version: 55
 
 global-properties:
   - ALLOW_DUPLICATE_CUSTOM_TARGETS
@@ -120,6 +120,7 @@ target-properties:
   - AUTOMOC_COMPILER_PREDEFINES                             # Since 3.10
   - AUTOMOC_DEPEND_FILTERS
   - AUTOMOC_EXECUTABLE                                      # Since 3.14
+  - AUTOMOC_INCLUDE_DIRECTORIES                             # Since 4.1
   - AUTOMOC_MACRO_NAMES
   - AUTOMOC_MOC_OPTIONS
   - AUTOMOC_PATH_PREFIX                                     # Since 3.16
@@ -284,13 +285,17 @@ target-properties:
   - <LANG>_COMPILER_LAUNCHER
   - <LANG>_CPPCHECK                                         # Since 3.10
   - <LANG>_CPPLINT
+  - <LANG>_ICSTAT                                           # Since 4.1
   - <LANG>_INCLUDE_WHAT_YOU_USE
   - <LANG>_LINKER_LAUNCHER                                  # Since 3.21
+  - <LANG>_STANDARD
+  - <LANG>_STANDARD_REQUIRED
   - <LANG>_VISIBILITY_PRESET
   - LIBRARY_OUTPUT_DIRECTORY_<CONFIG>
   - LIBRARY_OUTPUT_DIRECTORY
   - LIBRARY_OUTPUT_NAME_<CONFIG>
   - LIBRARY_OUTPUT_NAME
+  - SPDX_LICENSE                                            # Since 4.1
   - LINK_DEPENDS_NO_SHARED
   - LINK_DEPENDS
   - LINK_DIRECTORIES                                        # Since 3.13
@@ -782,7 +787,6 @@ variables:
   - CMAKE_ARGC
   - CMAKE_ARGV<n>
   - CMAKE_BINARY_DIR
-  - CMAKE_BUILD_TOOL
   - CMAKE_CACHEFILE_DIR
   - CMAKE_CACHE_MAJOR_VERSION
   - CMAKE_CACHE_MINOR_VERSION
@@ -810,10 +814,12 @@ variables:
   - CMAKE_EXECUTABLE_SUFFIX
   - CMAKE_EXTRA_SHARED_LIBRARY_SUFFIXES
   - CMAKE_FIND_DEBUG_MODE                                   # Since 3.17
+  - CMAKE_FIND_DEBUG_MODE_NO_IMPLICIT_CONFIGURE_LOG         # Since 4.1
   - CMAKE_FIND_PACKAGE_NAME
   - CMAKE_FIND_PACKAGE_REDIRECTS_DIR                        # Since 3.24
   - CMAKE_FIND_PACKAGE_SORT_DIRECTION
   - CMAKE_FIND_PACKAGE_SORT_ORDER
+  - CMAKE_FIND_REQUIRED                                     # Since 4.1
   - CMAKE_GENERATOR
   - CMAKE_GENERATOR_INSTANCE                                # Since 3.11
   - CMAKE_GENERATOR_NO_COMPILER_ENV                         # "Professional CMake" §17.4
@@ -1129,12 +1135,16 @@ variables:
   - CMAKE_APPLE_SILICON_PROCESSOR                           # Since 3.19.2
   - CMAKE_ARCHIVE_OUTPUT_DIRECTORY
   - CMAKE_ARCHIVE_OUTPUT_DIRECTORY_<CONFIG>
+  - CMAKE_AUTOGEN_BETTER_GRAPH_MULTI_CONFIG                 # Since 3.29
+  - CMAKE_AUTOGEN_COMMAND_LINE_LENGTH_MAX                   # Since 3.29
   - CMAKE_AUTOGEN_ORIGIN_DEPENDS                            # Since 3.14
   - CMAKE_AUTOGEN_PARALLEL
   - CMAKE_AUTOGEN_USE_SYSTEM_INCLUDE                        # Since 3.27
   - CMAKE_AUTOGEN_VERBOSE                                   # Since 3.13
   - CMAKE_AUTOMOC
   - CMAKE_AUTOMOC_DEPEND_FILTERS
+  - CMAKE_AUTOMOC_INCLUDE_DIRECTORIES                       # Since 4.1
+  - CMAKE_AUTOMOC_MACRO_NAMES                               # Since 3.10
   - CMAKE_AUTOMOC_MOC_OPTIONS
   - CMAKE_AUTOMOC_PATH_PREFIX                               # Since 3.16
   - CMAKE_AUTOMOC_EXECUTABLE                                # Since 3.27
@@ -1195,6 +1205,7 @@ variables:
   - CMAKE_<LANG>_COMPILER_LAUNCHER
   - CMAKE_<LANG>_CPPCHECK                                   # Since 3.10
   - CMAKE_<LANG>_CPPLINT
+  - CMAKE_<LANG>_ICSTAT                                     # Since 4.1
   - CMAKE_<LANG>_INCLUDE_WHAT_YOU_USE
   - CMAKE_<LANG>_LINK_GROUP_USING_<FEATURE>                 # Since 3.24
   - CMAKE_<LANG>_LINK_GROUP_USING_<FEATURE>_SUPPORTED       # Since 3.24
@@ -1269,6 +1280,8 @@ variables:
   - CMAKE_TRY_COMPILE_TARGET_TYPE
   - CMAKE_UNITY_BUILD                                       # Since 3.16
   - CMAKE_UNITY_BUILD_BATCH_SIZE                            # Since 3.16
+  - CMAKE_UNITY_BUILD_RELOCATABLE                           # Since 4.0
+  - CMAKE_UNITY_BUILD_UNIQUE_ID                             # Since 3.20
   - CMAKE_VERIFY_INTERFACE_HEADER_SETS                      # Since 3.24
   - CMAKE_VISIBILITY_INLINES_HIDDEN
   - CMAKE_VS_DEBUGGER_COMMAND                               # Since 3.27
@@ -1911,10 +1924,11 @@ variables:
   - CPACK_NUGET_<compName>_PACKAGE_TAGS
   - CPACK_NUGET_PACKAGE_DEPENDENCIES
   - CPACK_NUGET_<compName>_PACKAGE_DEPENDENCIES
-    # NOTE The followed two variables are covered by gener  ic `<ID>_VERSION` pattern
+    # NOTE The followed two variables are covered by generic `<ID>_VERSION` pattern
   #- CPACK_NUGET_PACKAGE_DEPENDENCIES_<dependency>_VERSION
-  #- CPACK_NUGET_<compName>_PACKAGE_DEPENDENCIES_<dependen  cy>_VERSION
+  #- CPACK_NUGET_<compName>_PACKAGE_DEPENDENCIES_<dependency>_VERSION
   - CPACK_NUGET_PACKAGE_DEBUG
+  - CPACK_NUGET_SYMBOL_PACKAGE                              # Since 4.1
   # Since 3.30
   - CPACK_NUGET_PACKAGE_README
   - CPACK_NUGET_<compName>_PACKAGE_README
@@ -2004,6 +2018,10 @@ variables:
   - CPACK_RPM_<COMPONENT>_PACKAGE_REQUIRES_PREUN
   - CPACK_RPM_PACKAGE_SUGGESTS
   - CPACK_RPM_<COMPONENT>_PACKAGE_SUGGESTS
+  - CPACK_RPM_PACKAGE_SUPPLEMENTS                           # Since 4.1
+  - CPACK_RPM_<COMPONENT>_PACKAGE_SUPPLEMENTS               # Since 4.1
+  - CPACK_RPM_PACKAGE_ENHANCES                              # Since 4.1
+  - CPACK_RPM_<COMPONENT>_PACKAGE_ENHANCES                  # Since 4.1
   - CPACK_RPM_PACKAGE_PROVIDES
   - CPACK_RPM_<COMPONENT>_PACKAGE_PROVIDES
   - CPACK_RPM_PACKAGE_OBSOLETES
@@ -2217,6 +2235,7 @@ variables:
   - Boost_USE_STATIC_LIBS
   - Boost_USE_DEBUG_RUNTIME
   - Boost_USE_DEBUG_PYTHON
+  - Boost_USE_STATIC_RUNTIME
   - Boost_USE_STLPORT
   - Boost_USE_STLPORT_DEPRECATED_NATIVE_IOSTREAMS
   - Boost_COMPILER
@@ -2919,7 +2938,8 @@ deprecated-or-internal-variables:
   - CMAKE_SYSTEM_ARCH
   # Superseded by `CMAKE_EXECUTABLE_ENABLE_EXPORTS`
   - CMAKE_ENABLE_EXPORTS
-
+  # This variable exists only for backwards compatibility. Use CMAKE_MAKE_PROGRAM.
+  - CMAKE_BUILD_TOOL
 
 
 # https://cmake.org/cmake/help/latest/manual/cmake-env-variables.7.html
@@ -2956,6 +2976,8 @@ environment-variables:
   - CMAKE_INSTALL_MODE                                      # Since 3.22
   - CMAKE_INSTALL_PREFIX                                    # Since 3.29
   - CMAKE_<LANG>_COMPILER_LAUNCHER                          # Since 3.17
+  - CMAKE_<LANG>_IMPLICIT_LINK_DIRECTORIES_EXCLUDE          # Since 3.27
+  - CMAKE_<LANG>_IMPLICIT_LINK_LIBRARIES_EXCLUDE            # Since 4.1
   - CMAKE_<LANG>_LINKER_LAUNCHER                            # Since 3.21
   - CMAKE_MSVCIDE_RUN_PATH
   - CMAKE_NO_VERBOSE
@@ -3163,7 +3185,7 @@ scripting-commands:
       # Hashing
       - HASH
 
-  - name: cmake_pkg_config # Since 3.31
+  - name: cmake_pkg_config                                  # Since 3.31
     named-args:
       - EXTRACT
       - EXACT
@@ -3180,6 +3202,12 @@ scripting-commands:
       - SYSTEM_LIBRARY_DIRS
       - ALLOW_SYSTEM_INCLUDES
       - ALLOW_SYSTEM_LIBS
+        # Since 4.1
+      - POPULATE
+      - BIND_PC_REQUIRES
+      - IMPORT
+      - NAME
+      - PREFIX
     special-args:
       - STRICT
       - PERMISSIVE
@@ -4227,11 +4255,13 @@ project-commands:
       - DESCRIPTION                                         # Since 3.8 or 3.9 (?)
       - HOMEPAGE_URL                                        # Since 3.12
       - LANGUAGES
+      - COMPAT_VERSION                                      # Since 4.1
     special-args:
       - ASM
       - ASM-ATT
       - ASM_NASM
       - ASM_MASM
+      - ASM_MARMASM                                         # Since 3.26
       - C
       - CSharp
       - CXX
@@ -4709,7 +4739,6 @@ modules:
     - FindBoost
     - FindBullet
     - FindBZip2
-    - FindCABLE
     - FindCoin3D
     - FindCUDAToolkit
     - FindCups
@@ -4728,7 +4757,6 @@ modules:
     - FindFLTK2
     - FindFontconfig
     - FindFreetype
-    - FindGCCXML
     - FindGettext
     - FindGIF
     - FindGit
@@ -4894,6 +4922,9 @@ modules:
     # however, the docs claims that they have been deprecated
     - GetPrerequisites
     - TestBigEndian
+    # Deprecated in 4.1
+    - FindGCCXML
+    - FindCABLE
 
 standard-module-commands:
   # AndroidTestUtilities

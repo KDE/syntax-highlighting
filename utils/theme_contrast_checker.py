@@ -277,9 +277,28 @@ if args.scores:
     SPELL_LUMINANCE = scores[10:15]
     DECORATION_LUMINANCE = scores[15:20]
 
-BOLD_TEXT = (BOLD_LUMINANCE, True, 'Text. ▐')
-NORMAL_TEXT = (NORMAL_LUMINANCE, False, 'Text. ▐')
-DECORATION_TEXT = (DECORATION_LUMINANCE, False, 'Text. ▐')
+TEXT_DISPLAY = 'Text. ▐'
+# (luminance, bold, italic, underline, strike_through, text)
+BOLD_TEXT = (BOLD_LUMINANCE, True, False, False, False, TEXT_DISPLAY)
+NORMAL_TEXT = (NORMAL_LUMINANCE, False, False, False, False, TEXT_DISPLAY)
+DECORATION_TEXT = (DECORATION_LUMINANCE, False, False, False, False, TEXT_DISPLAY)
+SPELL_TEXT = (SPELL_LUMINANCE, False, False, False, False, '~~~~~~~')
+
+def make_style_text(styles: dict[str, str | bool]):
+    bold = styles.get('bold', False)
+    italic = styles.get('italic', False)
+    underline = styles.get('underline', False)
+    strike_through = styles.get('strike_through', False)
+
+    return (
+        BOLD_LUMINANCE if bold else NORMAL_LUMINANCE,
+        bold,
+        italic,
+        underline,
+        strike_through,
+        TEXT_DISPLAY
+    )
+
 HEADER = (
     '\x1b[35m'
     ' Background                             |'
@@ -306,6 +325,9 @@ def flum(luminance: float,
          fg: ColorInfo,
          luminance_values: tuple[int, int, int, int, int],
          is_bold: bool,
+         is_italic: bool,
+         is_underline: bool,
+         is_strike_through: bool,
          sample_text: str
          ) -> str:
     """
@@ -337,8 +359,12 @@ def flum(luminance: float,
     (r1, g1, b1) = fg.color
     (r2, g2, b2) = bg.color
     bold = ';1' if is_bold else ''
+    italic = ';3' if is_italic else ''
+    underline = ';4' if is_underline else ''
+    strike_through = ';9' if is_strike_through else ''
     return f'{ffloat(luminance)}{adjusted_text} | {score}\x1b[m  ' \
-           f'\x1b[38;2;{r1};{g1};{b1};48;2;{r2};{g2};{b2}{bold}m {sample_text} \x1b[m'
+           f'\x1b[38;2;{r1};{g1};{b1};48;2;{r2};{g2};{b2}' \
+           f'{bold}{italic}{underline}{strike_through}m {sample_text} \x1b[m'
 
 def color2ansi(rgb: RGBColor) -> str:
     return f'{rgb[0]};{rgb[1]};{rgb[2]}'
@@ -346,34 +372,13 @@ def color2ansi(rgb: RGBColor) -> str:
 spaces = '                                                                    '
 def fcol_impl(name: str, rgb: str, n: int) -> str:
     w = spaces[0: n - (len(name) + len(rgb) + 3)]
-    return f'{name} \x1b[37m({rgb})\x1b[m{w}'
+    return f'{name} ({rgb}){w}'
 
 def fcol1(name: str, rgb: str) -> str:
     return fcol_impl(name, rgb, 38)
 
 def fcol2(name: str, rgb: str) -> str:
     return fcol_impl(name, rgb, 43)
-
-def create_tab_from_text_styles(min_luminance: float,
-                                max_luminance: float,
-                                add_luminance: float,
-                                add_percent_luminance: float,
-                                col1: str,
-                                kstyle: str,
-                                bg: ColorInfo,
-                                text_styles: dict[str, dict[str, str | bool]]
-                                ) -> str:
-    lines = []
-    for name, defs in sorted(text_styles.items()):
-        if style := defs.get(kstyle):
-            fg = ColorInfo(style, bg.color)
-            lum = APCA_contrast(fg.Y, bg.Y)
-            if min_luminance <= abs(lum) <= max_luminance:
-                bold = defs.get('bold', False)
-                result = flum(lum, add_luminance, add_percent_luminance,
-                              bg, fg, *(BOLD_TEXT if bold else NORMAL_TEXT))
-                lines.append(f' {col1} | {fcol2(name, fg.text)} | {result}')
-    return '\n'.join(lines)
 
 
 output = []
@@ -455,7 +460,7 @@ def run_borders(
         if min_luminance <= abs(lum) <= max_luminance:
             col = fcol1(name, bg.text)
             result = flum(lum, add_luminance, add_percent_luminance,
-                          bg, fg_separator, DECORATION_LUMINANCE, False, NORMAL_TEXT[2])
+                          bg, fg_separator, *DECORATION_TEXT)
             output.append(f' {col} | {fcol2("Separator", fg_separator.text)} | {result}\n')
 
 
@@ -488,7 +493,7 @@ def run(d: dict[str, str | dict[str, bool | str | dict[str, bool | str]]],
     output.append('\n\x1b[34mText Area\x1b[m:\n')
 
     editor_bg_colors = {
-        k: (ColorInfo(editor_colors[k], bg_editor.color), 'text-color')
+        k: (ColorInfo(editor_colors[k], bg_editor.color), 'text-color', 'background-color')
         for k in (
             'TemplateReadOnlyPlaceholder',
             'TemplatePlaceholder',
@@ -505,23 +510,37 @@ def run(d: dict[str, str | dict[str, bool | str | dict[str, bool | str]]],
     if not accepted_backgrounds or 'TextSelection' in accepted_backgrounds:
         editor_bg_colors['TextSelection'] = (
             ColorInfo(editor_colors['TextSelection'], bg_editor.color),
-            'selected-text-color'
+            'selected-text-color', 'selected-background-color'
         )
     if not accepted_backgrounds or 'BackgroundColor' in accepted_backgrounds:
-        editor_bg_colors['BackgroundColor'] = (bg_editor, 'text-color')
+        editor_bg_colors['BackgroundColor'] = (bg_editor, 'text-color', 'background-color')
 
     text_styles = d['text-styles']
     custom_styles = d.get('custom-styles', {}) if show_custom_styles else {}
 
-    for name, (bg, kstyle) in editor_bg_colors.items():
-        col = fcol1(name, bg.text)
+    def create_table_from_text_styles(text_styles: dict[str, dict[str, str | bool]]) -> str:
+        lines = []
+        for style_name, styles in sorted(text_styles.items()):
+            if fg_color := styles.get(kstyle):
+                if bg_color := styles.get(kbgstyle):
+                    custom_bg = ColorInfo(bg_color, bg.color)
+                    custom_col1 = fcol1(name, bg.text)
+                else:
+                    custom_bg = bg
+                    custom_col1 = col1
+                fg = ColorInfo(fg_color, custom_bg.color)
+                lum = APCA_contrast(fg.Y, custom_bg.Y)
+                if min_luminance <= abs(lum) <= max_luminance:
+                    result = flum(lum, add_luminance, add_percent_luminance,
+                                  custom_bg, fg, *make_style_text(styles))
+                    lines.append(f' {custom_col1} | {fcol2(style_name, fg.text)} | {result}')
+        return '\n'.join(lines)
+
+    for name, (bg, kstyle, kbgstyle) in editor_bg_colors.items():
+        col1 = fcol1(name, bg.text)
 
         if show_standard_styles:
-            tab = create_tab_from_text_styles(
-                min_luminance, max_luminance,
-                add_luminance, add_percent_luminance,
-                col, kstyle, bg, text_styles
-            )
+            tab = create_table_from_text_styles(text_styles)
 
             #
             # Spell decoration
@@ -531,8 +550,8 @@ def run(d: dict[str, str | dict[str, bool | str | dict[str, bool | str]]],
             lum = APCA_contrast(fg.Y, bg.Y)
             if min_luminance <= abs(lum) <= max_luminance:
                 result = flum(lum, add_luminance, add_percent_luminance,
-                              bg, fg, SPELL_LUMINANCE, False, '~~~~~~~')
-                spell_line = f' {col} | {fcol2(name, fg.text)} | {result}'
+                              bg, fg, *SPELL_TEXT)
+                spell_line = f' {col1} | {fcol2(name, fg.text)} | {result}'
                 tab = f'{tab}\n{spell_line}' if tab else spell_line
 
             if tab:
@@ -542,11 +561,7 @@ def run(d: dict[str, str | dict[str, bool | str | dict[str, bool | str]]],
         for language, defs in sorted(custom_styles.items()):
             if accepted_languages and language not in accepted_languages:
                 continue
-            if tab := create_tab_from_text_styles(
-                min_luminance, max_luminance,
-                add_luminance, add_percent_luminance,
-                col, kstyle, bg, defs
-            ):
+            if tab := create_table_from_text_styles(defs):
                 output.append(f'\n\x1b[36mLanguage: "{language}"\x1b[m:\n{tab}\n')
 
     # ignored:
@@ -643,6 +658,9 @@ if is_html:
 
     ansi_to_html = {
         '1': 'bold',
+        '3': 'italic',
+        '4': 'underline',
+        '9': 'strike_through',
         '31': 'red',
         '32': 'green',
         '33': 'orange',
@@ -717,6 +735,10 @@ pre {{
 }}
 
 .bold {{ font-weight: bold }}
+.italic {{ font-style: italic }}
+.underline {{ text-decoration: underline }}
+.strike_through {{ text-decoration: line-through }}
+.underline.strike_through {{ text-decoration: underline line-through }}
 
 /* light theme */
 

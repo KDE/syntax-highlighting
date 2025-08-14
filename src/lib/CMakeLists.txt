@@ -74,12 +74,11 @@ set(Forwarding_Header_Names
 ecm_generate_headers(CamelCase_HEADERS
     HEADER_NAMES ${Forwarding_Header_Names}
     REQUIRED_HEADERS SyntaxHighlighting_HEADERS
-    OUTPUT_DIR ${CMAKE_BINARY_DIR}/KSyntaxHighlighting/KSyntaxHighlighting
+    SHARED_PREFIX KSyntaxHighlighting
 )
 
 target_include_directories(KF6SyntaxHighlighting
     INTERFACE "$<INSTALL_INTERFACE:${KDE_INSTALL_INCLUDEDIR_KF}/KSyntaxHighlighting>"
-    PUBLIC "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/KSyntaxHighlighting;>"
 )
 
 install(TARGETS KF6SyntaxHighlighting EXPORT KF6SyntaxHighlightingTargets ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})

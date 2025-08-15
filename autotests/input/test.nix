@@ -63,4 +63,12 @@ in {
     };
 
     abc."cde".fgh = abc."cde".fgh;
+
+    attr = 
+      a: b:
+      map (v: v + 1) [1 2 3];
+    attrWithAssert = 
+      a: b:
+      assert a == b;
+      map (v: v + 1) [1 2 3];
 }

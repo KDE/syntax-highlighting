@@ -2,11 +2,11 @@
 # SPDX-FileCopyrightText: 2021 Volker Krause <vkrause@kde.org>
 # SPDX-License-Identifier: BSD-3-Clause
 
-ecm_add_qml_module(kquicksyntaxhighlightingplugin URI "org.kde.syntaxhighlighting")
+ecm_add_qml_module(kquicksyntaxhighlightingplugin URI "org.kde.syntaxhighlighting" GENERATE_PLUGIN_SOURCE VERSION 1.0)
 
 target_sources(kquicksyntaxhighlightingplugin PRIVATE
-    kquicksyntaxhighlightingplugin.cpp
     kquicksyntaxhighlighter.cpp
+    types.cpp
 )
 target_link_libraries(kquicksyntaxhighlightingplugin PRIVATE
     KF6SyntaxHighlighting

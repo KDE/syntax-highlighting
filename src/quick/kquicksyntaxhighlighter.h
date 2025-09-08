@@ -12,6 +12,7 @@
 #include <KSyntaxHighlighting/Theme>
 
 #include <QObject>
+#include <QQmlEngine>
 #include <QVariant>
 
 namespace KSyntaxHighlighting
@@ -83,6 +84,8 @@ class SyntaxHighlighter;
 class KQuickSyntaxHighlighter : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_NAMED_ELEMENT(SyntaxHighlighter)
 
     /*!
      * \qmlproperty QtObject SyntaxHighlighter::textEdit

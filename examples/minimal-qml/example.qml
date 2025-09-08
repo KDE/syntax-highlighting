@@ -7,6 +7,7 @@
 import QtQuick
 import QtQuick.Controls as QQC2
 import org.kde.syntaxhighlighting
+import org.kde.kirigami as Kirigami
 
 QQC2.ScrollView {
     width: 250

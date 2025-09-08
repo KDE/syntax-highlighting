@@ -50,6 +50,7 @@ ecm_generate_export_header(KF6SyntaxHighlighting
     EXCLUDE_DEPRECATED_BEFORE_AND_AT ${EXCLUDE_DEPRECATED_BEFORE_AND_AT}
 )
 
+qt_extract_metatypes(KF6SyntaxHighlighting)
 target_link_libraries(KF6SyntaxHighlighting
     PUBLIC
         Qt6::Gui

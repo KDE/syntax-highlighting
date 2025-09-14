@@ -234,7 +234,7 @@ public:
      * The returned Theme is guaranteed to be a valid theme.
      * \since 5.79
      */
-    Q_INVOKABLE KSyntaxHighlighting::Theme defaultTheme(DefaultTheme t = LightTheme) const;
+    Q_INVOKABLE KSyntaxHighlighting::Theme defaultTheme(KSyntaxHighlighting::Repository::DefaultTheme t = KSyntaxHighlighting::Repository::LightTheme) const;
 
     /*!
      * Returns the best matching theme for the given palette

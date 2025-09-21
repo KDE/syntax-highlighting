@@ -1,0 +1,118 @@
+<Comment># SPARQL Query for Syntax Highlighting Test</Comment><br/>
+<Comment># This query includes a wide range of features to test a highlighter's capabilities.</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Comment># == 1. Prologue: Base URI and Prefixes</Comment><br/>
+<Keyword>BASE</Keyword><Normal Text>          </Normal Text><IRI><http://example.org/book-data/></IRI><br/>
+<Keyword>PREFIX</Keyword><Normal Text> ex:    </Normal Text><IRI><http://example.org/vocab#></IRI><br/>
+<Keyword>PREFIX</Keyword><Normal Text> foaf:  </Normal Text><IRI><http://xmlns.com/foaf/0.1/></IRI><br/>
+<Keyword>PREFIX</Keyword><Normal Text> rdf:   </Normal Text><IRI><http://www.w3.org/1999/02/22-rdf-syntax-ns#></IRI><br/>
+<Keyword>PREFIX</Keyword><Normal Text> rdfs:  </Normal Text><IRI><http://www.w3.org/2000/01/rdf-schema#></IRI><br/>
+<Keyword>PREFIX</Keyword><Normal Text> xsd:   </Normal Text><IRI><http://www.w3.org/2001/XMLSchema#></IRI><br/>
+<Keyword>PREFIX</Keyword><Normal Text> dc:    </Normal Text><IRI><http://purl.org/dc/elements/1.1/></IRI><br/>
+<Normal Text></Normal Text><br/>
+<Comment># == 2. Query Form: SELECT with Expressions and Aggregates</Comment><br/>
+<Keyword>SELECT</Keyword><Normal Text> </Normal Text><Keyword>DISTINCT</Keyword><br/>
+<Normal Text>    ?authorName</Normal Text><br/>
+<Normal Text>    </Normal Text><Operator>(</Operator><Function>UCASE</Function><Operator>(</Operator><Normal Text>?title</Normal Text><Operator>)</Operator><Normal Text> </Normal Text><Keyword>AS</Keyword><Normal Text> ?upperCaseTitle</Normal Text><Operator>)</Operator><br/>
+<Normal Text>    ?publicationDate</Normal Text><br/>
+<Normal Text>    </Normal Text><Comment># Aggregate functions</Comment><br/>
+<Normal Text>    </Normal Text><Operator>(</Operator><Function>COUNT</Function><Operator>(</Operator><Normal Text>?character</Normal Text><Operator>)</Operator><Normal Text> </Normal Text><Keyword>AS</Keyword><Normal Text> ?characterCount</Normal Text><Operator>)</Operator><br/>
+<Normal Text>    </Normal Text><Operator>(</Operator><Function>GROUP_CONCAT</Function><Operator>(</Operator><Keyword>DISTINCT</Keyword><Normal Text> ?genre</Normal Text><Operator>;</Operator><Normal Text> SEPARATOR</Normal Text><Operator>=</Operator><String>", "</String><Operator>)</Operator><Normal Text> </Normal Text><Keyword>AS</Keyword><Normal Text> ?genres</Normal Text><Operator>)</Operator><br/>
+<Normal Text>    </Normal Text><Operator>(</Operator><Function>AVG</Function><Operator>(</Operator><Normal Text>?rating</Normal Text><Operator>)</Operator><Normal Text> </Normal Text><Keyword>AS</Keyword><Normal Text> ?averageRating</Normal Text><Operator>)</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Comment># == 3. Dataset Clause: Defining the Query Target</Comment><br/>
+<Keyword>FROM</Keyword><Normal Text> </Normal Text><IRI><http://example.org/library-main-graph></IRI><br/>
+<Keyword>FROM</Keyword><Normal Text> </Normal Text><Keyword>NAMED</Keyword><Normal Text> </Normal Text><IRI><http://example.org/library-metadata-graph></IRI><br/>
+<Normal Text></Normal Text><br/>
+<Comment># == 4. Query Pattern: The Core Logic</Comment><br/>
+<Keyword>WHERE</Keyword><Normal Text> </Normal Text><Operator>{</Operator><br/>
+<Normal Text>    </Normal Text><Comment># Inline data with VALUES</Comment><br/>
+<Normal Text>    </Normal Text><Keyword>VALUES</Keyword><Normal Text> ?authorType </Normal Text><Operator>{</Operator><Normal Text> foaf:Person ex:FictionalEntity </Normal Text><Operator>}</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Comment># Basic Graph Pattern with various term types</Comment><br/>
+<Normal Text>    ?author a foaf:person </Normal Text><Operator>;</Operator><br/>
+<Normal Text>            rdf:type ?authorType </Normal Text><Operator>;</Operator><br/>
+<Normal Text>            foaf:name ?authorName </Normal Text><Operator>;</Operator><br/>
+<Normal Text>            foaf:birthday ?birthDate </Normal Text><Operator>.</Operator><Normal Text> </Normal Text><Comment># Semicolon for predicate-object lists</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    ?author foaf:smoker true </Normal Text><Operator>.</Operator><br/>
+<Normal Text>    ?author foaf:child false </Normal Text><Operator>.</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Comment># Property path: one or more 'knows' relationships</Comment><br/>
+<Normal Text>    ?author foaf:knows</Normal Text><Operator>+</Operator><Normal Text> ?colleague </Normal Text><Operator>.</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Comment># Nested blank node syntax</Comment><br/>
+<Normal Text>    ?book dc:creator </Normal Text><Operator>[</Operator><Normal Text> foaf:name ?authorName </Normal Text><Operator>]</Operator><Normal Text> </Normal Text><Operator>;</Operator><br/>
+<Normal Text>          dc:title ?title </Normal Text><Operator>;</Operator><br/>
+<Normal Text>          ex:rating ?rating </Normal Text><Operator>.</Operator><Normal Text> </Normal Text><Comment># Period to end the triple block.</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Comment># OPTIONAL block for data that may not exist</Comment><br/>
+<Normal Text>    </Normal Text><Keyword>OPTIONAL</Keyword><Normal Text> </Normal Text><Operator>{</Operator><br/>
+<Normal Text>        ?book ex:hasCharacter ?character </Normal Text><Operator>.</Operator><br/>
+<Normal Text>        ?character foaf:name ?characterName </Normal Text><Operator>.</Operator><br/>
+<Normal Text>    </Normal Text><Operator>}</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Comment># UNION to combine results from alternative patterns</Comment><br/>
+<Normal Text>    </Normal Text><Operator>{</Operator><br/>
+<Normal Text>        ?book ex:genre </Normal Text><String>"Science Fiction"</String><Normal Text>@en </Normal Text><Operator>.</Operator><br/>
+<Normal Text>    </Normal Text><Operator>}</Operator><br/>
+<Normal Text>    </Normal Text><Keyword>UNION</Keyword><br/>
+<Normal Text>    </Normal Text><Operator>{</Operator><br/>
+<Normal Text>        ?book ex:genre </Normal Text><String>"Fantasy"</String><Operator>^^</Operator><Normal Text>xsd:string </Normal Text><Operator>.</Operator><br/>
+<Normal Text>    </Normal Text><Operator>}</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Comment># BIND to compute and assign a new variable</Comment><br/>
+<Normal Text>    </Normal Text><Keyword>BIND</Keyword><Operator>(</Operator><Function>YEAR</Function><Operator>(</Operator><Normal Text>?birthDate</Normal Text><Operator>)</Operator><Normal Text> </Normal Text><Keyword>AS</Keyword><Normal Text> ?birthYear</Normal Text><Operator>)</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Comment># Subquery to pre-filter books</Comment><br/>
+<Normal Text>    </Normal Text><Operator>{</Operator><br/>
+<Normal Text>      </Normal Text><Keyword>SELECT</Keyword><Normal Text> ?book ?publicationDate </Normal Text><Keyword>WHERE</Keyword><Normal Text> </Normal Text><Operator>{</Operator><br/>
+<Normal Text>        ?book dc:date ?publicationDate </Normal Text><Operator>.</Operator><br/>
+<Normal Text>        </Normal Text><Keyword>FILTER</Keyword><Operator>(</Operator><Normal Text>?publicationDate </Normal Text><Operator>></Operator><Normal Text> </Normal Text><String>"2000-01-01T00:00:00"</String><Operator>^^</Operator><Normal Text>xsd:dateTime </Normal Text><Operator>&&</Operator><Normal Text> ?publicationDate </Normal Text><Operator><</Operator><Normal Text> </Normal Text><String>"2010-01-01T00:00:00"</String><Operator>^^</Operator><Normal Text>xsd:dateTime</Normal Text><Operator>)</Operator><br/>
+<Normal Text>      </Normal Text><Operator>}</Operator><br/>
+<Normal Text>      </Normal Text><Keyword>LIMIT</Keyword><Normal Text> </Normal Text><Decimal>100</Decimal><br/>
+<Normal Text>    </Normal Text><Operator>}</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Comment># GRAPH clause to query a specific named graph</Comment><br/>
+<Normal Text>    </Normal Text><Keyword>GRAPH</Keyword><Normal Text> </Normal Text><IRI><http://example.org/library-metadata-graph></IRI><Normal Text> </Normal Text><Operator>{</Operator><br/>
+<Normal Text>        ?book ex:reviewedBy _:reviewer </Normal Text><Operator>.</Operator><Normal Text> </Normal Text><Comment># Blank node label</Comment><br/>
+<Normal Text>    </Normal Text><Operator>}</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Comment># SERVICE clause for federated queries</Comment><br/>
+<Normal Text>    </Normal Text><Keyword>SERVICE</Keyword><Normal Text> </Normal Text><IRI><http://dbpedia.org/sparql></IRI><Normal Text> </Normal Text><Operator>{</Operator><br/>
+<Normal Text>        ?colleague rdfs:label ?colleagueLabel </Normal Text><Operator>.</Operator><br/>
+<Normal Text>        </Normal Text><Keyword>FILTER</Keyword><Operator>(</Operator><Function>LANG</Function><Operator>(</Operator><Normal Text>?colleagueLabel</Normal Text><Operator>)</Operator><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><String>"en"</String><Operator>)</Operator><br/>
+<Normal Text>    </Normal Text><Operator>}</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Comment># FILTER clause with a variety of functions and operators</Comment><br/>
+<Normal Text>    </Normal Text><Keyword>FILTER</Keyword><Normal Text> </Normal Text><Operator>(</Operator><br/>
+<Normal Text>        </Normal Text><Comment># Logical, comparison, and arithmetic</Comment><br/>
+<Normal Text>        </Normal Text><Operator>(</Operator><Normal Text>?rating </Normal Text><Operator>></Operator><Normal Text> </Normal Text><Float>3.5</Float><Normal Text> </Normal Text><Operator>&&</Operator><Normal Text> ?birthYear </Normal Text><Operator><</Operator><Normal Text> </Normal Text><Decimal>1980</Decimal><Operator>)</Operator><Normal Text> </Normal Text><Operator>||</Operator><br/>
+<Normal Text>        </Normal Text><Comment># Regular expression</Comment><br/>
+<Normal Text>        </Normal Text><Function>REGEX</Function><Operator>(</Operator><Normal Text>?authorName</Normal Text><Operator>,</Operator><Normal Text> </Normal Text><String>"^J</String><String Char>\\</String Char><String>.</String><String Char>\\</String Char><String>s?K</String><String Char>\\</String Char><String>."</String><Operator>,</Operator><Normal Text> </Normal Text><String>"i"</String><Operator>)</Operator><Normal Text> </Normal Text><Operator>&&</Operator><br/>
+<Normal Text>        </Normal Text><Comment># Check for existence of a value</Comment><br/>
+<Normal Text>        </Normal Text><Function>BOUND</Function><Operator>(</Operator><Normal Text>?characterName</Normal Text><Operator>)</Operator><Normal Text> </Normal Text><Operator>&&</Operator><br/>
+<Normal Text>        </Normal Text><Comment># String and numeric functions</Comment><br/>
+<Normal Text>        </Normal Text><Operator>(</Operator><Function>STRLEN</Function><Operator>(</Operator><Normal Text>?title</Normal Text><Operator>)</Operator><Normal Text> </Normal Text><Operator>-</Operator><Normal Text> </Normal Text><Decimal>5</Decimal><Normal Text> </Normal Text><Operator>></Operator><Normal Text> </Normal Text><Decimal>10</Decimal><Operator>)</Operator><Normal Text> </Normal Text><Operator>&&</Operator><br/>
+<Normal Text>        </Normal Text><Comment># IN operator</Comment><br/>
+<Normal Text>        ?genre </Normal Text><Keyword>IN</Keyword><Normal Text> </Normal Text><Operator>(</Operator><String>"Fantasy"</String><Operator>,</Operator><Normal Text> </Normal Text><String>"Sci-Fi"</String><Operator>)</Operator><Normal Text> </Normal Text><Operator>&&</Operator><br/>
+<Normal Text>        </Normal Text><Comment># Datatype and language checks</Comment><br/>
+<Normal Text>        </Normal Text><Function>LANGMATCHES</Function><Operator>(</Operator><Function>LANG</Function><Operator>(</Operator><Normal Text>?title</Normal Text><Operator>),</Operator><Normal Text> </Normal Text><String>"en-US"</String><Operator>)</Operator><Normal Text> </Normal Text><Operator>&&</Operator><br/>
+<Normal Text>        </Normal Text><Function>DATATYPE</Function><Operator>(</Operator><Normal Text>?rating</Normal Text><Operator>)</Operator><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> xsd:decimal</Normal Text><br/>
+<Normal Text>    </Normal Text><Operator>)</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text>    </Normal Text><Keyword>FILTER</Keyword><Normal Text> </Normal Text><Keyword>NOT</Keyword><Normal Text> </Normal Text><Keyword>EXISTS</Keyword><Normal Text> </Normal Text><Operator>{</Operator><br/>
+<Normal Text>        ?colleague schema:memberOf ?organization </Normal Text><Operator>.</Operator><br/>
+<Normal Text>    </Normal Text><Operator>}</Operator><br/>
+<Operator>}</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Comment># == 5. Solution Modifiers: Ordering, Grouping, and Slicing</Comment><br/>
+<Keyword>GROUP</Keyword><Normal Text> </Normal Text><Keyword>BY</Keyword><Normal Text> ?authorName ?title ?publicationDate</Normal Text><br/>
+<Keyword>HAVING</Keyword><Normal Text> </Normal Text><Operator>(</Operator><Function>COUNT</Function><Operator>(</Operator><Normal Text>?character</Normal Text><Operator>)</Operator><Normal Text> </Normal Text><Operator>>=</Operator><Normal Text> </Normal Text><Decimal>2</Decimal><Operator>)</Operator><Normal Text> </Normal Text><Comment># Filter on aggregate results</Comment><br/>
+<Keyword>ORDER</Keyword><Normal Text> </Normal Text><Keyword>BY</Keyword><Normal Text> </Normal Text><Keyword>DESC</Keyword><Operator>(</Operator><Normal Text>?averageRating</Normal Text><Operator>)</Operator><Normal Text> </Normal Text><Keyword>ASC</Keyword><Operator>(</Operator><Normal Text>?authorName</Normal Text><Operator>)</Operator><br/>
+<Keyword>LIMIT</Keyword><Normal Text> </Normal Text><Decimal>10</Decimal><br/>
+<Keyword>OFFSET</Keyword><Normal Text> </Normal Text><Decimal>20</Decimal><br/>
+<Normal Text></Normal Text><br/>
+<Comment># == Other SPARQL Keywords (for syntax highlighting completeness)</Comment><br/>
+<Comment># CONSTRUCT, DESCRIBE, ASK (alternative query forms)</Comment><br/>
+<Comment># INSERT DATA, DELETE DATA, LOAD, CLEAR, CREATE, DROP (update operations)</Comment><br/>

@@ -1,0 +1,118 @@
+# SPARQL Query for Syntax Highlighting Test
+# This query includes a wide range of features to test a highlighter's capabilities.
+
+# == 1. Prologue: Base URI and Prefixes
+BASE          <http://example.org/book-data/>
+PREFIX ex:    <http://example.org/vocab#>
+PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
+PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>
+PREFIX dc:    <http://purl.org/dc/elements/1.1/>
+
+# == 2. Query Form: SELECT with Expressions and Aggregates
+SELECT DISTINCT
+    ?authorName
+    (UCASE(?title) AS ?upperCaseTitle)
+    ?publicationDate
+    # Aggregate functions
+    (COUNT(?character) AS ?characterCount)
+    (GROUP_CONCAT(DISTINCT ?genre; SEPARATOR=", ") AS ?genres)
+    (AVG(?rating) AS ?averageRating)
+
+# == 3. Dataset Clause: Defining the Query Target
+FROM <http://example.org/library-main-graph>
+FROM NAMED <http://example.org/library-metadata-graph>
+
+# == 4. Query Pattern: The Core Logic
+WHERE {
+    # Inline data with VALUES
+    VALUES ?authorType { foaf:Person ex:FictionalEntity }
+
+    # Basic Graph Pattern with various term types
+    ?author a foaf:person ;
+            rdf:type ?authorType ;
+            foaf:name ?authorName ;
+            foaf:birthday ?birthDate . # Semicolon for predicate-object lists
+
+    ?author foaf:smoker true .
+    ?author foaf:child false .
+
+    # Property path: one or more 'knows' relationships
+    ?author foaf:knows+ ?colleague .
+
+    # Nested blank node syntax
+    ?book dc:creator [ foaf:name ?authorName ] ;
+          dc:title ?title ;
+          ex:rating ?rating . # Period to end the triple block.
+
+    # OPTIONAL block for data that may not exist
+    OPTIONAL {
+        ?book ex:hasCharacter ?character .
+        ?character foaf:name ?characterName .
+    }
+
+    # UNION to combine results from alternative patterns
+    {
+        ?book ex:genre "Science Fiction"@en .
+    }
+    UNION
+    {
+        ?book ex:genre "Fantasy"^^xsd:string .
+    }
+
+    # BIND to compute and assign a new variable
+    BIND(YEAR(?birthDate) AS ?birthYear)
+
+    # Subquery to pre-filter books
+    {
+      SELECT ?book ?publicationDate WHERE {
+        ?book dc:date ?publicationDate .
+        FILTER(?publicationDate > "2000-01-01T00:00:00"^^xsd:dateTime && ?publicationDate < "2010-01-01T00:00:00"^^xsd:dateTime)
+      }
+      LIMIT 100
+    }
+
+    # GRAPH clause to query a specific named graph
+    GRAPH <http://example.org/library-metadata-graph> {
+        ?book ex:reviewedBy _:reviewer . # Blank node label
+    }
+
+    # SERVICE clause for federated queries
+    SERVICE <http://dbpedia.org/sparql> {
+        ?colleague rdfs:label ?colleagueLabel .
+        FILTER(LANG(?colleagueLabel) = "en")
+    }
+
+    # FILTER clause with a variety of functions and operators
+    FILTER (
+        # Logical, comparison, and arithmetic
+        (?rating > 3.5 && ?birthYear < 1980) ||
+        # Regular expression
+        REGEX(?authorName, "^J\\.\\s?K\\.", "i") &&
+        # Check for existence of a value
+        BOUND(?characterName) &&
+        # String and numeric functions
+        (STRLEN(?title) - 5 > 10) &&
+        # IN operator
+        ?genre IN ("Fantasy", "Sci-Fi") &&
+        # Datatype and language checks
+        LANGMATCHES(LANG(?title), "en-US") &&
+        DATATYPE(?rating) = xsd:decimal
+    )
+
+    FILTER NOT EXISTS {
+        ?colleague schema:memberOf ?organization .
+    }
+}
+
+# == 5. Solution Modifiers: Ordering, Grouping, and Slicing
+GROUP BY ?authorName ?title ?publicationDate
+HAVING (COUNT(?character) >= 2) # Filter on aggregate results
+ORDER BY DESC(?averageRating) ASC(?authorName)
+LIMIT 10
+OFFSET 20
+
+# == Other SPARQL Keywords (for syntax highlighting completeness)
+# CONSTRUCT, DESCRIBE, ASK (alternative query forms)
+# INSERT DATA, DELETE DATA, LOAD, CLEAR, CREATE, DROP (update operations)

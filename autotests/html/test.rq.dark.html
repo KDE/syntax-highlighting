@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>test.rq</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (SPARQL) - Theme (Breeze Dark)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="color:#7a7c7d"># SPARQL Query for Syntax Highlighting Test</span>
+<span style="color:#7a7c7d"># This query includes a wide range of features to test a highlighter's capabilities.</span>
+
+<span style="color:#7a7c7d"># == 1. Prologue: Base URI and Prefixes</span>
+<span style="font-weight:bold">BASE</span>          <span style="color:#f44f4f">&lt;http://example.org/book-data/></span>
+<span style="font-weight:bold">PREFIX</span> ex:    <span style="color:#f44f4f">&lt;http://example.org/vocab#></span>
+<span style="font-weight:bold">PREFIX</span> foaf:  <span style="color:#f44f4f">&lt;http://xmlns.com/foaf/0.1/></span>
+<span style="font-weight:bold">PREFIX</span> rdf:   <span style="color:#f44f4f">&lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#></span>
+<span style="font-weight:bold">PREFIX</span> rdfs:  <span style="color:#f44f4f">&lt;http://www.w3.org/2000/01/rdf-schema#></span>
+<span style="font-weight:bold">PREFIX</span> xsd:   <span style="color:#f44f4f">&lt;http://www.w3.org/2001/XMLSchema#></span>
+<span style="font-weight:bold">PREFIX</span> dc:    <span style="color:#f44f4f">&lt;http://purl.org/dc/elements/1.1/></span>
+
+<span style="color:#7a7c7d"># == 2. Query Form: SELECT with Expressions and Aggregates</span>
+<span style="font-weight:bold">SELECT</span> <span style="font-weight:bold">DISTINCT</span>
+    ?authorName
+    <span style="color:#3f8058">(</span><span style="color:#8e44ad">UCASE</span><span style="color:#3f8058">(</span>?title<span style="color:#3f8058">)</span> <span style="font-weight:bold">AS</span> ?upperCaseTitle<span style="color:#3f8058">)</span>
+    ?publicationDate
+    <span style="color:#7a7c7d"># Aggregate functions</span>
+    <span style="color:#3f8058">(</span><span style="color:#8e44ad">COUNT</span><span style="color:#3f8058">(</span>?character<span style="color:#3f8058">)</span> <span style="font-weight:bold">AS</span> ?characterCount<span style="color:#3f8058">)</span>
+    <span style="color:#3f8058">(</span><span style="color:#8e44ad">GROUP_CONCAT</span><span style="color:#3f8058">(</span><span style="font-weight:bold">DISTINCT</span> ?genre<span style="color:#3f8058">;</span> SEPARATOR<span style="color:#3f8058">=</span><span style="color:#f44f4f">", "</span><span style="color:#3f8058">)</span> <span style="font-weight:bold">AS</span> ?genres<span style="color:#3f8058">)</span>
+    <span style="color:#3f8058">(</span><span style="color:#8e44ad">AVG</span><span style="color:#3f8058">(</span>?rating<span style="color:#3f8058">)</span> <span style="font-weight:bold">AS</span> ?averageRating<span style="color:#3f8058">)</span>
+
+<span style="color:#7a7c7d"># == 3. Dataset Clause: Defining the Query Target</span>
+<span style="font-weight:bold">FROM</span> <span style="color:#f44f4f">&lt;http://example.org/library-main-graph></span>
+<span style="font-weight:bold">FROM</span> <span style="font-weight:bold">NAMED</span> <span style="color:#f44f4f">&lt;http://example.org/library-metadata-graph></span>
+
+<span style="color:#7a7c7d"># == 4. Query Pattern: The Core Logic</span>
+<span style="font-weight:bold">WHERE</span> <span style="color:#3f8058">{</span>
+    <span style="color:#7a7c7d"># Inline data with VALUES</span>
+    <span style="font-weight:bold">VALUES</span> ?authorType <span style="color:#3f8058">{</span> foaf:Person ex:FictionalEntity <span style="color:#3f8058">}</span>
+
+    <span style="color:#7a7c7d"># Basic Graph Pattern with various term types</span>
+    ?author a foaf:person <span style="color:#3f8058">;</span>
+            rdf:type ?authorType <span style="color:#3f8058">;</span>
+            foaf:name ?authorName <span style="color:#3f8058">;</span>
+            foaf:birthday ?birthDate <span style="color:#3f8058">.</span> <span style="color:#7a7c7d"># Semicolon for predicate-object lists</span>
+
+    ?author foaf:smoker true <span style="color:#3f8058">.</span>
+    ?author foaf:child false <span style="color:#3f8058">.</span>
+
+    <span style="color:#7a7c7d"># Property path: one or more 'knows' relationships</span>
+    ?author foaf:knows<span style="color:#3f8058">+</span> ?colleague <span style="color:#3f8058">.</span>
+
+    <span style="color:#7a7c7d"># Nested blank node syntax</span>
+    ?book dc:creator <span style="color:#3f8058">[</span> foaf:name ?authorName <span style="color:#3f8058">]</span> <span style="color:#3f8058">;</span>
+          dc:title ?title <span style="color:#3f8058">;</span>
+          ex:rating ?rating <span style="color:#3f8058">.</span> <span style="color:#7a7c7d"># Period to end the triple block.</span>
+
+    <span style="color:#7a7c7d"># OPTIONAL block for data that may not exist</span>
+    <span style="font-weight:bold">OPTIONAL</span> <span style="color:#3f8058">{</span>
+        ?book ex:hasCharacter ?character <span style="color:#3f8058">.</span>
+        ?character foaf:name ?characterName <span style="color:#3f8058">.</span>
+    <span style="color:#3f8058">}</span>
+
+    <span style="color:#7a7c7d"># UNION to combine results from alternative patterns</span>
+    <span style="color:#3f8058">{</span>
+        ?book ex:genre <span style="color:#f44f4f">"Science Fiction"</span>@en <span style="color:#3f8058">.</span>
+    <span style="color:#3f8058">}</span>
+    <span style="font-weight:bold">UNION</span>
+    <span style="color:#3f8058">{</span>
+        ?book ex:genre <span style="color:#f44f4f">"Fantasy"</span><span style="color:#3f8058">^^</span>xsd:string <span style="color:#3f8058">.</span>
+    <span style="color:#3f8058">}</span>
+
+    <span style="color:#7a7c7d"># BIND to compute and assign a new variable</span>
+    <span style="font-weight:bold">BIND</span><span style="color:#3f8058">(</span><span style="color:#8e44ad">YEAR</span><span style="color:#3f8058">(</span>?birthDate<span style="color:#3f8058">)</span> <span style="font-weight:bold">AS</span> ?birthYear<span style="color:#3f8058">)</span>
+
+    <span style="color:#7a7c7d"># Subquery to pre-filter books</span>
+    <span style="color:#3f8058">{</span>
+      <span style="font-weight:bold">SELECT</span> ?book ?publicationDate <span style="font-weight:bold">WHERE</span> <span style="color:#3f8058">{</span>
+        ?book dc:date ?publicationDate <span style="color:#3f8058">.</span>
+        <span style="font-weight:bold">FILTER</span><span style="color:#3f8058">(</span>?publicationDate <span style="color:#3f8058">></span> <span style="color:#f44f4f">"2000-01-01T00:00:00"</span><span style="color:#3f8058">^^</span>xsd:dateTime <span style="color:#3f8058">&amp;&amp;</span> ?publicationDate <span style="color:#3f8058">&lt;</span> <span style="color:#f44f4f">"2010-01-01T00:00:00"</span><span style="color:#3f8058">^^</span>xsd:dateTime<span style="color:#3f8058">)</span>
+      <span style="color:#3f8058">}</span>
+      <span style="font-weight:bold">LIMIT</span> <span style="color:#f67400">100</span>
+    <span style="color:#3f8058">}</span>
+
+    <span style="color:#7a7c7d"># GRAPH clause to query a specific named graph</span>
+    <span style="font-weight:bold">GRAPH</span> <span style="color:#f44f4f">&lt;http://example.org/library-metadata-graph></span> <span style="color:#3f8058">{</span>
+        ?book ex:reviewedBy _:reviewer <span style="color:#3f8058">.</span> <span style="color:#7a7c7d"># Blank node label</span>
+    <span style="color:#3f8058">}</span>
+
+    <span style="color:#7a7c7d"># SERVICE clause for federated queries</span>
+    <span style="font-weight:bold">SERVICE</span> <span style="color:#f44f4f">&lt;http://dbpedia.org/sparql></span> <span style="color:#3f8058">{</span>
+        ?colleague rdfs:label ?colleagueLabel <span style="color:#3f8058">.</span>
+        <span style="font-weight:bold">FILTER</span><span style="color:#3f8058">(</span><span style="color:#8e44ad">LANG</span><span style="color:#3f8058">(</span>?colleagueLabel<span style="color:#3f8058">)</span> <span style="color:#3f8058">=</span> <span style="color:#f44f4f">"en"</span><span style="color:#3f8058">)</span>
+    <span style="color:#3f8058">}</span>
+
+    <span style="color:#7a7c7d"># FILTER clause with a variety of functions and operators</span>
+    <span style="font-weight:bold">FILTER</span> <span style="color:#3f8058">(</span>
+        <span style="color:#7a7c7d"># Logical, comparison, and arithmetic</span>
+        <span style="color:#3f8058">(</span>?rating <span style="color:#3f8058">></span> <span style="color:#f67400">3.5</span> <span style="color:#3f8058">&amp;&amp;</span> ?birthYear <span style="color:#3f8058">&lt;</span> <span style="color:#f67400">1980</span><span style="color:#3f8058">)</span> <span style="color:#3f8058">||</span>
+        <span style="color:#7a7c7d"># Regular expression</span>
+        <span style="color:#8e44ad">REGEX</span><span style="color:#3f8058">(</span>?authorName<span style="color:#3f8058">,</span> <span style="color:#f44f4f">"^J</span><span style="color:#3daee9">\\</span><span style="color:#f44f4f">.</span><span style="color:#3daee9">\\</span><span style="color:#f44f4f">s?K</span><span style="color:#3daee9">\\</span><span style="color:#f44f4f">."</span><span style="color:#3f8058">,</span> <span style="color:#f44f4f">"i"</span><span style="color:#3f8058">)</span> <span style="color:#3f8058">&amp;&amp;</span>
+        <span style="color:#7a7c7d"># Check for existence of a value</span>
+        <span style="color:#8e44ad">BOUND</span><span style="color:#3f8058">(</span>?characterName<span style="color:#3f8058">)</span> <span style="color:#3f8058">&amp;&amp;</span>
+        <span style="color:#7a7c7d"># String and numeric functions</span>
+        <span style="color:#3f8058">(</span><span style="color:#8e44ad">STRLEN</span><span style="color:#3f8058">(</span>?title<span style="color:#3f8058">)</span> <span style="color:#3f8058">-</span> <span style="color:#f67400">5</span> <span style="color:#3f8058">></span> <span style="color:#f67400">10</span><span style="color:#3f8058">)</span> <span style="color:#3f8058">&amp;&amp;</span>
+        <span style="color:#7a7c7d"># IN operator</span>
+        ?genre <span style="font-weight:bold">IN</span> <span style="color:#3f8058">(</span><span style="color:#f44f4f">"Fantasy"</span><span style="color:#3f8058">,</span> <span style="color:#f44f4f">"Sci-Fi"</span><span style="color:#3f8058">)</span> <span style="color:#3f8058">&amp;&amp;</span>
+        <span style="color:#7a7c7d"># Datatype and language checks</span>
+        <span style="color:#8e44ad">LANGMATCHES</span><span style="color:#3f8058">(</span><span style="color:#8e44ad">LANG</span><span style="color:#3f8058">(</span>?title<span style="color:#3f8058">),</span> <span style="color:#f44f4f">"en-US"</span><span style="color:#3f8058">)</span> <span style="color:#3f8058">&amp;&amp;</span>
+        <span style="color:#8e44ad">DATATYPE</span><span style="color:#3f8058">(</span>?rating<span style="color:#3f8058">)</span> <span style="color:#3f8058">=</span> xsd:decimal
+    <span style="color:#3f8058">)</span>
+
+    <span style="font-weight:bold">FILTER</span> <span style="font-weight:bold">NOT</span> <span style="font-weight:bold">EXISTS</span> <span style="color:#3f8058">{</span>
+        ?colleague schema:memberOf ?organization <span style="color:#3f8058">.</span>
+    <span style="color:#3f8058">}</span>
+<span style="color:#3f8058">}</span>
+
+<span style="color:#7a7c7d"># == 5. Solution Modifiers: Ordering, Grouping, and Slicing</span>
+<span style="font-weight:bold">GROUP</span> <span style="font-weight:bold">BY</span> ?authorName ?title ?publicationDate
+<span style="font-weight:bold">HAVING</span> <span style="color:#3f8058">(</span><span style="color:#8e44ad">COUNT</span><span style="color:#3f8058">(</span>?character<span style="color:#3f8058">)</span> <span style="color:#3f8058">>=</span> <span style="color:#f67400">2</span><span style="color:#3f8058">)</span> <span style="color:#7a7c7d"># Filter on aggregate results</span>
+<span style="font-weight:bold">ORDER</span> <span style="font-weight:bold">BY</span> <span style="font-weight:bold">DESC</span><span style="color:#3f8058">(</span>?averageRating<span style="color:#3f8058">)</span> <span style="font-weight:bold">ASC</span><span style="color:#3f8058">(</span>?authorName<span style="color:#3f8058">)</span>
+<span style="font-weight:bold">LIMIT</span> <span style="color:#f67400">10</span>
+<span style="font-weight:bold">OFFSET</span> <span style="color:#f67400">20</span>
+
+<span style="color:#7a7c7d"># == Other SPARQL Keywords (for syntax highlighting completeness)</span>
+<span style="color:#7a7c7d"># CONSTRUCT, DESCRIBE, ASK (alternative query forms)</span>
+<span style="color:#7a7c7d"># INSERT DATA, DELETE DATA, LOAD, CLEAR, CREATE, DROP (update operations)</span>
+</pre></body></html>

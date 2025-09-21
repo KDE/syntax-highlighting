@@ -391,7 +391,7 @@ public:
      * Returns the marker that starts a single line comment.
      * For instance, in C++ the single line comment marker is "//".
      * \since 5.50
-     * \sa singleLineCommentPosition();
+     * \sa singleLineCommentPosition()
      */
     QString singleLineCommentMarker() const;
 
@@ -399,7 +399,7 @@ public:
      * Returns the insert position of the comment marker for sinle line
      * comments.
      * \since 5.50
-     * \sa singleLineCommentMarker();
+     * \sa singleLineCommentMarker()
      */
     CommentPosition singleLineCommentPosition() const;
 

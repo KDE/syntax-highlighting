@@ -209,10 +209,10 @@ namespace
 {
 
 struct KateVersion {
-    int majorRevision;
-    int minorRevision;
+    uint majorRevision;
+    uint minorRevision;
 
-    KateVersion(int majorRevision = 0, int minorRevision = 0)
+    KateVersion(uint majorRevision = 0, uint minorRevision = 0)
         : majorRevision(majorRevision)
         , minorRevision(minorRevision)
     {
@@ -237,11 +237,18 @@ public:
         m_currentContext = nullptr;
 
         const auto idx = verStr.indexOf(u'.');
-        if (idx <= 0) {
-            qWarning() << filename << "invalid kateversion" << verStr;
+        bool okVersion = idx > 0;
+        if (okVersion) {
+            m_currentDefinition->kateVersion = {
+                verStr.sliced(0, idx).toUInt(&okVersion),
+                verStr.sliced(idx + 1).toUInt(&okVersion),
+            };
+        }
+        if (!okVersion) {
+            qWarning() << filename << "invalid kateversion. The expected format is 'major.minor' (e.g. \"5.79\")." << verStr;
             m_success = false;
-        } else {
-            m_currentDefinition->kateVersion = {verStr.sliced(0, idx).toInt(), verStr.sliced(idx + 1).toInt()};
+            // continue with a recent version to avoid warning such as "available from XXX"
+            m_currentDefinition->kateVersion = {9999999, 0};
         }
 
         auto checkName = [this, &filename](char const *nameType, const QString &name) {

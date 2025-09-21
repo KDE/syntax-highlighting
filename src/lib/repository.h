@@ -215,11 +215,9 @@ public:
     Q_INVOKABLE KSyntaxHighlighting::Theme theme(const QString &themeName) const;
 
     /*!
-     * \enum ResolveState
-     *
      * Built-in default theme types.
      * \sa defaultTheme()
-     * 
+     *
      * \value LightTheme
      * \value DarkTheme
      */

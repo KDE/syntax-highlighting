@@ -195,12 +195,10 @@ public:
     Q_ENUM(TextStyle)
 
     /*!
-     * \enum EditorColorRole
-     * 
      * Editor color roles, used to paint line numbers, editor background etc.
      * The colors typically should have good contrast with the colors used
      * in the TextStyle%s.
-     * 
+     *
      * \value BackgroundColor
      *        Background color for the editing area.
      * \value TextSelection

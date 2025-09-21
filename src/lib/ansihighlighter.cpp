@@ -13,7 +13,6 @@
 #include "ksyntaxhighlighting_logging.h"
 #include "state.h"
 #include "state_p.h"
-#include "theme.h"
 
 #include <QColor>
 #include <QFile>

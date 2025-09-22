@@ -1,0 +1,132 @@
+xkb_keymap {
+    xkb_keycodes  { include "evdev+aliases(qwerty)" };
+    xkb_types     { include "complete"  };
+    xkb_compat    { include "complete"  };
+    xkb_symbols   { include "pc+us(dvorak)+inet(evdev)+terminate(ctrl_alt_bksp)"    };
+    xkb_geometry  { include "pc(pc105)" };
+};
+
+default partial alphanumeric_keys modifier_keys
+xkb_symbols "basic" {
+    include "us(basic)"
+    include "/usr/share/X11/xkb/symbols/it"
+    include "B(S1)|B(S2)"
+    include "%S/de(basic)"
+    override "B(S1)|B(S2)"
+
+    name[Group1] = "Banana (US)";
+ 
+    key <AE01> { [ exclam,          1]     };
+    key <AE12> { [ plus,            equal] };
+    key <A> { [Greek_alpha, Greek_ALPHA, ae, AE] };
+    key <AD05> { [t, T, tslash, Tslash] };       // Type: FOUR_LEVEL_ALPHABETIC
+    key <AD01> { [], [], [ q, Q ] };
+    key <AD05> { [ b, B, U1F966 ]};
+    key <> { [NoSymbol, a, b, {a, b}] };
+
+    key <LALT> { virtualModifier = Alt   }; // Alt is bound to <LALT>
+
+    key <LALT> {
+        symbols[Group1]=[Alt_L],
+        actions[Group1]=[SetMods(modifiers=modMapMods)]
+
+        repeat = False,
+        [ Alt_L ]
+    };
+
+    key <AD01> {
+        type[Group1] = "TWO_LEVEL", // Type
+        [q, Q]                      // Symbols
+    };
+
+    key <LCTL> {
+        symbols[1] = [ Control_L                                          ],
+        actions[1] = [ { SetMods(modifiers=Control), SetGroup(group=+1) } ]
+    };
+
+    override key <AC11> {[ agrave,      adiaeresis,     braceleft       ]};
+    replace key <PRSC> {[  Super_R,  Super_R  ]};
+    modifier_map Mod4 { <PRSC>, <RWIN> };
+};
+ 
+// Mandatory to extend the
+! include %S/evdev
+ 
+! option     = symbols
+  custom:foo = +custom(bar)
+  custom:baz = +other(baz)
+
+// Explicit default section with no name required
+partial alphanumeric_keys
+xkb_symbols { include "us(basic)" };
+
+xkb_keycodes "jp106" {
+    include "sgi_vndr/indigo(pc101)"
+    <VOL-> = 122;
+    <HZTG> = 22;
+    alias <AE13> = <BKSL>;
+    augment "sgi_vndr/indy(pc101)"
+    alternate <BKSL> = 100;
+    minimum = 8;
+    maximum = 255;
+};
+
+xkb_types {
+    // ...
+    type "TWO_LEVEL_PLUS_CONTROL" {
+        modifiers = Shift + Control;
+        map[None]          = Level1;
+        map[Shift]         = Level2;
+        map[Control]       = Level3;
+        map[Control+Shift] = Level4;
+        // Using preserve will make Control not consumed and allow
+        // applications to detect keyboard shortcuts with alternative
+        // keysyms in levels 3 and 4 rather than the levels 1 and 2.
+        preserve[Control]       = Control;
+        preserve[Control+Shift] = Control;
+        preserve[Shift+Lock+LevelThree] = Lock;
+        level_name[Level1] = "Base";
+        level_name[Level2] = "Shift";
+        level_name[Level3] = "Tweaked Control";
+        level_name[Level4] = "Tweaked Control + Shift";
+    };
+};
+
+default partial xkb_compatibility "basic" {
+    interpret AccessX_Enable {
+        action = LockControls(controls=AccessXKeys);
+    };
+};
+
+default xkb_compatibility "basic" {
+    virtual_modifiers  NumLock;
+
+    interpret.repeat = False;
+    setMods.clearLocks = True;
+    latchMods.clearLocks = True;
+
+    interpret Shift_Lock+AnyOf(Shift+Lock) {
+        action = LockMods(modifiers=Shift);
+    };
+
+    interpret Num_Lock+Any {
+        virtualModifier = NumLock;
+        action = LockMods(modifiers=NumLock);
+    };
+
+    interpret Mode_switch {
+        action = SetGroup(group=+1);
+    };
+
+    interpret Any + Any {
+        action = SetMods(modifiers=modMapMods);
+    };
+
+    group 2 = Mod5;
+
+    indicator "Shift Lock" {
+        !allowExplicit;
+        whichModState = Locked;
+        modifiers = Shift;
+    };
+};

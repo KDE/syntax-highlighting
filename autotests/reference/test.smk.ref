@@ -1,0 +1,279 @@
+<Comment># =============================================================================</Comment><br/>
+<Comment># Snakefile — comprehensive feature test for Snakemake highlighting</Comment><br/>
+<Comment># Minimal comments; lines marked `# ERROR:` are intentionally invalid.</Comment><br/>
+<Comment># =============================================================================</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Comment># ---------- Top-level Python ----------</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Block Opener>if</Block Opener><Normal Text> </Normal Text><Constant>True</Constant><Normal Text>: </Normal Text><Error>forbidden</Error><Normal Text> </Normal Text><Comment># ERROR: no text allowed after block opener</Comment><br/>
+<Normal Text>    </Normal Text><Variable>a</Variable><Normal Text> = </Normal Text><Number>1</Number><br/>
+<Block Opener>else</Block Opener><Normal Text>: </Normal Text><Error>forbidden</Error><Normal Text> </Normal Text><Comment># ERROR: same</Comment><br/>
+<Normal Text>    </Normal Text><Variable>a</Variable><Normal Text> = </Normal Text><Number>0</Number><br/>
+<Normal Text></Normal Text><br/>
+<Variable>config</Variable><Normal Text> = </Normal Text><Operator>{</Operator><br/>
+<Normal Text>    </Normal Text><String>"method"</String><Operator>:</Operator><Normal Text> </Normal Text><String>"B"</String><Operator>,</Operator><br/>
+<Normal Text>    </Normal Text><String>"samples"</String><Operator>:</Operator><Normal Text> </Normal Text><Operator>[</Operator><String>"S1"</String><Operator>,</Operator><Normal Text> </Normal Text><String>"S2"</String><Operator>],</Operator><br/>
+<Normal Text>    </Normal Text><String>"ref"</String><Operator>:</Operator><Normal Text> </Normal Text><String>"ref/genome.fa"</String><Operator>,</Operator><br/>
+<Normal Text>    </Normal Text><String>"gtf"</String><Operator>:</Operator><Normal Text> </Normal Text><String>"ref/genes.gtf"</String><Operator>,</Operator><br/>
+<Normal Text>    </Normal Text><String>"threads_default"</String><Operator>:</Operator><Normal Text> </Normal Text><Number>4</Number><Operator>,</Operator><br/>
+<Normal Text>    </Normal Text><String>"work"</String><Operator>:</Operator><Normal Text> </Normal Text><String>"work"</String><Operator>,</Operator><br/>
+<Normal Text>    </Normal Text><String>"adapters"</String><Operator>:</Operator><Normal Text> </Normal Text><Operator>{</Operator><String>"fwd"</String><Operator>:</Operator><Normal Text> </Normal Text><String>"AGATCGGAAGAGC"</String><Operator>,</Operator><Normal Text> </Normal Text><String>"rev"</String><Operator>:</Operator><Normal Text> </Normal Text><String>"AGATCGGAAGAGC"</String><Operator>}</Operator><br/>
+<Operator>}</Operator><br/>
+<Variable>SAMPLES</Variable><Normal Text> = </Normal Text><Variable>config</Variable><Operator>[</Operator><String>"samples"</String><Operator>]</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Block Opener>def</Block Opener><Normal Text> </Normal Text><Python Function>fq</Python Function><Operator>(</Operator><Variable>sample</Variable><Operator>,</Operator><Normal Text> </Normal Text><Variable>mate</Variable><Operator>)</Operator><Normal Text>:</Normal Text><br/>
+<Normal Text>    </Normal Text><Python Keyword>return</Python Keyword><Normal Text> </Normal Text><String>f"raw/</String><FStringDelimiter>{</FStringDelimiter><Variable>sample</Variable><FStringDelimiter>}</FStringDelimiter><String>_R</String><FStringDelimiter>{</FStringDelimiter><Variable>mate</Variable><FStringDelimiter>}</FStringDelimiter><String>.fastq.gz"</String><br/>
+<Normal Text></Normal Text><br/>
+<Comment># ---------- Global Snakemake directives ----------</Comment><br/>
+<Block Opener>workdir</Block Opener><Normal Text>: </Normal Text><Variable>config</Variable><Operator>[</Operator><String>"work"</String><Operator>]</Operator><br/>
+<Block Opener>localrules</Block Opener><Normal Text>: </Normal Text><Variable>all</Variable><Operator>,</Operator><Normal Text> </Normal Text><Variable>qc_fastqc</Variable><br/>
+<Block Opener>ruleorder</Block Opener><Normal Text>: </Normal Text><Variable>sort_index</Variable><Normal Text> > </Normal Text><Variable>align</Variable><br/>
+<Block Opener>report</Block Opener><Normal Text>: </Normal Text><String>"report/report.html"</String><br/>
+<Block Opener>envvars</Block Opener><Normal Text>: </Normal Text><String>"LD_LIBRARY_PATH"</String><Operator>,</Operator><Normal Text> </Normal Text><String>"OMP_NUM_THREADS"</String><br/>
+<Block Opener>wildcard_constraints</Block Opener><Normal Text>:</Normal Text><br/>
+<Normal Text>    </Normal Text><Variable>sample</Variable><Normal Text> = </Normal Text><String>r"[A-Za-z0-9_]+"</String><br/>
+<Normal Text></Normal Text><br/>
+<Block Opener>include</Block Opener><Normal Text>: </Normal Text><String>"extras.smk"</String><br/>
+<Block Opener>container</Block Opener><Normal Text>: </Normal Text><String>"docker://ubuntu:22.04"</String><br/>
+<Block Opener>conda</Block Opener><Normal Text>: </Normal Text><String>"envs/global.yml"</String><br/>
+<Block Opener>containerized</Block Opener><Normal Text>:</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Legacy/compat directives still recognized in old workflows</Comment><br/>
+<Block Opener>moduleinclude</Block Opener><Normal Text>: </Normal Text><String>"legacy/tools.smk"</String><Normal Text>   </Normal Text><Comment># legacy include for modules</Comment><br/>
+<Comment># deprecated (kept for legacy)</Comment><br/>
+<Block Opener>subworkflow</Block Opener><Normal Text> </Normal Text><Rule Name>oldwf</Rule Name><Normal Text>:  </Normal Text><Error>something </Error><Comment>#ERROR: nothing allowed after colon</Comment><br/>
+<Normal Text>    </Normal Text><SmkDirective>workdir</SmkDirective><Operator>:</Operator><Normal Text> </Normal Text><String>"oldwf"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>snakefile</SmkDirective><Operator>:</Operator><Normal Text> </Normal Text><String>"workflow/Snakefile"</String><br/>
+<Normal Text>    </Normal Text><Error>input:</Error><Normal Text> </Normal Text><Comment># ERROR: `input` directive not allowed in subworkflows</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Comment># ---------- Modules and use rule ----------</Comment><br/>
+<Block Opener>module</Block Opener><Normal Text> </Normal Text><Rule Name>asm</Rule Name><Normal Text>: </Normal Text><Error>something </Error><Comment>#ERROR: nothing allowed after colon</Comment><br/>
+<Normal Text>    </Normal Text><SmkDirective>snakefile</SmkDirective><Operator>:</Operator><Normal Text> </Normal Text><String>"modules/assembly.smk"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>config</SmkDirective><Operator>:</Operator><Normal Text> </Normal Text><String>"modules/assembly.yaml"</String><br/>
+<Normal Text>    </Normal Text><Error>input:</Error><Normal Text> </Normal Text><String>"test"</String><Normal Text> </Normal Text><Comment># ERROR: `input` directive not allowed in modules</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Reuse a rule from the module; inside `with:` we use regular rule directives</Comment><br/>
+<Block Opener>use rule</Block Opener><Normal Text> </Normal Text><Rule Name>assemble</Rule Name><Normal Text> </Normal Text><RuleHeaderKeyword>as</RuleHeaderKeyword><Normal Text> </Normal Text><Rule Name>assemble_mod</Rule Name><Normal Text> </Normal Text><RuleHeaderKeyword>with</RuleHeaderKeyword><Normal Text>: </Normal Text><Error>something </Error><Comment>#ERROR: nothing allowed after colon</Comment><br/>
+<Normal Text>    </Normal Text><Error>snakefile:</Error><Normal Text> </Normal Text><Comment># ERROR `snakefile` directive not allowed in rules</Comment><br/>
+<Normal Text>    </Normal Text><SmkDirective>threads</SmkDirective><Normal Text>: </Normal Text><Number>8</Number><br/>
+<Normal Text>    </Normal Text><SmkDirective>params</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Variable>mode</Variable><Normal Text> = </Normal Text><String>"quick"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>message</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"Assembling </String><SmkPlaceholder>{wildcards.sample}</SmkPlaceholder><String> (module override)"</String><br/>
+<Normal Text>    </Normal Text><Comment># wrong directive (kept to test error handling inside a use-body)</Comment><br/>
+<Normal Text>    </Normal Text><Error>outpt:</Error><Normal Text> </Normal Text><String>"SHOULD-NOT-BE-HERE"</String><Normal Text>   </Normal Text><Comment># ERROR: typo</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Comment># ---------- INTENTIONAL TOP-LEVEL ERRORS ----------</Comment><br/>
+<Error>workdirr:</Error><Normal Text> </Normal Text><String>"typo/dir"</String><Normal Text>              </Normal Text><Comment># ERROR: unknown top-level keyword</Comment><br/>
+<Error>snakefile:</Error><Normal Text> </Normal Text><String>"top/level.smk"</String><Normal Text>        </Normal Text><Comment># ERROR: only valid inside module/subworkflow</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Comment># ---------- Pipeline ----------</Comment><br/>
+<Block Opener>rule</Block Opener><Normal Text> </Normal Text><Rule Name>all</Rule Name><Normal Text>:</Normal Text><br/>
+<Normal Text>    </Normal Text><SmkDirective>input</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Python Function>expand</Python Function><Operator>(</Operator><String>"results/</String><SmkWildcard>{sample}</SmkWildcard><String>/summary.txt"</String><Operator>,</Operator><Normal Text> </Normal Text><Variable>sample</Variable><Normal Text>=</Normal Text><Variable>SAMPLES</Variable><Operator>)</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Block Opener>rule</Block Opener><Normal Text> </Normal Text><Rule Name>qc_fastqc</Rule Name><Normal Text>:</Normal Text><br/>
+<Normal Text>    </Normal Text><SmkDirective>input</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Variable>r1</Variable><Normal Text> = </Normal Text><Python Keyword>lambda</Python Keyword><Normal Text> </Normal Text><Variable>wc</Variable><Operator>:</Operator><Normal Text> </Normal Text><Python Function>fq</Python Function><Operator>(</Operator><Variable>wc</Variable><Operator>.</Operator><Variable>sample</Variable><Operator>,</Operator><Normal Text> </Normal Text><Number>1</Number><Operator>),</Operator><br/>
+<Normal Text>        </Normal Text><Variable>r2</Variable><Normal Text> = </Normal Text><Python Keyword>lambda</Python Keyword><Normal Text> </Normal Text><Variable>wc</Variable><Operator>:</Operator><Normal Text> </Normal Text><Python Function>fq</Python Function><Operator>(</Operator><Variable>wc</Variable><Operator>.</Operator><Variable>sample</Variable><Operator>,</Operator><Normal Text> </Normal Text><Number>2</Number><Operator>),</Operator><br/>
+<Normal Text>    </Normal Text><SmkDirective>output</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Variable>html</Variable><Normal Text> = </Normal Text><String>"qc/</String><SmkWildcard>{sample}</SmkWildcard><String>_fastqc.html"</String><Operator>,</Operator><br/>
+<Normal Text>        </Normal Text><Variable>zip</Variable><Normal Text>  = </Normal Text><String>"qc/</String><SmkWildcard>{sample}</SmkWildcard><String>_fastqc.zip"</String><Operator>,</Operator><br/>
+<Normal Text>    </Normal Text><SmkDirective>threads</SmkDirective><Normal Text>: </Normal Text><Number>2</Number><br/>
+<Normal Text>    </Normal Text><SmkDirective>resources</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Variable>mem_mb</Variable><Normal Text> = </Normal Text><Number>1024</Number><br/>
+<Normal Text>    </Normal Text><SmkDirective>log</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"log/fastqc_</String><SmkWildcard>{sample}</SmkWildcard><String>.log"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>params</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Variable>extra</Variable><Normal Text> = </Normal Text><String>"--nogroup"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>shell</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"""</String><br/>
+<String>        fastqc -t </String><SmkPlaceholder>{threads}</SmkPlaceholder><String> </String><SmkPlaceholder>{params.extra}</SmkPlaceholder><String> -o qc </String><SmkPlaceholder>{input.r1}</SmkPlaceholder><String> </String><SmkPlaceholder>{input.r2}</SmkPlaceholder><String> > </String><SmkPlaceholder>{log}</SmkPlaceholder><String> 2>&1</String><br/>
+<String>        """</String><br/>
+<Normal Text></Normal Text><br/>
+<Block Opener>rule</Block Opener><Normal Text> </Normal Text><Rule Name>trim_cutadapt</Rule Name><Normal Text>:</Normal Text><br/>
+<Normal Text>    </Normal Text><SmkDirective>input</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Variable>r1</Variable><Normal Text> = </Normal Text><Python Keyword>lambda</Python Keyword><Normal Text> </Normal Text><Variable>wc</Variable><Operator>:</Operator><Normal Text> </Normal Text><Python Function>fq</Python Function><Operator>(</Operator><Variable>wc</Variable><Operator>.</Operator><Variable>sample</Variable><Operator>,</Operator><Normal Text> </Normal Text><Number>1</Number><Operator>),</Operator><br/>
+<Normal Text>        </Normal Text><Variable>r2</Variable><Normal Text> = </Normal Text><Python Keyword>lambda</Python Keyword><Normal Text> </Normal Text><Variable>wc</Variable><Operator>:</Operator><Normal Text> </Normal Text><Python Function>fq</Python Function><Operator>(</Operator><Variable>wc</Variable><Operator>.</Operator><Variable>sample</Variable><Operator>,</Operator><Normal Text> </Normal Text><Number>2</Number><Operator>),</Operator><br/>
+<Normal Text>    </Normal Text><SmkDirective>output</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Variable>r1</Variable><Normal Text> = </Normal Text><String>"trim/</String><SmkWildcard>{sample}</SmkWildcard><String>_R1.fastq.gz"</String><Operator>,</Operator><Normal Text> </Normal Text><Comment># `sample`: wildcard</Comment><br/>
+<Normal Text>        </Normal Text><Variable>r2</Variable><Normal Text> = </Normal Text><String>"trim/</String><SmkWildcard>{sample}</SmkWildcard><String>_R2.fastq.gz"</String><Operator>,</Operator><br/>
+<Normal Text>        </Normal Text><Variable>report</Variable><Normal Text> = </Normal Text><String>f"</String><FStringDelimiter>{</FStringDelimiter><Variable>report_dir</Variable><FStringDelimiter>}</FStringDelimiter><String>/</String><SmkWildcard>{{sample}}</SmkWildcard><String>"</String><Normal Text> </Normal Text><Comment># `report_dir`: f-string interpolation, `sample`: wildcard</Comment><br/>
+<Normal Text>    </Normal Text><SmkDirective>params</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Variable>a</Variable><Normal Text> = </Normal Text><Variable>config</Variable><Operator>[</Operator><String>"adapters"</String><Operator>][</Operator><String>"fwd"</String><Operator>],</Operator><br/>
+<Normal Text>        </Normal Text><Variable>A</Variable><Normal Text> = </Normal Text><Variable>config</Variable><Operator>[</Operator><String>"adapters"</String><Operator>][</Operator><String>"rev"</String><Operator>],</Operator><br/>
+<Normal Text>    </Normal Text><SmkDirective>threads</SmkDirective><Normal Text>: </Normal Text><Number>8</Number><br/>
+<Normal Text>    </Normal Text><SmkDirective>conda</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"envs/cutadapt.yml"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>log</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"log/cutadapt_</String><SmkWildcard>{sample}</SmkWildcard><String>.log"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>shell</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"""</String><br/>
+<String>        cutadapt -j </String><SmkPlaceholder>{threads}</SmkPlaceholder><String> -a </String><SmkPlaceholder>{params.a}</SmkPlaceholder><String> -A </String><SmkPlaceholder>{params.A}</SmkPlaceholder><String> \</String><br/>
+<String>            -o </String><SmkPlaceholder>{output.r1}</SmkPlaceholder><String> -p </String><SmkPlaceholder>{output.r2}</SmkPlaceholder><String> </String><SmkPlaceholder>{input.r1}</SmkPlaceholder><String> </String><SmkPlaceholder>{input.r2}</SmkPlaceholder><String> > </String><SmkPlaceholder>{log}</SmkPlaceholder><String> 2>&1</String><br/>
+<String>        """</String><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Example of wrapper usage (version string illustrative)</Comment><br/>
+<Block Opener>rule</Block Opener><Normal Text> </Normal Text><Rule Name>align</Rule Name><Normal Text>:</Normal Text><br/>
+<Normal Text>    </Normal Text><SmkDirective>input</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Variable>r1</Variable><Normal Text> = </Normal Text><String>"trim/</String><SmkWildcard>{sample}</SmkWildcard><String>_R1.fastq.gz"</String><Operator>,</Operator><br/>
+<Normal Text>        </Normal Text><Variable>r2</Variable><Normal Text> = </Normal Text><String>"trim/</String><SmkWildcard>{sample}</SmkWildcard><String>_R2.fastq.gz"</String><Operator>,</Operator><br/>
+<Normal Text>        </Normal Text><Variable>ref</Variable><Normal Text> = </Normal Text><Variable>config</Variable><Operator>[</Operator><String>"ref"</String><Operator>],</Operator><br/>
+<Normal Text>    </Normal Text><SmkDirective>output</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Variable>bam</Variable><Normal Text> = </Normal Text><String>"map/</String><SmkWildcard>{sample}</SmkWildcard><String>.unsorted.bam"</String><Operator>,</Operator><br/>
+<Normal Text>    </Normal Text><SmkDirective>threads</SmkDirective><Normal Text>: </Normal Text><Number>12</Number><br/>
+<Normal Text>    </Normal Text><SmkDirective>resources</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Variable>mem_mb</Variable><Normal Text> = </Normal Text><Number>8000</Number><br/>
+<Normal Text>    </Normal Text><SmkDirective>params</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Comment># BWA-MEM2 example options</Comment><br/>
+<Normal Text>        </Normal Text><Variable>extra</Variable><Normal Text> = </Normal Text><String>"-M"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>log</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"log/align_</String><SmkWildcard>{sample}</SmkWildcard><String>.log"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>wrapper</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"0.90.0/bio/bwa/mem2"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>shell</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"bwa-mem2 mem -t </String><SmkPlaceholder>{threads}</SmkPlaceholder><String> </String><SmkPlaceholder>{params.extra}</SmkPlaceholder><String> </String><SmkPlaceholder>{input.ref}</SmkPlaceholder><String> </String><SmkPlaceholder>{input.r1}</SmkPlaceholder><String> </String><SmkPlaceholder>{input.r2}</SmkPlaceholder><String> | samtools view -bS - > </String><SmkPlaceholder>{output.bam}</SmkPlaceholder><String> 2> </String><SmkPlaceholder>{log}</SmkPlaceholder><String>"</String><br/>
+<Normal Text></Normal Text><br/>
+<Block Opener>rule</Block Opener><Normal Text> </Normal Text><Rule Name>sort_index</Rule Name><Normal Text>:</Normal Text><br/>
+<Normal Text>    </Normal Text><SmkDirective>input</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"map/</String><SmkWildcard>{sample}</SmkWildcard><String>.unsorted.bam"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>output</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Variable>bam</Variable><Normal Text> = </Normal Text><String>"map/</String><SmkWildcard>{sample}</SmkWildcard><String>.bam"</String><Operator>,</Operator><br/>
+<Normal Text>        </Normal Text><Variable>bai</Variable><Normal Text> = </Normal Text><String>"map/</String><SmkWildcard>{sample}</SmkWildcard><String>.bam.bai"</String><Operator>,</Operator><br/>
+<Normal Text>    </Normal Text><SmkDirective>threads</SmkDirective><Normal Text>: </Normal Text><Number>6</Number><br/>
+<Normal Text>    </Normal Text><SmkDirective>resources</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Variable>mem_mb</Variable><Normal Text> = </Normal Text><Number>4000</Number><br/>
+<Normal Text>    </Normal Text><SmkDirective>envmodules</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"samtools/1.16"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>shadow</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"minimal"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>shell</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"""</String><br/>
+<String>        samtools sort -@ </String><SmkPlaceholder>{threads}</SmkPlaceholder><String> -o </String><SmkPlaceholder>{output.bam}</SmkPlaceholder><String> </String><SmkPlaceholder>{input}</SmkPlaceholder><br/>
+<String>        samtools index -@ </String><SmkPlaceholder>{threads}</SmkPlaceholder><String> </String><SmkPlaceholder>{output.bam}</SmkPlaceholder><br/>
+<String>        """</String><br/>
+<Normal Text></Normal Text><br/>
+<Block Opener>rule</Block Opener><Normal Text> </Normal Text><Rule Name>quantify</Rule Name><Normal Text>:</Normal Text><br/>
+<Normal Text>    </Normal Text><SmkDirective>input</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Variable>bam</Variable><Normal Text> = </Normal Text><String>"map/</String><SmkWildcard>{sample}</SmkWildcard><String>.bam"</String><Operator>,</Operator><br/>
+<Normal Text>        </Normal Text><Variable>bai</Variable><Normal Text> = </Normal Text><String>"map/</String><SmkWildcard>{sample}</SmkWildcard><String>.bam.bai"</String><Operator>,</Operator><br/>
+<Normal Text>        </Normal Text><Variable>gtf</Variable><Normal Text> = </Normal Text><Variable>config</Variable><Operator>[</Operator><String>"gtf"</String><Operator>],</Operator><br/>
+<Normal Text>    </Normal Text><SmkDirective>output</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Variable>counts</Variable><Normal Text> = </Normal Text><String>"counts/</String><SmkWildcard>{sample}</SmkWildcard><String>.txt"</String><Operator>,</Operator><br/>
+<Normal Text>    </Normal Text><SmkDirective>threads</SmkDirective><Normal Text>: </Normal Text><Number>4</Number><br/>
+<Normal Text>    </Normal Text><SmkDirective>group</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"counting"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>priority</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Number>50</Number><br/>
+<Normal Text>    </Normal Text><SmkDirective>params</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Variable>feature_type</Variable><Normal Text> = </Normal Text><String>"exon"</String><Operator>,</Operator><br/>
+<Normal Text>        </Normal Text><Variable>id_attr</Variable><Normal Text> = </Normal Text><String>"gene_id"</String><Operator>,</Operator><br/>
+<Normal Text>    </Normal Text><SmkDirective>shell</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"""</String><br/>
+<String>        featureCounts -T </String><SmkPlaceholder>{threads}</SmkPlaceholder><String> -a </String><SmkPlaceholder>{input.gtf}</SmkPlaceholder><String> -t </String><SmkPlaceholder>{params.feature_type}</SmkPlaceholder><String> -g </String><SmkPlaceholder>{params.id_attr}</SmkPlaceholder><String> \</String><br/>
+<String>            -o </String><SmkPlaceholder>{output.counts}</SmkPlaceholder><String> </String><SmkPlaceholder>{input.bam}</SmkPlaceholder><br/>
+<String>        """</String><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Example of script & notebook directives</Comment><br/>
+<Block Opener>rule</Block Opener><Normal Text> </Normal Text><Rule Name>plot_qc</Rule Name><Normal Text>:</Normal Text><br/>
+<Normal Text>    </Normal Text><SmkDirective>input</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"qc/</String><SmkWildcard>{sample}</SmkWildcard><String>_fastqc.zip"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>output</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"plots/</String><SmkWildcard>{sample}</SmkWildcard><String>_qc.png"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>script</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"scripts/plot_qc.py"</String><Normal Text>    </Normal Text><Comment># not executed; present to test directive</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Block Opener>rule</Block Opener><Normal Text> </Normal Text><Rule Name>explore_notebook</Rule Name><Normal Text>:</Normal Text><br/>
+<Normal Text>    </Normal Text><SmkDirective>input</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"counts/</String><SmkWildcard>{sample}</SmkWildcard><String>.txt"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>output</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"notebooks/</String><SmkWildcard>{sample}</SmkWildcard><String>_eda.ipynb"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>notebook</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"notebooks/template.ipynb"</String><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Example of per-rule container / cache / benchmark / message / name / version (legacy)</Comment><br/>
+<Block Opener>rule</Block Opener><Normal Text> </Normal Text><Rule Name>summarize</Rule Name><Normal Text>:</Normal Text><br/>
+<Normal Text>    </Normal Text><SmkDirective>input</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Variable>bam</Variable><Normal Text> = </Normal Text><String>"map/</String><SmkWildcard>{sample}</SmkWildcard><String>.bam"</String><Operator>,</Operator><br/>
+<Normal Text>        </Normal Text><Variable>counts</Variable><Normal Text> = </Normal Text><String>"counts/</String><SmkWildcard>{sample}</SmkWildcard><String>.txt"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>output</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Variable>txt</Variable><Normal Text> = </Normal Text><String>"results/</String><SmkWildcard>{sample}</SmkWildcard><String>/summary.txt"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>params</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Variable>tag</Variable><Normal Text> = </Normal Text><String>"</String><SmkWildcard>{sample}</SmkWildcard><String>"</String><Normal Text>        </Normal Text><Comment># wildcard should highlight distinctly</Comment><br/>
+<Normal Text>    </Normal Text><SmkDirective>message</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"Summarizing </String><SmkPlaceholder>{wildcards.sample}</SmkPlaceholder><String>"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>name</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"summarize_</String><SmkWildcard>{sample}</SmkWildcard><String>"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>benchmark</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"benchmark/summarize_</String><SmkWildcard>{sample}</SmkWildcard><String>.tsv"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>cache</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"permissive"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>container</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"docker://python:3.11"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>version</SmkDirective><Normal Text>: </Normal Text><String>"1.0"</String><Normal Text>            </Normal Text><Comment># legacy directive</Comment><br/>
+<Normal Text>    </Normal Text><SmkDirective>threads</SmkDirective><Normal Text>: </Normal Text><Number>2</Number><br/>
+<Normal Text>    </Normal Text><SmkDirective>resources</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Variable>mem_mb</Variable><Normal Text> = </Normal Text><Number>512</Number><br/>
+<Normal Text>    </Normal Text><SmkDirective>log</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"log/summarize_</String><SmkWildcard>{sample}</SmkWildcard><String>.log"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>run:</SmkDirective><br/>
+<Normal Text>        </Normal Text><Comment># simple Python run block</Comment><br/>
+<Normal Text>        </Normal Text><Python Keyword>import</Python Keyword><Normal Text> </Normal Text><Variable>json</Variable><br/>
+<Normal Text>        </Normal Text><Variable>meta</Variable><Normal Text> = </Normal Text><Operator>{</Operator><br/>
+<Normal Text>            </Normal Text><String>"sample"</String><Operator>:</Operator><Normal Text> </Normal Text><Variable>wildcards</Variable><Operator>.</Operator><Variable>sample</Variable><Operator>,</Operator><br/>
+<Normal Text>            </Normal Text><String>"bam"</String><Operator>:</Operator><Normal Text> </Normal Text><Variable>input</Variable><Operator>.</Operator><Variable>bam</Variable><Operator>,</Operator><br/>
+<Normal Text>            </Normal Text><String>"counts"</String><Operator>:</Operator><Normal Text> </Normal Text><Variable>input</Variable><Operator>.</Operator><Variable>counts</Variable><Operator>,</Operator><br/>
+<Normal Text>            </Normal Text><String>"tag"</String><Operator>:</Operator><Normal Text> </Normal Text><Variable>params</Variable><Operator>.</Operator><Variable>tag</Variable><Operator>,</Operator><br/>
+<Normal Text>        </Normal Text><Operator>}</Operator><br/>
+<Normal Text>        </Normal Text><Comment># write a tiny summary</Comment><br/>
+<Normal Text>        </Normal Text><Python Keyword>import</Python Keyword><Normal Text> </Normal Text><Variable>os</Variable><br/>
+<Normal Text>        </Normal Text><Variable>os</Variable><Operator>.</Operator><Python Function>makedirs</Python Function><Operator>(</Operator><Variable>os</Variable><Operator>.</Operator><Variable>path</Variable><Operator>.</Operator><Python Function>dirname</Python Function><Operator>(</Operator><Variable>output</Variable><Operator>.</Operator><Variable>txt</Variable><Operator>),</Operator><Normal Text> </Normal Text><Variable>exist_ok</Variable><Normal Text>=</Normal Text><Constant>True</Constant><Operator>)</Operator><br/>
+<Normal Text>        </Normal Text><Python Keyword>with</Python Keyword><Normal Text> </Normal Text><Python Function>open</Python Function><Operator>(</Operator><Variable>output</Variable><Operator>.</Operator><Variable>txt</Variable><Operator>,</Operator><Normal Text> </Normal Text><String>"w"</String><Operator>)</Operator><Normal Text> </Normal Text><Python Keyword>as</Python Keyword><Normal Text> </Normal Text><Variable>fh</Variable><Operator>:</Operator><br/>
+<Normal Text>            </Normal Text><Variable>fh</Variable><Operator>.</Operator><Python Function>write</Python Function><Operator>(</Operator><Variable>json</Variable><Operator>.</Operator><Python Function>dumps</Python Function><Operator>(</Operator><Variable>meta</Variable><Operator>,</Operator><Normal Text> </Normal Text><Variable>indent</Variable><Normal Text>=</Normal Text><Number>2</Number><Operator>)</Operator><Normal Text> + </Normal Text><String>"</String><EscapeCharacter>\n</EscapeCharacter><String>"</String><Operator>)</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Comment># ---------- More intentional errors inside a rule body ----------</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Block Opener>if</Block Opener><Normal Text> </Normal Text><Variable>config</Variable><Operator>[</Operator><String>"method"</String><Operator>]</Operator><Normal Text> </Normal Text><Operator>==</Operator><Normal Text> </Normal Text><String>"A"</String><Normal Text>:</Normal Text><br/>
+<Normal Text>    </Normal Text><br/>
+<Normal Text>    </Normal Text><Block Opener>rule</Block Opener><Normal Text> </Normal Text><Rule Name>bad_header_examples_A</Rule Name><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><SmkDirective>input</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>            </Normal Text><String>"map/</String><SmkWildcard>{sample}</SmkWildcard><String>.bam"</String><br/>
+<Normal Text>        </Normal Text><Error>outpt:</Error><Normal Text>      </Normal Text><Comment># ERROR: unknown directive</Comment><br/>
+<Normal Text>            </Normal Text><String>"nowhere.txt"</String><br/>
+<Normal Text>        </Normal Text><Error>foo:</Error><Normal Text>        </Normal Text><Comment># ERROR: unknown directive</Comment><br/>
+<Normal Text>            </Normal Text><String>"bar"</String><br/>
+<Normal Text>        </Normal Text><SmkDirective>shell</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>            </Normal Text><String>"true"</String><br/>
+<Block Opener>else</Block Opener><Normal Text>:</Normal Text><br/>
+<Normal Text>    </Normal Text><Block Opener>rule</Block Opener><Normal Text> </Normal Text><Rule Name>bad_header_examples_B</Rule Name><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><SmkDirective>input</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>            </Normal Text><String>"map/</String><SmkWildcard>{sample}</SmkWildcard><String>.bam"</String><br/>
+<Normal Text>        </Normal Text><SmkDirective>output</SmkDirective><Normal Text>:      </Normal Text><Comment># ERROR: unknown directive</Comment><br/>
+<Normal Text>            </Normal Text><String>"nowhere.txt"</String><br/>
+<Normal Text>        </Normal Text><Error>foo:</Error><Normal Text>        </Normal Text><Comment># ERROR: unknown directive</Comment><br/>
+<Normal Text>            </Normal Text><String>"bar"</String><br/>
+<Normal Text>        </Normal Text><SmkDirective>shell</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>            </Normal Text><String>"true"</String><br/>
+<Normal Text></Normal Text><br/>
+<Comment># ---------- Using the module rule  ----------</Comment><br/>
+<Block Opener>rule</Block Opener><Normal Text> </Normal Text><Rule Name>assemble_via_module</Rule Name><Normal Text>:</Normal Text><br/>
+<Normal Text>    </Normal Text><SmkDirective>input</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"trim/</String><SmkWildcard>{sample}</SmkWildcard><String>_R1.fastq.gz"</String><Operator>,</Operator><br/>
+<Normal Text>        </Normal Text><String>"trim/</String><SmkWildcard>{sample}</SmkWildcard><String>_R2.fastq.gz"</String><Operator>,</Operator><br/>
+<Normal Text>    </Normal Text><SmkDirective>output</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"assembly/</String><SmkWildcard>{sample}</SmkWildcard><String>/contigs.fa"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>threads</SmkDirective><Normal Text>: </Normal Text><Number>8</Number><br/>
+<Normal Text>    </Normal Text><SmkDirective>shell</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"echo assembly > </String><SmkPlaceholder>{output}</SmkPlaceholder><String>"</String><br/>
+<Normal Text></Normal Text><br/>
+<Comment># ---------- Default target redirection ----------</Comment><br/>
+<Block Opener>rule</Block Opener><Normal Text> </Normal Text><Rule Name>final_default</Rule Name><Normal Text>:</Normal Text><br/>
+<Normal Text>    </Normal Text><SmkDirective>output</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"FINAL.marker"</String><br/>
+<Normal Text>    </Normal Text><SmkDirective>default_target</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><Constant>True</Constant><br/>
+<Normal Text>    </Normal Text><SmkDirective>shell</SmkDirective><Normal Text>:</Normal Text><br/>
+<Normal Text>        </Normal Text><String>"touch </String><SmkPlaceholder>{output}</SmkPlaceholder><String>"</String><br/>
+<Normal Text>        </Normal Text><br/>
+<Block Opener>rule</Block Opener><Normal Text>: </Normal Text><Error>no text</Error><Normal Text> </Normal Text><Error>allowed</Error><Normal Text> </Normal Text><Error>here</Error><Normal Text>  </Normal Text><Comment># ERROR: no text allowed after block opener</Comment><br/>
+<Normal Text>    </Normal Text><SmkDirective>input</SmkDirective><Normal Text>: </Normal Text><String>"back_to_normal.txt"</String><br/>

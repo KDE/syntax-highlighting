@@ -1,0 +1,279 @@
+# =============================================================================
+# Snakefile — comprehensive feature test for Snakemake highlighting
+# Minimal comments; lines marked `# ERROR:` are intentionally invalid.
+# =============================================================================
+
+# ---------- Top-level Python ----------
+
+if True: forbidden # ERROR: no text allowed after block opener
+    a = 1
+else: forbidden # ERROR: same
+    a = 0
+
+config = {
+    "method": "B",
+    "samples": ["S1", "S2"],
+    "ref": "ref/genome.fa",
+    "gtf": "ref/genes.gtf",
+    "threads_default": 4,
+    "work": "work",
+    "adapters": {"fwd": "AGATCGGAAGAGC", "rev": "AGATCGGAAGAGC"}
+}
+SAMPLES = config["samples"]
+
+def fq(sample, mate):
+    return f"raw/{sample}_R{mate}.fastq.gz"
+
+# ---------- Global Snakemake directives ----------
+workdir: config["work"]
+localrules: all, qc_fastqc
+ruleorder: sort_index > align
+report: "report/report.html"
+envvars: "LD_LIBRARY_PATH", "OMP_NUM_THREADS"
+wildcard_constraints:
+    sample = r"[A-Za-z0-9_]+"
+
+include: "extras.smk"
+container: "docker://ubuntu:22.04"
+conda: "envs/global.yml"
+containerized:
+
+# Legacy/compat directives still recognized in old workflows
+moduleinclude: "legacy/tools.smk"   # legacy include for modules
+# deprecated (kept for legacy)
+subworkflow oldwf:  something #ERROR: nothing allowed after colon
+    workdir: "oldwf"
+    snakefile: "workflow/Snakefile"
+    input: # ERROR: `input` directive not allowed in subworkflows
+
+# ---------- Modules and use rule ----------
+module asm: something #ERROR: nothing allowed after colon
+    snakefile: "modules/assembly.smk"
+    config: "modules/assembly.yaml"
+    input: "test" # ERROR: `input` directive not allowed in modules
+
+# Reuse a rule from the module; inside `with:` we use regular rule directives
+use rule assemble as assemble_mod with: something #ERROR: nothing allowed after colon
+    snakefile: # ERROR `snakefile` directive not allowed in rules
+    threads: 8
+    params:
+        mode = "quick"
+    message:
+        "Assembling {wildcards.sample} (module override)"
+    # wrong directive (kept to test error handling inside a use-body)
+    outpt: "SHOULD-NOT-BE-HERE"   # ERROR: typo
+
+# ---------- INTENTIONAL TOP-LEVEL ERRORS ----------
+workdirr: "typo/dir"              # ERROR: unknown top-level keyword
+snakefile: "top/level.smk"        # ERROR: only valid inside module/subworkflow
+
+# ---------- Pipeline ----------
+rule all:
+    input:
+        expand("results/{sample}/summary.txt", sample=SAMPLES)
+
+rule qc_fastqc:
+    input:
+        r1 = lambda wc: fq(wc.sample, 1),
+        r2 = lambda wc: fq(wc.sample, 2),
+    output:
+        html = "qc/{sample}_fastqc.html",
+        zip  = "qc/{sample}_fastqc.zip",
+    threads: 2
+    resources:
+        mem_mb = 1024
+    log:
+        "log/fastqc_{sample}.log"
+    params:
+        extra = "--nogroup"
+    shell:
+        """
+        fastqc -t {threads} {params.extra} -o qc {input.r1} {input.r2} > {log} 2>&1
+        """
+
+rule trim_cutadapt:
+    input:
+        r1 = lambda wc: fq(wc.sample, 1),
+        r2 = lambda wc: fq(wc.sample, 2),
+    output:
+        r1 = "trim/{sample}_R1.fastq.gz", # `sample`: wildcard
+        r2 = "trim/{sample}_R2.fastq.gz",
+        report = f"{report_dir}/{{sample}}" # `report_dir`: f-string interpolation, `sample`: wildcard
+    params:
+        a = config["adapters"]["fwd"],
+        A = config["adapters"]["rev"],
+    threads: 8
+    conda:
+        "envs/cutadapt.yml"
+    log:
+        "log/cutadapt_{sample}.log"
+    shell:
+        """
+        cutadapt -j {threads} -a {params.a} -A {params.A} \
+            -o {output.r1} -p {output.r2} {input.r1} {input.r2} > {log} 2>&1
+        """
+
+# Example of wrapper usage (version string illustrative)
+rule align:
+    input:
+        r1 = "trim/{sample}_R1.fastq.gz",
+        r2 = "trim/{sample}_R2.fastq.gz",
+        ref = config["ref"],
+    output:
+        bam = "map/{sample}.unsorted.bam",
+    threads: 12
+    resources:
+        mem_mb = 8000
+    params:
+        # BWA-MEM2 example options
+        extra = "-M"
+    log:
+        "log/align_{sample}.log"
+    wrapper:
+        "0.90.0/bio/bwa/mem2"
+    shell:
+        "bwa-mem2 mem -t {threads} {params.extra} {input.ref} {input.r1} {input.r2} | samtools view -bS - > {output.bam} 2> {log}"
+
+rule sort_index:
+    input:
+        "map/{sample}.unsorted.bam"
+    output:
+        bam = "map/{sample}.bam",
+        bai = "map/{sample}.bam.bai",
+    threads: 6
+    resources:
+        mem_mb = 4000
+    envmodules:
+        "samtools/1.16"
+    shadow:
+        "minimal"
+    shell:
+        """
+        samtools sort -@ {threads} -o {output.bam} {input}
+        samtools index -@ {threads} {output.bam}
+        """
+
+rule quantify:
+    input:
+        bam = "map/{sample}.bam",
+        bai = "map/{sample}.bam.bai",
+        gtf = config["gtf"],
+    output:
+        counts = "counts/{sample}.txt",
+    threads: 4
+    group:
+        "counting"
+    priority:
+        50
+    params:
+        feature_type = "exon",
+        id_attr = "gene_id",
+    shell:
+        """
+        featureCounts -T {threads} -a {input.gtf} -t {params.feature_type} -g {params.id_attr} \
+            -o {output.counts} {input.bam}
+        """
+
+# Example of script & notebook directives
+rule plot_qc:
+    input:
+        "qc/{sample}_fastqc.zip"
+    output:
+        "plots/{sample}_qc.png"
+    script:
+        "scripts/plot_qc.py"    # not executed; present to test directive
+
+rule explore_notebook:
+    input:
+        "counts/{sample}.txt"
+    output:
+        "notebooks/{sample}_eda.ipynb"
+    notebook:
+        "notebooks/template.ipynb"
+
+# Example of per-rule container / cache / benchmark / message / name / version (legacy)
+rule summarize:
+    input:
+        bam = "map/{sample}.bam",
+        counts = "counts/{sample}.txt"
+    output:
+        txt = "results/{sample}/summary.txt"
+    params:
+        tag = "{sample}"        # wildcard should highlight distinctly
+    message:
+        "Summarizing {wildcards.sample}"
+    name:
+        "summarize_{sample}"
+    benchmark:
+        "benchmark/summarize_{sample}.tsv"
+    cache:
+        "permissive"
+    container:
+        "docker://python:3.11"
+    version: "1.0"            # legacy directive
+    threads: 2
+    resources:
+        mem_mb = 512
+    log:
+        "log/summarize_{sample}.log"
+    run:
+        # simple Python run block
+        import json
+        meta = {
+            "sample": wildcards.sample,
+            "bam": input.bam,
+            "counts": input.counts,
+            "tag": params.tag,
+        }
+        # write a tiny summary
+        import os
+        os.makedirs(os.path.dirname(output.txt), exist_ok=True)
+        with open(output.txt, "w") as fh:
+            fh.write(json.dumps(meta, indent=2) + "\n")
+
+# ---------- More intentional errors inside a rule body ----------
+
+if config["method"] == "A":
+    
+    rule bad_header_examples_A:
+        input:
+            "map/{sample}.bam"
+        outpt:      # ERROR: unknown directive
+            "nowhere.txt"
+        foo:        # ERROR: unknown directive
+            "bar"
+        shell:
+            "true"
+else:
+    rule bad_header_examples_B:
+        input:
+            "map/{sample}.bam"
+        output:      # ERROR: unknown directive
+            "nowhere.txt"
+        foo:        # ERROR: unknown directive
+            "bar"
+        shell:
+            "true"
+
+# ---------- Using the module rule  ----------
+rule assemble_via_module:
+    input:
+        "trim/{sample}_R1.fastq.gz",
+        "trim/{sample}_R2.fastq.gz",
+    output:
+        "assembly/{sample}/contigs.fa"
+    threads: 8
+    shell:
+        "echo assembly > {output}"
+
+# ---------- Default target redirection ----------
+rule final_default:
+    output:
+        "FINAL.marker"
+    default_target:
+        True
+    shell:
+        "touch {output}"
+        
+rule: no text allowed here  # ERROR: no text allowed after block opener
+    input: "back_to_normal.txt"

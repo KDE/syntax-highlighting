@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>test.smk</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (Snakemake) - Theme (Breeze Light)"/>
+</head><body style="background-color:#ffffff;color:#1f1c1b"><pre>
+<span style="color:#898887"># =============================================================================</span>
+<span style="color:#898887"># Snakefile — comprehensive feature test for Snakemake highlighting</span>
+<span style="color:#898887"># Minimal comments; lines marked `# ERROR:` are intentionally invalid.</span>
+<span style="color:#898887"># =============================================================================</span>
+
+<span style="color:#898887"># ---------- Top-level Python ----------</span>
+
+<span style="font-weight:bold">if</span> <span style="color:#aa5500">True</span>: <span style="color:#bf0303;text-decoration:underline">forbidden</span> <span style="color:#898887"># ERROR: no text allowed after block opener</span>
+    <span style="color:#0057ae">a</span> = <span style="color:#b08000">1</span>
+<span style="font-weight:bold">else</span>: <span style="color:#bf0303;text-decoration:underline">forbidden</span> <span style="color:#898887"># ERROR: same</span>
+    <span style="color:#0057ae">a</span> = <span style="color:#b08000">0</span>
+
+<span style="color:#0057ae">config</span> = <span style="color:#ca60ca">{</span>
+    <span style="color:#bf0303">"method"</span><span style="color:#ca60ca">:</span> <span style="color:#bf0303">"B"</span><span style="color:#ca60ca">,</span>
+    <span style="color:#bf0303">"samples"</span><span style="color:#ca60ca">:</span> <span style="color:#ca60ca">[</span><span style="color:#bf0303">"S1"</span><span style="color:#ca60ca">,</span> <span style="color:#bf0303">"S2"</span><span style="color:#ca60ca">],</span>
+    <span style="color:#bf0303">"ref"</span><span style="color:#ca60ca">:</span> <span style="color:#bf0303">"ref/genome.fa"</span><span style="color:#ca60ca">,</span>
+    <span style="color:#bf0303">"gtf"</span><span style="color:#ca60ca">:</span> <span style="color:#bf0303">"ref/genes.gtf"</span><span style="color:#ca60ca">,</span>
+    <span style="color:#bf0303">"threads_default"</span><span style="color:#ca60ca">:</span> <span style="color:#b08000">4</span><span style="color:#ca60ca">,</span>
+    <span style="color:#bf0303">"work"</span><span style="color:#ca60ca">:</span> <span style="color:#bf0303">"work"</span><span style="color:#ca60ca">,</span>
+    <span style="color:#bf0303">"adapters"</span><span style="color:#ca60ca">:</span> <span style="color:#ca60ca">{</span><span style="color:#bf0303">"fwd"</span><span style="color:#ca60ca">:</span> <span style="color:#bf0303">"AGATCGGAAGAGC"</span><span style="color:#ca60ca">,</span> <span style="color:#bf0303">"rev"</span><span style="color:#ca60ca">:</span> <span style="color:#bf0303">"AGATCGGAAGAGC"</span><span style="color:#ca60ca">}</span>
+<span style="color:#ca60ca">}</span>
+<span style="color:#0057ae">SAMPLES</span> = <span style="color:#0057ae">config</span><span style="color:#ca60ca">[</span><span style="color:#bf0303">"samples"</span><span style="color:#ca60ca">]</span>
+
+<span style="font-weight:bold">def</span> <span style="color:#644a9b">fq</span><span style="color:#ca60ca">(</span><span style="color:#0057ae">sample</span><span style="color:#ca60ca">,</span> <span style="color:#0057ae">mate</span><span style="color:#ca60ca">)</span>:
+    <span style="font-weight:bold">return</span> <span style="color:#bf0303">f"raw/</span><span style="color:#3daee9">{</span><span style="color:#0057ae">sample</span><span style="color:#3daee9">}</span><span style="color:#bf0303">_R</span><span style="color:#3daee9">{</span><span style="color:#0057ae">mate</span><span style="color:#3daee9">}</span><span style="color:#bf0303">.fastq.gz"</span>
+
+<span style="color:#898887"># ---------- Global Snakemake directives ----------</span>
+<span style="font-weight:bold">workdir</span>: <span style="color:#0057ae">config</span><span style="color:#ca60ca">[</span><span style="color:#bf0303">"work"</span><span style="color:#ca60ca">]</span>
+<span style="font-weight:bold">localrules</span>: <span style="color:#0057ae">all</span><span style="color:#ca60ca">,</span> <span style="color:#0057ae">qc_fastqc</span>
+<span style="font-weight:bold">ruleorder</span>: <span style="color:#0057ae">sort_index</span> > <span style="color:#0057ae">align</span>
+<span style="font-weight:bold">report</span>: <span style="color:#bf0303">"report/report.html"</span>
+<span style="font-weight:bold">envvars</span>: <span style="color:#bf0303">"LD_LIBRARY_PATH"</span><span style="color:#ca60ca">,</span> <span style="color:#bf0303">"OMP_NUM_THREADS"</span>
+<span style="font-weight:bold">wildcard_constraints</span>:
+    <span style="color:#0057ae">sample</span> = <span style="color:#bf0303">r"[A-Za-z0-9_]+"</span>
+
+<span style="font-weight:bold">include</span>: <span style="color:#bf0303">"extras.smk"</span>
+<span style="font-weight:bold">container</span>: <span style="color:#bf0303">"docker://ubuntu:22.04"</span>
+<span style="font-weight:bold">conda</span>: <span style="color:#bf0303">"envs/global.yml"</span>
+<span style="font-weight:bold">containerized</span>:
+
+<span style="color:#898887"># Legacy/compat directives still recognized in old workflows</span>
+<span style="font-weight:bold">moduleinclude</span>: <span style="color:#bf0303">"legacy/tools.smk"</span>   <span style="color:#898887"># legacy include for modules</span>
+<span style="color:#898887"># deprecated (kept for legacy)</span>
+<span style="font-weight:bold">subworkflow</span> <span style="color:#644a9b">oldwf</span>:  <span style="color:#bf0303;text-decoration:underline">something </span><span style="color:#898887">#ERROR: nothing allowed after colon</span>
+    <span style="color:#644a9b;font-weight:bold">workdir</span><span style="color:#ca60ca">:</span> <span style="color:#bf0303">"oldwf"</span>
+    <span style="color:#644a9b;font-weight:bold">snakefile</span><span style="color:#ca60ca">:</span> <span style="color:#bf0303">"workflow/Snakefile"</span>
+    <span style="color:#bf0303;text-decoration:underline">input:</span> <span style="color:#898887"># ERROR: `input` directive not allowed in subworkflows</span>
+
+<span style="color:#898887"># ---------- Modules and use rule ----------</span>
+<span style="font-weight:bold">module</span> <span style="color:#644a9b">asm</span>: <span style="color:#bf0303;text-decoration:underline">something </span><span style="color:#898887">#ERROR: nothing allowed after colon</span>
+    <span style="color:#644a9b;font-weight:bold">snakefile</span><span style="color:#ca60ca">:</span> <span style="color:#bf0303">"modules/assembly.smk"</span>
+    <span style="color:#644a9b;font-weight:bold">config</span><span style="color:#ca60ca">:</span> <span style="color:#bf0303">"modules/assembly.yaml"</span>
+    <span style="color:#bf0303;text-decoration:underline">input:</span> <span style="color:#bf0303">"test"</span> <span style="color:#898887"># ERROR: `input` directive not allowed in modules</span>
+
+<span style="color:#898887"># Reuse a rule from the module; inside `with:` we use regular rule directives</span>
+<span style="font-weight:bold">use rule</span> <span style="color:#644a9b">assemble</span> <span style="font-weight:bold">as</span> <span style="color:#644a9b">assemble_mod</span> <span style="font-weight:bold">with</span>: <span style="color:#bf0303;text-decoration:underline">something </span><span style="color:#898887">#ERROR: nothing allowed after colon</span>
+    <span style="color:#bf0303;text-decoration:underline">snakefile:</span> <span style="color:#898887"># ERROR `snakefile` directive not allowed in rules</span>
+    <span style="color:#644a9b;font-weight:bold">threads</span>: <span style="color:#b08000">8</span>
+    <span style="color:#644a9b;font-weight:bold">params</span>:
+        <span style="color:#0057ae">mode</span> = <span style="color:#bf0303">"quick"</span>
+    <span style="color:#644a9b;font-weight:bold">message</span>:
+        <span style="color:#bf0303">"Assembling </span><span style="color:#0095ff;font-weight:bold">{wildcards.sample}</span><span style="color:#bf0303"> (module override)"</span>
+    <span style="color:#898887"># wrong directive (kept to test error handling inside a use-body)</span>
+    <span style="color:#bf0303;text-decoration:underline">outpt:</span> <span style="color:#bf0303">"SHOULD-NOT-BE-HERE"</span>   <span style="color:#898887"># ERROR: typo</span>
+
+<span style="color:#898887"># ---------- INTENTIONAL TOP-LEVEL ERRORS ----------</span>
+<span style="color:#bf0303;text-decoration:underline">workdirr:</span> <span style="color:#bf0303">"typo/dir"</span>              <span style="color:#898887"># ERROR: unknown top-level keyword</span>
+<span style="color:#bf0303;text-decoration:underline">snakefile:</span> <span style="color:#bf0303">"top/level.smk"</span>        <span style="color:#898887"># ERROR: only valid inside module/subworkflow</span>
+
+<span style="color:#898887"># ---------- Pipeline ----------</span>
+<span style="font-weight:bold">rule</span> <span style="color:#644a9b">all</span>:
+    <span style="color:#644a9b;font-weight:bold">input</span>:
+        <span style="color:#644a9b">expand</span><span style="color:#ca60ca">(</span><span style="color:#bf0303">"results/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">/summary.txt"</span><span style="color:#ca60ca">,</span> <span style="color:#0057ae">sample</span>=<span style="color:#0057ae">SAMPLES</span><span style="color:#ca60ca">)</span>
+
+<span style="font-weight:bold">rule</span> <span style="color:#644a9b">qc_fastqc</span>:
+    <span style="color:#644a9b;font-weight:bold">input</span>:
+        <span style="color:#0057ae">r1</span> = <span style="font-weight:bold">lambda</span> <span style="color:#0057ae">wc</span><span style="color:#ca60ca">:</span> <span style="color:#644a9b">fq</span><span style="color:#ca60ca">(</span><span style="color:#0057ae">wc</span><span style="color:#ca60ca">.</span><span style="color:#0057ae">sample</span><span style="color:#ca60ca">,</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">),</span>
+        <span style="color:#0057ae">r2</span> = <span style="font-weight:bold">lambda</span> <span style="color:#0057ae">wc</span><span style="color:#ca60ca">:</span> <span style="color:#644a9b">fq</span><span style="color:#ca60ca">(</span><span style="color:#0057ae">wc</span><span style="color:#ca60ca">.</span><span style="color:#0057ae">sample</span><span style="color:#ca60ca">,</span> <span style="color:#b08000">2</span><span style="color:#ca60ca">),</span>
+    <span style="color:#644a9b;font-weight:bold">output</span>:
+        <span style="color:#0057ae">html</span> = <span style="color:#bf0303">"qc/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">_fastqc.html"</span><span style="color:#ca60ca">,</span>
+        <span style="color:#0057ae">zip</span>  = <span style="color:#bf0303">"qc/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">_fastqc.zip"</span><span style="color:#ca60ca">,</span>
+    <span style="color:#644a9b;font-weight:bold">threads</span>: <span style="color:#b08000">2</span>
+    <span style="color:#644a9b;font-weight:bold">resources</span>:
+        <span style="color:#0057ae">mem_mb</span> = <span style="color:#b08000">1024</span>
+    <span style="color:#644a9b;font-weight:bold">log</span>:
+        <span style="color:#bf0303">"log/fastqc_</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">.log"</span>
+    <span style="color:#644a9b;font-weight:bold">params</span>:
+        <span style="color:#0057ae">extra</span> = <span style="color:#bf0303">"--nogroup"</span>
+    <span style="color:#644a9b;font-weight:bold">shell</span>:
+        <span style="color:#bf0303">"""</span>
+<span style="color:#bf0303">        fastqc -t </span><span style="color:#0095ff;font-weight:bold">{threads}</span><span style="color:#bf0303"> </span><span style="color:#0095ff;font-weight:bold">{params.extra}</span><span style="color:#bf0303"> -o qc </span><span style="color:#0095ff;font-weight:bold">{input.r1}</span><span style="color:#bf0303"> </span><span style="color:#0095ff;font-weight:bold">{input.r2}</span><span style="color:#bf0303"> > </span><span style="color:#0095ff;font-weight:bold">{log}</span><span style="color:#bf0303"> 2>&amp;1</span>
+<span style="color:#bf0303">        """</span>
+
+<span style="font-weight:bold">rule</span> <span style="color:#644a9b">trim_cutadapt</span>:
+    <span style="color:#644a9b;font-weight:bold">input</span>:
+        <span style="color:#0057ae">r1</span> = <span style="font-weight:bold">lambda</span> <span style="color:#0057ae">wc</span><span style="color:#ca60ca">:</span> <span style="color:#644a9b">fq</span><span style="color:#ca60ca">(</span><span style="color:#0057ae">wc</span><span style="color:#ca60ca">.</span><span style="color:#0057ae">sample</span><span style="color:#ca60ca">,</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">),</span>
+        <span style="color:#0057ae">r2</span> = <span style="font-weight:bold">lambda</span> <span style="color:#0057ae">wc</span><span style="color:#ca60ca">:</span> <span style="color:#644a9b">fq</span><span style="color:#ca60ca">(</span><span style="color:#0057ae">wc</span><span style="color:#ca60ca">.</span><span style="color:#0057ae">sample</span><span style="color:#ca60ca">,</span> <span style="color:#b08000">2</span><span style="color:#ca60ca">),</span>
+    <span style="color:#644a9b;font-weight:bold">output</span>:
+        <span style="color:#0057ae">r1</span> = <span style="color:#bf0303">"trim/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">_R1.fastq.gz"</span><span style="color:#ca60ca">,</span> <span style="color:#898887"># `sample`: wildcard</span>
+        <span style="color:#0057ae">r2</span> = <span style="color:#bf0303">"trim/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">_R2.fastq.gz"</span><span style="color:#ca60ca">,</span>
+        <span style="color:#0057ae">report</span> = <span style="color:#bf0303">f"</span><span style="color:#3daee9">{</span><span style="color:#0057ae">report_dir</span><span style="color:#3daee9">}</span><span style="color:#bf0303">/</span><span style="color:#006e28">{{sample}}</span><span style="color:#bf0303">"</span> <span style="color:#898887"># `report_dir`: f-string interpolation, `sample`: wildcard</span>
+    <span style="color:#644a9b;font-weight:bold">params</span>:
+        <span style="color:#0057ae">a</span> = <span style="color:#0057ae">config</span><span style="color:#ca60ca">[</span><span style="color:#bf0303">"adapters"</span><span style="color:#ca60ca">][</span><span style="color:#bf0303">"fwd"</span><span style="color:#ca60ca">],</span>
+        <span style="color:#0057ae">A</span> = <span style="color:#0057ae">config</span><span style="color:#ca60ca">[</span><span style="color:#bf0303">"adapters"</span><span style="color:#ca60ca">][</span><span style="color:#bf0303">"rev"</span><span style="color:#ca60ca">],</span>
+    <span style="color:#644a9b;font-weight:bold">threads</span>: <span style="color:#b08000">8</span>
+    <span style="color:#644a9b;font-weight:bold">conda</span>:
+        <span style="color:#bf0303">"envs/cutadapt.yml"</span>
+    <span style="color:#644a9b;font-weight:bold">log</span>:
+        <span style="color:#bf0303">"log/cutadapt_</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">.log"</span>
+    <span style="color:#644a9b;font-weight:bold">shell</span>:
+        <span style="color:#bf0303">"""</span>
+<span style="color:#bf0303">        cutadapt -j </span><span style="color:#0095ff;font-weight:bold">{threads}</span><span style="color:#bf0303"> -a </span><span style="color:#0095ff;font-weight:bold">{params.a}</span><span style="color:#bf0303"> -A </span><span style="color:#0095ff;font-weight:bold">{params.A}</span><span style="color:#bf0303"> \</span>
+<span style="color:#bf0303">            -o </span><span style="color:#0095ff;font-weight:bold">{output.r1}</span><span style="color:#bf0303"> -p </span><span style="color:#0095ff;font-weight:bold">{output.r2}</span><span style="color:#bf0303"> </span><span style="color:#0095ff;font-weight:bold">{input.r1}</span><span style="color:#bf0303"> </span><span style="color:#0095ff;font-weight:bold">{input.r2}</span><span style="color:#bf0303"> > </span><span style="color:#0095ff;font-weight:bold">{log}</span><span style="color:#bf0303"> 2>&amp;1</span>
+<span style="color:#bf0303">        """</span>
+
+<span style="color:#898887"># Example of wrapper usage (version string illustrative)</span>
+<span style="font-weight:bold">rule</span> <span style="color:#644a9b">align</span>:
+    <span style="color:#644a9b;font-weight:bold">input</span>:
+        <span style="color:#0057ae">r1</span> = <span style="color:#bf0303">"trim/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">_R1.fastq.gz"</span><span style="color:#ca60ca">,</span>
+        <span style="color:#0057ae">r2</span> = <span style="color:#bf0303">"trim/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">_R2.fastq.gz"</span><span style="color:#ca60ca">,</span>
+        <span style="color:#0057ae">ref</span> = <span style="color:#0057ae">config</span><span style="color:#ca60ca">[</span><span style="color:#bf0303">"ref"</span><span style="color:#ca60ca">],</span>
+    <span style="color:#644a9b;font-weight:bold">output</span>:
+        <span style="color:#0057ae">bam</span> = <span style="color:#bf0303">"map/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">.unsorted.bam"</span><span style="color:#ca60ca">,</span>
+    <span style="color:#644a9b;font-weight:bold">threads</span>: <span style="color:#b08000">12</span>
+    <span style="color:#644a9b;font-weight:bold">resources</span>:
+        <span style="color:#0057ae">mem_mb</span> = <span style="color:#b08000">8000</span>
+    <span style="color:#644a9b;font-weight:bold">params</span>:
+        <span style="color:#898887"># BWA-MEM2 example options</span>
+        <span style="color:#0057ae">extra</span> = <span style="color:#bf0303">"-M"</span>
+    <span style="color:#644a9b;font-weight:bold">log</span>:
+        <span style="color:#bf0303">"log/align_</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">.log"</span>
+    <span style="color:#644a9b;font-weight:bold">wrapper</span>:
+        <span style="color:#bf0303">"0.90.0/bio/bwa/mem2"</span>
+    <span style="color:#644a9b;font-weight:bold">shell</span>:
+        <span style="color:#bf0303">"bwa-mem2 mem -t </span><span style="color:#0095ff;font-weight:bold">{threads}</span><span style="color:#bf0303"> </span><span style="color:#0095ff;font-weight:bold">{params.extra}</span><span style="color:#bf0303"> </span><span style="color:#0095ff;font-weight:bold">{input.ref}</span><span style="color:#bf0303"> </span><span style="color:#0095ff;font-weight:bold">{input.r1}</span><span style="color:#bf0303"> </span><span style="color:#0095ff;font-weight:bold">{input.r2}</span><span style="color:#bf0303"> | samtools view -bS - > </span><span style="color:#0095ff;font-weight:bold">{output.bam}</span><span style="color:#bf0303"> 2> </span><span style="color:#0095ff;font-weight:bold">{log}</span><span style="color:#bf0303">"</span>
+
+<span style="font-weight:bold">rule</span> <span style="color:#644a9b">sort_index</span>:
+    <span style="color:#644a9b;font-weight:bold">input</span>:
+        <span style="color:#bf0303">"map/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">.unsorted.bam"</span>
+    <span style="color:#644a9b;font-weight:bold">output</span>:
+        <span style="color:#0057ae">bam</span> = <span style="color:#bf0303">"map/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">.bam"</span><span style="color:#ca60ca">,</span>
+        <span style="color:#0057ae">bai</span> = <span style="color:#bf0303">"map/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">.bam.bai"</span><span style="color:#ca60ca">,</span>
+    <span style="color:#644a9b;font-weight:bold">threads</span>: <span style="color:#b08000">6</span>
+    <span style="color:#644a9b;font-weight:bold">resources</span>:
+        <span style="color:#0057ae">mem_mb</span> = <span style="color:#b08000">4000</span>
+    <span style="color:#644a9b;font-weight:bold">envmodules</span>:
+        <span style="color:#bf0303">"samtools/1.16"</span>
+    <span style="color:#644a9b;font-weight:bold">shadow</span>:
+        <span style="color:#bf0303">"minimal"</span>
+    <span style="color:#644a9b;font-weight:bold">shell</span>:
+        <span style="color:#bf0303">"""</span>
+<span style="color:#bf0303">        samtools sort -@ </span><span style="color:#0095ff;font-weight:bold">{threads}</span><span style="color:#bf0303"> -o </span><span style="color:#0095ff;font-weight:bold">{output.bam}</span><span style="color:#bf0303"> </span><span style="color:#0095ff;font-weight:bold">{input}</span>
+<span style="color:#bf0303">        samtools index -@ </span><span style="color:#0095ff;font-weight:bold">{threads}</span><span style="color:#bf0303"> </span><span style="color:#0095ff;font-weight:bold">{output.bam}</span>
+<span style="color:#bf0303">        """</span>
+
+<span style="font-weight:bold">rule</span> <span style="color:#644a9b">quantify</span>:
+    <span style="color:#644a9b;font-weight:bold">input</span>:
+        <span style="color:#0057ae">bam</span> = <span style="color:#bf0303">"map/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">.bam"</span><span style="color:#ca60ca">,</span>
+        <span style="color:#0057ae">bai</span> = <span style="color:#bf0303">"map/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">.bam.bai"</span><span style="color:#ca60ca">,</span>
+        <span style="color:#0057ae">gtf</span> = <span style="color:#0057ae">config</span><span style="color:#ca60ca">[</span><span style="color:#bf0303">"gtf"</span><span style="color:#ca60ca">],</span>
+    <span style="color:#644a9b;font-weight:bold">output</span>:
+        <span style="color:#0057ae">counts</span> = <span style="color:#bf0303">"counts/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">.txt"</span><span style="color:#ca60ca">,</span>
+    <span style="color:#644a9b;font-weight:bold">threads</span>: <span style="color:#b08000">4</span>
+    <span style="color:#644a9b;font-weight:bold">group</span>:
+        <span style="color:#bf0303">"counting"</span>
+    <span style="color:#644a9b;font-weight:bold">priority</span>:
+        <span style="color:#b08000">50</span>
+    <span style="color:#644a9b;font-weight:bold">params</span>:
+        <span style="color:#0057ae">feature_type</span> = <span style="color:#bf0303">"exon"</span><span style="color:#ca60ca">,</span>
+        <span style="color:#0057ae">id_attr</span> = <span style="color:#bf0303">"gene_id"</span><span style="color:#ca60ca">,</span>
+    <span style="color:#644a9b;font-weight:bold">shell</span>:
+        <span style="color:#bf0303">"""</span>
+<span style="color:#bf0303">        featureCounts -T </span><span style="color:#0095ff;font-weight:bold">{threads}</span><span style="color:#bf0303"> -a </span><span style="color:#0095ff;font-weight:bold">{input.gtf}</span><span style="color:#bf0303"> -t </span><span style="color:#0095ff;font-weight:bold">{params.feature_type}</span><span style="color:#bf0303"> -g </span><span style="color:#0095ff;font-weight:bold">{params.id_attr}</span><span style="color:#bf0303"> \</span>
+<span style="color:#bf0303">            -o </span><span style="color:#0095ff;font-weight:bold">{output.counts}</span><span style="color:#bf0303"> </span><span style="color:#0095ff;font-weight:bold">{input.bam}</span>
+<span style="color:#bf0303">        """</span>
+
+<span style="color:#898887"># Example of script &amp; notebook directives</span>
+<span style="font-weight:bold">rule</span> <span style="color:#644a9b">plot_qc</span>:
+    <span style="color:#644a9b;font-weight:bold">input</span>:
+        <span style="color:#bf0303">"qc/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">_fastqc.zip"</span>
+    <span style="color:#644a9b;font-weight:bold">output</span>:
+        <span style="color:#bf0303">"plots/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">_qc.png"</span>
+    <span style="color:#644a9b;font-weight:bold">script</span>:
+        <span style="color:#bf0303">"scripts/plot_qc.py"</span>    <span style="color:#898887"># not executed; present to test directive</span>
+
+<span style="font-weight:bold">rule</span> <span style="color:#644a9b">explore_notebook</span>:
+    <span style="color:#644a9b;font-weight:bold">input</span>:
+        <span style="color:#bf0303">"counts/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">.txt"</span>
+    <span style="color:#644a9b;font-weight:bold">output</span>:
+        <span style="color:#bf0303">"notebooks/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">_eda.ipynb"</span>
+    <span style="color:#644a9b;font-weight:bold">notebook</span>:
+        <span style="color:#bf0303">"notebooks/template.ipynb"</span>
+
+<span style="color:#898887"># Example of per-rule container / cache / benchmark / message / name / version (legacy)</span>
+<span style="font-weight:bold">rule</span> <span style="color:#644a9b">summarize</span>:
+    <span style="color:#644a9b;font-weight:bold">input</span>:
+        <span style="color:#0057ae">bam</span> = <span style="color:#bf0303">"map/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">.bam"</span><span style="color:#ca60ca">,</span>
+        <span style="color:#0057ae">counts</span> = <span style="color:#bf0303">"counts/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">.txt"</span>
+    <span style="color:#644a9b;font-weight:bold">output</span>:
+        <span style="color:#0057ae">txt</span> = <span style="color:#bf0303">"results/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">/summary.txt"</span>
+    <span style="color:#644a9b;font-weight:bold">params</span>:
+        <span style="color:#0057ae">tag</span> = <span style="color:#bf0303">"</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">"</span>        <span style="color:#898887"># wildcard should highlight distinctly</span>
+    <span style="color:#644a9b;font-weight:bold">message</span>:
+        <span style="color:#bf0303">"Summarizing </span><span style="color:#0095ff;font-weight:bold">{wildcards.sample}</span><span style="color:#bf0303">"</span>
+    <span style="color:#644a9b;font-weight:bold">name</span>:
+        <span style="color:#bf0303">"summarize_</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">"</span>
+    <span style="color:#644a9b;font-weight:bold">benchmark</span>:
+        <span style="color:#bf0303">"benchmark/summarize_</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">.tsv"</span>
+    <span style="color:#644a9b;font-weight:bold">cache</span>:
+        <span style="color:#bf0303">"permissive"</span>
+    <span style="color:#644a9b;font-weight:bold">container</span>:
+        <span style="color:#bf0303">"docker://python:3.11"</span>
+    <span style="color:#644a9b;font-weight:bold">version</span>: <span style="color:#bf0303">"1.0"</span>            <span style="color:#898887"># legacy directive</span>
+    <span style="color:#644a9b;font-weight:bold">threads</span>: <span style="color:#b08000">2</span>
+    <span style="color:#644a9b;font-weight:bold">resources</span>:
+        <span style="color:#0057ae">mem_mb</span> = <span style="color:#b08000">512</span>
+    <span style="color:#644a9b;font-weight:bold">log</span>:
+        <span style="color:#bf0303">"log/summarize_</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">.log"</span>
+    <span style="color:#644a9b;font-weight:bold">run:</span>
+        <span style="color:#898887"># simple Python run block</span>
+        <span style="font-weight:bold">import</span> <span style="color:#0057ae">json</span>
+        <span style="color:#0057ae">meta</span> = <span style="color:#ca60ca">{</span>
+            <span style="color:#bf0303">"sample"</span><span style="color:#ca60ca">:</span> <span style="color:#0057ae">wildcards</span><span style="color:#ca60ca">.</span><span style="color:#0057ae">sample</span><span style="color:#ca60ca">,</span>
+            <span style="color:#bf0303">"bam"</span><span style="color:#ca60ca">:</span> <span style="color:#0057ae">input</span><span style="color:#ca60ca">.</span><span style="color:#0057ae">bam</span><span style="color:#ca60ca">,</span>
+            <span style="color:#bf0303">"counts"</span><span style="color:#ca60ca">:</span> <span style="color:#0057ae">input</span><span style="color:#ca60ca">.</span><span style="color:#0057ae">counts</span><span style="color:#ca60ca">,</span>
+            <span style="color:#bf0303">"tag"</span><span style="color:#ca60ca">:</span> <span style="color:#0057ae">params</span><span style="color:#ca60ca">.</span><span style="color:#0057ae">tag</span><span style="color:#ca60ca">,</span>
+        <span style="color:#ca60ca">}</span>
+        <span style="color:#898887"># write a tiny summary</span>
+        <span style="font-weight:bold">import</span> <span style="color:#0057ae">os</span>
+        <span style="color:#0057ae">os</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">makedirs</span><span style="color:#ca60ca">(</span><span style="color:#0057ae">os</span><span style="color:#ca60ca">.</span><span style="color:#0057ae">path</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">dirname</span><span style="color:#ca60ca">(</span><span style="color:#0057ae">output</span><span style="color:#ca60ca">.</span><span style="color:#0057ae">txt</span><span style="color:#ca60ca">),</span> <span style="color:#0057ae">exist_ok</span>=<span style="color:#aa5500">True</span><span style="color:#ca60ca">)</span>
+        <span style="font-weight:bold">with</span> <span style="color:#644a9b">open</span><span style="color:#ca60ca">(</span><span style="color:#0057ae">output</span><span style="color:#ca60ca">.</span><span style="color:#0057ae">txt</span><span style="color:#ca60ca">,</span> <span style="color:#bf0303">"w"</span><span style="color:#ca60ca">)</span> <span style="font-weight:bold">as</span> <span style="color:#0057ae">fh</span><span style="color:#ca60ca">:</span>
+            <span style="color:#0057ae">fh</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">write</span><span style="color:#ca60ca">(</span><span style="color:#0057ae">json</span><span style="color:#ca60ca">.</span><span style="color:#644a9b">dumps</span><span style="color:#ca60ca">(</span><span style="color:#0057ae">meta</span><span style="color:#ca60ca">,</span> <span style="color:#0057ae">indent</span>=<span style="color:#b08000">2</span><span style="color:#ca60ca">)</span> + <span style="color:#bf0303">"</span><span style="color:#924c9d">\n</span><span style="color:#bf0303">"</span><span style="color:#ca60ca">)</span>
+
+<span style="color:#898887"># ---------- More intentional errors inside a rule body ----------</span>
+
+<span style="font-weight:bold">if</span> <span style="color:#0057ae">config</span><span style="color:#ca60ca">[</span><span style="color:#bf0303">"method"</span><span style="color:#ca60ca">]</span> <span style="color:#ca60ca">==</span> <span style="color:#bf0303">"A"</span>:
+    
+    <span style="font-weight:bold">rule</span> <span style="color:#644a9b">bad_header_examples_A</span>:
+        <span style="color:#644a9b;font-weight:bold">input</span>:
+            <span style="color:#bf0303">"map/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">.bam"</span>
+        <span style="color:#bf0303;text-decoration:underline">outpt:</span>      <span style="color:#898887"># ERROR: unknown directive</span>
+            <span style="color:#bf0303">"nowhere.txt"</span>
+        <span style="color:#bf0303;text-decoration:underline">foo:</span>        <span style="color:#898887"># ERROR: unknown directive</span>
+            <span style="color:#bf0303">"bar"</span>
+        <span style="color:#644a9b;font-weight:bold">shell</span>:
+            <span style="color:#bf0303">"true"</span>
+<span style="font-weight:bold">else</span>:
+    <span style="font-weight:bold">rule</span> <span style="color:#644a9b">bad_header_examples_B</span>:
+        <span style="color:#644a9b;font-weight:bold">input</span>:
+            <span style="color:#bf0303">"map/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">.bam"</span>
+        <span style="color:#644a9b;font-weight:bold">output</span>:      <span style="color:#898887"># ERROR: unknown directive</span>
+            <span style="color:#bf0303">"nowhere.txt"</span>
+        <span style="color:#bf0303;text-decoration:underline">foo:</span>        <span style="color:#898887"># ERROR: unknown directive</span>
+            <span style="color:#bf0303">"bar"</span>
+        <span style="color:#644a9b;font-weight:bold">shell</span>:
+            <span style="color:#bf0303">"true"</span>
+
+<span style="color:#898887"># ---------- Using the module rule  ----------</span>
+<span style="font-weight:bold">rule</span> <span style="color:#644a9b">assemble_via_module</span>:
+    <span style="color:#644a9b;font-weight:bold">input</span>:
+        <span style="color:#bf0303">"trim/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">_R1.fastq.gz"</span><span style="color:#ca60ca">,</span>
+        <span style="color:#bf0303">"trim/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">_R2.fastq.gz"</span><span style="color:#ca60ca">,</span>
+    <span style="color:#644a9b;font-weight:bold">output</span>:
+        <span style="color:#bf0303">"assembly/</span><span style="color:#006e28">{sample}</span><span style="color:#bf0303">/contigs.fa"</span>
+    <span style="color:#644a9b;font-weight:bold">threads</span>: <span style="color:#b08000">8</span>
+    <span style="color:#644a9b;font-weight:bold">shell</span>:
+        <span style="color:#bf0303">"echo assembly > </span><span style="color:#0095ff;font-weight:bold">{output}</span><span style="color:#bf0303">"</span>
+
+<span style="color:#898887"># ---------- Default target redirection ----------</span>
+<span style="font-weight:bold">rule</span> <span style="color:#644a9b">final_default</span>:
+    <span style="color:#644a9b;font-weight:bold">output</span>:
+        <span style="color:#bf0303">"FINAL.marker"</span>
+    <span style="color:#644a9b;font-weight:bold">default_target</span>:
+        <span style="color:#aa5500">True</span>
+    <span style="color:#644a9b;font-weight:bold">shell</span>:
+        <span style="color:#bf0303">"touch </span><span style="color:#0095ff;font-weight:bold">{output}</span><span style="color:#bf0303">"</span>
+        
+<span style="font-weight:bold">rule</span>: <span style="color:#bf0303;text-decoration:underline">no text</span> <span style="color:#bf0303;text-decoration:underline">allowed</span> <span style="color:#bf0303;text-decoration:underline">here</span>  <span style="color:#898887"># ERROR: no text allowed after block opener</span>
+    <span style="color:#644a9b;font-weight:bold">input</span>: <span style="color:#bf0303">"back_to_normal.txt"</span>
+</pre></body></html>

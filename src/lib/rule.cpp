@@ -589,9 +589,15 @@ static QRegularExpression::PatternOptions makePattenOptions(const HighlightingCo
         | QRegularExpression::UseUnicodePropertiesOption;
 }
 
-static void resolveRegex(QRegularExpression &regexp, Context *context)
+static void resolveRegex(QRegularExpression &regexp, const ContextSwitch::ContextList &contexts)
 {
-    bool enableCapture = context && context->hasDynamicRule();
+    bool enableCapture = false;
+    for (auto *context : contexts) {
+        if (context->hasDynamicRule()) {
+            enableCapture = true;
+            break;
+        }
+    }
 
     // disable DontCaptureOption when reference a context with dynamic rule or
     // with invalid regex because DontCaptureOption with back reference capture is an error
@@ -649,7 +655,7 @@ void RegExpr::resolve()
 {
     m_isResolved = true;
 
-    resolveRegex(m_regexp, context().context());
+    resolveRegex(m_regexp, context().contexts());
 }
 
 MatchResult RegExpr::doMatch(QStringView text, int offset, const QStringList &, DynamicRegexpCache &) const
@@ -674,7 +680,7 @@ void DynamicRegExpr::resolve()
     m_isResolved = true;
 
     QRegularExpression regexp(m_pattern, m_patternOptions);
-    resolveRegex(regexp, context().context());
+    resolveRegex(regexp, context().contexts());
     m_patternOptions = regexp.patternOptions();
 }
 

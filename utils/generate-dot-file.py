@@ -4,9 +4,10 @@
 
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Iterable, Mapping
+from typing import Iterable, Mapping, Iterable
 from textwrap import wrap
 from xml.parsers import expat
+from abc import ABC, abstractmethod
 
 import re
 
@@ -16,10 +17,13 @@ parser = ArgumentParser(
     description=f'''Dot file generator for xml syntax
 
 Example:
-    generate-dot-file.py data/syntax/lua.xml | dot -T svg -o image.svg && xdg-open image.svg''')
+    generate-dot-file.py data/syntax/lua.xml | dot -T svg -o image.svg''')
 
 parser.add_argument('-c', '--context-only', action='store_true',
                     help='Generates contexts without rules')
+
+parser.add_argument('-n', '--minimize-node', action='store_true',
+                    help='Removes intermediate nodes that appear in the presence of #pop or multiple contexts (only with --context-only)')
 
 parser.add_argument('-r', '--resolve-entities', action='store_true',
                     help='Evaluate xml entities')
@@ -38,8 +42,8 @@ args = parser.parse_args()
 excludes = [re.compile(patt) for patt in args.exclude]
 includes = [re.compile(patt) for patt in args.include]
 context_only = args.context_only
+minimize_node = args.minimize_node
 resolve_entities = args.resolve_entities or context_only
-
 
 global_entities = {
     '&#9;': '\\t',
@@ -57,18 +61,16 @@ global_entities = {
 }
 entities_finder = re.compile('|'.join(global_entities))
 
-
-
 Outside = 0
 Context = 1
 Rule = 2
 
-class XMLParser:
+class XMLParserBase(ABC):
     depth = Outside
     matched = False
     ictx = 0
     ctx_name = ''
-    ctx_attrs: dict[str, str] = {}
+    ctx_attrs: dict[str, str]
     escaped_ctx_name = ''
     ctx_color = ''
     irule = 0
@@ -77,10 +79,26 @@ class XMLParser:
     reversed_entities: dict[str, str] = {}
     resolved_entity_searcher: re.Pattern
 
-    def __init__(self, start_ctx, end_ctx, rule_process):
-        self.start_ctx = start_ctx
-        self.end_ctx = end_ctx
-        self.rule_process = rule_process
+    output: list[str]
+    minimize_node: bool
+
+    def __init__(self, output: list[str]):
+        self.output = output
+        self.ctx_attrs = {}
+        self.reversed_entities = {}
+        super().__init__()
+
+    @abstractmethod
+    def start_ctx(self) -> None:
+        ...
+
+    @abstractmethod
+    def end_ctx(self) -> None:
+        ...
+
+    @abstractmethod
+    def rule_process(self, irule: int, tag: str, attrs: dict[str, str]) -> None:
+        ...
 
     def start_element(self, tag: str, attrs: dict[str, str]):
         if self.depth == Context:
@@ -91,7 +109,7 @@ class XMLParser:
                     string = attrs.get('String')
                     if string:
                         attrs['String'] = self.unresolve_entities(string)
-                self.rule_process(self, self.irule, tag, attrs)
+                self.rule_process(self.irule, tag, attrs)
         elif tag == 'context':
             name = attrs['name']
             self.depth = Context
@@ -103,12 +121,12 @@ class XMLParser:
                 self.ctx_attrs = attrs
                 self.escaped_ctx_name = escape(name)
                 self.ctx_color = compute_color(name)
-                self.start_ctx(self)
+                self.start_ctx()
 
     def end_element(self, name: str):
         if self.depth == Context:
             if self.matched:
-                self.end_ctx(self)
+                self.end_ctx()
             self.ictx += 1
         self.depth -= 1
 
@@ -138,10 +156,10 @@ class XMLParser:
         self.resolved_entity_searcher = re.compile(patt)
 
 
-color_map = [
+color_map = (
     '"/rdgy4/3"',
     '"/set312/1"',
-    '"lightgoldenrod1"',
+    '"lightgoldenrod2"',
     '"/set312/3"',
     '"/set312/4"',
     '"/set312/5"',
@@ -151,7 +169,7 @@ color_map = [
     '"/purd6/3"',
     '"/ylgn4/2"',
     '"/set26/6"',
-]
+)
 
 picked_colors: dict[int, str] = {}
 
@@ -170,15 +188,30 @@ def match_patterns(name: str, patterns: list[re.Pattern]) -> bool:
     return any(patt.search(name) for patt in patterns)
 
 
-_pop_counter_re = re.compile('^(?:#pop)+')
+_pops_re = re.compile(r'^(?:#pop)+!?')
 
-def labelize(name: str) -> str:
-    m = _pop_counter_re.match(name)
-    if m:
-        n = len(m[0]) // 4
-        if n > 1:
-            return f'#pop({n}){name[n * 4:]}'
-    return name
+def split_ctx(ctx: str) -> tuple[str,  # '#pop' sequence
+                                 str,  # seprator between pop and ctx
+                                 str,  # contexts without pop
+                                 Iterable[str]  # next contexts
+                                 ]:
+    pop = ''
+
+    ctx_without_pop: str = _pops_re.sub('', ctx)
+    n = len(ctx) - len(ctx_without_pop)
+    if n:
+        if n > 5:
+            pop = f'#pop({n//4})'
+        else:
+            pop = '#pop'
+
+    if ctx_without_pop:
+        # unique context with order preservation
+        ctxs = {ctx: None for ctx in ctx_without_pop.split('!')}
+        sep = pop and ctx_without_pop and "!" or ""
+        return (pop, sep, ctx_without_pop, ctxs.keys())
+
+    return (pop, '', ctx_without_pop, ())
 
 
 def stringify_attrs(attr_names: Iterable[str], attrs: Mapping[str, str]) -> str:
@@ -187,7 +220,7 @@ def stringify_attrs(attr_names: Iterable[str], attrs: Mapping[str, str]) -> str:
         attr = attrs.get(name)
         if attr:
             part = '\n'.join(wrap(attr, 40))
-            s += f'  {v}:{part}'
+            s += f'  {name}:{part}'
     return s
 
 
@@ -195,40 +228,178 @@ def escape(s: str) -> str:
     return s.replace('\\', '\\\\').replace('"', '\\"')
 
 
-def jumpctx(s: str) -> str:
-    i = s.find('!')
-    return '' if i == -1 else s[i+1:]
-
-
 def xml_bool(s: str | None) -> bool:
     return s == '1' or s == 'true'
 
 
-def push_context_attr(output: list[str],
-                      escaped_origin: str, escaped_ctx_name: str, escaped_name_attr: str,
-                      style: str, color: str) -> None:
-    if escaped_name_attr == '#stay':
-        output.append(f'    "{escaped_origin}" -> "{escaped_ctx_name}" [style={style},color={color}];\n')
-    elif escaped_name_attr.startswith('#'):
-        ref = f'{escaped_ctx_name}!!{escaped_name_attr}'
-        output.append(
-            f'    "{escaped_origin}" -> "{ref}" [style={style},color={color}];\n'
-            f'    "{ref}" [label="{labelize(escaped_name_attr)}",color={color}];\n'
+class XMLContextOnlyParser(XMLParserBase):
+    # avoid multi arrow for ctx1 -> ctx2
+    krule_contexts: dict[str, int]
+    minimize_node: bool
+
+    def __init__(self, output: list[str], minimize_node: bool):
+        self.krule_contexts = {}
+        self.minimize_node = minimize_node
+        super().__init__(output)
+
+    def start_ctx(self) -> None:
+        self.krule_contexts.clear()
+
+    def rule_process(self, irule: int, name: str, attrs: dict[str, str]) -> None:
+        self.krule_contexts[attrs.get('context') or '#stay'] = irule
+
+    def end_ctx(self) -> None:
+        color = self.ctx_color
+        ctx_name = self.escaped_ctx_name
+        self.output.append(f'  "{ctx_name}" [style=filled,color={color}]\n')
+
+        self.krule_contexts.setdefault(self.ctx_attrs.get('fallthroughContext') or '#stay', -1)
+        self.krule_contexts.setdefault(self.ctx_attrs.get('lineEndContext') or '#stay', -2)
+        self.krule_contexts.setdefault(self.ctx_attrs.get('lineEmptyContext') or '#stay', -3)
+
+        self.krule_contexts.pop('#stay')
+
+        dejavu: set[str] = set()
+
+        def push(s: str):
+            if s not in dejavu:
+                dejavu.add(s)
+                self.output.append(s)
+
+        for rule_context, i in sorted(self.krule_contexts.items(), key=lambda t: t[1]):
+            escaped_rule_context = escape(rule_context)
+            pop, sep, ctx_without_pop, next_contexts = split_ctx(escaped_rule_context)
+
+            if self.minimize_node:
+                for ctx in next_contexts:
+                    push(f'  "{ctx_name}" -> "{ctx}" [color={color}];\n')
+                continue
+
+            # rule
+            if i >= 0:
+                style = ''
+            # fallthroughContext
+            elif i == -1:
+                style = ',style=dashed'
+            # lineEndContext
+            elif i == -2:
+                style = ',style=dotted'
+            # lineEmptyContext
+            else:  # if i == -3:
+                style = ',style=bold'
+
+            # create intermediate node
+            if pop or len(next_contexts) > 1:
+                node = f'{ctx_name}!!{escaped_rule_context}'
+                push(
+                    f'  "{ctx_name}" -> "{node}" [color={color}{style}];\n'
+                    f'  "{node}" [label="{pop}{sep}{ctx_without_pop}"];\n'
+                )
+                if node not in dejavu:
+                    dejavu.add(node)
+                    for ctx in next_contexts:
+                        self.output.append(f'  "{node}" -> "{ctx}" [color={color}];\n')
+            # direct link
+            else:
+                push(f'  "{ctx_name}" -> "{escaped_rule_context}" [color={color}{style}];\n')
+
+
+class XMLParser(XMLParserBase):
+    # Cattribute is the context attribute if no attribute is specified
+    # note: char1 is tranformed into String
+    FIRST_LINE_ATTRIBUTES = ('attribute', 'Cattribute', 'String', 'char')
+    SECOND_LINE_ATTRIBUTES = ('beginRegion', 'endRegion', 'lookAhead', 'firstNonSpace', 'column', 'additionalDeliminator', 'weakDeliminator', 'insensitive')
+
+    kdot: dict[str, bool]
+    escaped_name = ''
+
+    def __init__(self, output: list[str]):
+        self.kdot = {}
+        super().__init__(output)
+
+    def start_ctx(self) -> None:
+        self.escaped_name = self.escaped_ctx_name
+
+        self.kdot.clear()
+        self.output.append(
+            f'  subgraph cluster{self.ictx} {{\n'
+            f'    "{self.escaped_name}" [shape=box,style=filled,color={self.ctx_color}];\n'
         )
 
+    def rule_process(self, irule: int, name: str, attrs: dict[str, str]) -> None:
+        color = self.ctx_color
+        escaped_ctx_name = self.escaped_ctx_name
 
-def push_last_transition(output: list[str],
-                         escaped_name: str, escaped_ctx_name: str, escaped_name_attr: str,
-                         color: str) -> None:
-    if escaped_name_attr == '#stay':
-        return
+        escaped_name = f'{escaped_ctx_name}!!{irule}!!{escape(name)}'
 
-    if escaped_name_attr.startswith('#'):
-        escaped_last_ctx = jumpctx(escaped_name_attr)
-        if escaped_last_ctx:
-            output.append(f'  "{escaped_ctx_name}!!{escaped_name_attr}" -> "{escaped_last_ctx}" [style=dashed,color={color}];\n')
-    else:
-        output.append(f'  "{escaped_name}" -> "{escaped_name_attr}" [style=dashed,color={color}];\n')
+        # context or rule linked to the next rule
+        self.output.append(
+            f'    "{self.escaped_name}" -> "{escaped_name}"'
+            f' [style=dashed,color={color}];\n'
+        )
+
+        self.escaped_name = escaped_name
+
+        rule_context = attrs.get('context', '#stay')
+
+        if name == 'IncludeRules':
+            label = f'  {rule_context}'
+        else:
+            if 'attribute' not in attrs:
+                attrs['Cattribute'] = self.ctx_attrs['attribute']
+            if 'char1' in attrs:
+                attrs['String'] = attrs.pop('char') + attrs.pop('char1')
+            label = stringify_attrs(self.FIRST_LINE_ATTRIBUTES, attrs)
+            label2 = stringify_attrs(self.SECOND_LINE_ATTRIBUTES, attrs)
+            if label2:
+                label = f'{label}\n{label2}'
+        self.output.append(f'    "{escaped_name}" [label="{name}{escape(label)}"];\n')
+
+        if xml_bool(attrs.get('lookAhead')):
+            self.output.append(f'    "{escaped_name}" [style=dashed];\n')
+
+        if rule_context and rule_context != '#stay':
+            self.push_link(escaped_name, rule_context, color, style='')
+        else:
+            self.output.append(
+                f'    "{escaped_name}" -> "{escaped_ctx_name}" [color=dodgerblue3];\n'
+            )
+
+    def push_link(self, escaped_name: str, ctx: str, color: str, style: str) -> None:
+        if style:
+            style = f',style={style}'
+
+        escaped_ctx = escape(ctx)
+        pop, sep, ctx_without_pop, next_contexts = split_ctx(escaped_ctx)
+
+        if pop or len(next_contexts) > 1:
+            node = f'{self.escaped_ctx_name}!!{escaped_ctx}'
+            self.kdot[f'    "{escaped_name}" -> "{node}" [color={color}{style}];\n'] = True
+            self.kdot[f'    "{node}" [label="{pop}{sep}{ctx_without_pop}",color=red];\n'] = True
+            for ctx in next_contexts:
+                self.kdot[f'  "{node}" -> "{ctx}" [color={color}];\n'] = False
+        else:
+            self.kdot[f'  "{escaped_name}" -> "{escaped_ctx}" [color={color}{style}];\n'] = False
+
+    def end_ctx(self) -> None:
+        for escaped_ctx, attr, style, color in (
+            (self.escaped_name, 'fallthroughContext', 'dashed', self.ctx_color),
+            (self.escaped_ctx_name, 'lineEndContext', 'dotted', 'blue'),
+            (self.escaped_ctx_name, 'lineEmptyContext', 'bold', 'purple'),
+        ):
+            ctx = self.ctx_attrs.get(attr)
+
+            if ctx and ctx != '#stay':
+                self.push_link(escaped_ctx, ctx, color, style)
+            else:
+                self.output.append(
+                    f'    "{escaped_ctx}" -> "{self.escaped_ctx_name}"'
+                    f' [style={style},color={color}];\n'
+                )
+
+        self.output.extend(s for s, in_cluster in self.kdot.items() if in_cluster)
+        self.output.append('  }\n')
+        self.output.extend(s for s, in_cluster in self.kdot.items() if not in_cluster)
 
 
 output = [
@@ -237,164 +408,10 @@ output = [
 ]
 
 if context_only:
-    # avoid multi arrow for ctx1 -> ctx2
-    krule_contexts: dict[str, int] = {}
-    # shares #pop... nodes
-    kpoped_contexts: dict[tuple[str, str], str] = {}
-
-    def start_ctx(p: XMLParser):
-        krule_contexts.clear()
-
-    def rule_process(p: XMLParser, irule: int, name: str, attrs: dict[str, str]):
-        krule_contexts[attrs.get('context') or '#stay'] = irule
-
-    def end_ctx(p: XMLParser):
-        color = p.ctx_color
-        ctx_name = p.escaped_ctx_name
-        output.append(f'  "{ctx_name}" [style=filled,color={color}]\n')
-
-        krule_contexts.setdefault(p.ctx_attrs.get('fallthroughContext') or '#stay', -1)
-        krule_contexts.setdefault(p.ctx_attrs.get('lineEndContext') or '#stay', -2)
-        krule_contexts.setdefault(p.ctx_attrs.get('lineEmptyContext') or '#stay', -3)
-
-        krule_contexts.pop('#stay')
-
-        for rule_context, i in sorted(krule_contexts.items(), key=lambda t: t[1]):
-            if i >= 0:
-                style = f'color={color}'
-            elif i == -1:
-                style = f'style=dashed,color={color}'
-            elif i == -2:
-                style = 'style=dotted,color=blue'
-            else:  # if i == -3:
-                style = 'style=dotted,color=purple'
-
-            escaped_rule_context = escape(rule_context)
-            labelized_context = labelize(escaped_rule_context)
-            if rule_context.startswith('#'):
-                next_context = jumpctx(escaped_rule_context)
-                if next_context:
-                    k = (labelized_context, next_context)
-                    poped_context = kpoped_contexts.get(k)
-                    if poped_context:
-                        output.append(f'  "{ctx_name}" -> "{poped_context}" [{style}];\n')
-                    else:
-                        poped_context = f'{ctx_name}!!{i}'
-                        kpoped_contexts[k] = poped_context
-                        output.append(f'  "{ctx_name}" -> "{poped_context}" [{style}];\n'
-                                      f'  "{poped_context}" [label="{labelized_context}"];\n'
-                                      f'  "{poped_context}" -> "{next_context}"\n')
-                else:
-                    poped_context = f'{ctx_name}!!{i}'
-                    output.append(f'  "{ctx_name}" -> "{poped_context}" [{style}];\n'
-                                  f'  "{poped_context}" [label="{labelized_context}"];\n')
-            else:
-                output.append(f'  "{ctx_name}" -> "{labelized_context}" [{style}]\n')
-
+    xml_parser = XMLContextOnlyParser(output, minimize_node)
 else:
-    first_line_attributes = ('attribute', 'String', 'char')  # char1 is tranformed into String
-    second_line_attributes = ('beginRegion', 'endRegion', 'lookAhead', 'firstNonSpace', 'column', 'additionalDeliminator', 'weakDeliminator')
+    xml_parser = XMLParser(output)
 
-    kdot: dict[str, tuple[str, int]] = {}
-    escaped_name = ''
-
-    def start_ctx(p: XMLParser):
-        global escaped_name
-
-        escaped_name = p.escaped_ctx_name
-
-        kdot.clear()
-        output.append(
-            f'  subgraph cluster{p.ictx} {{\n'
-            f'    "{escaped_name}" [shape=box,style=filled,color={p.ctx_color}];\n'
-        )
-
-    def rule_process(p: XMLParser, irule: int, name: str, attrs: dict[str, str]):
-        global escaped_name
-
-        color = p.ctx_color
-        escaped_ctx_name = p.escaped_ctx_name
-
-        next_name = f'{p.ctx_name}!!{irule}!!{name}'
-        escaped_next_name = escape(next_name)
-        rule_context = attrs.get('context', '#stay')
-        output.append(f'    "{escaped_name}" -> "{escaped_next_name}" [style=dashed,color={color}];\n')
-
-        escaped_name = escaped_next_name
-
-        if name == 'IncludeRules':
-            label = f'  {rule_context}'
-        else:
-            if 'attribute' not in attrs:
-                attrs['attribute'] = p.ctx_attrs['attribute']
-            if 'char1' in attrs:
-                attrs['String'] = attrs.pop('char') + attrs.pop('char1')
-            label = stringify_attrs(first_line_attributes, attrs)
-            label2 = stringify_attrs(second_line_attributes, attrs)
-            if label2:
-                label = f'{label}\n{label2}'
-        output.append(f'    "{escaped_name}" [label="{name}{escape(label)}"];\n')
-
-        if xml_bool(attrs.get('lookAhead')):
-            output.append(f'    "{escaped_name}" [style=dashed];\n')
-
-        if rule_context == '#stay':
-            output.append(f'    "{escaped_name}" -> "{escaped_ctx_name}" [color=dodgerblue3];\n')
-        elif rule_context:
-            escaped_rule_context = escape(rule_context)
-            if rule_context.startswith('#'):
-                escaped_bind_ctx_name = jumpctx(escaped_rule_context)
-                ref = f'{escaped_ctx_name}!!{escaped_rule_context}'
-                output.append(
-                    f'    "{escaped_name}" -> "{ref}" [color={color}];\n'
-                    f'    "{ref}" [label="{labelize(escaped_rule_context)}"];\n'
-                )
-                if escaped_bind_ctx_name:
-                    kdot[f'{ref}!!{escaped_bind_ctx_name}'] = (
-                        f'  "{ref}" -> "{escaped_bind_ctx_name}" [color={color}];\n'
-                        f'  "{ref}" [color=red];\n',
-                        irule,
-                    )
-            else:
-                kdot[f'{irule}'] = (
-                    f'  "{escaped_name}" -> "{escaped_rule_context}" [color={color}];\n',
-                    irule,
-                )
-
-    def end_ctx(p: XMLParser):
-        color = p.ctx_color
-        escaped_ctx_name = p.escaped_ctx_name
-
-        fallthrough_ctx = p.ctx_attrs.get('fallthroughContext', '#stay')
-        escaped_fallthrough_ctx = escape(fallthrough_ctx)
-        push_context_attr(output, escaped_name, escaped_ctx_name,
-                          escaped_fallthrough_ctx, 'dashed', color)
-
-        end_ctx = p.ctx_attrs.get('lineEndContext', '#stay')
-        escaped_end_ctx = escape(end_ctx)
-        push_context_attr(output, escaped_ctx_name, escaped_ctx_name,
-                          escaped_end_ctx, 'dotted', 'blue')
-
-        empty_ctx = p.ctx_attrs.get('lineEmptyContext', '#stay')
-        escaped_empty_ctx = escape(empty_ctx)
-        push_context_attr(output, escaped_ctx_name, escaped_ctx_name,
-                          escaped_empty_ctx, 'dotted', 'purple')
-
-        output.append('  }\n')
-
-        push_last_transition(output, escaped_name, escaped_ctx_name,
-                             escaped_fallthrough_ctx, color)
-
-        push_last_transition(output, escaped_name, escaped_ctx_name,
-                             escaped_end_ctx, color)
-
-        push_last_transition(output, escaped_name, escaped_ctx_name,
-                             escaped_empty_ctx, color)
-
-        output.extend(expr for expr, _ in sorted(kdot.values(), key=lambda t: t[1]))
-
-
-xml_parser = XMLParser(start_ctx, end_ctx, rule_process)
 p = expat.ParserCreate()
 p.StartElementHandler = xml_parser.start_element
 p.EndElementHandler = xml_parser.end_element

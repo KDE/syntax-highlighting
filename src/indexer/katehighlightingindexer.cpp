@@ -335,8 +335,8 @@ public:
             }
 
             auto markAsUsedContext = [](ContextName &contextName) {
-                if (!contextName.stay && contextName.context) {
-                    contextName.context->isOnlyIncluded = false;
+                for (auto *ctx : contextName.contexts) {
+                    ctx->isOnlyIncluded = false;
                 }
             };
 
@@ -344,19 +344,25 @@ public:
             while (contextIt.hasNext()) {
                 contextIt.next();
                 auto &context = contextIt.value();
-                resolveContextName(definition, context, context.lineEndContext, context.line);
-                resolveContextName(definition, context, context.lineEmptyContext, context.line);
-                resolveContextName(definition, context, context.fallthroughContext, context.line);
+                resolveContextName(definition, context.lineEndContext, context.line, "lineEndContext");
+                resolveContextName(definition, context.lineEmptyContext, context.line, "lineEmptyContext");
+                resolveContextName(definition, context.fallthroughContext, context.line, "fallthroughContext");
                 markAsUsedContext(context.lineEndContext);
                 markAsUsedContext(context.lineEmptyContext);
                 markAsUsedContext(context.fallthroughContext);
                 for (auto &rule : context.rules) {
                     rule.parentContext = &context;
-                    resolveContextName(definition, context, rule.context, rule.line);
                     if (rule.type != Context::Rule::Type::IncludeRules) {
+                        resolveContextName(definition, rule.context, rule.line, "context");
                         markAsUsedContext(rule.context);
-                    } else if (rule.includeAttrib == XmlBool::True && rule.context.context) {
-                        rule.context.context->referencedWithIncludeAttrib = true;
+                    } else {
+                        auto *ctx = resolveContextPartName(definition, rule.context.name, rule.line, "context", rule.context.name);
+                        if (ctx) {
+                            rule.context.contexts.push_back(ctx);
+                            if (rule.includeAttrib == XmlBool::True) {
+                                ctx->referencedWithIncludeAttrib = true;
+                            }
+                        }
                     }
                 }
             }
@@ -484,12 +490,14 @@ private:
 
     struct Context;
 
+    using ContextList = QVarLengthArray<Context *, 2>;
+
     struct ContextName {
         QString name;
         int popCount = 0;
         bool stay = false;
 
-        Context *context = nullptr;
+        ContextList contexts{};
     };
 
     struct Parser {
@@ -957,6 +965,9 @@ private:
             if (name.isEmpty()) {
                 qWarning() << filename << "line" << xml.lineNumber() << "missing attribute: name";
                 success = false;
+            } else if (name.contains(u'!')) {
+                qWarning() << filename << "line" << xml.lineNumber() << "the name contains '!', which is a character used to refer to multiple contexts";
+                success = false;
             }
 
             if (attribute.isEmpty()) {
@@ -1115,28 +1126,16 @@ private:
                         continue;
                     }
 
-                    if (rule.context.stay) {
-                        qWarning() << definition.filename << "line" << rule.line << "IncludeRules refers to himself";
-                        m_success = false;
-                        continue;
-                    }
-
-                    if (rule.context.popCount) {
-                        qWarning() << definition.filename << "line" << rule.line << "IncludeRules with #pop prefix";
-                        m_success = false;
-                    }
-
-                    if (!rule.context.context) {
-                        m_success = false;
+                    if (rule.context.contexts.isEmpty()) {
                         continue;
                     }
 
                     // resolve includedRules and includedIncludeRules
 
                     usedContexts.clear();
-                    usedContexts.insert(rule.context.context);
+                    usedContexts.insert(rule.context.contexts.front());
                     contexts.clear();
-                    contexts.append(rule.context.context);
+                    contexts.append(rule.context.contexts.front());
 
                     for (int i = 0; i < contexts.size(); ++i) {
                         currentContext.hasDynamicRule = contexts[i]->hasDynamicRule;
@@ -1150,10 +1149,11 @@ private:
                                 rule.includedIncludeRules.insert(&includedRule);
 
                                 if (includedRule.includedRules.isEmpty()) {
-                                    const auto *context = includedRule.context.context;
-                                    if (context && !usedContexts.contains(context)) {
-                                        contexts.append(context);
-                                        usedContexts.insert(context);
+                                    for (const auto *context : includedRule.context.contexts) {
+                                        if (!usedContexts.contains(context)) {
+                                            contexts.append(context);
+                                            usedContexts.insert(context);
+                                        }
                                     }
                                 } else {
                                     rule.includedRules.append(includedRule.includedRules);
@@ -1184,20 +1184,22 @@ private:
                 contexts.append(definition.firstContext);
 
                 for (int i = 0; i < contexts.size(); ++i) {
-                    auto appendContext = [&](const Context *context) {
-                        if (context && !usedContexts.contains(context)) {
-                            contexts.append(context);
-                            usedContexts.insert(context);
+                    auto appendContext = [&](const ContextList &contextList) {
+                        for (auto *context : contextList) {
+                            if (!usedContexts.contains(context)) {
+                                contexts.append(context);
+                                usedContexts.insert(context);
+                            }
                         }
                     };
 
                     const auto *context = contexts[i];
-                    appendContext(context->lineEndContext.context);
-                    appendContext(context->lineEmptyContext.context);
-                    appendContext(context->fallthroughContext.context);
+                    appendContext(context->lineEndContext.contexts);
+                    appendContext(context->lineEmptyContext.contexts);
+                    appendContext(context->fallthroughContext.contexts);
 
                     for (auto &rule : context->rules) {
-                        appendContext(rule.context.context);
+                        appendContext(rule.context.contexts);
                     }
                 }
             }
@@ -1396,9 +1398,17 @@ private:
             static const QRegularExpression isMinimal(QStringLiteral("(?![.][*+?][$]?[)]*$)[.][*+?][^?+]"));
             static const QRegularExpression hasNotGreedy(QStringLiteral("[*+?][?+]"));
 
+            auto hasDynamicRule = [](const ContextList &contexts) {
+                for (auto *context : contexts) {
+                    if (context->hasDynamicRule) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+
             if (rule.lookAhead == XmlBool::True && rule.minimal != XmlBool::True && reg.contains(isMinimal) && !reg.contains(hasNotGreedy)
-                && (!rule.context.context || !rule.context.context->hasDynamicRule || regexp.captureCount() == 0)
-                && (reg.back() != u'$' || reg.contains(u'|'))) {
+                && (!hasDynamicRule(rule.context.contexts) || regexp.captureCount() == 0) && (reg.back() != u'$' || reg.contains(u'|'))) {
                 qWarning() << rule.filename << "line" << rule.line
                            << "RegExpr should be have minimal=\"1\" or use lazy operator (i.g, '.*' -> '.*?'):" << rule.string;
                 return false;
@@ -1524,8 +1534,8 @@ private:
 
                 int maxCaptureUsed = 0;
                 // maximal dynamic reference
-                if (rule.context.context && !rule.context.stay) {
-                    for (const auto &nextRule : std::as_const(rule.context.context->rules)) {
+                for (auto *context : rule.context.contexts) {
+                    for (const auto &nextRule : std::as_const(context->rules)) {
                         if (nextRule.dynamic == XmlBool::True) {
                             static const QStringView cap[]{
                                 u"%1"_sv,
@@ -2191,9 +2201,8 @@ private:
         observedRules.reserve(context.rules.size());
         for (const Context::Rule &rule : context.rules) {
             const Context::Rule *includeRule = nullptr;
-            if (rule.type == Context::Rule::Type::IncludeRules) {
-                auto *context = rule.context.context;
-                if (context && context->isOnlyIncluded) {
+            if (rule.type == Context::Rule::Type::IncludeRules && !rule.context.contexts.isEmpty()) {
+                if (rule.context.contexts.front()->isOnlyIncluded) {
                     includeRule = &rule;
                 }
             }
@@ -2556,14 +2565,20 @@ private:
                     break;
                 }
 
-                if (auto &ruleAndInclude = includeContexts[rule.context.context]) {
+                if (rule.context.contexts.isEmpty()) {
+                    break;
+                }
+
+                if (auto &ruleAndInclude = includeContexts[rule.context.contexts.front()]) {
                     updateUnreachable1(ruleAndInclude);
                 } else {
                     ruleAndInclude.rule = &rule;
                 }
 
                 for (const auto *rulePtr : rule.includedIncludeRules) {
-                    includeContexts.insert(rulePtr->context.context, RuleAndInclude{rulePtr, &rule});
+                    for (auto *context : rulePtr->context.contexts) {
+                        includeContexts.insert(context, RuleAndInclude{rulePtr, &rule});
+                    }
                 }
 
                 if (observedRule.includeRules) {
@@ -2728,7 +2743,7 @@ private:
                 return rule1.beginRegion == rule2.beginRegion
                     && rule1.endRegion == rule2.endRegion
                     && rule1.firstNonSpace == rule2.firstNonSpace
-                    && rule1.context.context == rule2.context.context
+                    && rule1.context.contexts == rule2.context.contexts
                     && rule1.context.popCount == rule2.context.popCount;
                 // clang-format on
             };
@@ -2790,7 +2805,7 @@ private:
     //! - "#pop!Comment"  -> "Comment"
     //! - "##ISO C++"     -> ""
     //! - "Comment##ISO C++"-> "Comment" in ISO C++
-    void resolveContextName(Definition &definition, Context &context, ContextName &contextName, int line)
+    void resolveContextName(Definition &definition, ContextName &contextName, int line, const char *attrName)
     {
         QStringView name = contextName.name;
         if (name.isEmpty()) {
@@ -2798,7 +2813,7 @@ private:
         } else if (name.startsWith(u"#stay"_sv)) {
             contextName.stay = true;
             if (name.size() > 5) {
-                qWarning() << definition.filename << "line" << line << "invalid context in" << context.name;
+                qWarning() << definition.filename << "line" << line << "invalid context in " << attrName << "=" << contextName.name;
                 m_success = false;
             }
         } else {
@@ -2811,40 +2826,58 @@ private:
                 if (name.startsWith(u'!') && name.size() > 1) {
                     name = name.sliced(1);
                 } else {
-                    qWarning() << definition.filename << "line" << line << "'!' missing between '#pop' and context name" << context.name;
+                    qWarning() << definition.filename << "line" << line << "'!' missing between '#pop' and context name in " << attrName << "="
+                               << contextName.name;
                     m_success = false;
                 }
             }
 
             if (!name.isEmpty()) {
-                const int idx = name.indexOf(u"##"_sv);
-                if (idx == -1) {
-                    auto it = definition.contexts.find(name.toString());
-                    if (it != definition.contexts.end()) {
-                        contextName.context = &*it;
-                    }
-                } else {
-                    auto defName = name.sliced(idx + 2);
-                    auto it = m_definitions.find(defName.toString());
-                    if (it != m_definitions.end()) {
-                        auto listName = name.sliced(0, idx).toString();
-                        definition.referencedDefinitions.insert(&*it);
-                        auto ctxIt = it->contexts.find(listName.isEmpty() ? it->firstContextName : listName);
-                        if (ctxIt != it->contexts.end()) {
-                            contextName.context = &*ctxIt;
-                        }
-                    } else {
-                        qWarning() << definition.filename << "line" << line << "unknown definition in" << context.name;
-                        m_success = false;
+                for (auto contextPart : QStringTokenizer{name, u'!'}) {
+                    auto *ctx = resolveContextPartName(definition, contextPart, line, attrName, contextName.name);
+                    if (ctx) {
+                        contextName.contexts.push_back(ctx);
                     }
                 }
 
-                if (!contextName.context) {
-                    qWarning() << definition.filename << "line" << line << "unknown context" << name << "in" << context.name;
+                if (contextName.contexts.size() > 1 && definition.kateVersion < KateVersion{6, 22}) {
+                    qWarning() << definition.filename << "line" << line
+                               << "multiple contexts are only available since version \"6.21\". Please, increase kateversion.";
                     m_success = false;
                 }
             }
         }
+    }
+
+    Context *resolveContextPartName(Definition &definition, QStringView contextNamePart, int line, const char *attrName, QStringView originalContext)
+    {
+        auto originalContextNamePart = contextNamePart;
+        auto *contextMap = &definition.contexts;
+        const int idx = contextNamePart.indexOf(u"##"_sv);
+        if (idx != -1) {
+            auto defName = contextNamePart.sliced(idx + 2);
+            auto it = m_definitions.find(defName.toString());
+            if (it == m_definitions.end()) {
+                qWarning() << definition.filename << "line" << line << "unknown definition" << defName << "in" << attrName << "=" << originalContext;
+                m_success = false;
+                return nullptr;
+            }
+            contextMap = &it->contexts;
+            definition.referencedDefinitions.insert(&*it);
+            contextNamePart = contextNamePart.sliced(0, idx);
+            if (contextNamePart.isEmpty()) {
+                contextNamePart = it->firstContextName;
+            }
+        }
+
+        auto ctxIt = contextMap->find(contextNamePart.toString());
+        if (ctxIt != contextMap->end()) {
+            return &*ctxIt;
+        }
+
+        qWarning() << definition.filename << "line" << line << "unknown context" << originalContextNamePart << "in " << attrName << "=" << originalContext;
+        m_success = false;
+        return nullptr;
     }
 
     QMap<QString, Definition> m_definitions;

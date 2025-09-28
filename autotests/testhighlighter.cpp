@@ -123,6 +123,47 @@ private Q_SLOTS:
                 continue;
             }
 
+            // Mermaid is split into several files representing one type of graph
+            // because the syntax does not allow multiple graphs to be mixed in the same file.
+            if (entry.first == u"Mermaid") {
+                bool regularMermaidFile = false;
+                for (const auto &testCase : entry.second) {
+                    // clang-format off
+                    regularMermaidFile
+                      = testCase.endsWith(u"test.flowchart.mmd")
+                     || testCase.endsWith(u"test.sequenceDiagram.mmd")
+                     || testCase.endsWith(u"test.classDiagram.mmd")
+                     || testCase.endsWith(u"test.stateDiagram.mmd")
+                     || testCase.endsWith(u"test.erDiagram.mmd")
+                     || testCase.endsWith(u"test.journey.mmd")
+                     || testCase.endsWith(u"test.gantt.mmd")
+                     || testCase.endsWith(u"test.pie.mmd")
+                     || testCase.endsWith(u"test.quadrantChart.mmd")
+                     || testCase.endsWith(u"test.requirementDiagram.mmd")
+                     || testCase.endsWith(u"test.gitGraph.mmd")
+                     || testCase.endsWith(u"test.C4Context.mmd")
+                     || testCase.endsWith(u"test.mindmap.mmd")
+                     || testCase.endsWith(u"test.timeline.mmd")
+                     || testCase.endsWith(u"test.zenuml.mmd")
+                     || testCase.endsWith(u"test.sankey.mmd")
+                     || testCase.endsWith(u"test.xychart.mmd")
+                     || testCase.endsWith(u"test.block.mmd")
+                     || testCase.endsWith(u"test.packet.mmd")
+                     || testCase.endsWith(u"test.kanban.mmd")
+                     || testCase.endsWith(u"test.architecture.mmd")
+                     || testCase.endsWith(u"test.radar.mmd")
+                     || testCase.endsWith(u"test.treemap.mmd")
+                    ;
+                    // clang-format on
+                    if (!regularMermaidFile) {
+                        break;
+                    }
+                }
+                if (regularMermaidFile) {
+                    continue;
+                }
+            }
+
             // abort and tell about duplicated test cases!
             qWarning() << "Multiple unit tests for the language " << entry.first;
             for (const auto &testCase : entry.second) {

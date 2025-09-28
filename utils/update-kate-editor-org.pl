@@ -191,10 +191,9 @@ foreach my $htmlFile (<data/html/*.dark.html>, <data/html/.*.dark.html>) {
     close $F;
     if (defined($name)) {
         $htmlFile =~ s/\.dark\.html//;
-        if (defined($nameToHTML{$name})) {
-            die "Duplicated test output found for '$name' (".$nameToHTML{$name}." vs. ".$htmlFile.").\ntesthighlighter_test in the framework should not have allowed that!\n";
+        if (!defined($nameToHTML{$name}) || $htmlFile lt $nameToHTML{$name}) {
+            $nameToHTML{$name} = $htmlFile;
         }
-        $nameToHTML{$name} = $htmlFile;
     } else {
         print "Skipping $htmlFile as proper generator meta information tag missing.\n";
     }

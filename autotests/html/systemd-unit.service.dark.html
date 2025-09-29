@@ -72,7 +72,7 @@
 <span style="color:#2980b9">ExecCondition</span> = /bin/exec/condition
 <span style="color:#2980b9">ExecReload</span> = /bin/exec/reload
 <span style="color:#2980b9">ExecStop</span> = /bin/kill -SIGABRT <span style="color:#27aeae">$MAINPID</span>
-<span style="color:#2980b9">ExecStopPost</span> = <span style="color:#da4453">-:!!</span>/bin/stop/post
+<span style="color:#2980b9">ExecStopPost</span> = <span style="color:#da4453">-:!</span>/bin/stop/post
 <span style="color:#2980b9">RestartSec</span> = <span style="color:#f67400">15</span>
 <span style="color:#2980b9">RestartSteps</span> = <span style="color:#f67400">2</span>
 <span style="color:#2980b9">RestartMaxDelaySec</span> = <span style="color:#f67400">150</span><span style="font-style:italic">ms</span>
@@ -205,6 +205,12 @@
 <span style="color:#2980b9">CacheDirectory</span> = some/dir
 <span style="color:#2980b9">LogsDirectory</span> = some/dir
 <span style="color:#2980b9">ConfigurationDirectory</span> = some/dir
+<span style="color:#2980b9">StateDirectoryQuota</span> = <span style="color:#f67400">2</span><span style="font-style:italic">G</span>
+<span style="color:#2980b9">CacheDirectoryQuota</span> = <span style="color:#27aeae;font-weight:bold">off</span>
+<span style="color:#2980b9">LogsDirectoryQuota</span> = <span style="color:#f67400">70</span><span style="font-style:italic">%</span>
+<span style="color:#2980b9">StateDirectoryAccounting</span> = <span style="color:#27aeae;font-weight:bold">false</span>
+<span style="color:#2980b9">CacheDirectoryAccounting</span> = <span style="color:#27aeae;font-weight:bold">false</span>
+<span style="color:#2980b9">LogsDirectoryAccounting</span> = <span style="color:#27aeae;font-weight:bold">false</span>
 <span style="color:#2980b9">RuntimeDirectoryMode</span> = <span style="color:#f67400">0755</span>
 <span style="color:#2980b9">StateDirectoryMode</span> = <span style="color:#f67400">0755</span>
 <span style="color:#2980b9">CacheDirectoryMode</span> = <span style="color:#f67400">0755</span>
@@ -233,6 +239,16 @@
   <span style="color:#27aeae;font-weight:bold">@temporary</span>
 <span style="color:#2980b9">RestrictNamespaces</span> = <span style="color:#27aeae;font-weight:bold">cgroup</span> <span style="color:#27aeae;font-weight:bold">net</span> <span style="color:#fdbc4b;font-weight:bold">\</span>
   <span style="color:#27aeae;font-weight:bold">ipc</span>
+<span style="color:#2980b9">DelegateNamespaces</span> = <span style="color:#27aeae;font-weight:bold">pid</span> <span style="color:#27aeae;font-weight:bold">uts</span>
+<span style="color:#2980b9">PrivateBPF</span> = <span style="color:#27aeae;font-weight:bold">true</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupInetIngress</span> <span style="color:#fdbc4b;font-weight:bold">\</span>
+  <span style="color:#27aeae;font-weight:bold">BPFCgroupSockOps</span> <span style="color:#27aeae;font-weight:bold">BPFCgroupSockOps</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFMapCreate</span> <span style="color:#27aeae;font-weight:bold">BPFProgLoad</span> <span style="color:#fdbc4b;font-weight:bold">\</span>
+  <span style="color:#27aeae;font-weight:bold">BPFProgTestRun</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeUnspec</span> <span style="color:#fdbc4b;font-weight:bold">\</span>
+  <span style="color:#27aeae;font-weight:bold">BPFMapTypeQueue</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeXdp</span> <span style="color:#fdbc4b;font-weight:bold">\</span>
+  <span style="color:#27aeae;font-weight:bold">BPFProgTypeXdp</span>
 <span style="color:#2980b9">LockPersonality</span> = <span style="color:#27aeae;font-weight:bold">yes</span>
 <span style="color:#2980b9">MemoryDenyWriteExecute</span> = <span style="color:#27aeae;font-weight:bold">true</span>
 <span style="color:#2980b9">RestrictRealtime</span> = <span style="color:#27aeae;font-weight:bold">true</span>
@@ -292,7 +308,6 @@
 <span style="color:#2980b9">WatchdogSignal</span> = <span style="color:#27aeae;font-weight:bold">SIGQUIT</span>
 
 <span style="color:#7a7c7d">## from systemd.resource-control</span>
-<span style="color:#2980b9">CPUAccounting</span> = <span style="color:#27aeae;font-weight:bold">yes</span>
 <span style="color:#2980b9">CPUWeight</span> = <span style="color:#f67400">1234</span>
 <span style="color:#2980b9">StartupCPUWeight</span> = <span style="color:#f67400">321</span>
 <span style="color:#2980b9">CPUQuota</span> = <span style="color:#f67400">123.4</span><span style="font-style:italic">%</span>
@@ -349,6 +364,8 @@
 
 
 <span style="font-weight:bold">[Slice]</span>
+<span style="color:#2980b9">ConcurrencyHardMax</span> = <span style="color:#f67400">20</span>
+<span style="color:#2980b9">ConcurrencySoftMax</span> = <span style="color:#27aeae;font-weight:bold">infinity</span>
 <span style="color:#7a7c7d"># The Slice section may include options of the resource-control option group.</span>
 <span style="color:#7a7c7d"># See [Service] for available options of systemd.resource-control.</span>
 
@@ -399,8 +416,10 @@
 <span style="color:#2980b9">Transparent</span> = <span style="color:#27aeae;font-weight:bold">no</span>
 <span style="color:#2980b9">Broadcast</span> = <span style="color:#27aeae;font-weight:bold">true</span>
 <span style="color:#2980b9">PassCredentials</span> = <span style="color:#27aeae;font-weight:bold">yes</span>
+<span style="color:#2980b9">PassPIDFD</span> = <span style="color:#27aeae;font-weight:bold">true</span>
 <span style="color:#2980b9">PassSecurity</span> = <span style="color:#27aeae;font-weight:bold">true</span>
 <span style="color:#2980b9">PassPacketInfo</span> = <span style="color:#27aeae;font-weight:bold">true</span>
+<span style="color:#2980b9">AcceptFileDescriptors</span> = <span style="color:#27aeae;font-weight:bold">no</span>
 <span style="color:#2980b9">Timestamping</span> = <span style="color:#27aeae;font-weight:bold">nsec</span>
 <span style="color:#2980b9">TCPCongestion</span> = westwood
 <span style="color:#2980b9">ExecStartPre</span> = <span style="color:#da4453">+</span>/usr/bin/start/pre
@@ -416,6 +435,8 @@
 <span style="color:#2980b9">TriggerLimitBurst</span> = <span style="color:#f67400">50</span>
 <span style="color:#2980b9">PollLimitIntervalSec</span> = <span style="color:#f67400">1</span><span style="font-style:italic">s</span> <span style="color:#f67400">300</span><span style="font-style:italic">ms</span>
 <span style="color:#2980b9">PollLimitBurst</span> = <span style="color:#f67400">120</span>
+<span style="color:#2980b9">DeferTrigger</span> = <span style="color:#27aeae;font-weight:bold">patient</span>
+<span style="color:#2980b9">DeferTriggerMaxSec</span> = <span style="color:#27aeae;font-weight:bold">infinity</span>
 <span style="color:#2980b9">PassFileDescriptorsToExec</span> = <span style="color:#27aeae;font-weight:bold">true</span>
 <span style="color:#7a7c7d"># see [Service] for options from systemd.exec and systemd.kill</span>
 
@@ -439,6 +460,7 @@
 <span style="color:#2980b9">OnCalendar</span> = <span style="color:#27aeae;font-weight:bold">daily</span>
 <span style="color:#2980b9">AccuracySec</span> = <span style="color:#f67400">1</span><span style="font-style:italic">min</span> <span style="color:#f67400">10</span><span style="font-style:italic">sec</span>
 <span style="color:#2980b9">RandomizedDelaySec</span> = <span style="color:#f67400">30</span><span style="font-style:italic">s</span>
+<span style="color:#2980b9">RandomizedOffsetSec</span> = <span style="color:#f67400">20</span><span style="font-style:italic">s</span>
 <span style="color:#2980b9">FixedRandomDelay</span> = <span style="color:#27aeae;font-weight:bold">yes</span>
 <span style="color:#2980b9">DeferReactivation</span> = <span style="color:#27aeae;font-weight:bold">true</span>
 <span style="color:#2980b9">OnClockChange</span> = <span style="color:#27aeae;font-weight:bold">false</span>
@@ -499,6 +521,7 @@
 <span style="color:#2980b9">ConditionHost</span> = <span style="color:#da4453">!</span>shodan<span style="color:#3daee9">*</span>
 <span style="color:#2980b9">ConditionKernelCommandLine</span> = <span style="color:#da4453">!</span>kernel_option
 <span style="color:#2980b9">ConditionKernelVersion</span> = <span style="color:#da4453">| </span>>= 4.<span style="color:#3daee9">*</span>
+<span style="color:#2980b9">ConditionVersion</span> = kernel >= 4.<span style="color:#3daee9">*</span>
 <span style="color:#2980b9">ConditionCredential</span> = name
 <span style="color:#2980b9">ConditionEnvironment</span> = SOME_ENVIRONMENT_VARIABLE=some_value
 <span style="color:#2980b9">ConditionSecurity</span> = <span style="color:#da4453">| !</span> <span style="color:#27aeae;font-weight:bold">selinux</span>
@@ -526,6 +549,7 @@
 <span style="color:#2980b9">ConditionMemoryPressure</span> = <span style="color:#f67400">20</span>%<span style="color:#da4453">/</span><span style="color:#27aeae;font-weight:bold;font-style:italic">5min</span>
 <span style="color:#2980b9">ConditionCPUPressure</span> = <span style="color:#f67400">12</span>%<span style="color:#da4453">/</span><span style="color:#27aeae;font-weight:bold;font-style:italic">10sec</span>
 <span style="color:#2980b9">ConditionIOPressure</span> = <span style="color:#f67400">30</span>% <span style="color:#da4453">/</span> <span style="color:#27aeae;font-weight:bold;font-style:italic">1min</span>
+<span style="color:#2980b9">ConditionKernelModuleLoaded</span> = modulename
 <span style="color:#2980b9">AssertArchitecture</span> = <span style="color:#27aeae;font-weight:bold">x86</span>
 <span style="color:#2980b9">AssertVirtualization</span> = <span style="color:#da4453">|</span><span style="color:#27aeae;font-weight:bold">vmware</span>
 <span style="color:#2980b9">AssertHost</span> = <span style="color:#da4453">!</span>shodan<span style="color:#3daee9">*</span>
@@ -956,6 +980,7 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9">RestrictNamespaces</span> = <span style="color:#27aeae;font-weight:bold">mnt</span>
 <span style="color:#2980b9">RestrictNamespaces</span> = <span style="color:#27aeae;font-weight:bold">net</span>
 <span style="color:#2980b9">RestrictNamespaces</span> = <span style="color:#27aeae;font-weight:bold">pid</span>
+<span style="color:#2980b9">RestrictNamespaces</span> = <span style="color:#27aeae;font-weight:bold">time</span>
 <span style="color:#2980b9">RestrictNamespaces</span> = <span style="color:#27aeae;font-weight:bold">user</span>
 <span style="color:#2980b9">RestrictNamespaces</span> = <span style="color:#27aeae;font-weight:bold">uts</span>
 <span style="color:#2980b9">RestrictNamespaces</span> = <span style="color:#27aeae;font-weight:bold">cgroup</span> <span style="color:#27aeae;font-weight:bold">uts</span>
@@ -1091,6 +1116,214 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9">StopWhenUnneeded</span> = i<span style="color:#27aeae;font-weight:bold">n</span>valid
 <span style="color:#7a7c7d"># multiple values</span>
 <span style="color:#2980b9">StopWhenUnneeded</span> = <span style="color:#27aeae;font-weight:bold">false</span> true
+
+
+<span style="color:#7a7c7d">###### bpf delegate attachments</span>
+<span style="font-weight:bold">[Service]</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupInetIngress</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupInetEgress</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupInetSockCreate</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupSockOps</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFSkSkbStreamParser</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFSkSkbStreamVerdict</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupDevice</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFSkMsgVerdict</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupInet4Bind</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupInet6Bind</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupInet4Connect</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupInet6Connect</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupInet4PostBind</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupInet6PostBind</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupUdp4Sendmsg</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupUdp6Sendmsg</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFLircMode2</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFFlowDissector</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupSysctl</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupUdp4Recvmsg</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupUdp6Recvmsg</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupGetsockopt</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupSetsockopt</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFTraceRawTp</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFTraceFentry</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFTraceFexit</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFModifyReturn</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFLsmMac</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFTraceIter</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupInet4Getpeername</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupInet6Getpeername</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupInet4Getsockname</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupInet6Getsockname</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFXdpDevmap</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupInetSockRelease</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFXdpCpumap</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFSkLookup</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFXdp</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFSkSkbVerdict</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFSkReuseportSelect</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFSkReuseportSelectOrMigrate</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFPerfEvent</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFTraceKprobeMulti</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFLsmCgroup</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFStructOps</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFNetfilter</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFTcxIngress</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFTcxEgress</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFTraceUprobeMulti</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupUnixConnect</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupUnixSendmsg</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupUnixRecvmsg</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupUnixGetpeername</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFCgroupUnixGetsockname</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFNetkitPrimary</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFNetkitPeer</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFTraceKprobeSession</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = <span style="color:#27aeae;font-weight:bold">BPFTraceUprobeSession</span>
+<span style="color:#7a7c7d">## invalid values</span>
+<span style="color:#2980b9">BPFDelegateAttachments</span> = invalid
+
+
+<span style="color:#7a7c7d">###### bpf delegate commands</span>
+<span style="font-weight:bold">[Service]</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFTokenCreate</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFTaskFdQuery</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFRawTracepointOpen</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTestRun</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFProgStreamReadByFd</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFProgQuery</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFProgLoad</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFProgGetNextId</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFProgGetFdById</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFProgDetach</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFProgBindMap</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFProgAttach</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFObjPin</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFObjGetInfoByFd</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFObjGet</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFMapUpdateElem</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFMapUpdateBatch</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFMapLookupElem</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFMapLookupBatch</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFMapLookupAndDeleteElem</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFMapLookupAndDeleteBatch</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFMapGetNextKey</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFMapGetNextId</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFMapGetFdById</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFMapFreeze</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFMapDeleteElem</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFMapDeleteBatch</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFMapCreate</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFLinkUpdate</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFLinkGetNextId</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFLinkGetFdById</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFLinkDetach</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFLinkCreate</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFIterCreate</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFEnableStats</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFBtfLoad</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFBtfGetNextId</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = <span style="color:#27aeae;font-weight:bold">BPFBtfGetFdById</span>
+<span style="color:#7a7c7d">## invalid values</span>
+<span style="color:#2980b9">BPFDelegateCommands</span> = invalid
+
+
+<span style="color:#7a7c7d">###### bpf delegate maps</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeUnspec</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeHash</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeArray</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeProgArray</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypePerfEventArray</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypePercpuHash</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypePercpuArray</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeStackTrace</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeCgroupArray</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeLruHash</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeLruPercpuHash</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeLpmTrie</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeArrayOfMaps</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeHashOfMaps</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeDevmap</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeSockmap</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeCpumap</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeXskmap</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeSockhash</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeCgroupStorageDeprecated</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeReuseportSockarray</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypePercpuCgroupStorageDeprecated</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeQueue</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeStack</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeSkStorage</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeDevmapHash</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeStructOps</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeRingbuf</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeInodeStorage</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeTaskStorage</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeBloomFilter</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeUserRingbuf</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeCgrpStorage</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = <span style="color:#27aeae;font-weight:bold">BPFMapTypeArena</span>
+<span style="color:#7a7c7d">## invalid values</span>
+<span style="color:#2980b9">BPFDelegateMaps</span> = invalid
+
+
+<span style="color:#7a7c7d">###### bpf delegate programs</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeUnspec</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeSocketFilter</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeKprobe</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeSchedCls</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeSchedAct</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeTracepoint</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeXdp</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypePerfEvent</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeCgroupSkb</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeCgroupSock</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeLwtIn</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeLwtOut</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeLwtXmit</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeSockOps</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeSkSkb</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeCgroupDevice</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeSkMsg</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeRawTracepoint</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeCgroupSockAddr</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeLwtSeg6local</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeLircMode2</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeSkReuseport</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeFlowDissector</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeCgroupSysctl</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeRawTracepointWritable</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeCgroupSockopt</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeTracing</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeStructOps</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeExt</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeLsm</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeSkLookup</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = <span style="color:#27aeae;font-weight:bold">BPFProgTypeNetfilter</span>
+<span style="color:#7a7c7d">## invalid values</span>
+<span style="color:#2980b9">BPFDelegatePrograms</span> = invalid
+
+
+<span style="color:#7a7c7d">###### bpf program type</span>
+<span style="color:#2980b9">BPFProgram</span> = <span style="color:#27aeae;font-weight:bold">sysctl</span>
+<span style="color:#2980b9">BPFProgram</span> = <span style="color:#27aeae;font-weight:bold">sock_ops</span>
+<span style="color:#2980b9">BPFProgram</span> = <span style="color:#27aeae;font-weight:bold">sock_create</span>
+<span style="color:#2980b9">BPFProgram</span> = <span style="color:#27aeae;font-weight:bold">setsockopt</span>
+<span style="color:#2980b9">BPFProgram</span> = <span style="color:#27aeae;font-weight:bold">sendmsg6</span>
+<span style="color:#2980b9">BPFProgram</span> = <span style="color:#27aeae;font-weight:bold">sendmsg4</span>
+<span style="color:#2980b9">BPFProgram</span> = <span style="color:#27aeae;font-weight:bold">recvmsg6</span>
+<span style="color:#2980b9">BPFProgram</span> = <span style="color:#27aeae;font-weight:bold">recvmsg4</span>
+<span style="color:#2980b9">BPFProgram</span> = <span style="color:#27aeae;font-weight:bold">post_bind6</span>
+<span style="color:#2980b9">BPFProgram</span> = <span style="color:#27aeae;font-weight:bold">post_bind4</span>
+<span style="color:#2980b9">BPFProgram</span> = <span style="color:#27aeae;font-weight:bold">ingress</span>
+<span style="color:#2980b9">BPFProgram</span> = <span style="color:#27aeae;font-weight:bold">getsockopt</span>
+<span style="color:#2980b9">BPFProgram</span> = <span style="color:#27aeae;font-weight:bold">egress</span>
+<span style="color:#2980b9">BPFProgram</span> = <span style="color:#27aeae;font-weight:bold">device</span>
+<span style="color:#2980b9">BPFProgram</span> = <span style="color:#27aeae;font-weight:bold">connect6</span>
+<span style="color:#2980b9">BPFProgram</span> = <span style="color:#27aeae;font-weight:bold">connect4</span>
+<span style="color:#2980b9">BPFProgram</span> = <span style="color:#27aeae;font-weight:bold">bind6</span>
+<span style="color:#2980b9">BPFProgram</span> = <span style="color:#27aeae;font-weight:bold">bind4</span>
+<span style="color:#2980b9">BPFProgram</span> = <span style="color:#27aeae;font-weight:bold">bind6</span>:/sys/fs/bpf/sock-addr-hook
+<span style="color:#7a7c7d">## invalid values</span>
+<span style="color:#2980b9">BPFProgram</span> = invalid
 
 
 <span style="color:#7a7c7d">###### calendar</span>
@@ -1289,13 +1522,13 @@ WantedBy = some.service some.socket
 <span style="color:#7a7c7d">###### controller list</span>
 <span style="font-weight:bold">[Service]</span>
 <span style="color:#7a7c7d"># single controller</span>
-<span style="color:#2980b9">DisableControllers</span> = <span style="color:#27aeae;font-weight:bold">blkio</span>
+<span style="color:#2980b9">DisableControllers</span> = blkio
 <span style="color:#2980b9">DisableControllers</span> = <span style="color:#27aeae;font-weight:bold">bpf-devices</span>
 <span style="color:#2980b9">DisableControllers</span> = <span style="color:#27aeae;font-weight:bold">bpf-firewall</span>
 <span style="color:#2980b9">DisableControllers</span> = <span style="color:#27aeae;font-weight:bold">cpu</span>
-<span style="color:#2980b9">DisableControllers</span> = <span style="color:#27aeae;font-weight:bold">cpuacct</span>
+<span style="color:#2980b9">DisableControllers</span> = cpuacct
 <span style="color:#2980b9">DisableControllers</span> = <span style="color:#27aeae;font-weight:bold">cpuset</span>
-<span style="color:#2980b9">DisableControllers</span> = <span style="color:#27aeae;font-weight:bold">devices</span>
+<span style="color:#2980b9">DisableControllers</span> = devices
 <span style="color:#2980b9">DisableControllers</span> = <span style="color:#27aeae;font-weight:bold">io</span>
 <span style="color:#2980b9">DisableControllers</span> = <span style="color:#27aeae;font-weight:bold">memory</span>
 <span style="color:#2980b9">DisableControllers</span> = <span style="color:#27aeae;font-weight:bold">pids</span>
@@ -1446,19 +1679,29 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9">CPUWeight</span> = 1 <span style="color:#f67400">10000</span>
 
 
+<span style="color:#7a7c7d">###### defer trigger</span>
+<span style="font-weight:bold">[Socket]</span>
+<span style="color:#2980b9">DeferTrigger</span> = <span style="color:#27aeae;font-weight:bold">patient</span>
+<span style="color:#7a7c7d"># single boolean</span>
+<span style="color:#2980b9">DeferTrigger</span> = <span style="color:#27aeae;font-weight:bold">false</span>
+<span style="color:#2980b9">DeferTrigger</span> = <span style="color:#27aeae;font-weight:bold">true</span>
+<span style="color:#7a7c7d">## invalid values</span>
+<span style="color:#2980b9">DeferTrigger</span> = i<span style="color:#27aeae;font-weight:bold">n</span>valid
+<span style="color:#7a7c7d"># multiple values</span>
+<span style="color:#2980b9">DeferTrigger</span> = <span style="color:#27aeae;font-weight:bold">patient</span> true
+
+
+
 <span style="color:#7a7c7d">###### delegate</span>
 <span style="font-weight:bold">[Service]</span>
 <span style="color:#7a7c7d"># single boolean</span>
 <span style="color:#2980b9">Delegate</span> = <span style="color:#27aeae;font-weight:bold">false</span>
 <span style="color:#2980b9">Delegate</span> = <span style="color:#27aeae;font-weight:bold">true</span>
 <span style="color:#7a7c7d"># single controller</span>
-<span style="color:#2980b9">Delegate</span> = <span style="color:#27aeae;font-weight:bold">blkio</span>
 <span style="color:#2980b9">Delegate</span> = <span style="color:#27aeae;font-weight:bold">bpf-devices</span>
 <span style="color:#2980b9">Delegate</span> = <span style="color:#27aeae;font-weight:bold">bpf-firewall</span>
 <span style="color:#2980b9">Delegate</span> = <span style="color:#27aeae;font-weight:bold">cpu</span>
-<span style="color:#2980b9">Delegate</span> = <span style="color:#27aeae;font-weight:bold">cpuacct</span>
 <span style="color:#2980b9">Delegate</span> = <span style="color:#27aeae;font-weight:bold">cpuset</span>
-<span style="color:#2980b9">Delegate</span> = <span style="color:#27aeae;font-weight:bold">devices</span>
 <span style="color:#2980b9">Delegate</span> = <span style="color:#27aeae;font-weight:bold">io</span>
 <span style="color:#2980b9">Delegate</span> = <span style="color:#27aeae;font-weight:bold">memory</span>
 <span style="color:#2980b9">Delegate</span> = <span style="color:#27aeae;font-weight:bold">pids</span>
@@ -1520,25 +1763,24 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9">ExecStart</span> = cmd1 <span style="color:#3daee9">%h</span> arg1_1 <span style="color:#27aeae">$var1</span>, cmd2 <span style="color:#3daee9">%u</span> arg2_1 <span style="color:#27aeae">$var2_1</span><span style="color:#fdbc4b;font-weight:bold">\</span>
   <span style="color:#27aeae">$var2_2</span>
 <span style="color:#7a7c7d"># escapes (not exactly the same as detected by HlCStringChar)</span>
-<span style="color:#2980b9">ExecStart</span> = cmd \, <span style="color:#3daee9">\'</span> <span style="color:#3daee9">\"</span> \\ \a <span style="color:#3daee9">\b</span> <span style="color:#3daee9">\f</span> <span style="color:#3daee9">\n</span> <span style="color:#3daee9">\r</span> <span style="color:#3daee9">\s</span> <span style="color:#3daee9">\t</span> <span style="color:#3daee9">\v</span> <span style="color:#3daee9">\x0A</span> <span style="color:#3daee9">\012</span> <span style="color:#3daee9">\u1234</span> <span style="color:#3daee9">\U12abcdef</span>
-<span style="color:#7a7c7d"># prefix</span>
-<span style="color:#2980b9">ExecStart</span> = <span style="color:#da4453">@</span>/some/cmd arg "@!+-:"
+<span style="color:#2980b9">ExecStart</span> = cmd <span style="color:#3daee9">\'</span> <span style="color:#3daee9">\"</span> <span style="color:#3daee9">\\</span> <span style="color:#3daee9">\a</span> <span style="color:#3daee9">\b</span> <span style="color:#3daee9">\f</span> <span style="color:#3daee9">\n</span> <span style="color:#3daee9">\r</span> <span style="color:#3daee9">\s</span> <span style="color:#3daee9">\t</span> <span style="color:#3daee9">\v</span> <span style="color:#3daee9">\x0A</span> <span style="color:#3daee9">\012</span> <span style="color:#3daee9">\u1234</span> <span style="color:#3daee9">\U12abcdef</span>
+
+
+<span style="color:#7a7c7d">###### exec prefix</span>
+<span style="color:#2980b9">ExecStart</span> = <span style="color:#da4453">@</span>/some/cmd arg "@-:+!|"
 <span style="color:#2980b9">ExecStart</span> = <span style="color:#da4453">-</span>/some/cmd-1 -option arg
 <span style="color:#2980b9">ExecStart</span> = <span style="color:#da4453">:</span>/some/cmd arg
 <span style="color:#2980b9">ExecStart</span> = <span style="color:#da4453">+</span>/some/cmd arg
 <span style="color:#2980b9">ExecStart</span> = <span style="color:#da4453">!</span>/some/cmd arg
-<span style="color:#2980b9">ExecStart</span> = <span style="color:#da4453">!!</span>/some/cmd arg
-<span style="color:#2980b9">ExecStart</span> = <span style="color:#da4453">@:-!!</span>/some/cmd arg
-<span style="color:#2980b9">ExecStart</span> = <span style="color:#da4453">@!!-:</span>/some/cmd arg
+<span style="color:#2980b9">ExecStart</span> = <span style="color:#da4453">|</span>/some/cmd arg
+<span style="color:#2980b9">ExecStart</span> = <span style="color:#da4453">@:-!</span>/some/cmd arg
+<span style="color:#2980b9">ExecStart</span> = <span style="color:#da4453">@!-:</span>/some/cmd arg
 <span style="color:#2980b9">ExecStart</span> = <span style="color:#da4453">@:-+</span>/some/cmd arg
 <span style="color:#7a7c7d">## invalid values</span>
 <span style="color:#7a7c7d"># invalid prefix</span>
 <span style="color:#2980b9">ExecStart</span> = @ /some/cmd arg
 <span style="color:#2980b9">ExecStart</span> = @ -/some/cmd arg
-<span style="color:#2980b9">ExecStart</span> = <span style="color:#da4453">+</span>!/some/cmd arg
-<span style="color:#2980b9">ExecStart</span> = <span style="color:#da4453">!!</span>!/some/cmd arg
-<span style="color:#2980b9">ExecStart</span> = <span style="color:#da4453">@</span>+@/some/cmd arg
-<span style="color:#2980b9">ExecStart</span> = <span style="color:#da4453">@!!</span>+/some/cmd arg
+<span style="color:#2980b9">ExecStart</span> = <span style="color:#da4453">+</span>! /some/cmd arg
 
 
 <span style="color:#7a7c7d">###### exit status</span>
@@ -1718,7 +1960,6 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9">Type</span> = <span style="color:#27aeae;font-weight:bold">ocfs2</span>
 <span style="color:#2980b9">Type</span> = <span style="color:#27aeae;font-weight:bold">overlay</span>
 <span style="color:#2980b9">Type</span> = <span style="color:#27aeae;font-weight:bold">proc</span>
-<span style="color:#2980b9">Type</span> = <span style="color:#27aeae;font-weight:bold">reiserfs</span>
 <span style="color:#2980b9">Type</span> = <span style="color:#27aeae;font-weight:bold">tmpfs</span>
 <span style="color:#2980b9">Type</span> = <span style="color:#27aeae;font-weight:bold">tracefs</span>
 <span style="color:#2980b9">Type</span> = <span style="color:#27aeae;font-weight:bold">udf</span>
@@ -2135,6 +2376,7 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9">OnFailureJobMode</span> = <span style="color:#27aeae;font-weight:bold">ignore-dependencies</span>
 <span style="color:#2980b9">OnFailureJobMode</span> = <span style="color:#27aeae;font-weight:bold">ignore-requirements</span>
 <span style="color:#2980b9">OnFailureJobMode</span> = <span style="color:#27aeae;font-weight:bold">isolate</span>
+<span style="color:#2980b9">OnFailureJobMode</span> = <span style="color:#27aeae;font-weight:bold">lenient</span>
 <span style="color:#2980b9">OnFailureJobMode</span> = <span style="color:#27aeae;font-weight:bold">replace</span>
 <span style="color:#2980b9">OnFailureJobMode</span> = <span style="color:#27aeae;font-weight:bold">replace-irreversibly</span>
 <span style="color:#7a7c7d">## invalid values</span>
@@ -2253,6 +2495,7 @@ WantedBy = some.service some.socket
 
 <span style="color:#7a7c7d">###### private users</span>
 <span style="font-weight:bold">[Service]</span>
+<span style="color:#2980b9">PrivateUsers</span> = <span style="color:#27aeae;font-weight:bold">full</span>
 <span style="color:#2980b9">PrivateUsers</span> = <span style="color:#27aeae;font-weight:bold">identity</span>
 <span style="color:#2980b9">PrivateUsers</span> = <span style="color:#27aeae;font-weight:bold">self</span>
 <span style="color:#7a7c7d">## should accept any boolean value</span>
@@ -2310,6 +2553,18 @@ WantedBy = some.service some.socket
 <span style="color:#2980b9">ProtectHome</span> = i<span style="color:#27aeae;font-weight:bold">n</span>valid
 <span style="color:#7a7c7d"># multiple values</span>
 <span style="color:#2980b9">ProtectHome</span> = <span style="color:#27aeae;font-weight:bold">tmpfs</span> true
+
+
+<span style="color:#7a7c7d">###### protect hostname</span>
+<span style="font-weight:bold">[Service]</span>
+<span style="color:#2980b9">ProtectHostname</span> = <span style="color:#27aeae;font-weight:bold">private</span>
+<span style="color:#2980b9">ProtectHostname</span> = <span style="color:#27aeae;font-weight:bold">private</span>:host.example.com
+<span style="color:#2980b9">ProtectHostname</span> = <span style="color:#27aeae;font-weight:bold">true</span>
+<span style="color:#2980b9">ProtectHostname</span> = <span style="color:#27aeae;font-weight:bold">yes</span>:somehostname
+<span style="color:#7a7c7d">## invalid values</span>
+<span style="color:#2980b9">ProtectHostname</span> = i<span style="color:#27aeae;font-weight:bold">n</span>valid
+<span style="color:#7a7c7d"># multiple values</span>
+<span style="color:#2980b9">ProtectHostname</span> = <span style="color:#27aeae;font-weight:bold">private</span> true
 
 
 <span style="color:#7a7c7d">###### protect system</span>

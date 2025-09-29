@@ -66,7 +66,7 @@
 <Option Name>ExecCondition</Option Name><Normal> = /bin/exec/condition</Normal><br/>
 <Option Name>ExecReload</Option Name><Normal> = /bin/exec/reload</Normal><br/>
 <Option Name>ExecStop</Option Name><Normal> = /bin/kill -SIGABRT </Normal><Environment Variable>$MAINPID</Environment Variable><br/>
-<Option Name>ExecStopPost</Option Name><Normal> = </Normal><Prefix>-:!!</Prefix><Normal>/bin/stop/post</Normal><br/>
+<Option Name>ExecStopPost</Option Name><Normal> = </Normal><Prefix>-:!</Prefix><Normal>/bin/stop/post</Normal><br/>
 <Option Name>RestartSec</Option Name><Normal> = </Normal><Number>15</Number><br/>
 <Option Name>RestartSteps</Option Name><Normal> = </Normal><Number>2</Number><br/>
 <Option Name>RestartMaxDelaySec</Option Name><Normal> = </Normal><Number>150</Number><Measurement Unit>ms</Measurement Unit><br/>
@@ -199,6 +199,12 @@
 <Option Name>CacheDirectory</Option Name><Normal> = some/dir</Normal><br/>
 <Option Name>LogsDirectory</Option Name><Normal> = some/dir</Normal><br/>
 <Option Name>ConfigurationDirectory</Option Name><Normal> = some/dir</Normal><br/>
+<Option Name>StateDirectoryQuota</Option Name><Normal> = </Normal><Number>2</Number><Measurement Unit>G</Measurement Unit><br/>
+<Option Name>CacheDirectoryQuota</Option Name><Normal> = </Normal><Constant>off</Constant><br/>
+<Option Name>LogsDirectoryQuota</Option Name><Normal> = </Normal><Number>70</Number><Measurement Unit>%</Measurement Unit><br/>
+<Option Name>StateDirectoryAccounting</Option Name><Normal> = </Normal><Constant>false</Constant><br/>
+<Option Name>CacheDirectoryAccounting</Option Name><Normal> = </Normal><Constant>false</Constant><br/>
+<Option Name>LogsDirectoryAccounting</Option Name><Normal> = </Normal><Constant>false</Constant><br/>
 <Option Name>RuntimeDirectoryMode</Option Name><Normal> = </Normal><File Mode>0755</File Mode><br/>
 <Option Name>StateDirectoryMode</Option Name><Normal> = </Normal><File Mode>0755</File Mode><br/>
 <Option Name>CacheDirectoryMode</Option Name><Normal> = </Normal><File Mode>0755</File Mode><br/>
@@ -227,6 +233,16 @@
 <Normal>  </Normal><Constant>@temporary</Constant><br/>
 <Option Name>RestrictNamespaces</Option Name><Normal> = </Normal><Constant>cgroup</Constant><Normal> </Normal><Constant>net</Constant><Normal> </Normal><Continuation>\</Continuation><br/>
 <Normal>  </Normal><Constant>ipc</Constant><br/>
+<Option Name>DelegateNamespaces</Option Name><Normal> = </Normal><Constant>pid</Constant><Normal> </Normal><Constant>uts</Constant><br/>
+<Option Name>PrivateBPF</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupInetIngress</Constant><Normal> </Normal><Continuation>\</Continuation><br/>
+<Normal>  </Normal><Constant>BPFCgroupSockOps</Constant><Normal> </Normal><Constant>BPFCgroupSockOps</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFMapCreate</Constant><Normal> </Normal><Constant>BPFProgLoad</Constant><Normal> </Normal><Continuation>\</Continuation><br/>
+<Normal>  </Normal><Constant>BPFProgTestRun</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeUnspec</Constant><Normal> </Normal><Continuation>\</Continuation><br/>
+<Normal>  </Normal><Constant>BPFMapTypeQueue</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeXdp</Constant><Normal> </Normal><Continuation>\</Continuation><br/>
+<Normal>  </Normal><Constant>BPFProgTypeXdp</Constant><br/>
 <Option Name>LockPersonality</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
 <Option Name>MemoryDenyWriteExecute</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
 <Option Name>RestrictRealtime</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
@@ -286,7 +302,6 @@
 <Option Name>WatchdogSignal</Option Name><Normal> = </Normal><Constant>SIGQUIT</Constant><br/>
 <Normal></Normal><br/>
 <Comment>## from systemd.resource-control</Comment><br/>
-<Option Name>CPUAccounting</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
 <Option Name>CPUWeight</Option Name><Normal> = </Normal><Number>1234</Number><br/>
 <Option Name>StartupCPUWeight</Option Name><Normal> = </Normal><Number>321</Number><br/>
 <Option Name>CPUQuota</Option Name><Normal> = </Normal><Number>123.4</Number><Measurement Unit>%</Measurement Unit><br/>
@@ -343,6 +358,8 @@
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Section Header>[Slice]</Section Header><br/>
+<Option Name>ConcurrencyHardMax</Option Name><Normal> = </Normal><Number>20</Number><br/>
+<Option Name>ConcurrencySoftMax</Option Name><Normal> = </Normal><Constant>infinity</Constant><br/>
 <Comment># The Slice section may include options of the resource-control option group.</Comment><br/>
 <Comment># See [Service] for available options of systemd.resource-control.</Comment><br/>
 <Normal></Normal><br/>
@@ -393,8 +410,10 @@
 <Option Name>Transparent</Option Name><Normal> = </Normal><Constant>no</Constant><br/>
 <Option Name>Broadcast</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
 <Option Name>PassCredentials</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
+<Option Name>PassPIDFD</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
 <Option Name>PassSecurity</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
 <Option Name>PassPacketInfo</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
+<Option Name>AcceptFileDescriptors</Option Name><Normal> = </Normal><Constant>no</Constant><br/>
 <Option Name>Timestamping</Option Name><Normal> = </Normal><Constant>nsec</Constant><br/>
 <Option Name>TCPCongestion</Option Name><Normal> = westwood</Normal><br/>
 <Option Name>ExecStartPre</Option Name><Normal> = </Normal><Prefix>+</Prefix><Normal>/usr/bin/start/pre</Normal><br/>
@@ -410,6 +429,8 @@
 <Option Name>TriggerLimitBurst</Option Name><Normal> = </Normal><Number>50</Number><br/>
 <Option Name>PollLimitIntervalSec</Option Name><Normal> = </Normal><Number>1</Number><Measurement Unit>s</Measurement Unit><Normal> </Normal><Number>300</Number><Measurement Unit>ms</Measurement Unit><br/>
 <Option Name>PollLimitBurst</Option Name><Normal> = </Normal><Number>120</Number><br/>
+<Option Name>DeferTrigger</Option Name><Normal> = </Normal><Constant>patient</Constant><br/>
+<Option Name>DeferTriggerMaxSec</Option Name><Normal> = </Normal><Constant>infinity</Constant><br/>
 <Option Name>PassFileDescriptorsToExec</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
 <Comment># see [Service] for options from systemd.exec and systemd.kill</Comment><br/>
 <Normal></Normal><br/>
@@ -433,6 +454,7 @@
 <Option Name>OnCalendar</Option Name><Normal> = </Normal><Constant>daily</Constant><br/>
 <Option Name>AccuracySec</Option Name><Normal> = </Normal><Number>1</Number><Measurement Unit>min</Measurement Unit><Normal> </Normal><Number>10</Number><Measurement Unit>sec</Measurement Unit><br/>
 <Option Name>RandomizedDelaySec</Option Name><Normal> = </Normal><Number>30</Number><Measurement Unit>s</Measurement Unit><br/>
+<Option Name>RandomizedOffsetSec</Option Name><Normal> = </Normal><Number>20</Number><Measurement Unit>s</Measurement Unit><br/>
 <Option Name>FixedRandomDelay</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
 <Option Name>DeferReactivation</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
 <Option Name>OnClockChange</Option Name><Normal> = </Normal><Constant>false</Constant><br/>
@@ -493,6 +515,7 @@
 <Option Name>ConditionHost</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>shodan</Normal><Wildcard>*</Wildcard><br/>
 <Option Name>ConditionKernelCommandLine</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>kernel_option</Normal><br/>
 <Option Name>ConditionKernelVersion</Option Name><Normal> = </Normal><Prefix>| </Prefix><Normal>>= 4.</Normal><Wildcard>*</Wildcard><br/>
+<Option Name>ConditionVersion</Option Name><Normal> = kernel >= 4.</Normal><Wildcard>*</Wildcard><br/>
 <Option Name>ConditionCredential</Option Name><Normal> = name</Normal><br/>
 <Option Name>ConditionEnvironment</Option Name><Normal> = SOME_ENVIRONMENT_VARIABLE=some_value</Normal><br/>
 <Option Name>ConditionSecurity</Option Name><Normal> = </Normal><Prefix>| !</Prefix><Normal> </Normal><Constant>selinux</Constant><br/>
@@ -520,6 +543,7 @@
 <Option Name>ConditionMemoryPressure</Option Name><Normal> = </Normal><Number>20</Number><Normal>%</Normal><Separator>/</Separator><Threshold Time Span>5min</Threshold Time Span><br/>
 <Option Name>ConditionCPUPressure</Option Name><Normal> = </Normal><Number>12</Number><Normal>%</Normal><Separator>/</Separator><Threshold Time Span>10sec</Threshold Time Span><br/>
 <Option Name>ConditionIOPressure</Option Name><Normal> = </Normal><Number>30</Number><Normal>% </Normal><Separator>/</Separator><Normal> </Normal><Threshold Time Span>1min</Threshold Time Span><br/>
+<Option Name>ConditionKernelModuleLoaded</Option Name><Normal> = modulename</Normal><br/>
 <Option Name>AssertArchitecture</Option Name><Normal> = </Normal><Constant>x86</Constant><br/>
 <Option Name>AssertVirtualization</Option Name><Normal> = </Normal><Prefix>|</Prefix><Constant>vmware</Constant><br/>
 <Option Name>AssertHost</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>shodan</Normal><Wildcard>*</Wildcard><br/>
@@ -950,6 +974,7 @@
 <Option Name>RestrictNamespaces</Option Name><Normal> = </Normal><Constant>mnt</Constant><br/>
 <Option Name>RestrictNamespaces</Option Name><Normal> = </Normal><Constant>net</Constant><br/>
 <Option Name>RestrictNamespaces</Option Name><Normal> = </Normal><Constant>pid</Constant><br/>
+<Option Name>RestrictNamespaces</Option Name><Normal> = </Normal><Constant>time</Constant><br/>
 <Option Name>RestrictNamespaces</Option Name><Normal> = </Normal><Constant>user</Constant><br/>
 <Option Name>RestrictNamespaces</Option Name><Normal> = </Normal><Constant>uts</Constant><br/>
 <Option Name>RestrictNamespaces</Option Name><Normal> = </Normal><Constant>cgroup</Constant><Normal> </Normal><Constant>uts</Constant><br/>
@@ -1085,6 +1110,214 @@
 <Option Name>StopWhenUnneeded</Option Name><Normal> = i</Normal><Constant>n</Constant><Normal>valid</Normal><br/>
 <Comment># multiple values</Comment><br/>
 <Option Name>StopWhenUnneeded</Option Name><Normal> = </Normal><Constant>false</Constant><Normal> true</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Comment>###### bpf delegate attachments</Comment><br/>
+<Section Header>[Service]</Section Header><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupInetIngress</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupInetEgress</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupInetSockCreate</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupSockOps</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFSkSkbStreamParser</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFSkSkbStreamVerdict</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupDevice</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFSkMsgVerdict</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupInet4Bind</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupInet6Bind</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupInet4Connect</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupInet6Connect</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupInet4PostBind</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupInet6PostBind</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupUdp4Sendmsg</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupUdp6Sendmsg</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFLircMode2</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFFlowDissector</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupSysctl</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupUdp4Recvmsg</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupUdp6Recvmsg</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupGetsockopt</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupSetsockopt</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFTraceRawTp</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFTraceFentry</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFTraceFexit</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFModifyReturn</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFLsmMac</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFTraceIter</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupInet4Getpeername</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupInet6Getpeername</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupInet4Getsockname</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupInet6Getsockname</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFXdpDevmap</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupInetSockRelease</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFXdpCpumap</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFSkLookup</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFXdp</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFSkSkbVerdict</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFSkReuseportSelect</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFSkReuseportSelectOrMigrate</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFPerfEvent</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFTraceKprobeMulti</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFLsmCgroup</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFStructOps</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFNetfilter</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFTcxIngress</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFTcxEgress</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFTraceUprobeMulti</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupUnixConnect</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupUnixSendmsg</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupUnixRecvmsg</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupUnixGetpeername</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFCgroupUnixGetsockname</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFNetkitPrimary</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFNetkitPeer</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFTraceKprobeSession</Constant><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = </Normal><Constant>BPFTraceUprobeSession</Constant><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>BPFDelegateAttachments</Option Name><Normal> = invalid</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Comment>###### bpf delegate commands</Comment><br/>
+<Section Header>[Service]</Section Header><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFTokenCreate</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFTaskFdQuery</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFRawTracepointOpen</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFProgTestRun</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFProgStreamReadByFd</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFProgQuery</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFProgLoad</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFProgGetNextId</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFProgGetFdById</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFProgDetach</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFProgBindMap</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFProgAttach</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFObjPin</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFObjGetInfoByFd</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFObjGet</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFMapUpdateElem</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFMapUpdateBatch</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFMapLookupElem</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFMapLookupBatch</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFMapLookupAndDeleteElem</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFMapLookupAndDeleteBatch</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFMapGetNextKey</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFMapGetNextId</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFMapGetFdById</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFMapFreeze</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFMapDeleteElem</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFMapDeleteBatch</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFMapCreate</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFLinkUpdate</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFLinkGetNextId</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFLinkGetFdById</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFLinkDetach</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFLinkCreate</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFIterCreate</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFEnableStats</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFBtfLoad</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFBtfGetNextId</Constant><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = </Normal><Constant>BPFBtfGetFdById</Constant><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>BPFDelegateCommands</Option Name><Normal> = invalid</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Comment>###### bpf delegate maps</Comment><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeUnspec</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeHash</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeArray</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeProgArray</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypePerfEventArray</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypePercpuHash</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypePercpuArray</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeStackTrace</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeCgroupArray</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeLruHash</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeLruPercpuHash</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeLpmTrie</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeArrayOfMaps</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeHashOfMaps</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeDevmap</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeSockmap</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeCpumap</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeXskmap</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeSockhash</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeCgroupStorageDeprecated</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeReuseportSockarray</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypePercpuCgroupStorageDeprecated</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeQueue</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeStack</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeSkStorage</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeDevmapHash</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeStructOps</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeRingbuf</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeInodeStorage</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeTaskStorage</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeBloomFilter</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeUserRingbuf</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeCgrpStorage</Constant><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = </Normal><Constant>BPFMapTypeArena</Constant><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>BPFDelegateMaps</Option Name><Normal> = invalid</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Comment>###### bpf delegate programs</Comment><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeUnspec</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeSocketFilter</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeKprobe</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeSchedCls</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeSchedAct</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeTracepoint</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeXdp</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypePerfEvent</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeCgroupSkb</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeCgroupSock</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeLwtIn</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeLwtOut</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeLwtXmit</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeSockOps</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeSkSkb</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeCgroupDevice</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeSkMsg</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeRawTracepoint</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeCgroupSockAddr</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeLwtSeg6local</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeLircMode2</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeSkReuseport</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeFlowDissector</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeCgroupSysctl</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeRawTracepointWritable</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeCgroupSockopt</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeTracing</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeStructOps</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeExt</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeLsm</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeSkLookup</Constant><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = </Normal><Constant>BPFProgTypeNetfilter</Constant><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>BPFDelegatePrograms</Option Name><Normal> = invalid</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Comment>###### bpf program type</Comment><br/>
+<Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>sysctl</Constant><br/>
+<Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>sock_ops</Constant><br/>
+<Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>sock_create</Constant><br/>
+<Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>setsockopt</Constant><br/>
+<Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>sendmsg6</Constant><br/>
+<Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>sendmsg4</Constant><br/>
+<Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>recvmsg6</Constant><br/>
+<Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>recvmsg4</Constant><br/>
+<Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>post_bind6</Constant><br/>
+<Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>post_bind4</Constant><br/>
+<Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>ingress</Constant><br/>
+<Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>getsockopt</Constant><br/>
+<Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>egress</Constant><br/>
+<Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>device</Constant><br/>
+<Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>connect6</Constant><br/>
+<Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>connect4</Constant><br/>
+<Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>bind6</Constant><br/>
+<Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>bind4</Constant><br/>
+<Option Name>BPFProgram</Option Name><Normal> = </Normal><Constant>bind6</Constant><Normal>:/sys/fs/bpf/sock-addr-hook</Normal><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>BPFProgram</Option Name><Normal> = invalid</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### calendar</Comment><br/>
@@ -1283,13 +1516,13 @@
 <Comment>###### controller list</Comment><br/>
 <Section Header>[Service]</Section Header><br/>
 <Comment># single controller</Comment><br/>
-<Option Name>DisableControllers</Option Name><Normal> = </Normal><Constant>blkio</Constant><br/>
+<Option Name>DisableControllers</Option Name><Normal> = blkio</Normal><br/>
 <Option Name>DisableControllers</Option Name><Normal> = </Normal><Constant>bpf-devices</Constant><br/>
 <Option Name>DisableControllers</Option Name><Normal> = </Normal><Constant>bpf-firewall</Constant><br/>
 <Option Name>DisableControllers</Option Name><Normal> = </Normal><Constant>cpu</Constant><br/>
-<Option Name>DisableControllers</Option Name><Normal> = </Normal><Constant>cpuacct</Constant><br/>
+<Option Name>DisableControllers</Option Name><Normal> = cpuacct</Normal><br/>
 <Option Name>DisableControllers</Option Name><Normal> = </Normal><Constant>cpuset</Constant><br/>
-<Option Name>DisableControllers</Option Name><Normal> = </Normal><Constant>devices</Constant><br/>
+<Option Name>DisableControllers</Option Name><Normal> = devices</Normal><br/>
 <Option Name>DisableControllers</Option Name><Normal> = </Normal><Constant>io</Constant><br/>
 <Option Name>DisableControllers</Option Name><Normal> = </Normal><Constant>memory</Constant><br/>
 <Option Name>DisableControllers</Option Name><Normal> = </Normal><Constant>pids</Constant><br/>
@@ -1440,19 +1673,29 @@
 <Option Name>CPUWeight</Option Name><Normal> = 1 </Normal><Number>10000</Number><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
+<Comment>###### defer trigger</Comment><br/>
+<Section Header>[Socket]</Section Header><br/>
+<Option Name>DeferTrigger</Option Name><Normal> = </Normal><Constant>patient</Constant><br/>
+<Comment># single boolean</Comment><br/>
+<Option Name>DeferTrigger</Option Name><Normal> = </Normal><Constant>false</Constant><br/>
+<Option Name>DeferTrigger</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>DeferTrigger</Option Name><Normal> = i</Normal><Constant>n</Constant><Normal>valid</Normal><br/>
+<Comment># multiple values</Comment><br/>
+<Option Name>DeferTrigger</Option Name><Normal> = </Normal><Constant>patient</Constant><Normal> true</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
 <Comment>###### delegate</Comment><br/>
 <Section Header>[Service]</Section Header><br/>
 <Comment># single boolean</Comment><br/>
 <Option Name>Delegate</Option Name><Normal> = </Normal><Constant>false</Constant><br/>
 <Option Name>Delegate</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
 <Comment># single controller</Comment><br/>
-<Option Name>Delegate</Option Name><Normal> = </Normal><Constant>blkio</Constant><br/>
 <Option Name>Delegate</Option Name><Normal> = </Normal><Constant>bpf-devices</Constant><br/>
 <Option Name>Delegate</Option Name><Normal> = </Normal><Constant>bpf-firewall</Constant><br/>
 <Option Name>Delegate</Option Name><Normal> = </Normal><Constant>cpu</Constant><br/>
-<Option Name>Delegate</Option Name><Normal> = </Normal><Constant>cpuacct</Constant><br/>
 <Option Name>Delegate</Option Name><Normal> = </Normal><Constant>cpuset</Constant><br/>
-<Option Name>Delegate</Option Name><Normal> = </Normal><Constant>devices</Constant><br/>
 <Option Name>Delegate</Option Name><Normal> = </Normal><Constant>io</Constant><br/>
 <Option Name>Delegate</Option Name><Normal> = </Normal><Constant>memory</Constant><br/>
 <Option Name>Delegate</Option Name><Normal> = </Normal><Constant>pids</Constant><br/>
@@ -1514,25 +1757,24 @@
 <Option Name>ExecStart</Option Name><Normal> = cmd1 </Normal><Specifier>%h</Specifier><Normal> arg1_1 </Normal><Environment Variable>$var1</Environment Variable><Normal>, cmd2 </Normal><Specifier>%u</Specifier><Normal> arg2_1 </Normal><Environment Variable>$var2_1</Environment Variable><Continuation>\</Continuation><br/>
 <Normal>  </Normal><Environment Variable>$var2_2</Environment Variable><br/>
 <Comment># escapes (not exactly the same as detected by HlCStringChar)</Comment><br/>
-<Option Name>ExecStart</Option Name><Normal> = cmd \, </Normal><Escape>\'</Escape><Normal> </Normal><Escape>\"</Escape><Normal> \\ \a </Normal><Escape>\b</Escape><Normal> </Normal><Escape>\f</Escape><Normal> </Normal><Escape>\n</Escape><Normal> </Normal><Escape>\r</Escape><Normal> </Normal><Escape>\s</Escape><Normal> </Normal><Escape>\t</Escape><Normal> </Normal><Escape>\v</Escape><Normal> </Normal><Escape>\x0A</Escape><Normal> </Normal><Escape>\012</Escape><Normal> </Normal><Escape>\u1234</Escape><Normal> </Normal><Escape>\U12abcdef</Escape><br/>
-<Comment># prefix</Comment><br/>
-<Option Name>ExecStart</Option Name><Normal> = </Normal><Prefix>@</Prefix><Normal>/some/cmd arg "@!+-:"</Normal><br/>
+<Option Name>ExecStart</Option Name><Normal> = cmd </Normal><Escape>\'</Escape><Normal> </Normal><Escape>\"</Escape><Normal> </Normal><Escape>\\</Escape><Normal> </Normal><Escape>\a</Escape><Normal> </Normal><Escape>\b</Escape><Normal> </Normal><Escape>\f</Escape><Normal> </Normal><Escape>\n</Escape><Normal> </Normal><Escape>\r</Escape><Normal> </Normal><Escape>\s</Escape><Normal> </Normal><Escape>\t</Escape><Normal> </Normal><Escape>\v</Escape><Normal> </Normal><Escape>\x0A</Escape><Normal> </Normal><Escape>\012</Escape><Normal> </Normal><Escape>\u1234</Escape><Normal> </Normal><Escape>\U12abcdef</Escape><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Comment>###### exec prefix</Comment><br/>
+<Option Name>ExecStart</Option Name><Normal> = </Normal><Prefix>@</Prefix><Normal>/some/cmd arg "@-:+!|"</Normal><br/>
 <Option Name>ExecStart</Option Name><Normal> = </Normal><Prefix>-</Prefix><Normal>/some/cmd-1 -option arg</Normal><br/>
 <Option Name>ExecStart</Option Name><Normal> = </Normal><Prefix>:</Prefix><Normal>/some/cmd arg</Normal><br/>
 <Option Name>ExecStart</Option Name><Normal> = </Normal><Prefix>+</Prefix><Normal>/some/cmd arg</Normal><br/>
 <Option Name>ExecStart</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>/some/cmd arg</Normal><br/>
-<Option Name>ExecStart</Option Name><Normal> = </Normal><Prefix>!!</Prefix><Normal>/some/cmd arg</Normal><br/>
-<Option Name>ExecStart</Option Name><Normal> = </Normal><Prefix>@:-!!</Prefix><Normal>/some/cmd arg</Normal><br/>
-<Option Name>ExecStart</Option Name><Normal> = </Normal><Prefix>@!!-:</Prefix><Normal>/some/cmd arg</Normal><br/>
+<Option Name>ExecStart</Option Name><Normal> = </Normal><Prefix>|</Prefix><Normal>/some/cmd arg</Normal><br/>
+<Option Name>ExecStart</Option Name><Normal> = </Normal><Prefix>@:-!</Prefix><Normal>/some/cmd arg</Normal><br/>
+<Option Name>ExecStart</Option Name><Normal> = </Normal><Prefix>@!-:</Prefix><Normal>/some/cmd arg</Normal><br/>
 <Option Name>ExecStart</Option Name><Normal> = </Normal><Prefix>@:-+</Prefix><Normal>/some/cmd arg</Normal><br/>
 <Comment>## invalid values</Comment><br/>
 <Comment># invalid prefix</Comment><br/>
 <Option Name>ExecStart</Option Name><Normal> = @ /some/cmd arg</Normal><br/>
 <Option Name>ExecStart</Option Name><Normal> = @ -/some/cmd arg</Normal><br/>
-<Option Name>ExecStart</Option Name><Normal> = </Normal><Prefix>+</Prefix><Normal>!/some/cmd arg</Normal><br/>
-<Option Name>ExecStart</Option Name><Normal> = </Normal><Prefix>!!</Prefix><Normal>!/some/cmd arg</Normal><br/>
-<Option Name>ExecStart</Option Name><Normal> = </Normal><Prefix>@</Prefix><Normal>+@/some/cmd arg</Normal><br/>
-<Option Name>ExecStart</Option Name><Normal> = </Normal><Prefix>@!!</Prefix><Normal>+/some/cmd arg</Normal><br/>
+<Option Name>ExecStart</Option Name><Normal> = </Normal><Prefix>+</Prefix><Normal>! /some/cmd arg</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### exit status</Comment><br/>
@@ -1712,7 +1954,6 @@
 <Option Name>Type</Option Name><Normal> = </Normal><Constant>ocfs2</Constant><br/>
 <Option Name>Type</Option Name><Normal> = </Normal><Constant>overlay</Constant><br/>
 <Option Name>Type</Option Name><Normal> = </Normal><Constant>proc</Constant><br/>
-<Option Name>Type</Option Name><Normal> = </Normal><Constant>reiserfs</Constant><br/>
 <Option Name>Type</Option Name><Normal> = </Normal><Constant>tmpfs</Constant><br/>
 <Option Name>Type</Option Name><Normal> = </Normal><Constant>tracefs</Constant><br/>
 <Option Name>Type</Option Name><Normal> = </Normal><Constant>udf</Constant><br/>
@@ -2129,6 +2370,7 @@
 <Option Name>OnFailureJobMode</Option Name><Normal> = </Normal><Constant>ignore-dependencies</Constant><br/>
 <Option Name>OnFailureJobMode</Option Name><Normal> = </Normal><Constant>ignore-requirements</Constant><br/>
 <Option Name>OnFailureJobMode</Option Name><Normal> = </Normal><Constant>isolate</Constant><br/>
+<Option Name>OnFailureJobMode</Option Name><Normal> = </Normal><Constant>lenient</Constant><br/>
 <Option Name>OnFailureJobMode</Option Name><Normal> = </Normal><Constant>replace</Constant><br/>
 <Option Name>OnFailureJobMode</Option Name><Normal> = </Normal><Constant>replace-irreversibly</Constant><br/>
 <Comment>## invalid values</Comment><br/>
@@ -2247,6 +2489,7 @@
 <Normal></Normal><br/>
 <Comment>###### private users</Comment><br/>
 <Section Header>[Service]</Section Header><br/>
+<Option Name>PrivateUsers</Option Name><Normal> = </Normal><Constant>full</Constant><br/>
 <Option Name>PrivateUsers</Option Name><Normal> = </Normal><Constant>identity</Constant><br/>
 <Option Name>PrivateUsers</Option Name><Normal> = </Normal><Constant>self</Constant><br/>
 <Comment>## should accept any boolean value</Comment><br/>
@@ -2304,6 +2547,18 @@
 <Option Name>ProtectHome</Option Name><Normal> = i</Normal><Constant>n</Constant><Normal>valid</Normal><br/>
 <Comment># multiple values</Comment><br/>
 <Option Name>ProtectHome</Option Name><Normal> = </Normal><Constant>tmpfs</Constant><Normal> true</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Comment>###### protect hostname</Comment><br/>
+<Section Header>[Service]</Section Header><br/>
+<Option Name>ProtectHostname</Option Name><Normal> = </Normal><Constant>private</Constant><br/>
+<Option Name>ProtectHostname</Option Name><Normal> = </Normal><Constant>private</Constant><Normal>:host.example.com</Normal><br/>
+<Option Name>ProtectHostname</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
+<Option Name>ProtectHostname</Option Name><Normal> = </Normal><Constant>yes</Constant><Normal>:somehostname</Normal><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>ProtectHostname</Option Name><Normal> = i</Normal><Constant>n</Constant><Normal>valid</Normal><br/>
+<Comment># multiple values</Comment><br/>
+<Option Name>ProtectHostname</Option Name><Normal> = </Normal><Constant>private</Constant><Normal> true</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### protect system</Comment><br/>

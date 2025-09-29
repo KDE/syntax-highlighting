@@ -66,7 +66,7 @@ ExecStartPost = -cmd arg, @cmd2 name -o \x0A
 ExecCondition = /bin/exec/condition
 ExecReload = /bin/exec/reload
 ExecStop = /bin/kill -SIGABRT $MAINPID
-ExecStopPost = -:!!/bin/stop/post
+ExecStopPost = -:!/bin/stop/post
 RestartSec = 15
 RestartSteps = 2
 RestartMaxDelaySec = 150ms
@@ -199,6 +199,12 @@ StateDirectory = some/dir
 CacheDirectory = some/dir
 LogsDirectory = some/dir
 ConfigurationDirectory = some/dir
+StateDirectoryQuota = 2G
+CacheDirectoryQuota = off
+LogsDirectoryQuota = 70%
+StateDirectoryAccounting = false
+CacheDirectoryAccounting = false
+LogsDirectoryAccounting = false
 RuntimeDirectoryMode = 0755
 StateDirectoryMode = 0755
 CacheDirectoryMode = 0755
@@ -227,6 +233,16 @@ RestrictFileSystems = ~btrfs ntfs3 \
   @temporary
 RestrictNamespaces = cgroup net \
   ipc
+DelegateNamespaces = pid uts
+PrivateBPF = true
+BPFDelegateAttachments = BPFCgroupInetIngress \
+  BPFCgroupSockOps BPFCgroupSockOps
+BPFDelegateCommands = BPFMapCreate BPFProgLoad \
+  BPFProgTestRun
+BPFDelegateMaps = BPFMapTypeUnspec \
+  BPFMapTypeQueue
+BPFDelegatePrograms = BPFProgTypeXdp \
+  BPFProgTypeXdp
 LockPersonality = yes
 MemoryDenyWriteExecute = true
 RestrictRealtime = true
@@ -286,7 +302,6 @@ FinalKillSignal = SIGABRT
 WatchdogSignal = SIGQUIT
 
 ## from systemd.resource-control
-CPUAccounting = yes
 CPUWeight = 1234
 StartupCPUWeight = 321
 CPUQuota = 123.4%
@@ -343,6 +358,8 @@ NFTSet = cgroup:inet:filter:my_service \
 
 
 [Slice]
+ConcurrencyHardMax = 20
+ConcurrencySoftMax = infinity
 # The Slice section may include options of the resource-control option group.
 # See [Service] for available options of systemd.resource-control.
 
@@ -393,8 +410,10 @@ FreeBind = yes
 Transparent = no
 Broadcast = true
 PassCredentials = yes
+PassPIDFD = true
 PassSecurity = true
 PassPacketInfo = true
+AcceptFileDescriptors = no
 Timestamping = nsec
 TCPCongestion = westwood
 ExecStartPre = +/usr/bin/start/pre
@@ -410,6 +429,8 @@ TriggerLimitIntervalSec = 1s 500ms
 TriggerLimitBurst = 50
 PollLimitIntervalSec = 1s 300ms
 PollLimitBurst = 120
+DeferTrigger = patient
+DeferTriggerMaxSec = infinity
 PassFileDescriptorsToExec = true
 # see [Service] for options from systemd.exec and systemd.kill
 
@@ -433,6 +454,7 @@ OnUnitInactiveSec = 1m 30s
 OnCalendar = daily
 AccuracySec = 1min 10sec
 RandomizedDelaySec = 30s
+RandomizedOffsetSec = 20s
 FixedRandomDelay = yes
 DeferReactivation = true
 OnClockChange = false
@@ -493,6 +515,7 @@ ConditionVirtualization = |vmware
 ConditionHost = !shodan*
 ConditionKernelCommandLine = !kernel_option
 ConditionKernelVersion = | >= 4.*
+ConditionVersion = kernel >= 4.*
 ConditionCredential = name
 ConditionEnvironment = SOME_ENVIRONMENT_VARIABLE=some_value
 ConditionSecurity = | ! selinux
@@ -520,6 +543,7 @@ ConditionOSRelease = ID=some-id
 ConditionMemoryPressure = 20%/5min
 ConditionCPUPressure = 12%/10sec
 ConditionIOPressure = 30% / 1min
+ConditionKernelModuleLoaded = modulename
 AssertArchitecture = x86
 AssertVirtualization = |vmware
 AssertHost = !shodan*
@@ -950,6 +974,7 @@ RestrictNamespaces = ipc
 RestrictNamespaces = mnt
 RestrictNamespaces = net
 RestrictNamespaces = pid
+RestrictNamespaces = time
 RestrictNamespaces = user
 RestrictNamespaces = uts
 RestrictNamespaces = cgroup uts
@@ -1085,6 +1110,214 @@ StopWhenUnneeded = off
 StopWhenUnneeded = invalid
 # multiple values
 StopWhenUnneeded = false true
+
+
+###### bpf delegate attachments
+[Service]
+BPFDelegateAttachments = BPFCgroupInetIngress
+BPFDelegateAttachments = BPFCgroupInetEgress
+BPFDelegateAttachments = BPFCgroupInetSockCreate
+BPFDelegateAttachments = BPFCgroupSockOps
+BPFDelegateAttachments = BPFSkSkbStreamParser
+BPFDelegateAttachments = BPFSkSkbStreamVerdict
+BPFDelegateAttachments = BPFCgroupDevice
+BPFDelegateAttachments = BPFSkMsgVerdict
+BPFDelegateAttachments = BPFCgroupInet4Bind
+BPFDelegateAttachments = BPFCgroupInet6Bind
+BPFDelegateAttachments = BPFCgroupInet4Connect
+BPFDelegateAttachments = BPFCgroupInet6Connect
+BPFDelegateAttachments = BPFCgroupInet4PostBind
+BPFDelegateAttachments = BPFCgroupInet6PostBind
+BPFDelegateAttachments = BPFCgroupUdp4Sendmsg
+BPFDelegateAttachments = BPFCgroupUdp6Sendmsg
+BPFDelegateAttachments = BPFLircMode2
+BPFDelegateAttachments = BPFFlowDissector
+BPFDelegateAttachments = BPFCgroupSysctl
+BPFDelegateAttachments = BPFCgroupUdp4Recvmsg
+BPFDelegateAttachments = BPFCgroupUdp6Recvmsg
+BPFDelegateAttachments = BPFCgroupGetsockopt
+BPFDelegateAttachments = BPFCgroupSetsockopt
+BPFDelegateAttachments = BPFTraceRawTp
+BPFDelegateAttachments = BPFTraceFentry
+BPFDelegateAttachments = BPFTraceFexit
+BPFDelegateAttachments = BPFModifyReturn
+BPFDelegateAttachments = BPFLsmMac
+BPFDelegateAttachments = BPFTraceIter
+BPFDelegateAttachments = BPFCgroupInet4Getpeername
+BPFDelegateAttachments = BPFCgroupInet6Getpeername
+BPFDelegateAttachments = BPFCgroupInet4Getsockname
+BPFDelegateAttachments = BPFCgroupInet6Getsockname
+BPFDelegateAttachments = BPFXdpDevmap
+BPFDelegateAttachments = BPFCgroupInetSockRelease
+BPFDelegateAttachments = BPFXdpCpumap
+BPFDelegateAttachments = BPFSkLookup
+BPFDelegateAttachments = BPFXdp
+BPFDelegateAttachments = BPFSkSkbVerdict
+BPFDelegateAttachments = BPFSkReuseportSelect
+BPFDelegateAttachments = BPFSkReuseportSelectOrMigrate
+BPFDelegateAttachments = BPFPerfEvent
+BPFDelegateAttachments = BPFTraceKprobeMulti
+BPFDelegateAttachments = BPFLsmCgroup
+BPFDelegateAttachments = BPFStructOps
+BPFDelegateAttachments = BPFNetfilter
+BPFDelegateAttachments = BPFTcxIngress
+BPFDelegateAttachments = BPFTcxEgress
+BPFDelegateAttachments = BPFTraceUprobeMulti
+BPFDelegateAttachments = BPFCgroupUnixConnect
+BPFDelegateAttachments = BPFCgroupUnixSendmsg
+BPFDelegateAttachments = BPFCgroupUnixRecvmsg
+BPFDelegateAttachments = BPFCgroupUnixGetpeername
+BPFDelegateAttachments = BPFCgroupUnixGetsockname
+BPFDelegateAttachments = BPFNetkitPrimary
+BPFDelegateAttachments = BPFNetkitPeer
+BPFDelegateAttachments = BPFTraceKprobeSession
+BPFDelegateAttachments = BPFTraceUprobeSession
+## invalid values
+BPFDelegateAttachments = invalid
+
+
+###### bpf delegate commands
+[Service]
+BPFDelegateCommands = BPFTokenCreate
+BPFDelegateCommands = BPFTaskFdQuery
+BPFDelegateCommands = BPFRawTracepointOpen
+BPFDelegateCommands = BPFProgTestRun
+BPFDelegateCommands = BPFProgStreamReadByFd
+BPFDelegateCommands = BPFProgQuery
+BPFDelegateCommands = BPFProgLoad
+BPFDelegateCommands = BPFProgGetNextId
+BPFDelegateCommands = BPFProgGetFdById
+BPFDelegateCommands = BPFProgDetach
+BPFDelegateCommands = BPFProgBindMap
+BPFDelegateCommands = BPFProgAttach
+BPFDelegateCommands = BPFObjPin
+BPFDelegateCommands = BPFObjGetInfoByFd
+BPFDelegateCommands = BPFObjGet
+BPFDelegateCommands = BPFMapUpdateElem
+BPFDelegateCommands = BPFMapUpdateBatch
+BPFDelegateCommands = BPFMapLookupElem
+BPFDelegateCommands = BPFMapLookupBatch
+BPFDelegateCommands = BPFMapLookupAndDeleteElem
+BPFDelegateCommands = BPFMapLookupAndDeleteBatch
+BPFDelegateCommands = BPFMapGetNextKey
+BPFDelegateCommands = BPFMapGetNextId
+BPFDelegateCommands = BPFMapGetFdById
+BPFDelegateCommands = BPFMapFreeze
+BPFDelegateCommands = BPFMapDeleteElem
+BPFDelegateCommands = BPFMapDeleteBatch
+BPFDelegateCommands = BPFMapCreate
+BPFDelegateCommands = BPFLinkUpdate
+BPFDelegateCommands = BPFLinkGetNextId
+BPFDelegateCommands = BPFLinkGetFdById
+BPFDelegateCommands = BPFLinkDetach
+BPFDelegateCommands = BPFLinkCreate
+BPFDelegateCommands = BPFIterCreate
+BPFDelegateCommands = BPFEnableStats
+BPFDelegateCommands = BPFBtfLoad
+BPFDelegateCommands = BPFBtfGetNextId
+BPFDelegateCommands = BPFBtfGetFdById
+## invalid values
+BPFDelegateCommands = invalid
+
+
+###### bpf delegate maps
+BPFDelegateMaps = BPFMapTypeUnspec
+BPFDelegateMaps = BPFMapTypeHash
+BPFDelegateMaps = BPFMapTypeArray
+BPFDelegateMaps = BPFMapTypeProgArray
+BPFDelegateMaps = BPFMapTypePerfEventArray
+BPFDelegateMaps = BPFMapTypePercpuHash
+BPFDelegateMaps = BPFMapTypePercpuArray
+BPFDelegateMaps = BPFMapTypeStackTrace
+BPFDelegateMaps = BPFMapTypeCgroupArray
+BPFDelegateMaps = BPFMapTypeLruHash
+BPFDelegateMaps = BPFMapTypeLruPercpuHash
+BPFDelegateMaps = BPFMapTypeLpmTrie
+BPFDelegateMaps = BPFMapTypeArrayOfMaps
+BPFDelegateMaps = BPFMapTypeHashOfMaps
+BPFDelegateMaps = BPFMapTypeDevmap
+BPFDelegateMaps = BPFMapTypeSockmap
+BPFDelegateMaps = BPFMapTypeCpumap
+BPFDelegateMaps = BPFMapTypeXskmap
+BPFDelegateMaps = BPFMapTypeSockhash
+BPFDelegateMaps = BPFMapTypeCgroupStorageDeprecated
+BPFDelegateMaps = BPFMapTypeReuseportSockarray
+BPFDelegateMaps = BPFMapTypePercpuCgroupStorageDeprecated
+BPFDelegateMaps = BPFMapTypeQueue
+BPFDelegateMaps = BPFMapTypeStack
+BPFDelegateMaps = BPFMapTypeSkStorage
+BPFDelegateMaps = BPFMapTypeDevmapHash
+BPFDelegateMaps = BPFMapTypeStructOps
+BPFDelegateMaps = BPFMapTypeRingbuf
+BPFDelegateMaps = BPFMapTypeInodeStorage
+BPFDelegateMaps = BPFMapTypeTaskStorage
+BPFDelegateMaps = BPFMapTypeBloomFilter
+BPFDelegateMaps = BPFMapTypeUserRingbuf
+BPFDelegateMaps = BPFMapTypeCgrpStorage
+BPFDelegateMaps = BPFMapTypeArena
+## invalid values
+BPFDelegateMaps = invalid
+
+
+###### bpf delegate programs
+BPFDelegatePrograms = BPFProgTypeUnspec
+BPFDelegatePrograms = BPFProgTypeSocketFilter
+BPFDelegatePrograms = BPFProgTypeKprobe
+BPFDelegatePrograms = BPFProgTypeSchedCls
+BPFDelegatePrograms = BPFProgTypeSchedAct
+BPFDelegatePrograms = BPFProgTypeTracepoint
+BPFDelegatePrograms = BPFProgTypeXdp
+BPFDelegatePrograms = BPFProgTypePerfEvent
+BPFDelegatePrograms = BPFProgTypeCgroupSkb
+BPFDelegatePrograms = BPFProgTypeCgroupSock
+BPFDelegatePrograms = BPFProgTypeLwtIn
+BPFDelegatePrograms = BPFProgTypeLwtOut
+BPFDelegatePrograms = BPFProgTypeLwtXmit
+BPFDelegatePrograms = BPFProgTypeSockOps
+BPFDelegatePrograms = BPFProgTypeSkSkb
+BPFDelegatePrograms = BPFProgTypeCgroupDevice
+BPFDelegatePrograms = BPFProgTypeSkMsg
+BPFDelegatePrograms = BPFProgTypeRawTracepoint
+BPFDelegatePrograms = BPFProgTypeCgroupSockAddr
+BPFDelegatePrograms = BPFProgTypeLwtSeg6local
+BPFDelegatePrograms = BPFProgTypeLircMode2
+BPFDelegatePrograms = BPFProgTypeSkReuseport
+BPFDelegatePrograms = BPFProgTypeFlowDissector
+BPFDelegatePrograms = BPFProgTypeCgroupSysctl
+BPFDelegatePrograms = BPFProgTypeRawTracepointWritable
+BPFDelegatePrograms = BPFProgTypeCgroupSockopt
+BPFDelegatePrograms = BPFProgTypeTracing
+BPFDelegatePrograms = BPFProgTypeStructOps
+BPFDelegatePrograms = BPFProgTypeExt
+BPFDelegatePrograms = BPFProgTypeLsm
+BPFDelegatePrograms = BPFProgTypeSkLookup
+BPFDelegatePrograms = BPFProgTypeNetfilter
+## invalid values
+BPFDelegatePrograms = invalid
+
+
+###### bpf program type
+BPFProgram = sysctl
+BPFProgram = sock_ops
+BPFProgram = sock_create
+BPFProgram = setsockopt
+BPFProgram = sendmsg6
+BPFProgram = sendmsg4
+BPFProgram = recvmsg6
+BPFProgram = recvmsg4
+BPFProgram = post_bind6
+BPFProgram = post_bind4
+BPFProgram = ingress
+BPFProgram = getsockopt
+BPFProgram = egress
+BPFProgram = device
+BPFProgram = connect6
+BPFProgram = connect4
+BPFProgram = bind6
+BPFProgram = bind4
+BPFProgram = bind6:/sys/fs/bpf/sock-addr-hook
+## invalid values
+BPFProgram = invalid
 
 
 ###### calendar
@@ -1440,19 +1673,29 @@ CPUWeight = invalid
 CPUWeight = 1 10000
 
 
+###### defer trigger
+[Socket]
+DeferTrigger = patient
+# single boolean
+DeferTrigger = false
+DeferTrigger = true
+## invalid values
+DeferTrigger = invalid
+# multiple values
+DeferTrigger = patient true
+
+
+
 ###### delegate
 [Service]
 # single boolean
 Delegate = false
 Delegate = true
 # single controller
-Delegate = blkio
 Delegate = bpf-devices
 Delegate = bpf-firewall
 Delegate = cpu
-Delegate = cpuacct
 Delegate = cpuset
-Delegate = devices
 Delegate = io
 Delegate = memory
 Delegate = pids
@@ -1514,25 +1757,24 @@ ExecStart = /some/cmd %u arg $var1 inside${var2}word ${var3} $var4
 ExecStart = cmd1 %h arg1_1 $var1, cmd2 %u arg2_1 $var2_1\
   $var2_2
 # escapes (not exactly the same as detected by HlCStringChar)
-ExecStart = cmd \, \' \" \\ \a \b \f \n \r \s \t \v \x0A \012 \u1234 \U12abcdef
-# prefix
-ExecStart = @/some/cmd arg "@!+-:"
+ExecStart = cmd \' \" \\ \a \b \f \n \r \s \t \v \x0A \012 \u1234 \U12abcdef
+
+
+###### exec prefix
+ExecStart = @/some/cmd arg "@-:+!|"
 ExecStart = -/some/cmd-1 -option arg
 ExecStart = :/some/cmd arg
 ExecStart = +/some/cmd arg
 ExecStart = !/some/cmd arg
-ExecStart = !!/some/cmd arg
-ExecStart = @:-!!/some/cmd arg
-ExecStart = @!!-:/some/cmd arg
+ExecStart = |/some/cmd arg
+ExecStart = @:-!/some/cmd arg
+ExecStart = @!-:/some/cmd arg
 ExecStart = @:-+/some/cmd arg
 ## invalid values
 # invalid prefix
 ExecStart = @ /some/cmd arg
 ExecStart = @ -/some/cmd arg
-ExecStart = +!/some/cmd arg
-ExecStart = !!!/some/cmd arg
-ExecStart = @+@/some/cmd arg
-ExecStart = @!!+/some/cmd arg
+ExecStart = +! /some/cmd arg
 
 
 ###### exit status
@@ -1712,7 +1954,6 @@ Type = ntfs3
 Type = ocfs2
 Type = overlay
 Type = proc
-Type = reiserfs
 Type = tmpfs
 Type = tracefs
 Type = udf
@@ -2129,6 +2370,7 @@ OnFailureJobMode = flush
 OnFailureJobMode = ignore-dependencies
 OnFailureJobMode = ignore-requirements
 OnFailureJobMode = isolate
+OnFailureJobMode = lenient
 OnFailureJobMode = replace
 OnFailureJobMode = replace-irreversibly
 ## invalid values
@@ -2247,6 +2489,7 @@ PrivateTmp = disconnected true
 
 ###### private users
 [Service]
+PrivateUsers = full
 PrivateUsers = identity
 PrivateUsers = self
 ## should accept any boolean value
@@ -2304,6 +2547,18 @@ ProtectHome = yes
 ProtectHome = invalid
 # multiple values
 ProtectHome = tmpfs true
+
+
+###### protect hostname
+[Service]
+ProtectHostname = private
+ProtectHostname = private:host.example.com
+ProtectHostname = true
+ProtectHostname = yes:somehostname
+## invalid values
+ProtectHostname = invalid
+# multiple values
+ProtectHostname = private true
 
 
 ###### protect system

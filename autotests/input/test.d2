@@ -1,0 +1,220 @@
+
+"""
+Block comment:
+This file demonstrates:
+ - imports (regular and quoted)
+ - vars & substitutions
+ - containers, nested objects
+ - many shapes: cylinder, sql_table, class, c4-person, circle, square, sequence_diagram
+ - edges with labels (markdown, LaTeX), different arrow kinds
+ - tooltips & links
+ - style blocks and globs (wildcards)
+ - nulling / suspend / unsuspend
+ - scenarios / steps composition
+"""
+
+# Imports
+# regular import
+...@shared
+
+# quoted import
+...@"team.v1"
+
+# Variables
+vars: {
+  colors: {
+    service: "#0B5FFF"
+    db: "#E6F0FF"
+    warn: "#FFDD99"
+  }
+  urls: {
+    docs: "https://example.com/docs#top"
+  }
+}
+
+# Global style for the root
+style: {
+  fill: transparent
+  font: mono
+}
+
+client: {
+  shape: c4-person
+  label: "Client (browser)\nmodern user agent"
+  tooltip: "Client provides credentials and interacts with the API."
+  link: ${urls.docs}
+  width: 90
+  height: 90
+  style: {font-size: 10}
+}
+
+browser_cache: {
+  shape: square
+  label: "Browser\nCache"
+  style: {opacity: 0.9}
+}
+
+api_gateway: {
+  shape: rectangle
+  label: "API Gateway\n(rate-limits, auth)"
+  style: {
+    fill: ${colors.service}
+    font-color: white
+  }
+}
+
+auth: {
+  shape: circle
+  label: "Auth\n(oAuth2 / JWT)"
+  tooltip: "Supports PKCE & refresh tokens"
+}
+
+workers: {
+  shape: queue
+  label: "Background\nworkers"
+  style: {shadow: true}
+}
+
+db_primary: {
+  shape: cylinder
+  label: "Postgres\nPrimary"
+  tooltip: "primary-db.example.com\nPG 14"
+  link: "https://db.example.com/console"
+  style: {fill: ${colors.db}; stroke: "#0B4A6F"}
+}
+
+# SQL table
+users: {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  name: string
+  email: string {constraint: ["unique"; "not null"]}
+  created_at: timestamptz
+}
+
+# UML class
+Order: {
+  shape: class
+  id: int
+  total: float64
+  placeOrder(customerId int): bool
+  cancel(): bool
+}
+
+square_node: {shape: square; label: "square"}
+circle_node: {shape: circle; label: "circle"}
+
+# Sequence diagram
+login_sequence: {
+  shape: sequence_diagram
+  # actors (explicit ordering matters inside sequence_diagram)
+  client
+  api_gateway
+  auth
+  # messages (order matters)
+  client -> api_gateway: "POST /login"
+  api_gateway -> auth: "validate(credentials)"
+  auth -> api_gateway: "200 OK\n{ token }"
+  api_gateway -> client: "302 redirect"
+  auth -> auth: "hash(password)"
+  alt: {
+    "invalid creds": {
+      api_gateway -> client: "401 Unauthorized"
+    }
+    "valid creds": {
+      api_gateway -> client: "302 redirect"
+    }
+  }
+}
+
+# Connections (edges) + labels
+client -> api_gateway: "REST: POST /v1/session"
+client -> browser_cache: "Cache read (stale-while-revalidate)"
+browser_cache <- api_gateway: "cache-bust (stale)"
+api_gateway -> auth: |md
+  OAuth token exchange
+  ```js
+  fetch('/token')
+  ```
+|
+api_gateway -> workers: "enqueue: `processEmail()`"
+workers -> db_primary: "writes (event logs)"
+api_gateway <-> monitoring: |tex
+  \textcolor{green}{E}=mc^2
+|
+
+db_primary <- replica_db: "replication (async)"
+worker_queue: {
+  shape: package
+  label: "worker-queue (internal)"
+  style: {opacity: 0.6}
+}
+
+# explicit connection with a multi-line block-string label
+api_gateway -> worker_queue: |"""md
+  Some label:
+    * bullet 1
+    * bullet 2
+
+  And an inline `code()` snippet.
+"""|
+
+monitoring: {shape: text; label: "Monitoring"}
+monitoring: {tooltip: "OpenTelemetry + Grafana\nClick to open docs"; link: ${urls.docs}}
+
+*: {!&shape: sql_table; style.opacity: 0.95}
+
+temp_user: {
+  shape: person
+  name: John
+}
+
+**: unsuspend
+temp_user: suspend
+
+# names that require quoting (dots, spaces, leading numerals)
+"schema.v1.table": {shape: page; label: "table with dot in ID"}
+"123-start": {shape: diamond; label: "starts-with-number"}
+"complex/name with spaces": {shape: hexagon; label: "complex ID"}
+
+# Styles on selectors
+*d*b*: {style.font-size: 12}
+
+# Nulling a nested attribute
+users.created_at: null
+
+*: {style.font-color: "#222"}
+
+*: {&link: *; style.fill: yellow; style.stroke: "#0A8F0A"}
+
+*: {
+  &shape: c4-person
+  style.fill: ${colors.warn}
+}
+
+scenarios: {
+  degraded: {
+    db_primary: {style.opacity: 0.5}
+    replica_db: {style.opacity: 1.0; style.stroke: "#FF0000"}
+    api_gateway -> replica_db: "read-only fallback (degraded)"
+    legacy_db: null # overriding with null removes it
+  }
+}
+
+steps: {
+  1: {
+    api_gateway: {style.border-radius: 8}
+  }
+  2: {
+    api_gateway: {style.border-radius: 2; style.stroke-dash: 4}
+  }
+}
+
+layers: {
+  extra: {
+    emoji_node: {shape: rectangle; label: "Emoji 🚀 — 測試"}
+    square_node2: {shape: square; width: 40;
+                                  height: 40}
+    weird_label_node: {shape: rectangle; label: "This label has a #hash and (paren): check"}
+  }
+}

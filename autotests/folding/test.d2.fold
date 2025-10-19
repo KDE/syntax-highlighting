@@ -1,0 +1,220 @@
+
+<beginfold id='1'>"""</beginfold id='1'>
+Block comment:
+This file demonstrates:
+ - imports (regular and quoted)
+ - vars & substitutions
+ - containers, nested objects
+ - many shapes: cylinder, sql_table, class, c4-person, circle, square, sequence_diagram
+ - edges with labels (markdown, LaTeX), different arrow kinds
+ - tooltips & links
+ - style blocks and globs (wildcards)
+ - nulling / suspend / unsuspend
+ - scenarios / steps composition
+<endfold id='1'>"""</endfold id='1'>
+
+# Imports
+# regular import
+...@shared
+
+# quoted import
+...@"team.v1"
+
+# Variables
+vars: <beginfold id='2'>{</beginfold id='2'>
+  colors: <beginfold id='2'>{</beginfold id='2'>
+    service: <beginfold id='3'>"</beginfold id='3'>#0B5FFF<endfold id='3'>"</endfold id='3'>
+    db: <beginfold id='3'>"</beginfold id='3'>#E6F0FF<endfold id='3'>"</endfold id='3'>
+    warn: <beginfold id='3'>"</beginfold id='3'>#FFDD99<endfold id='3'>"</endfold id='3'>
+  <endfold id='2'>}</endfold id='2'>
+  urls: <beginfold id='2'>{</beginfold id='2'>
+    docs: <beginfold id='3'>"</beginfold id='3'>https://example.com/docs#top<endfold id='3'>"</endfold id='3'>
+  <endfold id='2'>}</endfold id='2'>
+<endfold id='2'>}</endfold id='2'>
+
+# Global style for the root
+style: <beginfold id='4'>{</beginfold id='4'>
+  fill: transparent
+  font: mono
+<endfold id='4'>}</endfold id='4'>
+
+client: <beginfold id='2'>{</beginfold id='2'>
+  shape: c4-person
+  label: <beginfold id='3'>"</beginfold id='3'>Client (browser)\nmodern user agent<endfold id='3'>"</endfold id='3'>
+  tooltip: <beginfold id='3'>"</beginfold id='3'>Client provides credentials and interacts with the API.<endfold id='3'>"</endfold id='3'>
+  link: ${urls.docs}
+  width: 90
+  height: 90
+  style: <beginfold id='4'>{</beginfold id='4'>font-size: 10<endfold id='4'>}</endfold id='4'>
+<endfold id='2'>}</endfold id='2'>
+
+browser_cache: <beginfold id='2'>{</beginfold id='2'>
+  shape: square
+  label: <beginfold id='3'>"</beginfold id='3'>Browser\nCache<endfold id='3'>"</endfold id='3'>
+  style: <beginfold id='4'>{</beginfold id='4'>opacity: 0.9<endfold id='4'>}</endfold id='4'>
+<endfold id='2'>}</endfold id='2'>
+
+api_gateway: <beginfold id='2'>{</beginfold id='2'>
+  shape: rectangle
+  label: <beginfold id='3'>"</beginfold id='3'>API Gateway\n(rate-limits, auth)<endfold id='3'>"</endfold id='3'>
+  style: <beginfold id='4'>{</beginfold id='4'>
+    fill: ${colors.service}
+    font-color: white
+  <endfold id='4'>}</endfold id='4'>
+<endfold id='2'>}</endfold id='2'>
+
+auth: <beginfold id='2'>{</beginfold id='2'>
+  shape: circle
+  label: <beginfold id='3'>"</beginfold id='3'>Auth\n(oAuth2 / JWT)<endfold id='3'>"</endfold id='3'>
+  tooltip: <beginfold id='3'>"</beginfold id='3'>Supports PKCE & refresh tokens<endfold id='3'>"</endfold id='3'>
+<endfold id='2'>}</endfold id='2'>
+
+workers: <beginfold id='2'>{</beginfold id='2'>
+  shape: queue
+  label: <beginfold id='3'>"</beginfold id='3'>Background\nworkers<endfold id='3'>"</endfold id='3'>
+  style: <beginfold id='4'>{</beginfold id='4'>shadow: true<endfold id='4'>}</endfold id='4'>
+<endfold id='2'>}</endfold id='2'>
+
+db_primary: <beginfold id='2'>{</beginfold id='2'>
+  shape: cylinder
+  label: <beginfold id='3'>"</beginfold id='3'>Postgres\nPrimary<endfold id='3'>"</endfold id='3'>
+  tooltip: <beginfold id='3'>"</beginfold id='3'>primary-db.example.com\nPG 14<endfold id='3'>"</endfold id='3'>
+  link: "https://db.example.com/console"
+  style: <beginfold id='4'>{</beginfold id='4'>fill: ${colors.db}; stroke: <beginfold id='3'>"</beginfold id='3'>#0B4A6F<endfold id='3'>"</endfold id='3'><endfold id='4'>}</endfold id='4'>
+<endfold id='2'>}</endfold id='2'>
+
+# SQL table
+users: <beginfold id='2'>{</beginfold id='2'>
+  shape: sql_table
+  id: int <beginfold id='2'>{</beginfold id='2'>constraint: primary_key<endfold id='2'>}</endfold id='2'>
+  name: string
+  email: string <beginfold id='2'>{</beginfold id='2'>constraint: ["unique"; "not null"]<endfold id='2'>}</endfold id='2'>
+  created_at: timestamptz
+<endfold id='2'>}</endfold id='2'>
+
+# UML class
+Order: <beginfold id='2'>{</beginfold id='2'>
+  shape: class
+  id: int
+  total: float64
+  placeOrder(customerId int): bool
+  cancel(): bool
+<endfold id='2'>}</endfold id='2'>
+
+square_node: <beginfold id='2'>{</beginfold id='2'>shape: square; label: <beginfold id='3'>"</beginfold id='3'>square<endfold id='3'>"</endfold id='3'><endfold id='2'>}</endfold id='2'>
+circle_node: <beginfold id='2'>{</beginfold id='2'>shape: circle; label: <beginfold id='3'>"</beginfold id='3'>circle<endfold id='3'>"</endfold id='3'><endfold id='2'>}</endfold id='2'>
+
+# Sequence diagram
+login_sequence: <beginfold id='2'>{</beginfold id='2'>
+  shape: sequence_diagram
+  # actors (explicit ordering matters inside sequence_diagram)
+  client
+  api_gateway
+  auth
+  # messages (order matters)
+  client -> api_gateway: <beginfold id='3'>"</beginfold id='3'>POST /login<endfold id='3'>"</endfold id='3'>
+  api_gateway -> auth: <beginfold id='3'>"</beginfold id='3'>validate(credentials)<endfold id='3'>"</endfold id='3'>
+  auth -> api_gateway: <beginfold id='3'>"</beginfold id='3'>200 OK\n{ token }<endfold id='3'>"</endfold id='3'>
+  api_gateway -> client: <beginfold id='3'>"</beginfold id='3'>302 redirect<endfold id='3'>"</endfold id='3'>
+  auth -> auth: <beginfold id='3'>"</beginfold id='3'>hash(password)<endfold id='3'>"</endfold id='3'>
+  alt: <beginfold id='2'>{</beginfold id='2'>
+    <beginfold id='5'>"</beginfold id='5'>invalid creds<endfold id='5'>"</endfold id='5'>: <beginfold id='2'>{</beginfold id='2'>
+      api_gateway -> client: <beginfold id='3'>"</beginfold id='3'>401 Unauthorized<endfold id='3'>"</endfold id='3'>
+    <endfold id='2'>}</endfold id='2'>
+    <beginfold id='5'>"</beginfold id='5'>valid creds<endfold id='5'>"</endfold id='5'>: <beginfold id='2'>{</beginfold id='2'>
+      api_gateway -> client: <beginfold id='3'>"</beginfold id='3'>302 redirect<endfold id='3'>"</endfold id='3'>
+    <endfold id='2'>}</endfold id='2'>
+  <endfold id='2'>}</endfold id='2'>
+<endfold id='2'>}</endfold id='2'>
+
+# Connections (edges) + labels
+client -> api_gateway: <beginfold id='3'>"</beginfold id='3'>REST: POST /v1/session<endfold id='3'>"</endfold id='3'>
+client -> browser_cache: <beginfold id='3'>"</beginfold id='3'>Cache read (stale-while-revalidate)<endfold id='3'>"</endfold id='3'>
+browser_cache <- api_gateway: <beginfold id='3'>"</beginfold id='3'>cache-bust (stale)<endfold id='3'>"</endfold id='3'>
+api_gateway -> auth: <beginfold id='6'>|md</beginfold id='6'>
+  OAuth token exchange
+  <beginfold id='7'>```js</beginfold id='7'>
+  fetch('/token')
+  <endfold id='7'>```</endfold id='7'>
+<endfold id='6'>|</endfold id='6'>
+api_gateway -> workers: <beginfold id='3'>"</beginfold id='3'>enqueue: `processEmail()`<endfold id='3'>"</endfold id='3'>
+workers -> db_primary: <beginfold id='3'>"</beginfold id='3'>writes (event logs)<endfold id='3'>"</endfold id='3'>
+api_gateway <-> monitoring: <beginfold id='6'>|tex</beginfold id='6'>
+  \textcolor{green}{E}=mc^2
+<endfold id='6'>|</endfold id='6'>
+
+db_primary <- replica_db: <beginfold id='3'>"</beginfold id='3'>replication (async)<endfold id='3'>"</endfold id='3'>
+worker_queue: <beginfold id='2'>{</beginfold id='2'>
+  shape: package
+  label: <beginfold id='3'>"</beginfold id='3'>worker-queue (internal)<endfold id='3'>"</endfold id='3'>
+  style: <beginfold id='4'>{</beginfold id='4'>opacity: 0.6<endfold id='4'>}</endfold id='4'>
+<endfold id='2'>}</endfold id='2'>
+
+# explicit connection with a multi-line block-string label
+api_gateway -> worker_queue: <beginfold id='6'>|"""md</beginfold id='6'>
+  Some label:
+    * bullet 1
+    * bullet 2
+
+  And an inline `code()` snippet.
+<endfold id='6'>"""|</endfold id='6'>
+
+monitoring: <beginfold id='2'>{</beginfold id='2'>shape: text; label: <beginfold id='3'>"</beginfold id='3'>Monitoring<endfold id='3'>"</endfold id='3'><endfold id='2'>}</endfold id='2'>
+monitoring: <beginfold id='2'>{</beginfold id='2'>tooltip: <beginfold id='3'>"</beginfold id='3'>OpenTelemetry + Grafana\nClick to open docs<endfold id='3'>"</endfold id='3'>; link: ${urls.docs}<endfold id='2'>}</endfold id='2'>
+
+*: <beginfold id='2'>{</beginfold id='2'>!&shape: sql_table; style.opacity: 0.95<endfold id='2'>}</endfold id='2'>
+
+temp_user: <beginfold id='2'>{</beginfold id='2'>
+  shape: person
+  name: John
+<endfold id='2'>}</endfold id='2'>
+
+**: unsuspend
+temp_user: suspend
+
+# names that require quoting (dots, spaces, leading numerals)
+<beginfold id='5'>"</beginfold id='5'>schema.v1.table<endfold id='5'>"</endfold id='5'>: <beginfold id='2'>{</beginfold id='2'>shape: page; label: <beginfold id='3'>"</beginfold id='3'>table with dot in ID<endfold id='3'>"</endfold id='3'><endfold id='2'>}</endfold id='2'>
+<beginfold id='5'>"</beginfold id='5'>123-start<endfold id='5'>"</endfold id='5'>: <beginfold id='2'>{</beginfold id='2'>shape: diamond; label: <beginfold id='3'>"</beginfold id='3'>starts-with-number<endfold id='3'>"</endfold id='3'><endfold id='2'>}</endfold id='2'>
+<beginfold id='5'>"</beginfold id='5'>complex/name with spaces<endfold id='5'>"</endfold id='5'>: <beginfold id='2'>{</beginfold id='2'>shape: hexagon; label: <beginfold id='3'>"</beginfold id='3'>complex ID<endfold id='3'>"</endfold id='3'><endfold id='2'>}</endfold id='2'>
+
+# Styles on selectors
+*d*b*: <beginfold id='2'>{</beginfold id='2'>style.font-size: 12<endfold id='2'>}</endfold id='2'>
+
+# Nulling a nested attribute
+users.created_at: null
+
+*: <beginfold id='2'>{</beginfold id='2'>style.font-color: <beginfold id='3'>"</beginfold id='3'>#222<endfold id='3'>"</endfold id='3'><endfold id='2'>}</endfold id='2'>
+
+*: <beginfold id='2'>{</beginfold id='2'>&link: *; style.fill: yellow; style.stroke: <beginfold id='3'>"</beginfold id='3'>#0A8F0A<endfold id='3'>"</endfold id='3'><endfold id='2'>}</endfold id='2'>
+
+*: <beginfold id='2'>{</beginfold id='2'>
+  &shape: c4-person
+  style.fill: ${colors.warn}
+<endfold id='2'>}</endfold id='2'>
+
+scenarios: <beginfold id='2'>{</beginfold id='2'>
+  degraded: <beginfold id='2'>{</beginfold id='2'>
+    db_primary: <beginfold id='2'>{</beginfold id='2'>style.opacity: 0.5<endfold id='2'>}</endfold id='2'>
+    replica_db: <beginfold id='2'>{</beginfold id='2'>style.opacity: 1.0; style.stroke: <beginfold id='3'>"</beginfold id='3'>#FF0000<endfold id='3'>"</endfold id='3'><endfold id='2'>}</endfold id='2'>
+    api_gateway -> replica_db: <beginfold id='3'>"</beginfold id='3'>read-only fallback (degraded)<endfold id='3'>"</endfold id='3'>
+    legacy_db: null # overriding with null removes it
+  <endfold id='2'>}</endfold id='2'>
+<endfold id='2'>}</endfold id='2'>
+
+steps: <beginfold id='2'>{</beginfold id='2'>
+  1: <beginfold id='2'>{</beginfold id='2'>
+    api_gateway: <beginfold id='2'>{</beginfold id='2'>style.border-radius: 8<endfold id='2'>}</endfold id='2'>
+  <endfold id='2'>}</endfold id='2'>
+  2: <beginfold id='2'>{</beginfold id='2'>
+    api_gateway: <beginfold id='2'>{</beginfold id='2'>style.border-radius: 2; style.stroke-dash: 4<endfold id='2'>}</endfold id='2'>
+  <endfold id='2'>}</endfold id='2'>
+<endfold id='2'>}</endfold id='2'>
+
+layers: <beginfold id='2'>{</beginfold id='2'>
+  extra: <beginfold id='2'>{</beginfold id='2'>
+    emoji_node: <beginfold id='2'>{</beginfold id='2'>shape: rectangle; label: <beginfold id='3'>"</beginfold id='3'>Emoji 🚀 — 測試<endfold id='3'>"</endfold id='3'><endfold id='2'>}</endfold id='2'>
+    square_node2: <beginfold id='2'>{</beginfold id='2'>shape: square; width: 40;
+                                  height: 40<endfold id='2'>}</endfold id='2'>
+    weird_label_node: <beginfold id='2'>{</beginfold id='2'>shape: rectangle; label: <beginfold id='3'>"</beginfold id='3'>This label has a #hash and (paren): check<endfold id='3'>"</endfold id='3'><endfold id='2'>}</endfold id='2'>
+  <endfold id='2'>}</endfold id='2'>
+<endfold id='2'>}</endfold id='2'>

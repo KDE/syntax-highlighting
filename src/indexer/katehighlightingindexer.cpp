@@ -227,12 +227,13 @@ struct KateVersion {
 class HlFilesChecker
 {
 public:
-    void setDefinition(QStringView verStr, const QString &filename, const QString &name, const QStringList &alternativeNames)
+    void setDefinition(QStringView verStr, const QString &filename, const QString &name, const QStringList &alternativeNames, bool generated)
     {
         m_currentDefinition = &*m_definitions.insert(name, Definition{});
         m_currentDefinition->languageName = name;
         m_currentDefinition->filename = filename;
         m_currentDefinition->kateVersionStr = verStr.toString();
+        m_currentDefinition->generated = generated;
         m_currentKeywords = nullptr;
         m_currentContext = nullptr;
 
@@ -402,20 +403,22 @@ public:
                 success = false;
             }
 
-            // search for existing itemDatas, but unusable.
-            const auto ignoredNames = ignoredAttributeNames - usedAttributeNames;
-            for (const auto &styleName : ignoredNames) {
-                qWarning() << filename << "line" << styleName.line << "attribute" << styleName.name
-                           << "is never used. All uses are with lookAhead=true or <IncludeRules/>";
-                success = false;
-            }
+            if (!definition.generated) {
+                // search for existing itemDatas, but unusable.
+                const auto ignoredNames = ignoredAttributeNames - usedAttributeNames;
+                for (const auto &styleName : ignoredNames) {
+                    qWarning() << filename << "line" << styleName.line << "attribute" << styleName.name
+                               << "is never used. All uses are with lookAhead=true or <IncludeRules/>";
+                    success = false;
+                }
 
-            // search for unused itemDatas.
-            auto unusedNames = definition.itemDatas.styleNames - usedAttributeNames;
-            unusedNames -= ignoredNames;
-            for (const auto &styleName : std::as_const(unusedNames)) {
-                qWarning() << filename << "line" << styleName.line << "unused itemData:" << styleName.name;
-                success = false;
+                // search for unused itemDatas.
+                auto unusedNames = definition.itemDatas.styleNames - usedAttributeNames;
+                unusedNames -= ignoredNames;
+                for (const auto &styleName : std::as_const(unusedNames)) {
+                    qWarning() << filename << "line" << styleName.line << "unused itemData:" << styleName.name;
+                    success = false;
+                }
             }
         }
 
@@ -1038,6 +1041,7 @@ private:
         QString kateVersionStr;
         QString languageName;
         QSet<const Definition *> referencedDefinitions;
+        bool generated; // unreachability criteria should not be enforced with generated grammars
 
         // Parse <keywords ...>
         bool parseKeywords(const QXmlStreamReader &xml)
@@ -1234,8 +1238,10 @@ private:
             const auto &filename = definition.filename;
 
             if (!usedContexts.contains(&context)) {
-                qWarning() << filename << "line" << context.line << "unused context:" << context.name;
-                success = false;
+                if (!definition.generated) {
+                    qWarning() << filename << "line" << context.line << "unused context:" << context.name;
+                    success = false;
+                }
                 continue;
             }
 
@@ -1249,7 +1255,8 @@ private:
             }
 
             success = checkContextAttribute(definition, context) && success;
-            success = checkUreachableRules(definition.filename, context, unreachableIncludedRules) && success;
+            if (!definition.generated)
+                success = checkUreachableRules(definition.filename, context, unreachableIncludedRules) && success;
             success = suggestRuleMerger(definition.filename, context) && success;
 
             for (const auto &rule : context.rules) {
@@ -1265,7 +1272,8 @@ private:
                 success = checkWordDetect(rule) && success;
                 success = checkKeyword(definition, rule) && success;
                 success = checkRegExpr(filename, rule, context) && success;
-                success = checkDelimiters(definition, rule) && success;
+                if (!definition.generated)
+                    success = checkDelimiters(definition, rule) && success;
             }
         }
 
@@ -3288,6 +3296,7 @@ bool checkExtensions(QStringView extensions)
 struct CompressedFile {
     QString fileName;
     QString xmlData;
+    bool generated;
 };
 
 }
@@ -3401,8 +3410,9 @@ int main(int argc, char *argv[])
         hl[QStringLiteral("version")] = xml.attributes().value(QLatin1String("version")).toInt();
         hl[QStringLiteral("priority")] = xml.attributes().value(QLatin1String("priority")).toInt();
 
-        // add boolean one
+        // boolean attributes
         hl[QStringLiteral("hidden")] = attrToBool(xml.attributes().value(QLatin1String("hidden")));
+        hl[QStringLiteral("generated")] = attrToBool(xml.attributes().value(QLatin1String("generated")));
 
         // keep some strings as UTF-8 for faster translations
         hl[QStringLiteral("nameUtf8")] = hl[QStringLiteral("name")].toString().toUtf8();
@@ -3415,7 +3425,11 @@ int main(int argc, char *argv[])
         const QString hlName = hl[QStringLiteral("name")].toString();
         const QString hlAlternativeNames = hl[QStringLiteral("alternativeNames")].toString();
 
-        filesChecker.setDefinition(kateversion, hlFilename, hlName, hlAlternativeNames.split(u';', Qt::SkipEmptyParts));
+        filesChecker.setDefinition(kateversion,
+                                   hlFilename,
+                                   hlName,
+                                   hlAlternativeNames.split(u';', Qt::SkipEmptyParts),
+                                   hl[QStringLiteral("generated")].toBool());
 
         // As the compressor removes "fallthrough" attribute which is required with
         // "fallthroughContext" before the 5.62 version, the minimum version is
@@ -3435,10 +3449,7 @@ int main(int argc, char *argv[])
             printXmlError(hlFilename, xml);
         }
 
-        compressedFiles.emplace_back(CompressedFile{
-            QFileInfo(hlFilename).fileName(),
-            compressor.compressedXML(),
-        });
+        compressedFiles.emplace_back(CompressedFile{QFileInfo(hlFilename).fileName(), compressor.compressedXML(), hl[QStringLiteral("generated")].toBool()});
     }
 
     filesChecker.resolveContexts();
@@ -3485,7 +3496,7 @@ int main(int argc, char *argv[])
                 const auto version = attrs.value(u"kateversion"_sv);
                 const QString hlName = attrs.value(u"name"_sv).toString();
                 const QString hlAlternativeNames = attrs.value(u"alternativeNames"_sv).toString();
-                filesChecker2.setDefinition(version, outFileName, hlName, hlAlternativeNames.split(u';', Qt::SkipEmptyParts));
+                filesChecker2.setDefinition(version, outFileName, hlName, hlAlternativeNames.split(u';', Qt::SkipEmptyParts), compressedFile.generated);
             }
             filesChecker2.processElement(xml);
         }

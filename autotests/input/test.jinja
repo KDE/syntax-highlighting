@@ -1,0 +1,61 @@
+{# Define variables with double quotes #}
+{% set title = "Jinja Example" %}
+{% set items = ["Apple", "Banana", "Cherry"] %}
+{% set user = {"name": "John", "age": 30, "is_active": true} %}
+
+{# Conditional statement #}
+{% if user.is_active %}
+User {{ user.name + 'is active' }}
+{% else %}
+User {{ user.name + 'is not active' }}
+{% endif %}
+
+{# Loop through a list sorted, tested items #}
+{% for item in items if not item is boolean %}
+Fruit: {{ item }}
+{% endfor %}
+
+{# Using custom and built-in filters with trim options #}
+{{- user.name | upper -}}
+{{+ user.name | length +}}
+{{ user.name | comment_text | upper }}
+{{ user.name | comment_text | length }}
+{# ... also without spaces #}
+{{-user.name|safe-}}
+{# ... and with math #}
+{{user.age - (42 % 0xff) / 3.2 |safe}}
+
+{# Calling python functions #}
+{{ f.bar(3.14 != f.pi()) }}
+
+{# Using a block for template inheritance #}
+{% block content scoped required %}
+Default content
+{% endblock %}
+
+{# Macro with multiline comment and description
+
+  using filter with parameter
+#}
+{% macro format_comments(comments) -%}
+{{ comments | comment_text | join('\n    ') }}
+{% endmacro -%}
+
+{# Advanced macro using nested branches, member access,
+  filters and tests with custom and built-in functions
+#}
+{% macro join_params(operation, default_values = false) %}
+{%   if default_values %}
+{%     set params = operation.parameters | map(attribute='parameter_type_default') | join(', ') %}
+{%   else %}
+{%     set params = operation.parameters | map('parameter_type', default='void') | join(', ') %}
+{%   endif %}
+{%   if operation.zoned is boolean and operation.zoned is zone_valid %}
+{%     if params | length %}
+{%       set params = params + ', const QString &zone' %}
+{%     else %}
+{%       set params = 'const QString &zone' %}
+{%     endif %}
+{%   endif %}
+{{params}}
+{%- endmacro %}

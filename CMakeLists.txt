@@ -57,6 +57,9 @@ set_package_properties(XercesC PROPERTIES PURPOSE "Compile-time validation of sy
 find_package(Perl REQUIRED)
 set_package_properties(Perl PROPERTIES PURPOSE "Auto-generate PHP syntax definition files.")
 
+find_package(Python)
+set_package_properties(Python PROPERTIES PURPOSE "Auto-generate Jinja syntax definition files.")
+
 #
 # allow to install the "differently" licensed syntax xml files instead of putting them in a QRC and link them in
 #

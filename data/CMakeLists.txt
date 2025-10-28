@@ -49,6 +49,53 @@ generate_syntax_definition(generate-xslt.pl xslt.xml xml.xml
 # generate JSONC definition
 generate_syntax_definition(generate-jsonc.pl jsonc.xml json.xml)
 
+# generate Jinja definitions
+if(Python_FOUND)
+    set(jinja_langs html css xml json yaml toml sql python cpp qml java groovy rust javascript typescript ruby cmake qmake ini bash zsh dockerfile terraform systemd-unit)
+    set(jinja_indir ${CMAKE_CURRENT_SOURCE_DIR}/syntax)
+    set(jinja_outdir ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax)
+    set(jinja_prefix jinja-)
+    list(TRANSFORM jinja_langs REPLACE "(.+)" "${jinja_indir}/\\1.xml" OUTPUT_VARIABLE in_xmls)
+
+    execute_process(
+        COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/generators/generate_jinja.py --dry-run
+                --jinja-xml ${CMAKE_CURRENT_SOURCE_DIR}/syntax/jinja.xml
+                --prefix ${jinja_prefix}
+                --output-dir ${jinja_outdir}
+                ${in_xmls}
+        OUTPUT_VARIABLE out_xmls
+        RESULT_VARIABLE dry_run
+    )
+
+    if(${dry_run} EQUAL 0)
+        string(REPLACE "\r" "" out_xmls ${out_xmls})
+        string(REPLACE "\n" ";" out_xmls ${out_xmls})
+        file(TO_CMAKE_PATH "${out_xmls}" out_xmls)
+        list(TRANSFORM out_xmls REPLACE ${jinja_outdir} ${jinja_indir} OUTPUT_VARIABLE in_xmls)
+        list(TRANSFORM in_xmls REPLACE ${jinja_prefix} "")
+
+        add_custom_target(
+            generate-jinja ALL
+            DEPENDS ${out_xmls}
+        )
+        add_custom_command(
+            OUTPUT ${out_xmls}
+            COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/generators/generate_jinja.py
+                    --jinja-xml ${CMAKE_CURRENT_SOURCE_DIR}/syntax/jinja.xml
+                    --prefix ${jinja_prefix}
+                    --output-dir ${jinja_outdir}
+                    ${in_xmls}
+            DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/generators/generate_jinja.py
+                    ${CMAKE_CURRENT_SOURCE_DIR}/syntax/jinja.xml
+                    ${in_xmls}
+            VERBATIM
+        )
+        set(gen_defs ${gen_defs} ${out_xmls})
+    else()
+        message(NOTICE "There was an error with the Jinja generator tool, left out of build.")
+    endif()
+endif()
+
 # find all definitions
 file(GLOB src_defs "${CMAKE_CURRENT_SOURCE_DIR}/syntax/*.xml")
 set(defs ${src_defs} ${gen_defs})

@@ -1,0 +1,61 @@
+<beginfold id='1'>{#</beginfold id='1'> Define variables with double quotes <endfold id='1'>#}</endfold id='1'>
+<beginfold id='2'>{%</beginfold id='2'> set title = "Jinja Example" <endfold id='2'>%}</endfold id='2'>
+<beginfold id='2'>{%</beginfold id='2'> set items = ["Apple", "Banana", "Cherry"] <endfold id='2'>%}</endfold id='2'>
+<beginfold id='2'>{%</beginfold id='2'> set user = {"name": "John", "age": 30, "is_active": true} <endfold id='2'>%}</endfold id='2'>
+
+<beginfold id='1'>{#</beginfold id='1'> Conditional statement <endfold id='1'>#}</endfold id='1'>
+<beginfold id='2'>{%</beginfold id='2'> <beginfold id='3'>if</beginfold id='3'> user.is_active <endfold id='2'>%}</endfold id='2'>
+User <beginfold id='4'>{{</beginfold id='4'> user.name + 'is active' <endfold id='4'>}}</endfold id='4'>
+<beginfold id='2'>{%</beginfold id='2'> else <endfold id='2'>%}</endfold id='2'>
+User <beginfold id='4'>{{</beginfold id='4'> user.name + 'is not active' <endfold id='4'>}}</endfold id='4'>
+<beginfold id='2'>{%</beginfold id='2'> <endfold id='3'>endif</endfold id='3'> <endfold id='2'>%}</endfold id='2'>
+
+<beginfold id='1'>{#</beginfold id='1'> Loop through a list sorted, tested items <endfold id='1'>#}</endfold id='1'>
+<beginfold id='2'>{%</beginfold id='2'> <beginfold id='5'>for</beginfold id='5'> item in items if not item is boolean <endfold id='2'>%}</endfold id='2'>
+Fruit: <beginfold id='4'>{{</beginfold id='4'> item <endfold id='4'>}}</endfold id='4'>
+<beginfold id='2'>{%</beginfold id='2'> <endfold id='5'>endfor</endfold id='5'> <endfold id='2'>%}</endfold id='2'>
+
+<beginfold id='1'>{#</beginfold id='1'> Using custom and built-in filters with trim options <endfold id='1'>#}</endfold id='1'>
+<beginfold id='4'>{{</beginfold id='4'>- user.name | upper <endfold id='4'>-}}</endfold id='4'>
+<beginfold id='4'>{{</beginfold id='4'>+ user.name | length <endfold id='4'>+}}</endfold id='4'>
+<beginfold id='4'>{{</beginfold id='4'> user.name | comment_text | upper <endfold id='4'>}}</endfold id='4'>
+<beginfold id='4'>{{</beginfold id='4'> user.name | comment_text | length <endfold id='4'>}}</endfold id='4'>
+<beginfold id='1'>{#</beginfold id='1'> ... also without spaces <endfold id='1'>#}</endfold id='1'>
+<beginfold id='4'>{{</beginfold id='4'>-user.name|safe<endfold id='4'>-}}</endfold id='4'>
+<beginfold id='1'>{#</beginfold id='1'> ... and with math <endfold id='1'>#}</endfold id='1'>
+<beginfold id='4'>{{</beginfold id='4'>user.age - (42 % 0xff) / 3.2 |safe<endfold id='4'>}}</endfold id='4'>
+
+<beginfold id='1'>{#</beginfold id='1'> Calling python functions <endfold id='1'>#}</endfold id='1'>
+<beginfold id='4'>{{</beginfold id='4'> f.bar(3.14 != f.pi()) <endfold id='4'>}}</endfold id='4'>
+
+<beginfold id='1'>{#</beginfold id='1'> Using a block for template inheritance <endfold id='1'>#}</endfold id='1'>
+<beginfold id='2'>{%</beginfold id='2'> <beginfold id='6'>block</beginfold id='6'> content scoped required <endfold id='2'>%}</endfold id='2'>
+Default content
+<beginfold id='2'>{%</beginfold id='2'> <endfold id='6'>endblock</endfold id='6'> <endfold id='2'>%}</endfold id='2'>
+
+<beginfold id='1'>{#</beginfold id='1'> Macro with multiline comment and description
+
+  using filter with parameter
+<endfold id='1'>#}</endfold id='1'>
+<beginfold id='2'>{%</beginfold id='2'> <beginfold id='7'>macro</beginfold id='7'> format_comments(comments) <endfold id='2'>-%}</endfold id='2'>
+<beginfold id='4'>{{</beginfold id='4'> comments | comment_text | join('\n    ') <endfold id='4'>}}</endfold id='4'>
+<beginfold id='2'>{%</beginfold id='2'> <endfold id='7'>endmacro</endfold id='7'> <endfold id='2'>-%}</endfold id='2'>
+
+<beginfold id='1'>{#</beginfold id='1'> Advanced macro using nested branches, member access,
+  filters and tests with custom and built-in functions
+<endfold id='1'>#}</endfold id='1'>
+<beginfold id='2'>{%</beginfold id='2'> <beginfold id='7'>macro</beginfold id='7'> join_params(operation, default_values = false) <endfold id='2'>%}</endfold id='2'>
+<beginfold id='2'>{%</beginfold id='2'>   <beginfold id='3'>if</beginfold id='3'> default_values <endfold id='2'>%}</endfold id='2'>
+<beginfold id='2'>{%</beginfold id='2'>     set params = operation.parameters | map(attribute='parameter_type_default') | join(', ') <endfold id='2'>%}</endfold id='2'>
+<beginfold id='2'>{%</beginfold id='2'>   else <endfold id='2'>%}</endfold id='2'>
+<beginfold id='2'>{%</beginfold id='2'>     set params = operation.parameters | map('parameter_type', default='void') | join(', ') <endfold id='2'>%}</endfold id='2'>
+<beginfold id='2'>{%</beginfold id='2'>   <endfold id='3'>endif</endfold id='3'> <endfold id='2'>%}</endfold id='2'>
+<beginfold id='2'>{%</beginfold id='2'>   <beginfold id='3'>if</beginfold id='3'> operation.zoned is boolean and operation.zoned is zone_valid <endfold id='2'>%}</endfold id='2'>
+<beginfold id='2'>{%</beginfold id='2'>     <beginfold id='3'>if</beginfold id='3'> params | length <endfold id='2'>%}</endfold id='2'>
+<beginfold id='2'>{%</beginfold id='2'>       set params = params + ', const QString &zone' <endfold id='2'>%}</endfold id='2'>
+<beginfold id='2'>{%</beginfold id='2'>     else <endfold id='2'>%}</endfold id='2'>
+<beginfold id='2'>{%</beginfold id='2'>       set params = 'const QString &zone' <endfold id='2'>%}</endfold id='2'>
+<beginfold id='2'>{%</beginfold id='2'>     <endfold id='3'>endif</endfold id='3'> <endfold id='2'>%}</endfold id='2'>
+<beginfold id='2'>{%</beginfold id='2'>   <endfold id='3'>endif</endfold id='3'> <endfold id='2'>%}</endfold id='2'>
+<beginfold id='4'>{{</beginfold id='4'>params<endfold id='4'>}}</endfold id='4'>
+<beginfold id='2'>{%</beginfold id='2'>- <endfold id='7'>endmacro</endfold id='7'> <endfold id='2'>%}</endfold id='2'>

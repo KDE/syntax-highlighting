@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language>
 <!-- Author: Dominik Holland <dominik.holland@qt.io> -->
-<language name="QFace" version="4" kateversion="5.0" section="Scripts" extensions="*.qface"
+<language name="QFace" version="5" kateversion="5.62" section="Scripts" extensions="*.qface"
           mimetype="text/x-qface;application/x-qface" indenter="cstyle"
           author="Dominik Holland (dominik.holland@qt.io), Zoltan Gera (zoltan.gera@qt.io)"
           license="MIT">
@@ -70,7 +70,7 @@
         <IncludeRules context="Basic" />
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="Basic">
-        <DetectChar attribute="Annotation" context="Annotation" char="@" />
+        <DetectChar attribute="Annotation" context="AnnotationLeadIn" char="@" />
         <IncludeRules context="Common" />
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="Common">
@@ -86,6 +86,9 @@
         <DetectSpaces/>
         <DetectIdentifier attribute="Module Name" context="#stay"/>
         <Float attribute="Module Version" context="#pop" />
+      </context>
+      <context attribute="Annotation" lineEndContext="#pop" name="AnnotationLeadIn" fallthroughContext="#pop!Annotation">
+        <DetectIdentifier attribute="Annotation" context="#pop!Annotation" />
       </context>
       <context attribute="Annotation" lineEndContext="#pop" name="Annotation">
         <DetectSpaces/>
@@ -135,6 +138,7 @@
         <WordDetect attribute="Primitive" context="Function" String="void"/>
         <keyword attribute="Primitive" context="FuncOrVar" String="primitives" />
         <keyword attribute="Aggregate" context="Aggregate" String="aggregates" />
+        <RegExpr attribute="Normal Text" context="#stay" String="[a-zA-Z_][a-zA-Z0-9_]*(?=\.)" />
         <DetectIdentifier attribute="Property Type" context="FuncOrVar" />
         <DetectChar attribute="Normal Text" context="#pop#pop" char="}" endRegion="Brace" />
         <IncludeRules context="Basic" />
@@ -143,6 +147,7 @@
         <DetectSpaces />
         <keyword attribute="Primitive" context="#pop!FuncOrVar" String="primitives" />
         <keyword attribute="Aggregate" context="#stay" String="aggregates" />
+        <RegExpr attribute="Normal Text" context="#stay" String="[a-zA-Z_][a-zA-Z0-9_]*(?=\.)" />
         <DetectIdentifier attribute="Property Type" context="#pop!FuncOrVar" />
         <DetectChar attribute="Normal Text" context="#pop!FuncOrVar" char=">" />
       </context>
@@ -160,6 +165,7 @@
         <DetectSpaces />
         <keyword attribute="Primitive" context="Variable" String="primitives" />
         <keyword attribute="Aggregate" context="AggrInParam" String="aggregates" />
+        <RegExpr attribute="Normal Text" context="#stay" String="[a-zA-Z_][a-zA-Z0-9_]*(?=\.)" />
         <DetectIdentifier attribute="Property Type" context="Variable" />
         <DetectChar attribute="Operator" context="#stay" char="," />
         <DetectChar attribute="Operator" context="#pop#pop" char=")" />
@@ -168,6 +174,7 @@
         <DetectSpaces />
         <keyword attribute="Primitive" context="#pop!Variable" String="primitives" />
         <keyword attribute="Aggregate" context="#stay" String="aggregates" />
+        <RegExpr attribute="Normal Text" context="#stay" String="[a-zA-Z_][a-zA-Z0-9_]*(?=\.)" />
         <DetectIdentifier attribute="Property Type" context="#pop!Variable" />
         <DetectChar attribute="Normal Text" context="#pop!Variable" char=">" />
       </context>
@@ -210,11 +217,11 @@
       <itemData name="YAML Operator" defStyleNum="dsKeyword" spellChecking="false"/>
       <itemData name="YAML Key" defStyleNum="dsFunction" spellChecking="false"/>
       <itemData name="YAML Constant" defStyleNum="dsChar" spellChecking="false"/>
-      <itemData name="Property Type" defStyleNum="dsNormal" spellChecking="false" />
+      <itemData name="Property Type" defStyleNum="dsDataType" spellChecking="false" />
       <itemData name="Property Name" defStyleNum="dsVariable" spellChecking="true" />
       <itemData name="Function Name" defStyleNum="dsFunction" spellChecking="true" />
-      <itemData name="Object Name" defStyleNum="dsNormal" spellChecking="true" />
-      <itemData name="Element Name" defStyleNum="dsNormal" spellChecking="true" />
+      <itemData name="Object Name" defStyleNum="dsDataType" spellChecking="true" />
+      <itemData name="Element Name" defStyleNum="dsDataType" spellChecking="true" />
       <itemData name="Signal" defStyleNum="dsExtension" spellChecking="false"/>
       <itemData name="Primitive" defStyleNum="dsDataType" spellChecking="false"/>
       <itemData name="Aggregate" defStyleNum="dsBuiltIn" spellChecking="false"/>

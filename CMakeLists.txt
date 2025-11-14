@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-set(KF_VERSION "6.20.0")
+set(KF_VERSION "6.21.0")
 project(KSyntaxHighlighting VERSION ${KF_VERSION})
 
 find_package(ECM 6.20.0 REQUIRED NO_MODULE)

@@ -473,10 +473,8 @@
       <RegExpr attribute="Special"          context="#stay" String="(::|=&gt;|-&gt;|&lt;-|=)(?![&symbolops;])" />
       <RegExpr attribute="Signature"        context="#stay" String="\s*[a-z_][a-zA-Z0-9_']*\s*(?=::([^&symbolops;]|$))|\s*(\([&symbolops;]*\))*\s*(?=::[^&symbolops;])" />
       <RegExpr attribute="Function"         context="#stay" String="([A-Z][a-zA-Z0-9_']*\.)*[a-z_][a-zA-Z0-9_']*" />
-      <!-- Match backslash operators explicitly before general operators -->
-      <!-- Matches: \\, \/, \+, \>, etc. but NOT lambda (\ followed by space/identifier) -->
-      <RegExpr attribute="Operator"         context="#stay" String="([A-Z][a-zA-Z0-9_']*\.)*\\[!#\$%&amp;\*\+/&lt;=&gt;\?\\@\^\|~\.:]+" />
-      <RegExpr attribute="Operator"         context="#stay" String="([A-Z][a-zA-Z0-9_']*\.)*[&symbolops;]+" />
+      <!-- Match backslash operators before general operators (order matters for precedence) -->
+      <RegExpr attribute="Operator"         context="#stay" String="([A-Z][a-zA-Z0-9_']*\.)*\\[!#\$%&amp;\*\+/&lt;=&gt;\?\\@\^\|~\.:]+|([A-Z][a-zA-Z0-9_']*\.)*[&symbolops;]+" />
       <RegExpr attribute="Type"             context="#stay" String="([A-Z][a-zA-Z0-9_']*\.)*[A-Z][a-zA-Z0-9_']*|'(?![A-Z]')([A-Z][a-zA-Z0-9_']*\.)*[A-Z][a-zA-Z0-9_']*" />
 
       <RegExpr    attribute="Float"   context="#stay" String ="\d+\.\d+([Ee][+-]?\d+)?|\d+[Ee][+-]?\d+"/>
@@ -547,9 +545,8 @@
       <keyword attribute="Keyword"          context="#stay" String="import_keywords" />
       <RegExpr attribute="Function"         context="#stay" String="([A-Z][a-zA-Z0-9_']*\.)*[a-z][a-zA-Z0-9_']*" />
       <RegExpr attribute="Type"             context="#stay" String="([A-Z][a-zA-Z0-9_']*\.)*[A-Z][a-zA-Z0-9_']*" />
-      <!-- Add operator matching to import context -->
-      <RegExpr attribute="Operator"         context="#stay" String="([A-Z][a-zA-Z0-9_']*\.)*\\[!#\$%&amp;\*\+/&lt;=&gt;\?\\@\^\|~\.:]+" />
-      <RegExpr attribute="Operator"         context="#stay" String="([A-Z][a-zA-Z0-9_']*\.)*[&symbolops;]+" />
+      <!-- Add operator matching to import context (backslash operators matched first) -->
+      <RegExpr attribute="Operator"         context="#stay" String="([A-Z][a-zA-Z0-9_']*\.)*\\[!#\$%&amp;\*\+/&lt;=&gt;\?\\@\^\|~\.:]+|([A-Z][a-zA-Z0-9_']*\.)*[&symbolops;]+" />
 
       <IncludeRules context="FindComment" />
     </context>

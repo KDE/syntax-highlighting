@@ -146,4 +146,34 @@ justtesting''	<span style="color:#f67400">9</span>	<span style="color:#27ae60">=
 <span style="color:#27ae60">{-# LANGUAGE OverlappingInstances,</span>
 <span style="color:#27ae60">             BangPatterns</span>
 <span style="color:#27ae60">#-}</span>
+
+<span style="color:#7a7c7d">-- Test backslash operators and lambda expressions (Bug 512318)</span>
+
+<span style="color:#7a7c7d">-- Lambda expressions should have backslash separate from identifier</span>
+lambdaTest1 <span style="color:#27ae60">=</span> <span style="color:#3f8058">\</span>x <span style="color:#27ae60">-></span> x
+lambdaTest2 <span style="color:#27ae60">=</span> <span style="color:#3f8058">\</span>x y <span style="color:#27ae60">-></span> x <span style="color:#3f8058">+</span> y
+lambdaTest3 <span style="color:#27ae60">=</span> <span style="color:#8e44ad">map</span> (<span style="color:#3f8058">\</span>x <span style="color:#27ae60">-></span> x <span style="color:#3f8058">*</span> <span style="color:#f67400">2</span>) [<span style="color:#f67400">1</span>,<span style="color:#f67400">2</span>,<span style="color:#f67400">3</span>]
+
+<span style="color:#7a7c7d">-- Set difference operator should be atomic</span>
+setDiffTest <span style="color:#27ae60">=</span> [<span style="color:#f67400">1</span>,<span style="color:#f67400">2</span>,<span style="color:#f67400">3</span>] <span style="color:#3f8058">\\</span> [<span style="color:#f67400">2</span>]
+
+<span style="color:#7a7c7d">-- Logical operators should be atomic tokens</span>
+logicalOrTest <span style="color:#27ae60">=</span> a <span style="color:#3f8058">\/</span> b
+  <span style="font-weight:bold">where</span> a <span style="color:#27ae60">=</span> <span style="color:#2980b9">True</span>
+        b <span style="color:#27ae60">=</span> <span style="color:#2980b9">False</span>
+
+logicalAndTest <span style="color:#27ae60">=</span> a <span style="color:#3f8058">/\</span> b
+  <span style="font-weight:bold">where</span> a <span style="color:#27ae60">=</span> <span style="color:#2980b9">True</span>
+        b <span style="color:#27ae60">=</span> <span style="color:#2980b9">False</span>
+
+<span style="color:#7a7c7d">-- Custom backslash operators</span>
+customOp1 <span style="color:#27ae60">=</span> <span style="color:#f67400">1</span> <span style="color:#3f8058">\+</span> <span style="color:#f67400">2</span>
+customOp2 <span style="color:#27ae60">=</span> x <span style="color:#3f8058">\></span> y
+  <span style="font-weight:bold">where</span> x <span style="color:#27ae60">=</span> <span style="color:#f67400">5</span>
+        y <span style="color:#27ae60">=</span> <span style="color:#f67400">3</span>
+
+<span style="color:#7a7c7d">-- Operators in import statements</span>
+<span style="font-weight:bold">import</span> <span style="color:#2980b9">Data.List</span> (<span style="color:#3f8058">\\</span>, (<span style="color:#3f8058">++</span>))
+<span style="font-weight:bold">import</span> <span style="color:#2980b9">Data.Set</span> ((<span style="color:#3f8058">/\</span>), (<span style="color:#3f8058">\/</span>))
+<span style="font-weight:bold">import</span> <span style="color:#2980b9">Custom.Ops</span> ((<span style="color:#3f8058">\+</span>), (<span style="color:#3f8058">\></span>))
 </pre></body></html>

@@ -140,3 +140,33 @@ EQ, False, GT, Just, LT, Left, Nothing, Right, True
 {-# LANGUAGE OverlappingInstances,
              BangPatterns
 #-}
+
+-- Test backslash operators and lambda expressions (Bug 512318)
+
+-- Lambda expressions should have backslash separate from identifier
+lambdaTest1 = \x -> x
+lambdaTest2 = \x y -> x + y
+lambdaTest3 = map (\x -> x * 2) [1,2,3]
+
+-- Set difference operator should be atomic
+setDiffTest = [1,2,3] \\ [2]
+
+-- Logical operators should be atomic tokens
+logicalOrTest = a \/ b
+  where a = True
+        b = False
+
+logicalAndTest = a /\ b
+  where a = True
+        b = False
+
+-- Custom backslash operators
+customOp1 = 1 \+ 2
+customOp2 = x \> y
+  where x = 5
+        y = 3
+
+-- Operators in import statements
+import Data.List (\\, (++))
+import Data.Set ((/\), (\/))
+import Custom.Ops ((\+), (\>))

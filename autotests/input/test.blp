@@ -1,0 +1,65 @@
+using Gtk 4.0;
+using Adw 1;
+using Shumate 1.0;
+
+template $ShumateDemoWindow: Adw.ApplicationWindow {
+    can-focus: true;
+    title: bind template.my-property; // This is a comment in blueprint.
+    default-width: 800;
+    default-height: 600;
+
+    [titlebar]
+    HeaderBar {
+        DropDown layers_dropdown {
+            notify::selected => $_on_layers_dropdown_notify_selected() swapped;
+        }
+    }
+
+    Overlay overlay {
+        vexpand: true;
+
+        Shumate.Map map {}
+
+        [overlay]
+        Shumate.Scale scale {
+            halign: start;
+            valign: end;
+        }
+
+        [overlay]
+        Box {
+            visible: bind $_get_box_visible(map.visible) as <bool>;
+            halign: center;
+            valign: center;
+            orientation: horizontal;
+
+            Shumate.Compass compass {
+                halign: end;
+                map: map;
+            }
+
+            Shumate.License license {
+                halign: bind compass.halign inverted;
+            }
+
+            Label {
+                label: _("This Widget Was Written In Blueprint!");
+
+                styles [
+                    "title-1",
+                    "success",
+                ]
+            }
+
+            Button {
+                label: _("Press To Squeak :3");
+                clicked => $_on_button_clicked();
+
+                styles [
+                    "suggested-action",
+                    "pill",
+                ]
+            }
+        }
+    }
+}

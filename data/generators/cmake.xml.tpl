@@ -196,7 +196,7 @@
             <!--[- endfor ]-->
           <!--[- endif ]-->
           <!--[- if command.name == 'set' or command.name == 'unset' ]-->
-        <RegExpr attribute="Cache Variable Substitution" context="CacheVarSubst" String="CACHE\{" />
+        <StringDetect attribute="Cache Variable Substitution" context="CacheVarSubst" String="CACHE{" />
           <!--[- endif ]-->
         <keyword attribute="Named Args" context="#stay" String="<!--{command.name}-->_nargs" />
         <!--[- endif ]-->
@@ -294,7 +294,7 @@
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="Detect Variable Substitutions">
-        <RegExpr attribute="Cache Variable Substitution" context="CacheVarSubst" String="\$CACHE\{" />
+        <StringDetect attribute="Cache Variable Substitution" context="CacheVarSubst" String="$CACHE{" />
         <RegExpr attribute="Environment Variable Substitution" context="EnvVarSubst" String="\$?ENV\{" />
         <Detect2Chars attribute="Variable Substitution" context="VarSubst" char="$" char1="{" />
         <RegExpr attribute="@Variable Substitution" context="@VarSubst" String="@&var_ref_re;@" lookAhead="true" />

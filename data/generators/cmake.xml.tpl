@@ -195,7 +195,7 @@
         <WordDetect String="<!--{kw}-->" attribute="Named Args" context="<!--{command.name}-->_tgts" />
             <!--[- endfor ]-->
           <!--[- endif ]-->
-          <!--[- if command.name == 'set' or command.name == 'unset' ]-->
+          <!--[- if command.name in ('if', 'elseif', 'set', 'unset', 'while') ]-->
         <StringDetect attribute="Cache Variable Substitution" context="CacheVarSubst" String="CACHE{" />
           <!--[- endif ]-->
         <keyword attribute="Named Args" context="#stay" String="<!--{command.name}-->_nargs" />

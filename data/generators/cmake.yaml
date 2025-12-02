@@ -1,4 +1,8 @@
-version: 55
+#
+# SPDX-FileCopyrightText: 2017-2025 Alex Turbov <i.zaufi@gmail.com>
+#
+
+version: 57
 
 global-properties:
   - ALLOW_DUPLICATE_CUSTOM_TARGETS
@@ -249,6 +253,8 @@ target-properties:
   - IMPORT_SUFFIX
   - INCLUDE_DIRECTORIES
   - INSTALL_NAME_DIR
+  - INSTALL_OBJECT_NAME_STRATEGY                            # Since 4.2
+  - INSTALL_OBJECT_ONLY_USE_DESTINATION                     # Since 4.2
   - INSTALL_REMOVE_ENVIRONMENT_RPATH                        # Since 3.16
   - INSTALL_RPATH
   - INSTALL_RPATH_USE_LINK_PATH
@@ -374,6 +380,7 @@ target-properties:
   - RUNTIME_OUTPUT_NAME_<CONFIG>
   - RUNTIME_OUTPUT_NAME
   - SKIP_BUILD_RPATH
+  - SKIP_LINTING                                            # Since 4.2
   - SOURCE_DIR
   - SOURCES
   - SOVERSION
@@ -395,6 +402,7 @@ target-properties:
   - UNITY_BUILD_BATCH_SIZE                                  # Since 3.16
   - UNITY_BUILD_CODE_AFTER_INCLUDE                          # Since 3.16
   - UNITY_BUILD_CODE_BEFORE_INCLUDE                         # Since 3.16
+  - UNITY_BUILD_FILENAME_PREFIX                             # Since 4.2
   - UNITY_BUILD_MODE                                        # Since 3.18
   - UNITY_BUILD_UNIQUE_ID                                   # Since 3.20
   - VERIFY_INTERFACE_HEADER_SETS                            # Since 3.24
@@ -530,13 +538,16 @@ source-properties:
   - Fortran_PREPROCESS                                      # Since 3.18
   - GENERATED
   - HEADER_FILE_ONLY
+  - JOB_POOL_COMPILE                                        # Since 4.2
   - INCLUDE_DIRECTORIES                                     # Since 3.11
+  - INSTALL_OBJECT_NAME                                     # Since 4.2
   - KEEP_EXTENSION
   - LABELS
   - LANGUAGE
   - LOCATION
   - MACOSX_PACKAGE_LOCATION
   - OBJECT_DEPENDS
+  - OBJECT_NAME                                             # Since 4.2
   - OBJECT_OUTPUTS
   - SKIP_AUTOGEN
   - SKIP_AUTOMOC
@@ -728,6 +739,21 @@ generator-expressions:
   - LINK_ONLY
   - DEVICE_LINK                                             # Since 3.18
   - HOST_LINK                                               # Since 3.18
+  # Linker ID and Frontend-Variant                          # Since 4.2
+  - C_COMPILER_LINKER_ID
+  - CXX_COMPILER_LINKER_ID
+  - CUDA_COMPILER_LINKER_ID
+  - OBJC_COMPILER_LINKER_ID
+  - OBJCXX_COMPILER_LINKER_ID
+  - Fortran_COMPILER_LINKER_ID
+  - HIP_COMPILER_LINKER_ID
+  - C_COMPILER_LINKER_FRONTEND_VARIANT
+  - CXX_COMPILER_LINKER_FRONTEND_VARIANT
+  - CUDA_COMPILER_LINKER_FRONTEND_VARIANT
+  - OBJC_COMPILER_LINKER_FRONTEND_VARIANT
+  - OBJCXX_COMPILER_LINKER_FRONTEND_VARIANT
+  - Fortran_COMPILER_LINKER_FRONTEND_VARIANT
+  - HIP_COMPILER_LINKER_FRONTEND_VARIANT
   # Target-Dependent Expressions
   - TARGET_EXISTS                                           # Since 3.12
   - TARGET_NAME_IF_EXISTS                                   # Since 3.12
@@ -765,6 +791,7 @@ generator-expressions:
   - TARGET_BUNDLE_CONTENT_DIR
   - TARGET_RUNTIME_DLLS                                     # Since 3.21
   - TARGET_RUNTIME_DLL_DIRS                                 # Since 3.27
+  - TARGET_INTERMEDIATE_DIR                                 # Since 4.2
   # Export And Install Expressions
   - INSTALL_INTERFACE
   - BUILD_INTERFACE
@@ -805,6 +832,8 @@ variables:
   - CMAKE_CURRENT_LIST_FILE
   - CMAKE_CURRENT_LIST_LINE
   - CMAKE_CURRENT_SOURCE_DIR
+  - CMAKE_CXX_STDLIB_MODULES_JSON                           # Since 4.2
+  - CMAKE_DEBUG_TARGET_PROPERTIES
   - CMAKE_DIRECTORY_LABELS                                  # Since 3.10
   - CMAKE_DL_LIBS
   - CMAKE_DOTNET_SDK                                        # Since 3.23
@@ -826,7 +855,9 @@ variables:
   - CMAKE_GENERATOR_PLATFORM
   - CMAKE_GENERATOR_TOOLSET
   - CMAKE_IMPORT_LIBRARY_PREFIX
+  - CMAKE_IMPORT_LIBRARY_PREFIX_<LANG>
   - CMAKE_IMPORT_LIBRARY_SUFFIX
+  - CMAKE_IMPORT_LIBRARY_SUFFIX_<LANG>
   - CMAKE_JOB_POOL_COMPILE
   - CMAKE_JOB_POOL_LINK
   - CMAKE_JOB_POOLS                                         # Since 3.11
@@ -869,15 +900,22 @@ variables:
   - CMAKE_ROOT
   - CMAKE_SCRIPT_MODE_FILE
   - CMAKE_SHARED_LIBRARY_PREFIX
+  - CMAKE_SHARED_LIBRARY_PREFIX_<LANG>
   - CMAKE_SHARED_LIBRARY_SUFFIX
+  - CMAKE_SHARED_LIBRARY_SUFFIX_<LANG>
   - CMAKE_SHARED_MODULE_PREFIX
+  - CMAKE_SHARED_MODULE_PREFIX_<LANG>
   - CMAKE_SHARED_MODULE_SUFFIX
+  - CMAKE_SHARED_MODULE_SUFFIX_<LANG>
   - CMAKE_SIZEOF_VOID_P
   - CMAKE_SKIP_INSTALL_RULES
+  - CMAKE_SKIP_LINTING                                      # Since 4.2
   - CMAKE_SKIP_RPATH
   - CMAKE_SOURCE_DIR
   - CMAKE_STATIC_LIBRARY_PREFIX
+  - CMAKE_STATIC_LIBRARY_PREFIX_<LANG>
   - CMAKE_STATIC_LIBRARY_SUFFIX
+  - CMAKE_STATIC_LIBRARY_SUFFIX_<LANG>
   - CMAKE_Swift_COMPILATION_MODE                            # Since 3.29
   - CMAKE_Swift_MODULE_DIRECTORY                            # Since 3.15
   - CMAKE_Swift_NUM_THREADS                                 # Since 3.15
@@ -933,6 +971,7 @@ variables:
   - CMAKE_ABSOLUTE_DESTINATION_FILES
   - CMAKE_ADD_CUSTOM_COMMAND_DEPENDS_EXPLICIT_ONLY          # Since 3.27
   - CMAKE_APPBUNDLE_PATH
+  - CMAKE_AUTOGEN_INTERMEDIATE_DIR_STRATEGY                 # Since 4.2
   - CMAKE_BUILD_TYPE
   - CMAKE_CLANG_VFS_OVERLAY                                 # Since 3.19
   - CMAKE_CODEBLOCKS_COMPILER_ID                            # Since 3.11
@@ -941,7 +980,6 @@ variables:
   - CMAKE_COLOR_DIAGNOSTICS                                 # Since 3.24
   - CMAKE_COLOR_MAKEFILE
   - CMAKE_CONFIGURATION_TYPES
-  - CMAKE_DEBUG_TARGET_PROPERTIES
   - CMAKE_DEPENDS_IN_PROJECT_ONLY
   - CMAKE_DISABLE_FIND_PACKAGE_<PackageName>
   - CMAKE_ECLIPSE_GENERATE_LINKED_RESOURCES
@@ -997,6 +1035,7 @@ variables:
   - CMAKE_MAXIMUM_RECURSION_DEPTH                           # Since 3.14
   - CMAKE_MFC_FLAG
   - CMAKE_MODULE_PATH
+  - CMAKE_INTERMEDIATE_DIR_STRATEGY                         # Since 4.2
   - CMAKE_POLICY_DEFAULT_CMP<NNNN>
   - CMAKE_POLICY_VERSION_MINIMUM                            # Since 4.0
   - CMAKE_POLICY_WARNING_CMP<NNNN>
@@ -1656,6 +1695,19 @@ variables:
   - GRAPHVIZ_EXTERNAL_LIBS
   - GRAPHVIZ_IGNORE_TARGETS
   - GRAPHVIZ_GENERATE_PER_TARGET
+  # [built-in]: CPack AppImage Generator (since 4.2)
+  - CPACK_APPIMAGE_TOOL_EXECUTABLE
+  - CPACK_APPIMAGE_PATCHELF_EXECUTABLE
+  - CPACK_APPIMAGE_DESKTOP_FILE
+  - CPACK_APPIMAGE_UPDATE_INFORMATION
+  - CPACK_APPIMAGE_GUESS_UPDATE_INFORMATION
+  - CPACK_APPIMAGE_COMPRESSOR
+  - CPACK_APPIMAGE_MKSQUASHFS_OPTIONS
+  - CPACK_APPIMAGE_NO_APPSTREAM
+  - CPACK_APPIMAGE_EXCLUDE_FILE
+  - CPACK_APPIMAGE_RUNTIME_FILE
+  - CPACK_APPIMAGE_SIGN
+  - CPACK_APPIMAGE_SIGN_KEY
   # - CPackArchive
   - CPACK_ARCHIVE_FILE_NAME
   - CPACK_ARCHIVE_<COMPONENT>_FILE_NAME
@@ -2776,7 +2828,6 @@ variables:
   - wxWidgets_DEFINITIONS
   - wxWidgets_DEFINITIONS_DEBUG
   - wxWidgets_CXX_FLAGS
-  - wxWidgets_USE_FILE
   # - FindX11
   # - FindXalanC
   - XalanC_LIBRARY
@@ -2940,6 +2991,10 @@ deprecated-or-internal-variables:
   - CMAKE_ENABLE_EXPORTS
   # This variable exists only for backwards compatibility. Use CMAKE_MAKE_PROGRAM.
   - CMAKE_BUILD_TOOL
+  # The FindwxWidgets module's result variable `wxWidgets_USE_FILE`
+  # is now deprecated in favor of including the UsewxWidgets module directly.
+  # (since 4.2)
+  - wxWidgets_USE_FILE
 
 
 # https://cmake.org/cmake/help/latest/manual/cmake-env-variables.7.html
@@ -2961,6 +3016,7 @@ environment-variables:
   # Environment Variables that Control the Build
   - ADSP_ROOT                                               # Since 3.24
   - CMAKE_APPLE_SILICON_PROCESSOR                           # Since 3.19.2
+  - CMAKE_AUTOGEN_INTERMEDIATE_DIR_STRATEGY                 # Since 4.2
   - CMAKE_BUILD_PARALLEL_LEVEL
   - CMAKE_BUILD_TYPE                                        # Since 3.22
   - CMAKE_COLOR_DIAGNOSTICS                                 # Since 3.24
@@ -2980,6 +3036,7 @@ environment-variables:
   - CMAKE_<LANG>_IMPLICIT_LINK_LIBRARIES_EXCLUDE            # Since 4.1
   - CMAKE_<LANG>_LINKER_LAUNCHER                            # Since 3.21
   - CMAKE_MSVCIDE_RUN_PATH
+  - CMAKE_INTERMEDIATE_DIR_STRATEGY                         # Since 4.2
   - CMAKE_NO_VERBOSE
   - CMAKE_OSX_ARCHITECTURES
   - CMAKE_TOOLCHAIN_FILE                                    # Since 3.21
@@ -3120,6 +3177,9 @@ scripting-commands:
       - GET_MESSAGE_LOG_LEVEL
       # Since 3.29
       - EXIT
+      # Since 4.2
+      - TRACE
+      - EXPAND
     # Since 3.24
     special-args:
       - FIND_PACKAGE
@@ -3688,6 +3748,7 @@ scripting-commands:
       - source-properties
       - cache-properties
       - install-properties
+    has-target-name-after-kw: TARGET
 
   - name: if
     named-args: *if
@@ -3830,6 +3891,7 @@ scripting-commands:
       - APPEND_STRING
       - PROPERTY
     property-args: *get-property
+    has-target-name-after-kw: TARGET
 
   - name: set
     named-args:
@@ -3854,6 +3916,7 @@ scripting-commands:
       - REGEX
       - MATCH
       - MATCHALL
+      - QUOTE                                               # Since 4.2
       - APPEND
       - PREPEND                                             # Since 3.10
       - CONCAT
@@ -5064,6 +5127,7 @@ standard-module-commands:
     named-args:
       - BUILTIN_TYPES_ONLY
       - LANGUAGE
+      - RESULT_VARIABLE                                     # Since 4.2
     special-args: *ccxx
   # CheckVariableExists
   - name: check_variable_exists
@@ -5705,15 +5769,17 @@ standard-module-commands:
   - name: swig_add_library
     named-args:
       - TYPE
-      - SHARED
-      - MODULE
-      - STATIC
-      - USE_BUILD_SHARED_LIBS
       - LANGUAGE
       - NO_PROXY
       - OUTPUT_DIR
       - OUTFILE_DIR
       - SOURCES
+      - DEBUG_POSTFIX                                       # Since 4.2
+    special-args:
+      - SHARED
+      - MODULE
+      - STATIC
+      - USE_BUILD_SHARED_LIBS
   - name: swig_link_libraries
   # UsewxWidgets
   # NOTE Some standard finder modules also provide commands

@@ -399,6 +399,9 @@ def remove_duplicate_context_nodes(root):
 
         # update context name referenced by each rule
         for context in contexts:
+            ref = remap.get(context.attrib.get('fallthroughContext'))
+            if ref:
+                context.attrib['fallthroughContext'] = ref
             for rule in context:
                 ref = remap.get(rule.attrib.get('context'))
                 if ref:

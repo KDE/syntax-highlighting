@@ -159,11 +159,11 @@
         <DetectChar attribute="Normal Text" context="#pop" char=")" />
       </context>
         <!--[- if command.first_arg_is_target ]-->
-      <context attribute="Normal Text" lineEndContext="#stay" name="<!--{command.name}-->_ctx_op_tgt_first">
+      <context attribute="Normal Text" lineEndContext="#stay" name="<!--{command.name}-->_ctx_op_tgt_first" fallthroughContext="<!--{command.name}-->_ctx_op">
         <DetectSpaces />
         <RegExpr attribute="Aliased Targets" context="<!--{command.name}-->_ctx_op" String="&tgt_name_re;::&tgt_name_re;(?:\:\:&tgt_name_re;)*" />
         <RegExpr attribute="Targets" context="<!--{command.name}-->_ctx_op" String="&tgt_name_re;" />
-        <IncludeRules context="User Function Opened" />
+        <DetectChar attribute="Normal Text" context="#pop" char=")" lookAhead="true" />
       </context>
         <!--[- endif ]-->
         <!--[- if command.first_args_are_targets ]-->
@@ -180,7 +180,6 @@
         <IncludeRules context="User Function Opened" />
       </context>
         <!--[- endif ]-->
-        <!--[- if not command.first_args_are_targets or (command.named_args and command.named_args.kw) ]-->
       <context attribute="Normal Text" lineEndContext="#stay" name="<!--{command.name}-->_ctx_op">
         <DetectSpaces />
         <!--[- if command.nested_parentheses ]-->
@@ -189,12 +188,15 @@
         <DetectChar attribute="Normal Text" context="#pop" char=")" lookAhead="true" />
         <!--[- if command.named_args and command.named_args.kw ]-->
           <!--[- if command.has_target_name_after_kw ]-->
-        <WordDetect String="<!--{command.has_target_name_after_kw}-->" attribute="Named Args" context="Target Name" />
+        <WordDetect String="<!--{command.has_target_name_after_kw}-->" attribute="Named Args" context="<!--{command.name}-->_tgts" />
           <!--[- endif ]-->
           <!--[- if command.has_target_names_after_kw ]-->
             <!--[- for kw in command.has_target_names_after_kw ]-->
         <WordDetect String="<!--{kw}-->" attribute="Named Args" context="<!--{command.name}-->_tgts" />
             <!--[- endfor ]-->
+          <!--[- endif ]-->
+          <!--[- if command.name == 'set' or command.name == 'unset' ]-->
+        <RegExpr attribute="Cache Variable Substitution" context="CacheVarSubst" String="CACHE\{" />
           <!--[- endif ]-->
         <keyword attribute="Named Args" context="#stay" String="<!--{command.name}-->_nargs" />
         <!--[- endif ]-->
@@ -224,15 +226,13 @@
           <!--[- endif ]-->
         <!--[- endif ]-->
       </context>
-        <!--[- endif ]-->
-        <!--[- if command.has_target_names_after_kw ]-->
+        <!--[- if command.has_target_name_after_kw or command.has_target_names_after_kw]-->
       <context attribute="Normal Text" lineEndContext="#stay" name="<!--{command.name}-->_tgts">
         <DetectSpaces />
-        <DetectChar attribute="Normal Text" context="#pop" char=")" lookAhead="true" />
         <keyword attribute="Named Args" context="#pop" String="<!--{command.name}-->_nargs" lookAhead="true" />
         <IncludeRules context="Detect Aliased Targets" />
         <IncludeRules context="Detect Targets" />
-        <IncludeRules context="User Function Args" />
+        <IncludeRules context="User Function Opened" />
       </context>
         <!--[- endif ]-->
         <!--[- if command.nested_parentheses ]-->
@@ -294,10 +294,17 @@
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="Detect Variable Substitutions">
-        <RegExpr attribute="Cache Variable Substitution" context="#stay" String="\$CACHE\{\s*[\w-]+\s*\}" />
+        <RegExpr attribute="Cache Variable Substitution" context="CacheVarSubst" String="\$CACHE\{" />
         <RegExpr attribute="Environment Variable Substitution" context="EnvVarSubst" String="\$?ENV\{" />
         <Detect2Chars attribute="Variable Substitution" context="VarSubst" char="$" char1="{" />
         <RegExpr attribute="@Variable Substitution" context="@VarSubst" String="@&var_ref_re;@" lookAhead="true" />
+      </context>
+
+      <context attribute="Cache Variable Substitution" lineEndContext="#pop" name="CacheVarSubst">
+        <DetectChar attribute="Cache Variable Substitution" context="#pop" char="}" />
+        <IncludeRules context="Detect Builtin Variables" />
+        <IncludeRules context="Detect Variable Substitutions" />
+        <DetectIdentifier />
       </context>
 
       <context attribute="Environment Variable Substitution" lineEndContext="#pop" name="EnvVarSubst">
@@ -306,15 +313,15 @@
         <!--[- if environment_variables.re ]-->
         <RegExpr attribute="Standard Environment Variable" context="#stay" String="<!--{environment_variables.re}-->" />
         <!--[- endif ]-->
-        <DetectIdentifier />
         <IncludeRules context="Detect Variable Substitutions" />
+        <DetectIdentifier />
       </context>
 
       <context attribute="Variable Substitution" lineEndContext="#pop" name="VarSubst">
         <DetectChar attribute="Variable Substitution" context="#pop" char="}" />
         <IncludeRules context="Detect Builtin Variables" />
-        <DetectIdentifier />
         <IncludeRules context="Detect Variable Substitutions" />
+        <DetectIdentifier />
       </context>
 
       <context attribute="@Variable Substitution" lineEndContext="#pop" name="@VarSubst">
@@ -325,13 +332,6 @@
         <DetectChar attribute="@Variable Substitution" context="#pop#pop" char="@" />
         <IncludeRules context="Detect Builtin Variables" />
         <DetectIdentifier />
-      </context>
-
-      <context attribute="Normal Text" lineEndContext="#stay" name="Target Name">
-        <DetectSpaces />
-        <RegExpr attribute="Aliased Targets" context="#pop" String="&tgt_name_re;::&tgt_name_re;(?:\:\:&tgt_name_re;)*" />
-        <IncludeRules context="Detect Targets" />
-        <IncludeRules context="User Function Opened" />
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="Detect Targets">

@@ -14,11 +14,11 @@ TimeoutIdleSec = 5min 5s
 
 [Install]
 Alias = some.service some.invalid some_%b.service
-WantedBy = some.service some.socket some.invalid
+WantedBy = some@instance.service some.socket some.invalid
 RequiredBy = some.service some.socket some.invalid
 UpheldBy = some.service some.socket some.invalid
 Also = some.service some.socket some.invalid
-DefaultInstance = id
+DefaultInstance = some-instance
 
 
 [Mount]
@@ -65,6 +65,7 @@ ExecStartPre = @/bin/start/pre some args
 ExecStartPost = -cmd arg, @cmd2 name -o \x0A
 ExecCondition = /bin/exec/condition
 ExecReload = /bin/exec/reload
+ExecReloadPost = /bin/exec/reload-post
 ExecStop = /bin/kill -SIGABRT $MAINPID
 ExecStopPost = -:!/bin/stop/post
 RestartSec = 15
@@ -219,6 +220,7 @@ TemporaryFileSystem = /var:ro
 PrivateTmp = yes
 PrivateDevices = on
 PrivateNetwork = no
+UserNamespacePath = /proc/12345/ns/user
 NetworkNamespacePath = /some/path
 PrivatePIDs = true
 PrivateUsers = off
@@ -579,7 +581,6 @@ AssertIOPressure = 30% / 1min
 ###### invalid sections
 [Device]
 [Invalid]
-[Slice]
 [Target]
 
 
@@ -1255,6 +1256,7 @@ BPFDelegateMaps = BPFMapTypeBloomFilter
 BPFDelegateMaps = BPFMapTypeUserRingbuf
 BPFDelegateMaps = BPFMapTypeCgrpStorage
 BPFDelegateMaps = BPFMapTypeArena
+BPFDelegateMaps = BPFMapTypeInsnArray
 ## invalid values
 BPFDelegateMaps = invalid
 

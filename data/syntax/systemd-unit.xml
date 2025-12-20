@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created for systemd version 258. -->
+<!-- Created for systemd version 259. -->
 <!DOCTYPE language [
 <!ENTITY alp "A-Za-z">
 <!ENTITY aln "&alp;0-9">
@@ -22,7 +22,7 @@
 <!ENTITY tsp_unit "&tsp_year;|&tsp_month;|&tsp_week;|&tsp_day;|&tsp_hour;|&tsp_sec;|&tsp_msec;|&tsp_usec;|&tsp_min;">
 <!ENTITY tsp "\d+(?:\.\d+)?\h*(?=(&tsp_unit;)?)">
 ]>
-<language version="18" author="Andreas Gratzer" extensions="*.automount;*.device;*.mount;*.path;*.service;*.slice;*.socket;*.swap;*.target;*.timer" kateversion="5.0" license="MIT" mimetype="text/x-systemd-unit" name="systemd unit" section="Configuration">
+<language version="19" author="Andreas Gratzer" extensions="*.automount;*.device;*.mount;*.path;*.service;*.slice;*.socket;*.swap;*.target;*.timer" kateversion="5.0" license="MIT" mimetype="text/x-systemd-unit" name="systemd unit" section="Configuration">
   <highlighting>
     <list name="boolean">
       <!-- 0, 1, t, f, y, n are also valid, but handled using AnyChar. -->
@@ -257,6 +257,7 @@
       <item>BPFMapTypeLruPercpuHash</item>
       <item>BPFMapTypeLruHash</item>
       <item>BPFMapTypeLpmTrie</item>
+      <item>BPFMapTypeInsnArray</item>
       <item>BPFMapTypeInodeStorage</item>
       <item>BPFMapTypeHashOfMaps</item>
       <item>BPFMapTypeHash</item>
@@ -1163,7 +1164,21 @@
       <item>TTYPath</item>
       <item>TemporaryFileSystem</item>
       <item>UnsetEnvironment</item>
+      <item>UserNamespacePath</item>
       <item>UtmpIdentifier</item>
+    </list>
+    <list name="options mount">
+      <!-- Only options of type "text". Others are handled separately. -->
+      <item>Options</item>
+      <item>What</item>
+      <item>Where</item>
+    </list>
+    <list name="options path">
+      <!-- Only options of type "text". Others are handled separately. -->
+      <item>DirectoryNotEmpty</item>
+      <item>PathChanged</item>
+      <item>PathExists</item>
+      <item>PathModified</item>
     </list>
     <list name="options resource-control">
       <!-- Only options of type "text". Others are handled separately. -->
@@ -2031,7 +2046,7 @@
       <context name="options install" attribute="Normal" lineEndContext="#stay">
         <WordDetect String="Alias" firstNonSpace="true" attribute="Option Name" context="unit list"/>
         <WordDetect String="Also" firstNonSpace="true" attribute="Option Name" context="unit list"/>
-        <WordDetect String="DefaultInstance" firstNonSpace="true" attribute="Option Name" context="text"/>
+        <WordDetect String="DefaultInstance" firstNonSpace="true" attribute="Option Name" context="unit instance"/>
         <WordDetect String="RequiredBy" firstNonSpace="true" attribute="Option Name" context="unit list"/>
         <WordDetect String="UpheldBy" firstNonSpace="true" attribute="Option Name" context="unit list"/>
         <WordDetect String="WantedBy" firstNonSpace="true" attribute="Option Name" context="unit list"/>
@@ -2046,25 +2061,20 @@
         <WordDetect String="WatchdogSignal" firstNonSpace="true" attribute="Option Name" context="signal"/>
       </context>
       <context name="options mount" attribute="Normal" lineEndContext="#stay">
+        <keyword String="options mount" firstNonSpace="true" attribute="Option Name" context="text"/>
         <WordDetect String="DirectoryMode" firstNonSpace="true" attribute="Option Name" context="file mode"/>
         <WordDetect String="ForceUnmount" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="LazyUnmount" firstNonSpace="true" attribute="Option Name" context="boolean"/>
-        <WordDetect String="Options" firstNonSpace="true" attribute="Option Name" context="text"/>
         <WordDetect String="ReadWriteOnly" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="SloppyOptions" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="TimeoutSec" firstNonSpace="true" attribute="Option Name" context="time span"/>
         <WordDetect String="Type" firstNonSpace="true" attribute="Option Name" context="fs type"/>
-        <WordDetect String="What" firstNonSpace="true" attribute="Option Name" context="text"/>
-        <WordDetect String="Where" firstNonSpace="true" attribute="Option Name" context="text"/>
       </context>
       <context name="options path" attribute="Normal" lineEndContext="#stay">
+        <keyword String="options path" firstNonSpace="true" attribute="Option Name" context="text"/>
         <WordDetect String="DirectoryMode" firstNonSpace="true" attribute="Option Name" context="file mode"/>
-        <WordDetect String="DirectoryNotEmpty" firstNonSpace="true" attribute="Option Name" context="text"/>
         <WordDetect String="MakeDirectory" firstNonSpace="true" attribute="Option Name" context="boolean"/>
-        <WordDetect String="PathChanged" firstNonSpace="true" attribute="Option Name" context="text"/>
-        <WordDetect String="PathExists" firstNonSpace="true" attribute="Option Name" context="text"/>
         <WordDetect String="PathExistsGlob" firstNonSpace="true" attribute="Option Name" context="text glob"/>
-        <WordDetect String="PathModified" firstNonSpace="true" attribute="Option Name" context="text"/>
         <WordDetect String="TriggerLimitBurst" firstNonSpace="true" attribute="Option Name" context="cardinal"/>
         <WordDetect String="TriggerLimitIntervalSec" firstNonSpace="true" attribute="Option Name" context="time span"/>
         <WordDetect String="Unit" firstNonSpace="true" attribute="Option Name" context="unit"/>
@@ -2133,6 +2143,7 @@
         <keyword String="options service" firstNonSpace="true" attribute="Option Name" context="text"/>
         <WordDetect String="ExecCondition" firstNonSpace="true" attribute="Option Name" context="exec"/>
         <WordDetect String="ExecReload" firstNonSpace="true" attribute="Option Name" context="exec"/>
+        <WordDetect String="ExecReloadPost" firstNonSpace="true" attribute="Option Name" context="exec"/>
         <WordDetect String="ExecStart" firstNonSpace="true" attribute="Option Name" context="exec"/>
         <WordDetect String="ExecStartPost" firstNonSpace="true" attribute="Option Name" context="exec"/>
         <WordDetect String="ExecStartPre" firstNonSpace="true" attribute="Option Name" context="exec"/>

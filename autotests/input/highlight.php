@@ -102,13 +102,22 @@ echo <<<HTML
 HTML;
 echo <<<"HTML"
 <p>bla $var \$var bla\'</p>
-HTML;
+HTML,
+  <<<"HTML"
+    <p>bla $var \$var bla\'</p>
+    HTML;
 echo <<<'HTML'
 <p>bla $var \$var bla\'</p>
-HTML;
+HTML,
+  <<<'HTML'
+    <p>bla $var \$var bla\'</p>
+    HTML;
 echo <<<DOC
 <p>bla $var \$var bla\'</p>
-DOC;
+DOC,
+  <<<DOC
+    <p>bla $var \$var bla\'</p>
+    DOC;
 echo <<<DOC
 		<p>bla $var \$var bla\'</p>
 	DOC;

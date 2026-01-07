@@ -24,9 +24,9 @@ def check_grammar_dirs(args):
         if not os.path.isdir(gr_dir):
             print(f'Search folder {gr_dir} does not exist.')
             sys.exit(1)
-        args.grammar_dir[i] = os.path.realpath(gr_dir)
+        args.grammar_dir[i] = os.path.abspath(gr_dir)
     for grammar_xml in args.grammar_xmls:
-        folder = os.path.dirname(os.path.realpath(grammar_xml))
+        folder = os.path.dirname(os.path.abspath(grammar_xml))
         if folder not in args.grammar_dir:
             args.grammar_dir.append(folder)
 
@@ -69,7 +69,7 @@ def frontend():
             sys.exit(1)
     if args.output_dir is None:
         args.output_dir = '.'
-    args.output_dir = os.path.realpath(args.output_dir)
+    args.output_dir = os.path.abspath(args.output_dir)
     if not os.path.isdir(args.output_dir):
         print('Destination folder does not exist.')
         sys.exit(1)

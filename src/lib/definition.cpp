@@ -360,6 +360,10 @@ bool DefinitionData::load(OnlyKeywords onlyKeywords)
         else if (reader.name() == QLatin1String("general")) {
             loadGeneral(reader);
         }
+
+        else if (reader.name() == QLatin1String("spellchecking")) {
+            loadSpellchecking(reader);
+        }
     }
 
     for (auto &kw : keywordLists) {
@@ -662,14 +666,9 @@ void DefinitionData::loadGeneral(QXmlStreamReader &reader)
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);
     reader.readNext();
 
-    // reference counter to count XML child elements, to not return too early
-    int elementRefCounter = 1;
-
     while (!reader.atEnd()) {
         switch (reader.tokenType()) {
         case QXmlStreamReader::StartElement:
-            ++elementRefCounter;
-
             if (reader.name() == QLatin1String("keywords")) {
                 if (reader.attributes().hasAttribute(QLatin1String("casesensitive"))) {
                     caseSensitive = Xml::attrToBool(reader.attributes().value(QLatin1String("casesensitive"))) ? Qt::CaseSensitive : Qt::CaseInsensitive;
@@ -694,16 +693,13 @@ void DefinitionData::loadGeneral(QXmlStreamReader &reader)
                 loadFoldingIgnoreList(reader);
             } else if (reader.name() == QLatin1String("comments")) {
                 loadComments(reader);
-            } else if (reader.name() == QLatin1String("spellchecking")) {
-                loadSpellchecking(reader);
             } else {
                 reader.skipCurrentElement();
             }
             reader.readNext();
             break;
         case QXmlStreamReader::EndElement:
-            --elementRefCounter;
-            if (elementRefCounter == 0) {
+            if (reader.name() == QLatin1String("general")) {
                 return;
             }
             reader.readNext();

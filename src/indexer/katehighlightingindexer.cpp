@@ -2842,7 +2842,7 @@ private:
 
                 if (contextName.contexts.size() > 1 && definition.kateVersion < KateVersion{6, 22}) {
                     qWarning() << definition.filename << "line" << line
-                               << "multiple contexts are only available since version \"6.21\". Please, increase kateversion.";
+                               << "multiple contexts are only available since version \"6.22\". Please, increase kateversion.";
                     m_success = false;
                 }
             }

@@ -4,13 +4,6 @@
 #    fg sfg sfh sft
 # <endfold id='1'>END</endfold id='1'>
 #
-# text in (parenthesis) is ok, (even
-# over several lines)
-# escaped \) and \( are ok
-# an unbalanced single ) is not ok
-# This is due to fish comment handling in command substitutions
-# which cannot reasonably handled by kate syntax highlighting
-
 
 ### Commands and paths
 ls -l |sort
@@ -32,7 +25,7 @@ usr/b?n/ls
 u*ls        # doesn't work, but ok
 "ls" /tmp/testtest                         # Quotes in commands are expanded
 /us"r/bin"/xy/ls
-abcd$a      # show error
+abcd$a
 other) abc  # show error
 <other abc  # show error
 other> abc  # ok
@@ -51,6 +44,12 @@ ls/
 ls;echo xy
 flex++
 echo [abc] abc
+\
+\
+cmd
+
+cmd\
+#cmd
 
 #specials
 command -s ls
@@ -63,11 +62,9 @@ set test1[1..$n] $test; echo $test1
 set test1[$n..1] $test; echo $test1
 set test1[2..4 -2..-4] $test1[4..2 -4..-2]; echo $test1
 set test1[2..4 -2..-4][1] $test1[4..2 -4..-2][1]
-#                     ~~~ invalid
 set test1\
 [2..4 -2..-4]\
 [1] a
-#~~ invalid
 set test1 \
     #bla bla
     a b c
@@ -80,7 +77,8 @@ read -gi $test
 read -gi "test"
 read -gi (echo test)
 
-set x (string split --max 1 --right / (status current-filename) #Comment test)
+set x (string split --max 1 --right / (status current-filename) #Comment test
+)
 set test (exec $cmd)
 
 # direct path
@@ -135,6 +133,7 @@ history merge
 true ;ls
 echo (true)
 echo (true #comment)
+ls)
 echo (true>>xyz/abc)
 true -error     # show error
 pwd > abc
@@ -183,18 +182,14 @@ test -f /tmp/abc -a -e /tmp/def;cat /tmp/abc;
    echo x;<endfold id='2'>end</endfold id='2'>
 
 ### Redirections
-ls < SOURCE_FILE         # stdin
-ls > DESTINATION         # stdout
-ls ^ DESTINATION         # stderr
-ls >> DESTINATION_FILE   # append
-ls ^^ DESTINATION_FILE   # append
-ls >? DESTINATION        # noclobber
-ls ^? DESTINATION
+ls < SOURCE_FILE        # stdin
+ls > DESTINATION        # stdout
+ls >> DESTINATION_FILE  # append
+ls >? DESTINATION       # noclobber
 
-ls ^? ~
-ls ^? ~testuser/abc
-ls ^?/DESTINATION
-ls ^?#DESTINATION       # show error
+ls ^ DESTINATION        # removed since 3.5.0 (released June 16, 2022)
+ls ^^ DESTINATION_FILE  # removed since 3.5.0 (released June 16, 2022)
+ls ^? DESTINATION       # removed since 3.5.0 (released June 16, 2022)
 
 ls > $abc[5]
 ls >"abc"/defg$v/xyz
@@ -206,9 +201,11 @@ ls /tmp/tst>&25?        # show error
 ls /tmp/tst>&25 ?       # ok
 ls 3>&- xyz
 ls 1<DESTINATION
-echo Hello > all_output.txt ^&1 xyz
+echo Hello > all_output.txt >? xyz
 ls 2>&-;echo end
 ls xyz 2>|cat
+echo sd'ds' 1>&2
+echo sd'ds'1>&2
 
 ls>x
 abs>x
@@ -253,6 +250,8 @@ echo $$foo[1..-1][5]
 echo $$foo[1..-1]\
 [5][2]\
 [5]
+echo $$
+echo $$$$$
 
  #show error
 echo $PATH[error
@@ -267,22 +266,24 @@ echo input.{c,12h,TXT}
 echo input.{abc$test[(count $test)..1],(echo $txt)}
 echo input.{a{b,c},12h,TXT}}  # show error
 
-
 ### Index range expansion
 echo (echo $a)[2..5]
 echo (echo $a)[2..5 1..3]
 echo (echo $a)[-1..1]
 
 ### Process expansion
-fg %ema               # ???
-
+echo %ema  # removed (expect %self) since 3.0b1 (released December 11, 2018)
+echo %self # removed since 4.0.0 (released February 27, 2025)
 
 ### Command substitution
 echo -n -s "$USER" @ "$__fish_prompt_hostname" ' ' (set_color $color_cwd) (/usr/bin/ls) (set_color normal) 
 
-echo (#hallo)abc      # ok
-echo (ls #hallo)abc   # ok, die context-Tiefe ist anders
-echo (ls;#hallo)abc   #     als hier.
+echo (#hallo)abc
+)
+echo (ls #hallo)abc
+)
+echo (ls;#hallo)abc
+)
 echo (ls#hallo)abc    # ok: # may be inner part of function names!
 echo (/usr/bin/ls)
 echo (ls >>mem/abc)
@@ -301,11 +302,6 @@ echo (seq 10)\
 # multline command substitution
 set x (echo dirlist; # blabla
        ls)
-
-## same, but commented out:
-
-# set x (echo dirlist; # blabla
-#        ls)
 
 set pi (math "scale=10; 4*a(1)")
 

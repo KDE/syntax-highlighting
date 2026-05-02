@@ -4,13 +4,6 @@
 <Comment>#    fg sfg sfh sft</Comment><br/>
 <Comment># </Comment><Region Marker>END</Region Marker><br/>
 <Comment>#</Comment><br/>
-<Comment># text in (parenthesis) is ok, (even</Comment><br/>
-<Comment># over several lines)</Comment><br/>
-<Comment># escaped \) and \( are ok</Comment><br/>
-<Comment># an unbalanced single </Comment><Error>)</Error><Normal Text> is not ok</Normal Text><br/>
-<Comment># This is due to fish comment handling in command substitutions</Comment><br/>
-<Comment># which cannot reasonably handled by kate syntax highlighting</Comment><br/>
-<Normal Text></Normal Text><br/>
 <Normal Text></Normal Text><br/>
 <Comment>### Commands and paths</Comment><br/>
 <UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Option>-l</Option><Normal Text> </Normal Text><Separator>|</Separator><UnixCommand>sort</UnixCommand><br/>
@@ -27,17 +20,17 @@
 <CommandPath>/usr/bin/</CommandPath><Command>lsother</Command><br/>
 <CommandPath>../test/root/bin/</CommandPath><Command>fish</Command><Normal Text> </Normal Text><Option>-c</Option><Normal Text> </Normal Text><String DoubleQ>"echo </String DoubleQ><Variable>$t8</Variable><String DoubleQ>"</String DoubleQ><br/>
 <CommandPath>test/root/bin/</CommandPath><Command>fish</Command><Normal Text> </Normal Text><Option>-c</Option><Normal Text> </Normal Text><String DoubleQ>"echo </String DoubleQ><Variable>$t8</Variable><String DoubleQ>"</String DoubleQ><br/>
-<CommandPath>u?r/bin/</CommandPath><UnixCommand>ls</UnixCommand><br/>
-<CommandPath>usr/b?n/</CommandPath><UnixCommand>ls</UnixCommand><br/>
-<CommandPath>u*</CommandPath><UnixCommand>ls</UnixCommand><Normal Text>        </Normal Text><Comment># doesn't work, but ok</Comment><br/>
+<CommandPath>u</CommandPath><Glob>?</Glob><CommandPath>r/bin/</CommandPath><UnixCommand>ls</UnixCommand><br/>
+<CommandPath>usr/b</CommandPath><Glob>?</Glob><CommandPath>n/</CommandPath><UnixCommand>ls</UnixCommand><br/>
+<Command>u</Command><Glob>*</Glob><Command>ls</Command><Normal Text>        </Normal Text><Comment># doesn't work, but ok</Comment><br/>
 <String DoubleQ>"ls"</String DoubleQ><Normal Text> </Normal Text><Path>/tmp/testtest</Path><Normal Text>                         </Normal Text><Comment># Quotes in commands are expanded</Comment><br/>
 <CommandPath>/us</CommandPath><String DoubleQ>"r/bin"</String DoubleQ><CommandPath>/xy/</CommandPath><UnixCommand>ls</UnixCommand><br/>
-<Command>abcd</Command><Error>$</Error><Command>a</Command><Normal Text>      </Normal Text><Comment># show error</Comment><br/>
+<Command>abcd</Command><Variable>$a</Variable><br/>
 <Command>other</Command><Error>)</Error><Normal Text> abc  </Normal Text><Comment># show error</Comment><br/>
 <Error><</Error><Normal Text>other abc  </Normal Text><Comment># show error</Comment><br/>
 <Command>other</Command><Redirection>></Redirection><Normal Text> </Normal Text><Path>abc</Path><Normal Text>  </Normal Text><Comment># ok</Comment><br/>
 <Command>oth</Command><Redirection>></Redirection><Path>er</Path><Normal Text> abc  </Normal Text><Comment># ok</Comment><br/>
-<Command>ot</Command><Error>(</Error><Command>her</Command><Error>)</Error><Normal Text> abc </Normal Text><Comment># show error</Comment><br/>
+<Command>ot</Command><Error>(</Error><Command>her</Command><Keychar>)</Keychar><Normal Text> abc </Normal Text><Comment># show error</Comment><br/>
 <Normal Text></Normal Text><br/>
 <Command>-cmd</Command><br/>
 <Command>déjà-vu</Command><br/>
@@ -51,6 +44,12 @@
 <UnixCommand>ls</UnixCommand><Separator>;</Separator><Builtin>echo</Builtin><Normal Text> xy</Normal Text><br/>
 <UnixCommand>flex++</UnixCommand><br/>
 <Builtin>echo</Builtin><Normal Text> [abc] abc</Normal Text><br/>
+<Escape>\</Escape><br/>
+<Escape>\</Escape><br/>
+<Command>cmd</Command><br/>
+<Normal Text></Normal Text><br/>
+<Command>cmd</Command><Escape>\</Escape><br/>
+<Command>#cmd</Command><br/>
 <Normal Text></Normal Text><br/>
 <Comment>#specials</Comment><br/>
 <Builtin>command</Builtin><Normal Text> </Normal Text><Option>-s</Option><Normal Text> </Normal Text><UnixCommand>ls</UnixCommand><br/>
@@ -62,12 +61,10 @@
 <Builtin>set</Builtin><Normal Text> </Normal Text><Variable>test1</Variable><Index>[1..</Index><Variable>$n</Variable><Index>]</Index><Normal Text> </Normal Text><Variable>$test</Variable><Separator>;</Separator><Normal Text> </Normal Text><Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$test1</Variable><br/>
 <Builtin>set</Builtin><Normal Text> </Normal Text><Variable>test1</Variable><Index>[</Index><Variable>$n</Variable><Index>..1]</Index><Normal Text> </Normal Text><Variable>$test</Variable><Separator>;</Separator><Normal Text> </Normal Text><Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$test1</Variable><br/>
 <Builtin>set</Builtin><Normal Text> </Normal Text><Variable>test1</Variable><Index>[2..4 -2..-4]</Index><Normal Text> </Normal Text><Variable>$test1</Variable><Index>[4..2 -4..-2]</Index><Separator>;</Separator><Normal Text> </Normal Text><Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$test1</Variable><br/>
-<Builtin>set</Builtin><Normal Text> </Normal Text><Variable>test1</Variable><Index>[2..4 -2..-4]</Index><Normal Text>[1] </Normal Text><Variable>$test1</Variable><Index>[4..2 -4..-2][1]</Index><br/>
-<Comment>#                     ~~~ invalid</Comment><br/>
+<Builtin>set</Builtin><Normal Text> </Normal Text><Variable>test1</Variable><Index>[2..4 -2..-4][1]</Index><Normal Text> </Normal Text><Variable>$test1</Variable><Index>[4..2 -4..-2][1]</Index><br/>
 <Builtin>set</Builtin><Normal Text> </Normal Text><Variable>test1</Variable><Escape>\</Escape><br/>
 <Index>[2..4 -2..-4]</Index><Escape>\</Escape><br/>
-<Normal Text>[1] a</Normal Text><br/>
-<Comment>#~~ invalid</Comment><br/>
+<Index>[1]</Index><Normal Text> a</Normal Text><br/>
 <Builtin>set</Builtin><Normal Text> </Normal Text><Variable>test1</Variable><Normal Text> </Normal Text><Escape>\</Escape><br/>
 <Normal Text>    </Normal Text><Comment>#bla bla</Comment><br/>
 <Normal Text>    a b c</Normal Text><br/>
@@ -80,16 +77,17 @@
 <Builtin>read</Builtin><Normal Text> </Normal Text><Option>-gi</Option><Normal Text> </Normal Text><String DoubleQ>"test"</String DoubleQ><br/>
 <Builtin>read</Builtin><Normal Text> </Normal Text><Option>-gi</Option><Normal Text> </Normal Text><Keychar>(</Keychar><Builtin>echo</Builtin><Normal Text> test</Normal Text><Keychar>)</Keychar><br/>
 <Normal Text></Normal Text><br/>
-<Builtin>set</Builtin><Normal Text> </Normal Text><Variable>x</Variable><Normal Text> </Normal Text><Keychar>(</Keychar><Builtin>string</Builtin><Normal Text> </Normal Text><Builtin>split</Builtin><Normal Text> </Normal Text><Option>--max</Option><Normal Text> 1 </Normal Text><Option>--right</Option><Normal Text> </Normal Text><Path>/</Path><Normal Text> </Normal Text><Keychar>(</Keychar><Builtin>status</Builtin><Normal Text> current-filename</Normal Text><Keychar>)</Keychar><Normal Text> </Normal Text><Comment>#Comment test</Comment><Keychar>)</Keychar><br/>
+<Builtin>set</Builtin><Normal Text> </Normal Text><Variable>x</Variable><Normal Text> </Normal Text><Keychar>(</Keychar><Builtin>string</Builtin><Normal Text> </Normal Text><Builtin>split</Builtin><Normal Text> </Normal Text><Option>--max</Option><Normal Text> 1 </Normal Text><Option>--right</Option><Normal Text> </Normal Text><Path>/</Path><Normal Text> </Normal Text><Keychar>(</Keychar><Builtin>status</Builtin><Normal Text> current-filename</Normal Text><Keychar>)</Keychar><Normal Text> </Normal Text><Comment>#Comment test</Comment><br/>
+<Keychar>)</Keychar><br/>
 <Builtin>set</Builtin><Normal Text> </Normal Text><Variable>test</Variable><Normal Text> </Normal Text><Keychar>(</Keychar><Builtin>exec</Builtin><Normal Text> </Normal Text><Variable>$cmd</Variable><Keychar>)</Keychar><br/>
 <Normal Text></Normal Text><br/>
 <Comment># direct path</Comment><br/>
-<Builtin>test</Builtin><Normal Text> </Normal Text><Operator>-d </Operator><Variable>$tmpldir</Variable><Path>/resources</Path><br/>
+<Builtin>test</Builtin><Normal Text> </Normal Text><Operator>-d</Operator><Normal Text> </Normal Text><Variable>$tmpldir</Variable><Path>/resources</Path><br/>
 <Normal Text></Normal Text><br/>
 <Comment>### Options</Comment><br/>
 <UnixCommand>cat</UnixCommand><Normal Text> </Normal Text><Option>-l</Option><Normal Text> </Normal Text><Path>/usr/local/test</Path><Redirection>></Redirection><Path>logfile</Path><br/>
 <UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Option>--longopt</Option><Operator>=</Operator><Path>/test</Path><br/>
-<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Option>-l</Option><String DoubleQ>"kasdflakjs"</String DoubleQ><Normal Text> </Normal Text><Option>-r</Option><Path>/usr/test</Path><Normal Text> </Normal Text><Option>-x</Option><Path>../test/../bla</Path><Normal Text> </Normal Text><Option>-z</Option><HomeDir>~xyz</HomeDir><Path>/hello</Path><br/>
+<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Option>-l</Option><String DoubleQ>"kasdflakjs"</String DoubleQ><Normal Text> </Normal Text><Option>-r</Option><Path>/usr/test</Path><Normal Text> </Normal Text><Option>-x</Option><Path>../test/../bla</Path><Normal Text> </Normal Text><Option>-z</Option><Path>~xyz/hello</Path><br/>
 <Normal Text></Normal Text><br/>
 <Comment>### Arguments</Comment><br/>
 <Builtin>echo</Builtin><Normal Text> abc</Normal Text><String DoubleQ>"def"</String DoubleQ><Normal Text>ghi</Normal Text><br/>
@@ -114,11 +112,11 @@
 <Builtin>test</Builtin><Normal Text> </Normal Text><Path>..</Path><Normal Text> abc</Normal Text><br/>
 <Normal Text></Normal Text><br/>
 <Comment>### Escapes</Comment><br/>
-<UnixCommand>touch</UnixCommand><Normal Text> a</Normal Text><Escape>\?</Escape><Normal Text>bc</Normal Text><Escape>\[\]</Escape><Normal Text>ax</Normal Text><Escape>\~</Escape><Normal Text>dsf</Normal Text><Escape>\#</Escape><Normal Text>gsd</Normal Text><Escape>\a</Escape><Normal Text>f</Normal Text><Escape>\(\)</Escape><Normal Text>dg</Normal Text><Escape>\?</Escape><Normal Text>sd</Normal Text><Escape>\ </Escape><Normal Text>fg</Normal Text><Escape>\b</Escape><Normal Text>hh</Normal Text><Escape>\%</Escape><Normal Text>j</Normal Text><Escape>\$</Escape><Normal Text>k</Normal Text><Escape>\\</Escape><Normal Text>l</Normal Text><Escape>\?</Escape><Normal Text>sed</Normal Text><Escape>\*</Escape><Normal Text>jk</Normal Text><Escape>\></Escape><Normal Text>hj</Normal Text><Escape>\<</Escape><Normal Text>hou</Normal Text><Escape>\&</Escape><Normal Text>h</Normal Text><Escape>\;</Escape><Normal Text>hgkj</Normal Text><Escape>\^</Escape><Normal Text>kj</Normal Text><Escape>\"</Escape><Normal Text>kjh</Normal Text><Escape>\'</Escape><Normal Text>jhg</Normal Text><br/>
+<UnixCommand>touch</UnixCommand><Normal Text> a</Normal Text><Escape>\?</Escape><Normal Text>bc</Normal Text><Escape>\[\]</Escape><Normal Text>ax</Normal Text><Escape>\~</Escape><Normal Text>dsf</Normal Text><Escape>\#</Escape><Normal Text>gsd</Normal Text><Escape>\a</Escape><Normal Text>f</Normal Text><Escape>\(\)</Escape><Normal Text>dg</Normal Text><Escape>\?</Escape><Normal Text>sd</Normal Text><Escape>\ </Escape><Normal Text>fg</Normal Text><Escape>\b</Escape><Normal Text>hh</Normal Text><Escape>\</Escape><Normal Text>%j</Normal Text><Escape>\$</Escape><Normal Text>k</Normal Text><Escape>\\</Escape><Normal Text>l</Normal Text><Escape>\?</Escape><Normal Text>sed</Normal Text><Escape>\*</Escape><Normal Text>jk</Normal Text><Escape>\></Escape><Normal Text>hj</Normal Text><Escape>\<</Escape><Normal Text>hou</Normal Text><Escape>\&</Escape><Normal Text>h</Normal Text><Escape>\;</Escape><Normal Text>hgkj</Normal Text><Escape>\</Escape><Normal Text>^kj</Normal Text><Escape>\"</Escape><Normal Text>kjh</Normal Text><Escape>\'</Escape><Normal Text>jhg</Normal Text><br/>
 <UnixCommand>touch</UnixCommand><Normal Text> sdf</Normal Text><Escape>\xa5</Escape><Normal Text>lh</Normal Text><Escape>\Xb7</Escape><Normal Text>kll</Normal Text><Escape>\157</Escape><Normal Text>j</Normal Text><Escape>\15</Escape><Normal Text>8hk</Normal Text><Escape>\ua47b</Escape><Normal Text>z</Normal Text><Escape>\U123b5678</Escape><Normal Text>fs</Normal Text><Escape>\cx</Escape><Normal Text>zdfga</Normal Text><br/>
 <Normal Text></Normal Text><br/>
 <UnixCommand>touch</UnixCommand><Normal Text> </Normal Text><String DoubleQ>"a\?bc\[\]a"</String DoubleQ><Normal Text>      </Normal Text><Comment># no escaping in Quotes</Comment><br/>
-<UnixCommand>touch</UnixCommand><Normal Text> fgh\y1            </Normal Text><Comment># \y is no escape sequence in fish, show it as normal text like fish itself</Comment><br/>
+<UnixCommand>touch</UnixCommand><Normal Text> fgh</Normal Text><Escape>\</Escape><Normal Text>y1            </Normal Text><Comment># \y is no escape sequence in fish, show it as normal text like fish itself</Comment><br/>
 <Normal Text></Normal Text><br/>
 <Comment>### Builtins</Comment><br/>
 <Builtin>. </Builtin><Normal Text>hallo</Normal Text><br/>
@@ -134,9 +132,10 @@
 <Normal Text></Normal Text><br/>
 <Builtin>true</Builtin><Normal Text> </Normal Text><Separator>;</Separator><UnixCommand>ls</UnixCommand><br/>
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><Builtin>true</Builtin><Keychar>)</Keychar><br/>
-<Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><Builtin>true</Builtin><Normal Text> </Normal Text><Comment>#comment</Comment><Keychar>)</Keychar><br/>
+<Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><Builtin>true</Builtin><Normal Text> </Normal Text><Comment>#comment)</Comment><br/>
+<UnixCommand>ls</UnixCommand><Keychar>)</Keychar><br/>
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><Builtin>true</Builtin><Redirection>>></Redirection><Path>xyz/abc</Path><Keychar>)</Keychar><br/>
-<Builtin>true</Builtin><Normal Text> </Normal Text><Error>-error     </Error><Comment># show error</Comment><br/>
+<Builtin>true</Builtin><Normal Text> </Normal Text><Error>-error</Error><Normal Text>     </Normal Text><Comment># show error</Comment><br/>
 <Builtin>pwd</Builtin><Normal Text> </Normal Text><Redirection>></Redirection><Normal Text> </Normal Text><Path>abc</Path><br/>
 <Normal Text></Normal Text><br/>
 <Builtin>command</Builtin><Normal Text> </Normal Text><Option>-s</Option><Normal Text> </Normal Text><UnixCommand>ls</UnixCommand><Separator>;</Separator><UnixCommand>cat</UnixCommand><Normal Text> test</Normal Text><br/>
@@ -162,53 +161,51 @@
 <CommandPath>/usr/test/</CommandPath><Command>testtest</Command><Normal Text> </Normal Text><Path>/usr/test/testtest</Path><br/>
 <Normal Text></Normal Text><br/>
 <Comment>### test</Comment><br/>
-<Builtin>test</Builtin><Normal Text> NUM1</Normal Text><Operator> -eq </Operator><Normal Text>NUM2</Normal Text><br/>
-<Builtin>test</Builtin><Normal Text> </Normal Text><Operator>-f </Operator><Path>/tmp/abc</Path><Normal Text> </Normal Text><Operator>-a -e </Operator><Path>/tmp/def</Path><Separator>;</Separator><UnixCommand>cat</UnixCommand><Normal Text> </Normal Text><Path>/tmp/abc</Path><Separator>;</Separator><br/>
+<Builtin>test</Builtin><Normal Text> NUM1 </Normal Text><Operator>-eq</Operator><Normal Text> NUM2</Normal Text><br/>
+<Builtin>test</Builtin><Normal Text> </Normal Text><Operator>-f</Operator><Normal Text> </Normal Text><Path>/tmp/abc</Path><Normal Text> </Normal Text><Operator>-a</Operator><Normal Text> </Normal Text><Operator>-e</Operator><Normal Text> </Normal Text><Path>/tmp/def</Path><Separator>;</Separator><UnixCommand>cat</UnixCommand><Normal Text> </Normal Text><Path>/tmp/abc</Path><Separator>;</Separator><br/>
 <Normal Text></Normal Text><br/>
-<Control Flow>if</Control Flow><Normal Text> </Normal Text><Builtin>test</Builtin><Normal Text> </Normal Text><Escape>\(</Escape><Normal Text> </Normal Text><Operator>-f </Operator><Path>/foo</Path><Normal Text> </Normal Text><Operator>-o -f </Operator><Path>/bar</Path><Normal Text> </Normal Text><Escape>\)</Escape><Normal Text> </Normal Text><Operator>-a </Operator><Escape>\(</Escape><Normal Text> </Normal Text><Operator>-f </Operator><Path>/baz</Path><Normal Text> </Normal Text><Operator>-o -f </Operator><Path>/bat</Path><Normal Text> </Normal Text><Escape>\)</Escape><br/>
-<Normal Text>    </Normal Text><Builtin>echo</Builtin><Normal Text> Success</Normal Text><Path>.</Path><br/>
+<Control Flow>if</Control Flow><Normal Text> </Normal Text><Builtin>test</Builtin><Normal Text> </Normal Text><Escape>\(</Escape><Normal Text> </Normal Text><Operator>-f</Operator><Normal Text> </Normal Text><Path>/foo</Path><Normal Text> </Normal Text><Operator>-o</Operator><Normal Text> </Normal Text><Operator>-f</Operator><Normal Text> </Normal Text><Path>/bar</Path><Normal Text> </Normal Text><Escape>\)</Escape><Normal Text> </Normal Text><Operator>-a</Operator><Normal Text> </Normal Text><Escape>\(</Escape><Normal Text> </Normal Text><Operator>-f</Operator><Normal Text> </Normal Text><Path>/baz</Path><Normal Text> </Normal Text><Operator>-o</Operator><Normal Text> </Normal Text><Operator>-f</Operator><Normal Text> </Normal Text><Path>/bat</Path><Normal Text> </Normal Text><Escape>\)</Escape><br/>
+<Normal Text>    </Normal Text><Builtin>echo</Builtin><Normal Text> Success.</Normal Text><br/>
 <Control Flow>end</Control Flow><br/>
 <Normal Text></Normal Text><br/>
-<Builtin>[ </Builtin><Normal Text>25</Normal Text><Operator> -eq </Operator><Variable>$NUM2</Variable><Builtin> ]</Builtin><br/>
-<Builtin>[ </Builtin><String DoubleQ>"abc"</String DoubleQ><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><String DoubleQ>"</String DoubleQ><Variable>$STRING2</Variable><String DoubleQ>"</String DoubleQ><Builtin> ]</Builtin><br/>
+<Builtin>[ </Builtin><Normal Text>25 </Normal Text><Operator>-eq</Operator><Normal Text> </Normal Text><Variable>$NUM2</Variable><Normal Text> </Normal Text><Builtin>]</Builtin><br/>
+<Builtin>[ </Builtin><String DoubleQ>"abc"</String DoubleQ><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><String DoubleQ>"</String DoubleQ><Variable>$STRING2</Variable><String DoubleQ>"</String DoubleQ><Normal Text> </Normal Text><Builtin>]</Builtin><br/>
 <Normal Text></Normal Text><br/>
-<Control Flow>if</Control Flow><Normal Text> </Normal Text><Builtin>[ </Builtin><Operator>!</Operator><Normal Text> </Normal Text><Escape>\(</Escape><Normal Text>STRING1 </Normal Text><Operator>!=</Operator><Normal Text> STRING2</Normal Text><Escape>\)</Escape><Builtin> ]</Builtin><Separator>;</Separator><UnixCommand>ls</UnixCommand><Separator>;</Separator><Control Flow>end</Control Flow><br/>
-<Control Flow>if</Control Flow><Normal Text> </Normal Text><Builtin>[ </Builtin><Operator>-f </Operator><Path>abc</Path><Builtin> ]</Builtin><Error>#</Error><Normal Text> </Normal Text><Error>show error</Error><br/>
+<Control Flow>if</Control Flow><Normal Text> </Normal Text><Builtin>[ </Builtin><Operator>!</Operator><Normal Text> </Normal Text><Escape>\(</Escape><Normal Text>STRING1 </Normal Text><Operator>!=</Operator><Normal Text> STRING2</Normal Text><Escape>\)</Escape><Normal Text> </Normal Text><Builtin>]</Builtin><Separator>;</Separator><UnixCommand>ls</UnixCommand><Separator>;</Separator><Control Flow>end</Control Flow><br/>
+<Control Flow>if</Control Flow><Normal Text> </Normal Text><Builtin>[ </Builtin><Operator>-f</Operator><Normal Text> </Normal Text><Path>abc</Path><Normal Text> ]# show error</Normal Text><br/>
 <Control Flow>end</Control Flow><br/>
-<Control Flow>if</Control Flow><Normal Text> </Normal Text><Builtin>[ </Builtin><Operator>-f </Operator><Path>abc</Path><Builtin> ]</Builtin><Normal Text> </Normal Text><Comment># ok</Comment><br/>
+<Control Flow>if</Control Flow><Normal Text> </Normal Text><Builtin>[ </Builtin><Operator>-f</Operator><Normal Text> </Normal Text><Path>abc</Path><Normal Text> </Normal Text><Builtin>]</Builtin><Normal Text> </Normal Text><Comment># ok</Comment><br/>
 <Control Flow>end</Control Flow><br/>
 <Normal Text></Normal Text><br/>
-<Control Flow>if</Control Flow><Normal Text> </Normal Text><Builtin>[ </Builtin><Operator>!</Operator><Normal Text> </Normal Text><Escape>\(</Escape><Normal Text>STRING1 </Normal Text><Operator>!=</Operator><Normal Text> STRING2</Normal Text><Escape>\)</Escape><Builtin> ]</Builtin><Normal Text> </Normal Text><Error>ls</Error><Separator>;</Separator><Control Flow>end</Control Flow><Normal Text> </Normal Text><Comment># show error</Comment><br/>
-<Control Flow>if</Control Flow><Normal Text> </Normal Text><Builtin>[ </Builtin><String DoubleQ>"abc"</String DoubleQ><Normal Text> </Normal Text><Operator>!=</Operator><Normal Text> </Normal Text><String DoubleQ>"def"</String DoubleQ><Builtin> ]</Builtin><Normal Text> </Normal Text><Comment># hallo</Comment><br/>
+<Control Flow>if</Control Flow><Normal Text> </Normal Text><Builtin>[ </Builtin><Operator>!</Operator><Normal Text> </Normal Text><Escape>\(</Escape><Normal Text>STRING1 </Normal Text><Operator>!=</Operator><Normal Text> STRING2</Normal Text><Escape>\)</Escape><Normal Text> </Normal Text><Builtin>]</Builtin><Normal Text> </Normal Text><Error>ls</Error><Separator>;</Separator><Control Flow>end</Control Flow><Normal Text> </Normal Text><Comment># show error</Comment><br/>
+<Control Flow>if</Control Flow><Normal Text> </Normal Text><Builtin>[ </Builtin><String DoubleQ>"abc"</String DoubleQ><Normal Text> </Normal Text><Operator>!=</Operator><Normal Text> </Normal Text><String DoubleQ>"def"</String DoubleQ><Normal Text> </Normal Text><Builtin>]</Builtin><Normal Text> </Normal Text><Comment># hallo</Comment><br/>
 <Normal Text>   </Normal Text><Builtin>echo</Builtin><Normal Text> x</Normal Text><Separator>;</Separator><Control Flow>end</Control Flow><br/>
 <Normal Text></Normal Text><br/>
 <Comment>### Redirections</Comment><br/>
-<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection><</Redirection><Normal Text> </Normal Text><Path>SOURCE_FILE</Path><Normal Text>         </Normal Text><Comment># stdin</Comment><br/>
-<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>></Redirection><Normal Text> </Normal Text><Path>DESTINATION</Path><Normal Text>         </Normal Text><Comment># stdout</Comment><br/>
-<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>^</Redirection><Normal Text> </Normal Text><Path>DESTINATION</Path><Normal Text>         </Normal Text><Comment># stderr</Comment><br/>
-<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>>></Redirection><Normal Text> </Normal Text><Path>DESTINATION_FILE</Path><Normal Text>   </Normal Text><Comment># append</Comment><br/>
-<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>^^</Redirection><Normal Text> </Normal Text><Path>DESTINATION_FILE</Path><Normal Text>   </Normal Text><Comment># append</Comment><br/>
-<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>>?</Redirection><Normal Text> </Normal Text><Path>DESTINATION</Path><Normal Text>        </Normal Text><Comment># noclobber</Comment><br/>
-<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>^?</Redirection><Normal Text> </Normal Text><Path>DESTINATION</Path><br/>
+<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection><</Redirection><Normal Text> </Normal Text><Path>SOURCE_FILE</Path><Normal Text>        </Normal Text><Comment># stdin</Comment><br/>
+<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>></Redirection><Normal Text> </Normal Text><Path>DESTINATION</Path><Normal Text>        </Normal Text><Comment># stdout</Comment><br/>
+<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>>></Redirection><Normal Text> </Normal Text><Path>DESTINATION_FILE</Path><Normal Text>  </Normal Text><Comment># append</Comment><br/>
+<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>>?</Redirection><Normal Text> </Normal Text><Path>DESTINATION</Path><Normal Text>       </Normal Text><Comment># noclobber</Comment><br/>
 <Normal Text></Normal Text><br/>
-<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>^?</Redirection><Normal Text> </Normal Text><HomeDir>~</HomeDir><br/>
-<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>^?</Redirection><Normal Text> </Normal Text><HomeDir>~testuser</HomeDir><Path>/abc</Path><br/>
-<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>^?</Redirection><Path>/DESTINATION</Path><br/>
-<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>^?</Redirection><Error>#</Error><Normal Text>DESTINATION       </Normal Text><Comment># show error</Comment><br/>
+<UnixCommand>ls</UnixCommand><Normal Text> ^ DESTINATION        </Normal Text><Comment># removed since 3.5.0 (released June 16, 2022)</Comment><br/>
+<UnixCommand>ls</UnixCommand><Normal Text> ^^ DESTINATION_FILE  </Normal Text><Comment># removed since 3.5.0 (released June 16, 2022)</Comment><br/>
+<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Path>^</Path><Glob>?</Glob><Normal Text> DESTINATION       </Normal Text><Comment># removed since 3.5.0 (released June 16, 2022)</Comment><br/>
 <Normal Text></Normal Text><br/>
 <UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>></Redirection><Normal Text> </Normal Text><Variable>$abc</Variable><Index>[5]</Index><br/>
 <UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>></Redirection><String DoubleQ>"abc"</String DoubleQ><Path>/defg</Path><Variable>$v</Variable><Path>/xyz</Path><br/>
 <Normal Text></Normal Text><br/>
-<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>></Redirection><Error>&</Error><Normal Text>                   </Normal Text><Comment># show error</Comment><br/>
-<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>></Redirection><Normal Text> </Normal Text><Error>&</Error><Normal Text>1                 </Normal Text><Comment># show error</Comment><br/>
+<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>></Redirection><Error>&</Error><Normal Text>                   </Normal Text><Error>#</Error><Comment> show error</Comment><br/>
+<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>></Redirection><Normal Text> </Normal Text><Error>&</Error><Command>1</Command><Normal Text>                 </Normal Text><Comment># show error</Comment><br/>
 <UnixCommand>ls</UnixCommand><Normal Text> abc</Normal Text><Redirection>>&25</Redirection><Normal Text> xyz </Normal Text><Path>/tmp/xyz</Path><Normal Text> </Normal Text><Variable>$abc</Variable><br/>
-<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Path>/tmp/tst</Path><Redirection>>&25</Redirection><Error>?</Error><Normal Text>        </Normal Text><Comment># show error</Comment><br/>
+<UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Path>/tmp/tst</Path><Redirection>>&25</Redirection><Glob>?</Glob><Normal Text>        </Normal Text><Comment># show error</Comment><br/>
 <UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Path>/tmp/tst</Path><Redirection>>&25</Redirection><Normal Text> </Normal Text><Glob>?</Glob><Normal Text>       </Normal Text><Comment># ok</Comment><br/>
 <UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>3>&-</Redirection><Normal Text> xyz</Normal Text><br/>
 <UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>1<</Redirection><Path>DESTINATION</Path><br/>
-<Builtin>echo</Builtin><Normal Text> Hello </Normal Text><Redirection>></Redirection><Normal Text> </Normal Text><Path>all_output.txt</Path><Normal Text> </Normal Text><Redirection>^&1</Redirection><Normal Text> xyz</Normal Text><br/>
+<Builtin>echo</Builtin><Normal Text> Hello </Normal Text><Redirection>></Redirection><Normal Text> </Normal Text><Path>all_output.txt</Path><Normal Text> </Normal Text><Redirection>>?</Redirection><Normal Text> </Normal Text><Path>xyz</Path><br/>
 <UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>2>&-</Redirection><Separator>;</Separator><Builtin>echo</Builtin><Normal Text> end</Normal Text><br/>
 <UnixCommand>ls</UnixCommand><Normal Text> xyz </Normal Text><Redirection>2>|</Redirection><UnixCommand>cat</UnixCommand><br/>
+<Builtin>echo</Builtin><Normal Text> sd</Normal Text><String SingleQ>'ds'</String SingleQ><Normal Text> </Normal Text><Redirection>1>&2</Redirection><br/>
+<Builtin>echo</Builtin><Normal Text> sd</Normal Text><String SingleQ>'ds'</String SingleQ><Normal Text>1</Normal Text><Redirection>>&2</Redirection><br/>
 <Normal Text></Normal Text><br/>
 <UnixCommand>ls</UnixCommand><Redirection>></Redirection><Path>x</Path><br/>
 <Command>abs</Command><Redirection>></Redirection><Path>x</Path><br/>
@@ -253,20 +250,21 @@
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$$foo</Variable><Index>[1..-1]</Index><Escape>\</Escape><br/>
 <Index>[5][2]</Index><Escape>\</Escape><br/>
 <Index>[5]</Index><br/>
+<Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$</Variable><Error>$</Error><br/>
+<Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$$$$</Variable><Error>$</Error><br/>
 <Normal Text></Normal Text><br/>
 <Normal Text> </Normal Text><Comment>#show error</Comment><br/>
-<Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$PATH</Variable><Index>[</Index><Error>error</Error><br/>
-<Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$PATH</Variable><Index>[1..</Index><Error>error</Error><Index>]</Index><br/>
+<Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$PATH</Variable><Index>[</Index><Error>e</Error><Normal Text>rror</Normal Text><br/>
+<Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$PATH</Variable><Index>[1..</Index><Error>e</Error><Normal Text>rror]</Normal Text><br/>
 <Normal Text></Normal Text><br/>
-<Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$PATH</Variable><Index>[1 2 34</Index><Normal Text> </Normal Text><Index>]</Index><br/>
+<Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$PATH</Variable><Index>[1 2 34 ]</Index><br/>
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$PATH</Variable><Index>[1.. 2]</Index><br/>
-<Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$PATH</Variable><Index>[1</Index><Normal Text> </Normal Text><Index>..2]</Index><br/>
+<Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$PATH</Variable><Index>[1 ..2]</Index><br/>
 <Normal Text></Normal Text><br/>
 <Comment>### Brace Expansion</Comment><br/>
 <Builtin>echo</Builtin><Normal Text> input.</Normal Text><Keychar>{</Keychar><Normal Text>c</Normal Text><Separator>,</Separator><Normal Text>12h</Normal Text><Separator>,</Separator><Normal Text>TXT</Normal Text><Keychar>}</Keychar><br/>
 <Builtin>echo</Builtin><Normal Text> input.</Normal Text><Keychar>{</Keychar><Normal Text>abc</Normal Text><Variable>$test</Variable><Index>[</Index><Keychar>(</Keychar><Builtin>count</Builtin><Normal Text> </Normal Text><Variable>$test</Variable><Keychar>)</Keychar><Index>..1]</Index><Separator>,</Separator><Keychar>(</Keychar><Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$txt</Variable><Keychar>)}</Keychar><br/>
 <Builtin>echo</Builtin><Normal Text> input.</Normal Text><Keychar>{</Keychar><Normal Text>a</Normal Text><Keychar>{</Keychar><Normal Text>b</Normal Text><Separator>,</Separator><Normal Text>c</Normal Text><Keychar>}</Keychar><Separator>,</Separator><Normal Text>12h</Normal Text><Separator>,</Separator><Normal Text>TXT</Normal Text><Keychar>}</Keychar><Error>}</Error><Normal Text>  </Normal Text><Comment># show error</Comment><br/>
-<Normal Text></Normal Text><br/>
 <Normal Text></Normal Text><br/>
 <Comment>### Index range expansion</Comment><br/>
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$a</Variable><Keychar>)</Keychar><Index>[2..5]</Index><br/>
@@ -274,38 +272,36 @@
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$a</Variable><Keychar>)</Keychar><Index>[-1..1]</Index><br/>
 <Normal Text></Normal Text><br/>
 <Comment>### Process expansion</Comment><br/>
-<Builtin>fg</Builtin><Normal Text> </Normal Text><Keychar>%</Keychar><Process>ema</Process><Normal Text>               </Normal Text><Comment># ???</Comment><br/>
-<Normal Text></Normal Text><br/>
+<Builtin>echo</Builtin><Normal Text> %ema  </Normal Text><Comment># removed (expect %self) since 3.0b1 (released December 11, 2018)</Comment><br/>
+<Builtin>echo</Builtin><Normal Text> %self </Normal Text><Comment># removed since 4.0.0 (released February 27, 2025)</Comment><br/>
 <Normal Text></Normal Text><br/>
 <Comment>### Command substitution</Comment><br/>
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Option>-n</Option><Normal Text> </Normal Text><Option>-s</Option><Normal Text> </Normal Text><String DoubleQ>"</String DoubleQ><Variable>$USER</Variable><String DoubleQ>"</String DoubleQ><Normal Text> @ </Normal Text><String DoubleQ>"</String DoubleQ><Variable>$__fish_prompt_hostname</Variable><String DoubleQ>"</String DoubleQ><Normal Text> </Normal Text><String SingleQ>' '</String SingleQ><Normal Text> </Normal Text><Keychar>(</Keychar><Builtin>set_color</Builtin><Normal Text> </Normal Text><Variable>$color_cwd</Variable><Keychar>)</Keychar><Normal Text> </Normal Text><Keychar>(</Keychar><CommandPath>/usr/bin/</CommandPath><UnixCommand>ls</UnixCommand><Keychar>)</Keychar><Normal Text> </Normal Text><Keychar>(</Keychar><Builtin>set_color</Builtin><Normal Text> normal</Normal Text><Keychar>)</Keychar><Normal Text> </Normal Text><br/>
 <Normal Text></Normal Text><br/>
-<Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><Comment>#hallo</Comment><Keychar>)</Keychar><Normal Text>abc      </Normal Text><Comment># ok</Comment><br/>
-<Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Comment>#hallo</Comment><Keychar>)</Keychar><Normal Text>abc   </Normal Text><Comment># ok, die context-Tiefe ist anders</Comment><br/>
-<Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><UnixCommand>ls</UnixCommand><Separator>;</Separator><Comment>#hallo</Comment><Keychar>)</Keychar><Normal Text>abc   </Normal Text><Comment>#     als hier.</Comment><br/>
+<Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><Comment>#hallo)abc</Comment><br/>
+<Keychar>)</Keychar><br/>
+<Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Comment>#hallo)abc</Comment><br/>
+<Keychar>)</Keychar><br/>
+<Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><UnixCommand>ls</UnixCommand><Separator>;</Separator><Comment>#hallo)abc</Comment><br/>
+<Keychar>)</Keychar><br/>
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><Command>ls#hallo</Command><Keychar>)</Keychar><Normal Text>abc    </Normal Text><Comment># ok: # may be inner part of function names!</Comment><br/>
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><CommandPath>/usr/bin/</CommandPath><UnixCommand>ls</UnixCommand><Keychar>)</Keychar><br/>
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Redirection>>></Redirection><Path>mem/abc</Path><Keychar>)</Keychar><br/>
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$test</Variable><Index>[2]</Index><Keychar>)</Keychar><br/>
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><CommandPath>/usr</CommandPath><String DoubleQ>"/bi"</String DoubleQ><CommandPath>n/</CommandPath><UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Path>/tmp</Path><Keychar>)</Keychar><br/>
-<Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><UnixCommand>seq</UnixCommand><Normal Text> 10</Normal Text><Keychar>)</Keychar><Index>[1]</Index><Normal Text>[2]</Normal Text><br/>
+<Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><UnixCommand>seq</UnixCommand><Normal Text> 10</Normal Text><Keychar>)</Keychar><Index>[1][2]</Index><br/>
 <Comment>#               ~~~ not an index</Comment><br/>
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><UnixCommand>seq</UnixCommand><Normal Text> 10</Normal Text><Keychar>)</Keychar><Escape>\</Escape><br/>
-<Index>[1]</Index><Normal Text>[2]</Normal Text><br/>
+<Index>[1][2]</Index><br/>
 <Comment>#  ~~~ not an index</Comment><br/>
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Keychar>(</Keychar><UnixCommand>seq</UnixCommand><Normal Text> 10</Normal Text><Keychar>)</Keychar><Escape>\</Escape><br/>
 <Index>[1]</Index><Escape>\</Escape><br/>
-<Normal Text>[2]</Normal Text><br/>
+<Index>[2]</Index><br/>
 <Comment>#~~ not an index</Comment><br/>
 <Normal Text></Normal Text><br/>
 <Comment># multline command substitution</Comment><br/>
 <Builtin>set</Builtin><Normal Text> </Normal Text><Variable>x</Variable><Normal Text> </Normal Text><Keychar>(</Keychar><Builtin>echo</Builtin><Normal Text> dirlist</Normal Text><Separator>;</Separator><Normal Text> </Normal Text><Comment># blabla</Comment><br/>
 <Normal Text>       </Normal Text><UnixCommand>ls</UnixCommand><Keychar>)</Keychar><br/>
-<Normal Text></Normal Text><br/>
-<Comment>## same, but commented out:</Comment><br/>
-<Normal Text></Normal Text><br/>
-<Comment># set x (echo dirlist; # blabla</Comment><br/>
-<Comment>#        ls)</Comment><br/>
 <Normal Text></Normal Text><br/>
 <Builtin>set</Builtin><Normal Text> </Normal Text><Variable>pi</Variable><Normal Text> </Normal Text><Keychar>(</Keychar><Builtin>math</Builtin><Normal Text> </Normal Text><String DoubleQ>"scale=10; 4*a(1)"</String DoubleQ><Keychar>)</Keychar><br/>
 <Normal Text></Normal Text><br/>
@@ -313,7 +309,7 @@
 <UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Escape>\</Escape><br/>
 <Normal Text>  </Normal Text><Path>/usr/bin</Path><br/>
 <Normal Text></Normal Text><br/>
-<Builtin>test</Builtin><Normal Text> </Normal Text><String DoubleQ>"STRING1"</String DoubleQ><Operator>=</Operator><String DoubleQ>"STRING2"</String DoubleQ><Normal Text> </Normal Text><Operator>-a </Operator><Escape>\</Escape><br/>
+<Builtin>test</Builtin><Normal Text> </Normal Text><String DoubleQ>"STRING1"</String DoubleQ><Normal Text>=</Normal Text><String DoubleQ>"STRING2"</String DoubleQ><Normal Text> </Normal Text><Operator>-a</Operator><Normal Text> </Normal Text><Escape>\</Escape><br/>
 <Normal Text>     </Normal Text><String DoubleQ>"STRING3"</String DoubleQ><Normal Text> </Normal Text><Operator>=</Operator><Normal Text> </Normal Text><Keychar>(</Keychar><Builtin>echo</Builtin><Normal Text> </Normal Text><String DoubleQ>"STRING4"</String DoubleQ><Keychar>)</Keychar><br/>
 <Normal Text></Normal Text><br/>
 <Builtin>echo</Builtin><Normal Text> input.</Normal Text><Keychar>{</Keychar><Normal Text>abc</Normal Text><Escape>\</Escape><br/>
@@ -330,7 +326,7 @@
 <Builtin>echo</Builtin><Normal Text> </Normal Text><String DoubleQ>"123456</String DoubleQ><Escape>\</Escape><br/>
 <String DoubleQ>      78910"</String DoubleQ><br/>
 <Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$PATH</Variable><Index>[1..3</Index><Escape>\</Escape><br/>
-<Normal Text>          </Normal Text><Index>]</Index><br/>
+<Index>          ]</Index><br/>
 <UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Path>/usr</Path><Escape>\</Escape><br/>
 <Path>local/bin</Path><br/>
 <Builtin>echo</Builtin><Normal Text> foo</Normal Text><Escape>\ </Escape><Normal Text>bar</Normal Text><br/>
@@ -338,7 +334,7 @@
 <Normal Text>bar</Normal Text><br/>
 <Normal Text></Normal Text><br/>
 <Control Flow>for</Control Flow><Normal Text> </Normal Text><Variable>i</Variable><Normal Text> </Normal Text><Escape>\</Escape><br/>
-<Normal Text>    </Normal Text><Control Flow>in</Control Flow><Normal Text> </Normal Text><Escape>\</Escape><br/>
+<Normal Text>    </Normal Text><Keyword>in</Keyword><Normal Text> </Normal Text><Escape>\</Escape><br/>
 <Normal Text>    a b c</Normal Text><br/>
 <Normal Text>    </Normal Text><Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$i</Variable><br/>
 <Control Flow>end</Control Flow><br/>
@@ -394,37 +390,37 @@
 <UnixCommand>diff</UnixCommand><Normal Text> </Normal Text><Keychar>(</Keychar><UnixCommand>sort</UnixCommand><Normal Text> a.txt </Normal Text><Separator>|</Separator><Normal Text> </Normal Text><Builtin>psub</Builtin><Keychar>)</Keychar><Normal Text> </Normal Text><Keychar>(</Keychar><UnixCommand>sort</UnixCommand><Normal Text> b.txt </Normal Text><Separator>|</Separator><Normal Text> </Normal Text><Builtin>psub</Builtin><Keychar>)</Keychar><br/>
 <Command>source-highlight</Command><Normal Text> </Normal Text><Option>-f</Option><Normal Text> esc </Normal Text><Keychar>(</Keychar><UnixCommand>cpp</UnixCommand><Normal Text> main.c </Normal Text><Separator>|</Separator><Normal Text> </Normal Text><Builtin>psub</Builtin><Normal Text> </Normal Text><Option>-s</Option><Normal Text> .c</Normal Text><Keychar>)</Keychar><br/>
 <Normal Text></Normal Text><br/>
-<Control Flow>while</Control Flow><Normal Text> </Normal Text><Builtin>test</Builtin><Normal Text> </Normal Text><Operator>-f </Operator><Path>foo.txt</Path><Normal Text>  </Normal Text><Comment># comment</Comment><br/>
+<Control Flow>while</Control Flow><Normal Text> </Normal Text><Builtin>test</Builtin><Normal Text> </Normal Text><Operator>-f</Operator><Normal Text> </Normal Text><Path>foo.txt</Path><Normal Text>  </Normal Text><Comment># comment</Comment><br/>
 <Normal Text>  </Normal Text><Builtin>echo</Builtin><Normal Text> hallo</Normal Text><br/>
 <Control Flow>end</Control Flow><br/>
 <Normal Text></Normal Text><br/>
-<Control Flow>for</Control Flow><Normal Text> </Normal Text><Variable>i</Variable><Normal Text> </Normal Text><Control Flow>in</Control Flow><Normal Text> </Normal Text><Keychar>{</Keychar><Normal Text>1</Normal Text><Separator>,</Separator><Keychar>(</Keychar><UnixCommand>ls</UnixCommand><Keychar>)</Keychar><Separator>,</Separator><Normal Text>3</Normal Text><Keychar>}</Keychar><Normal Text>    </Normal Text><Comment># comment</Comment><br/>
+<Control Flow>for</Control Flow><Normal Text> </Normal Text><Variable>i</Variable><Normal Text> </Normal Text><Keyword>in</Keyword><Normal Text> </Normal Text><Keychar>{</Keychar><Normal Text>1</Normal Text><Separator>,</Separator><Keychar>(</Keychar><UnixCommand>ls</UnixCommand><Keychar>)</Keychar><Separator>,</Separator><Normal Text>3</Normal Text><Keychar>}</Keychar><Normal Text>    </Normal Text><Comment># comment</Comment><br/>
 <Normal Text>  </Normal Text><Builtin>echo</Builtin><Normal Text> </Normal Text><Variable>$i</Variable><br/>
 <Control Flow>end</Control Flow><br/>
 <Normal Text></Normal Text><br/>
 <Comment># function</Comment><br/>
-<Control Flow>function</Control Flow><Normal Text> </Normal Text><Command>__hidden</Command><Normal Text>      </Normal Text><Comment># comment</Comment><br/>
+<Keyword>function</Keyword><Normal Text> </Normal Text><Command>__hidden</Command><Normal Text>      </Normal Text><Comment># comment</Comment><br/>
 <Normal Text>  </Normal Text><Builtin>cd</Builtin><Normal Text> </Normal Text><Path>/</Path><br/>
 <Control Flow>end</Control Flow><br/>
 <Normal Text></Normal Text><br/>
-<Control Flow>function</Control Flow><Normal Text> </Normal Text><Command>ll</Command><Normal Text> </Normal Text><Escape>\</Escape><br/>
+<Keyword>function</Keyword><Normal Text> </Normal Text><Command>ll</Command><Normal Text> </Normal Text><Escape>\</Escape><br/>
 <Normal Text>  </Normal Text><Option>-d </Option><Function Doc>"multiline</Function Doc><br/>
 <Function Doc>  description"</Function Doc><br/>
 <Normal Text>    </Normal Text><UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Option>-l</Option><Normal Text> </Normal Text><Variable>$argv</Variable><br/>
 <Control Flow>end</Control Flow><br/>
 <Normal Text></Normal Text><br/>
-<Control Flow>function</Control Flow><Normal Text> </Normal Text><Command>ls</Command><Normal Text> </Normal Text><Option>--description=</Option><Function Doc>"Description"</Function Doc><Normal Text> </Normal Text><Option>-a</Option><Normal Text> a b c </Normal Text><Comment># comment</Comment><br/>
+<Keyword>function</Keyword><Normal Text> </Normal Text><Command>ls</Command><Normal Text> </Normal Text><Option>--description=</Option><Function Doc>"Description"</Function Doc><Normal Text> </Normal Text><Option>-a</Option><Normal Text> a b c </Normal Text><Comment># comment</Comment><br/>
 <Normal Text>    </Normal Text><Builtin>command</Builtin><Normal Text> </Normal Text><UnixCommand>ls</UnixCommand><Normal Text> </Normal Text><Option>--color</Option><Operator>=</Operator><Normal Text>auto </Normal Text><Variable>$argv</Variable><br/>
-<Normal Text>    </Normal Text><Control Flow>if</Control Flow><Normal Text> </Normal Text><Builtin>test</Builtin><Normal Text> </Normal Text><Operator>-f </Operator><Path>foo.txt</Path><br/>
+<Normal Text>    </Normal Text><Control Flow>if</Control Flow><Normal Text> </Normal Text><Builtin>test</Builtin><Normal Text> </Normal Text><Operator>-f</Operator><Normal Text> </Normal Text><Path>foo.txt</Path><br/>
 <Normal Text>        </Normal Text><Builtin>echo</Builtin><Normal Text> foo.txt exists</Normal Text><br/>
-<Normal Text>    </Normal Text><Control Flow>else</Control Flow><Normal Text> </Normal Text><Control Flow>if</Control Flow><Normal Text> </Normal Text><Builtin>test</Builtin><Normal Text> </Normal Text><Operator>-f </Operator><Path>bar.txt</Path><Normal Text>          </Normal Text><Comment># comment</Comment><br/>
+<Normal Text>    </Normal Text><Control Flow>else</Control Flow><Normal Text> </Normal Text><Control Flow>if</Control Flow><Normal Text> </Normal Text><Builtin>test</Builtin><Normal Text> </Normal Text><Operator>-f</Operator><Normal Text> </Normal Text><Path>bar.txt</Path><Normal Text>          </Normal Text><Comment># comment</Comment><br/>
 <Normal Text>        </Normal Text><Builtin>echo</Builtin><Normal Text> bar.txt exists</Normal Text><br/>
 <Normal Text>    </Normal Text><Control Flow>else</Control Flow><br/>
 <Normal Text>        </Normal Text><Builtin>echo</Builtin><Normal Text> foo.txt and bar.txt do not exist</Normal Text><br/>
 <Normal Text>    </Normal Text><Control Flow>end</Control Flow><Normal Text>                              </Normal Text><Comment># comment</Comment><br/>
 <Control Flow>end</Control Flow><br/>
 <Normal Text></Normal Text><br/>
-<Control Flow>function</Control Flow><Normal Text> </Normal Text><Command>test</Command><Separator>;</Separator><Builtin>echo</Builtin><Normal Text> hallo</Normal Text><Separator>;</Separator><Control Flow>end</Control Flow><Normal Text>         </Normal Text><Comment># comment</Comment><br/>
+<Keyword>function</Keyword><Normal Text> </Normal Text><Command>test</Command><Separator>;</Separator><Builtin>echo</Builtin><Normal Text> hallo</Normal Text><Separator>;</Separator><Control Flow>end</Control Flow><Normal Text>         </Normal Text><Comment># comment</Comment><br/>
 <Normal Text></Normal Text><br/>
 <Control Flow>switch</Control Flow><Normal Text> </Normal Text><Variable>$animal</Variable><Normal Text>   </Normal Text><Comment># comment</Comment><br/>
 <Normal Text>    </Normal Text><Control Flow>case</Control Flow><Normal Text> cat     </Normal Text><Comment># comment</Comment><br/>
@@ -442,41 +438,41 @@
 <Normal Text>  </Normal Text><Builtin>echo</Builtin><Normal Text> </Normal Text><String DoubleQ>"?"</String DoubleQ><br/>
 <Control Flow>end</Control Flow><br/>
 <Normal Text></Normal Text><br/>
-<Control Flow>if</Control Flow><Normal Text> </Normal Text><Control Flow>not</Control Flow><Normal Text> </Normal Text><Builtin>test</Builtin><Normal Text> </Normal Text><Operator>-f </Operator><Path>spoon</Path><Normal Text>   </Normal Text><Comment>#comment</Comment><br/>
+<Control Flow>if</Control Flow><Normal Text> </Normal Text><Control Flow>not</Control Flow><Normal Text> </Normal Text><Builtin>test</Builtin><Normal Text> </Normal Text><Operator>-f</Operator><Normal Text> </Normal Text><Path>spoon</Path><Normal Text>   </Normal Text><Comment>#comment</Comment><br/>
 <Normal Text>  </Normal Text><Builtin>echo</Builtin><Normal Text> There is no spoon</Normal Text><br/>
 <Control Flow>else</Control Flow><br/>
 <Normal Text>  </Normal Text><Builtin>exit</Builtin><Normal Text> 1</Normal Text><br/>
 <Control Flow>end</Control Flow><br/>
 <Normal Text></Normal Text><br/>
-<Control Flow>for</Control Flow><Normal Text> </Normal Text><Variable>file</Variable><Normal Text> </Normal Text><Control Flow>in</Control Flow><Normal Text> </Normal Text><Variable>$cfgfiles</Variable><br/>
-<Normal Text>    </Normal Text><Control Flow>if</Control Flow><Normal Text> </Normal Text><Builtin>test</Builtin><Normal Text> </Normal Text><Operator>-f </Operator><Variable>$file</Variable><br/>
+<Control Flow>for</Control Flow><Normal Text> </Normal Text><Variable>file</Variable><Normal Text> </Normal Text><Keyword>in</Keyword><Normal Text> </Normal Text><Variable>$cfgfiles</Variable><br/>
+<Normal Text>    </Normal Text><Control Flow>if</Control Flow><Normal Text> </Normal Text><Builtin>test</Builtin><Normal Text> </Normal Text><Operator>-f</Operator><Normal Text> </Normal Text><Variable>$file</Variable><br/>
 <Normal Text>        </Normal Text><Builtin>string</Builtin><Normal Text> </Normal Text><Builtin>match</Builtin><Normal Text> </Normal Text><Option>-r</Option><Normal Text> </Normal Text><String SingleQ>'\[Dialer'</String SingleQ><Normal Text> </Normal Text><Redirection><</Redirection><Normal Text> </Normal Text><Variable>$file</Variable><Normal Text> </Normal Text><Separator>|</Separator><Normal Text> </Normal Text><Builtin>string</Builtin><Normal Text> </Normal Text><Builtin>replace</Builtin><Normal Text> </Normal Text><Option>-r</Option><Normal Text> </Normal Text><String SingleQ>'\[Dialer (.+)\]'</String SingleQ><Normal Text> </Normal Text><String SingleQ>'$1'</String SingleQ><br/>
 <Normal Text>    </Normal Text><Control Flow>end</Control Flow><br/>
 <Control Flow>end</Control Flow><Normal Text> </Normal Text><Separator>|</Separator><Normal Text> </Normal Text><UnixCommand>sort</UnixCommand><Normal Text> </Normal Text><Option>-u</Option><Normal Text> </Normal Text><Separator>|</Separator><Normal Text> </Normal Text><Builtin>string</Builtin><Normal Text> </Normal Text><Builtin>match</Builtin><Normal Text> </Normal Text><Option>-v</Option><Normal Text> Defaults</Normal Text><br/>
 <Normal Text></Normal Text><br/>
-<Control Flow>for</Control Flow><Normal Text> </Normal Text><Variable>i</Variable><Normal Text> </Normal Text><Control Flow>in</Control Flow><Normal Text> </Normal Text><Glob>*</Glob><Path>.c</Path><br/>
+<Control Flow>for</Control Flow><Normal Text> </Normal Text><Variable>i</Variable><Normal Text> </Normal Text><Keyword>in</Keyword><Normal Text> </Normal Text><Glob>*</Glob><Path>.c</Path><br/>
 <Normal Text>    </Normal Text><Control Flow>if</Control Flow><Normal Text> </Normal Text><UnixCommand>grep</UnixCommand><Normal Text> smurf </Normal Text><Variable>$i</Variable><Normal Text>     </Normal Text><Comment># comment</Comment><br/>
 <Normal Text>        </Normal Text><Builtin>echo</Builtin><Normal Text> Smurfs are present in </Normal Text><Variable>$i</Variable><br/>
-<Normal Text>        </Normal Text><Builtin>break</Builtin><br/>
+<Normal Text>        </Normal Text><Control Flow>break</Control Flow><br/>
 <Normal Text>    </Normal Text><Control Flow>end</Control Flow><br/>
 <Control Flow>end</Control Flow><br/>
 <Normal Text></Normal Text><br/>
-<Control Flow>if</Control Flow><Normal Text> </Normal Text><Control Flow>begin</Control Flow><Normal Text> </Normal Text><Builtin>contains</Builtin><Normal Text> </Normal Text><Option>--</Option><Normal Text> </Normal Text><Variable>$argv</Variable><Normal Text> </Normal Text><Option>--force</Option><Normal Text>   </Normal Text><Comment># ohne ; nach begin: geht</Comment><br/>
+<Control Flow>if</Control Flow><Normal Text> </Normal Text><Keyword>begin</Keyword><Normal Text> </Normal Text><Builtin>contains</Builtin><Normal Text> </Normal Text><Option>--</Option><Normal Text> </Normal Text><Variable>$argv</Variable><Normal Text> </Normal Text><Option>--force</Option><Normal Text>   </Normal Text><Comment># ohne ; nach begin: geht</Comment><br/>
 <Normal Text>        </Normal Text><Control Flow>or</Control Flow><Normal Text> </Normal Text><Control Flow>not</Control Flow><Normal Text> </Normal Text><Builtin>status</Builtin><Normal Text> </Normal Text><Option>--is-interactive</Option><Normal Text> and not status </Normal Text><Option>--is-login</Option><br/>
-<Normal Text>    </Normal Text><Control Flow>end</Control Flow><br/>
+<Normal Text>    </Normal Text><Keyword>end</Keyword><br/>
 <Normal Text>    </Normal Text><Builtin>echo</Builtin><Normal Text> </Normal Text><String DoubleQ>""</String DoubleQ><br/>
 <Control Flow>end</Control Flow><br/>
 <Normal Text></Normal Text><br/>
-<Control Flow>begin</Control Flow><Normal Text>                    </Normal Text><Comment># comment</Comment><br/>
-<Normal Text>  </Normal Text><Control Flow>for</Control Flow><Normal Text> </Normal Text><Variable>i</Variable><Normal Text> </Normal Text><Control Flow>in</Control Flow><Normal Text> </Normal Text><Glob>*</Glob><Path>.tmp</Path><br/>
+<Keyword>begin</Keyword><Normal Text>                    </Normal Text><Comment># comment</Comment><br/>
+<Normal Text>  </Normal Text><Control Flow>for</Control Flow><Normal Text> </Normal Text><Variable>i</Variable><Normal Text> </Normal Text><Keyword>in</Keyword><Normal Text> </Normal Text><Glob>*</Glob><Path>.tmp</Path><br/>
 <Normal Text>      </Normal Text><Control Flow>if</Control Flow><Normal Text> </Normal Text><UnixCommand>grep</UnixCommand><Normal Text> smurf </Normal Text><Variable>$i</Variable><br/>
-<Normal Text>          </Normal Text><Builtin>continue</Builtin><br/>
+<Normal Text>          </Normal Text><Control Flow>continue</Control Flow><br/>
 <Normal Text>      </Normal Text><Control Flow>end</Control Flow><br/>
 <Normal Text>      </Normal Text><UnixCommand>rm</UnixCommand><Normal Text> </Normal Text><Variable>$i</Variable><br/>
 <Normal Text>  </Normal Text><Control Flow>end</Control Flow><br/>
-<Control Flow>end</Control Flow><br/>
+<Keyword>end</Keyword><br/>
 <Normal Text></Normal Text><br/>
-<Control Flow>if</Control Flow><Normal Text> </Normal Text><Builtin>[ </Builtin><Variable>$status</Variable><Operator> -eq </Operator><Normal Text>1</Normal Text><Builtin> ]</Builtin><br/>
+<Control Flow>if</Control Flow><Normal Text> </Normal Text><Builtin>[ </Builtin><Variable>$status</Variable><Normal Text> </Normal Text><Operator>-eq</Operator><Normal Text> 1 </Normal Text><Builtin>]</Builtin><br/>
 <Normal Text>	</Normal Text><Builtin>set</Builtin><Normal Text> </Normal Text><Variable>sta</Variable><Normal Text> pass</Normal Text><br/>
 <Control Flow>else</Control Flow><br/>
 <Normal Text>	</Normal Text><Builtin>set</Builtin><Normal Text> </Normal Text><Variable>sta</Variable><Normal Text> fail</Normal Text><br/>
@@ -487,11 +483,11 @@
 <Normal Text></Normal Text><br/>
 <Comment># Process Expansion</Comment><br/>
 <Comment># see fish issue 4230</Comment><br/>
-<UnixCommand>kill</UnixCommand><Normal Text> </Normal Text><Option>-STOP</Option><Normal Text> </Normal Text><Keychar>%</Keychar><Process>self</Process><br/>
+<UnixCommand>kill</UnixCommand><Normal Text> </Normal Text><Option>-STOP</Option><Normal Text> %self</Normal Text><br/>
 <Normal Text></Normal Text><br/>
 <Command>endcmd</Command><Normal Text> </Normal Text><Comment># is a command</Comment><br/>
 <Normal Text></Normal Text><br/>
-<Control Flow>for</Control Flow><Normal Text> </Normal Text><Variable>inc</Variable><Normal Text> </Normal Text><Control Flow>in</Control Flow><Normal Text> a </Normal Text><Comment># inc is a variable</Comment><br/>
+<Control Flow>for</Control Flow><Normal Text> </Normal Text><Variable>inc</Variable><Normal Text> </Normal Text><Keyword>in</Keyword><Normal Text> a </Normal Text><Comment># inc is a variable</Comment><br/>
 <Control Flow>end</Control Flow><br/>
 <Normal Text></Normal Text><br/>
 <Control Flow>switch</Control Flow><Normal Text> d</Normal Text><Separator>;</Separator><Control Flow>case</Control Flow><Normal Text> </Normal Text><String DoubleQ>"*"</String DoubleQ><Normal Text> </Normal Text><Separator>;</Separator><Normal Text> </Normal Text><Control Flow>case</Control Flow><Normal Text> d</Normal Text><Separator>;</Separator><Builtin>echo</Builtin><Separator>;</Separator><Normal Text> </Normal Text><Control Flow>end</Control Flow><br/>

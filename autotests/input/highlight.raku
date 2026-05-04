@@ -724,3 +724,14 @@ if 'abc-abc-abc' ~~ / $<string>=( [ $<part>=[abc] ]* % '-' ) / {
 }
 
 [«[«[«[+]»]»]»] <1 2 3 4>
+
+grammar HighestOfLights {
+    has $.attribute;
+
+    token testToken { <ident> }
+    token testTokenTwo { <.panic("oh no!")> }
+
+    token withArgs($a, Str :$foo = 99) { <:NewLine + [ \r \R \c[ZERO WIDTH NON-JOINER] ]> }
+
+    regex haveARegex { <withArgs(1, :123foo)> }
+}

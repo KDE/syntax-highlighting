@@ -254,6 +254,8 @@ say "\c999 \c999999999 \c[LATIN CAPITAL LETTER A, LATIN CAPITAL LETTER B] \c77s 
 say "\x0 \x00 \x[0] \x[00] \x[f] \xaaa \xfffffff \xffh \x[ffff] \x[fffffff] \x[42,42]";
 say "\o0 \o00 \o[0] \o[00] \o[7] \o333 \o77777777 \o77h \o[333] \o[77777777] \o[42,42]";
 
+say 'Literal backslash: \\n, Literal backslash: \n, literal single quote \' and end-of-string\\';
+
 say Q[A literal string] ;
 say ｢More plainly.｣ ;
 say Q ^Almost any non-word character can be a delimiter!^ ;

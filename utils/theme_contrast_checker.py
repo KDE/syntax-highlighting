@@ -104,9 +104,9 @@ parser.add_argument('-S', '--scores', metavar='SCORES', type=parse_scores,
                     help='modify ratings values. Expects a comma-separated list of numbers. The order of the list is the same as in the legend.')
 
 # sRGB is W3 in APCA
-parser.add_argument('-C', '--color-space', default='sRGB',
+parser.add_argument('-C', '--color-space', default='Okl',
                     choices=['sRGB', 'DisplayP3', 'AdobeRGB', 'Rec2020', 'Okl'],
-                    help='select a color space ; Okl is a color space that increases the contrast of red with black or blue background and decreases it with white or green background')
+                    help='select a color space')
 
 parser.add_argument('-d', '--compute-diff', action='store_true',
                     help='compute luminance between 2 colors or more ; the first color represents the background, the others the foreground')

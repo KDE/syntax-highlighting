@@ -10,65 +10,6 @@ def parse_scores(s: str) -> list[int]:
     return [int(x) for x in s.split(',')]
 
 
-parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
-                                 description='''Contrast checker for themes
-
-Allows you to view all the colors and backgrounds applied to a theme and rate the contrast based on the APCA (Accessible Perceptual Contrast Algorithm) used in WCAG 3. A very low score is a sign of poor contrast, and can make reading difficult or impossible.
-
-However, color perception depends on the individual, hardware or software configurations (night/blue light filter), lighting or simply surrounding colors. For example, low contrast may remain legible in the editor when not surrounded by bright color.
-
-There are 3 options for modifying the contract result:
-
-  -a / --add-luminance and -p / --add-percent-luminance to directly modify the output value. For example, -p -14 -a 15 increases the constrast a little when it's low and very little when it's high.
-
-  -C / --color-space Okl selects a color space with different properties, mainly on the color red.
-''')
-
-parser.add_argument('-f', '--bg', metavar='BACKGROUND', action='append',
-                    help='show only the specified background color styles')
-parser.add_argument('-B', '--bg-color', metavar='COLOR', type=str,
-                    help='force a background color and --bg BackgroundColor')
-parser.add_argument('-l', '--language', metavar='LANGUAGE', action='append',
-                    help='show only the specified language')
-
-parser.add_argument('-c', '--no-custom-styles', action='store_true',
-                    help='do not display custom languages')
-parser.add_argument('-s', '--no-standard-styles', action='store_true',
-                    help='do not display standard colors')
-parser.add_argument('-b', '--no-borders', action='store_true',
-                    help='do not display border colors')
-parser.add_argument('-H', '--no-legend', action='store_true',
-                    help='do not display legend')
-
-parser.add_argument('-M', '--min-luminance', metavar='LUMINANCE', type=float, default=0,
-                    help='only displays colors with a higher luminance')
-parser.add_argument('-L', '--max-luminance', metavar='LUMINANCE', type=float, default=110.0,
-                    help='only displays colors with a lower luminance')
-
-parser.add_argument('-a', '--add-luminance', metavar='LUMINANCE', type=float, default=0,
-                    help='add fixed value for luminance')
-parser.add_argument('-p', '--add-percent-luminance', metavar='LUMINANCE', type=float, default=0,
-                    help='add percent luminance. Apply before --add-luminance')
-parser.add_argument('-S', '--scores', metavar='SCORES', type=parse_scores,
-                    help='modify ratings values. Expects a comma-separated list of numbers. The order of the list is the same as in the legend.')
-
-# sRGB is W3 in APCA
-parser.add_argument('-C', '--color-space', default='sRGB',
-                    choices=['sRGB', 'DisplayP3', 'AdobeRGB', 'Rec2020', 'Okl'],
-                    help='select a color space ; Okl is a color space that increases the contrast of red with black or blue background and decreases it with white or green background')
-
-parser.add_argument('-d', '--compute-diff', action='store_true',
-                    help='compute luminance between 2 colors or more ; the first color represents the background, the others the foreground')
-
-parser.add_argument('-F', '--output-format', default='ansi', choices=['ansi', 'html'])
-parser.add_argument('-T', '--html-title', help='title of html page when --output-format=html')
-
-parser.add_argument('themes_or_colors', metavar='THEME_OR_COLOR', nargs='+',
-                    help='a .theme file or a color (#rgb, #rrggbb, #argb, #aarrggbb) when -d / --compute-diff is used')
-
-args = parser.parse_intermixed_args()
-
-
 RGBColor = tuple[int, int, int]
 
 def parse_rgb_color(color: str, bg: RGBColor) -> RGBColor:
@@ -112,6 +53,71 @@ def parse_rgb_color(color: str, bg: RGBColor) -> RGBColor:
         (alpha * result[1] + (255 - alpha) * bg[1]) // 255,
         (alpha * result[2] + (255 - alpha) * bg[2]) // 255,
     )
+
+def argparse_color(color: str) -> RGBColor:
+    return parse_rgb_color(color, (0,0,0))
+
+parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
+                                 description='''Contrast checker for themes and colors
+
+Allows you to view all the colors and backgrounds applied to a theme and rate the contrast based on the APCA (Accessible Perceptual Contrast Algorithm) used in WCAG 3. A very low score is a sign of poor contrast, and can make reading difficult or impossible.
+
+However, color perception depends on the individual, hardware or software configurations (night/blue light filter), lighting or simply surrounding colors. For example, low contrast may remain legible in the editor when not surrounded by bright color.
+
+There are 3 options for modifying the contract result:
+
+  -a / --add-luminance and -p / --add-percent-luminance to directly modify the output value. For example, -p -14 -a 15 increases the constrast a little when it's low and very little when it's high.
+
+  -C / --color-space Okl selects a color space with different properties, mainly on the color red.
+''')
+
+parser.add_argument('-f', '--bg', metavar='BACKGROUND', action='append',
+                    help='show only the specified background color styles')
+parser.add_argument('-B', '--bg-color', metavar='COLOR', type=str,
+                    help='force a background color and --bg BackgroundColor')
+parser.add_argument('-l', '--language', metavar='LANGUAGE', action='append',
+                    help='show only the specified language')
+
+parser.add_argument('-c', '--no-custom-styles', action='store_true',
+                    help='do not display custom languages')
+parser.add_argument('-s', '--no-standard-styles', action='store_true',
+                    help='do not display standard colors')
+parser.add_argument('-b', '--no-borders', action='store_true',
+                    help='do not display border colors')
+parser.add_argument('-H', '--no-legend', action='store_true',
+                    help='do not display legend')
+
+parser.add_argument('-M', '--min-luminance', metavar='LUMINANCE', type=float, default=0,
+                    help='only displays colors with a higher luminance')
+parser.add_argument('-L', '--max-luminance', metavar='LUMINANCE', type=float, default=110.0,
+                    help='only displays colors with a lower luminance')
+parser.add_argument('-n', '--neighbor-color', metavar='COLOR', type=argparse_color,
+                    help='show only that colors are close to the specified one')
+parser.add_argument('-N', '--neighbor-distance', metavar='LUMINANCE', type=float, default=12.0,
+                    help='maximum distance between two colors that are considered neighbor (-n / --neighbor)')
+
+parser.add_argument('-a', '--add-luminance', metavar='LUMINANCE', type=float, default=0,
+                    help='add fixed value for luminance')
+parser.add_argument('-p', '--add-percent-luminance', metavar='LUMINANCE', type=float, default=0,
+                    help='add percent luminance. Apply before --add-luminance')
+parser.add_argument('-S', '--scores', metavar='SCORES', type=parse_scores,
+                    help='modify ratings values. Expects a comma-separated list of numbers. The order of the list is the same as in the legend.')
+
+# sRGB is W3 in APCA
+parser.add_argument('-C', '--color-space', default='sRGB',
+                    choices=['sRGB', 'DisplayP3', 'AdobeRGB', 'Rec2020', 'Okl'],
+                    help='select a color space ; Okl is a color space that increases the contrast of red with black or blue background and decreases it with white or green background')
+
+parser.add_argument('-d', '--compute-diff', action='store_true',
+                    help='compute luminance between 2 colors or more ; the first color represents the background, the others the foreground')
+
+parser.add_argument('-F', '--output-format', default='ansi', choices=['ansi', 'html'])
+parser.add_argument('-T', '--html-title', help='title of html page when --output-format=html')
+
+parser.add_argument('themes_or_colors', metavar='THEME_OR_COLOR', nargs='+',
+                    help='a .theme file or a color (#rgb, #rrggbb, #argb, #aarrggbb) when -d / --compute-diff is used')
+
+args = parser.parse_intermixed_args()
 
 
 # based on https://drafts.csswg.org/css-color/#color-conversion-code (CSS 4)
@@ -475,7 +481,9 @@ def run(d: dict[str, str | dict[str, bool | str | dict[str, bool | str]]],
         show_custom_styles: bool,
         show_standard_styles: bool,
         accepted_backgrounds: set[str] | None,
-        accepted_languages: set[str] | None
+        accepted_languages: set[str] | None,
+        neighbor_color: RGBColor | None,
+        neighbor_distance: float,
         ) -> None:
     editor_colors = d['editor-colors']
 
@@ -487,6 +495,17 @@ def run(d: dict[str, str | dict[str, bool | str | dict[str, bool | str]]],
         run_borders(min_luminance, max_luminance,
                     add_luminance, add_percent_luminance,
                     editor_colors, bg_editor)
+
+    if neighbor_color and neighbor_distance:
+        neighbor_Y = rgb_to_Y(neighbor_color)
+        def accept_luminance(lum: float, fg_Y: float) -> bool:
+            return (
+                min_luminance <= abs(lum) <= max_luminance
+                and abs(APCA_contrast(neighbor_Y, fg_Y)) <= neighbor_distance
+            )
+    else:
+        def accept_luminance(lum: float, _fg_Y: float) -> bool:
+            return min_luminance <= abs(lum) <= max_luminance
 
     #
     # Editor
@@ -532,7 +551,7 @@ def run(d: dict[str, str | dict[str, bool | str | dict[str, bool | str]]],
                     custom_col1 = col1
                 fg = ColorInfo(fg_color, custom_bg.color)
                 lum = APCA_contrast(fg.Y, custom_bg.Y)
-                if min_luminance <= abs(lum) <= max_luminance:
+                if accept_luminance(lum, fg.Y):
                     result = flum(lum, add_luminance, add_percent_luminance,
                                   custom_bg, fg, *make_style_text(styles))
                     lines.append(f' {custom_col1} | {fcol2(style_name, fg.text)} | {result}')
@@ -550,7 +569,7 @@ def run(d: dict[str, str | dict[str, bool | str | dict[str, bool | str]]],
             name = 'SpellChecking'
             fg = ColorInfo(editor_colors[name], bg_editor.color)
             lum = APCA_contrast(fg.Y, bg.Y)
-            if min_luminance <= abs(lum) <= max_luminance:
+            if accept_luminance(lum, fg.Y):
                 result = flum(lum, add_luminance, add_percent_luminance,
                               bg, fg, *SPELL_TEXT)
                 spell_line = f' {col1} | {fcol2(name, fg.text)} | {result}'
@@ -656,6 +675,8 @@ else:
             not args.no_standard_styles,
             args.bg and set(args.bg),
             args.language and set(args.language),
+            args.neighbor_color,
+            args.neighbor_distance,
         )
 
 is_html = args.output_format == 'html' and not args.compute_diff

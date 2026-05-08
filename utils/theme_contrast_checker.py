@@ -26,6 +26,8 @@ There are 3 options for modifying the contract result:
 
 parser.add_argument('-f', '--bg', metavar='BACKGROUND', action='append',
                     help='show only the specified background color styles')
+parser.add_argument('-B', '--bg-color', metavar='COLOR', type=str,
+                    help='force a background color and --bg BackgroundColor')
 parser.add_argument('-l', '--language', metavar='LANGUAGE', action='append',
                     help='show only the specified language')
 
@@ -636,6 +638,13 @@ else:
         except OSError as e:
             print(f'\x1b[31m{e}\x1b[m', file=sys.stderr)
             continue
+
+        # set the new background color
+        if args.bg_color:
+            bg = parse_rgb_color(data['editor-colors']['BackgroundColor'], (0,0,0))
+            bg = parse_rgb_color(args.bg_color, bg)
+            data['editor-colors']['BackgroundColor'] = f'#{bg[0]:02x}{bg[1]:02x}{bg[2]:02x}'
+            args.bg = ('BackgroundColor',)
 
         run(data,
             args.min_luminance,

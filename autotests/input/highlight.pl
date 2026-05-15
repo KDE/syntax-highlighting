@@ -2,6 +2,15 @@
 # This is a pseudo Perl file to test Kate's Perl syntax highlighting.
 # TODO: this is incomplete, add more syntax examples!
 
+use v5f;
+use v5.36;
+use Module ();
+use Module 12.34;
+use constant;
+use sigtrap qw(SEGV BUS);
+use feature 'say';
+no feature 'say';
+
 sub prg($)
 {
 	my $var = shift;

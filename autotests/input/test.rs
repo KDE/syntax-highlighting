@@ -11,6 +11,9 @@ pub use self::PathParameters::*;
 pub use symbol::{Ident, Symbol as Name};
 use serialize::{self, Encoder, Decoder};
 use std::u32;
+use std::str::{Bytes, CharIndices};
+use std::str::Lines;
+use std::str;
 
 #[derive(Clone, PartialEq, Eq, Hash, Copy)]
 
@@ -54,6 +57,12 @@ trait T {
 extern crate foo;
 fn main() {
     foo::r#try();
+}
+
+// str
+fn str_user() {
+	let the_line: &str = "this is &str";
+	let char_iter = str::chars(&the_line);
 }
 
 #[valid types]

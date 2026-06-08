@@ -9,7 +9,7 @@ another key: O"Brien
 boolean: true
 null_value: null
 single quotes: 'have ''one'' escape pattern'
-double quotes: "have many: \", \0, \t, \u263A, \x0d\x0a == \r\n, and more."
+double quotes: "have many: \", \0, \t, \u263A, \x0d\x0a == \r\n, and more. \x"
 
 decimal: +12345
 negative: -1_4
@@ -27,8 +27,8 @@ not a number: !!float .NaN
 datetime: 2001-12-15T02:59:43.1Z
 date: 2002-12-14
 
-json_map: {"key": "value"}
-json_seq: [3, 2, -.inf, "value"]
+json_map: {"key": "value", "key":value, key: value, nokey:value}
+json_seq: [3, 2, -.inf, "value", "key": value, "key":value, key: value, nokey:value]
 another key: [O'Brien, O"Brien,true,false , null]
 another key: {key: [+0x12a, , !!hello: bye, 1, off, {a: [{b: ''}]}]}
 
@@ -108,7 +108,7 @@ key1:
     literal: "text"
    no-literal: "text"
 - item1
-    - item2
+    - item2:
         - - - key: >-
                "literal text" # [ ]
 
@@ -119,9 +119,33 @@ key1:
              literal: [ ]
             no-literal: [ ]
 
+ - # bla bla
+   a: # comment
+    !str
+    - value # new value
+   a: # ds
+    !str text
+    - text # - is a text
+   a: # ds
+    !str text
+    - text
+   - value # new value (desindented)
+
+# This implementation only supports 4 dashes at most.
+- - - - abc
+        - cde # = "abc - cde"
+- - - - - abc
+          - cde # mistakenly detected as new indent
+
+[key]: text: text
+
 # Capture the indentation of the literal/folded operator:
 |-
  literal: "text"
+
+| # comment
+  # no comment
+ # comment
 
 !!binary |
  R0lGODlhDAAMAIQAAP//9/X
@@ -149,7 +173,7 @@ key1:
       no-literal: "text" 
 
 # This implementation of literal blocks has a limitation:
-# it only supports 6 dashes at most.
+# it only supports 4 dashes at most for indent detection.
 - - - - - - - key: |
                literal? "dfsf"
 

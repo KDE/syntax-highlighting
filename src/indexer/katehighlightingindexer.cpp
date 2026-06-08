@@ -1581,9 +1581,15 @@ private:
                 const int maxCapture = std::max(maxCaptureUsed, maxBackReference);
 
                 if (maxCapture && regexp.captureCount() > maxCapture) {
-                    qWarning() << rule.filename << "line" << rule.line << "RegExpr with" << regexp.captureCount() << "captures but only" << maxCapture
-                               << "are used. Please, replace '(...)' with '(?:...)':" << rule.string;
-                    return false;
+                    // An optional lookahead capture requires a final capture without lookahead to be captured (as in YAML).
+                    // "a(?=(.)?)" with "a" has no capture
+                    // "a(?=(.)?)()" with "a" has 2 captures ("" and "")
+                    if (regexp.captureCount() > 10 || regexp.captureCount() != maxCapture + 1 || !rule.string.endsWith(u"()"_sv)
+                        || rule.string.endsWith(u"\\()"_sv)) {
+                        qWarning() << rule.filename << "line" << rule.line << "RegExpr with" << regexp.captureCount() << "captures but only" << maxCapture
+                                   << "are used. Please, replace '(...)' with '(?:...)':" << rule.string;
+                        return false;
+                    }
                 }
 
                 useCapture = maxCapture;

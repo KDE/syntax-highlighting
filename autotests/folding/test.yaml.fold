@@ -9,7 +9,7 @@ another key: O"Brien
 boolean: true
 null_value: null
 single quotes: <beginfold id='1'>'</beginfold id='1'>have ''one'' escape pattern<endfold id='1'>'</endfold id='1'>
-double quotes: <beginfold id='1'>"</beginfold id='1'>have many: \", \0, \t, \u263A, \x0d\x0a == \r\n, and more.<endfold id='1'>"</endfold id='1'>
+double quotes: <beginfold id='1'>"</beginfold id='1'>have many: \", \0, \t, \u263A, \x0d\x0a == \r\n, and more. \x<endfold id='1'>"</endfold id='1'>
 
 decimal: +12345
 negative: -1_4
@@ -27,8 +27,8 @@ not a number: !!float .NaN
 datetime: 2001-12-15T02:59:43.1Z
 date: 2002-12-14
 
-json_map: <beginfold id='3'>{</beginfold id='3'>"key": <beginfold id='1'>"</beginfold id='1'>value<endfold id='1'>"</endfold id='1'><endfold id='3'>}</endfold id='3'>
-json_seq: <beginfold id='2'>[</beginfold id='2'>3, 2, -.inf, <beginfold id='1'>"</beginfold id='1'>value<endfold id='1'>"</endfold id='1'><endfold id='2'>]</endfold id='2'>
+json_map: <beginfold id='3'>{</beginfold id='3'>"key": <beginfold id='1'>"</beginfold id='1'>value<endfold id='1'>"</endfold id='1'>, "key":value, key: value, nokey:value<endfold id='3'>}</endfold id='3'>
+json_seq: <beginfold id='2'>[</beginfold id='2'>3, 2, -.inf, <beginfold id='1'>"</beginfold id='1'>value<endfold id='1'>"</endfold id='1'>, "key": value, "key":value, key: value, nokey:value<endfold id='2'>]</endfold id='2'>
 another key: <beginfold id='2'>[</beginfold id='2'>O'Brien, O"Brien,true,false , null<endfold id='2'>]</endfold id='2'>
 another key: <beginfold id='3'>{</beginfold id='3'>key: <beginfold id='2'>[</beginfold id='2'>+0x12a, , !!hello: bye, 1, off, <beginfold id='3'>{</beginfold id='3'>a: <beginfold id='2'>[</beginfold id='2'><beginfold id='3'>{</beginfold id='3'>b: <beginfold id='1'>'</beginfold id='1'><endfold id='1'>'</endfold id='1'><endfold id='3'>}</endfold id='3'><endfold id='2'>]</endfold id='2'><endfold id='3'>}</endfold id='3'><endfold id='2'>]</endfold id='2'><endfold id='3'>}</endfold id='3'>
 
@@ -49,8 +49,8 @@ foo: &foo
     ? &B1 !!str <beginfold id='1'>"</beginfold id='1'>foo<endfold id='1'>"</endfold id='1'>
     : !!str <beginfold id='1'>"</beginfold id='1'>bar<endfold id='1'>"</endfold id='1'>,
     ? !!str <beginfold id='1'>"</beginfold id='1'>baz<endfold id='1'>"</endfold id='1'>
-<indentfold>    : *B1,
-</indentfold>  <endfold id='3'>}</endfold id='3'>,
+    : *B1,
+  <endfold id='3'>}</endfold id='3'>,
   !!map <beginfold id='3'>{</beginfold id='3'>
      !!str "sun" : !!str <beginfold id='1'>"</beginfold id='1'>yellow<endfold id='1'>"</endfold id='1'>,
   <endfold id='3'>}</endfold id='3'>,
@@ -99,17 +99,17 @@ key1:
     literal: " text" # [ ]
 
     # literal { }
-<endfold id='4'></endfold id='4'>   key3: <beginfold id='4'>|+</beginfold id='4'>
+<endfold id='4'></endfold id='4'>   key3: <beginfold id='4'>|</beginfold id='4'>+
     literal: 'text'
 <indentfold><endfold id='4'></endfold id='4'>   no-literal: <beginfold id='1'>"</beginfold id='1'> text<endfold id='1'>"</endfold id='1'>
     #comment
 
-</indentfold>?  key: <beginfold id='4'>|-</beginfold id='4'>
+</indentfold>?  key: <beginfold id='4'>|</beginfold id='4'>-
     literal: "text"
 <indentfold><endfold id='4'></endfold id='4'>   no-literal: <beginfold id='1'>"</beginfold id='1'>text<endfold id='1'>"</endfold id='1'>
 - item1
-    - item2
-</indentfold>        - - - key: <beginfold id='4'>>-</beginfold id='4'>
+    - item2:
+</indentfold>        - - - key: <beginfold id='4'>></beginfold id='4'>-
                "literal text" # [ ]
 
                'literal block'
@@ -119,11 +119,35 @@ key1:
              literal: [ ]
 <indentfold><endfold id='4'></endfold id='4'>            no-literal: <beginfold id='2'>[</beginfold id='2'> <endfold id='2'>]</endfold id='2'>
 
+ - # bla bla
+   a: # comment
+    !str
+    - value # new value
+   a: # ds
+    !str text
+    - text # - is a text
+   a: # ds
+    !str text
+    - text
+   - value # new value (desindented)
+
+# This implementation only supports 4 dashes at most.
+- - - - abc
+        - cde # = "abc - cde"
+- - - - - abc
+          - cde # mistakenly detected as new indent
+
+<beginfold id='2'>[</beginfold id='2'>key<endfold id='2'>]</endfold id='2'>: text: text
+
 # Capture the indentation of the literal/folded operator:
-</indentfold><beginfold id='4'>|-</beginfold id='4'>
+</indentfold><beginfold id='4'>|</beginfold id='4'>-
  literal: "text"
 
-<endfold id='4'></endfold id='4'>!!binary <beginfold id='4'>|</beginfold id='4'>
+<endfold id='4'></endfold id='4'><beginfold id='4'>|</beginfold id='4'> # comment
+  # no comment
+<indentfold><endfold id='4'></endfold id='4'> # comment
+
+</indentfold>!!binary <beginfold id='4'>|</beginfold id='4'>
  R0lGODlhDAAMAIQAAP//9/X
  17unp5WZmZgAAAOfn515eXv
  Pz7Y6OjuDg4J+fn5OTk6enp
@@ -131,7 +155,7 @@ key1:
 
 <indentfold><endfold id='4'></endfold id='4'>key1:
   key2:
-</indentfold><beginfold id='4'>   |</beginfold id='4'>
+</indentfold>   <beginfold id='4'>|</beginfold id='4'>
    literal: "text"
 <indentfold><endfold id='4'></endfold id='4'>  key3:
 </indentfold>   !!str <beginfold id='4'>|</beginfold id='4'>
@@ -139,21 +163,21 @@ key1:
    #literal
 
 <indentfold><endfold id='4'></endfold id='4'># Capture the indentation of the operators "-" or "?":
-</indentfold>? - - - !!hello <beginfold id='4'>|+</beginfold id='4'>
+</indentfold>? - - - !!hello <beginfold id='4'>|</beginfold id='4'>+
        literal: "sdfsd" # [ ]
 <indentfold><endfold id='4'></endfold id='4'>      no-literal: <beginfold id='1'>"</beginfold id='1'>sdfsd<endfold id='1'>"</endfold id='1'> # [ ]
 
-</indentfold>- - - - <beginfold id='4'>>-</beginfold id='4'>
+</indentfold>- - - - <beginfold id='4'>></beginfold id='4'>-
        literal: "text"
        #literal
 <indentfold><endfold id='4'></endfold id='4'>      no-literal: <beginfold id='1'>"</beginfold id='1'>text<endfold id='1'>"</endfold id='1'> 
 
 # This implementation of literal blocks has a limitation:
-# it only supports 6 dashes at most.
-- - - - - - - key: |
+# it only supports 4 dashes at most for indent detection.
+</indentfold>- - - - - - - key: <beginfold id='4'>|</beginfold id='4'>
                literal? "dfsf"
 
-# Only comments after spaces & strings in multiline attributes (bug #407060)
+<indentfold><endfold id='4'></endfold id='4'># Only comments after spaces & strings in multiline attributes (bug #407060)
 reg_list:
 - reg: ?#XPath //div[@class="product_item cf"][@id] ))(?sx)
     id="product(?P<code>[^"]+)"

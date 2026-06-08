@@ -27,6 +27,7 @@ target_sources(KF6SyntaxHighlighting PRIVATE
     theme.cpp
     wildcardmatcher.cpp
     themedata.cpp
+    themepreviewicon.cpp
     worddelimiters.cpp
     ${syntax_highlighting_QM_LOADER}
     $<TARGET_OBJECTS:SyntaxHighlightingData>

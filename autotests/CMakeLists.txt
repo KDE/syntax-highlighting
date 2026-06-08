@@ -27,6 +27,11 @@ ecm_mark_nongui_executable(theme_test)
 add_test(NAME theme_test COMMAND theme_test)
 target_link_libraries(theme_test KF6SyntaxHighlighting Qt6::Test)
 
+add_executable(themepreviewicon_test themepreviewicon_test.cpp)
+ecm_mark_nongui_executable(themepreviewicon_test)
+add_test(NAME themepreviewicon_test COMMAND themepreviewicon_test)
+target_link_libraries(themepreviewicon_test KF6SyntaxHighlighting Qt6::Test)
+
 add_executable(testhighlighter_test testhighlighter.cpp)
 ecm_mark_nongui_executable(testhighlighter_test)
 add_test(NAME testhighlighter_test COMMAND testhighlighter_test)

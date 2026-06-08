@@ -7,6 +7,7 @@
 
 #include "theme.h"
 #include "themedata_p.h"
+#include "themepreviewicon_p.h"
 
 #include <QCoreApplication>
 
@@ -102,6 +103,15 @@ bool Theme::isStrikeThrough(TextStyle style) const
 QRgb Theme::editorColor(EditorColorRole role) const
 {
     return m_data->editorColor(role);
+}
+
+QIcon Theme::previewIcon() const
+{
+    if (isValid()) {
+        return QIcon(new ThemePreviewIconEngine(*this));
+    } else {
+        return QIcon();
+    }
 }
 
 #include "moc_theme.cpp"

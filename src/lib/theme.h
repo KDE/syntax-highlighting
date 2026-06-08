@@ -11,6 +11,7 @@
 
 #include <QColor>
 #include <QExplicitlySharedDataPointer>
+#include <QIcon>
 #include <QTypeInfo>
 #include <qobjectdefs.h>
 
@@ -396,6 +397,16 @@ public:
      * Returns whether the given style should be shown struck through.
      */
     bool isStrikeThrough(TextStyle style) const;
+
+    /*!
+     * Returns a preview icon for the theme.
+     *
+     * This can be used in a theme selection list to give the user
+     * an impression of the general look and feel for the theme.
+     *
+     * \since 6.28
+     */
+    QIcon previewIcon() const;
 
 public:
     /*!

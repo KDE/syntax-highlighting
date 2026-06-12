@@ -58,7 +58,7 @@
   <!ENTITY is_end_of_simple_cmd "(?=[&white;|;&lt;&gt;)}]|&amp;&amp_sep;|$)">
 ]>
 
-<language name="Fish" version="11" kateversion="6.22" section="Scripts" extensions="*.fish;fishd.*" mimetype="application/x-fish" casesensitive="1" author="Arnd Diestelhorst (adiestelhorst@m-xchg.de)" license="LGPL">
+<language name="Fish" version="12" kateversion="6.22" section="Scripts" extensions="*.fish;fishd.*" mimetype="application/x-fish" casesensitive="1" author="Arnd Diestelhorst (adiestelhorst@m-xchg.de)" license="LGPL">
 
   <!-- Based on Fish 4.6
   https://fishshell.com/docs/current/relnotes.html
@@ -439,13 +439,28 @@
       </context>
 
       <context name="func_Option" attribute="Normal Text">
-        <RegExpr attribute="Option" String="(?:-d[&white;]*|--description=)(?=[&quot;'])" context="funcdesc" beginRegion="doc"/>
+        <RegExpr attribute="Option" String="-d[&white;]*(?=[&quot;']|\\$)|--description(?=[=&white;])" context="funcdesc" beginRegion="doc"/>
         <DetectChar char="-" attribute="Option" context="#pop!Option"/>
       </context>
-      <!-- -d "..." / - -description="..." -->
+      <!-- -d "..." / - -description="..." / - -description "..." -->
       <context name="funcdesc" attribute="Function Doc">
         <DetectChar context="DocstringSQ" char="'"/>
         <DetectChar context="DocstringDQ" char="&quot;"/>
+        <DetectChar attribute="Option" context="funcdescLong" char="="/>
+        <AnyChar context="funcdescSpacing" String="&white;"/>
+        <LineContinue attribute="Escape" context="funcdescSpacing"/>
+      </context>
+      <context name="funcdescLong" attribute="Function Doc" fallthroughContext="#pop#pop#pop!ArgMaybePath">
+        <DetectChar context="#pop!DocstringSQ" char="'"/>
+        <DetectChar context="#pop!DocstringDQ" char="&quot;"/>
+      </context>
+      <context name="funcdescSpacing" attribute="Function Doc" fallthroughContext="funcdescClose" lineEndContext="funcdescClose">
+        <IncludeRules context="funcdescLong"/>
+        <DetectSpaces/>
+        <LineContinue attribute="Escape"/>
+      </context>
+      <context name="funcdescClose" attribute="Function Doc" fallthroughContext="#pop#pop#pop#pop">
+        <RegExpr String="." lookAhead="1" context="#pop#pop#pop#pop" endRegion="doc"/>
       </context>
       <context name="DocstringSQ" attribute="Function Doc">
         <DetectChar attribute="Function Doc" context="#pop#pop#pop" char="'" endRegion="doc"/>

@@ -409,6 +409,13 @@ function ll \
     ls -l $argv
 end
 
+function ll --description "description"
+end
+
+function ll -d\
+  # <- close description
+end
+
 function ls --description="Description" -a a b c # comment
     command ls --color=auto $argv
     if test -f foo.txt

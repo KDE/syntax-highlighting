@@ -151,11 +151,10 @@ def infuse_header(grammar, jinja_tag, xtra_ext):
     lang_tag = grammar.getroot()
     lang_tag.set('name', jinja_tag.get('name') + '/' + lang_tag.get('name'))
     lang_tag.set('section', jinja_tag.get('section'))
-    lang_tag.set('version', str(round(time.time())))
+    lang_tag.set('version', max(lang_tag.get('version'), jinja_tag.get('version')))
     lang_tag.set('license', jinja_tag.get('license'))
     lang_tag.set('priority', lang_tag.get('priority', '0'))
-    lang_tag.set('kateversion', max(lang_tag.get('kateversion'),
-                                    jinja_tag.get('kateversion')))
+    lang_tag.set('kateversion', max(lang_tag.get('kateversion'), jinja_tag.get('kateversion')))
 
     if lang_tag.get('extensions'):
         exts = ''

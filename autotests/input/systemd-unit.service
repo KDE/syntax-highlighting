@@ -307,7 +307,11 @@ FinalKillSignal = SIGABRT
 WatchdogSignal = SIGQUIT
 
 ## from systemd.resource-control
+CPUPressureThresholdSec = 250ms
+CPUPressureWatch = skip
 CPUWeight = 1234
+IOPressureWatch = auto
+IOPressureThresholdSec = 123 ms
 StartupCPUWeight = 321
 CPUQuota = 123.4%
 CPUQuotaPeriodSec = 1s 23ms 45us
@@ -315,6 +319,7 @@ AllowedCPUs = 0-8, 12
 StartupAllowedCPUs = 0-24
 AllowedMemoryNodes = 5-8, 12
 StartupAllowedMemoryNodes = 5-10, 12
+CPUSetPartition = root
 MemoryAccounting = yes
 MemoryMin = 10G
 MemoryLow = 20%
@@ -539,9 +544,11 @@ ConditionPathIsSocket = !/some/path
 ConditionDirectoryNotEmpty = !/some/path
 ConditionFileNotEmpty = !/some/path
 ConditionFileIsExecutable = !/some/path
+ConditionFraction = !some!tag 75.5%
 ConditionUser = |@system
 ConditionGroup = |groupname
 ConditionControlGroupController = memory
+ConditionMachineTag = so?e*tag
 ConditionMemory = | >= 1G
 ConditionCPUs = | < 8
 ConditionCPUFeature = | sse2
@@ -562,6 +569,8 @@ AssertCapability = !CAP_NET_ADMIN
 AssertACPower = true
 AssertNeedsUpdate = !/var
 AssertFirstBoot = |false
+AssertFraction = some-tag 100%
+AssertMachineTag = so?e*tag
 AssertPathExists = !/some/absolute/path
 AssertPathExistsGlob = |!/mnt/*
 AssertPathIsDirectory = !/some/path
@@ -1681,6 +1690,17 @@ CPUWeight = invalid
 CPUWeight = 1 10000
 
 
+###### cpuset partition type
+[Service]
+CPUSetPartition = isolated
+CPUSetPartition = member
+CPUSetPartition = root
+## invalid values
+CPUSetPartition = invalid
+# multiple values
+CPUSetPartition = isolated root
+
+
 ###### defer trigger
 [Socket]
 DeferTrigger = patient
@@ -1691,7 +1711,6 @@ DeferTrigger = true
 DeferTrigger = invalid
 # multiple values
 DeferTrigger = patient true
-
 
 
 ###### delegate
@@ -1816,6 +1835,7 @@ SuccessExitStatus = KEYRING
 SuccessExitStatus = LIMITS
 SuccessExitStatus = LOGS_DIRECTORY
 SuccessExitStatus = MEMORY
+SuccessExitStatus = MEMORY_THP
 SuccessExitStatus = NAMESPACE
 SuccessExitStatus = NETWORK
 SuccessExitStatus = NICE
@@ -1885,6 +1905,18 @@ TimeoutStartFailureMode = invalid
 TimeoutStartFailureMode = abort kill
 
 
+###### fd store preserve
+[Service]
+FileDescriptorStorePreserve = on-success
+FileDescriptorStorePreserve = restart
+FileDescriptorStorePreserve = yes
+FileDescriptorStorePreserve = no
+## invalid values
+FileDescriptorStorePreserve = invalid
+# multiple values
+FileDescriptorStorePreserve = on-success restart
+
+
 ###### file mode
 [Automount]
 DirectoryMode = 755
@@ -1916,6 +1948,28 @@ ConditionFirmware = smbios-field
 ConditionFirmware = smbios-field()
 # multiple values
 ConditionFirmware = uefi device-tree
+
+
+###### fraction
+[Unit]
+ConditionFraction = 100%
+ConditionFraction = 12.34 %
+ConditionFraction = 0.5%
+ConditionFraction = 0.%
+ConditionFraction = some!tag 12.34%
+ConditionFraction = !some!tag 12.34%
+ConditionFraction = ! 12.34%
+# The tag is an arbitrary string without spaces, so this is ok too.
+ConditionFraction = 12.34% 12.34%
+## invalid values
+# More than 100%.
+ConditionFraction = 123 %
+# More than 2 decimal places.
+ConditionFraction = 50.123 %
+# Misplaced `!`.
+ConditionFraction = some!tag ! 12.34%
+# Tag after percent value.
+ConditionFraction = 12.34% some!tag
 
 
 ###### fs set
@@ -2489,6 +2543,21 @@ Personality = m68k
 Personality = x86-64 s390x
 
 
+###### pressure watch
+[Service]
+CPUPressureWatch = auto
+CPUPressureWatch = skip
+# boolean (see boolean above for all supported values)
+CPUPressureWatch = yes
+CPUPressureWatch = no
+CPUPressureWatch = 0
+CPUPressureWatch = 1
+## invalid values
+CPUPressureWatch = invalid
+# multiple values
+CPUPressureWatch = auto skip
+
+
 ###### private tmp
 [Service]
 PrivateTmp = disconnected
@@ -2668,6 +2737,7 @@ SecureBits = invalid
 ConditionSecurity = apparmor
 ConditionSecurity = audit
 ConditionSecurity = ima
+ConditionSecurity = measured-os
 ConditionSecurity = measured-uki
 ConditionSecurity = selinux
 ConditionSecurity = smack

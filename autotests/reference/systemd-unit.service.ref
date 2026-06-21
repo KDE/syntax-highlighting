@@ -307,7 +307,11 @@
 <Option Name>WatchdogSignal</Option Name><Normal> = </Normal><Constant>SIGQUIT</Constant><br/>
 <Normal></Normal><br/>
 <Comment>## from systemd.resource-control</Comment><br/>
+<Option Name>CPUPressureThresholdSec</Option Name><Normal> = </Normal><Number>250</Number><Measurement Unit>ms</Measurement Unit><br/>
+<Option Name>CPUPressureWatch</Option Name><Normal> = </Normal><Constant>skip</Constant><br/>
 <Option Name>CPUWeight</Option Name><Normal> = </Normal><Number>1234</Number><br/>
+<Option Name>IOPressureWatch</Option Name><Normal> = </Normal><Constant>auto</Constant><br/>
+<Option Name>IOPressureThresholdSec</Option Name><Normal> = </Normal><Number>123 </Number><Measurement Unit>ms</Measurement Unit><br/>
 <Option Name>StartupCPUWeight</Option Name><Normal> = </Normal><Number>321</Number><br/>
 <Option Name>CPUQuota</Option Name><Normal> = </Normal><Number>123.4</Number><Measurement Unit>%</Measurement Unit><br/>
 <Option Name>CPUQuotaPeriodSec</Option Name><Normal> = </Normal><Number>1</Number><Measurement Unit>s</Measurement Unit><Normal> </Normal><Number>23</Number><Measurement Unit>ms</Measurement Unit><Normal> </Normal><Number>45</Number><Measurement Unit>us</Measurement Unit><br/>
@@ -315,6 +319,7 @@
 <Option Name>StartupAllowedCPUs</Option Name><Normal> = </Normal><Number>0-24</Number><br/>
 <Option Name>AllowedMemoryNodes</Option Name><Normal> = </Normal><Number>5-8</Number><Normal>, </Normal><Number>12</Number><br/>
 <Option Name>StartupAllowedMemoryNodes</Option Name><Normal> = </Normal><Number>5-10</Number><Normal>, </Normal><Number>12</Number><br/>
+<Option Name>CPUSetPartition</Option Name><Normal> = </Normal><Constant>root</Constant><br/>
 <Option Name>MemoryAccounting</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
 <Option Name>MemoryMin</Option Name><Normal> = </Normal><Number>10</Number><Measurement Unit>G</Measurement Unit><br/>
 <Option Name>MemoryLow</Option Name><Normal> = </Normal><Number>20</Number><Measurement Unit>%</Measurement Unit><br/>
@@ -539,9 +544,11 @@
 <Option Name>ConditionDirectoryNotEmpty</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>/some/path</Normal><br/>
 <Option Name>ConditionFileNotEmpty</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>/some/path</Normal><br/>
 <Option Name>ConditionFileIsExecutable</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>/some/path</Normal><br/>
+<Option Name>ConditionFraction</Option Name><Normal> = </Normal><Prefix>!</Prefix><Tag>some!tag </Tag><Number>75.5</Number><Measurement Unit>%</Measurement Unit><br/>
 <Option Name>ConditionUser</Option Name><Normal> = </Normal><Prefix>|</Prefix><Constant>@system</Constant><br/>
 <Option Name>ConditionGroup</Option Name><Normal> = </Normal><Prefix>|</Prefix><Normal>groupname</Normal><br/>
 <Option Name>ConditionControlGroupController</Option Name><Normal> = </Normal><Constant>memory</Constant><br/>
+<Option Name>ConditionMachineTag</Option Name><Normal> = so</Normal><Wildcard>?</Wildcard><Normal>e</Normal><Wildcard>*</Wildcard><Normal>tag</Normal><br/>
 <Option Name>ConditionMemory</Option Name><Normal> = </Normal><Prefix>| </Prefix><Normal>>= </Normal><Number>1</Number><Measurement Unit>G</Measurement Unit><br/>
 <Option Name>ConditionCPUs</Option Name><Normal> = </Normal><Prefix>| </Prefix><Normal>< </Normal><Number>8</Number><br/>
 <Option Name>ConditionCPUFeature</Option Name><Normal> = </Normal><Prefix>| </Prefix><Constant>sse2</Constant><br/>
@@ -562,6 +569,8 @@
 <Option Name>AssertACPower</Option Name><Normal> = </Normal><Constant>true</Constant><br/>
 <Option Name>AssertNeedsUpdate</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>/var</Normal><br/>
 <Option Name>AssertFirstBoot</Option Name><Normal> = </Normal><Prefix>|</Prefix><Constant>false</Constant><br/>
+<Option Name>AssertFraction</Option Name><Normal> = </Normal><Tag>some-tag </Tag><Number>100</Number><Measurement Unit>%</Measurement Unit><br/>
+<Option Name>AssertMachineTag</Option Name><Normal> = so</Normal><Wildcard>?</Wildcard><Normal>e</Normal><Wildcard>*</Wildcard><Normal>tag</Normal><br/>
 <Option Name>AssertPathExists</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>/some/absolute/path</Normal><br/>
 <Option Name>AssertPathExistsGlob</Option Name><Normal> = </Normal><Prefix>|!</Prefix><Normal>/mnt/</Normal><Wildcard>*</Wildcard><br/>
 <Option Name>AssertPathIsDirectory</Option Name><Normal> = </Normal><Prefix>!</Prefix><Normal>/some/path</Normal><br/>
@@ -1681,6 +1690,17 @@
 <Option Name>CPUWeight</Option Name><Normal> = 1 </Normal><Number>10000</Number><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
+<Comment>###### cpuset partition type</Comment><br/>
+<Section Header>[Service]</Section Header><br/>
+<Option Name>CPUSetPartition</Option Name><Normal> = </Normal><Constant>isolated</Constant><br/>
+<Option Name>CPUSetPartition</Option Name><Normal> = </Normal><Constant>member</Constant><br/>
+<Option Name>CPUSetPartition</Option Name><Normal> = </Normal><Constant>root</Constant><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>CPUSetPartition</Option Name><Normal> = invalid</Normal><br/>
+<Comment># multiple values</Comment><br/>
+<Option Name>CPUSetPartition</Option Name><Normal> = </Normal><Constant>isolated</Constant><Normal> root</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
 <Comment>###### defer trigger</Comment><br/>
 <Section Header>[Socket]</Section Header><br/>
 <Option Name>DeferTrigger</Option Name><Normal> = </Normal><Constant>patient</Constant><br/>
@@ -1691,7 +1711,6 @@
 <Option Name>DeferTrigger</Option Name><Normal> = invalid</Normal><br/>
 <Comment># multiple values</Comment><br/>
 <Option Name>DeferTrigger</Option Name><Normal> = </Normal><Constant>patient</Constant><Normal> true</Normal><br/>
-<Normal></Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### delegate</Comment><br/>
@@ -1816,6 +1835,7 @@
 <Option Name>SuccessExitStatus</Option Name><Normal> = </Normal><Constant>LIMITS</Constant><br/>
 <Option Name>SuccessExitStatus</Option Name><Normal> = </Normal><Constant>LOGS_DIRECTORY</Constant><br/>
 <Option Name>SuccessExitStatus</Option Name><Normal> = </Normal><Constant>MEMORY</Constant><br/>
+<Option Name>SuccessExitStatus</Option Name><Normal> = </Normal><Constant>MEMORY_THP</Constant><br/>
 <Option Name>SuccessExitStatus</Option Name><Normal> = </Normal><Constant>NAMESPACE</Constant><br/>
 <Option Name>SuccessExitStatus</Option Name><Normal> = </Normal><Constant>NETWORK</Constant><br/>
 <Option Name>SuccessExitStatus</Option Name><Normal> = </Normal><Constant>NICE</Constant><br/>
@@ -1885,6 +1905,18 @@
 <Option Name>TimeoutStartFailureMode</Option Name><Normal> = </Normal><Constant>abort</Constant><Normal> kill</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
+<Comment>###### fd store preserve</Comment><br/>
+<Section Header>[Service]</Section Header><br/>
+<Option Name>FileDescriptorStorePreserve</Option Name><Normal> = </Normal><Constant>on-success</Constant><br/>
+<Option Name>FileDescriptorStorePreserve</Option Name><Normal> = </Normal><Constant>restart</Constant><br/>
+<Option Name>FileDescriptorStorePreserve</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
+<Option Name>FileDescriptorStorePreserve</Option Name><Normal> = </Normal><Constant>no</Constant><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>FileDescriptorStorePreserve</Option Name><Normal> = invalid</Normal><br/>
+<Comment># multiple values</Comment><br/>
+<Option Name>FileDescriptorStorePreserve</Option Name><Normal> = </Normal><Constant>on-success</Constant><Normal> restart</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
 <Comment>###### file mode</Comment><br/>
 <Section Header>[Automount]</Section Header><br/>
 <Option Name>DirectoryMode</Option Name><Normal> = </Normal><File Mode>755</File Mode><br/>
@@ -1916,6 +1948,28 @@
 <Option Name>ConditionFirmware</Option Name><Normal> = smbios-field()</Normal><br/>
 <Comment># multiple values</Comment><br/>
 <Option Name>ConditionFirmware</Option Name><Normal> = </Normal><Constant>uefi</Constant><Normal> device-tree</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
+<Comment>###### fraction</Comment><br/>
+<Section Header>[Unit]</Section Header><br/>
+<Option Name>ConditionFraction</Option Name><Normal> = </Normal><Number>100</Number><Measurement Unit>%</Measurement Unit><br/>
+<Option Name>ConditionFraction</Option Name><Normal> = </Normal><Tag>12.34 </Tag><Normal>%</Normal><br/>
+<Option Name>ConditionFraction</Option Name><Normal> = </Normal><Number>0.5</Number><Measurement Unit>%</Measurement Unit><br/>
+<Option Name>ConditionFraction</Option Name><Normal> = </Normal><Number>0.</Number><Measurement Unit>%</Measurement Unit><br/>
+<Option Name>ConditionFraction</Option Name><Normal> = </Normal><Tag>some!tag </Tag><Number>12.34</Number><Measurement Unit>%</Measurement Unit><br/>
+<Option Name>ConditionFraction</Option Name><Normal> = </Normal><Prefix>!</Prefix><Tag>some!tag </Tag><Number>12.34</Number><Measurement Unit>%</Measurement Unit><br/>
+<Option Name>ConditionFraction</Option Name><Normal> = </Normal><Prefix>!</Prefix><Number> 12.34</Number><Measurement Unit>%</Measurement Unit><br/>
+<Comment># The tag is an arbitrary string without spaces, so this is ok too.</Comment><br/>
+<Option Name>ConditionFraction</Option Name><Normal> = </Normal><Tag>12.34% </Tag><Number>12.34</Number><Measurement Unit>%</Measurement Unit><br/>
+<Comment>## invalid values</Comment><br/>
+<Comment># More than 100%.</Comment><br/>
+<Option Name>ConditionFraction</Option Name><Normal> = </Normal><Tag>123 </Tag><Normal>%</Normal><br/>
+<Comment># More than 2 decimal places.</Comment><br/>
+<Option Name>ConditionFraction</Option Name><Normal> = </Normal><Tag>50.123 </Tag><Normal>%</Normal><br/>
+<Comment># Misplaced `!`.</Comment><br/>
+<Option Name>ConditionFraction</Option Name><Normal> = </Normal><Tag>some!tag </Tag><Normal>!</Normal><Number> 12.34</Number><Measurement Unit>%</Measurement Unit><br/>
+<Comment># Tag after percent value.</Comment><br/>
+<Option Name>ConditionFraction</Option Name><Normal> = </Normal><Tag>12.34% </Tag><Normal>some!tag</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
 <Comment>###### fs set</Comment><br/>
@@ -2489,6 +2543,21 @@
 <Option Name>Personality</Option Name><Normal> = </Normal><Constant>x86-64</Constant><Normal> s390x</Normal><br/>
 <Normal></Normal><br/>
 <Normal></Normal><br/>
+<Comment>###### pressure watch</Comment><br/>
+<Section Header>[Service]</Section Header><br/>
+<Option Name>CPUPressureWatch</Option Name><Normal> = </Normal><Constant>auto</Constant><br/>
+<Option Name>CPUPressureWatch</Option Name><Normal> = </Normal><Constant>skip</Constant><br/>
+<Comment># boolean (see boolean above for all supported values)</Comment><br/>
+<Option Name>CPUPressureWatch</Option Name><Normal> = </Normal><Constant>yes</Constant><br/>
+<Option Name>CPUPressureWatch</Option Name><Normal> = </Normal><Constant>no</Constant><br/>
+<Option Name>CPUPressureWatch</Option Name><Normal> = </Normal><Constant>0</Constant><br/>
+<Option Name>CPUPressureWatch</Option Name><Normal> = </Normal><Constant>1</Constant><br/>
+<Comment>## invalid values</Comment><br/>
+<Option Name>CPUPressureWatch</Option Name><Normal> = invalid</Normal><br/>
+<Comment># multiple values</Comment><br/>
+<Option Name>CPUPressureWatch</Option Name><Normal> = </Normal><Constant>auto</Constant><Normal> skip</Normal><br/>
+<Normal></Normal><br/>
+<Normal></Normal><br/>
 <Comment>###### private tmp</Comment><br/>
 <Section Header>[Service]</Section Header><br/>
 <Option Name>PrivateTmp</Option Name><Normal> = </Normal><Constant>disconnected</Constant><br/>
@@ -2668,6 +2737,7 @@
 <Option Name>ConditionSecurity</Option Name><Normal> = </Normal><Constant>apparmor</Constant><br/>
 <Option Name>ConditionSecurity</Option Name><Normal> = </Normal><Constant>audit</Constant><br/>
 <Option Name>ConditionSecurity</Option Name><Normal> = </Normal><Constant>ima</Constant><br/>
+<Option Name>ConditionSecurity</Option Name><Normal> = </Normal><Constant>measured-os</Constant><br/>
 <Option Name>ConditionSecurity</Option Name><Normal> = </Normal><Constant>measured-uki</Constant><br/>
 <Option Name>ConditionSecurity</Option Name><Normal> = </Normal><Constant>selinux</Constant><br/>
 <Option Name>ConditionSecurity</Option Name><Normal> = </Normal><Constant>smack</Constant><br/>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created for systemd version 260. -->
+<!-- Created for systemd version 261. -->
 <!DOCTYPE language [
 <!ENTITY alp "A-Za-z">
 <!ENTITY aln "&alp;0-9">
@@ -23,7 +23,7 @@
 <!ENTITY tsp_unit "&tsp_year;|&tsp_month;|&tsp_week;|&tsp_day;|&tsp_hour;|&tsp_sec;|&tsp_msec;|&tsp_usec;|&tsp_min;">
 <!ENTITY tsp "\d+(?:\.\d+)?\h*(?=(&tsp_unit;)?)">
 ]>
-<language version="20" author="Andreas Gratzer" extensions="*.automount;*.device;*.mount;*.path;*.service;*.slice;*.socket;*.swap;*.target;*.timer" kateversion="5.0" license="MIT" mimetype="text/x-systemd-unit" name="systemd unit" section="Configuration">
+<language version="21" author="Andreas Gratzer" extensions="*.automount;*.device;*.mount;*.path;*.service;*.slice;*.socket;*.swap;*.target;*.timer" kateversion="5.0" license="MIT" mimetype="text/x-systemd-unit" name="systemd unit" section="Configuration">
   <highlighting>
     <list name="boolean">
       <item>true</item>
@@ -474,6 +474,11 @@
       <item>ext</item>
       <item>batch</item>
     </list>
+    <list name="cpuset partition type">
+      <item>root</item>
+      <item>member</item>
+      <item>isolated</item>
+    </list>
     <list name="device policy">
       <item>strict</item>
       <item>closed</item>
@@ -649,6 +654,7 @@
       <item>NICE</item>
       <item>NETWORK</item>
       <item>NAMESPACE</item>
+      <item>MEMORY_THP</item>
       <item>MEMORY</item>
       <item>LOGS_DIRECTORY</item>
       <item>LIMITS</item>
@@ -687,6 +693,12 @@
       <item>terminate</item>
       <item>kill</item>
       <item>abort</item>
+    </list>
+    <list name="fd store preserve">
+      <item>yes</item>
+      <item>restart</item>
+      <item>on-success</item>
+      <item>no</item>
     </list>
     <list name="fs set">
       <item>@temporary</item>
@@ -906,6 +918,12 @@
       <item>arm-be</item>
       <item>arm</item>
     </list>
+    <list name="pressure watch">
+      <item>yes</item>
+      <item>skip</item>
+      <item>no</item>
+      <item>auto</item>
+    </list>
     <list name="private tmp">
       <item>disconnected</item>
     </list>
@@ -967,6 +985,7 @@
       <item>smack</item>
       <item>selinux</item>
       <item>measured-uki</item>
+      <item>measured-os</item>
       <item>ima</item>
       <item>cvm</item>
       <item>audit</item>
@@ -1209,6 +1228,7 @@
       <item>DeviceAllow</item>
       <item>IPEgressFilterPath</item>
       <item>IPIngressFilterPath</item>
+      <item>OOMRules</item>
     </list>
     <list name="options service">
       <!-- Only options of type "text". Others are handled separately. -->
@@ -1518,6 +1538,9 @@
         <WordDetect String="idle" attribute="Constant" context="#pop"/>
         <IncludeRules context="weight"/>
       </context>
+      <context name="cpuset partition type" attribute="Normal" lineEndContext="#pop">
+        <keyword String="cpuset partition type" attribute="Constant" context="#pop"/>
+      </context>
       <context name="defer trigger" attribute="Normal" lineEndContext="#pop">
         <WordDetect String="patient" attribute="Constant" context="#pop"/>
         <IncludeRules context="boolean"/>
@@ -1573,12 +1596,28 @@
       <context name="failure mode" attribute="Normal" lineEndContext="#pop">
         <keyword String="failure mode" attribute="Constant" context="#pop"/>
       </context>
+      <context name="fd store preserve" attribute="Normal" lineEndContext="#pop">
+        <keyword String="fd store preserve" attribute="Constant" context="#pop"/>
+      </context>
       <context name="file mode" attribute="Normal" lineEndContext="#pop">
         <RegExpr String="[0-7]{3,4}" attribute="File Mode" context="#pop"/>
       </context>
       <context name="firmware" attribute="Normal" lineEndContext="#pop">
         <WordDetect String="uefi" attribute="Constant" context="#pop"/>
         <RegExpr String="device-tree(?:-compatible(?=\(.+\)))?|smbios-field(?=\(.+\))" attribute="Constant" context="#pop"/>
+      </context>
+      <context name="fraction" attribute="Normal" fallthrough="true" fallthroughContext="fraction tag" lineEndContext="#pop">
+        <DetectSpaces/>
+        <DetectChar char="="/>
+        <DetectChar char="!" attribute="Prefix" context="#pop!fraction tag"/>
+      </context>
+      <context name="fraction tag" attribute="Normal" fallthrough="true" fallthroughContext="fraction percent" lineEndContext="#pop">
+        <!-- arbitrary string not containing whitespace -->
+        <RegExpr String="\h*[^\h]+\h+" attribute="Tag" context="#pop!fraction percent"/>
+      </context>
+      <context name="fraction percent" attribute="Normal" lineEndContext="#pop">
+        <!-- 0..100 percent with 0..2 decimal places -->
+        <RegExpr String="\h*(?:100|[1-9]?\d(?:\.(?:\d\d?)?)?)\h*(?=%)" attribute="Number" context="#pop!percent S"/>
       </context>
       <context name="fs type" attribute="Normal" lineEndContext="#pop">
         <keyword String="fs type" attribute="Constant" context="#pop"/>
@@ -1736,6 +1775,10 @@
       </context>
       <context name="personality" attribute="Normal" lineEndContext="#pop">
         <keyword String="personality" attribute="Constant" context="#pop"/>
+      </context>
+      <context name="pressure watch" attribute="Normal" lineEndContext="#pop">
+        <keyword String="pressure watch" attribute="Constant" context="#pop"/>
+        <IncludeRules context="boolean"/>
       </context>
       <context name="private tmp" attribute="Normal" lineEndContext="#pop">
         <keyword String="private tmp" attribute="Constant" context="#pop"/>
@@ -2119,8 +2162,11 @@
         <WordDetect String="AllowedCPUs" firstNonSpace="true" attribute="Option Name" context="cpu index list"/>
         <WordDetect String="AllowedMemoryNodes" firstNonSpace="true" attribute="Option Name" context="cpu index list"/>
         <WordDetect String="BPFProgram" firstNonSpace="true" attribute="Option Name" context="bpf program"/>
+        <WordDetect String="CPUPressureThresholdSec" firstNonSpace="true" attribute="Option Name" context="time span"/>
+        <WordDetect String="CPUPressureWatch" firstNonSpace="true" attribute="Option Name" context="pressure watch"/>
         <WordDetect String="CPUQuota" firstNonSpace="true" attribute="Option Name" context="percent"/>
         <WordDetect String="CPUQuotaPeriodSec" firstNonSpace="true" attribute="Option Name" context="time span"/>
+        <WordDetect String="CPUSetPartition" firstNonSpace="true" attribute="Option Name" context="cpuset partition type"/>
         <WordDetect String="CPUWeight" firstNonSpace="true" attribute="Option Name" context="cpu weight"/>
         <WordDetect String="CoredumpReceive" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="Delegate" firstNonSpace="true" attribute="Option Name" context="delegate"/>
@@ -2129,6 +2175,8 @@
         <WordDetect String="IOAccounting" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="IODeviceLatencyTargetSec" firstNonSpace="true" attribute="Option Name" context="device time span"/>
         <WordDetect String="IODeviceWeight" firstNonSpace="true" attribute="Option Name" context="weight"/>
+        <WordDetect String="IOPressureThresholdSec" firstNonSpace="true" attribute="Option Name" context="time span"/>
+        <WordDetect String="IOPressureWatch" firstNonSpace="true" attribute="Option Name" context="pressure watch"/>
         <WordDetect String="IOReadBandwidthMax" firstNonSpace="true" attribute="Option Name" context="device cardinal KMGT"/>
         <WordDetect String="IOReadIOPSMax" firstNonSpace="true" attribute="Option Name" context="device cardinal KMGT"/>
         <WordDetect String="IOWeight" firstNonSpace="true" attribute="Option Name" context="weight"/>
@@ -2185,7 +2233,7 @@
         <WordDetect String="ExecStopPost" firstNonSpace="true" attribute="Option Name" context="exec"/>
         <WordDetect String="ExitType" firstNonSpace="true" attribute="Option Name" context="exit type"/>
         <WordDetect String="FileDescriptorStoreMax" firstNonSpace="true" attribute="Option Name" context="cardinal"/>
-        <WordDetect String="FileDescriptorStorePreserve" firstNonSpace="true" attribute="Option Name" context="boolean"/>
+        <WordDetect String="FileDescriptorStorePreserve" firstNonSpace="true" attribute="Option Name" context="fd store preserve"/>
         <WordDetect String="GuessMainPID" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="NonBlocking" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="NotifyAccess" firstNonSpace="true" attribute="Option Name" context="notify access"/>
@@ -2310,11 +2358,13 @@
         <WordDetect String="AssertFileIsExecutable" firstNonSpace="true" attribute="Option Name" context="AC text"/>
         <WordDetect String="AssertFileNotEmpty" firstNonSpace="true" attribute="Option Name" context="AC text"/>
         <WordDetect String="AssertFirstBoot" firstNonSpace="true" attribute="Option Name" context="AC boolean"/>
+        <WordDetect String="AssertFraction" firstNonSpace="true" attribute="Option Name" context="fraction"/>
         <WordDetect String="AssertGroup" firstNonSpace="true" attribute="Option Name" context="AC group"/>
         <WordDetect String="AssertHost" firstNonSpace="true" attribute="Option Name" context="AC text *"/>
         <WordDetect String="AssertIOPressure" firstNonSpace="true" attribute="Option Name" context="AC threshold"/>
         <WordDetect String="AssertKernelCommandLine" firstNonSpace="true" attribute="Option Name" context="AC text"/>
         <WordDetect String="AssertKernelVersion" firstNonSpace="true" attribute="Option Name" context="AC text *"/>
+        <WordDetect String="AssertMachineTag" firstNonSpace="true" attribute="Option Name" context="text glob"/>
         <WordDetect String="AssertMemory" firstNonSpace="true" attribute="Option Name" context="AC cardinal"/>
         <WordDetect String="AssertMemoryPressure" firstNonSpace="true" attribute="Option Name" context="AC threshold"/>
         <WordDetect String="AssertNeedsUpdate" firstNonSpace="true" attribute="Option Name" context="AC text"/>
@@ -2346,11 +2396,13 @@
         <WordDetect String="ConditionFileNotEmpty" firstNonSpace="true" attribute="Option Name" context="AC text"/>
         <WordDetect String="ConditionFirmware" firstNonSpace="true" attribute="Option Name" context="AC firmware"/>
         <WordDetect String="ConditionFirstBoot" firstNonSpace="true" attribute="Option Name" context="AC boolean"/>
+        <WordDetect String="ConditionFraction" firstNonSpace="true" attribute="Option Name" context="fraction"/>
         <WordDetect String="ConditionGroup" firstNonSpace="true" attribute="Option Name" context="AC group"/>
         <WordDetect String="ConditionHost" firstNonSpace="true" attribute="Option Name" context="AC text *"/>
         <WordDetect String="ConditionIOPressure" firstNonSpace="true" attribute="Option Name" context="AC threshold"/>
         <WordDetect String="ConditionKernelCommandLine" firstNonSpace="true" attribute="Option Name" context="AC text"/>
         <WordDetect String="ConditionKernelVersion" firstNonSpace="true" attribute="Option Name" context="AC text *"/>
+        <WordDetect String="ConditionMachineTag" firstNonSpace="true" attribute="Option Name" context="text glob"/>
         <WordDetect String="ConditionMemory" firstNonSpace="true" attribute="Option Name" context="AC cardinal KMGT"/>
         <WordDetect String="ConditionMemoryPressure" firstNonSpace="true" attribute="Option Name" context="AC threshold"/>
         <WordDetect String="ConditionNeedsUpdate" firstNonSpace="true" attribute="Option Name" context="AC text"/>
@@ -2477,6 +2529,7 @@
       <itemData name="Section Header" defStyleNum="dsKeyword" spellChecking="false"/>
       <itemData name="Separator" defStyleNum="dsSpecialString" spellChecking="false"/>
       <itemData name="Specifier" defStyleNum="dsSpecialChar" spellChecking="false"/>
+      <itemData name="Tag" defStyleNum="dsAttribute" spellChecking="false"/>
       <itemData name="Threshold Time Span" defStyleNum="dsConstant" italic="true" spellChecking="false"/>
       <itemData name="Unit Extension" defStyleNum="dsPreprocessor" italic="true" spellChecking="false"/>
       <itemData name="Unit Instance" defStyleNum="dsPreprocessor" bold="true" spellChecking="false"/>

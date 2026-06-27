@@ -287,6 +287,8 @@ Q_SIGNALS:
     void reloaded();
 
 private:
+    bool eventFilter(QObject *receiver, QEvent *event) override;
+
     Q_DISABLE_COPY(Repository)
     friend class RepositoryPrivate;
     std::unique_ptr<RepositoryPrivate> d;

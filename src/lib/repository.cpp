@@ -14,6 +14,7 @@
 
 #include <QCborMap>
 #include <QCborValue>
+#include <QCoreApplication>
 #include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>
@@ -105,6 +106,10 @@ Repository::Repository()
 {
     initResource();
     d->load(this);
+    if (QCoreApplication::instance()) {
+        // watching for language changes to purge our translation caches
+        QCoreApplication::instance()->installEventFilter(this);
+    }
 }
 
 Repository::~Repository()
@@ -432,6 +437,22 @@ void Repository::addCustomSearchPath(const QString &path)
 QList<QString> Repository::customSearchPaths() const
 {
     return d->m_customSearchPaths;
+}
+
+bool Repository::eventFilter(QObject *receiver, QEvent *ev)
+{
+    if (ev->type() == QEvent::LanguageChange) {
+        // definition references remain valid, but sort order by translated name will change
+        // so better be on the safe side here
+        Q_EMIT aboutToReload();
+        for (const auto &it : d->m_defs) {
+            auto def = DefinitionData::get(it.second);
+            def->translatedName.clear();
+            def->translatedSection.clear();
+        }
+        Q_EMIT reload();
+    }
+    return QObject::eventFilter(receiver, ev);
 }
 
 #include "moc_repository.cpp"

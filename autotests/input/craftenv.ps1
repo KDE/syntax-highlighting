@@ -49,6 +49,7 @@ echo [bool]::Parse('false')
 echo $env:EDITOR ${env:EDITOR} $foo ${foo} $foo-bar ${foo-bar} ${a b
 c}
 echo "hashtable: $(@{ key = 'value' })"
+echo "Date of event: $($timestamp.ToString("yyyy-MM-dd"))"
 echo 122.42kb 332.d 23d 625 3232e+2 0x233 0b1101
 echo 0xaj 0b1112 123a
 

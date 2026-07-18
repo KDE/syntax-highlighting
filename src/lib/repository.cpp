@@ -441,7 +441,7 @@ QList<QString> Repository::customSearchPaths() const
 
 bool Repository::eventFilter(QObject *receiver, QEvent *ev)
 {
-    if (ev->type() == QEvent::LanguageChange) {
+    if ((ev->type() == QEvent::LanguageChange) && (receiver == QCoreApplication::instance())) {
         // definition references remain valid, but sort order by translated name will change
         // so better be on the safe side here
         Q_EMIT aboutToReload();

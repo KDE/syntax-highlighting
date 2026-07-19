@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2017-2026 Alex Turbov <i.zaufi@gmail.com>
 #
 
-version: 60
+version: 61
 
 global-properties:
   - ALLOW_DUPLICATE_CUSTOM_TARGETS
@@ -226,6 +226,12 @@ target-properties:
   - IMPLICIT_DEPENDS_INCLUDE_TRANSFORM
   - IMPORTED_COMMON_LANGUAGE_RUNTIME                        # Since 3.12
   - IMPORTED_CONFIGURATIONS
+  - IMPORTED_CXX_MODULES_COMPILE_DEFINITIONS                # Since 3.28
+  - IMPORTED_CXX_MODULES_COMPILE_FEATURES                   # Since 3.28
+  - IMPORTED_CXX_MODULES_COMPILE_OPTIONS                    # Since 3.28
+  - IMPORTED_CXX_MODULES_<CONFIG>                           # Since 3.28
+  - IMPORTED_CXX_MODULES_INCLUDE_DIRECTORIES                # Since 3.28
+  - IMPORTED_CXX_MODULES_LINK_LIBRARIES                     # Since 3.28
   - IMPORTED_GLOBAL                                         # Since 3.11
   - IMPORTED_IMPLIB_<CONFIG>
   - IMPORTED_IMPLIB
@@ -395,6 +401,8 @@ target-properties:
   - Swift_LANGUAGE_VERSION                                  # Since 3.16
   - Swift_MODULE_DIRECTORY                                  # Since 3.15
   - Swift_MODULE_NAME                                       # Since 3.15
+  - Swift_PACKAGE_NAME                                      # Since 4.4
+  - Swift_SEPARATE_MODULE_EMISSION                          # Since 4.4
   - SYSTEM                                                  # Since 3.25
   - TEST_LAUNCHER                                           # Since 3.29
   - TRANSITIVE_COMPILE_PROPERTIES                           # Since 3.30
@@ -496,6 +504,25 @@ target-properties:
   - XCODE_SCHEME_ZOMBIE_OBJECTS                             # Since 3.13
   - XCODE_XCCONFIG                                          # Since 3.24
   - XCTEST
+
+fileset-properties:                                         # Since 4.4
+  - BASE_DIRS
+  - COMPILE_DEFINITIONS
+  - COMPILE_OPTIONS
+  - CXX_SCAN_FOR_MODULES
+  - JOB_POOL_COMPILE
+  - INCLUDE_DIRECTORIES
+  - INDEPENDENT_FILES
+  - INTERFACE_COMPILE_DEFINITIONS
+  - INTERFACE_COMPILE_OPTIONS
+  - INTERFACE_INCLUDE_DIRECTORIES
+  - INTERFACE_SOURCES
+  - SCOPE
+  - SKIP_LINTING
+  - SKIP_PRECOMPILE_HEADERS
+  - SKIP_UNITY_BUILD_INCLUSION
+  - SOURCES
+  - TYPE
 
 test-properties:
   - ATTACHED_FILES_ON_FAIL
@@ -964,6 +991,7 @@ variables:
   - CMAKE_PROJECT_VERSION_TWEAK                             # Since 3.12
   - CMAKE_RANLIB
   - CMAKE_ROOT
+  - CMAKE_RULE_MESSAGES                                     # Since 3.13
   - CMAKE_SCRIPT_MODE_FILE
   - CMAKE_SHARED_LIBRARY_PREFIX
   - CMAKE_SHARED_LIBRARY_PREFIX_<LANG>
@@ -985,6 +1013,8 @@ variables:
   - CMAKE_Swift_COMPILATION_MODE                            # Since 3.29
   - CMAKE_Swift_MODULE_DIRECTORY                            # Since 3.15
   - CMAKE_Swift_NUM_THREADS                                 # Since 3.15
+  - CMAKE_Swift_SEPARATE_MODULE_EMISSION                    # Since 4.4
+  - CMAKE_TEST_BUILD_DEPENDS                                # Since 4.4
   - CMAKE_TEST_LAUNCHER                                     # Since 3.29
   - CMAKE_TOOLCHAIN_FILE
   - CMAKE_TWEAK_VERSION
@@ -1134,8 +1164,8 @@ variables:
   - CMAKE_SYSTEM_LIBRARY_PATH
   - CMAKE_SYSTEM_PREFIX_PATH
   - CMAKE_SYSTEM_PROGRAM_PATH
+  - CMAKE_TARGET_MESSAGES                                   # Mentioned in `TARGET_MESSAGES` property docs
   - CMAKE_USER_MAKE_RULES_OVERRIDE
-  - CMAKE_WARN_DEPRECATED
   - CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION
   - CMAKE_XCODE_GENERATE_SCHEME
   - CMAKE_XCODE_GENERATE_TOP_LEVEL_PROJECT_ONLY             # Since 3.13
@@ -1515,12 +1545,14 @@ variables:
   - CTEST_BINARY_DIRECTORY
   - CTEST_BUILD_COMMAND
   - CTEST_BUILD_NAME
+  - CTEST_BUILD_PRESET                                      # Since 4.4
   - CTEST_BZR_COMMAND
   - CTEST_BZR_UPDATE_OPTIONS
   - CTEST_CHANGE_ID
   - CTEST_CHECKOUT_COMMAND
   - CTEST_CONFIGURATION_TYPE
   - CTEST_CONFIGURE_COMMAND
+  - CTEST_CONFIGURE_PRESET                                  # Since 4.4
   - CTEST_COVERAGE_COMMAND
   - CTEST_COVERAGE_EXTRA_FLAGS
   - CTEST_CURL_OPTIONS
@@ -1568,17 +1600,22 @@ variables:
   - CTEST_P4_COMMAND
   - CTEST_P4_OPTIONS
   - CTEST_P4_UPDATE_OPTIONS
+  - CTEST_PRESET                                            # Since 4.4
+  - CTEST_PRESETS_FILE                                      # Since 4.4
   - CTEST_RESOURCE_SPEC_FILE                                # Since 3.18
   - CTEST_RUN_CURRENT_SCRIPT                                # Since 3.11
   - CTEST_SITE
   - CTEST_SUBMIT_INACTIVITY_TIMEOUT                         # Since 3.23
+  - CTEST_SUBMIT_PARTS                                      # Since 4.4
   - CTEST_SUBMIT_URL                                        # Since 3.14
   - CTEST_SOURCE_DIRECTORY
   - CTEST_SVN_COMMAND
   - CTEST_SVN_OPTIONS
   - CTEST_SVN_UPDATE_OPTIONS
   - CTEST_TEST_LOAD
+  - CTEST_TEST_PRESET                                       # Since 4.4
   - CTEST_TEST_TIMEOUT
+  - CTEST_TEST_COVERAGE_TOOL                                # Since 4.4
   - CTEST_TLS_VERSION                                       # Since 3.30
   - CTEST_TLS_VERIFY                                        # Since 3.30
   - CTEST_UPDATE_COMMAND
@@ -1673,7 +1710,7 @@ variables:
   - CMAKE_PKG_CONFIG_SYS_LIB_DIRS
   - CMAKE_PKG_CONFIG_ALLOW_SYS_INCLUDES
   - CMAKE_PKG_CONFIG_ALLOW_SYS_LIBS
-  # The following variables will be populated from the con  tents of package file:
+  # The following variables will be populated from the contents of package file:
   - CMAKE_PKG_CONFIG_NAME
   - CMAKE_PKG_CONFIG_DESCRIPTION
   #- CMAKE_PKG_CONFIG_VERSION                               # Skip due to more generic parretn match
@@ -1697,6 +1734,11 @@ variables:
   - CMAKE_GET_OS_RELEASE_FALLBACK_SCRIPTS
   - CMAKE_GET_OS_RELEASE_FALLBACK_RESULT_<varname>
   - CMAKE_GET_OS_RELEASE_FALLBACK_RESULT
+  # Variables described in the `cmake-cxxmodules(7)` man
+  - CMAKE_CXX_MODULE_MAP_FORMAT
+  - CMAKE_CXX_MODULE_MAP_FLAG
+  - CMAKE_CXX_COMPILE_BMI
+  - CMAKE_CXX_MODULE_BMI_ONLY_FLAG
   # Well known CMake's official module's variables
   # - BundleUtilities
   - BU_CHMOD_BUNDLE_ITEMS
@@ -1789,6 +1831,7 @@ variables:
   - CPACK_ARCHIVE_GID                                       # Since 4.3
   - CPACK_ARCHIVE_THREADS                                   # Since 3.18
   - CPACK_ARCHIVE_COMPRESSION_LEVEL                         # Since 4.3
+  - CPACK_ARCHIVE_ENCODING                                  # Since 4.4
   # - CPackBundle
   - CPACK_BUNDLE_NAME
   - CPACK_BUNDLE_PLIST
@@ -2013,6 +2056,8 @@ variables:
   - CPACK_NSIS_IGNORE_LICENSE_PAGE                          # Since 3.22
   - CPACK_NSIS_EXECUTABLE_PRE_ARGUMENTS                     # Since 3.25
   - CPACK_NSIS_EXECUTABLE_POST_ARGUMENTS                    # Since 3.25
+  - CPACK_NSIS_CRC_CHECK                                    # Since 4.2
+  - CPACK_NSIS_IGNORE_COMPONENTS_PAGE                       # Since 4.4
   # - CPackNuGet (since 3.12)
   - CPACK_NUGET_COMPONENT_INSTALL
   - CPACK_NUGET_PACKAGE_NAME
@@ -2289,6 +2334,8 @@ variables:
   - ExternalData_HTTPHEADERS                                # Since 4.0
   - ExternalData_LINK_CONTENT
   - ExternalData_NO_SYMLINKS
+  - ExternalData_STATE_ROOT                                 # Since 4.4
+  - ExternalData_LINK_MODE                                  # Since 4.4
   - ExternalData_OBJECT_STORES
   - ExternalData_SERIES_PARSE
   - ExternalData_SERIES_PARSE_PREFIX
@@ -2804,6 +2851,7 @@ variables:
   - Python3_EXECUTABLE_DEBUG                                # Since 3.30
   - Python3_INTERPRETER                                     # Since 3.30
   - Python3_INTERPRETER_ID
+  - Python3_FREE_THREADED                                   # Since 4.4
   - Python3_STDLIB
   - Python3_STDARCH
   - Python3_SITELIB
@@ -3016,13 +3064,18 @@ deprecated-or-internal-variables:
   - CMAKE_<LANG>_PLATFORM_ID
   - CMAKE_NOT_USING_CONFIG_FLAGS
   - CMAKE_VS_INTEL_Fortran_PROJECT_VERSION
+  # Mentioned in the `CMakeFiles/CMakeConfigureLog.yaml`, but not documented
+  # in the `find_package` manual.
+  - CMAKE_FIND_USE_CMAKE_PACKAGE_REGISTRY
   # Deprecated Variables that Provide Information
   - CMAKE_EXTRA_GENERATOR
   # Deprecated Variables that Change Behavior
   - CMAKE_AUTOMOC_RELAXED_MODE
   - CMAKE_BACKWARDS_COMPATIBILITY
+  - CMAKE_ERROR_DEPRECATED                                  # Since 4.4
   - CMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY
   - CMAKE_FIND_PACKAGE_NO_SYSTEM_PACKAGE_REGISTRY
+  - CMAKE_WARN_DEPRECATED                                   # Since 4.4
   # Deprecated Variables that Describe the System
   - MSVC10
   - MSVC11
@@ -3061,8 +3114,14 @@ deprecated-or-internal-variables:
   - CPACK_TEMPORARY_DIRECTORY
   - CPACK_TOPLEVEL_DIRECTORY
   - CPACK_INSTALL_PREFIX
+  # Mentioned in the `CPACK_OBJCOPY_EXECUTABLE` description
+  - CMAKE_OBJCOPY
   # Mentioned in `file(GET_RUNTIME_DEPENDENCIES)` docs
   - CMAKE_OBJDUMP
+  # Mentioned in the `CPACK_READELF_EXECUTABLE` description
+  - CMAKE_READELF
+  # Mentioned in `Unix Makefiles` and `Ninja` generator docs
+  - CMAKE_STRIP
   # Mentioned in "Deprecated and Removed Features" of release notes 3.21
   - CMAKE_SYSTEM_ARCH
   # Superseded by `CMAKE_EXECUTABLE_ENABLE_EXPORTS`
@@ -3105,6 +3164,7 @@ environment-variables:
   - CMAKE_CONFIGURATION_TYPES                               # Since 3.22
   - CMAKE_CONFIG_TYPE
   - CMAKE_CROSSCOMPILING_EMULATOR                           # Since 3.28
+  - CMAKE_DISABLE_PRECOMPILE_HEADERS                        # Since 4.4
   - CMAKE_EXPORT_BUILD_DATABASE                             # Since 3.31
   - CMAKE_EXPORT_COMPILE_COMMANDS                           # Since 3.17
   - CMAKE_GENERATOR
@@ -3178,12 +3238,38 @@ scripting-commands:
       - SCOPE_FOR
       - PROPAGATE
     special-args:
+      - DIAGNOSTICS                                         # Since 4.4
       - POLICIES
       - VARIABLES
     start-region: block
 
   - name: break
     nulary?: true
+
+  - name: cmake_diagnostic                                  # Since 4.4
+    named-args:
+      - SET
+      - PROMOTE
+      - DEMOTE
+      - GET
+      - PUSH
+      - POP
+      - RECURSE
+      - NO_RECURSE
+    special-args:
+      # Actions:
+      - IGNORE
+      - WARN
+      - SEND_ERROR
+      - FATAL_ERROR
+      # Diagnostic Categories
+      - CMD_AUTHOR
+      - CMD_DEPRECATED
+      - CMD_EXPERIMENTAL
+      - CMD_INSTALL_ABSOLUTE_DESTINATION
+      - CMD_POLICY
+      - CMD_UNINITIALIZED
+      - CMD_UNUSED_CLI
 
   - name: cmake_host_system_information
     named-args:
@@ -3277,6 +3363,7 @@ scripting-commands:
   - name: cmake_parse_arguments
     named-args:
       - PARSE_ARGV
+      - PARSE_ARGN                                          # Since 4.4
 
   - name: cmake_path                                        # Since 3.20
     named-args:
@@ -3396,6 +3483,7 @@ scripting-commands:
       - AND
       - OR
       - COMMAND
+      - DIAGNOSTIC                                          # Since 4.4
       - POLICY
       - TARGET
       - TEST
@@ -3477,6 +3565,8 @@ scripting-commands:
       - ECHO_OUTPUT_VARIABLE                                # Since 3.18
       - ECHO_ERROR_VARIABLE                                 # Since 3.18
       - COMMAND_ERROR_IS_FATAL                              # Since 3.19
+      - ENVIRONMENT                                         # Since 4.4
+      - ENVIRONMENT_MODIFICATION                            # Since 4.4
     special-args:
       - NONE
       - AUTO
@@ -3835,6 +3925,7 @@ scripting-commands:
       - global-properties
       - directory-properties
       - target-properties
+      - fileset-properties
       - test-properties
       - source-properties
       - cache-properties
@@ -3852,6 +3943,7 @@ scripting-commands:
       - OPTIONAL
       - RESULT_VARIABLE
       - NO_POLICY_SCOPE
+      - NO_DIAGNOSTIC_SCOPE                                 # Since 4.4
 
   - name: include_guard                                     # Since 3.10
     named-args:
@@ -3899,6 +3991,10 @@ scripting-commands:
       # NOTE Another `PREPEND` named arg has already added
       - POP_FRONT
       - POP_BACK
+      # Since 4.4
+      - APPLY
+      - COMPARATOR
+      - PREDICATE
     # Since 3.13
     special-args:
       - STRING
@@ -4066,6 +4162,7 @@ scripting-commands:
       - SET
       - EQUAL
       - STRING_ENCODE                                       # Since 4.3
+      - PARTIAL_EQUAL                                       # Since 4.4
 
   - name: unset
     named-args:
@@ -4079,7 +4176,6 @@ scripting-commands:
     has-target-name-after-kw: TARGET
     nested-parentheses?: true
     start-region: while
-
 
 project-commands:
   - name: add_compile_definitions                           # Since 3.12
@@ -4232,6 +4328,20 @@ project-commands:
       - INITIALIZE_FROM_VARIABLE                            # Since 3.23
     property-args: *get-property
 
+  - name: discover_tests                                    # Since 4.4
+    named-args:
+      - COMMAND
+      - COMMAND_EXPAND_LISTS
+      - CONFIGURATIONS
+      - DISCOVERY_ARGS
+      - DISCOVERY_MATCH
+      - DISCOVERY_PROPERTIES
+      - TEST_NAME
+      - TEST_ARGS
+      - TEST_PROPERTIES
+    property-args:
+      - test-properties
+
   - name: enable_language
     named-args:
       - OPTIONAL
@@ -4241,6 +4351,7 @@ project-commands:
       - ASM_NASM
       - ASM_MARMASM                                         # Since 3.26
       - ASM_MASM
+      - ASM_POASM                                           # Since 4.4
       - C
       - CSharp
       - CXX
@@ -4665,6 +4776,7 @@ project-commands:
     special-args:
       - HEADERS
       - CXX_MODULES                                         # Since 3.28
+      - SOURCES                                             # Since 4.4
     first-arg-is-target?: true
 
   - name: try_compile
@@ -4729,6 +4841,7 @@ ctest-commands:
       - BUILD
       - APPEND
       - CONFIGURATION
+      - PARALLEL_LEVEL
       - FLAGS
       - PROJECT_NAME
       - TARGET
@@ -4736,6 +4849,8 @@ ctest-commands:
       - NUMBER_WARNINGS
       - RETURN_VALUE
       - CAPTURE_CMAKE_ERROR
+      - PRESET                                              # Since 4.4
+      - PRESETS_FILE                                        # Since 4.4
 
   - name: ctest_configure
     named-args:
@@ -4746,6 +4861,8 @@ ctest-commands:
       - RETURN_VALUE
       - QUIET
       - CAPTURE_CMAKE_ERROR
+      - PRESET                                              # Since 4.4
+      - PRESETS_FILE                                        # Since 4.4
 
   - name: ctest_coverage
     named-args:
@@ -4772,10 +4889,17 @@ ctest-commands:
       - EXCLUDE_FIXTURE_SETUP
       - EXCLUDE_FIXTURE_CLEANUP
       - PARALLEL_LEVEL
+      - RESOURCE_SPEC_FILE
       - TEST_LOAD
       - SCHEDULE_RANDOM
+      - STOP_ON_FAILURE
       - STOP_TIME
       - RETURN_VALUE
+      - CAPTURE_CMAKE_ERROR
+      - REPEAT
+      - OUTPUT_JUNIT
+      - PRESET                                              # Since 4.4
+      - PRESETS_FILE                                        # Since 4.4
       - DEFECT_COUNT
       - QUIET
 
@@ -4824,6 +4948,7 @@ ctest-commands:
       - EXCLUDE_FIXTURE_SETUP
       - EXCLUDE_FIXTURE_CLEANUP
       - PARALLEL_LEVEL
+      - RESOURCE_SPEC_FILE
       - TEST_LOAD
       - SCHEDULE_RANDOM
       - STOP_ON_FAILURE                                     # Since 3.18
@@ -4831,6 +4956,9 @@ ctest-commands:
       - RETURN_VALUE
       - CAPTURE_CMAKE_ERROR
       - REPEAT                                              # Since 3.17
+      - OUTPUT_JUNIT
+      - PRESET                                              # Since 4.4
+      - PRESETS_FILE                                        # Since 4.4
       - QUIET
     special-args:
       # Since 3.17
@@ -4842,6 +4970,9 @@ ctest-commands:
     named-args:
       - SOURCE
       - RETURN_VALUE
+      - VERSION_ONLY                                        # Since 4.4
+      - VERSION_OVERRIDE                                    # Since 4.4
+      - CAPTURE_CMAKE_ERROR
       - QUIET
 
   - name: ctest_upload
@@ -5314,7 +5445,11 @@ standard-module-commands:
       - AnyNewerVersion
       - SameMajorVersion
       - SameMinorVersion
-      - ExactVersion
+      - ExactVersion                                        # Deprecated since 4.4!
+      # Since 4.4
+      - SamePatchVersion
+      - SameFullVersion
+      - SemanticVersion
   - name: generate_apple_platform_selection_file            # Since 3.29
     named-args:
       - INSTALL_DESTINATION
@@ -5539,6 +5674,8 @@ standard-module-commands:
       - GIT_PROGRESS
       - GIT_CONFIG
       - GIT_REMOTE_UPDATE_STRATEGY
+      - CMAKE_EP_GIT_CLONE_RETRY_COUNT                      # Since 4.4
+      - CMAKE_EP_GIT_CLONE_RETRY_DELAY                      # Since 4.4
       - SVN_REPOSITORY
       - SVN_REVISION
       - SVN_USERNAME
@@ -6073,11 +6210,15 @@ standard-module-commands:
       - APPEND_PATH
   # FindPython
   - name: Python_add_library
-    named-args:
+    named-args: &Python_add_library
       - STATIC
       - SHARED
       - MODULE
+      - USE_SABI
       - WITH_SOABI
+  # FindPython3
+  - name: Python3_add_library
+    named-args: *Python_add_library
   # FindSubversion
   - name: Subversion_WC_INFO
     named-args:

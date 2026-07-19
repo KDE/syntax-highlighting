@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# SPDX-FileCopyrightText: 2017-2025 Alex Turbov <i.zaufi@gmail.com>
+# SPDX-FileCopyrightText: 2017-2026 Alex Turbov <i.zaufi@gmail.com>
 #
 # /// script
 # requires-python = ">=3.11"
@@ -41,8 +41,9 @@ _PROPERTY_KEYS = [
     'global-properties'
   , 'directory-properties'
   , 'target-properties'
-  , 'source-properties'
+  , 'fileset-properties'
   , 'test-properties'
+  , 'source-properties'
   , 'cache-properties'
   , 'install-properties'
   ]

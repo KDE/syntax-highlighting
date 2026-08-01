@@ -442,15 +442,14 @@ QList<QString> Repository::customSearchPaths() const
 bool Repository::eventFilter(QObject *receiver, QEvent *ev)
 {
     if ((ev->type() == QEvent::LanguageChange) && (receiver == QCoreApplication::instance())) {
-        // definition references remain valid, but sort order by translated name will change
-        // so better be on the safe side here
-        Q_EMIT aboutToReload();
+        // we just swap the translations & update the order, not disturb the applications
+        // with reload signals that might trigger highligting invalidation and Co.
         for (const auto &it : d->m_defs) {
             auto def = DefinitionData::get(it.second);
             def->translatedName.clear();
             def->translatedSection.clear();
         }
-        Q_EMIT reload();
+        d->computeAlternativeDefLists();
     }
     return QObject::eventFilter(receiver, ev);
 }

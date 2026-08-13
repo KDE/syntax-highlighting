@@ -1,0 +1,80 @@
+<Comment># Variables, strings, functions, and settings</Comment><br/>
+<Keyword>set</Keyword><Normal Text> </Normal Text><Built-in>dotenv-load</Built-in><br/>
+<Keyword>set</Keyword><Normal Text> </Normal Text><Built-in>shell</Built-in><Normal Text> </Normal Text><Operator>:=</Operator><Normal Text> </Normal Text><Operator>[</Operator><String>"bash"</String><Operator>,</Operator><Normal Text> </Normal Text><String>"-uc"</String><Operator>]</Operator><br/>
+<Keyword>export</Keyword><Normal Text> </Normal Text><Variable>version</Variable><Normal Text> </Normal Text><Operator>:=</Operator><Normal Text> </Normal Text><String>"1.2.3"</String><br/>
+<Variable>archive</Variable><Normal Text> </Normal Text><Operator>:=</Operator><Normal Text> </Normal Text><String>'app-'</String><Normal Text> </Normal Text><Operator>+</Operator><Normal Text> </Normal Text><Variable>version</Variable><Normal Text> </Normal Text><Operator>+</Operator><Normal Text> </Normal Text><String>".tar.gz"</String><br/>
+<Variable>triple</Variable><Normal Text> </Normal Text><Operator>:=</Operator><Normal Text> </Normal Text><String>"""</String><br/>
+<String>  multiple lines</String><br/>
+<String>"""</String><br/>
+<Variable>home</Variable><Normal Text> </Normal Text><Operator>:=</Operator><Normal Text> </Normal Text><Function>env</Function><Operator>(</Operator><String>"HOME"</String><Operator>)</Operator><br/>
+<Variable>checked</Variable><Normal Text> </Normal Text><Operator>:=</Operator><Normal Text> </Normal Text><Keyword>if</Keyword><Normal Text> </Normal Text><Function>path_exists</Function><Operator>(</Operator><Variable>home</Variable><Operator>)</Operator><Normal Text> </Normal Text><Operator>{</Operator><Normal Text> </Normal Text><Variable>home</Variable><Normal Text> </Normal Text><Operator>}</Operator><Normal Text> </Normal Text><Keyword>else</Keyword><Normal Text> </Normal Text><Operator>{</Operator><Normal Text> </Normal Text><Function>error</Function><Operator>(</Operator><String>"missing home"</String><Operator>)</Operator><Normal Text> </Normal Text><Operator>}</Operator><br/>
+<Variable>command</Variable><Normal Text> </Normal Text><Operator>:=</Operator><Normal Text> </Normal Text><Command>`git rev-parse --short HEAD`</Command><br/>
+<Normal Text></Normal Text><br/>
+<Keyword>alias</Keyword><Normal Text> </Normal Text><Recipe>b</Recipe><Normal Text> </Normal Text><Operator>:=</Operator><Normal Text> </Normal Text><Recipe>build</Recipe><br/>
+<Keyword>import</Keyword><Operator>?</Operator><Normal Text> </Normal Text><String>'local.just'</String><br/>
+<Keyword>mod</Keyword><Normal Text> </Normal Text><Module>tools</Module><Normal Text> </Normal Text><String>'tools.just'</String><br/>
+<Normal Text></Normal Text><br/>
+<Attribute>[doc</Attribute><Operator>(</Operator><String>'Build the project'</String><Operator>)</Operator><Attribute>]</Attribute><br/>
+<Attribute>[group</Attribute><Operator>(</Operator><String>'development'</String><Operator>)</Operator><Attribute>]</Attribute><br/>
+<Recipe>build</Recipe><Normal Text> </Normal Text><Variable>$target</Variable><Operator>=</Operator><String>'debug'</String><Normal Text> </Normal Text><Variable>*flags</Variable><Separator>:</Separator><Normal Text> </Normal Text><Recipe>clean</Recipe><Normal Text> </Normal Text><Operator>(</Operator><Recipe>prepare</Recipe><Normal Text> </Normal Text><Recipe>target</Recipe><Operator>)</Operator><Normal Text> </Normal Text><Operator>&&</Operator><Normal Text> </Normal Text><Recipe>lint</Recipe><br/>
+<Normal Text>    </Normal Text><Control>@</Control><Normal Text>echo </Normal Text><String>"building </String><Interpolation>{{</Interpolation><Normal Text> </Normal Text><Variable>target</Variable><Normal Text> </Normal Text><Interpolation>}}</Interpolation><String> </String><Interpolation>{{</Interpolation><Normal Text> </Normal Text><Variable>archive</Variable><Normal Text> </Normal Text><Interpolation>}}</Interpolation><String>"</String><br/>
+<Normal Text>    cargo build </Normal Text><Option>--profile</Option><Normal Text> </Normal Text><Interpolation>{{</Interpolation><Normal Text> </Normal Text><Keyword>if</Keyword><Normal Text> </Normal Text><Variable>target</Variable><Normal Text> </Normal Text><Operator>==</Operator><Normal Text> </Normal Text><String>'debug'</String><Normal Text> </Normal Text><Operator>{</Operator><Normal Text> </Normal Text><String>'dev'</String><Normal Text> </Normal Text><Operator>}</Operator><Normal Text> </Normal Text><Keyword>else</Keyword><Normal Text> </Normal Text><Operator>{</Operator><Normal Text> </Normal Text><Variable>target</Variable><Normal Text> </Normal Text><Operator>}</Operator><Normal Text> </Normal Text><Interpolation>}}</Interpolation><Normal Text> </Normal Text><Interpolation>{{</Interpolation><Normal Text> </Normal Text><Variable>flags</Variable><Normal Text> </Normal Text><Interpolation>}}</Interpolation><br/>
+<Normal Text></Normal Text><br/>
+<Attribute>[no-cd]</Attribute><br/>
+<Attribute>[script</Attribute><Operator>(</Operator><String>"python3"</String><Operator>,</Operator><Attribute> </Attribute><String>"-u"</String><Operator>)</Operator><Attribute>]</Attribute><br/>
+<Recipe>script</Recipe><Normal Text> </Normal Text><Variable>name</Variable><Separator>:</Separator><br/>
+<Normal Text>    </Normal Text><Comment>#!/usr/bin/env python3</Comment><br/>
+<Normal Text>    print</Normal Text><Operator>(</Operator><String>"Hello, </String><Interpolation>{{</Interpolation><Normal Text> </Normal Text><Variable>name</Variable><Normal Text> </Normal Text><Interpolation>}}</Interpolation><String>!"</String><Operator>)</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Recipe>clean</Recipe><Separator>:</Separator><br/>
+<Normal Text>    </Normal Text><Control>-</Control><Normal Text>rm </Normal Text><Option>-rf</Option><Normal Text> target</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Recipe>prepare</Recipe><Normal Text> </Normal Text><Variable>target</Variable><Separator>:</Separator><br/>
+<Normal Text>    echo preparing </Normal Text><Interpolation>{{</Interpolation><Normal Text> </Normal Text><Variable>target</Variable><Normal Text> </Normal Text><Interpolation>}}</Interpolation><br/>
+<Normal Text></Normal Text><br/>
+<Recipe>lint</Recipe><Separator>:</Separator><br/>
+<Normal Text>    cargo clippy</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Multiline strings, backticks, and expressions</Comment><br/>
+<Variable>multiline_raw</Variable><Normal Text> </Normal Text><Operator>:=</Operator><Normal Text> </Normal Text><String>'first</String><br/>
+<String>second'</String><br/>
+<Variable>multiline_cooked</Variable><Normal Text> </Normal Text><Operator>:=</Operator><Normal Text> </Normal Text><String>"third</String><br/>
+<String>fourth"</String><br/>
+<Variable>multiline_command</Variable><Normal Text> </Normal Text><Operator>:=</Operator><Normal Text> </Normal Text><Command>`printf first</Command><br/>
+<Command>printf second`</Command><br/>
+<Variable>multiline_expression</Variable><Normal Text> </Normal Text><Operator>:=</Operator><Normal Text> </Normal Text><Operator>(</Operator><br/>
+<Normal Text>  </Normal Text><Variable>multiline_raw</Variable><br/>
+<Normal Text>  </Normal Text><Operator>+</Operator><Normal Text> </Normal Text><Variable>multiline_cooked</Variable><br/>
+<Operator>)</Operator><br/>
+<Variable>multiline_conditional</Variable><Normal Text> </Normal Text><Operator>:=</Operator><Normal Text> </Normal Text><Keyword>if</Keyword><Normal Text> </Normal Text><Variable>version</Variable><Normal Text> </Normal Text><Operator>==</Operator><Normal Text> </Normal Text><String>"1.2.3"</String><Normal Text> </Normal Text><Operator>{</Operator><br/>
+<Normal Text>  </Normal Text><String>"matching"</String><br/>
+<Operator>}</Operator><Normal Text> </Normal Text><Keyword>else</Keyword><Normal Text> </Normal Text><Operator>{</Operator><br/>
+<Normal Text>  </Normal Text><String>"different"</String><br/>
+<Operator>}</Operator><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Format and shell-expanded strings</Comment><br/>
+<Variable>formatted</Variable><Normal Text> </Normal Text><Operator>:=</Operator><Normal Text> </Normal Text><String>f"version=</String><Interpolation>{{</Interpolation><Normal Text> </Normal Text><Variable>version</Variable><Normal Text> </Normal Text><Interpolation>}}</Interpolation><String> literal=</String><Special Character>{{{{</Special Character><String>"</String><br/>
+<Variable>expanded</Variable><Normal Text> </Normal Text><Operator>:=</Operator><Normal Text> </Normal Text><String>x"$HOME/project"</String><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Eager assignments, unexports, continuations, comments, and sigils</Comment><br/>
+<Keyword>set</Keyword><Normal Text> </Normal Text><Built-in>guards</Built-in><Normal Text> </Normal Text><Comment># enable guarded recipe lines</Comment><br/>
+<Keyword>eager</Keyword><Normal Text> </Normal Text><Variable>eager_value</Variable><Normal Text> </Normal Text><Operator>:=</Operator><Normal Text> </Normal Text><Function>env</Function><Operator>(</Operator><String>"HOME"</String><Operator>)</Operator><br/>
+<Keyword>unexport</Keyword><Normal Text> </Normal Text><Variable>SECRET</Variable><Normal Text> </Normal Text><Comment># keep this out of recipes</Comment><br/>
+<Keyword>import</Keyword><Normal Text> </Normal Text><String>'shared.just'</String><Normal Text> </Normal Text><Comment># common definitions</Comment><br/>
+<Keyword>mod</Keyword><Normal Text> </Normal Text><Module>helpers</Module><Normal Text> </Normal Text><Comment># project helpers</Comment><br/>
+<Normal Text></Normal Text><br/>
+<Recipe>continued</Recipe><Separator>:</Separator><Normal Text> </Normal Text><Recipe>clean</Recipe><Normal Text> </Normal Text><Operator>\</Operator><br/>
+<Normal Text>           </Normal Text><Recipe>lint</Recipe><br/>
+<Normal Text>    echo continued</Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<Recipe>controls</Recipe><Separator>:</Separator><br/>
+<Normal Text>    </Normal Text><Control>@-?</Control><Normal Text>echo guarded</Normal Text><br/>
+<Normal Text>    echo foo#bar</Normal Text><br/>
+<Normal Text>    </Normal Text><Comment># generated for </Comment><Interpolation>{{</Interpolation><Normal Text> </Normal Text><Variable>version</Variable><Normal Text> </Normal Text><Interpolation>}}</Interpolation><br/>
+<Normal Text>    echo </Normal Text><String>'</String><Special Character>{{{{</Special Character><String> literal braces'</String><br/>
+<Normal Text></Normal Text><br/>
+<Recipe>unterminated-quote</Recipe><Separator>:</Separator><br/>
+<Normal Text>    echo </Normal Text><String>"</String><br/>
+<String></String><br/>
+<Recipe>quote-recovery</Recipe><Separator>:</Separator><br/>
+<Normal Text>    echo recovered</Normal Text><br/>

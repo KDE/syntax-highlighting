@@ -1,0 +1,80 @@
+# Variables, strings, functions, and settings
+set dotenv-load
+set shell := ["bash", "-uc"]
+export version := "1.2.3"
+archive := 'app-' + version + ".tar.gz"
+triple := """
+  multiple lines
+"""
+home := env("HOME")
+checked := if path_exists(home) { home } else { error("missing home") }
+command := `git rev-parse --short HEAD`
+
+alias b := build
+import? 'local.just'
+mod tools 'tools.just'
+
+[doc('Build the project')]
+[group('development')]
+build $target='debug' *flags: clean (prepare target) && lint
+    @echo "building {{ target }} {{ archive }}"
+    cargo build --profile {{ if target == 'debug' { 'dev' } else { target } }} {{ flags }}
+
+[no-cd]
+[script("python3", "-u")]
+script name:
+    #!/usr/bin/env python3
+    print("Hello, {{ name }}!")
+
+clean:
+    -rm -rf target
+
+prepare target:
+    echo preparing {{ target }}
+
+lint:
+    cargo clippy
+
+# Multiline strings, backticks, and expressions
+multiline_raw := 'first
+second'
+multiline_cooked := "third
+fourth"
+multiline_command := `printf first
+printf second`
+multiline_expression := (
+  multiline_raw
+  + multiline_cooked
+)
+multiline_conditional := if version == "1.2.3" {
+  "matching"
+} else {
+  "different"
+}
+
+# Format and shell-expanded strings
+formatted := f"version={{ version }} literal={{{{"
+expanded := x"$HOME/project"
+
+# Eager assignments, unexports, continuations, comments, and sigils
+set guards # enable guarded recipe lines
+eager eager_value := env("HOME")
+unexport SECRET # keep this out of recipes
+import 'shared.just' # common definitions
+mod helpers # project helpers
+
+continued: clean \
+           lint
+    echo continued
+
+controls:
+    @-?echo guarded
+    echo foo#bar
+    # generated for {{ version }}
+    echo '{{{{ literal braces'
+
+unterminated-quote:
+    echo "
+
+quote-recovery:
+    echo recovered

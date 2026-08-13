@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>justfile</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (Just) - Theme (Breeze Dark)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="color:#7a7c7d"># Variables, strings, functions, and settings</span>
+<span style="font-weight:bold">set</span> <span style="color:#609ca0">dotenv-load</span>
+<span style="font-weight:bold">set</span> <span style="color:#609ca0">shell</span> <span style="color:#3f8058">:=</span> <span style="color:#3f8058">[</span><span style="color:#f44f4f">"bash"</span><span style="color:#3f8058">,</span> <span style="color:#f44f4f">"-uc"</span><span style="color:#3f8058">]</span>
+<span style="font-weight:bold">export</span> <span style="color:#27aeae">version</span> <span style="color:#3f8058">:=</span> <span style="color:#f44f4f">"1.2.3"</span>
+<span style="color:#27aeae">archive</span> <span style="color:#3f8058">:=</span> <span style="color:#f44f4f">'app-'</span> <span style="color:#3f8058">+</span> <span style="color:#27aeae">version</span> <span style="color:#3f8058">+</span> <span style="color:#f44f4f">".tar.gz"</span>
+<span style="color:#27aeae">triple</span> <span style="color:#3f8058">:=</span> <span style="color:#f44f4f">"""</span>
+<span style="color:#f44f4f">  multiple lines</span>
+<span style="color:#f44f4f">"""</span>
+<span style="color:#27aeae">home</span> <span style="color:#3f8058">:=</span> <span style="color:#8e44ad">env</span><span style="color:#3f8058">(</span><span style="color:#f44f4f">"HOME"</span><span style="color:#3f8058">)</span>
+<span style="color:#27aeae">checked</span> <span style="color:#3f8058">:=</span> <span style="font-weight:bold">if</span> <span style="color:#8e44ad">path_exists</span><span style="color:#3f8058">(</span><span style="color:#27aeae">home</span><span style="color:#3f8058">)</span> <span style="color:#3f8058">{</span> <span style="color:#27aeae">home</span> <span style="color:#3f8058">}</span> <span style="font-weight:bold">else</span> <span style="color:#3f8058">{</span> <span style="color:#8e44ad">error</span><span style="color:#3f8058">(</span><span style="color:#f44f4f">"missing home"</span><span style="color:#3f8058">)</span> <span style="color:#3f8058">}</span>
+<span style="color:#27aeae">command</span> <span style="color:#3f8058">:=</span> <span style="color:#da4453">`git rev-parse --short HEAD`</span>
+
+<span style="font-weight:bold">alias</span> <span style="color:#8e44ad">b</span> <span style="color:#3f8058">:=</span> <span style="color:#8e44ad">build</span>
+<span style="font-weight:bold">import</span><span style="color:#3f8058">?</span> <span style="color:#f44f4f">'local.just'</span>
+<span style="font-weight:bold">mod</span> <span style="color:#27ae60">tools</span> <span style="color:#f44f4f">'tools.just'</span>
+
+<span style="color:#2980b9">[doc</span><span style="color:#3f8058">(</span><span style="color:#f44f4f">'Build the project'</span><span style="color:#3f8058">)</span><span style="color:#2980b9">]</span>
+<span style="color:#2980b9">[group</span><span style="color:#3f8058">(</span><span style="color:#f44f4f">'development'</span><span style="color:#3f8058">)</span><span style="color:#2980b9">]</span>
+<span style="color:#8e44ad">build</span> <span style="color:#27aeae">$target</span><span style="color:#3f8058">=</span><span style="color:#f44f4f">'debug'</span> <span style="color:#27aeae">*flags</span><span style="color:#3f8058">:</span> <span style="color:#8e44ad">clean</span> <span style="color:#3f8058">(</span><span style="color:#8e44ad">prepare</span> <span style="color:#8e44ad">target</span><span style="color:#3f8058">)</span> <span style="color:#3f8058">&amp;&amp;</span> <span style="color:#8e44ad">lint</span>
+    <span style="color:#fdbc4b;font-weight:bold">@</span>echo <span style="color:#f44f4f">"building </span><span style="color:#27ae60">{{</span> <span style="color:#27aeae">target</span> <span style="color:#27ae60">}}</span><span style="color:#f44f4f"> </span><span style="color:#27ae60">{{</span> <span style="color:#27aeae">archive</span> <span style="color:#27ae60">}}</span><span style="color:#f44f4f">"</span>
+    cargo build <span style="color:#2980b9">--profile</span> <span style="color:#27ae60">{{</span> <span style="font-weight:bold">if</span> <span style="color:#27aeae">target</span> <span style="color:#3f8058">==</span> <span style="color:#f44f4f">'debug'</span> <span style="color:#3f8058">{</span> <span style="color:#f44f4f">'dev'</span> <span style="color:#3f8058">}</span> <span style="font-weight:bold">else</span> <span style="color:#3f8058">{</span> <span style="color:#27aeae">target</span> <span style="color:#3f8058">}</span> <span style="color:#27ae60">}}</span> <span style="color:#27ae60">{{</span> <span style="color:#27aeae">flags</span> <span style="color:#27ae60">}}</span>
+
+<span style="color:#2980b9">[no-cd]</span>
+<span style="color:#2980b9">[script</span><span style="color:#3f8058">(</span><span style="color:#f44f4f">"python3"</span><span style="color:#3f8058">,</span><span style="color:#2980b9"> </span><span style="color:#f44f4f">"-u"</span><span style="color:#3f8058">)</span><span style="color:#2980b9">]</span>
+<span style="color:#8e44ad">script</span> <span style="color:#27aeae">name</span><span style="color:#3f8058">:</span>
+    <span style="color:#7a7c7d">#!/usr/bin/env python3</span>
+    print<span style="color:#3f8058">(</span><span style="color:#f44f4f">"Hello, </span><span style="color:#27ae60">{{</span> <span style="color:#27aeae">name</span> <span style="color:#27ae60">}}</span><span style="color:#f44f4f">!"</span><span style="color:#3f8058">)</span>
+
+<span style="color:#8e44ad">clean</span><span style="color:#3f8058">:</span>
+    <span style="color:#fdbc4b;font-weight:bold">-</span>rm <span style="color:#2980b9">-rf</span> target
+
+<span style="color:#8e44ad">prepare</span> <span style="color:#27aeae">target</span><span style="color:#3f8058">:</span>
+    echo preparing <span style="color:#27ae60">{{</span> <span style="color:#27aeae">target</span> <span style="color:#27ae60">}}</span>
+
+<span style="color:#8e44ad">lint</span><span style="color:#3f8058">:</span>
+    cargo clippy
+
+<span style="color:#7a7c7d"># Multiline strings, backticks, and expressions</span>
+<span style="color:#27aeae">multiline_raw</span> <span style="color:#3f8058">:=</span> <span style="color:#f44f4f">'first</span>
+<span style="color:#f44f4f">second'</span>
+<span style="color:#27aeae">multiline_cooked</span> <span style="color:#3f8058">:=</span> <span style="color:#f44f4f">"third</span>
+<span style="color:#f44f4f">fourth"</span>
+<span style="color:#27aeae">multiline_command</span> <span style="color:#3f8058">:=</span> <span style="color:#da4453">`printf first</span>
+<span style="color:#da4453">printf second`</span>
+<span style="color:#27aeae">multiline_expression</span> <span style="color:#3f8058">:=</span> <span style="color:#3f8058">(</span>
+  <span style="color:#27aeae">multiline_raw</span>
+  <span style="color:#3f8058">+</span> <span style="color:#27aeae">multiline_cooked</span>
+<span style="color:#3f8058">)</span>
+<span style="color:#27aeae">multiline_conditional</span> <span style="color:#3f8058">:=</span> <span style="font-weight:bold">if</span> <span style="color:#27aeae">version</span> <span style="color:#3f8058">==</span> <span style="color:#f44f4f">"1.2.3"</span> <span style="color:#3f8058">{</span>
+  <span style="color:#f44f4f">"matching"</span>
+<span style="color:#3f8058">}</span> <span style="font-weight:bold">else</span> <span style="color:#3f8058">{</span>
+  <span style="color:#f44f4f">"different"</span>
+<span style="color:#3f8058">}</span>
+
+<span style="color:#7a7c7d"># Format and shell-expanded strings</span>
+<span style="color:#27aeae">formatted</span> <span style="color:#3f8058">:=</span> <span style="color:#f44f4f">f"version=</span><span style="color:#27ae60">{{</span> <span style="color:#27aeae">version</span> <span style="color:#27ae60">}}</span><span style="color:#f44f4f"> literal=</span><span style="color:#3daee9">{{{{</span><span style="color:#f44f4f">"</span>
+<span style="color:#27aeae">expanded</span> <span style="color:#3f8058">:=</span> <span style="color:#f44f4f">x"$HOME/project"</span>
+
+<span style="color:#7a7c7d"># Eager assignments, unexports, continuations, comments, and sigils</span>
+<span style="font-weight:bold">set</span> <span style="color:#609ca0">guards</span> <span style="color:#7a7c7d"># enable guarded recipe lines</span>
+<span style="font-weight:bold">eager</span> <span style="color:#27aeae">eager_value</span> <span style="color:#3f8058">:=</span> <span style="color:#8e44ad">env</span><span style="color:#3f8058">(</span><span style="color:#f44f4f">"HOME"</span><span style="color:#3f8058">)</span>
+<span style="font-weight:bold">unexport</span> <span style="color:#27aeae">SECRET</span> <span style="color:#7a7c7d"># keep this out of recipes</span>
+<span style="font-weight:bold">import</span> <span style="color:#f44f4f">'shared.just'</span> <span style="color:#7a7c7d"># common definitions</span>
+<span style="font-weight:bold">mod</span> <span style="color:#27ae60">helpers</span> <span style="color:#7a7c7d"># project helpers</span>
+
+<span style="color:#8e44ad">continued</span><span style="color:#3f8058">:</span> <span style="color:#8e44ad">clean</span> <span style="color:#3f8058">\</span>
+           <span style="color:#8e44ad">lint</span>
+    echo continued
+
+<span style="color:#8e44ad">controls</span><span style="color:#3f8058">:</span>
+    <span style="color:#fdbc4b;font-weight:bold">@-?</span>echo guarded
+    echo foo#bar
+    <span style="color:#7a7c7d"># generated for </span><span style="color:#27ae60">{{</span> <span style="color:#27aeae">version</span> <span style="color:#27ae60">}}</span>
+    echo <span style="color:#f44f4f">'</span><span style="color:#3daee9">{{{{</span><span style="color:#f44f4f"> literal braces'</span>
+
+<span style="color:#8e44ad">unterminated-quote</span><span style="color:#3f8058">:</span>
+    echo <span style="color:#f44f4f">"</span>
+
+<span style="color:#8e44ad">quote-recovery</span><span style="color:#3f8058">:</span>
+    echo recovered
+</pre></body></html>

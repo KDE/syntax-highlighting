@@ -76,6 +76,8 @@
 
         <!ENTITY int "(?:[0-9]++[_0-9]*+)">
         <!ENTITY exp "(?:[eE][-+]?&int;)">
+
+        <!ENTITY escaped_ch "(?:[abeEfnrtv\\']|[0-7]{1,3}|x[A-Fa-f0-9]{1,2}|u[A-Fa-f0-9]{1,4}|U[A-Fa-f0-9]{1,8}|c.)">
 ]>
 
 <!--
@@ -83,7 +85,7 @@ https://zsh.sourceforge.io/releases.html
 current: 5.9
 -->
 
-<language name="Zsh" version="37" kateversion="5.79" section="Scripts" extensions="*.sh;*.zsh;.zshrc;.zprofile;.zlogin;.zlogout;.profile" mimetype="application/x-shellscript;text/x-shellscript" casesensitive="1" author="Jonathan Poelen (jonathan.poelen@gmail.com)" license="MIT">
+<language name="Zsh" version="38" kateversion="5.79" section="Scripts" extensions="*.sh;*.zsh;.zshrc;.zprofile;.zlogin;.zlogout;.profile" mimetype="application/x-shellscript;text/x-shellscript" casesensitive="1" author="Jonathan Poelen (jonathan.poelen@gmail.com)" license="MIT">
 
   <highlighting>
     <list name="keywords">
@@ -981,8 +983,8 @@ current: 5.9
         <AnyChar context="Number" String="0123456789." lookAhead="1"/>
         <DetectChar attribute="Parameter Expansion Operator" context="Subscript" char="["/>
         <IncludeRules context="FindWord"/>
-        <Detect2Chars attribute="BaseN" context="NoPrefix" char="#" char1="#"/>
-        <DetectChar attribute="Error" context="#stay" char="#"/>
+        <Detect2Chars attribute="BaseN" context="ChToNum" char="#" char1="#"/>
+        <DetectChar attribute="BaseN" context="#stay" char="#"/>
         <DetectChar context="NormalOptionMaybeBraceExpansion" char="{" lookAhead="1"/>
         <DetectChar context="NormalOptionMaybeGroupEnd" char="}" lookAhead="1"/>
       </context>
@@ -1035,7 +1037,7 @@ current: 5.9
         <DetectSpaces attribute="String SingleQ"/>
         <DetectIdentifier attribute="String SingleQ"/>
         <DetectChar attribute="String SingleQ" context="#pop" char="'"/>
-        <RegExpr attribute="String Escape" context="#stay" String="\\(?:[abeEfnrtv\\']|[0-7]{1,3}|x[A-Fa-f0-9]{1,2}|u[A-Fa-f0-9]{1,4}|U[A-Fa-f0-9]{1,8}|c.)?"/>
+        <RegExpr attribute="String Escape" context="#stay" String="\\&escaped_ch;?"/>
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="FindWord">
@@ -1460,8 +1462,8 @@ current: 5.9
         <DetectChar attribute="Parameter Expansion Operator" context="Subscript" char="["/>
         <IncludeRules context="FindWord"/>
         <DetectChar context="MaybeArithmeticBrace" char="{" lookAhead="1"/>
-        <Detect2Chars attribute="BaseN" context="NoPrefix" char="#" char1="#"/>
-        <DetectChar attribute="Error" context="#stay" char="#"/>
+        <Detect2Chars attribute="BaseN" context="ChToNum" char="#" char1="#"/>
+        <DetectChar attribute="BaseN" context="#stay" char="#"/>
         <DetectIdentifier attribute="Variable" context="#stay"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="ExprSubDblParen">
@@ -1473,9 +1475,11 @@ current: 5.9
         <IncludeRules context="DispatchBraceExpansion"/>
         <DetectChar attribute="Error" context="#pop" char="{"/>
       </context>
-      <context attribute="Normal Text" lineEndContext="#pop" name="NoPrefix" fallthroughContext="#pop">
-        <DetectChar context="AssumeEscape" char="\"/>
-        <RegExpr attribute="Number" context="#pop" String="[^][()]"/>
+      <!-- ##c in ((##c)) -->
+      <context attribute="Normal Text" lineEndContext="#pop" name="ChToNum" fallthroughContext="#pop">
+        <LineContinue attribute="Escape"/>
+        <!-- '##\)' is ok, but not '##\(' -->
+        <RegExpr attribute="Number" context="#pop" String="[^\[\]()\\$^]|\$(?=$|\)|[^+=:#^~+$@*'?{(\w])|\^?\\(&escaped_ch;|[^\[\]\(])|\^[^\[\]()\\]|\^(?=[)])"/>
       </context>
 
       <context attribute="Number" lineEndContext="#pop" name="Number">

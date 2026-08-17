@@ -42,7 +42,11 @@ echo $! $=!
 
 # expression subst:
 echo $(( cd << ed + 1 ))
-
+echo $((##a + ##$ + ##$a + ##^ + ##^A + ##^++ ##\a + ##^\a + ##abc))  # value of char
+                                                              # ~~ no number
+echo $((##$)) $((##^)) $((##\))) $((##\())
+                                    # ~~ no number
+echo $((#abc + #$abc))  # value of first character contents
 
 # command subst:
 echo $(ls -l)

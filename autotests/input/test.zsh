@@ -530,6 +530,7 @@ cd $(locate -l1 -r "/zoo.txt$")(:h) # cd to directory of first occurence of a fi
 cd ${$(!!)[3]:h}  # cd to 3rd in list
 cd ${$(locate zoo.txt)[1]:h}
 cd ${drive}/inetpub/wwwdev/www.some.co.uk/
+cd $x:h[1]
 cd **/*.php(.om[1]:h) # cd to directory of newest php file
 cd -
 cd /tmp/test/;touch {1..5} {6,7,8,12} {00..03}

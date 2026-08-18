@@ -503,7 +503,8 @@ echo ${(@)foo} ${(@)foo[1,2]} ${${(A)name}[1]} ${(AA)=name=...} ${(Q)${(z)foo}}
 echo ${(ps.$sep.)val} ${(ps.${sep}.)val} ${(s.$sep.)val} ${(s.)(.)val}
 echo ${(pr:2+3::_::$d:)var} ${(r:2+3::_::$d:)var}
 echo ${${:-=cat}:h}
-$foo:h34:a:gs/dfs/fds/:s/fds/d'd'f xyz $foo: $foo:O $foo:A
+echo ${foo:h34:a} $foo:h34:a
+$foo:h:a:gs/dfs/fds/:s/fds/d'd'f xyz $foo: $foo:O $foo:A
 3=$foo:QQQ xyz $a[3,$]:h3:t1:e
 echo ${${~foo}//\*/*.c}
 echo !$ !!:$ !* !!:* !-2:2 !:-3 !:2* !:2- !:2-3 !^ !:1 !!:1

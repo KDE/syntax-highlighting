@@ -47,6 +47,7 @@ echo $((##a + ##$ + ##$a + ##^ + ##^A + ##^++ ##\a + ##^\a + ##abc))  # value of
 echo $((##$)) $((##^)) $((##\))) $((##\())
                                     # ~~ no number
 echo $((#abc + #$abc))  # value of first character contents
+echo $[1+1]
 
 # command subst:
 echo $(ls -l)

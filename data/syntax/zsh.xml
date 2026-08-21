@@ -368,7 +368,13 @@ current: 5.9
         <Detect2Chars attribute="Parameter Expansion" context="#pop!VarBraceStart" char="$" char1="{"/>
         <StringDetect context="#pop!ExprDblParenSubstOrSubstCommand" String="$((" lookAhead="1"/>
         <Detect2Chars attribute="Parameter Expansion" context="#pop!SubstCommand" char="$" char1="(" beginRegion="subshell"/>
+        <StringDetect attribute="Parameter Expansion" context="#pop!ExprBracketSubst" String="$[" beginRegion="expression"/>
       </context>
+      <context attribute="Normal Text" lineEndContext="#stay" name="ExprBracketSubst">
+        <DetectChar attribute="Parameter Expansion" context="#pop" char="]" endRegion="expression"/>
+        <IncludeRules context="FindArithmetic"/>
+      </context>
+
       <context attribute="Variable" lineEndContext="#pop" name="DispatchStringVariables">
         <Detect2Chars attribute="String SingleQ" context="#pop!StringEsc" char="$" char1="'"/>
       </context>

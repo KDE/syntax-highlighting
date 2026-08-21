@@ -407,7 +407,7 @@ current: 5.9
       <!-- called as soon as $xxx is encoutered -->
       <context attribute="Normal Text" lineEndContext="#pop" name="AfterVarName" fallthroughContext="#pop">
         <DetectChar context="VarNameDispatchModifiers" char=":" lookAhead="1"/>
-        <DetectChar attribute="Parameter Expansion Operator" context="Subscript" char="["/>
+        <IncludeRules context="FindSubscript"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#pop#pop" name="VarNameDispatchModifiers" fallthroughContext="#pop#pop">
         <Detect2Chars attribute="Parameter Expansion" char=":" char1="a"/>
@@ -697,7 +697,7 @@ current: 5.9
       </context>
 
       <context attribute="Normal Text" lineEndContext="#pop" name="VarAssign" fallthroughContext="#pop">
-        <DetectChar attribute="Parameter Expansion Operator" context="Subscript" char="["/>
+        <IncludeRules context="FindSubscript"/>
         <DetectChar attribute="Operator" context="#pop!Assign" char="="/>
         <Detect2Chars attribute="Operator" context="#pop!Assign" char="+" char1="="/>
       </context>
@@ -993,7 +993,7 @@ current: 5.9
         <AnyChar context="#pop" String="&wordseps_or_extglog;" lookAhead="1"/>
         <AnyChar attribute="Operator" context="#stay" String="+-!%=^:"/>
         <IncludeRules context="FindNumber"/>
-        <DetectChar attribute="Parameter Expansion Operator" context="Subscript" char="["/>
+        <IncludeRules context="FindSubscript"/>
         <IncludeRules context="FindWord"/>
         <IncludeRules context="FindToNum"/>
         <DetectChar attribute="Control" char=","/>
@@ -1075,8 +1075,10 @@ current: 5.9
       </context>
 
       <!-- VarBraceStart is called as soon as ${ is encoutered -->
-      <context attribute="Variable" lineEndContext="#pop" name="VarBraceStart" fallthroughContext="#pop!CheckVarAlt">
+      <context attribute="Variable" lineEndContext="#pop!VarCmd" name="VarBraceStart" fallthroughContext="#pop!CheckVarAlt">
         <DetectChar attribute="Parameter Expansion" context="#pop!VarFlags" char="("/>
+        <AnyChar attribute="Parameter Expansion" context="#pop!VarCmd" String=" &tab;|"/>
+        <DetectChar attribute="Normal Text" context="#pop!VarCmdVar" char="{"/>
         <IncludeRules context="VarFlagsVar"/>
       </context>
       <context attribute="Variable" lineEndContext="#stay" name="VarBraceStartRecursive" fallthroughContext="#pop#pop!CheckVarAlt">
@@ -1092,7 +1094,7 @@ current: 5.9
         <DetectChar attribute="Parameter Expansion" context="#pop" char="}"/>
         <StringDetect attribute="Parameter Expansion Operator" context="#stay" String="[@]"/>
         <StringDetect attribute="Parameter Expansion Operator" context="#stay" String="[*]"/>
-        <DetectChar attribute="Parameter Expansion Operator" context="Subscript" char="["/>
+        <IncludeRules context="FindSubscript"/>
         <Detect2Chars attribute="Parameter Expansion Operator" context="#pop!AlternatePatternValue" char="%" char1="%"/>
         <Detect2Chars attribute="Parameter Expansion Operator" context="#pop!AlternatePatternValue" char="#" char1="#"/>
         <AnyChar attribute="Parameter Expansion Operator" context="#pop!AlternatePatternValue" String="#%"/>
@@ -1392,6 +1394,28 @@ current: 5.9
         <IncludeRules context="VarFlag_psx"/>
       </context>
 
+      <!-- brace command substitution:
+        ${|cmd} ${ cmd }
+           ~~~~    ~~~~~
+      -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="VarCmd" fallthroughContext="Command">
+        <DetectChar attribute="Parameter Expansion" context="#pop" char="}"/>
+        <IncludeRules context="Start"/>
+      </context>
+      <!-- ${{param} cmd}
+             ~~~~~~~
+      -->
+      <context attribute="Variable" lineEndContext="#stay" name="VarCmdVar">
+        <DetectChar attribute="Normal Text" context="VarCmdCheckSpace" char="}"/>
+        <AnyChar attribute="Error" context="#pop!VarCmd" String=" &tab;"/>
+        <IncludeRules context="FindSubscript"/>
+      </context>
+      <context attribute="Variable" lineEndContext="#pop#pop!VarCmd" name="VarCmdCheckSpace">
+        <DetectChar attribute="Normal Text" context="#pop#pop!VarCmd" char=" "/>
+        <DetectChar attribute="Parameter Expansion" context="#pop#pop" char="}"/>
+        <RegExpr attribute="Error" context="#pop#pop!VarCmd" String="."/>
+      </context>
+
       <context attribute="Escape" lineEndContext="#pop" name="BraceExpansion">
         <DetectChar attribute="Escape" context="#pop!BraceExpansion2" char="{"/>
       </context>
@@ -1472,7 +1496,7 @@ current: 5.9
         <IncludeRules context="FindBranchCondition"/>
         <AnyChar attribute="Operator" String="&arithmetic_op;"/>
         <IncludeRules context="FindNumber"/>
-        <DetectChar attribute="Parameter Expansion Operator" context="Subscript" char="["/>
+        <IncludeRules context="FindSubscript"/>
         <IncludeRules context="FindWord"/>
         <IncludeRules context="FindToNum"/>
         <DetectChar attribute="Control" char=","/>
@@ -1881,6 +1905,9 @@ current: 5.9
       </context>
 
       <!-- Subscript consumes anything till ], marks as Variable -->
+      <context attribute="Normal Text" name="FindSubscript">
+        <DetectChar attribute="Parameter Expansion Operator" context="Subscript" char="["/>
+      </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="Subscript" fallthroughContext="SubscriptArithmetic">
         <DetectChar attribute="Parameter Expansion Operator" context="#pop" char="]"/>
         <DetectChar context="SubscriptMaybeFlag" char="(" lookAhead="1"/>
@@ -1950,7 +1977,7 @@ current: 5.9
         <AnyChar attribute="Operator" context="#pop" String="@&arithmetic_op;"/>
         <DetectChar attribute="Control" context="#pop" char=","/>
         <IncludeRules context="FindNumber"/>
-        <DetectChar attribute="Parameter Expansion Operator" context="Subscript" char="["/>
+        <IncludeRules context="FindSubscript"/>
         <IncludeRules context="FindStrings"/>
         <DetectChar context="VariableOrSubscriptPos" char="$" lookAhead="1"/>
         <DetectChar attribute="Backquote" context="RegularBackq" char="`"/>
@@ -2065,7 +2092,7 @@ current: 5.9
         <DetectChar attribute="Glob Flag" context="GlobQualifier_d" char="d"/>
         <DetectChar attribute="Glob Flag" context="GlobQualifier_L" char="L"/>
         <DetectChar attribute="Glob Flag" context="GlobQualifier_Y" char="Y"/>
-        <DetectChar attribute="Parameter Expansion Operator" context="Subscript" char="["/>
+        <IncludeRules context="FindSubscript"/>
 
         <DetectChar attribute="Operator" context="#stay" char=","/>
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!GlobModifier" char=":"/>

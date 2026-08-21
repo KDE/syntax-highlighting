@@ -52,6 +52,13 @@ echo $[1+1]
 # command subst:
 echo $(ls -l)
 echo `cat myfile`
+echo ${|ls -l}
+echo ${ ls -l}
+echo ${ ls {a,b} ${var} $v}
+echo ${{param} ls -l}
+echo ${{array[k]} ls -l}
+echo ${{param}ls -l} # missing space
+echo ${{param}} # missing command
 
 
 # file subst:

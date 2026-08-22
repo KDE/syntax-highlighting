@@ -95,7 +95,7 @@ https://zsh.sourceforge.io/releases.html
 current: 5.9
 -->
 
-<language name="Zsh" version="38" kateversion="5.79" section="Scripts" extensions="*.sh;*.zsh;.zshrc;.zprofile;.zlogin;.zlogout;.profile" mimetype="application/x-shellscript;text/x-shellscript" casesensitive="1" author="Jonathan Poelen (jonathan.poelen@gmail.com)" license="MIT">
+<language name="Zsh" version="38" kateversion="6.22" section="Scripts" extensions="*.sh;*.zsh;.zshrc;.zprofile;.zlogin;.zlogout;.profile" mimetype="application/x-shellscript;text/x-shellscript" casesensitive="1" author="Jonathan Poelen (jonathan.poelen@gmail.com)" license="MIT">
 
   <highlighting>
     <list name="keywords">
@@ -411,10 +411,16 @@ current: 5.9
         <IncludeRules context="VarNameSubstLen"/>
       </context>
 
-      <!-- called as soon as $xxx is encoutered -->
+      <!-- called as soon as $xxx is encoutered
+        $var:... $var[xxx]:...
+            ~        ~    ~
+      -->
       <context attribute="Normal Text" lineEndContext="#pop" name="AfterVarName" fallthroughContext="#pop">
         <DetectChar context="VarNameDispatchModifiers" char=":" lookAhead="1"/>
-        <IncludeRules context="FindSubscript"/>
+        <DetectChar attribute="Parameter Expansion Operator" context="#pop!AfterVarNameSubscript!Subscript" char="["/>
+      </context>
+      <context attribute="Normal Text" lineEndContext="#pop" name="AfterVarNameSubscript" fallthroughContext="#pop">
+        <DetectChar context="VarNameDispatchModifiers" char=":" lookAhead="1"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#pop#pop" name="VarNameDispatchModifiers" fallthroughContext="#pop#pop">
         <Detect2Chars attribute="Parameter Expansion" char=":" char1="a"/>
@@ -1917,6 +1923,9 @@ current: 5.9
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="Subscript" fallthroughContext="SubscriptArithmetic">
         <DetectChar attribute="Parameter Expansion Operator" context="#pop" char="]"/>
+        <IncludeRules context="InSubscript"/>
+      </context>
+      <context attribute="Normal Text" name="InSubscript">
         <DetectChar context="SubscriptMaybeFlag" char="(" lookAhead="1"/>
         <!-- so that '-1' in '$var[-1]' is a number rather than an operator -->
         <DetectChar attribute="Number" context="SubscriptArithmetic" char="-"/>

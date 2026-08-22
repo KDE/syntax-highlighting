@@ -570,6 +570,7 @@ print $((${${(z)${(f)"$(dirs -v)"}[-1]}[1]} + 1)) # or
 print $(history -n -1|sed 's/.* //')
 print $aa[(e)*]
 print $ass_array[one]
+print $aa[1][0-9]
 print $x $y
 print ${#path[1]}       # length of first element in path array
 print ${#path}          # length of "path" array

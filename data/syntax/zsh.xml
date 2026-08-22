@@ -359,11 +359,16 @@ current: 5.9
         <DetectChar context="#pop#pop" char="}" lookAhead="1"/>
       </context>
 
+      <!-- $... -->
       <context attribute="Variable" lineEndContext="#pop" name="DispatchVariables">
         <IncludeRules context="DispatchSubstVariables"/>
         <IncludeRules context="DispatchStringVariables"/>
         <IncludeRules context="DispatchVarNameVariables"/>
       </context>
+
+      <!-- ${var}
+           ~~
+      -->
       <context attribute="Variable" lineEndContext="#pop" name="DispatchSubstVariables">
         <Detect2Chars attribute="Parameter Expansion" context="#pop!VarBraceStart" char="$" char1="{"/>
         <StringDetect context="#pop!ExprDblParenSubstOrSubstCommand" String="$((" lookAhead="1"/>
@@ -375,18 +380,24 @@ current: 5.9
         <IncludeRules context="FindArithmetic"/>
       </context>
 
+      <!-- $'...'
+           ~~
+      -->
       <context attribute="Variable" lineEndContext="#pop" name="DispatchStringVariables">
         <Detect2Chars attribute="String SingleQ" context="#pop!StringEsc" char="$" char1="'"/>
       </context>
+
+      <!-- $var $1 $* etc
+           ~    ~  ~
+      -->
       <context attribute="Variable" lineEndContext="#pop" name="DispatchVarNameVariables">
-        <RegExpr attribute="Dollar Prefix" context="#pop!VarNamePrefixedWithDollar" String="\$(?=&varname;|[0-9]+|[-*@?$!#~=^+])"/>
+        <RegExpr attribute="Dollar Prefix" context="#pop!VarNamePrefixedWithDollar" String="\$(?=&varname;|[-*@?$!#~=^+0-9])"/>
       </context>
       <context attribute="Variable" lineEndContext="#pop" name="VarNamePrefixedWithDollar">
         <DetectIdentifier attribute="Variable" context="#pop!AfterVarName"/>
         <Int attribute="Variable" context="#pop!AfterVarName" additionalDeliminator="$"/>
         <AnyChar attribute="Variable" context="#pop!AfterVarName" String="-*@?$!"/>
-        <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarNameSubstLen" char="#"/>
-        <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarNameParam+" char="+"/>
+        <AnyChar attribute="Parameter Expansion Operator" context="#pop!VarNameSubstLen" String="#+"/>
         <AnyChar attribute="Parameter Expansion Operator" context="#pop!VarNameParam" String="~=^"/>
       </context>
       <context attribute="Variable" lineEndContext="#pop" name="VarNameSubstLen" fallthroughContext="#pop!AfterVarName">
@@ -395,12 +406,8 @@ current: 5.9
         <Int attribute="Variable" context="#pop!AfterVarName" additionalDeliminator="#~=^+{}[]:-/$"/>
       </context>
       <context attribute="Variable" lineEndContext="#pop" name="VarNameParam" fallthroughContext="#pop!AfterVarName">
-        <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarNameSubstLen" char="#"/>
-        <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarNameParam+" char="+"/>
+        <AnyChar attribute="Parameter Expansion Operator" context="#pop!VarNameSubstLen" String="#+"/>
         <AnyChar attribute="Parameter Expansion Operator" context="#stay" String="^=~"/>
-        <IncludeRules context="VarNameSubstLen"/>
-      </context>
-      <context attribute="Variable" lineEndContext="#pop" name="VarNameParam+" fallthroughContext="#pop">
         <IncludeRules context="VarNameSubstLen"/>
       </context>
 

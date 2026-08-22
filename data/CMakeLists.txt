@@ -1,6 +1,9 @@
 # create a directory for generated definitions
 execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/generated/syntax)
 
+# init list of generated definitions
+set(gen_defs)
+
 macro(generate_syntax_definition generator targetFile srcFile)
     add_custom_target(
         ${targetFile} ALL
@@ -112,6 +115,7 @@ set(qrc_xml_file ${CMAKE_CURRENT_BINARY_DIR}/syntax-data-xml.qrc)
 set(qrc_file ${CMAKE_CURRENT_BINARY_DIR}/syntax-data.qrc)
 set(qrc_xml_body "")
 set(qrc_body "")
+set(compressedDefs)
 foreach(def ${defs})
     get_filename_component(def_name ${def} NAME)
     string(APPEND qrc_body "<file alias=\"${def_name}\">${compressed_xml_dir}/${def_name}</file>\n")

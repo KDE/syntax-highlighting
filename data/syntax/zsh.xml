@@ -441,22 +441,105 @@ current: 5.9
         <Detect2Chars attribute="Parameter Expansion" char=":" char1="&amp;"/>
         <StringDetect attribute="Parameter Expansion" context="VarNameModifier_s" String=":gs"/>
       </context>
-      <context attribute="Parameter Expansion Operator" lineEndContext="#pop#pop" name="VarNameModifier_s" fallthroughContext="#pop#pop">
-        <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarNameModifier_s_Str" char="/"/>
+
+
+      <!-- $var:s/../....
+                 ~~~~~...
+      -->
+      <context attribute="Parameter Expansion Operator" lineEndContext="#pop#pop#pop" name="VarNameModifier_s" fallthroughContext="#pop#pop#pop">
+        <DetectChar attribute="Parameter Expansion Operator" context="#pop#pop!VarNameModifier_s_Str" char="/"/>
+        <RegExpr attribute="Parameter Expansion Operator" context="#pop#pop!VarNameModifier_s_C_Rep!VarNameModifier_s_C_Str" String="([^&wordseps;])"/>
       </context>
-      <context attribute="String SingleQ" lineEndContext="#pop#pop" name="VarNameModifier_s_Str">
+      <!-- By default the left-hand side of substitutions are character strings,
+      but pattern with HIST_SUBST_PATTERN option. Assume no option. -->
+      <!-- $var:s/../....
+                  ~~~
+      -->
+      <context attribute="Verbatim String" lineEndContext="#pop#pop" name="VarNameModifier_s_Str">
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarNameModifier_s_Rep" char="/"/>
         <DetectChar context="AssumeEscape" char="\" lookAhead="1"/>
-        <DetectChar attribute="String DoubleQ" context="#pop" char="&quot;"/>
-        <DetectChar attribute="String SingleQ" context="#pop" char="'"/>
+        <DetectChar attribute="String SingleQ" context="VarNameModifier_s_StrSQ" char="'"/>
+        <DetectChar attribute="String DoubleQ" context="VarNameModifier_s_StrDQ" char='"'/>
+        <AnyChar context="#pop#pop" String="&wordseps;" lookAhead="1"/>
       </context>
-      <context attribute="String SingleQ" lineEndContext="#pop#pop" name="VarNameModifier_s_Rep">
+      <!-- #pop -> is VarNameModifier_s_C_Rep -->
+      <context attribute="Verbatim String" lineEndContext="#pop#pop#pop" name="VarNameModifier_s_C_Str">
+        <DetectChar attribute="Parameter Expansion Operator" context="#pop" char="1" dynamic="1"/>
         <DetectChar context="AssumeEscape" char="\" lookAhead="1"/>
-        <IncludeRules context="FindWord"/>
-        <DetectChar attribute="Parameter Expansion Operator" context="#pop" char="/"/>
-        <AnyChar context="#pop#pop" String=" &tab;&lt;>|&amp;;()" lookAhead="1"/>
-        <DetectIdentifier attribute="String SingleQ"/>
+        <!-- The string should stop if capture $1 is found,
+        but there is no way to propagate the capture. -->
+        <IncludeRules context="FindStrings"/>
+        <AnyChar context="#pop#pop#pop" String="&wordseps;" lookAhead="1"/>
       </context>
+      <!-- $var:s/..'../..'..  $var:s/..'..'../..
+                    ~~~~                ~~~~
+      -->
+      <context attribute="String SingleQ" name="VarNameModifier_s_StrSQ">
+        <DetectChar attribute="String SingleQ" context="#pop" char="'"/>
+        <LineContinue attribute="Escape"/>
+        <DetectChar attribute="Parameter Expansion Operator" context="#pop#pop!VarNameModifier_s_Rep!VarNameModifier_s_RepSQ" char="/"/>
+      </context>
+      <!-- $var:s/.."../.."..  $var:s/..".."../..
+                    ~~~~                ~~~~
+      -->
+      <context attribute="String DoubleQ" name="VarNameModifier_s_StrDQ">
+        <DetectChar attribute="String DoubleQ" context="#pop" char='"'/>
+        <DetectChar context="AssumeEscape" char="\" lookAhead="1"/>
+        <DetectChar attribute="Parameter Expansion Operator" context="#pop#pop!VarNameModifier_s_Rep!VarNameModifier_s_RepDQ" char="/"/>
+      </context>
+      <!-- $var:s/../....
+                     ~~..
+      -->
+      <context attribute="Replacement String" lineEndContext="#pop#pop" name="VarNameModifier_s_Rep">
+        <DetectChar attribute="Parameter Expansion Operator" context="#pop" char="/"/>
+        <!-- FindWord with a search for '/' in single and double quoted string -->
+        <DetectChar attribute="String SingleQ" context="VarNameModifier_s_RepSQ" char="'"/>
+        <DetectChar attribute="String DoubleQ" context="VarNameModifier_s_RepDQ" char="&quot;"/>
+        <IncludeRules context="VarNameModifier_s_Rep_Common"/>
+        <DetectIdentifier/>
+      </context>
+      <context attribute="Replacement String" lineEndContext="#pop#pop" name="VarNameModifier_s_C_Rep">
+        <DetectChar attribute="Parameter Expansion Operator" context="#pop" char="1" dynamic="1"/>
+        <!-- The string should stop if capture $1 is found,
+        but there is no way to propagate the capture. -->
+        <DetectChar attribute="String SingleQ" context="VarNameModifier_s_C_RepSQ" char="'"/>
+        <DetectChar attribute="String DoubleQ" context="VarNameModifier_s_C_RepDQ" char="&quot;"/>
+        <IncludeRules context="VarNameModifier_s_Rep_Common"/>
+      </context>
+      <context attribute="Replacement String" lineEndContext="#pop#pop" name="VarNameModifier_s_Rep_Common">
+        <DetectChar context="RegularVariable" char="$" lookAhead="1"/>
+        <DetectChar attribute="Backquote" context="RegularBackq" char="`"/>
+        <DetectChar context="AssumeEscape" char="\" lookAhead="1"/>
+        <AnyChar context="#pop#pop" String="&wordseps;" lookAhead="1"/>
+      </context>
+      <!-- $var:s/../..'../'..  $var:s/../..'..'..
+                       ~~~~                 ~~~~
+      -->
+      <context attribute="String SingleQ" name="VarNameModifier_s_RepSQ">
+        <DetectChar attribute="Parameter Expansion Operator" context="#pop#pop#pop#pop!StringSQ" char="/"/>
+        <IncludeRules context="VarNameModifier_s_C_RepSQ"/>
+      </context>
+      <context attribute="String SingleQ" name="VarNameModifier_s_C_RepSQ">
+        <IncludeRules context="StringSQ"/>
+        <!-- When no HIST_SUBST_PATTERN -->
+        <DetectChar attribute="Builtin" char="&amp;"/>
+        <StringDetect attribute="String Escape" String="\&amp;"/>
+      </context>
+      <!-- $var:s/../.."../"..  $var:s/../..".."..
+                       ~~~~                 ~~~~
+      -->
+      <context attribute="String DoubleQ" name="VarNameModifier_s_RepDQ">
+        <DetectChar attribute="Parameter Expansion Operator" context="#pop#pop#pop#pop!StringDQ" char="/"/>
+        <IncludeRules context="VarNameModifier_s_C_RepDQ"/>
+      </context>
+      <context attribute="String DoubleQ" name="VarNameModifier_s_C_RepDQ">
+        <!-- When no HIST_SUBST_PATTERN -->
+        <StringDetect attribute="String Escape" String="\&amp;"/>
+        <IncludeRules context="StringDQ"/>
+        <!-- When no HIST_SUBST_PATTERN -->
+        <DetectChar attribute="Builtin" char="&amp;"/>
+      </context>
+
 
       <context attribute="Normal Text" lineEndContext="#stay" name="CommandBackq" fallthroughContext="Command">
         <DetectChar attribute="Backquote" context="#pop!CommandArgs" char="`"/>
@@ -2271,6 +2354,8 @@ current: 5.9
       <itemData name="Escape"         defStyleNum="dsDataType"      spellChecking="false"/>
       <itemData name="String SingleQ" defStyleNum="dsString"/>
       <itemData name="String DoubleQ" defStyleNum="dsString"/>
+      <itemData name="Verbatim String" defStyleNum="dsVerbatimString" spellChecking="false"/>
+      <itemData name="Replacement String" defStyleNum="dsSpecialString" spellChecking="false"/>
       <itemData name="Here Doc"       defStyleNum="dsString"/>
       <itemData name="Backquote"      defStyleNum="dsKeyword"       spellChecking="false"/>
       <itemData name="String Escape"  defStyleNum="dsDataType"/>

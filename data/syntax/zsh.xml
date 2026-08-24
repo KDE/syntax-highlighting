@@ -423,21 +423,25 @@ current: 5.9
         <DetectChar context="VarNameDispatchModifiers" char=":" lookAhead="1"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#pop#pop" name="VarNameDispatchModifiers" fallthroughContext="#pop#pop">
-        <Detect2Chars attribute="Parameter Expansion" char=":" char1="a"/>
-        <Detect2Chars attribute="Parameter Expansion" char=":" char1="A"/>
-        <Detect2Chars attribute="Parameter Expansion" char=":" char1="c"/>
-        <Detect2Chars attribute="Parameter Expansion" char=":" char1="e"/>
-        <Detect2Chars attribute="Parameter Expansion" char=":" char1="h"/>
-        <Detect2Chars attribute="Parameter Expansion" char=":" char1="l"/>
-        <Detect2Chars attribute="Parameter Expansion" char=":" char1="p"/>
-        <Detect2Chars attribute="Parameter Expansion" char=":" char1="P"/>
-        <Detect2Chars attribute="Parameter Expansion" char=":" char1="q"/>
-        <Detect2Chars attribute="Parameter Expansion" char=":" char1="Q"/>
-        <Detect2Chars attribute="Parameter Expansion" char=":" char1="r"/>
-        <Detect2Chars attribute="Parameter Expansion" context="VarNameModifier_s" char=":" char1="s"/>
-        <Detect2Chars attribute="Parameter Expansion" char=":" char1="t"/>
-        <Detect2Chars attribute="Parameter Expansion" char=":" char1="u"/>
+        <StringDetect attribute="Parameter Expansion" String=":a"/>
+        <StringDetect attribute="Parameter Expansion" String=":A"/>
+        <StringDetect attribute="Parameter Expansion" String=":c"/>
+        <StringDetect attribute="Parameter Expansion" String=":e"/>
+        <StringDetect attribute="Parameter Expansion" String=":h"/>
+        <StringDetect attribute="Parameter Expansion" String=":l"/>
+        <StringDetect attribute="Parameter Expansion" String=":p"/>
+        <StringDetect attribute="Parameter Expansion" String=":P"/>
+        <StringDetect attribute="Parameter Expansion" String=":q"/>
+        <StringDetect attribute="Parameter Expansion" String=":Q"/>
+        <StringDetect attribute="Parameter Expansion" String=":r"/>
+        <StringDetect attribute="Parameter Expansion" context="VarNameModifier_s" String=":s"/>
+        <StringDetect attribute="Parameter Expansion" String=":t"/>
+        <StringDetect attribute="Parameter Expansion" String=":u"/>
         <StringDetect attribute="Parameter Expansion" context="VarNameModifier_s" String=":gs"/>
+        <StringDetect String=":f" context="VarNameModifier_fFwW_Check" lookAhead="1"/>
+        <StringDetect String=":F" context="VarNameModifier_fFwW_Check" lookAhead="1"/>
+        <StringDetect String=":w" context="VarNameModifier_fFwW_Check" lookAhead="1"/>
+        <StringDetect String=":W" context="VarNameModifier_fFwW_Check" lookAhead="1"/>
       </context>
 
 
@@ -538,6 +542,81 @@ current: 5.9
         <DetectChar attribute="Builtin" char="&amp;"/>
       </context>
 
+
+      <!-- $var:fwh
+               ~..
+      -->
+      <context attribute="Normal Text" name="VarNameModifier_fFwW_Check" fallthroughContext="#pop#pop#pop">
+        <RegExpr attribute="Parameter Expansion" context="VarNameModifier_fFwW" String=":(?=(?:[fw]|[FW](?:&strings;|\([^&parent_close;&symbolseps;]*+\)|\{[^&brace_close;&wordseps;]*+\}|\[[^&bracket_close;&wordseps;]*+\]|([^&wordseps;{}])(?:[^&quot;'`\s&wordseps;]|&strings;)*?\1))+(?:[aAcehlpPqQrstu]|gs))|"/>
+      </context>
+      <!-- $var:fW(2)h
+                ~~   ~
+      -->
+      <context attribute="Normal Text" name="VarNameModifier_fFwW" lineEndContext="#pop#pop#pop#pop">
+        <AnyChar attribute="Parameter Expansion" String="fw"/>
+        <DetectChar attribute="Parameter Expansion" context="VarNameModifier_F" char="F"/>
+        <DetectChar attribute="Parameter Expansion" context="VarNameModifier_W" char="W"/>
+        <AnyChar attribute="Parameter Expansion" context="#pop#pop" String="aAcehlpPqQrtu"/>
+        <StringDetect attribute="Parameter Expansion" context="#pop#pop!VarNameModifier_s" String=":s"/>
+        <StringDetect attribute="Parameter Expansion" context="#pop#pop!VarNameModifier_s" String=":gs"/>
+      </context>
+      <!-- $var:F(expr)h
+                ~~~~~~~
+      -->
+      <context attribute="Normal Text" name="VarNameModifier_F" lineEndContext="#pop#pop#pop#pop#pop">
+        <IncludeRules context="FindStringsThenPop"/>
+        <StringDetect attribute="Parameter Expansion Operator" context="ArithmeticParamColon" String=":"/>
+        <StringDetect attribute="Parameter Expansion Operator" context="ArithmeticParamParent" String="("/>
+        <StringDetect attribute="Parameter Expansion Operator" context="ArithmeticParamBracket" String="["/>
+        <StringDetect attribute="Parameter Expansion Operator" context="ArithmeticParamBrace" String="{"/>
+        <RegExpr attribute="Parameter Expansion" context="ArithmeticParamDyn" String="(.)"/>
+      </context>
+      <context attribute="Normal Text" name="ArithmeticParamParent" lineEndContext="#pop#pop">
+        <IncludeRules context="VerbatimParamParent"/>
+        <IncludeRules context="FindArithmetic"/>
+      </context>
+      <context attribute="Normal Text" name="ArithmeticParamBracket" lineEndContext="#pop#pop">
+        <IncludeRules context="VerbatimParamBracket"/>
+        <IncludeRules context="FindArithmetic"/>
+      </context>
+      <context attribute="Normal Text" name="ArithmeticParamBrace" lineEndContext="#pop#pop">
+        <IncludeRules context="VerbatimParamBrace"/>
+        <IncludeRules context="FindArithmetic"/>
+      </context>
+      <context attribute="Normal Text" name="ArithmeticParamColon" lineEndContext="#pop#pop">
+        <IncludeRules context="VerbatimParamColon"/>
+        <IncludeRules context="FindArithmetic"/>
+      </context>
+      <context attribute="Normal Text" name="ArithmeticParamDyn" lineEndContext="#pop#pop">
+        <IncludeRules context="VerbatimParamDyn"/>
+        <IncludeRules context="FindArithmetic"/>
+      </context>
+      <!-- $var:W(xxx)h
+                ~~~~~~
+      -->
+      <context attribute="Normal Text" name="VarNameModifier_W" lineEndContext="#pop#pop#pop#pop#pop">
+        <IncludeRules context="FindStringsThenPop"/>
+        <StringDetect attribute="Parameter Expansion Operator" context="VerbatimParamColon" String=":"/>
+        <StringDetect attribute="Parameter Expansion Operator" context="VerbatimParamParent" String="("/>
+        <StringDetect attribute="Parameter Expansion Operator" context="VerbatimParamBracket" String="["/>
+        <StringDetect attribute="Parameter Expansion Operator" context="VerbatimParamBrace" String="{"/>
+        <RegExpr attribute="Parameter Expansion" context="VerbatimParamDyn" String="(.)"/>
+      </context>
+      <context attribute="Verbatim String" name="VerbatimParamParent" lineEndContext="#pop#pop">
+        <DetectChar attribute="Parameter Expansion Operator" context="#pop#pop" char=")"/>
+      </context>
+      <context attribute="Verbatim String" name="VerbatimParamBracket" lineEndContext="#pop#pop">
+        <DetectChar attribute="Parameter Expansion Operator" context="#pop#pop" char="]"/>
+      </context>
+      <context attribute="Verbatim String" name="VerbatimParamBrace" lineEndContext="#pop#pop">
+        <DetectChar attribute="Parameter Expansion Operator" context="#pop#pop" char="}"/>
+      </context>
+      <context attribute="Verbatim String" name="VerbatimParamColon" lineEndContext="#pop#pop">
+        <DetectChar attribute="Parameter Expansion Operator" context="#pop#pop" char=":"/>
+      </context>
+      <context attribute="Verbatim String" name="VerbatimParamDyn" lineEndContext="#pop#pop">
+        <DetectChar attribute="Parameter Expansion Operator" context="#pop#pop" char="1"/>
+      </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="CommandBackq" fallthroughContext="Command">
         <DetectChar attribute="Backquote" context="#pop!CommandArgs" char="`"/>
@@ -1160,6 +1239,10 @@ current: 5.9
       <context attribute="Normal Text" lineEndContext="#pop" name="FindStrings">
         <DetectChar attribute="String SingleQ" context="StringSQ" char="'"/>
         <DetectChar attribute="String DoubleQ" context="StringDQ" char="&quot;"/>
+      </context>
+      <context attribute="Normal Text" lineEndContext="#pop" name="FindStringsThenPop">
+        <DetectChar attribute="String SingleQ" context="#pop!StringSQ" char="'"/>
+        <DetectChar attribute="String DoubleQ" context="#pop!StringDQ" char="&quot;"/>
       </context>
 
       <!-- SubstCommand is called after a $( is encountered -->

@@ -1310,7 +1310,9 @@ current: 5.9
         <AnyChar attribute="Parameter Expansion Operator" context="#pop!AlternateValue" String="-+=?|*^"/>
         <Detect2Chars attribute="Parameter Expansion Operator" context="#pop!AlternateValue" char=":" char1="="/>
         <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarBraceSubst" char="/"/>
-        <!-- Modifiers -->
+        <IncludeRules context="VarBraceModifierOrArithmetic"/>
+      </context>
+      <context attribute="Parameter Expansion" lineEndContext="#pop!VarSub" name="VarBraceModifierOrArithmetic" fallthroughContext="#pop!VarSub">
         <AnyChar context="#pop!VarBraceModifiers" String="aAcehlpPqQrsg&amp;tufFwW" lookAhead="1"/>
         <DetectIdentifier attribute="Error" context="#pop!VarBraceModifiers"/>
       </context>
@@ -1602,7 +1604,7 @@ current: 5.9
       <!-- called as soon as ${xxx: is encoutered and followed by a arithmetic context (not modifier, etc) -->
       <context attribute="Normal Text" lineEndContext="#stay" name="VarSub">
         <DetectChar attribute="Parameter Expansion" context="#pop" char="}"/>
-        <DetectChar attribute="Parameter Expansion Operator" context="#stay" char=":"/>
+        <DetectChar attribute="Parameter Expansion Operator" context="#pop!VarBraceModifierOrArithmetic" char=":"/>
         <IncludeRules context="FindArithmetic"/>
       </context>
 

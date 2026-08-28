@@ -348,7 +348,8 @@ ls **.php
 ls **/*(#ia2)readme
 ls **/*(-@)
 ls **/*(.)
-ls **/*(.:g-w:)
+ls **/*(.:h:g-w:)
+ls **/*(.g:w::h)
 ls **/*(.Lm+10)
 ls **/*(D/e:'[[ -e $REPLY/index.php && -e $REPLY/index.html ]]':)
 ls **/*(u0WLk+10m0)
@@ -370,6 +371,7 @@ ls *.*(mM4)
 ls *.*~(lex|parse).[ch](^D^l1)
 ls *.*~[a-m]*(u:nobody:g:apache:.xX)
 ls *.c(#q:s/#%(#b)s(*).c/'S${match[1]}.C'/)
+ls *.c(#q:s'"'_)(#q:s"'"_)
 ls *.c(:r)
 ls *.c~lex.c
 ls *.h~(fred|foo).h
@@ -514,6 +516,8 @@ echo ${${:-=cat}:h}
 echo ${foo:h34:a} $foo:h34:a
 echo $foo:F:2:wh $foo:F[2]W( _ )h    $foo:fi $foo:F:2:i
 echo $foo:h:a:gs/dfs/fds/:s/fds/d'd'f xyz $foo: $foo:O $foo:A
+echo ${foo:s/{{{'}/}}/'_} ${foo:s/{{{"}/}}/"_}  # oups, last / in quoting
+echo $foo:s'"'_ $foo:s"'"_ ${foo:s'"'_} ${foo:s"'"_}
 echo $foo:s/a'bc/_&\&_/':h $foo:s/a"$a/$a,"/:h $foo:s/a'bc'd/_/:h $foo:s/abc/a"b&\&_"c/:h
 3=$foo:QQQ xyz $a[3,$]:h3:t1:e
 echo ${${~foo}//\*/*.c}

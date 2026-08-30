@@ -737,8 +737,11 @@ a) ]]
 [ a -eq 2 ] || [ a -eq 2] ] && [[ a -eq 2 ]] || [[ a != b ]];
 [ a -eq 2 ]||[ a -eq 2] ]&&[[ a -eq 2 ]]||[[ a != b ]];
 
+# arithmetic expression
 ((3+1+a+$c*(x) & 0x4342_2fd+03-08_5/23#D9a@_^8))
 ((1.3/(2-(a-4))))
+print $(( [#_] sqrt(1e7) 0__39 1423e23 .2443 43.34 34.43e4 .d))
+print $(( [#10_3] 1e___3 .__2 1.__e__3 1.__ ))
 
 # they are not arithmetic evaluations...
 ((cmd && cmd) || cmd)
@@ -747,8 +750,6 @@ $((cmd && cmd) || cmd)
 cmd) || cmd)
 $((cmd &&
 cmd) || cmd)
-
-print $(( [#_] sqrt(1e7) 0__39 1423e23 .2443 43.34 34.43e4 .d))
 
 { echo
     echo

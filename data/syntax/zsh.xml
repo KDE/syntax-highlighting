@@ -1685,12 +1685,25 @@ current: 5.9
         <AnyChar attribute="Parameter Expansion Operator" context="#pop!VarBraceSubstPat" String="#%"/>
       </context>
       <context attribute="Pattern" lineEndContext="#stay" name="VarBraceSubstPat">
-        <DetectChar attribute="Parameter Expansion Operator" context="#pop!AlternateValue" char="/"/>
+        <DetectChar attribute="Parameter Expansion Operator" context="VarBraceSubstRep" char="/"/>
         <DetectChar attribute="String DoubleQ" context="RecursiveAlternateValue" char="{"/>
         <DetectChar attribute="Parameter Expansion" context="#pop" char="}"/>
         <IncludeRules context="FindWord"/>
         <IncludeRules context="FindSubPattern"/>
         <DetectIdentifier attribute="Pattern"/>
+      </context>
+      <!-- ${foo/.../...}
+                     ~~~~
+      -->
+      <context attribute="Replacement String" lineEndContext="#stay" name="VarBraceSubstRep">
+        <DetectChar attribute="Replacement String" context="VarBraceSubstRepRec" char="{"/>
+        <DetectChar attribute="Parameter Expansion" context="#pop#pop" char="}"/>
+        <IncludeRules context="FindWord"/>
+      </context>
+      <context attribute="Replacement String" lineEndContext="#stay" name="VarBraceSubstRepRec">
+        <DetectChar attribute="Replacement String" context="VarBraceSubstRepRec" char="{"/>
+        <DetectChar attribute="Replacement String" context="#pop" char="}"/>
+        <IncludeRules context="FindWord"/>
       </context>
 
       <!-- called as soon as ${( is encoutered -->

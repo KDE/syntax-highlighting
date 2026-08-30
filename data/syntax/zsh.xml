@@ -2006,14 +2006,18 @@ current: 5.9
       </context>
 
       <context attribute="Number" name="FindToNum">
-        <Detect2Chars attribute="BaseN" context="ChToNum" char="#" char1="#"/>
-        <DetectChar attribute="BaseN" context="#stay" char="#"/>
+        <Detect2Chars attribute="Base" context="ChToNum" char="#" char1="#"/>
+        <DetectChar attribute="Base" context="MaybeOutputBase" char="#"/>
       </context>
       <!-- ##c in ((##c)) -->
       <context attribute="Normal Text" lineEndContext="#pop" name="ChToNum" fallthroughContext="#pop">
         <LineContinue attribute="Escape"/>
         <!-- '##\)' is ok, but not '##\(' -->
-        <RegExpr attribute="Number" context="#pop" String="[^\[\]()\\$^]|\$(?=$|\)|[^+=:#^~+$@*'?{(\w])|\^?\\(&escaped_ch;|[^\[\]\(])|\^[^\[\]()\\]|\^(?=[)])"/>
+        <RegExpr attribute="BaseN" context="#pop" String="[^\[\]()\\$^]|\$(?=$|\)|[^+=:#^~+$@*'?{(\w])|\^?\\(&escaped_ch;|[^\[\]\(])|\^[^\[\]()\\]|\^(?=[)])"/>
+      </context>
+      <!-- #n in ((#n)) -->
+      <context attribute="Normal Text" lineEndContext="#pop" name="MaybeOutputBase" fallthroughContext="#pop">
+        <AnyChar attribute="BaseN" String="0123456789_"/>
       </context>
 
       <context attribute="Number" name="FindNumber">
@@ -2993,7 +2997,7 @@ current: 5.9
       <itemData name="Option"         defStyleNum="dsAttribute"     spellChecking="false"/>
       <itemData name="Hex"            defStyleNum="dsBaseN"         spellChecking="false"/>
       <itemData name="Number"         defStyleNum="dsDecVal"        spellChecking="false"/>
-      <itemData name="Base"           defStyleNum="dsDataType"      spellChecking="false"/>
+      <itemData name="Base"           defStyleNum="dsPreprocessor"  spellChecking="false"/>
       <itemData name="BaseN"          defStyleNum="dsBaseN"         spellChecking="false"/>
       <itemData name="File Descriptor" defStyleNum="dsDecVal"       spellChecking="false"/>
       <itemData name="Parameter Expansion" defStyleNum="dsVariable" spellChecking="false"/>

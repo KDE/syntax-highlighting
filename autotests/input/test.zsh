@@ -430,7 +430,8 @@ ls $(echo /c/aax/*(.om[1]))(+cyg) &
 ls *~vssver.scc(.om[1])
 ls /c/aax/*(.om[1]+cyg)
 ls ${(ps:\0:)"$(grep -lZ foobar ./*.txt(.))"}
-ls [[[[]]x*
+ls [[[[]]x* []]] [^]]] [-a-Z<0-9>0-9<>] [a$foo:hb]
+ls [()] [(ab)] [a(b] [a)b]
 
 2 - f -f
 !a -f

@@ -12,6 +12,8 @@
         <!ENTITY symbolseps "&lt;>|&amp;;()">
         <!ENTITY wordseps   "&ws;&symbolseps;">
         <!ENTITY wordseps_or_extglog "&ws;>|&amp;;)`"> <!-- wordseps without < and ( -->
+        <!ENTITY symbolseps_without_parens "&lt;>|&amp;;">
+        <!ENTITY wordseps_without_parens   "&ws;&symbolseps_without_parens;">
 
         <!ENTITY bq_string  "`[^`]*+`">
         <!ENTITY sq_string  "'[^']*+'">
@@ -328,7 +330,7 @@ current: 5.9
       <context attribute="OtherCommand" lineEndContext="#pop" name="Command">
         <DetectSpaces attribute="Normal Text" context="#pop!CommandArgs"/>
         <DetectIdentifier attribute="OtherCommand" context="#stay"/>
-        <DetectChar context="CommandVariables" char="$" lookAhead="1"/>
+        <IncludeRules context="FindVariableOrCurrentStyle"/>
         <IncludeRules context="FindStrings"/>
         <Detect2Chars attribute="Control" context="#pop" char="&amp;" char1="&amp;"/>
         <Detect2Chars attribute="Control" context="#pop" char="|" char1="|"/>
@@ -342,10 +344,6 @@ current: 5.9
         <DetectChar context="CommandAssumeEscape" char="\" lookAhead="1"/>
         <DetectChar context="CommandMaybeBraceExpansion" char="{" lookAhead="1"/>
         <DetectChar context="CommandMaybeGroupEnd" char="}" lookAhead="1"/>
-      </context>
-      <context attribute="Command" lineEndContext="#pop" name="CommandVariables">
-        <IncludeRules context="DispatchVariables"/>
-        <DetectChar attribute="OtherCommand" context="#pop" char="$"/>
       </context>
       <context attribute="OtherCommand" lineEndContext="#pop" name="CommandAssumeEscape">
         <LineContinue attribute="Escape" context="#pop"/>
@@ -528,7 +526,7 @@ current: 5.9
         <DetectChar attribute="String DoubleQ" context="VarNameModifier_s_C_RepDQ" char="&quot;"/>
       </context>
       <context attribute="Replacement String" lineEndContext="#pop#pop" name="VarNameModifier_s_Rep_Common">
-        <DetectChar context="RegularVariable" char="$" lookAhead="1"/>
+        <IncludeRules context="FindVariable"/>
         <DetectChar attribute="Backquote" context="RegularBackq" char="`"/>
         <IncludeRules context="FindEscape"/>
         <AnyChar context="#pop#pop" String="&wordseps;" lookAhead="1"/>
@@ -817,11 +815,23 @@ current: 5.9
         <DetectIdentifier/>
       </context>
 
+      <!-- [a-Z]
+           ~
+      -->
       <context attribute="Glob" lineEndContext="#stay" name="FindGlobAny">
         <DetectChar attribute="Glob" context="GlobAnyFlag" char="["/>
       </context>
-      <context attribute="String SingleQ" lineEndContext="#pop" name="GlobAnyFlag" fallthroughContext="#pop!GlobAny">
-        <DetectChar attribute="Glob Flag" context="#pop!GlobAny" char="^"/>
+      <!-- [^a-Z]
+            ~
+      -->
+      <context attribute="String SingleQ" lineEndContext="#pop" name="GlobAnyFlag" fallthroughContext="#pop!GlobAnyNoClose">
+        <AnyChar attribute="Glob Flag" context="#pop!GlobAnyNoClose" String="!^"/>
+      </context>
+      <!-- []a-Z] [^]a-Z] [-a-Z] [^-a-Z]
+            ~       ~      ~       ~
+      -->
+      <context attribute="Glob" lineEndContext="#pop#pop" name="GlobAnyNoClose" fallthroughContext="#pop!GlobAny">
+        <AnyChar attribute="String SingleQ" context="#pop!GlobAny" String="]-"/>
       </context>
       <context attribute="String SingleQ" lineEndContext="#pop" name="GlobAny">
         <DetectIdentifier attribute="String SingleQ"/>
@@ -830,6 +840,21 @@ current: 5.9
         <IncludeRules context="FindStrings"/>
         <DetectChar attribute="Glob" context="#pop" char="]"/>
         <Detect2Chars attribute="Glob" context="GlobClass" char="[" char1=":"/>
+        <IncludeRules context="FindVariableOrCurrentStyle"/>
+        <DetectChar context="GlobAnyMaybeNumRange" char="&lt;" lookAhead="1"/>
+        <!-- some characters are prohibited, but it depends on the context of use
+        ${s/[...]/}, [[ $foo = [...] ]], [[ $foo = ( [...] ) ]], etc
+        -->
+      </context>
+      <!-- [abc<0-9>def<ghi]
+               ~~~~~   ~
+      -->
+      <context attribute="String SingleQ" name="GlobAnyMaybeNumRange">
+        <!-- [<0-9>] is quivalent to [-09\<\>], not [0-9\<\>]
+                ~ not a Glob Flag
+        -->
+        <RegExpr attribute="String SingleQ" context="#pop" String="&lt;[0-9]*-[0-9]*>"/>
+        <DetectChar context="#pop" char="&lt;"/>
       </context>
       <context attribute="Glob" lineEndContext="#pop#pop" name="GlobClass">
         <DetectIdentifier attribute="Pattern"/>
@@ -1252,9 +1277,22 @@ current: 5.9
 
       <context attribute="Normal Text" lineEndContext="#stay" name="FindWord">
         <IncludeRules context="FindStrings"/>
-        <DetectChar context="RegularVariable" char="$" lookAhead="1"/>
+        <IncludeRules context="FindVariable"/>
         <DetectChar attribute="Backquote" context="RegularBackq" char="`"/>
         <IncludeRules context="FindEscape"/>
+      </context>
+
+      <!-- $foo ${foo} $((...)) $(...) -->
+      <context attribute="Command" lineEndContext="#pop" name="FindVariableOrCurrentStyle">
+        <DetectChar context="VariableOrCurrentStyle" char="$" lookAhead="1"/>
+      </context>
+      <context attribute="Command" lineEndContext="#pop" name="VariableOrCurrentStyle">
+        <IncludeRules context="DispatchVariables"/>
+        <DetectChar context="#pop" char="$"/>
+      </context>
+      <!-- $foo ${foo} $((...)) $(...) -->
+      <context attribute="Normal Text" lineEndContext="#pop" name="FindVariable">
+        <DetectChar context="RegularVariable" char="$" lookAhead="1"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#pop" name="RegularVariable">
         <IncludeRules context="DispatchVariables"/>
@@ -1482,7 +1520,7 @@ current: 5.9
         <AnyChar context="#pop" String="&symbolseps;" lookAhead="1"/>
       </context>
       <context attribute="Replacement String" name="VarBraceModifier_s_Rep_Common">
-        <DetectChar context="RegularVariable" char="$" lookAhead="1"/>
+        <IncludeRules context="FindVariable"/>
         <DetectChar attribute="Backquote" context="RegularBackq" char="`"/>
         <IncludeRules context="FindEscape"/>
         <IncludeRules context="FindSingleGlob"/>
@@ -1879,7 +1917,7 @@ current: 5.9
         <DetectChar context="EscapeMaybeBraceExpansion" char="{" lookAhead="1"/>
         <IncludeRules context="FindEscape"/>
         <DetectChar attribute="Backquote" context="CommandBackq" char="`"/>
-        <DetectChar context="BraceExpansionVariables" char="$" lookAhead="1"/>
+        <IncludeRules context="FindVariableOrCurrentStyle"/>
         <IncludeRules context="FindStrings"/>
         <IncludeRules context="FindPattern"/>
         <DetectIdentifier attribute="Escape"/>
@@ -1887,10 +1925,6 @@ current: 5.9
       <context attribute="Escape" lineEndContext="#pop" name="EscapeMaybeBraceExpansion">
         <IncludeRules context="DispatchBraceExpansion"/>
         <DetectChar attribute="Escape" context="#pop!BraceExpansion2" char="{"/>
-      </context>
-      <context attribute="Escape" lineEndContext="#pop" name="BraceExpansionVariables">
-        <IncludeRules context="DispatchVariables"/>
-        <DetectChar attribute="Escape" context="#pop" char="$"/>
       </context>
 
       <context attribute="Escape" lineEndContext="#pop" name="PathBraceExpansion">
@@ -2625,7 +2659,7 @@ current: 5.9
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="IncGlobQualifier_e">
         <IncludeRules context="FindStrings"/>
-        <DetectChar context="RegularVariable" char="$" lookAhead="1"/>
+        <IncludeRules context="FindVariable"/>
         <DetectChar attribute="Backquote" context="RegularBackq" char="`"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="GlobQualifier_e[">
@@ -2819,7 +2853,7 @@ current: 5.9
         <AnyChar context="#pop" String="&symbolseps;" lookAhead="1"/>
       </context>
       <context attribute="Replacement String" name="GlobModifier_s_Rep_Common">
-        <DetectChar context="RegularVariable" char="$" lookAhead="1"/>
+        <IncludeRules context="FindVariable"/>
         <DetectChar attribute="Backquote" context="RegularBackq" char="`"/>
         <IncludeRules context="FindEscape"/>
         <IncludeRules context="FindSingleGlob"/>

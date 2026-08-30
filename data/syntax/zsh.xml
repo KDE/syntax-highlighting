@@ -246,8 +246,7 @@ current: 5.9
 
     <contexts>
       <context attribute="Normal Text" lineEndContext="#stay" name="Start" fallthroughContext="Command">
-        <DetectSpaces attribute="Normal Text" context="#stay"/>
-        <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <IncludeRules context="FindSpaceAndComment"/>
         <!-- start expression in double parentheses -->
         <Detect2Chars context="ExprDblParenOrSubShell" char="(" char1="(" lookAhead="1"/>
         <!-- start a subshell -->
@@ -797,7 +796,7 @@ current: 5.9
         <RegExpr attribute="Glob" context="#pop!InGlobRange" String="&lt;(?=[0-9]*-[0-9]*>)"/>
       </context>
       <context attribute="Number" lineEndContext="#stay" name="InGlobRange">
-        <AnyChar attribute="Number" context="#stay" String="0123456789"/>
+        <IncludeRules context="FindDigit"/>
         <DetectChar attribute="Glob" context="#stay" char="-"/>
         <DetectChar attribute="Glob" context="#pop" char=">"/>
       </context>
@@ -1275,6 +1274,11 @@ current: 5.9
         <RegExpr attribute="String Escape" context="#stay" String="\\&escaped_ch;?"/>
       </context>
 
+      <context attribute="Normal Text" lineEndContext="#stay" name="FindSpaceAndComment">
+        <DetectSpaces attribute="Normal Text" context="#stay"/>
+        <DetectChar attribute="Comment" context="Comment" char="#"/>
+      </context>
+
       <context attribute="Normal Text" lineEndContext="#stay" name="FindWord">
         <IncludeRules context="FindStrings"/>
         <IncludeRules context="FindVariable"/>
@@ -1380,7 +1384,7 @@ current: 5.9
                   ~          ~~
       -->
       <context attribute="Parameter Expansion" lineEndContext="#pop!VarBraceModifierNext" name="VarBraceModifier_h" fallthroughContext="#pop!VarBraceModifierNext">
-        <AnyChar attribute="Number" context="#stay" String="0123456789"/>
+        <IncludeRules context="FindDigit"/>
       </context>
 
 
@@ -2020,6 +2024,10 @@ current: 5.9
         <AnyChar attribute="BaseN" String="0123456789_"/>
       </context>
 
+      <context attribute="Number" name="FindDigit">
+        <AnyChar attribute="Number" context="#stay" String="0123456789"/>
+      </context>
+
       <context attribute="Number" name="FindNumber">
         <AnyChar context="Number" String="0123456789." lookAhead="1"/>
       </context>
@@ -2145,9 +2153,7 @@ current: 5.9
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="ExprDblBracketNot" fallthroughContext="#pop!ExprDblBracketParam1">
-        <DetectChar context="ExprDblBracketTestMaybeNot" char="!" lookAhead="1"/>
-        <DetectSpaces attribute="Normal Text" context="#stay"/>
-        <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <DetectChar context="ExprDblBracketTestMaybeNot" char="!" lookAhead="1"/>        <IncludeRules context="FindSpaceAndComment"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#pop" name="ExprDblBracketTestMaybeNot" fallthroughContext="#pop#pop!ExprDblBracketParam1">
         <RegExpr attribute="Expression" context="#pop" String="!(?=$|[&ws;(])"/>
@@ -2166,8 +2172,7 @@ current: 5.9
         <RegExpr attribute="Expression" context="#pop!ExprDblBracketUnary" String="&unary_operators;(?!\s+(?:=~|&binary_operators;))"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="ExprDblBracketUnary" fallthroughContext="#pop!ExprDblBracketValueText">
-        <DetectSpaces attribute="Normal Text"/>
-        <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <IncludeRules context="FindSpaceAndComment"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#pop" name="ExprDblBracketSubValue" fallthroughContext="#pop">
         <DetectChar attribute="Operator" context="ExprDblBracketNot" char="("/>
@@ -2221,17 +2226,12 @@ current: 5.9
         <IncludeRules context="FindSingleGlob"/>
         <IncludeRules context="FindGlobAny"/>
         <IncludeRules context="FindGroupPattern"/>
-        <DetectChar context="ExprDblBracketValueMaybeGlobRange" char="&lt;" lookAhead="1"/>
+        <IncludeRules context="FindGlobRangeOrError"/>
         <AnyChar attribute="Error" context="#stay" String=">&amp;|;"/>
-      </context>
-      <context attribute="Normal Text" lineEndContext="#stay" name="ExprDblBracketValueMaybeGlobRange">
-        <IncludeRules context="FindGlobRangeThenPop"/>
-        <DetectChar attribute="Error" context="#pop" char="&lt;"/>
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="ExprDblBracketParam2" fallthroughContext="#pop!ExprDblBracketParam2_2">
-        <DetectSpaces attribute="Normal Text" context="#stay"/>
-        <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <IncludeRules context="FindSpaceAndComment"/>
         <LineContinue attribute="Escape"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="ExprDblBracketParam2_2" fallthroughContext="ExprDblBracketValuePattern">
@@ -2273,8 +2273,7 @@ current: 5.9
       </context>
 
       <context attribute="Normal Text" lineEndContext="#stay" name="ExprDblBracketRegex" fallthroughContext="#pop!Regex">
-        <DetectSpaces attribute="Normal Text" context="#stay"/>
-        <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <IncludeRules context="FindSpaceAndComment"/>
       </context>
       <context attribute="Pattern" lineEndContext="#stay" name="Regex">
         <DetectIdentifier attribute="Pattern"/>
@@ -2381,8 +2380,7 @@ current: 5.9
 
       <!-- AssignArray consumes everything till ), marking assignments -->
       <context attribute="Normal Text" lineEndContext="#stay" name="AssignArray" fallthroughContext="NormalOption">
-        <DetectSpaces attribute="Normal Text" context="#stay"/>
-        <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <IncludeRules context="FindSpaceAndComment"/>
         <DetectChar attribute="Variable" context="#pop" char=")"/>
         <DetectChar context="AssignArrayKey" char="[" lookAhead="1"/>
         <DetectChar attribute="Backquote" context="AssignArrayBackq" char="`"/>
@@ -2613,7 +2611,7 @@ current: 5.9
       </context>
 
       <context attribute="Number" lineEndContext="#pop" name="GlobQualifier_Y" fallthroughContext="#pop">
-        <AnyChar attribute="Number" context="#stay" String="0123456789"/>
+        <IncludeRules context="FindDigit"/>
       </context>
 
       <context attribute="Glob Flag" lineEndContext="#pop" name="GlobQualifier_L" fallthroughContext="#pop">
@@ -2648,7 +2646,7 @@ current: 5.9
         <RegExpr attribute="Glob Flag" context="#pop!GlobQualifier_fx" String="(.)"/>
       </context>
       <context attribute="Number" lineEndContext="#pop" name="GlobQualifier_fo" fallthroughContext="#pop">
-        <AnyChar attribute="Number" context="#stay" String="0123456789"/>
+        <IncludeRules context="FindDigit"/>
         <DetectChar attribute="Glob" context="#stay" char="?"/>
       </context>
       <context attribute="Normal Text" lineEndContext="#stay" name="GlobQualifier_f[">
@@ -2707,7 +2705,7 @@ current: 5.9
       </context>
       <context attribute="Glob Flag" lineEndContext="#pop" name="IncGlobPatFlag" fallthroughContext="#pop">
         <AnyChar attribute="Glob Flag" context="#stay" String="ilIbBcmMaseuU,"/>
-        <AnyChar attribute="Number" context="#stay" String="0123456789"/>
+        <IncludeRules context="FindDigit"/>
         <DetectChar attribute="Glob Flag" context="#pop!GlobQualifier" char="q"/>
       </context>
 
@@ -2733,7 +2731,7 @@ current: 5.9
                ~       ~~
       -->
       <context attribute="Parameter Expansion" lineEndContext="#pop#pop" name="GlobModifier_h" fallthroughContext="#pop!GlobModifierNext">
-        <AnyChar attribute="Number" context="#stay" String="0123456789"/>
+        <IncludeRules context="FindDigit"/>
       </context>
 
 
@@ -2768,8 +2766,8 @@ current: 5.9
       <context attribute="Verbatim String" name="GlobModifier_s_Str_Recursive">
         <DetectChar context="#pop#pop#pop" char="/" lookAhead="1"/>
         <IncludeRules context="FindEscape"/>
-        <DetectChar attribute="String SingleQ" context="GlobModifier_s_StrSQ_Recursive" char="'"/>
-        <DetectChar attribute="String DoubleQ" context="GlobModifier_s_StrDQ_Recursive" char='"'/>
+        <DetectChar attribute="String SingleQ" context="VarBraceModifier_s_StrSQ_Recursive" char="'"/>
+        <DetectChar attribute="String DoubleQ" context="VarBraceModifier_s_StrDQ_Recursive" char='"'/>
         <DetectChar attribute="Verbatim String" context="Modifier_s_Str_to_Parent!Modifier_s_Str_to_Parent!GlobModifier_s_Str_Recursive" char="("/>
         <DetectChar context="#pop#pop#pop" char=")"/>
       </context>
@@ -2797,11 +2795,6 @@ current: 5.9
         <LineContinue attribute="Escape"/>
         <DetectChar attribute="Parameter Expansion Operator" context="#pop#pop!GlobModifier_s_Rep!GlobModifier_s_RepSQ" char="/"/>
       </context>
-      <context attribute="String SingleQ" name="GlobModifier_s_StrSQ_Recursive">
-        <DetectChar attribute="String SingleQ" context="#pop" char="'"/>
-        <LineContinue attribute="Escape"/>
-        <DetectChar context="#pop#pop#pop" char="/" lookAhead="1"/>
-      </context>
       <!-- *(#q:s'..'..}
                  ~~~~
       -->
@@ -2820,11 +2813,6 @@ current: 5.9
       <context attribute="Error" name="GlobModifier_s_StrDQ_to_Rep">
         <DetectChar attribute="Parameter Expansion Operator" context="#pop#pop#pop!GlobModifier_s_Rep!GlobModifier_s_RepDQ" char="/"/>
       </context>
-      <context attribute="String DoubleQ" name="GlobModifier_s_StrDQ_Recursive">
-        <DetectChar attribute="String DoubleQ" context="#pop" char='"'/>
-        <IncludeRules context="FindEscape"/>
-        <DetectChar context="#pop#pop" char="/" lookAhead="1"/>
-      </context>
       <!-- *(#q:s".."..}
                  ~~~~
       -->
@@ -2841,16 +2829,16 @@ current: 5.9
         <DetectChar attribute="String SingleQ" context="GlobModifier_s_RepSQ" char="'"/>
         <DetectChar attribute="String DoubleQ" context="GlobModifier_s_RepDQ" char="&quot;"/>
         <DetectChar attribute="Replacement String" context="GlobModifier_s_RepSQ!GlobModifier_s_RepDQ_to_End!GlobModifier_s_Rep_Recursive" char="&paren_open;"/>
-        <IncludeRules context="GlobModifier_s_Rep_Common"/>
+        <IncludeRules context="VarBraceModifier_s_Rep_Common"/>
         <IncludeRules context="GlobModifier_End"/>
       </context>
       <context attribute="Replacement String" name="GlobModifier_s_Rep_Recursive">
         <DetectChar context="#pop#pop#pop" char="/" lookAhead="1"/>
-        <DetectChar attribute="String SingleQ" context="GlobModifier_s_RepSQ_Recursive" char="'"/>
-        <DetectChar attribute="String DoubleQ" context="GlobModifier_s_RepDQ_Recursive" char='"'/>
+        <DetectChar attribute="String SingleQ" context="VarBraceModifier_s_RepSQ_Recursive" char="'"/>
+        <DetectChar attribute="String DoubleQ" context="VarBraceModifier_s_RepDQ_Recursive" char='"'/>
         <DetectChar attribute="Replacement String" context="Modifier_s_Str_to_Parent!Modifier_s_Str_to_Parent!GlobModifier_s_Rep_Recursive" char="("/>
         <DetectChar context="#pop#pop#pop" char=")"/>
-        <IncludeRules context="GlobModifier_s_Rep_Common"/>
+        <IncludeRules context="VarBraceModifier_s_Rep_Common"/>
         <AnyChar context="#pop" String="&symbolseps;" lookAhead="1"/>
       </context>
       <context attribute="Replacement String" name="GlobModifier_s_C_Rep">
@@ -2859,22 +2847,15 @@ current: 5.9
         but there is no way to propagate the capture. -->
         <IncludeRules context="FindVarNameModifier_s_C_RepQ"/>
         <DetectChar attribute="Replacement String" context="GlobModifier_s_C_Rep_Recursive" char="&paren_open;"/>
-        <IncludeRules context="GlobModifier_s_Rep_Common"/>
+        <IncludeRules context="VarBraceModifier_s_Rep_Common"/>
         <IncludeRules context="GlobModifier_End"/>
       </context>
       <context attribute="Replacement String" name="GlobModifier_s_C_Rep_Recursive">
         <IncludeRules context="FindVarNameModifier_s_C_RepQ"/>
-        <IncludeRules context="GlobModifier_s_Rep_Common"/>
+        <IncludeRules context="VarBraceModifier_s_Rep_Common"/>
         <DetectChar attribute="Replacement String" context="GlobModifier_s_C_Rep_Recursive" char="("/>
         <DetectChar context="#pop" char=")"/>
         <AnyChar context="#pop" String="&symbolseps;" lookAhead="1"/>
-      </context>
-      <context attribute="Replacement String" name="GlobModifier_s_Rep_Common">
-        <IncludeRules context="FindVariable"/>
-        <DetectChar attribute="Backquote" context="RegularBackq" char="`"/>
-        <IncludeRules context="FindEscape"/>
-        <IncludeRules context="FindSingleGlob"/>
-        <IncludeRules context="FindGlobRangeOrError"/>
       </context>
       <!-- *(#q:s/../..'../'..}  *(#q:s/../..'..'..}
                        ~~~~                  ~~~~
@@ -2883,20 +2864,12 @@ current: 5.9
         <IncludeRules context="VarNameModifier_s_C_RepSQ"/>
         <DetectChar attribute="Error" context="#pop#pop!GlobModifierNext!StringSQ" char="/"/>
       </context>
-      <context attribute="String SingleQ" name="GlobModifier_s_RepSQ_Recursive">
-        <IncludeRules context="VarNameModifier_s_C_RepSQ"/>
-        <DetectChar context="#pop#pop#pop" char="/" lookAhead="1"/>
-      </context>
       <!-- *(#q:s/../.."../"..}  *(#q:s/../..".."..}
                        ~~~~                  ~~~~
       -->
       <context attribute="String DoubleQ" name="GlobModifier_s_RepDQ">
         <IncludeRules context="VarNameModifier_s_C_RepDQ"/>
         <DetectChar attribute="Error" context="#pop#pop!GlobModifierNext!StringDQ" char="/"/>
-      </context>
-      <context attribute="String DoubleQ" name="GlobModifier_s_RepDQ_Recursive">
-        <IncludeRules context="VarNameModifier_s_C_RepDQ"/>
-        <DetectChar context="#pop#pop" char="/" lookAhead="1"/>
       </context>
       <context attribute="String DoubleQ" name="GlobModifier_s_RepDQ_to_End">
         <DetectChar attribute="Error" context="#pop#pop#pop!GlobModifierNext!StringDQ" char="/"/>

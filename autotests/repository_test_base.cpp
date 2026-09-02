@@ -71,6 +71,7 @@ constexpr DefinitionDataRow definitionsForFileNames[] = {
     {".envrc", ".envrc", "Bash"},
     {".env", ".env", "DotEnv"},
     {".env.*", ".env.local", "DotEnv"},
+    {"*.lrc", "song.lrc", "LRC Lyrics"},
 
     {"Config.*", "Config.beginning", "Kconfig"},
     {"usr.libexec.*", "usr.libexec.", "AppArmor Security Profile"},

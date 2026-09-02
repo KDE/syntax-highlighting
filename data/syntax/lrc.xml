@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language>
+<!--
+    SPDX-License-Identifier: MIT
+
+    LRC (LyRiCs) file format: https://en.wikipedia.org/wiki/LRC_(file_format)
+
+    A line consists of one or more timestamps followed by lyric text:
+
+        [mm:ss.xx]Lyric line
+        [mm:ss.xx][mm:ss.xx]Line with multiple timestamps
+
+    Metadata tags are placed at the top of the file:
+
+        [ti:Title]
+        [ar:Artist]
+        [al:Album]
+        [by:Creator]
+        [offset:500]
+
+    Enhanced LRC uses angle-bracket word timestamps inside the lyric text:
+
+        [mm:ss.xx]<mm:ss.xx>word <mm:ss.xx>word
+-->
+<language name="LRC Lyrics"
+          version="1"
+          kateversion="6.22"
+          author="Gary Wang" 
+          section="Other"
+          extensions="*.lrc"
+          mimetype="text/x-lrc"
+          license="MIT">
+  <highlighting>
+    <contexts>
+      <context name="Normal" attribute="Normal Text" lineEndContext="#stay">
+        <RegExpr context="#pop!Metadata" attribute="Meta Tag" String="\[(?=[A-Za-z]+\s*:)" lookAhead="true" firstNonSpace="true"/>
+        <RegExpr context="#pop!Timestamp" attribute="Timestamp" String="\[(?=\d{1,3}:[0-5]\d\.\d{2,3}\])" lookAhead="true"/>
+        <RegExpr context="#pop!WordTimestamp" attribute="Word Timestamp" String="&lt;(?=\d{1,3}:[0-5]\d\.\d{2,3}&gt;)" lookAhead="true"/>
+        <DetectIdentifier/>
+      </context>
+
+      <context name="Timestamp" attribute="Timestamp" lineEndContext="#pop">
+        <DetectChar attribute="Timestamp Bracket" context="#stay" char="["/>
+        <RegExpr attribute="Timestamp" context="#stay" String="\d{1,3}:[0-5]\d\.\d{2,3}"/>
+        <DetectChar attribute="Timestamp Bracket" context="#pop" char="]"/>
+      </context>
+
+      <context name="WordTimestamp" attribute="Word Timestamp" lineEndContext="#pop">
+        <DetectChar attribute="Word Timestamp Bracket" context="#stay" char="&lt;"/>
+        <RegExpr attribute="Word Timestamp" context="#stay" String="\d{1,3}:[0-5]\d\.\d{2,3}"/>
+        <DetectChar attribute="Word Timestamp Bracket" context="#pop" char="&gt;"/>
+      </context>
+
+      <context name="Metadata" attribute="Normal Text" lineEndContext="#pop">
+        <DetectChar attribute="Meta Bracket" context="#stay" char="["/>
+        <RegExpr attribute="Meta Tag" context="#pop!MetaValue" String="[A-Za-z]+(?=\s*:)"/>
+      </context>
+
+      <context name="MetaValue" attribute="Normal Text" lineEndContext="#pop">
+        <DetectChar attribute="Meta Separator" context="#stay" char=":"/>
+        <RegExpr attribute="Meta Value" context="#stay" String="[^\]\r\n]*"/>
+        <DetectChar attribute="Meta Bracket" context="#pop" char="]"/>
+      </context>
+    </contexts>
+
+    <itemDatas>
+      <itemData name="Normal Text" defStyleNum="dsNormal" spellChecking="true"/>
+      <itemData name="Timestamp" defStyleNum="dsComment" spellChecking="false"/>
+      <itemData name="Timestamp Bracket" defStyleNum="dsOperator" spellChecking="false"/>
+      <itemData name="Word Timestamp" defStyleNum="dsComment" spellChecking="false"/>
+      <itemData name="Word Timestamp Bracket" defStyleNum="dsOperator" spellChecking="false"/>
+      <itemData name="Meta Bracket" defStyleNum="dsOperator" spellChecking="false"/>
+      <itemData name="Meta Tag" defStyleNum="dsKeyword" spellChecking="false"/>
+      <itemData name="Meta Separator" defStyleNum="dsOperator" spellChecking="false"/>
+      <itemData name="Meta Value" defStyleNum="dsString" spellChecking="false"/>
+    </itemDatas>
+  </highlighting>
+</language>

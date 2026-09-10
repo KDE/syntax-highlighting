@@ -29,7 +29,7 @@ target_link_libraries(theme_test KF6SyntaxHighlighting Qt6::Test)
 
 add_executable(themepreviewicon_test themepreviewicon_test.cpp)
 ecm_mark_nongui_executable(themepreviewicon_test)
-add_test(NAME themepreviewicon_test COMMAND themepreviewicon_test)
+add_test(NAME themepreviewicon_test COMMAND themepreviewicon_test ${OFFSCREEN_QPA})
 target_link_libraries(themepreviewicon_test KF6SyntaxHighlighting Qt6::Test)
 
 add_executable(testhighlighter_test testhighlighter.cpp)

@@ -91,6 +91,9 @@ ecm_set_disabled_deprecation_versions(
     QT 6.11.0
 )
 
+# define which offscreen platform plugin to use for tests
+set(OFFSCREEN_QPA "-platform" "offscreen")
+
 #
 # Actually build the stuff
 #

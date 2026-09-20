@@ -188,11 +188,13 @@ public:
 
 #endif
 
+#include "../lib/isdigit_p.hpp"
 #include "../lib/worddelimiters_p.h"
 #include "../lib/xml_p.h"
 
 #include <array>
 
+using KSyntaxHighlighting::isDigit;
 using KSyntaxHighlighting::WordDelimiters;
 using KSyntaxHighlighting::Xml::attrToBool;
 
@@ -214,6 +216,61 @@ struct KateVersion {
     bool operator<(const KateVersion &version) const
     {
         return majorRevision < version.majorRevision || (majorRevision == version.majorRevision && minorRevision < version.minorRevision);
+    }
+};
+
+struct PopContextParser {
+    bool parseOk = true;
+    bool missingSeparatorBetweenPopAndContext = false;
+    bool hasPopWithCounter = false;
+    int popCount = 0;
+    QStringView remainingContext;
+
+    PopContextParser(QStringView context)
+    {
+        bool hasPopPrefix = false;
+
+        while (context.startsWith(u"#pop"_sv)) {
+            hasPopPrefix = true;
+            qsizetype offset = 4;
+            ++popCount;
+            if (context.size() > offset && context.at(offset) == u'(') {
+                hasPopWithCounter = true;
+                bool ok = false;
+
+                ++offset;
+                if (context.size() > offset + 1 && isDigit(context.at(offset))) {
+                    int counter = context.at(offset).unicode() - '0';
+
+                    ++offset;
+                    if (isDigit(context.at(offset))) {
+                        counter *= 10;
+                        counter += context.at(offset).unicode() - '0';
+                        ++offset;
+                    }
+
+                    if (context.size() > offset && context.at(offset) == u')') {
+                        popCount += counter - 1;
+                        ++offset;
+                        ok = true;
+                    }
+                }
+
+                parseOk = parseOk && ok;
+            }
+            context = context.sliced(offset);
+        }
+
+        if (hasPopPrefix && !context.isEmpty()) {
+            if (context.startsWith(u'!')) {
+                missingSeparatorBetweenPopAndContext = (context.size() == 1);
+                context = context.sliced(1);
+            } else {
+                missingSeparatorBetweenPopAndContext = true;
+            }
+        }
+
+        remainingContext = context;
     }
 };
 
@@ -2800,6 +2857,7 @@ private:
     //! Some input / output examples are:
     //! - "#stay"         -> ""
     //! - "#pop"          -> ""
+    //! - "#pop(3)"       -> ""
     //! - "Comment"       -> "Comment"
     //! - "#pop!Comment"  -> "Comment"
     //! - "##ISO C++"     -> ""
@@ -2816,19 +2874,24 @@ private:
                 m_success = false;
             }
         } else {
-            while (name.startsWith(u"#pop"_sv)) {
-                name = name.sliced(4);
-                ++contextName.popCount;
+            PopContextParser popCtx{name};
+            if (!popCtx.parseOk) {
+                qWarning() << definition.filename << "line" << line << "invalid #pop with counter in " << attrName << "=" << contextName.name
+                           << "; format is '#pop(counter)' with counter a number from 0 to 99.";
+                m_success = false;
+            }
+            name = popCtx.remainingContext;
+            contextName.popCount = popCtx.popCount;
+
+            if (popCtx.hasPopWithCounter && definition.kateVersion < KateVersion{6, 32}) {
+                qWarning() << definition.filename << "line" << line
+                           << "#pop with counter are only available since version \"6.32\". Please, increase kateversion.";
+                m_success = false;
             }
 
-            if (contextName.popCount && !name.isEmpty()) {
-                if (name.startsWith(u'!') && name.size() > 1) {
-                    name = name.sliced(1);
-                } else {
-                    qWarning() << definition.filename << "line" << line << "'!' missing between '#pop' and context name in " << attrName << "="
-                               << contextName.name;
-                    m_success = false;
-                }
+            if (popCtx.missingSeparatorBetweenPopAndContext) {
+                qWarning() << definition.filename << "line" << line << "'!' missing between '#pop' and context name in " << attrName << "=" << contextName.name;
+                m_success = false;
             }
 
             if (!name.isEmpty()) {
@@ -2948,20 +3011,34 @@ public:
                     } else if (attrName == u"context"_sv || attrName == u"lineEndContext"_sv || attrName == u"fallthroughContext"_sv
                                || attrName == u"lineEmptyContext"_sv) {
                         // ignore #stay context because this is the default
-                        if (value != u"#stay"_sv) {
-                            writeXmlAttribute(out, attrName, value, tagName);
+                        if (!value.isEmpty() && value != u"#stay"_sv) {
+                            PopContextParser popCtx{value};
+                            // compress #pop#pop or more to #pop(2)
+                            if (popCtx.popCount) {
+                                QString context = QStringLiteral("#pop");
+                                if (popCtx.popCount > 9) {
+                                    uint16_t n1 = popCtx.popCount / 10 + '0';
+                                    uint16_t n2 = popCtx.popCount % 10 + '0';
+                                    QChar suffix[]{u'(', n1, n2, u')'};
+                                    context.append(suffix, 4);
+                                } else if (popCtx.popCount > 1) {
+                                    uint16_t n1 = popCtx.popCount + '0';
+                                    QChar suffix[]{u'(', n1, u')'};
+                                    context.append(suffix, 3);
+                                }
+                                if (!popCtx.remainingContext.isEmpty()) {
+                                    context += u'!';
+                                    context += popCtx.remainingContext;
+                                }
+                                writeXmlAttribute(out, attrName, context, tagName);
+                            } else {
+                                writeXmlAttribute(out, attrName, popCtx.remainingContext, tagName);
+                            }
 
                             /*
                              * Extract context name and increment context counter
                              */
-                            bool hasPop = false;
-                            while (value.startsWith(u"#pop"_sv)) {
-                                hasPop = true;
-                                value = value.sliced(4);
-                            }
-                            if (hasPop && !value.isEmpty()) {
-                                value = value.sliced(1);
-                            }
+                            value = popCtx.remainingContext;
                             if (!value.isEmpty() && -1 == value.indexOf(u"##"_sv)) {
                                 m_contextRefs[value.toString()]++;
                             }
@@ -3463,10 +3540,9 @@ int main(int argc, char *argv[])
                                    hlAlternativeNames.split(u';', Qt::SkipEmptyParts),
                                    hl[QStringLiteral("generated")].toBool());
 
-        // As the compressor removes "fallthrough" attribute which is required with
-        // "fallthroughContext" before the 5.62 version, the minimum version is
+        // As the compressor replace "#pop#pop" with "#pop(2)", the minimum version is
         // automatically increased
-        HlCompressor compressor((filesChecker.currentVersion() < KateVersion{5, 62}) ? u"5.62"_s : kateversion.toString());
+        HlCompressor compressor((filesChecker.currentVersion() < KateVersion{6, 32}) ? u"6.32"_s : kateversion.toString());
         compressor.processElement(xml);
 
         // scan for broken regex or keywords with spaces

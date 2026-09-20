@@ -9,18 +9,13 @@
 #include "context_p.h"
 #include "definition_p.h"
 #include "dynamicregexpcache_p.h"
+#include "isdigit_p.hpp"
 #include "ksyntaxhighlighting_logging.h"
 #include "rule_p.h"
 #include "worddelimiters_p.h"
 #include "xml_p.h"
 
 using namespace KSyntaxHighlighting;
-
-// QChar::isDigit() match any digit in unicode (romain numeral, etc)
-static bool isDigit(QChar c)
-{
-    return (c <= QLatin1Char('9') && QLatin1Char('0') <= c);
-}
 
 static bool isOctalChar(QChar c)
 {

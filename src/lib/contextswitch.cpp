@@ -7,6 +7,7 @@
 
 #include "contextswitch_p.h"
 #include "definition_p.h"
+#include "isdigit_p.hpp"
 #include "ksyntaxhighlighting_logging.h"
 #include <QStringTokenizer>
 
@@ -19,12 +20,32 @@ void ContextSwitch::resolve(DefinitionData &def, QStringView context)
     }
 
     while (context.startsWith(QStringLiteral("#pop"))) {
+        qsizetype offset = 4;
         ++m_popCount;
-        if (context.size() > 4 && context.at(4) == QLatin1Char('!')) {
-            context = context.sliced(5);
+
+        // find "#pop(count)" with maximum 2 digits for `count`.
+        if (context.size() > offset + 2 && context.at(offset) == u'(') {
+            qsizetype offset2 = offset + 1;
+            if (isDigit(context.at(offset2))) {
+                int popCount = context.at(offset2).unicode() - '0';
+                ++offset2;
+                if (isDigit(context.at(offset2))) {
+                    popCount *= 10;
+                    popCount += context.at(offset2).unicode() - '0';
+                    ++offset2;
+                }
+                if (context.size() > offset2 && context.at(offset2) == u')') {
+                    offset = offset2 + 1;
+                    m_popCount += popCount - 1;
+                }
+            }
+        }
+
+        if (context.size() > offset && context.at(offset) == u'!') {
+            context = context.sliced(offset + 1);
             break;
         }
-        context = context.sliced(4);
+        context = context.sliced(offset);
     }
 
     m_isStay = !m_popCount;

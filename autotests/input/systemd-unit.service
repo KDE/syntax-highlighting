@@ -71,6 +71,7 @@ ExecStopPost = -:!/bin/stop/post
 RestartSec = 15
 RestartSteps = 2
 RestartMaxDelaySec = 150ms
+RestartRandomizedDelaySec = 200ms
 TimeoutStartSec = 5s 100ms
 TimeoutStopSec = infinity
 TimeoutAbortSec = 15
@@ -94,6 +95,8 @@ Sockets = some.socket \
   some-other.socket
 FileDescriptorStoreMax = 5
 FileDescriptorStorePreserve = yes
+LUOSession = some-name \
+  some-other-name
 USBFunctionDescriptors = /some/absolute/path
 USBFunctionStrings = /some/absolute/path
 OOMPolicy = stop
@@ -368,6 +371,7 @@ NFTSet = cgroup:inet:filter:my_service \
 
 
 [Slice]
+ActivatingConcurrencyMax = infinity
 ConcurrencyHardMax = 20
 ConcurrencySoftMax = infinity
 # The Slice section may include options of the resource-control option group.
@@ -412,10 +416,13 @@ ReusePort = no
 SmackLabel = value
 SmackLabelIPIn = value
 SmackLabelIPOut = value
+XAttrEntryPoint = user.some-xattr-name=some-value
+XAttrListen = user.arch-%a=id-%b
+XAttrAccept = user.some-xattr-name=some-value
 SELinuxContextFromNet = true
 PipeSize = 1M
 MessageQueueMaxMessages = 12
-MessageQueueMessageSize = 1234
+MessageQueueMessageSize = 1Ki
 FreeBind = yes
 Transparent = no
 Broadcast = true
@@ -1426,13 +1433,17 @@ TasksMax = 10 20
 TasksMax = infinity 20
 
 
-###### cardinal %KGMT infinity
+###### cardinal %KMGT infinity
 [Service]
 MemoryMin = 123
 MemoryMin = 12K
+MemoryMin = 12Ki
 MemoryMin = 12M
+MemoryMin = 12Mi
 MemoryMin = 12G
+MemoryMin = 12Gi
 MemoryMin = 12T
+MemoryMin = 12Ti
 MemoryMin = 12 G
 MemoryMin = 20%
 MemoryMin = infinity
@@ -1443,16 +1454,21 @@ MemoryMin = 12g
 MemoryMin = 12H
 MemoryMin = 12 E
 MemoryMin = 12P
+MemoryMin = 12%i
 
 
-###### cardinal KGMT
+###### cardinal KMGT
 [Socket]
 PipeSize = 123
 PipeSize = 12K
+PipeSize = 12Ki
 PipeSize = 12M
-PipeSize = 12G
+PipeSize = 12M
+PipeSize = 12Gi
 PipeSize = 12T
+PipeSize = 12Ti
 PipeSize = 12 G
+PipeSize = 12 Gi
 ## invalid values
 PipeSize = invalid
 PipeSize = infinity
@@ -1464,7 +1480,7 @@ PipeSize = 12P
 PipeSize = 20%
 
 
-###### cardinal KGMT infinity
+###### cardinal KMGT infinity
 [Service]
 MemorySwapMax = 123
 MemorySwapMax = 12K
@@ -1619,6 +1635,8 @@ ConditionCPUFeature = syscall
 ConditionCPUFeature = tsc
 ConditionCPUFeature = vme
 ConditionCPUFeature = xsave
+# since v262 features may have an architecture prefix
+ConditionCPUFeature = arm64.bti
 ## invalid values
 ConditionCPUFeature = invalid
 # multiple values
@@ -2431,6 +2449,8 @@ NUMAPolicy = default
 NUMAPolicy = interleave
 NUMAPolicy = local
 NUMAPolicy = preferred
+NUMAPolicy = preferred-many
+NUMAPolicy = weighted-interleave
 ## invalid values
 NUMAPolicy = invalid
 # multiple values
@@ -2720,16 +2740,22 @@ RuntimeDirectoryPreserve = restart no
 
 ###### secure bits list
 [Service]
-SecureBits = keep-caps
-SecureBits = keep-caps-locked
-SecureBits = no-setuid-fixup
-SecureBits = no-setuid-fixup-locked
-SecureBits = noroot
-SecureBits = noroot-locked
-SecureBits = keep-caps noroot-locked \
-  no-setuid-fixup
+# multiple values may be used
+SecureBits = \
+  exec-deny-interactive \
+  exec-deny-interactive-locked \
+  exec-restrict-file \
+  exec-restrict-file-locked \
+  keep-caps \
+  keep-caps-locked \
+  no-cap-ambient-raise \
+  no-cap-ambient-raise-locked \
+  no-setuid-fixup \
+  no-setuid-fixup-locked \
+  noroot \
+  noroot-locked
 ## invalid values
-SecureBits = invalid
+SecureBits = invalid noroot-invalid
 
 
 ###### security

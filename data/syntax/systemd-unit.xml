@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created for systemd version 261. -->
+<!-- Created for systemd version 262. -->
 <!DOCTYPE language [
 <!ENTITY alp "A-Za-z">
 <!ENTITY aln "&alp;0-9">
@@ -23,7 +23,7 @@
 <!ENTITY tsp_unit "&tsp_year;|&tsp_month;|&tsp_week;|&tsp_day;|&tsp_hour;|&tsp_sec;|&tsp_msec;|&tsp_usec;|&tsp_min;">
 <!ENTITY tsp "\d+(?:\.\d+)?\h*(?=(&tsp_unit;)?)">
 ]>
-<language version="21" author="Andreas Gratzer" extensions="*.automount;*.device;*.mount;*.path;*.service;*.slice;*.socket;*.swap;*.target;*.timer" kateversion="5.0" license="MIT" mimetype="text/x-systemd-unit" name="systemd unit" section="Configuration">
+<language version="22" author="Andreas Gratzer" extensions="*.automount;*.device;*.mount;*.path;*.service;*.slice;*.socket;*.swap;*.target;*.timer" kateversion="5.0" license="MIT" mimetype="text/x-systemd-unit" name="systemd unit" section="Configuration">
   <highlighting>
     <list name="boolean">
       <item>true</item>
@@ -151,8 +151,11 @@
       <item>BPFTraceKprobeSession</item>
       <item>BPFTraceKprobeMulti</item>
       <item>BPFTraceIter</item>
+      <item>BPFTraceFsessionMulti</item>
       <item>BPFTraceFsession</item>
+      <item>BPFTraceFexitMulti</item>
       <item>BPFTraceFexit</item>
+      <item>BPFTraceFentryMulti</item>
       <item>BPFTraceFentry</item>
       <item>BPFTcxIngress</item>
       <item>BPFTcxEgress</item>
@@ -255,6 +258,7 @@
       <item>BPFMapTypeSockhash</item>
       <item>BPFMapTypeSkStorage</item>
       <item>BPFMapTypeRingbuf</item>
+      <item>BPFMapTypeRhash</item>
       <item>BPFMapTypeReuseportSockarray</item>
       <item>BPFMapTypeQueue</item>
       <item>BPFMapTypeProgArray</item>
@@ -878,6 +882,8 @@
       <item>all</item>
     </list>
     <list name="numa policy">
+      <item>weighted-interleave</item>
+      <item>preferred-many</item>
       <item>preferred</item>
       <item>local</item>
       <item>interleave</item>
@@ -975,8 +981,14 @@
       <item>noroot</item>
       <item>no-setuid-fixup-locked</item>
       <item>no-setuid-fixup</item>
+      <item>no-cap-ambient-raise-locked</item>
+      <item>no-cap-ambient-raise</item>
       <item>keep-caps-locked</item>
       <item>keep-caps</item>
+      <item>exec-restrict-file-locked</item>
+      <item>exec-restrict-file</item>
+      <item>exec-deny-interactive-locked</item>
+      <item>exec-deny-interactive</item>
     </list>
     <list name="security">
       <item>uefi-secureboot</item>
@@ -1233,6 +1245,7 @@
     <list name="options service">
       <!-- Only options of type "text". Others are handled separately. -->
       <item>BusName</item>
+      <item>LUOSession</item>
       <item>PIDFile</item>
       <item>USBFunctionDescriptors</item>
       <item>USBFunctionStrings</item>
@@ -1254,6 +1267,9 @@
       <item>SmackLabelIPOut</item>
       <item>Symlinks</item>
       <item>TCPCongestion</item>
+      <item>XAttrAccept</item>
+      <item>XAttrEntryPoint</item>
+      <item>XAttrListen</item>
     </list>
     <list name="options swap">
       <!-- Only options of type "text". Others are handled separately. -->
@@ -1492,11 +1508,11 @@
         <WordDetect String="off" attribute="Constant" context="#pop"/>
       </context>
       <context name="cardinal %KMGT" attribute="Normal" lineEndContext="#pop">
-        <RegExpr String="\b[1-9]\d*\h*(?=([KMGT%])?)" attribute="Number" context="#pop!measurement unit"/>
+        <RegExpr String="\b[1-9]\d*\h*(?=(%|(?:[KMGT]i?))?)" attribute="Number" context="#pop!measurement unit"/>
         <LineContinue attribute="Continuation"/>
       </context>
       <context name="cardinal KMGT" attribute="Normal" lineEndContext="#pop">
-        <RegExpr String="\b[1-9]\d*\h*(?=([KMGT])?)" attribute="Number" context="#pop!measurement unit"/>
+        <RegExpr String="\b[1-9]\d*\h*(?=([KMGT]i?)?)" attribute="Number" context="#pop!measurement unit"/>
         <LineContinue attribute="Continuation"/>
       </context>
       <context name="cardinal KMGT infinity" attribute="Normal" lineEndContext="#pop">
@@ -2218,6 +2234,7 @@
         <WordDetect String="TasksMax" firstNonSpace="true" attribute="Option Name" context="cardinal % infinity"/>
       </context>
       <context name="options slice" attribute="Normal" lineEndContext="#stay">
+        <WordDetect String="ActivatingConcurrencyMax" firstNonSpace="true" attribute="Option Name" context="cardinal KMGT infinity"/>
         <WordDetect String="ConcurrencyHardMax" firstNonSpace="true" attribute="Option Name" context="cardinal KMGT infinity"/>
         <WordDetect String="ConcurrencySoftMax" firstNonSpace="true" attribute="Option Name" context="cardinal KMGT infinity"/>
       </context>
@@ -2247,6 +2264,7 @@
         <WordDetect String="RestartMaxDelaySec" firstNonSpace="true" attribute="Option Name" context="time span"/>
         <WordDetect String="RestartMode" firstNonSpace="true" attribute="Option Name" context="restart mode"/>
         <WordDetect String="RestartPreventExitStatus" firstNonSpace="true" attribute="Option Name" context="exit status signal"/>
+        <WordDetect String="RestartRandomizedDelaySec" firstNonSpace="true" attribute="Option Name" context="time span"/>
         <WordDetect String="RestartSec" firstNonSpace="true" attribute="Option Name" context="time span"/>
         <WordDetect String="RestartSteps" firstNonSpace="true" attribute="Option Name" context="cardinal"/>
         <WordDetect String="RootDirectoryStartOnly" firstNonSpace="true" attribute="Option Name" context="boolean"/>
@@ -2290,7 +2308,7 @@
         <WordDetect String="MaxConnections" firstNonSpace="true" attribute="Option Name" context="cardinal"/>
         <WordDetect String="MaxConnectionsPerSource" firstNonSpace="true" attribute="Option Name" context="cardinal"/>
         <WordDetect String="MessageQueueMaxMessages" firstNonSpace="true" attribute="Option Name" context="cardinal"/>
-        <WordDetect String="MessageQueueMessageSize" firstNonSpace="true" attribute="Option Name" context="cardinal"/>
+        <WordDetect String="MessageQueueMessageSize" firstNonSpace="true" attribute="Option Name" context="cardinal KMGT"/>
         <WordDetect String="NoDelay" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="PassCredentials" firstNonSpace="true" attribute="Option Name" context="boolean"/>
         <WordDetect String="PassFileDescriptorsToExec" firstNonSpace="true" attribute="Option Name" context="boolean"/>

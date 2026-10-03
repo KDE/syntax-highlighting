@@ -593,7 +593,7 @@ void DefinitionData::resolveContexts()
     contexts.reserve(contextDatas.size());
 
     /**
-     * Transform all HighlightingContextData to Context.
+     * Transform all HighlightingData to Context.
      * This is necessary so that Context::resolveContexts() can find the referenced contexts.
      */
     for (const auto &contextData : std::as_const(contextDatas)) {

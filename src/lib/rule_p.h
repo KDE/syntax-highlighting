@@ -93,12 +93,12 @@ public:
 
     virtual MatchResult doMatch(QStringView text, int offset, const QStringList &captures, DynamicRegexpCache &dynamicRegexpCache) const = 0;
 
-    static Rule::Ptr create(DefinitionData &def, const HighlightingContextData::Rule &ruleData, QStringView lookupContextName);
+    static Rule::Ptr create(DefinitionData &def, const HighlightingData::Rule &ruleData, QStringView lookupContextName);
 
 private:
     Q_DISABLE_COPY(Rule)
 
-    bool resolveCommon(DefinitionData &def, const HighlightingContextData::Rule &ruleData, QStringView lookupContextName);
+    bool resolveCommon(DefinitionData &def, const HighlightingData::Rule &ruleData, QStringView lookupContextName);
 
     enum class Type : quint8 {
         OtherRule,
@@ -124,7 +124,7 @@ protected:
 class AnyChar final : public Rule
 {
 public:
-    AnyChar(const HighlightingContextData::Rule::AnyChar &data);
+    AnyChar(const HighlightingData::Rule::AnyChar &data);
 
 protected:
     MatchResult doMatch(QStringView text, int offset, const QStringList &, DynamicRegexpCache &) const override;
@@ -136,7 +136,7 @@ private:
 class DetectChar final : public Rule
 {
 public:
-    DetectChar(const HighlightingContextData::Rule::DetectChar &data);
+    DetectChar(const HighlightingData::Rule::DetectChar &data);
 
 protected:
     MatchResult doMatch(QStringView text, int offset, const QStringList &, DynamicRegexpCache &) const override;
@@ -149,7 +149,7 @@ private:
 class Detect2Chars final : public Rule
 {
 public:
-    Detect2Chars(const HighlightingContextData::Rule::Detect2Chars &data);
+    Detect2Chars(const HighlightingData::Rule::Detect2Chars &data);
 
 protected:
     MatchResult doMatch(QStringView text, int offset, const QStringList &, DynamicRegexpCache &) const override;
@@ -174,7 +174,7 @@ protected:
 class Float final : public Rule
 {
 public:
-    Float(DefinitionData &def, const HighlightingContextData::Rule::Float &data);
+    Float(DefinitionData &def, const HighlightingData::Rule::Float &data);
 
 protected:
     MatchResult doMatch(QStringView text, int offset, const QStringList &, DynamicRegexpCache &) const override;
@@ -186,7 +186,7 @@ private:
 class IncludeRules final : public Rule
 {
 public:
-    IncludeRules(const HighlightingContextData::Rule::IncludeRules &data);
+    IncludeRules(const HighlightingData::Rule::IncludeRules &data);
 
     const QString &contextName() const
     {
@@ -209,7 +209,7 @@ private:
 class Int final : public Rule
 {
 public:
-    Int(DefinitionData &def, const HighlightingContextData::Rule::Int &data);
+    Int(DefinitionData &def, const HighlightingData::Rule::Int &data);
 
 protected:
     MatchResult doMatch(QStringView text, int offset, const QStringList &, DynamicRegexpCache &) const override;
@@ -227,7 +227,7 @@ protected:
 class HlCHex final : public Rule
 {
 public:
-    HlCHex(DefinitionData &def, const HighlightingContextData::Rule::HlCHex &data);
+    HlCHex(DefinitionData &def, const HighlightingData::Rule::HlCHex &data);
 
 protected:
     MatchResult doMatch(QStringView text, int offset, const QStringList &, DynamicRegexpCache &) const override;
@@ -239,7 +239,7 @@ private:
 class HlCOct final : public Rule
 {
 public:
-    HlCOct(DefinitionData &def, const HighlightingContextData::Rule::HlCOct &data);
+    HlCOct(DefinitionData &def, const HighlightingData::Rule::HlCOct &data);
 
 protected:
     MatchResult doMatch(QStringView text, int offset, const QStringList &, DynamicRegexpCache &) const override;
@@ -257,9 +257,9 @@ protected:
 class KeywordListRule final : public Rule
 {
 public:
-    KeywordListRule(const KeywordList &keywordList, DefinitionData &def, const HighlightingContextData::Rule::Keyword &data);
+    KeywordListRule(const KeywordList &keywordList, DefinitionData &def, const HighlightingData::Rule::Keyword &data);
 
-    static Rule::Ptr create(DefinitionData &def, const HighlightingContextData::Rule::Keyword &data, QStringView lookupContextName);
+    static Rule::Ptr create(DefinitionData &def, const HighlightingData::Rule::Keyword &data, QStringView lookupContextName);
 
 protected:
     MatchResult doMatch(QStringView text, int offset, const QStringList &, DynamicRegexpCache &) const override;
@@ -273,7 +273,7 @@ private:
 class LineContinue final : public Rule
 {
 public:
-    LineContinue(const HighlightingContextData::Rule::LineContinue &data);
+    LineContinue(const HighlightingData::Rule::LineContinue &data);
 
 protected:
     MatchResult doMatch(QStringView text, int offset, const QStringList &, DynamicRegexpCache &) const override;
@@ -285,7 +285,7 @@ private:
 class RangeDetect final : public Rule
 {
 public:
-    RangeDetect(const HighlightingContextData::Rule::RangeDetect &data);
+    RangeDetect(const HighlightingData::Rule::RangeDetect &data);
 
 protected:
     MatchResult doMatch(QStringView text, int offset, const QStringList &, DynamicRegexpCache &) const override;
@@ -298,7 +298,7 @@ private:
 class RegExpr final : public Rule
 {
 public:
-    RegExpr(const HighlightingContextData::Rule::RegExpr &data);
+    RegExpr(const HighlightingData::Rule::RegExpr &data);
 
 protected:
     MatchResult doMatch(QStringView text, int offset, const QStringList &, DynamicRegexpCache &) const override;
@@ -312,7 +312,7 @@ private:
 class DynamicRegExpr final : public Rule
 {
 public:
-    DynamicRegExpr(const HighlightingContextData::Rule::RegExpr &data);
+    DynamicRegExpr(const HighlightingData::Rule::RegExpr &data);
 
 protected:
     MatchResult doMatch(QStringView text, int offset, const QStringList &, DynamicRegexpCache &) const override;
@@ -327,7 +327,7 @@ private:
 class StringDetect final : public Rule
 {
 public:
-    StringDetect(const HighlightingContextData::Rule::StringDetect &data);
+    StringDetect(const HighlightingData::Rule::StringDetect &data);
 
 protected:
     MatchResult doMatch(QStringView text, int offset, const QStringList &, DynamicRegexpCache &) const override;
@@ -340,7 +340,7 @@ private:
 class DynamicStringDetect final : public Rule
 {
 public:
-    DynamicStringDetect(const HighlightingContextData::Rule::StringDetect &data);
+    DynamicStringDetect(const HighlightingData::Rule::StringDetect &data);
 
 protected:
     MatchResult doMatch(QStringView text, int offset, const QStringList &, DynamicRegexpCache &) const override;
@@ -353,7 +353,7 @@ private:
 class WordDetect final : public Rule
 {
 public:
-    WordDetect(DefinitionData &def, const HighlightingContextData::Rule::WordDetect &data);
+    WordDetect(DefinitionData &def, const HighlightingData::Rule::WordDetect &data);
 
 protected:
     MatchResult doMatch(QStringView text, int offset, const QStringList &, DynamicRegexpCache &) const override;

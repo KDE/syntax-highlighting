@@ -22,7 +22,7 @@ namespace KSyntaxHighlighting
  * After resolving contexts, members of this class are no longer
  * use and the instance can be freed to recover used memory.
  */
-class HighlightingContextData
+class HighlightingData
 {
 public:
     void load(const QString &defName, QXmlStreamReader &reader);

@@ -17,7 +17,7 @@
 
 using namespace KSyntaxHighlighting;
 
-Context::Context(const DefinitionData &def, const HighlightingContextData &data)
+Context::Context(const DefinitionData &def, const HighlightingData &data)
     : m_name(data.name)
     , m_attributeFormat(data.attribute.isEmpty() ? Format() : def.formatByName(data.attribute))
     , m_indentationBasedFolding(!data.noIndentationBasedFolding && def.indentationBasedFolding)
@@ -32,7 +32,7 @@ bool Context::indentationBasedFoldingEnabled() const
     return m_indentationBasedFolding;
 }
 
-void Context::resolveContexts(DefinitionData &def, const HighlightingContextData &data)
+void Context::resolveContexts(DefinitionData &def, const HighlightingData &data)
 {
     m_lineEndContext.resolve(def, data.lineEndContext);
     m_lineEmptyContext.resolve(def, data.lineEmptyContext);

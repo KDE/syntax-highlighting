@@ -24,9 +24,9 @@ static Qt::CaseSensitivity attrToCaseSensitivity(QStringView str)
     return Xml::attrToBool(str) ? Qt::CaseInsensitive : Qt::CaseSensitive;
 }
 
-static HighlightingContextData::Rule::WordDelimiters loadAdditionalWordDelimiters(QXmlStreamReader &reader)
+static HighlightingData::Rule::WordDelimiters loadAdditionalWordDelimiters(QXmlStreamReader &reader)
 {
-    return HighlightingContextData::Rule::WordDelimiters{
+    return HighlightingData::Rule::WordDelimiters{
         reader.attributes().value(QLatin1String("additionalDeliminator")).toString(),
         reader.attributes().value(QLatin1String("weakDeliminator")).toString(),
     };
@@ -52,9 +52,9 @@ static bool checkIsChar(QStringView str, const char *attrName, const QString &de
     return false;
 }
 
-static bool loadRule(const QString &defName, HighlightingContextData::Rule &rule, QXmlStreamReader &reader)
+static bool loadRule(const QString &defName, HighlightingData::Rule &rule, QXmlStreamReader &reader)
 {
-    using Rule = HighlightingContextData::Rule;
+    using Rule = HighlightingData::Rule;
 
     QStringView name = reader.name();
     const auto attrs = reader.attributes();
@@ -238,9 +238,9 @@ static bool loadRule(const QString &defName, HighlightingContextData::Rule &rule
 }
 
 template<class Data1, class Data2, class Visitor>
-static void dataRuleVisit(HighlightingContextData::Rule::Type type, Data1 &&data1, Data2 &&data2, Visitor &&visitor)
+static void dataRuleVisit(HighlightingData::Rule::Type type, Data1 &&data1, Data2 &&data2, Visitor &&visitor)
 {
-    using Rule = HighlightingContextData::Rule;
+    using Rule = HighlightingData::Rule;
     using Type = Rule::Type;
     switch (type) {
     case Type::AnyChar:
@@ -294,9 +294,9 @@ static void dataRuleVisit(HighlightingContextData::Rule::Type type, Data1 &&data
     }
 }
 
-HighlightingContextData::Rule::Rule() noexcept = default;
+HighlightingData::Rule::Rule() noexcept = default;
 
-HighlightingContextData::Rule::Rule(Rule &&other) noexcept
+HighlightingData::Rule::Rule(Rule &&other) noexcept
     : common(std::move(other.common))
 {
     dataRuleVisit(other.type, data, other.data, [](auto &data1, auto &data2) {
@@ -306,7 +306,7 @@ HighlightingContextData::Rule::Rule(Rule &&other) noexcept
     type = other.type;
 }
 
-HighlightingContextData::Rule::Rule(const Rule &other)
+HighlightingData::Rule::Rule(const Rule &other)
     : common(other.common)
 {
     dataRuleVisit(other.type, data, other.data, [](auto &data1, auto &data2) {
@@ -316,7 +316,7 @@ HighlightingContextData::Rule::Rule(const Rule &other)
     type = other.type;
 }
 
-HighlightingContextData::Rule::~Rule()
+HighlightingData::Rule::~Rule()
 {
     dataRuleVisit(type, data, data, [](auto &data, auto &) {
         using Data = std::remove_reference_t<decltype(data)>;
@@ -324,7 +324,7 @@ HighlightingContextData::Rule::~Rule()
     });
 }
 
-void HighlightingContextData::load(const QString &defName, QXmlStreamReader &reader)
+void HighlightingData::load(const QString &defName, QXmlStreamReader &reader)
 {
     Q_ASSERT(reader.name() == QLatin1String("context"));
     Q_ASSERT(reader.tokenType() == QXmlStreamReader::StartElement);

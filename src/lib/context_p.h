@@ -28,7 +28,7 @@ public:
     Context(Context &&) = default;
     Context &operator=(Context &&) = default;
 
-    Context(const DefinitionData &def, const HighlightingContextData &data);
+    Context(const DefinitionData &def, const HighlightingData &data);
     ~Context() = default;
 
     const QString &name() const
@@ -82,7 +82,7 @@ public:
      */
     bool indentationBasedFoldingEnabled() const;
 
-    void resolveContexts(DefinitionData &def, const HighlightingContextData &data);
+    void resolveContexts(DefinitionData &def, const HighlightingData &data);
     void resolveIncludes(DefinitionData &def);
 
 private:

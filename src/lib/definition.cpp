@@ -604,8 +604,9 @@ void DefinitionData::resolveContexts()
      * Resolves contexts and rules.
      */
     auto ctxIt = contexts.begin();
+    auto &highlightingContext = RepositoryPrivate::get(repo)->m_highlightingContext;
     for (const auto &contextData : std::as_const(contextDatas)) {
-        ctxIt->resolveContexts(*this, contextData);
+        ctxIt->resolveContexts(*this, highlightingContext, contextData);
         ++ctxIt;
     }
 

@@ -9,6 +9,7 @@
 #include "context_p.h"
 #include "definition.h"
 #include "definition_p.h"
+#include "foldingregion.h"
 #include "format.h"
 #include "ksyntaxhighlighting_logging.h"
 #include "state.h"

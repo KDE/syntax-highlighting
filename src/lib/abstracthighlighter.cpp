@@ -240,8 +240,7 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
         bool isLookAhead = false;
         int newOffset = 0;
         const Format *newFormat = nullptr;
-        for (const auto &ruleShared : stateData->topContext()->rules()) {
-            auto rule = ruleShared.get();
+        for (const auto *rule : stateData->topContext()->rules()) {
             /**
              * filter out rules that require a specific column
              */

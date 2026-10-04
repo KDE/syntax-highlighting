@@ -417,6 +417,8 @@ void Repository::reload()
 
     d->m_formatId = 0;
 
+    d->m_highlightingContext.clear();
+
     d->load(this);
 
     Q_EMIT reloaded();

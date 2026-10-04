@@ -9,6 +9,7 @@
 #include "definition_p.h"
 #include "format.h"
 #include "ksyntaxhighlighting_logging.h"
+#include "repository_p.h"
 #include "rule_p.h"
 #include "xml_p.h"
 
@@ -32,7 +33,7 @@ bool Context::indentationBasedFoldingEnabled() const
     return m_indentationBasedFolding;
 }
 
-void Context::resolveContexts(DefinitionData &def, const HighlightingData &data)
+void Context::resolveContexts(DefinitionData &def, HighlightingContext &hctx, const HighlightingData &data)
 {
     m_lineEndContext.resolve(def, data.lineEndContext);
     m_lineEmptyContext.resolve(def, data.lineEmptyContext);
@@ -49,8 +50,8 @@ void Context::resolveContexts(DefinitionData &def, const HighlightingData &data)
 
     m_rules.reserve(data.rules.size());
     for (const auto &ruleData : data.rules) {
-        m_rules.push_back(Rule::create(def, ruleData, m_name));
-        if (!m_rules.back()) {
+        auto &rule = m_rules.emplace_back(Rule::create(def, hctx, ruleData, m_name));
+        if (!rule) {
             m_rules.pop_back();
         }
     }
@@ -70,9 +71,9 @@ void Context::resolveIncludes(DefinitionData &def)
     m_resolveState = Resolving; // cycle guard
 
     for (auto it = m_rules.begin(); it != m_rules.end();) {
-        const IncludeRules *includeRules = it->get()->castToIncludeRules();
+        const IncludeRules *includeRules = (*it)->castToIncludeRules();
         if (!includeRules) {
-            m_hasDynamicRule = m_hasDynamicRule || it->get()->isDynamic();
+            m_hasDynamicRule = m_hasDynamicRule || (*it)->isDynamic();
             ++it;
             continue;
         }

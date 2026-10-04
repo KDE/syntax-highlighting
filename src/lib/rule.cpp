@@ -9,6 +9,7 @@
 #include "context_p.h"
 #include "definition_p.h"
 #include "dynamicregexpcache_p.h"
+#include "highlightingcontext_p.hpp"
 #include "isdigit_p.hpp"
 #include "ksyntaxhighlighting_logging.h"
 #include "rule_p.h"
@@ -164,48 +165,48 @@ static Rule::Ptr createRule(DefinitionData &def, const HighlightingData::Rule &r
 
     switch (ruleData.type) {
     case Type::AnyChar:
-        return std::make_shared<AnyChar>(ruleData.data.anyChar);
+        return std::make_unique<AnyChar>(ruleData.data.anyChar);
     case Type::DetectChar:
-        return std::make_shared<DetectChar>(ruleData.data.detectChar);
+        return std::make_unique<DetectChar>(ruleData.data.detectChar);
     case Type::Detect2Chars:
-        return std::make_shared<Detect2Chars>(ruleData.data.detect2Chars);
+        return std::make_unique<Detect2Chars>(ruleData.data.detect2Chars);
     case Type::IncludeRules:
-        return std::make_shared<IncludeRules>(ruleData.data.includeRules);
+        return std::make_unique<IncludeRules>(ruleData.data.includeRules);
     case Type::Int:
-        return std::make_shared<Int>(def, ruleData.data.detectInt);
+        return std::make_unique<Int>(def, ruleData.data.detectInt);
     case Type::Keyword:
         return KeywordListRule::create(def, ruleData.data.keyword, lookupContextName);
     case Type::LineContinue:
-        return std::make_shared<LineContinue>(ruleData.data.lineContinue);
+        return std::make_unique<LineContinue>(ruleData.data.lineContinue);
     case Type::RangeDetect:
-        return std::make_shared<RangeDetect>(ruleData.data.rangeDetect);
+        return std::make_unique<RangeDetect>(ruleData.data.rangeDetect);
     case Type::RegExpr:
         if (!ruleData.data.regExpr.dynamic) {
-            return std::make_shared<RegExpr>(ruleData.data.regExpr);
+            return std::make_unique<RegExpr>(ruleData.data.regExpr);
         } else {
-            return std::make_shared<DynamicRegExpr>(ruleData.data.regExpr);
+            return std::make_unique<DynamicRegExpr>(ruleData.data.regExpr);
         }
     case Type::StringDetect:
         if (ruleData.data.stringDetect.dynamic) {
-            return std::make_shared<DynamicStringDetect>(ruleData.data.stringDetect);
+            return std::make_unique<DynamicStringDetect>(ruleData.data.stringDetect);
         }
-        return std::make_shared<StringDetect>(ruleData.data.stringDetect);
+        return std::make_unique<StringDetect>(ruleData.data.stringDetect);
     case Type::WordDetect:
-        return std::make_shared<WordDetect>(def, ruleData.data.wordDetect);
+        return std::make_unique<WordDetect>(def, ruleData.data.wordDetect);
     case Type::Float:
-        return std::make_shared<Float>(def, ruleData.data.detectFloat);
+        return std::make_unique<Float>(def, ruleData.data.detectFloat);
     case Type::HlCOct:
-        return std::make_shared<HlCOct>(def, ruleData.data.hlCOct);
+        return std::make_unique<HlCOct>(def, ruleData.data.hlCOct);
     case Type::HlCStringChar:
-        return std::make_shared<HlCStringChar>();
+        return std::make_unique<HlCStringChar>();
     case Type::DetectIdentifier:
-        return std::make_shared<DetectIdentifier>();
+        return std::make_unique<DetectIdentifier>();
     case Type::DetectSpaces:
-        return std::make_shared<DetectSpaces>();
+        return std::make_unique<DetectSpaces>();
     case Type::HlCChar:
-        return std::make_shared<HlCChar>();
+        return std::make_unique<HlCChar>();
     case Type::HlCHex:
-        return std::make_shared<HlCHex>(def, ruleData.data.hlCHex);
+        return std::make_unique<HlCHex>(def, ruleData.data.hlCHex);
 
     case Type::Unknown:;
     }
@@ -213,13 +214,13 @@ static Rule::Ptr createRule(DefinitionData &def, const HighlightingData::Rule &r
     return Rule::Ptr(nullptr);
 }
 
-Rule::Ptr Rule::create(DefinitionData &def, const HighlightingData::Rule &ruleData, QStringView lookupContextName)
+Rule *Rule::create(DefinitionData &def, HighlightingContext &hctx, const HighlightingData::Rule &ruleData, QStringView lookupContextName)
 {
     auto rule = createRule(def, ruleData, lookupContextName);
     if (rule && !rule->resolveCommon(def, ruleData, lookupContextName)) {
         rule.reset();
     }
-    return rule;
+    return hctx.pushRule(std::move(rule));
 }
 
 AnyChar::AnyChar(const HighlightingData::Rule::AnyChar &data)
@@ -506,7 +507,7 @@ Rule::Ptr KeywordListRule::create(DefinitionData &def, const HighlightingData::R
         keywordList->initLookupForCaseSensitivity(data.caseSensitivityOverride);
     }
 
-    return std::make_shared<KeywordListRule>(*keywordList, def, data);
+    return std::make_unique<KeywordListRule>(*keywordList, def, data);
 }
 
 KeywordListRule::KeywordListRule(const KeywordList &keywordList, DefinitionData &def, const HighlightingData::Rule::Keyword &data)

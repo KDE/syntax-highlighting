@@ -12,8 +12,11 @@
 #include <QString>
 
 #include <map>
+#include <memory>
+#include <vector>
 
 #include "dynamicregexpcache_p.h"
+#include "highlightingcontext_p.hpp"
 
 namespace KSyntaxHighlighting
 {
@@ -61,6 +64,8 @@ public:
     int m_formatId = 0;
 
     DynamicRegexpCache m_dynamicRegexpCache;
+
+    HighlightingContext m_highlightingContext;
 };
 }
 

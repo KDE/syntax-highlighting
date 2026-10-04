@@ -27,6 +27,7 @@ class WordDelimiters;
 class DefinitionData;
 class IncludeRules;
 class DynamicRegexpCache;
+class HighlightingContext;
 
 class Rule
 {
@@ -34,7 +35,7 @@ public:
     Rule() = default;
     virtual ~Rule();
 
-    typedef std::shared_ptr<Rule> Ptr;
+    typedef std::unique_ptr<Rule> Ptr;
 
     const Format &attributeFormat() const
     {
@@ -93,7 +94,7 @@ public:
 
     virtual MatchResult doMatch(QStringView text, int offset, const QStringList &captures, DynamicRegexpCache &dynamicRegexpCache) const = 0;
 
-    static Rule::Ptr create(DefinitionData &def, const HighlightingData::Rule &ruleData, QStringView lookupContextName);
+    static Rule *create(DefinitionData &def, HighlightingContext &hctx, const HighlightingData::Rule &ruleData, QStringView lookupContextName);
 
 private:
     Q_DISABLE_COPY(Rule)

@@ -9,8 +9,6 @@
 
 #include "contextswitch_p.h"
 #include "format.h"
-#include "highlightingdata_p.hpp"
-#include "rule_p.h"
 
 #include <QString>
 
@@ -19,6 +17,9 @@
 namespace KSyntaxHighlighting
 {
 class DefinitionData;
+class HighlightingContext;
+class HighlightingData;
+class Rule;
 
 class Context
 {
@@ -71,7 +72,7 @@ public:
         return m_attributeFormat;
     }
 
-    const std::vector<Rule::Ptr> &rules() const
+    const std::vector<Rule *> &rules() const
     {
         return m_rules;
     }
@@ -82,13 +83,13 @@ public:
      */
     bool indentationBasedFoldingEnabled() const;
 
-    void resolveContexts(DefinitionData &def, const HighlightingData &data);
+    void resolveContexts(DefinitionData &def, HighlightingContext &hctx, const HighlightingData &data);
     void resolveIncludes(DefinitionData &def);
 
 private:
     enum ResolveState : quint8 { Unresolved, Resolving, Resolved };
 
-    std::vector<Rule::Ptr> m_rules;
+    std::vector<Rule *> m_rules;
 
     QString m_name;
 

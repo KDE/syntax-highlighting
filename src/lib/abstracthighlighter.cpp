@@ -169,7 +169,7 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
         return *defData->unify.insert(newState);
     }
 
-    auto &dynamicRegexpCache = RepositoryPrivate::get(defData->repo)->m_dynamicRegexpCache;
+    auto &highlightingContext = RepositoryPrivate::get(defData->repo)->m_highlightingContext;
 
     int offset = 0;
     int beginOffset = 0;
@@ -287,7 +287,7 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
                 }
             }
 
-            auto newResult = rule->doMatch(text, offset, stateData->topCaptures(), dynamicRegexpCache);
+            auto newResult = rule->doMatch(text, offset, stateData->topCaptures(), highlightingContext);
             newOffset = newResult.offset();
 
             /**

@@ -30,6 +30,7 @@ public:
 
     void clear()
     {
+        skipOffsetId = SkipOffsetId{};
         m_rules.clear();
         m_regexes.clear();
     }
@@ -42,17 +43,39 @@ public:
         return nullptr;
     }
 
-    QRegularExpression registryRegexp(QString const &pattern, QRegularExpression::PatternOptions options)
+    struct RegexpWithSkipOffsetId {
+        QRegularExpression regexp;
+        SkipOffsetId skipOffsetId;
+
+        RegexpWithSkipOffsetId(QString const &pattern, QRegularExpression::PatternOptions options)
+            : regexp(pattern, options)
+        {
+        }
+    };
+
+    const RegexpWithSkipOffsetId &registryRegexp(QString const &pattern, QRegularExpression::PatternOptions options)
     {
         auto result = m_regexes.tryEmplace(RegexKey(pattern, options), pattern, options);
+        if (result.inserted) {
+            result.iterator->skipOffsetId = nextSkipOffsetId();
+        }
         return *result.iterator;
+    }
+
+    SkipOffsetId nextSkipOffsetId()
+    {
+        using Int = std::underlying_type_t<SkipOffsetId>;
+        auto id = static_cast<Int>(skipOffsetId) + 1;
+        skipOffsetId = SkipOffsetId(id);
+        return skipOffsetId;
     }
 
 private:
     using RegexKey = std::pair<QString, QRegularExpression::PatternOptions>;
 
+    SkipOffsetId skipOffsetId{};
     std::vector<std::unique_ptr<Rule>> m_rules;
-    QHash<RegexKey, QRegularExpression> m_regexes;
+    QHash<RegexKey, RegexpWithSkipOffsetId> m_regexes;
 };
 
 }

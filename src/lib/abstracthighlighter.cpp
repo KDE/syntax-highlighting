@@ -181,24 +181,24 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
      *   - store the result of the first position that matches (or -1 for no match in the full line) in the skipOffsets hash for re-use
      *   - have capturesForLastDynamicSkipOffset as guard for dynamic regexes to invalidate the cache if they might have changed
      */
-    QVarLengthArray<QPair<const Rule *, int>, 8> skipOffsets;
+    QVarLengthArray<QPair<SkipOffsetId, int>, 8> skipOffsets;
     QStringList capturesForLastDynamicSkipOffset;
 
-    auto getSkipOffsetValue = [&skipOffsets](const Rule *r) -> int {
-        auto i = std::find_if(skipOffsets.begin(), skipOffsets.end(), [r](const auto &v) {
-            return v.first == r;
+    auto getSkipOffsetValue = [&skipOffsets](SkipOffsetId id) -> int {
+        auto i = std::find_if(skipOffsets.begin(), skipOffsets.end(), [id](const auto &v) {
+            return v.first == id;
         });
         if (i == skipOffsets.end())
             return 0;
         return i->second;
     };
 
-    auto insertSkipOffset = [&skipOffsets](const Rule *r, int i) {
-        auto it = std::find_if(skipOffsets.begin(), skipOffsets.end(), [r](const auto &v) {
-            return v.first == r;
+    auto insertSkipOffset = [&skipOffsets](SkipOffsetId id, int i) {
+        auto it = std::find_if(skipOffsets.begin(), skipOffsets.end(), [id](const auto &v) {
+            return v.first == id;
         });
         if (it == skipOffsets.end()) {
-            skipOffsets.push_back({r, i});
+            skipOffsets.push_back({id, i});
         } else {
             it->second = i;
         }
@@ -280,7 +280,7 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
                 if (rule->isDynamic() && (capturesForLastDynamicSkipOffset != stateData->topCaptures())) {
                     skipOffsets.clear();
                 } else {
-                    currentSkipOffset = getSkipOffsetValue(rule);
+                    currentSkipOffset = getSkipOffsetValue(rule->skipOffsetId());
                     if (currentSkipOffset < 0 || currentSkipOffset > offset) {
                         continue;
                     }
@@ -294,7 +294,7 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
              * update skip offset if new one rules out any later match or is larger than current one
              */
             if (newResult.skipOffset() < 0 || newResult.skipOffset() > currentSkipOffset) {
-                insertSkipOffset(rule, newResult.skipOffset());
+                insertSkipOffset(rule->skipOffsetId(), newResult.skipOffset());
 
                 // remember new captures, if dynamic to enforce proper reset above on change!
                 if (rule->isDynamic()) {

@@ -175,7 +175,7 @@ static Rule::Ptr createRule(DefinitionData &def, HighlightingContext &hctx, cons
     case Type::Int:
         return std::make_unique<Int>(def, ruleData.data.detectInt);
     case Type::Keyword:
-        return KeywordListRule::create(def, ruleData.data.keyword, lookupContextName);
+        return KeywordListRule::create(hctx, def, ruleData.data.keyword, lookupContextName);
     case Type::LineContinue:
         return std::make_unique<LineContinue>(ruleData.data.lineContinue);
     case Type::RangeDetect:
@@ -184,7 +184,7 @@ static Rule::Ptr createRule(DefinitionData &def, HighlightingContext &hctx, cons
         if (!ruleData.data.regExpr.dynamic) {
             return std::make_unique<RegExpr>(hctx, ruleData.data.regExpr);
         } else {
-            return std::make_unique<DynamicRegExpr>(ruleData.data.regExpr);
+            return std::make_unique<DynamicRegExpr>(hctx, ruleData.data.regExpr);
         }
     case Type::StringDetect:
         if (ruleData.data.stringDetect.dynamic) {
@@ -484,7 +484,7 @@ MatchResult Int::doMatch(QStringView text, int offset, const QStringList &, High
     return offset;
 }
 
-Rule::Ptr KeywordListRule::create(DefinitionData &def, const HighlightingData::Rule::Keyword &data, QStringView lookupContextName)
+Rule::Ptr KeywordListRule::create(HighlightingContext &hctx, DefinitionData &def, const HighlightingData::Rule::Keyword &data, QStringView lookupContextName)
 {
     /**
      * get our keyword list, if not found => bail out
@@ -507,16 +507,16 @@ Rule::Ptr KeywordListRule::create(DefinitionData &def, const HighlightingData::R
         keywordList->initLookupForCaseSensitivity(data.caseSensitivityOverride);
     }
 
-    return std::make_unique<KeywordListRule>(*keywordList, def, data);
+    return std::make_unique<KeywordListRule>(hctx, *keywordList, def, data);
 }
 
-KeywordListRule::KeywordListRule(const KeywordList &keywordList, DefinitionData &def, const HighlightingData::Rule::Keyword &data)
+KeywordListRule::KeywordListRule(HighlightingContext &hctx, const KeywordList &keywordList, DefinitionData &def, const HighlightingData::Rule::Keyword &data)
     : m_wordDelimiters(def.wordDelimiters)
     , m_keywordList(keywordList)
     , m_caseSensitivity(data.hasCaseSensitivityOverride ? data.caseSensitivityOverride : keywordList.caseSensitivity())
 {
     resolveAdditionalWordDelimiters(m_wordDelimiters, data.wordDelimiters);
-    m_hasSkipOffset = true;
+    setSkipOffsetId(hctx.nextSkipOffsetId());
 }
 
 MatchResult KeywordListRule::doMatch(QStringView text, int offset, const QStringList &, HighlightingContext &) const
@@ -644,9 +644,14 @@ static MatchResult regexMatch(const QRegularExpression &regexp, QStringView text
 }
 
 RegExpr::RegExpr(HighlightingContext &hctx, const HighlightingData::Rule::RegExpr &data)
-    : m_regexp(hctx.registryRegexp(data.pattern, makePattenOptions(data)))
+    // this lambda avoids calling the default constructor of QRegularExpression
+    // which makes an unnecessary dynamic allocation
+    : m_regexp([&] {
+        auto &regexpAndSkipOffsetId = hctx.registryRegexp(data.pattern, makePattenOptions(data));
+        setSkipOffsetId(regexpAndSkipOffsetId.skipOffsetId);
+        return regexpAndSkipOffsetId.regexp;
+    }())
 {
-    m_hasSkipOffset = true;
 }
 
 void RegExpr::resolve(HighlightingContext &hctx)
@@ -654,7 +659,10 @@ void RegExpr::resolve(HighlightingContext &hctx)
     m_isResolved = true;
 
     resolveRegex(m_regexp, context().contexts(), [&](QRegularExpression::PatternOptions options) {
-        m_regexp = hctx.registryRegexp(m_regexp.pattern(), options);
+        // note that it is not necessary to modify the id since activating capture
+        // has no influence on the MatchResult::offset().
+        // i.e. regexes with or without DontCaptureOption can share the same id.
+        m_regexp = hctx.registryRegexp(m_regexp.pattern(), options).regexp;
     });
 }
 
@@ -667,12 +675,12 @@ MatchResult RegExpr::doMatch(QStringView text, int offset, const QStringList &, 
     return regexMatch(m_regexp, text, offset);
 }
 
-DynamicRegExpr::DynamicRegExpr(const HighlightingData::Rule::RegExpr &data)
+DynamicRegExpr::DynamicRegExpr(HighlightingContext &hctx, const HighlightingData::Rule::RegExpr &data)
     : m_pattern(data.pattern)
     , m_patternOptions(makePattenOptions(data))
 {
     m_dynamic = true;
-    m_hasSkipOffset = true;
+    setSkipOffsetId(hctx.nextSkipOffsetId());
 }
 
 void DynamicRegExpr::resolve()

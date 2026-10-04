@@ -27,7 +27,8 @@ class WordDelimiters;
 class DefinitionData;
 class IncludeRules;
 class HighlightingContext;
-class HighlightingContext;
+
+enum class SkipOffsetId : std::int_fast32_t;
 
 class Rule
 {
@@ -89,12 +90,23 @@ public:
     // in the skipOffsets cache only if it can be found there.
     bool hasSkipOffset() const
     {
-        return m_hasSkipOffset;
+        return m_skipOffsetId != SkipOffsetId{};
+    }
+
+    SkipOffsetId skipOffsetId() const
+    {
+        return m_skipOffsetId;
     }
 
     virtual MatchResult doMatch(QStringView text, int offset, const QStringList &captures, HighlightingContext &hctx) const = 0;
 
     static Rule *create(DefinitionData &def, HighlightingContext &hctx, const HighlightingData::Rule &ruleData, QStringView lookupContextName);
+
+protected:
+    void setSkipOffsetId(SkipOffsetId id)
+    {
+        m_skipOffsetId = id;
+    }
 
 private:
     Q_DISABLE_COPY(Rule)
@@ -111,6 +123,7 @@ private:
     Format m_attributeFormat;
     ContextSwitch m_context;
     int m_column = -1;
+    SkipOffsetId m_skipOffsetId{};
     FoldingRegion m_beginRegion;
     FoldingRegion m_endRegion;
     Type m_type;
@@ -118,7 +131,6 @@ private:
     bool m_lookAhead = false;
 
 protected:
-    bool m_hasSkipOffset = false;
     bool m_dynamic = false;
 };
 
@@ -258,9 +270,9 @@ protected:
 class KeywordListRule final : public Rule
 {
 public:
-    KeywordListRule(const KeywordList &keywordList, DefinitionData &def, const HighlightingData::Rule::Keyword &data);
+    KeywordListRule(HighlightingContext &hctx, const KeywordList &keywordList, DefinitionData &def, const HighlightingData::Rule::Keyword &data);
 
-    static Rule::Ptr create(DefinitionData &def, const HighlightingData::Rule::Keyword &data, QStringView lookupContextName);
+    static Rule::Ptr create(HighlightingContext &hctx, DefinitionData &def, const HighlightingData::Rule::Keyword &data, QStringView lookupContextName);
 
 protected:
     MatchResult doMatch(QStringView text, int offset, const QStringList &, HighlightingContext &) const override;
@@ -313,7 +325,7 @@ private:
 class DynamicRegExpr final : public Rule
 {
 public:
-    DynamicRegExpr(const HighlightingData::Rule::RegExpr &data);
+    DynamicRegExpr(HighlightingContext &hctx, const HighlightingData::Rule::RegExpr &data);
 
 protected:
     MatchResult doMatch(QStringView text, int offset, const QStringList &, HighlightingContext &) const override;

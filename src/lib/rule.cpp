@@ -510,13 +510,23 @@ Rule::Ptr KeywordListRule::create(HighlightingContext &hctx, DefinitionData &def
     return std::make_unique<KeywordListRule>(hctx, *keywordList, def, data);
 }
 
+size_t KSyntaxHighlighting::KeywordListRule::hashKeywordList(size_t seed) const
+{
+    return qHashMulti(seed, m_caseSensitivity, &m_keywordList, m_wordDelimiters);
+}
+
+bool KSyntaxHighlighting::KeywordListRule::isEqualKeywordList(const KeywordListRule &other) const
+{
+    return m_caseSensitivity == other.m_caseSensitivity && &m_keywordList == &other.m_keywordList && m_wordDelimiters == other.m_wordDelimiters;
+}
+
 KeywordListRule::KeywordListRule(HighlightingContext &hctx, const KeywordList &keywordList, DefinitionData &def, const HighlightingData::Rule::Keyword &data)
     : m_wordDelimiters(def.wordDelimiters)
     , m_keywordList(keywordList)
     , m_caseSensitivity(data.hasCaseSensitivityOverride ? data.caseSensitivityOverride : keywordList.caseSensitivity())
 {
     resolveAdditionalWordDelimiters(m_wordDelimiters, data.wordDelimiters);
-    setSkipOffsetId(hctx.nextSkipOffsetId());
+    setSkipOffsetId(hctx.nextSkipOffsetId(*this));
 }
 
 MatchResult KeywordListRule::doMatch(QStringView text, int offset, const QStringList &, HighlightingContext &) const

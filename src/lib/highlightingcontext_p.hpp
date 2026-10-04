@@ -19,6 +19,20 @@
 namespace KSyntaxHighlighting
 {
 
+struct KeywordListRuleKey {
+    const KeywordListRule *keywordListRule;
+
+    bool operator==(const KeywordListRuleKey &other) const
+    {
+        return keywordListRule->isEqualKeywordList(*other.keywordListRule);
+    }
+};
+
+inline size_t qHash(KeywordListRuleKey key, size_t seed = 0)
+{
+    return key.keywordListRule->hashKeywordList(seed);
+}
+
 class HighlightingContext
 {
 public:
@@ -33,6 +47,7 @@ public:
         skipOffsetId = SkipOffsetId{};
         m_rules.clear();
         m_regexes.clear();
+        m_keywordLists.clear();
     }
 
     Rule *pushRule(Rule::Ptr &&rule)
@@ -62,6 +77,15 @@ public:
         return *result.iterator;
     }
 
+    SkipOffsetId nextSkipOffsetId(const KeywordListRule &keywordListRule)
+    {
+        auto result = m_keywordLists.tryEmplace(KeywordListRuleKey{&keywordListRule});
+        if (result.inserted) {
+            result.iterator.value() = nextSkipOffsetId();
+        }
+        return result.iterator.value();
+    }
+
     SkipOffsetId nextSkipOffsetId()
     {
         using Int = std::underlying_type_t<SkipOffsetId>;
@@ -76,6 +100,7 @@ private:
     SkipOffsetId skipOffsetId{};
     std::vector<std::unique_ptr<Rule>> m_rules;
     QHash<RegexKey, RegexpWithSkipOffsetId> m_regexes;
+    QHash<KeywordListRuleKey, SkipOffsetId> m_keywordLists;
 };
 
 }

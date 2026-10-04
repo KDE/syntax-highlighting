@@ -6,18 +6,20 @@
 
 #include "worddelimiters_p.h"
 
+#include <QHash> // qHashMulti
+
 using namespace KSyntaxHighlighting;
 
 WordDelimiters::WordDelimiters()
-    : asciiDelimiters{}
+    : m_asciiDelimiters{}
 {
     for (const char *p = "\t !%&()*+,-./:;<=>?[\\]^{|}~"; *p; ++p) {
-        asciiDelimiters.set(*p);
+        m_asciiDelimiters.set(*p);
     }
 }
 
 WordDelimiters::WordDelimiters(QStringView str)
-    : asciiDelimiters{}
+    : m_asciiDelimiters{}
 {
     append(str);
 }
@@ -25,19 +27,19 @@ WordDelimiters::WordDelimiters(QStringView str)
 bool WordDelimiters::contains(QChar c) const
 {
     if (c.unicode() < 128) {
-        return asciiDelimiters.test(c.unicode());
+        return m_asciiDelimiters.test(c.unicode());
     }
     // perf tells contains is MUCH faster than binary search here, very short array
-    return notAsciiDelimiters.contains(c);
+    return m_notAsciiDelimiters.contains(c);
 }
 
 void WordDelimiters::append(QStringView s)
 {
     for (QChar c : s) {
         if (c.unicode() < 128) {
-            asciiDelimiters.set(c.unicode());
+            m_asciiDelimiters.set(c.unicode());
         } else {
-            notAsciiDelimiters.append(c);
+            m_notAsciiDelimiters.append(c);
         }
     }
 }
@@ -46,9 +48,16 @@ void WordDelimiters::remove(QStringView s)
 {
     for (QChar c : s) {
         if (c.unicode() < 128) {
-            asciiDelimiters.set(c.unicode(), false);
+            m_asciiDelimiters.set(c.unicode(), false);
         } else {
-            notAsciiDelimiters.remove(c);
+            m_notAsciiDelimiters.remove(c);
         }
     }
 }
+
+size_t WordDelimiters::hash(size_t seed) const
+{
+    return qHashMulti(seed, m_notAsciiDelimiters, std::hash<decltype(m_asciiDelimiters)>()(m_asciiDelimiters));
+}
+
+bool WordDelimiters::operator==(const WordDelimiters &other) const = default;

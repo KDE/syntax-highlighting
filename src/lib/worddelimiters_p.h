@@ -46,18 +46,30 @@ public:
      */
     void remove(QStringView c);
 
+    /**
+     * Returns a hash value.
+     */
+    size_t hash(size_t seed = 0) const;
+
+    bool operator==(const WordDelimiters &other) const;
+
 private:
     /**
      * An array which represents ascii characters for very fast lookup.
      * The character is used as an index and the value @c true indicates a word delimiter.
      */
-    std::bitset<128> asciiDelimiters;
+    std::bitset<128> m_asciiDelimiters;
 
     /**
      * Contains characters that are not ascii and is empty for most syntax definition.
      */
-    QString notAsciiDelimiters;
+    QString m_notAsciiDelimiters;
 };
+
+inline size_t qHash(const WordDelimiters &wordDelimiters, size_t seed = 0)
+{
+    return wordDelimiters.hash(seed);
+}
 }
 
 #endif

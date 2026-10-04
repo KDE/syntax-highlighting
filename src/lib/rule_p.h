@@ -274,6 +274,9 @@ public:
 
     static Rule::Ptr create(HighlightingContext &hctx, DefinitionData &def, const HighlightingData::Rule::Keyword &data, QStringView lookupContextName);
 
+    size_t hashKeywordList(size_t seed) const;
+    bool isEqualKeywordList(const KeywordListRule &other) const;
+
 protected:
     MatchResult doMatch(QStringView text, int offset, const QStringList &, HighlightingContext &) const override;
 

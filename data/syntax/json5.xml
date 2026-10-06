@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language [
-  <!ENTITY escape "\\(?:['&quot;\\bfnrtv0]|x[0-9a-fA-f]{2}|u[0-9a-fA-f]{4})">
+  <!ENTITY escape "\\(?:['&quot;\\bfnrtv0]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4})">
   <!ENTITY dec "(0|[1-9][0-9]*)">
   <!ENTITY exp "([eE][+-]?[0-9]+)">
   <!ENTITY number "\b0[xX][0-9a-fA-F]+|\b&dec;(\.[0-9]*)?&exp;?|(?&lt;!\w)\.[0-9]+&exp;?">
+
+  <!-- without \uHHHH -->
+  <!ENTITY identifierStart "$_\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}\p{Nl}">
+  <!ENTITY identifierPart "&identifierStart;\p{Mn}\p{Mc}\p{Nd}\p{Pc}">
 ]>
 <!--
   https://spec.json5.org/
 -->
-<language name="JSON5" section="Markup" version="10" kateversion="5.79" extensions="*.json5" author="Jonathan Poelen (jonathan.poelen@gmail.com)" license="MIT">
+<language name="JSON5" section="Markup" version="11" kateversion="5.79" extensions="*.json5" author="Jonathan Poelen (jonathan.poelen@gmail.com)" license="MIT">
   <highlighting>
     <list name="Constants">
       <item>null</item>
@@ -39,6 +43,34 @@
         <DetectChar char="}" context="#pop" attribute="Object Delimiter" endRegion="object"/>
         <DetectSpaces context="#stay" attribute="Normal"/>
         <IncludeRules context="FindComment"/>
+        <DetectChar char="\" context="ObjectKeyEscape" lookAhead="1"/>
+        <RegExpr String="[&identifierStart;][&identifierPart;]*" context="ObjectKey" attribute="Unquoted Key"/>
+      </context>
+      <!-- { key: value }
+                ^~~~
+           { key\u0042key: value }
+                ^~~~
+      -->
+      <context name="ObjectKey" attribute="Error" fallthroughContext="ObjectKeySep">
+        <DetectChar char=":" context="#pop!ObjectValue" attribute="Key Separator"/>
+        <DetectChar char="\" context="ObjectKeyEscape" lookAhead="1"/>
+        <DetectChar char="}" context="#pop#pop" attribute="Object Delimiter" endRegion="object"/>
+        <AnyChar String="/ &#09;[]{}&quot;'" context="ObjectKeySep" lookAhead="1"/>
+        <RegExpr String="[&identifierPart;]*" attribute="Unquoted Key"/>
+      </context>
+      <context name="ObjectKeySep" attribute="Error">
+        <DetectSpaces attribute="Normal"/>
+        <DetectChar char=":" context="#pop#pop!ObjectValue" attribute="Key Separator"/>
+        <DetectChar char="\" context="ObjectKeyEscape" lookAhead="1"/>
+        <DetectChar char="}" context="#pop#pop#pop" attribute="Object Delimiter" endRegion="object"/>
+        <IncludeRules context="FindComment"/>
+      </context>
+      <!-- { \u0042bc: value }
+             ^~~~
+      -->
+      <context name="ObjectKeyEscape" attribute="Normal">
+        <RegExpr String="\\u[0-9a-fA-F]{4}" context="#pop" attribute="String Key Char"/>
+        <RegExpr String="\\(u[0-9a-fA-F]+)?" context="#pop" attribute="Error"/>
       </context>
 
       <!-- { "
@@ -68,7 +100,7 @@
         <IncludeRules context="InvalidEscape"/>
       </context>
       <context name="InvalidEscape" attribute="Normal">
-        <RegExpr String="\\(u[0-9a-fA-f]+|x[0-9a-fA-f]?|.)" context="#pop" attribute="Error"/>
+        <RegExpr String="\\(u[0-9a-fA-F]+|x[0-9a-fA-F]?|.)" context="#pop" attribute="Error"/>
       </context>
 
       <!-- "bla bla
@@ -163,6 +195,7 @@
       <itemData name="String Key Delimiter" defStyleNum="dsDataType"/>
       <itemData name="String Key"           defStyleNum="dsDataType"/>
       <itemData name="String Key Char"      defStyleNum="dsChar"/>
+      <itemData name="Unquoted Key"         defStyleNum="dsDataType"/>
 
       <itemData name="String Delimiter" defStyleNum="dsString"/>
       <itemData name="String"           defStyleNum="dsString"/>

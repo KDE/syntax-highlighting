@@ -78,6 +78,11 @@ y */ z
 #endif
 #endif
 
+#embed <data.dat>
+#embed "6_bits.bin" if_empty(42203) \
+  offset(1)
+
+
 static int g_global;
 
 template<class T, typename U, template<class> class = std::is_pointer>

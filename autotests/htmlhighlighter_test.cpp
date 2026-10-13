@@ -34,6 +34,7 @@ private:
 private Q_SLOTS:
     void initTestCase()
     {
+        qWarning() << "init";
         QStandardPaths::setTestModeEnabled(true);
         m_repo = new Repository;
         initRepositorySearchPaths(*m_repo);
@@ -41,6 +42,7 @@ private Q_SLOTS:
 
     void cleanupTestCase()
     {
+        qWarning() << "clean up";
         delete m_repo;
         m_repo = nullptr;
     }
@@ -109,6 +111,7 @@ private Q_SLOTS:
             // compare results
             compareFiles((i == 0) ? refFile : refDarkFile, (i == 0) ? outFile : outDarkFile);
         }
+        qWarning() << "do";
     }
 };
 

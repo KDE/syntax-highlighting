@@ -1,0 +1,233 @@
+// Test file for WGSL syntax highlighting
+
+// Single-line comment
+/* Multi-line comment */
+/*
+  Multi-line
+  comment
+*/
+/* Nested /* comments */ are supported */
+
+// Keywords
+fn var let const override struct
+if else for while loop switch case default
+break continue continuing return discard
+enable diagnostic requires alias const_assert
+
+// Literals
+true false
+
+// Scalar types
+bool f16 f32 i32 u32
+
+// Vector types
+vec2 vec3 vec4
+vec2i vec3i vec4i
+vec2u vec3u vec4u
+vec2f vec3f vec4f
+vec2h vec3h vec4h
+
+// Matrix types
+mat2x2 mat2x3 mat2x4
+mat3x2 mat3x3 mat3x4
+mat4x2 mat4x3 mat4x4
+mat2x2f mat3x3f mat4x4f
+mat2x2h mat3x3h mat4x4h
+
+// Container types
+array atomic ptr
+
+// Sampler types
+sampler sampler_comparison
+
+// Texture types
+texture_1d texture_2d texture_2d_array texture_3d
+texture_cube texture_cube_array
+texture_multisampled_2d
+texture_storage_1d texture_storage_2d
+texture_storage_2d_array texture_storage_3d
+texture_depth_2d texture_depth_2d_array
+texture_depth_cube texture_depth_cube_array
+texture_depth_multisampled_2d texture_external
+
+// Texel formats
+rgba8unorm rgba8snorm rgba8uint rgba8sint
+rgba16uint rgba16sint rgba16float
+r32uint r32sint r32float
+rg32uint rg32sint rg32float
+rgba32uint rgba32sint rgba32float
+bgra8unorm
+
+// Decimal integer literals
+0 1 123 42i 42u
+
+// Hex integer literals
+0x0 0xFF 0x123ABCi 0xDEADu
+
+// Decimal float literals
+0.0 1.0 0.5 1.5e10 2.5e-3 1. .5 1.0f 2.0h
+1e5 1e5f 1e5h
+
+// Hex float literals
+0x1.0 0x1.0p5 0x1.ABCp-10f 0x.5p2h
+0x1p10
+
+// Built-in functions
+abs(x)
+acos(x) acosh(x) asin(x) asinh(x) atan(x) atanh(x) atan2(y, x)
+ceil(x) clamp(x, lo, hi) cos(x) cosh(x)
+countLeadingZeros(x) countOneBits(x) countTrailingZeros(x)
+cross(a, b) degrees(x) determinant(m) distance(a, b) dot(a, b)
+exp(x) exp2(x) extractBits(v, offset, count)
+faceForward(e1, e2, e3) firstLeadingBit(x) firstTrailingBit(x)
+floor(x) fma(a, b, c) fract(x) frexp(x) fwidth(x)
+insertBits(v, n, offset, count) inverseSqrt(x)
+ldexp(x, n) length(x) log(x) log2(x)
+max(a, b) min(a, b) mix(a, b, t) modf(x) normalize(x)
+pow(x, y) quantizeToF16(x) radians(x)
+reflect(e1, e2) refract(e1, e2, eta) reverseBits(x)
+round(x) saturate(x) select(f, t, cond) sign(x)
+sin(x) sinh(x) smoothstep(lo, hi, x) sqrt(x) step(edge, x)
+storageBarrier() tan(x) tanh(x) transpose(m) trunc(x)
+workgroupBarrier() workgroupUniformLoad(p)
+bitcast(x)
+
+// Texture functions
+textureDimensions(t) textureGather(component, t, s, coords)
+textureGatherCompare(t, s, coords, depth_ref)
+textureLoad(t, coords, level)
+textureNumLayers(t) textureNumLevels(t) textureNumSamples(t)
+textureSample(t, s, coords) textureSampleBias(t, s, coords, bias)
+textureSampleCompare(t, s, coords, depth_ref)
+textureSampleCompareLevel(t, s, coords, depth_ref)
+textureSampleGrad(t, s, coords, ddx, ddy)
+textureSampleLevel(t, s, coords, level)
+textureSampleBaseClampToEdge(t, s, coords)
+textureStore(t, coords, value)
+
+// Atomic functions
+atomicLoad(a) atomicStore(a, v)
+atomicAdd(a, v) atomicSub(a, v)
+atomicMax(a, v) atomicMin(a, v)
+atomicAnd(a, v) atomicOr(a, v) atomicXor(a, v)
+atomicExchange(a, v) atomicCompareExchangeWeak(a, cmp, v)
+
+// Derivative functions
+dpdx(x) dpdxCoarse(x) dpdxFine(x)
+dpdy(x) dpdyCoarse(x) dpdyFine(x)
+fwidthCoarse(x) fwidthFine(x)
+
+// Pack/unpack functions
+pack2x16float(x) pack2x16snorm(x) pack2x16unorm(x)
+pack4x8snorm(x) pack4x8unorm(x)
+unpack2x16float(x) unpack2x16snorm(x) unpack2x16unorm(x)
+unpack4x8snorm(x) unpack4x8unorm(x)
+
+// arrayLength
+arrayLength(a)
+
+// Attributes
+@vertex
+@fragment
+@compute
+@binding(0)
+@group(0)
+@location(0)
+@builtin(position)
+@workgroup_size(64)
+@align(16)
+@size(16)
+@id(0)
+@interpolate(flat)
+@invariant
+@must_use
+@diagnostic(off, derivative_uniformity)
+
+// A complete vertex shader example
+struct VertexInput {
+    @location(0) position: vec3f,
+    @location(1) color: vec3f,
+};
+
+struct VertexOutput {
+    @builtin(position) clip_position: vec4f,
+    @location(0) color: vec3f,
+};
+
+@group(0) @binding(0)
+var<uniform> model_matrix: mat4x4f;
+
+@vertex
+fn vs_main(in: VertexInput) -> VertexOutput {
+    var out: VertexOutput;
+    out.clip_position = model_matrix * vec4f(in.position, 1.0);
+    out.color = in.color;
+    return out;
+}
+
+@fragment
+fn fs_main(in: VertexOutput) -> @location(0) vec4f {
+    return vec4f(in.color, 1.0);
+}
+
+// A compute shader example
+@group(0) @binding(0)
+var<storage, read_write> data: array<f32>;
+
+@compute @workgroup_size(64)
+fn cs_main(@builtin(global_invocation_id) id: vec3u) {
+    let index = id.x;
+    data[index] = data[index] * 2.0;
+}
+
+// Operators and symbols
+let a = 1 + 2 - 3 * 4 / 5 % 6;
+let b = (a > 0) && (a < 10) || !(a == 5);
+let c = a & 0xFF | 0x0F ^ 0x01;
+let d = a << 2;
+let e = a >> 1;
+
+// Control flow
+if (x > 0) {
+    y = x;
+} else {
+    y = -x;
+}
+
+for (var i = 0; i < 10; i++) {
+    sum += i;
+}
+
+while (x > 0) {
+    x = x - 1;
+}
+
+loop {
+    if (x <= 0) {
+        break;
+    }
+    x = x - 1;
+    continuing {
+        y = y + 1;
+    }
+}
+
+switch (x) {
+    case 0: {
+        y = 1;
+    }
+    case 1, 2: {
+        y = 2;
+    }
+    default: {
+        y = 0;
+    }
+}
+
+// Member access
+let v = some_struct.some_member;
+let w = some_struct.some_method();
+
+// FIXME
+// TODO
+// BUG

@@ -101,8 +101,7 @@
         <!-- Janet longstrings: a run of N backticks, closed by the next
              backtick run. The alternation keeps any inner run from
              closing the string early; see the MR description. -->
-        <RegExpr attribute="String" context="#stay" String="`(?!`)[^`]*`"/>
-        <RegExpr attribute="String" context="#stay" String="``+(?:``+[^`]|`[^`]|[^`])*``+"/>
+        <RegExpr attribute="String" context="#stay" String="(?:(?!`)[^`]*`|``+(?:``+[^`]|`[^`]|[^`])*``+)"/>
         <DetectChar attribute="String" context="String" char="&quot;"/>
         <Detect2Chars attribute="Delimiter" context="#stay" char="@" char1="["/>
         <Detect2Chars attribute="Delimiter" context="#stay" char="@" char1="{"/>
@@ -124,50 +123,39 @@
       <!-- The name introduced by a defining form. -->
       <context name="Defined Name" attribute="Definition" lineEndContext="#stay" fallthroughContext="#pop">
         <DetectSpaces attribute="Normal Text"/>
-        <RegExpr attribute="Definition" context="#pop" String="\(&symb;?"/>
-        <RegExpr attribute="Definition" context="#pop" String="&symb;"/>
+        <RegExpr attribute="Definition" context="#pop" String="(?:\(&symb;?|&symb;)"/>
       </context>
 
       <context name="Quote Reader" attribute="Reader Macro" lineEndContext="#pop" fallthroughContext="#pop">
         <DetectSpaces attribute="Normal Text"/>
-        <DetectChar attribute="Delimiter" context="#pop" char="("/>
-        <DetectChar attribute="Delimiter" context="#pop" char="["/>
-        <DetectChar attribute="Delimiter" context="#pop" char="{"/>
+        <AnyChar attribute="Delimiter" context="#pop" String="([{"/>
       </context>
 
       <context name="Quasiquote Reader" attribute="Reader Macro" lineEndContext="#pop" fallthroughContext="#pop">
         <DetectSpaces attribute="Normal Text"/>
-        <DetectChar attribute="Delimiter" context="#pop" char="("/>
-        <DetectChar attribute="Delimiter" context="#pop" char="["/>
-        <DetectChar attribute="Delimiter" context="#pop" char="{"/>
+        <AnyChar attribute="Delimiter" context="#pop" String="([{"/>
       </context>
 
       <context name="Unquote Reader" attribute="Reader Macro" lineEndContext="#pop" fallthroughContext="#pop">
         <DetectSpaces attribute="Normal Text"/>
-        <DetectChar attribute="Delimiter" context="#pop" char="("/>
-        <DetectChar attribute="Delimiter" context="#pop" char="["/>
-        <DetectChar attribute="Delimiter" context="#pop" char="{"/>
+        <AnyChar attribute="Delimiter" context="#pop" String="([{"/>
       </context>
 
       <context name="Splice Reader" attribute="Reader Macro" lineEndContext="#pop" fallthroughContext="#pop">
         <DetectSpaces attribute="Normal Text"/>
-        <DetectChar attribute="Delimiter" context="#pop" char="("/>
-        <DetectChar attribute="Delimiter" context="#pop" char="["/>
-        <DetectChar attribute="Delimiter" context="#pop" char="{"/>
+        <AnyChar attribute="Delimiter" context="#pop" String="([{"/>
       </context>
 
       <context name="Short Fn Reader" attribute="Reader Macro" lineEndContext="#pop" fallthroughContext="#pop">
         <DetectSpaces attribute="Normal Text"/>
-        <DetectChar attribute="Delimiter" context="#pop" char="("/>
-        <DetectChar attribute="Delimiter" context="#pop" char="["/>
-        <DetectChar attribute="Delimiter" context="#pop" char="{"/>
+        <AnyChar attribute="Delimiter" context="#pop" String="([{"/>
       </context>
 
       <context name="Keyword Tail" attribute="Keyword" lineEndContext="#pop" fallthroughContext="#pop"/>
 
       <!-- Janet strings are multi-line: the context stays open across newlines
            and only a closing quote pops it. -->
-      <context name="String" lineEndContext="#stay">
+      <context name="String" attribute="String" lineEndContext="#stay">
         <DetectChar attribute="String" context="#pop" char="&quot;"/>
         <DetectChar attribute="Special Char" context="String Escape" char="\"/>
         <RegExpr attribute="String" context="#stay" String="[^&quot;\\]+"/>

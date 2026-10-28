@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Janet syntax highlighting definition for KSyntaxHighlighting.
+
+    SPDX-FileCopyrightText: 2026 Phillip Cloud
+    SPDX-License-Identifier: MIT
+-->
+<!DOCTYPE language
+[
+  <!-- A Janet symbol: any run of the reader's symbol characters. -->
+  <!ENTITY symb "[^\s()\[\]{}&quot;'`,;~@|]+">
+]>
+<language name="Janet" version="1" kateversion="5.62" section="Scripts"
+          extensions="*.janet;*.jdn" mimetype="text/x-janet" priority="9"
+          casesensitive="true" author="Phillip Cloud" license="MIT">
+  <highlighting>
+    <list name="constants">
+      <item>nil</item>
+      <item>true</item>
+      <item>false</item>
+    </list>
+
+    <list name="specials">
+      <item>break</item>
+      <item>def</item>
+      <item>do</item>
+      <item>fn</item>
+      <item>if</item>
+      <item>quasiquote</item>
+      <item>quote</item>
+      <item>set</item>
+      <item>splice</item>
+      <item>unquote</item>
+      <item>upscope</item>
+      <item>var</item>
+      <item>while</item>
+    </list>
+
+    <!-- Forms whose first argument is a name being introduced. The name is
+         highlighted as a definition, the same way Scheme and Racket do it. -->
+    <list name="definers">
+      <item>def</item>
+      <item>def-</item>
+      <item>defglobal</item>
+      <item>defmacro</item>
+      <item>defmacro-</item>
+      <item>defn</item>
+      <item>defn-</item>
+      <item>var</item>
+      <item>varfn</item>
+    </list>
+
+    <list name="coreMacros">
+      <item>default</item>
+      <item>defer</item>
+      <item>each</item>
+      <item>eachk</item>
+      <item>eachp</item>
+      <item>edefer</item>
+      <item>for</item>
+      <item>forever</item>
+      <item>generate</item>
+      <item>if-let</item>
+      <item>if-not</item>
+      <item>if-with</item>
+      <item>label</item>
+      <item>let</item>
+      <item>loop</item>
+      <item>match</item>
+      <item>prompt</item>
+      <item>repeat</item>
+      <item>seq</item>
+      <item>tabseq</item>
+      <item>try</item>
+      <item>unless</item>
+      <item>when</item>
+      <item>when-let</item>
+      <item>when-with</item>
+      <item>with</item>
+      <item>with-dyns</item>
+      <item>with-syms</item>
+      <item>with-vars</item>
+    </list>
+
+    <list name="preprocessor">
+      <item>import</item>
+      <item>import*</item>
+      <item>module</item>
+      <item>use</item>
+    </list>
+
+    <contexts>
+      <context name="Normal Text" attribute="Normal Text" lineEndContext="#stay">
+        <!-- # opens a comment that runs to the end of the line. -->
+        <DetectChar attribute="Comment" context="Comment" char="#"/>
+        <DetectChar attribute="Reader Macro" context="Quote Reader" char="'"/>
+        <DetectChar attribute="Reader Macro" context="Unquote Reader" char=","/>
+        <DetectChar attribute="Reader Macro" context="Splice Reader" char=";"/>
+        <DetectChar attribute="Reader Macro" context="Quasiquote Reader" char="~"/>
+        <DetectChar attribute="Reader Macro" context="Short Fn Reader" char="|"/>
+        <!-- Janet longstrings: a run of N backticks, closed by the next
+             backtick run. The alternation keeps any inner run from
+             closing the string early; see the MR description. -->
+        <RegExpr attribute="String" context="#stay" String="`(?!`)[^`]*`"/>
+        <RegExpr attribute="String" context="#stay" String="``+(?:``+[^`]|`[^`]|[^`])*``+"/>
+        <DetectChar attribute="String" context="String" char="&quot;"/>
+        <Detect2Chars attribute="Delimiter" context="#stay" char="@" char1="["/>
+        <Detect2Chars attribute="Delimiter" context="#stay" char="@" char1="{"/>
+        <Detect2Chars attribute="Delimiter" context="#stay" char="@" char1="("/>
+        <AnyChar attribute="Delimiter" context="#stay" String="()[]{}@"/>
+        <keyword attribute="Special" context="#stay" String="specials"/>
+        <keyword attribute="Definition" context="Defined Name" String="definers"/>
+        <keyword attribute="Control Flow" context="#stay" String="coreMacros"/>
+        <keyword attribute="Preprocessor" context="#stay" String="preprocessor"/>
+        <keyword attribute="Constant" context="#stay" String="constants"/>
+        <RegExpr attribute="BaseN" context="#stay" String="[+-]?(?:0x[0-9A-Fa-f](?:_?[0-9A-Fa-f])*|(?:\d{1,2}r|[1-9]\d*)r[0-9A-Za-z](?:_?[0-9A-Za-z])*)"/>
+        <RegExpr attribute="Float" context="#stay" String="[+-]?\d(?:_?\d)*(?:\.(?:\d(?:_?\d)*)?)?(?:[eE][+-]?\d+)?"/>
+        <RegExpr attribute="Keyword" context="Keyword Tail" String=":&symb;"/>
+        <RegExpr attribute="Variable" context="#stay" String="&symb;"/>
+      </context>
+
+      <context name="Comment" attribute="Comment" lineEndContext="#pop"/>
+
+      <!-- The name introduced by a defining form. -->
+      <context name="Defined Name" attribute="Definition" lineEndContext="#stay" fallthroughContext="#pop">
+        <DetectSpaces attribute="Normal Text"/>
+        <RegExpr attribute="Definition" context="#pop" String="\(&symb;?"/>
+        <RegExpr attribute="Definition" context="#pop" String="&symb;"/>
+      </context>
+
+      <context name="Quote Reader" attribute="Reader Macro" lineEndContext="#pop" fallthroughContext="#pop">
+        <DetectSpaces attribute="Normal Text"/>
+        <DetectChar attribute="Delimiter" context="#pop" char="("/>
+        <DetectChar attribute="Delimiter" context="#pop" char="["/>
+        <DetectChar attribute="Delimiter" context="#pop" char="{"/>
+      </context>
+
+      <context name="Quasiquote Reader" attribute="Reader Macro" lineEndContext="#pop" fallthroughContext="#pop">
+        <DetectSpaces attribute="Normal Text"/>
+        <DetectChar attribute="Delimiter" context="#pop" char="("/>
+        <DetectChar attribute="Delimiter" context="#pop" char="["/>
+        <DetectChar attribute="Delimiter" context="#pop" char="{"/>
+      </context>
+
+      <context name="Unquote Reader" attribute="Reader Macro" lineEndContext="#pop" fallthroughContext="#pop">
+        <DetectSpaces attribute="Normal Text"/>
+        <DetectChar attribute="Delimiter" context="#pop" char="("/>
+        <DetectChar attribute="Delimiter" context="#pop" char="["/>
+        <DetectChar attribute="Delimiter" context="#pop" char="{"/>
+      </context>
+
+      <context name="Splice Reader" attribute="Reader Macro" lineEndContext="#pop" fallthroughContext="#pop">
+        <DetectSpaces attribute="Normal Text"/>
+        <DetectChar attribute="Delimiter" context="#pop" char="("/>
+        <DetectChar attribute="Delimiter" context="#pop" char="["/>
+        <DetectChar attribute="Delimiter" context="#pop" char="{"/>
+      </context>
+
+      <context name="Short Fn Reader" attribute="Reader Macro" lineEndContext="#pop" fallthroughContext="#pop">
+        <DetectSpaces attribute="Normal Text"/>
+        <DetectChar attribute="Delimiter" context="#pop" char="("/>
+        <DetectChar attribute="Delimiter" context="#pop" char="["/>
+        <DetectChar attribute="Delimiter" context="#pop" char="{"/>
+      </context>
+
+      <context name="Keyword Tail" attribute="Keyword" lineEndContext="#pop" fallthroughContext="#pop"/>
+
+      <!-- Janet strings are multi-line: the context stays open across newlines
+           and only a closing quote pops it. -->
+      <context name="String" lineEndContext="#stay">
+        <DetectChar attribute="String" context="#pop" char="&quot;"/>
+        <DetectChar attribute="Special Char" context="String Escape" char="\"/>
+        <RegExpr attribute="String" context="#stay" String="[^&quot;\\]+"/>
+      </context>
+
+      <context name="String Escape" attribute="Special Char" lineEndContext="#pop" fallthroughContext="#pop">
+        <AnyChar attribute="Special Char" context="#pop" String="abefnrtvz0?&quot;'\"/>
+        <RegExpr attribute="Special Char" context="#pop" String="x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|M-[2-7]-|C-.|U[0-9A-Fa-f]{1,6}"/>
+      </context>
+    </contexts>
+
+    <itemDatas>
+      <itemData name="Normal Text" defStyleNum="dsNormal"/>
+      <itemData name="Variable" defStyleNum="dsVariable"/>
+      <itemData name="Constant" defStyleNum="dsConstant"/>
+      <itemData name="Special" defStyleNum="dsBuiltIn"/>
+      <itemData name="Control Flow" defStyleNum="dsControlFlow"/>
+      <itemData name="Definition" defStyleNum="dsExtension" bold="1"/>
+      <itemData name="Preprocessor" defStyleNum="dsImport"/>
+      <itemData name="Reader Macro" defStyleNum="dsPreprocessor"/>
+      <itemData name="Delimiter" defStyleNum="dsOperator"/>
+      <itemData name="Keyword" defStyleNum="dsKeyword"/>
+      <itemData name="BaseN" defStyleNum="dsBaseN"/>
+      <itemData name="Float" defStyleNum="dsFloat"/>
+      <itemData name="String" defStyleNum="dsString"/>
+      <itemData name="Special Char" defStyleNum="dsSpecialChar"/>
+      <itemData name="Comment" defStyleNum="dsComment"/>
+    </itemDatas>
+  </highlighting>
+  <general>
+    <comments>
+      <comment name="singleLine" start="#"/>
+    </comments>
+    <keywords casesensitive="1" additionalDeliminator="()[]{}@&quot;'`,;~|"/>
+  </general>
+</language>

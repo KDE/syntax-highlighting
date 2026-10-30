@@ -9,9 +9,7 @@
 #include "definition_p.h"
 #include "format.h"
 #include "ksyntaxhighlighting_logging.h"
-#include "repository_p.h"
 #include "rule_p.h"
-#include "xml_p.h"
 
 #include <QString>
 #include <QXmlStreamReader>

@@ -14,7 +14,6 @@
 #include "ksyntaxhighlighting_logging.h"
 #include "rule_p.h"
 #include "worddelimiters_p.h"
-#include "xml_p.h"
 
 using namespace KSyntaxHighlighting;
 

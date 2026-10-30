@@ -20,7 +20,6 @@ QT_END_NAMESPACE
 
 namespace KSyntaxHighlighting
 {
-class Repository;
 class DefinitionData;
 
 class KeywordList

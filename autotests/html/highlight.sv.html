@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>highlight.sv</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (SystemVerilog) - Theme (Breeze Light)"/>
+</head><body style="background-color:#ffffff;color:#1f1c1b"><pre>
+<span style="color:#898887">//</span>
+<span style="color:#898887">// System Verilog Examples For Syntax Highlighting</span>
+<span style="color:#898887">// Taken from a hardware rasterizer project.</span>
+<span style="color:#898887">//</span>
+<span style="color:#898887">// Copyright (c) 2026 Samuel Fitzsimons (rainbain)</span>
+<span style="color:#898887">// </span><span style="color:#ca60ca;font-style:italic">SPDX-License-Identifier:</span><span style="color:#ca60ca;font-style:italic"> </span><span style="color:#ca60ca;font-style:italic">MIT</span>
+<span style="color:#898887">//</span>
+
+<span style="color:#006e28">`default_nettype</span> none
+<span style="color:#006e28">`timescale</span> <span style="color:#b08000">1</span>ns<span style="color:#ca60ca">/</span><span style="color:#b08000">1</span>ps
+
+<span style="font-weight:bold">module</span> raster #<span style="color:#ca60ca">(</span>
+    <span style="color:#0057ae">parameter</span> <span style="color:#0057ae">int</span> ATTR_MAX_BITS <span style="color:#ca60ca">=</span> <span style="color:#b08000">32</span><span style="color:#ca60ca">,</span>
+
+    <span style="color:#898887">// Example color generation</span>
+    <span style="color:#898887">// 1 sign bit, 8 color bits, 6 fractional bits</span>
+    <span style="color:#0057ae">parameter</span> <span style="color:#0057ae">int</span> NUM_ATTRS <span style="color:#ca60ca">=</span> <span style="color:#b08000">3</span><span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">parameter</span> <span style="color:#0057ae">int</span> ATTR_BITS <span style="color:#ca60ca">[</span>NUM_ATTRS<span style="color:#ca60ca">]</span> <span style="color:#ca60ca">=</span> '<span style="color:#ca60ca">{</span><span style="color:#b08000">15</span><span style="color:#ca60ca">,</span> <span style="color:#b08000">15</span><span style="color:#ca60ca">,</span> <span style="color:#b08000">15</span><span style="color:#ca60ca">},</span>
+    <span style="color:#0057ae">parameter</span> <span style="color:#0057ae">int</span> ATTR_FRAC <span style="color:#ca60ca">[</span>NUM_ATTRS<span style="color:#ca60ca">]</span> <span style="color:#ca60ca">=</span> '<span style="color:#ca60ca">{</span><span style="color:#b08000">6</span><span style="color:#ca60ca">,</span> <span style="color:#b08000">6</span><span style="color:#ca60ca">,</span> <span style="color:#b08000">6</span><span style="color:#ca60ca">}</span>
+<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">(</span>
+    <span style="color:#0057ae">input</span> <span style="color:#0057ae">logic</span> clk<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">input</span> <span style="color:#0057ae">logic</span> rst_n<span style="color:#ca60ca">,</span>
+
+    <span style="color:#0057ae">input</span>  <span style="color:#0057ae">logic</span> cmd_valid<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">output</span> <span style="color:#0057ae">logic</span> cmd_ready<span style="color:#ca60ca">,</span>
+
+    <span style="color:#0057ae">input</span>  <span style="color:#0057ae">logic</span>       cmd_pipe_cmd<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">input</span>  <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">7</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span>  cmd_pipe<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">input</span>  <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">7</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span>  cmd_fmt<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">input</span>  <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">4</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span>  cmd_minx<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">input</span>  <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">4</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span>  cmd_miny<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">input</span>  <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">4</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span>  cmd_maxx<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">input</span>  <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">4</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span>  cmd_maxy<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">input</span>  <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">17</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> cmd_w0_i<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">input</span>  <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">17</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> cmd_w1_i<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">input</span>  <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">17</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> cmd_w2_i<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">input</span>  <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">9</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> cmd_dw0_dx<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">input</span>  <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">9</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> cmd_dw1_dx<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">input</span>  <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">9</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> cmd_dw2_dx<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">input</span>  <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">9</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> cmd_dw0_dy<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">input</span>  <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">9</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> cmd_dw1_dy<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">input</span>  <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">9</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> cmd_dw2_dy<span style="color:#ca60ca">,</span>
+
+    <span style="color:#0057ae">input</span> <span style="color:#0057ae">logic</span> <span style="color:#ca60ca">[</span>NUM_ATTRS<span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">][</span>ATTR_MAX_BITS<span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> cmd_attr_i<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">input</span> <span style="color:#0057ae">logic</span> <span style="color:#ca60ca">[</span>NUM_ATTRS<span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">][</span>ATTR_MAX_BITS<span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> cmd_attr_dx<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">input</span> <span style="color:#0057ae">logic</span> <span style="color:#ca60ca">[</span>NUM_ATTRS<span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">][</span>ATTR_MAX_BITS<span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> cmd_attr_dy<span style="color:#ca60ca">,</span>
+
+
+    <span style="color:#0057ae">input</span>  <span style="color:#0057ae">logic</span>       frag_ready<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">output</span> <span style="color:#0057ae">logic</span>       frag_valid<span style="color:#ca60ca">,</span>
+
+    <span style="color:#0057ae">output</span> <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">4</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span>  frag_x<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">output</span> <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">4</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span>  frag_y<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">output</span> <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">7</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span>  frag_fmt<span style="color:#ca60ca">,</span>
+
+    <span style="color:#0057ae">output</span> <span style="color:#0057ae">logic</span> <span style="color:#ca60ca">[</span>NUM_ATTRS<span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">][</span>ATTR_MAX_BITS<span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> frag_attr<span style="color:#ca60ca">,</span>
+
+    <span style="color:#0057ae">output</span> <span style="color:#0057ae">logic</span>       pipe_valid<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">input</span>  <span style="color:#0057ae">logic</span>       pipe_ready<span style="color:#ca60ca">,</span>
+    <span style="color:#0057ae">output</span> <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">7</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span>  pipe
+<span style="color:#ca60ca">);</span>
+    <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">7</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span>  fmt<span style="color:#ca60ca">;</span>
+
+    <span style="color:#898887">// Tile and bounding box</span>
+    <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">4</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span>  tile_x<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">4</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span>  tile_y<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">4</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span>  minx<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">4</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span>  maxx<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span><span style="color:#ca60ca">[</span><span style="color:#b08000">4</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span>  maxy<span style="color:#ca60ca">;</span>
+
+    <span style="color:#898887">// Edge Function Registers</span>
+    <span style="color:#0057ae">logic</span> <span style="color:#0057ae">signed</span> <span style="color:#ca60ca">[</span><span style="color:#b08000">17</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> w0_i<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span> <span style="color:#0057ae">signed</span> <span style="color:#ca60ca">[</span><span style="color:#b08000">17</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> w1_i<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span> <span style="color:#0057ae">signed</span> <span style="color:#ca60ca">[</span><span style="color:#b08000">17</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> w2_i<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span> <span style="color:#0057ae">signed</span> <span style="color:#ca60ca">[</span><span style="color:#b08000">17</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> w0<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span> <span style="color:#0057ae">signed</span> <span style="color:#ca60ca">[</span><span style="color:#b08000">17</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> w1<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span> <span style="color:#0057ae">signed</span> <span style="color:#ca60ca">[</span><span style="color:#b08000">17</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> w2<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span> <span style="color:#0057ae">signed</span> <span style="color:#ca60ca">[</span><span style="color:#b08000">9</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> dw0_dx<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span> <span style="color:#0057ae">signed</span> <span style="color:#ca60ca">[</span><span style="color:#b08000">9</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> dw1_dx<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span> <span style="color:#0057ae">signed</span> <span style="color:#ca60ca">[</span><span style="color:#b08000">9</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> dw2_dx<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span> <span style="color:#0057ae">signed</span> <span style="color:#ca60ca">[</span><span style="color:#b08000">9</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> dw0_dy<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span> <span style="color:#0057ae">signed</span> <span style="color:#ca60ca">[</span><span style="color:#b08000">9</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> dw1_dy<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span> <span style="color:#0057ae">signed</span> <span style="color:#ca60ca">[</span><span style="color:#b08000">9</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> dw2_dy<span style="color:#ca60ca">;</span>
+
+    <span style="color:#898887">// Attribute Registers</span>
+    <span style="color:#0057ae">logic</span> <span style="color:#0057ae">signed</span> <span style="color:#ca60ca">[</span>NUM_ATTRS<span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">][</span>ATTR_MAX_BITS<span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> attr_i<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span> <span style="color:#0057ae">signed</span> <span style="color:#ca60ca">[</span>NUM_ATTRS<span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">][</span>ATTR_MAX_BITS<span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> attr<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span> <span style="color:#0057ae">signed</span> <span style="color:#ca60ca">[</span>NUM_ATTRS<span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">][</span>ATTR_MAX_BITS<span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> attr_dx<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span> <span style="color:#0057ae">signed</span> <span style="color:#ca60ca">[</span>NUM_ATTRS<span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">][</span>ATTR_MAX_BITS<span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> attr_dy<span style="color:#ca60ca">;</span>
+
+    <span style="color:#898887">// Adder outputs</span>
+    <span style="color:#0057ae">logic</span> <span style="color:#0057ae">signed</span> <span style="color:#ca60ca">[</span><span style="color:#b08000">17</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> w0_next<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span> <span style="color:#0057ae">signed</span> <span style="color:#ca60ca">[</span><span style="color:#b08000">17</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> w1_next<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span> <span style="color:#0057ae">signed</span> <span style="color:#ca60ca">[</span><span style="color:#b08000">17</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> w2_next<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span> <span style="color:#0057ae">signed</span> <span style="color:#ca60ca">[</span>NUM_ATTRS<span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">][</span>ATTR_MAX_BITS<span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> attr_next<span style="color:#ca60ca">;</span>
+
+    <span style="color:#0057ae">logic</span>               raster_active<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span>               vsync<span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span>               generate_output<span style="color:#ca60ca">;</span>
+
+    <span style="font-weight:bold">always_ff</span> <span style="color:#ca60ca">@(</span><span style="font-weight:bold">posedge</span> clk<span style="color:#ca60ca">)</span> <span style="font-weight:bold">begin</span>
+        <span style="font-weight:bold">if</span><span style="color:#ca60ca">(</span>cmd_valid <span style="color:#ca60ca">&amp;&amp;</span> cmd_ready<span style="color:#ca60ca">)</span> <span style="font-weight:bold">begin</span>
+            raster_active <span style="color:#ca60ca">&lt;=</span> <span style="color:#ca60ca">!</span>cmd_pipe_cmd<span style="color:#ca60ca">;</span>
+            pipe_valid <span style="color:#ca60ca">&lt;=</span> cmd_pipe_cmd<span style="color:#ca60ca">;</span>
+            pipe <span style="color:#ca60ca">&lt;=</span> cmd_pipe<span style="color:#ca60ca">;</span>
+            cmd_ready <span style="color:#ca60ca">&lt;=</span> <span style="color:#b08000">0</span><span style="color:#ca60ca">;</span>
+            tile_x <span style="color:#ca60ca">&lt;=</span> cmd_minx<span style="color:#ca60ca">;</span>
+            tile_y <span style="color:#ca60ca">&lt;=</span> cmd_miny<span style="color:#ca60ca">;</span>
+            minx <span style="color:#ca60ca">&lt;=</span> cmd_minx<span style="color:#ca60ca">;</span>
+            maxx <span style="color:#ca60ca">&lt;=</span> cmd_maxx<span style="color:#ca60ca">;</span>
+            maxy <span style="color:#ca60ca">&lt;=</span> cmd_maxy<span style="color:#ca60ca">;</span>
+            w0_i <span style="color:#ca60ca">&lt;=</span> cmd_w0_i<span style="color:#ca60ca">;</span>
+            w1_i <span style="color:#ca60ca">&lt;=</span> cmd_w1_i<span style="color:#ca60ca">;</span>
+            w2_i <span style="color:#ca60ca">&lt;=</span> cmd_w2_i<span style="color:#ca60ca">;</span>
+            w0 <span style="color:#ca60ca">&lt;=</span> cmd_w0_i<span style="color:#ca60ca">;</span>
+            w1 <span style="color:#ca60ca">&lt;=</span> cmd_w1_i<span style="color:#ca60ca">;</span>
+            w2 <span style="color:#ca60ca">&lt;=</span> cmd_w2_i<span style="color:#ca60ca">;</span>
+            dw0_dx <span style="color:#ca60ca">&lt;=</span> cmd_dw0_dx<span style="color:#ca60ca">;</span>
+            dw1_dx <span style="color:#ca60ca">&lt;=</span> cmd_dw1_dx<span style="color:#ca60ca">;</span>
+            dw2_dx <span style="color:#ca60ca">&lt;=</span> cmd_dw2_dx<span style="color:#ca60ca">;</span>
+            dw0_dy <span style="color:#ca60ca">&lt;=</span> cmd_dw0_dy<span style="color:#ca60ca">;</span>
+            dw1_dy <span style="color:#ca60ca">&lt;=</span> cmd_dw1_dy<span style="color:#ca60ca">;</span>
+            dw2_dy <span style="color:#ca60ca">&lt;=</span> cmd_dw2_dy<span style="color:#ca60ca">;</span>
+            attr_i <span style="color:#ca60ca">&lt;=</span> cmd_attr_i<span style="color:#ca60ca">;</span>
+            attr <span style="color:#ca60ca">&lt;=</span> cmd_attr_i<span style="color:#ca60ca">;</span>
+            attr_dx <span style="color:#ca60ca">&lt;=</span> cmd_attr_dx<span style="color:#ca60ca">;</span>
+            attr_dy <span style="color:#ca60ca">&lt;=</span> cmd_attr_dy<span style="color:#ca60ca">;</span>
+            fmt <span style="color:#ca60ca">&lt;=</span> cmd_fmt<span style="color:#ca60ca">;</span>
+            vsync <span style="color:#ca60ca">&lt;=</span> <span style="color:#b08000">0</span><span style="color:#ca60ca">;</span>
+        <span style="font-weight:bold">end</span>
+
+        <span style="font-weight:bold">if</span><span style="color:#ca60ca">(</span>pipe_ready <span style="color:#ca60ca">&amp;&amp;</span> pipe_valid<span style="color:#ca60ca">)</span> <span style="font-weight:bold">begin</span>
+            pipe_valid <span style="color:#ca60ca">&lt;=</span> <span style="color:#b08000">0</span><span style="color:#ca60ca">;</span>
+            cmd_ready <span style="color:#ca60ca">&lt;=</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">;</span>
+        <span style="font-weight:bold">end</span>
+
+        <span style="color:#898887">// Clear valid? May be overridden</span>
+        <span style="font-weight:bold">if</span><span style="color:#ca60ca">(</span>frag_valid <span style="color:#ca60ca">&amp;&amp;</span> frag_ready<span style="color:#ca60ca">)</span> <span style="font-weight:bold">begin</span>
+            frag_valid <span style="color:#ca60ca">&lt;=</span> <span style="color:#b08000">0</span><span style="color:#ca60ca">;</span>
+        <span style="font-weight:bold">end</span>
+
+        <span style="font-weight:bold">if</span><span style="color:#ca60ca">(</span>vsync<span style="color:#ca60ca">)</span> <span style="font-weight:bold">begin</span>
+            vsync <span style="color:#ca60ca">&lt;=</span> <span style="color:#b08000">0</span><span style="color:#ca60ca">;</span>
+
+            w0_i <span style="color:#ca60ca">&lt;=</span> w0_next<span style="color:#ca60ca">;</span>
+            w1_i <span style="color:#ca60ca">&lt;=</span> w1_next<span style="color:#ca60ca">;</span>
+            w2_i <span style="color:#ca60ca">&lt;=</span> w2_next<span style="color:#ca60ca">;</span>
+            w0 <span style="color:#ca60ca">&lt;=</span> w0_next<span style="color:#ca60ca">;</span>
+            w1 <span style="color:#ca60ca">&lt;=</span> w1_next<span style="color:#ca60ca">;</span>
+            w2 <span style="color:#ca60ca">&lt;=</span> w2_next<span style="color:#ca60ca">;</span>
+
+            attr <span style="color:#ca60ca">&lt;=</span> attr_next<span style="color:#ca60ca">;</span>
+            attr_i <span style="color:#ca60ca">&lt;=</span> attr_next<span style="color:#ca60ca">;</span>
+        <span style="font-weight:bold">end</span>
+
+        <span style="font-weight:bold">if</span><span style="color:#ca60ca">(</span>raster_active <span style="color:#ca60ca">&amp;&amp;</span> <span style="color:#ca60ca">(!</span>frag_valid <span style="color:#ca60ca">||</span> frag_ready<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">&amp;&amp;</span> <span style="color:#ca60ca">!</span>vsync<span style="color:#ca60ca">)</span> <span style="font-weight:bold">begin</span>
+            <span style="color:#898887">// Step X Counters</span>
+            w0 <span style="color:#ca60ca">&lt;=</span> w0_next<span style="color:#ca60ca">;</span>
+            w1 <span style="color:#ca60ca">&lt;=</span> w1_next<span style="color:#ca60ca">;</span>
+            w2 <span style="color:#ca60ca">&lt;=</span> w2_next<span style="color:#ca60ca">;</span>
+
+            attr <span style="color:#ca60ca">&lt;=</span> attr_next<span style="color:#ca60ca">;</span>
+
+            tile_x <span style="color:#ca60ca">&lt;=</span> tile_x <span style="color:#ca60ca">+</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">;</span>
+            <span style="font-weight:bold">if</span><span style="color:#ca60ca">(</span>tile_x <span style="color:#ca60ca">==</span> maxx<span style="color:#ca60ca">)</span> <span style="font-weight:bold">begin</span>
+                tile_x <span style="color:#ca60ca">&lt;=</span> minx<span style="color:#ca60ca">;</span>
+                tile_y <span style="color:#ca60ca">&lt;=</span> tile_y <span style="color:#ca60ca">+</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">;</span>
+                <span style="font-weight:bold">if</span><span style="color:#ca60ca">(</span>tile_y <span style="color:#ca60ca">==</span> maxy<span style="color:#ca60ca">)</span> <span style="font-weight:bold">begin</span>
+                    <span style="color:#898887">// Last pixel</span>
+                    cmd_ready <span style="color:#ca60ca">&lt;=</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">;</span>
+                    raster_active <span style="color:#ca60ca">&lt;=</span> <span style="color:#b08000">0</span><span style="color:#ca60ca">;</span>
+                <span style="font-weight:bold">end</span> <span style="font-weight:bold">else</span> <span style="font-weight:bold">begin</span>
+                    <span style="color:#898887">// Go down a row of pixels</span>
+                    vsync <span style="color:#ca60ca">&lt;=</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">;</span>
+                <span style="font-weight:bold">end</span>
+            <span style="font-weight:bold">end</span>
+        <span style="font-weight:bold">end</span>
+
+        <span style="font-weight:bold">if</span><span style="color:#ca60ca">(</span>generate_output<span style="color:#ca60ca">)</span> <span style="font-weight:bold">begin</span>
+            frag_x <span style="color:#ca60ca">&lt;=</span> tile_x<span style="color:#ca60ca">;</span>
+            frag_y <span style="color:#ca60ca">&lt;=</span> tile_y<span style="color:#ca60ca">;</span>
+            frag_fmt <span style="color:#ca60ca">&lt;=</span> fmt<span style="color:#ca60ca">;</span>
+            frag_valid <span style="color:#ca60ca">&lt;=</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">;</span>
+        <span style="font-weight:bold">end</span>
+
+        <span style="font-weight:bold">if</span><span style="color:#ca60ca">(!</span>rst_n<span style="color:#ca60ca">)</span> <span style="font-weight:bold">begin</span>
+            cmd_ready <span style="color:#ca60ca">&lt;=</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">;</span>
+            frag_valid <span style="color:#ca60ca">&lt;=</span> <span style="color:#b08000">0</span><span style="color:#ca60ca">;</span>
+            raster_active <span style="color:#ca60ca">&lt;=</span> <span style="color:#b08000">0</span><span style="color:#ca60ca">;</span>
+            pipe_valid <span style="color:#ca60ca">&lt;=</span> <span style="color:#b08000">0</span><span style="color:#ca60ca">;</span>
+            vsync <span style="color:#ca60ca">&lt;=</span> <span style="color:#b08000">0</span><span style="color:#ca60ca">;</span>
+        <span style="font-weight:bold">end</span>
+    <span style="font-weight:bold">end</span>
+
+    <span style="font-weight:bold">always_comb</span> <span style="font-weight:bold">begin</span>
+        generate_output <span style="color:#ca60ca">=</span> raster_active <span style="color:#ca60ca">&amp;&amp;</span> <span style="color:#ca60ca">(!</span>frag_valid <span style="color:#ca60ca">||</span> frag_ready<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">&amp;&amp;</span> <span style="color:#ca60ca">!</span>vsync <span style="color:#ca60ca">&amp;&amp;</span> w0 <span style="color:#ca60ca">>=</span> <span style="color:#b08000">0</span> <span style="color:#ca60ca">&amp;&amp;</span> w1 <span style="color:#ca60ca">>=</span> <span style="color:#b08000">0</span> <span style="color:#ca60ca">&amp;&amp;</span> w2 <span style="color:#ca60ca">>=</span> <span style="color:#b08000">0</span><span style="color:#ca60ca">;</span>
+
+        w0_next <span style="color:#ca60ca">=</span> <span style="color:#ca60ca">(</span>vsync <span style="color:#ca60ca">?</span> w0_i <span style="color:#ca60ca">:</span> w0<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">+</span> <span style="color:#ca60ca">(</span>vsync <span style="color:#ca60ca">?</span> <span style="color:#b08000">18</span>'<span style="color:#ca60ca">(</span>dw0_dy<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">:</span> <span style="color:#b08000">18</span>'<span style="color:#ca60ca">(</span>dw0_dx<span style="color:#ca60ca">));</span>
+        w1_next <span style="color:#ca60ca">=</span> <span style="color:#ca60ca">(</span>vsync <span style="color:#ca60ca">?</span> w1_i <span style="color:#ca60ca">:</span> w1<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">+</span> <span style="color:#ca60ca">(</span>vsync <span style="color:#ca60ca">?</span> <span style="color:#b08000">18</span>'<span style="color:#ca60ca">(</span>dw1_dy<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">:</span> <span style="color:#b08000">18</span>'<span style="color:#ca60ca">(</span>dw1_dx<span style="color:#ca60ca">));</span>
+        w2_next <span style="color:#ca60ca">=</span> <span style="color:#ca60ca">(</span>vsync <span style="color:#ca60ca">?</span> w2_i <span style="color:#ca60ca">:</span> w2<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">+</span> <span style="color:#ca60ca">(</span>vsync <span style="color:#ca60ca">?</span> <span style="color:#b08000">18</span>'<span style="color:#ca60ca">(</span>dw2_dy<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">:</span> <span style="color:#b08000">18</span>'<span style="color:#ca60ca">(</span>dw2_dx<span style="color:#ca60ca">));</span>
+
+        <span style="color:#898887">// Each attribute adder</span>
+        <span style="font-weight:bold">for</span> <span style="color:#ca60ca">(</span><span style="color:#0057ae">int</span> i <span style="color:#ca60ca">=</span> <span style="color:#b08000">0</span><span style="color:#ca60ca">;</span> i <span style="color:#ca60ca">&lt;</span> NUM_ATTRS<span style="color:#ca60ca">;</span> i<span style="color:#ca60ca">++)</span> <span style="font-weight:bold">begin</span>
+            attr_next<span style="color:#ca60ca">[</span>i<span style="color:#ca60ca">]</span> <span style="color:#ca60ca">=</span> <span style="color:#ca60ca">(</span>vsync <span style="color:#ca60ca">?</span> attr_i<span style="color:#ca60ca">[</span>i<span style="color:#ca60ca">]</span> <span style="color:#ca60ca">:</span> attr<span style="color:#ca60ca">[</span>i<span style="color:#ca60ca">])</span> <span style="color:#ca60ca">+</span> <span style="color:#ca60ca">(</span>vsync <span style="color:#ca60ca">?</span> attr_dy<span style="color:#ca60ca">[</span>i<span style="color:#ca60ca">]</span> <span style="color:#ca60ca">:</span> attr_dx<span style="color:#ca60ca">[</span>i<span style="color:#ca60ca">]);</span>
+        <span style="font-weight:bold">end</span>
+    <span style="font-weight:bold">end</span>
+
+    <span style="color:#898887">// Connect the attribute output</span>
+    <span style="color:#898887">// Only connecting the used bits</span>
+    <span style="color:#898887">// So that the unused adder bits get optimized out</span>
+    <span style="font-weight:bold">generate</span>
+        <span style="font-weight:bold">for</span> <span style="color:#ca60ca">(</span><span style="font-weight:bold">genvar</span> i <span style="color:#ca60ca">=</span> <span style="color:#b08000">0</span><span style="color:#ca60ca">;</span> i <span style="color:#ca60ca">&lt;</span> NUM_ATTRS<span style="color:#ca60ca">;</span> i<span style="color:#ca60ca">++)</span> <span style="font-weight:bold">begin :</span><span style="color:#0057ae"> </span><span style="color:#0057ae">gen_attr</span>
+            <span style="font-weight:bold">always_comb</span> <span style="font-weight:bold">begin</span>
+                frag_attr<span style="color:#ca60ca">[</span>i<span style="color:#ca60ca">][</span>ATTR_MAX_BITS<span style="color:#ca60ca">-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span>ATTR_BITS<span style="color:#ca60ca">[</span>i<span style="color:#ca60ca">]]</span> <span style="color:#ca60ca">=</span> '0<span style="color:#ca60ca">;</span>
+            <span style="font-weight:bold">end</span>
+
+            <span style="font-weight:bold">always_ff</span> <span style="color:#ca60ca">@(</span><span style="font-weight:bold">posedge</span> clk<span style="color:#ca60ca">)</span> <span style="font-weight:bold">begin</span>
+                <span style="font-weight:bold">if</span><span style="color:#ca60ca">(</span>generate_output<span style="color:#ca60ca">)</span> <span style="font-weight:bold">begin</span>
+                    frag_attr<span style="color:#ca60ca">[</span>i<span style="color:#ca60ca">][</span>ATTR_BITS<span style="color:#ca60ca">[</span>i<span style="color:#ca60ca">]-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> <span style="color:#ca60ca">&lt;=</span> attr<span style="color:#ca60ca">[</span>i<span style="color:#ca60ca">][</span>ATTR_BITS<span style="color:#ca60ca">[</span>i<span style="color:#ca60ca">]-</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">];</span>
+                <span style="font-weight:bold">end</span>
+            <span style="font-weight:bold">end</span>
+        <span style="font-weight:bold">end</span>
+    <span style="font-weight:bold">endgenerate</span>
+<span style="font-weight:bold">endmodule</span>
+
+<span style="color:#006e28">`define</span> HALF_PERIOD <span style="color:#b08000">5</span>
+
+<span style="color:#898887">//</span>
+<span style="color:#898887">// Some components of the testbench for syntax highlighting of other system verilog features</span>
+<span style="font-weight:bold">module</span> raster_tb<span style="color:#ca60ca">;</span>
+    <span style="font-weight:bold">function</span> <span style="color:#0057ae">automatic</span> <span style="color:#0057ae">void</span> <span style="color:#644a9b">show_cmd</span><span style="color:#ca60ca">(</span><span style="color:#0057ae">input</span> <span style="color:#0057ae">int</span> t<span style="color:#ca60ca">);</span>
+        <span style="font-weight:bold">if</span> <span style="color:#ca60ca">(</span>cmd_log<span style="color:#ca60ca">[</span>t <span style="color:#ca60ca">%</span> MAX_CMD<span style="color:#0057ae">].pipe_cmd</span><span style="color:#ca60ca">)</span>
+            <span style="color:#644a9b;font-weight:bold">$display</span><span style="color:#ca60ca">(</span><span style="color:#bf0303">"  command %0d: pipe token %h"</span><span style="color:#ca60ca">,</span> t<span style="color:#ca60ca">,</span> cmd_log<span style="color:#ca60ca">[</span>t <span style="color:#ca60ca">%</span> MAX_CMD<span style="color:#0057ae">].pipe</span><span style="color:#ca60ca">);</span>
+        <span style="font-weight:bold">else</span>
+            <span style="color:#644a9b;font-weight:bold">$display</span><span style="color:#ca60ca">(</span><span style="color:#bf0303">"  command %0d: triangle a=(%0d,%0d) b=(%0d,%0d) c=(%0d,%0d), tile at (%0d,%0d)"</span><span style="color:#ca60ca">,</span> t<span style="color:#ca60ca">,</span>
+                     cmd_vtx<span style="color:#ca60ca">[</span>t <span style="color:#ca60ca">%</span> MAX_CMD<span style="color:#ca60ca">][</span><span style="color:#b08000">0</span><span style="color:#ca60ca">],</span> cmd_vtx<span style="color:#ca60ca">[</span>t <span style="color:#ca60ca">%</span> MAX_CMD<span style="color:#ca60ca">][</span><span style="color:#b08000">1</span><span style="color:#ca60ca">],</span> cmd_vtx<span style="color:#ca60ca">[</span>t <span style="color:#ca60ca">%</span> MAX_CMD<span style="color:#ca60ca">][</span><span style="color:#b08000">2</span><span style="color:#ca60ca">],</span>
+                     cmd_vtx<span style="color:#ca60ca">[</span>t <span style="color:#ca60ca">%</span> MAX_CMD<span style="color:#ca60ca">][</span><span style="color:#b08000">3</span><span style="color:#ca60ca">],</span> cmd_vtx<span style="color:#ca60ca">[</span>t <span style="color:#ca60ca">%</span> MAX_CMD<span style="color:#ca60ca">][</span><span style="color:#b08000">4</span><span style="color:#ca60ca">],</span> cmd_vtx<span style="color:#ca60ca">[</span>t <span style="color:#ca60ca">%</span> MAX_CMD<span style="color:#ca60ca">][</span><span style="color:#b08000">5</span><span style="color:#ca60ca">],</span>
+                     cmd_tile<span style="color:#ca60ca">[</span>t <span style="color:#ca60ca">%</span> MAX_CMD<span style="color:#ca60ca">][</span><span style="color:#b08000">0</span><span style="color:#ca60ca">],</span> cmd_tile<span style="color:#ca60ca">[</span>t <span style="color:#ca60ca">%</span> MAX_CMD<span style="color:#ca60ca">][</span><span style="color:#b08000">1</span><span style="color:#ca60ca">]);</span>
+    <span style="font-weight:bold">endfunction</span>
+
+    <span style="font-weight:bold">task</span> <span style="color:#0057ae">automatic</span> <span style="color:#644a9b">add_random_triangle</span><span style="color:#ca60ca">();</span>
+        <span style="color:#0057ae">int</span> ax<span style="color:#ca60ca">,</span> ay<span style="color:#ca60ca">,</span> bx<span style="color:#ca60ca">,</span> by<span style="color:#ca60ca">,</span> cx<span style="color:#ca60ca">,</span> cy<span style="color:#ca60ca">;</span>
+        <span style="color:#0057ae">int</span> pick<span style="color:#ca60ca">;</span>
+        <span style="color:#0057ae">int</span> skip<span style="color:#ca60ca">;</span>
+        <span style="font-weight:bold">do</span> <span style="font-weight:bold">begin</span>
+            ax <span style="color:#ca60ca">=</span> int'<span style="color:#ca60ca">(</span><span style="color:#644a9b;font-weight:bold">$urandom_range</span><span style="color:#ca60ca">(</span>SCREEN_W <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">));</span>
+            ay <span style="color:#ca60ca">=</span> int'<span style="color:#ca60ca">(</span><span style="color:#644a9b;font-weight:bold">$urandom_range</span><span style="color:#ca60ca">(</span>SCREEN_H <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">));</span>
+            pick <span style="color:#ca60ca">=</span> int'<span style="color:#ca60ca">(</span><span style="color:#644a9b;font-weight:bold">$urandom_range</span><span style="color:#ca60ca">(</span><span style="color:#b08000">99</span><span style="color:#ca60ca">));</span>
+            <span style="font-weight:bold">if</span> <span style="color:#ca60ca">(</span>pick <span style="color:#ca60ca">&lt;</span> <span style="color:#b08000">25</span><span style="color:#ca60ca">)</span> <span style="font-weight:bold">begin</span>
+                <span style="color:#898887">// anywhere on screen</span>
+                bx <span style="color:#ca60ca">=</span> int'<span style="color:#ca60ca">(</span><span style="color:#644a9b;font-weight:bold">$urandom_range</span><span style="color:#ca60ca">(</span>SCREEN_W <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">));</span>  by <span style="color:#ca60ca">=</span> int'<span style="color:#ca60ca">(</span><span style="color:#644a9b;font-weight:bold">$urandom_range</span><span style="color:#ca60ca">(</span>SCREEN_H <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">));</span>
+                cx <span style="color:#ca60ca">=</span> int'<span style="color:#ca60ca">(</span><span style="color:#644a9b;font-weight:bold">$urandom_range</span><span style="color:#ca60ca">(</span>SCREEN_W <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">));</span>  cy <span style="color:#ca60ca">=</span> int'<span style="color:#ca60ca">(</span><span style="color:#644a9b;font-weight:bold">$urandom_range</span><span style="color:#ca60ca">(</span>SCREEN_H <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">));</span>
+            <span style="font-weight:bold">end</span> <span style="font-weight:bold">else</span> <span style="font-weight:bold">if</span> <span style="color:#ca60ca">(</span>pick <span style="color:#ca60ca">&lt;</span> <span style="color:#b08000">35</span><span style="color:#ca60ca">)</span> <span style="font-weight:bold">begin</span>
+                <span style="color:#898887">// huge, near three of the four screen corners, for the largest weights</span>
+                skip <span style="color:#ca60ca">=</span> int'<span style="color:#ca60ca">(</span><span style="color:#644a9b;font-weight:bold">$urandom_range</span><span style="color:#ca60ca">(</span><span style="color:#b08000">3</span><span style="color:#ca60ca">));</span>
+                ax <span style="color:#ca60ca">=</span> <span style="color:#644a9b">near</span><span style="color:#ca60ca">(</span>CORNER_X<span style="color:#ca60ca">[(</span>skip <span style="color:#ca60ca">+</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">)</span> <span style="color:#ca60ca">%</span> <span style="color:#b08000">4</span><span style="color:#ca60ca">],</span> <span style="color:#b08000">20</span><span style="color:#ca60ca">,</span> SCREEN_W <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>
+                ay <span style="color:#ca60ca">=</span> <span style="color:#644a9b">near</span><span style="color:#ca60ca">(</span>CORNER_Y<span style="color:#ca60ca">[(</span>skip <span style="color:#ca60ca">+</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">)</span> <span style="color:#ca60ca">%</span> <span style="color:#b08000">4</span><span style="color:#ca60ca">],</span> <span style="color:#b08000">20</span><span style="color:#ca60ca">,</span> SCREEN_H <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>
+                bx <span style="color:#ca60ca">=</span> <span style="color:#644a9b">near</span><span style="color:#ca60ca">(</span>CORNER_X<span style="color:#ca60ca">[(</span>skip <span style="color:#ca60ca">+</span> <span style="color:#b08000">2</span><span style="color:#ca60ca">)</span> <span style="color:#ca60ca">%</span> <span style="color:#b08000">4</span><span style="color:#ca60ca">],</span> <span style="color:#b08000">20</span><span style="color:#ca60ca">,</span> SCREEN_W <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>
+                by <span style="color:#ca60ca">=</span> <span style="color:#644a9b">near</span><span style="color:#ca60ca">(</span>CORNER_Y<span style="color:#ca60ca">[(</span>skip <span style="color:#ca60ca">+</span> <span style="color:#b08000">2</span><span style="color:#ca60ca">)</span> <span style="color:#ca60ca">%</span> <span style="color:#b08000">4</span><span style="color:#ca60ca">],</span> <span style="color:#b08000">20</span><span style="color:#ca60ca">,</span> SCREEN_H <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>
+                cx <span style="color:#ca60ca">=</span> <span style="color:#644a9b">near</span><span style="color:#ca60ca">(</span>CORNER_X<span style="color:#ca60ca">[(</span>skip <span style="color:#ca60ca">+</span> <span style="color:#b08000">3</span><span style="color:#ca60ca">)</span> <span style="color:#ca60ca">%</span> <span style="color:#b08000">4</span><span style="color:#ca60ca">],</span> <span style="color:#b08000">20</span><span style="color:#ca60ca">,</span> SCREEN_W <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>
+                cy <span style="color:#ca60ca">=</span> <span style="color:#644a9b">near</span><span style="color:#ca60ca">(</span>CORNER_Y<span style="color:#ca60ca">[(</span>skip <span style="color:#ca60ca">+</span> <span style="color:#b08000">3</span><span style="color:#ca60ca">)</span> <span style="color:#ca60ca">%</span> <span style="color:#b08000">4</span><span style="color:#ca60ca">],</span> <span style="color:#b08000">20</span><span style="color:#ca60ca">,</span> SCREEN_H <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>
+            <span style="font-weight:bold">end</span> <span style="font-weight:bold">else</span> <span style="font-weight:bold">if</span> <span style="color:#ca60ca">(</span>pick <span style="color:#ca60ca">&lt;</span> <span style="color:#b08000">55</span><span style="color:#ca60ca">)</span> <span style="font-weight:bold">begin</span>
+                <span style="color:#898887">// small</span>
+                bx <span style="color:#ca60ca">=</span> <span style="color:#644a9b">near</span><span style="color:#ca60ca">(</span>ax<span style="color:#ca60ca">,</span> <span style="color:#b08000">8</span><span style="color:#ca60ca">,</span> SCREEN_W <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>  by <span style="color:#ca60ca">=</span> <span style="color:#644a9b">near</span><span style="color:#ca60ca">(</span>ay<span style="color:#ca60ca">,</span> <span style="color:#b08000">8</span><span style="color:#ca60ca">,</span> SCREEN_H <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>
+                cx <span style="color:#ca60ca">=</span> <span style="color:#644a9b">near</span><span style="color:#ca60ca">(</span>ax<span style="color:#ca60ca">,</span> <span style="color:#b08000">8</span><span style="color:#ca60ca">,</span> SCREEN_W <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>  cy <span style="color:#ca60ca">=</span> <span style="color:#644a9b">near</span><span style="color:#ca60ca">(</span>ay<span style="color:#ca60ca">,</span> <span style="color:#b08000">8</span><span style="color:#ca60ca">,</span> SCREEN_H <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>
+            <span style="font-weight:bold">end</span> <span style="font-weight:bold">else</span> <span style="font-weight:bold">if</span> <span style="color:#ca60ca">(</span>pick <span style="color:#ca60ca">&lt;</span> <span style="color:#b08000">70</span><span style="color:#ca60ca">)</span> <span style="font-weight:bold">begin</span>
+                <span style="color:#898887">// medium, about a tile</span>
+                bx <span style="color:#ca60ca">=</span> <span style="color:#644a9b">near</span><span style="color:#ca60ca">(</span>ax<span style="color:#ca60ca">,</span> <span style="color:#b08000">60</span><span style="color:#ca60ca">,</span> SCREEN_W <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>  by <span style="color:#ca60ca">=</span> <span style="color:#644a9b">near</span><span style="color:#ca60ca">(</span>ay<span style="color:#ca60ca">,</span> <span style="color:#b08000">60</span><span style="color:#ca60ca">,</span> SCREEN_H <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>
+                cx <span style="color:#ca60ca">=</span> <span style="color:#644a9b">near</span><span style="color:#ca60ca">(</span>ax<span style="color:#ca60ca">,</span> <span style="color:#b08000">60</span><span style="color:#ca60ca">,</span> SCREEN_W <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>  cy <span style="color:#ca60ca">=</span> <span style="color:#644a9b">near</span><span style="color:#ca60ca">(</span>ay<span style="color:#ca60ca">,</span> <span style="color:#b08000">60</span><span style="color:#ca60ca">,</span> SCREEN_H <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>
+            <span style="font-weight:bold">end</span> <span style="font-weight:bold">else</span> <span style="font-weight:bold">if</span> <span style="color:#ca60ca">(</span>pick <span style="color:#ca60ca">&lt;</span> <span style="color:#b08000">85</span><span style="color:#ca60ca">)</span> <span style="font-weight:bold">begin</span>
+                <span style="color:#898887">// sliver: two vertices next to each other</span>
+                bx <span style="color:#ca60ca">=</span> int'<span style="color:#ca60ca">(</span><span style="color:#644a9b;font-weight:bold">$urandom_range</span><span style="color:#ca60ca">(</span>SCREEN_W <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">));</span>  by <span style="color:#ca60ca">=</span> int'<span style="color:#ca60ca">(</span><span style="color:#644a9b;font-weight:bold">$urandom_range</span><span style="color:#ca60ca">(</span>SCREEN_H <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">));</span>
+                cx <span style="color:#ca60ca">=</span> <span style="color:#644a9b">near</span><span style="color:#ca60ca">(</span>bx<span style="color:#ca60ca">,</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">,</span> SCREEN_W <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>           cy <span style="color:#ca60ca">=</span> <span style="color:#644a9b">near</span><span style="color:#ca60ca">(</span>by<span style="color:#ca60ca">,</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">,</span> SCREEN_H <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>
+            <span style="font-weight:bold">end</span> <span style="font-weight:bold">else</span> <span style="font-weight:bold">begin</span>
+                <span style="color:#898887">// vertices on or next to tile boundaries</span>
+                ax <span style="color:#ca60ca">=</span> <span style="color:#644a9b">on_tile_edge</span><span style="color:#ca60ca">(</span>SCREEN_W <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>  ay <span style="color:#ca60ca">=</span> <span style="color:#644a9b">on_tile_edge</span><span style="color:#ca60ca">(</span>SCREEN_H <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>
+                bx <span style="color:#ca60ca">=</span> <span style="color:#644a9b">on_tile_edge</span><span style="color:#ca60ca">(</span>SCREEN_W <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>  by <span style="color:#ca60ca">=</span> <span style="color:#644a9b">on_tile_edge</span><span style="color:#ca60ca">(</span>SCREEN_H <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>
+                cx <span style="color:#ca60ca">=</span> <span style="color:#644a9b">on_tile_edge</span><span style="color:#ca60ca">(</span>SCREEN_W <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>  cy <span style="color:#ca60ca">=</span> <span style="color:#644a9b">on_tile_edge</span><span style="color:#ca60ca">(</span>SCREEN_H <span style="color:#ca60ca">-</span> <span style="color:#b08000">1</span><span style="color:#ca60ca">);</span>
+            <span style="font-weight:bold">end</span>
+        <span style="font-weight:bold">end</span> <span style="font-weight:bold">while</span> <span style="color:#ca60ca">(</span><span style="color:#644a9b">tri_area</span><span style="color:#ca60ca">(</span>ax<span style="color:#ca60ca">,</span> ay<span style="color:#ca60ca">,</span> bx<span style="color:#ca60ca">,</span> by<span style="color:#ca60ca">,</span> cx<span style="color:#ca60ca">,</span> cy<span style="color:#ca60ca">)</span> <span style="color:#ca60ca">==</span> <span style="color:#b08000">0</span><span style="color:#ca60ca">);</span>
+        <span style="color:#644a9b">add_tri_random_tile</span><span style="color:#ca60ca">(</span>ax<span style="color:#ca60ca">,</span> ay<span style="color:#ca60ca">,</span> bx<span style="color:#ca60ca">,</span> by<span style="color:#ca60ca">,</span> cx<span style="color:#ca60ca">,</span> cy<span style="color:#ca60ca">,</span> <span style="color:#b08000">24</span>'<span style="color:#ca60ca">(</span><span style="color:#644a9b;font-weight:bold">$urandom</span><span style="color:#ca60ca">),</span> <span style="color:#b08000">24</span>'<span style="color:#ca60ca">(</span><span style="color:#644a9b;font-weight:bold">$urandom</span><span style="color:#ca60ca">),</span> <span style="color:#b08000">24</span>'<span style="color:#ca60ca">(</span><span style="color:#644a9b;font-weight:bold">$urandom</span><span style="color:#ca60ca">));</span>
+    <span style="font-weight:bold">endtask</span>
+
+
+    <span style="color:#898887">// Sized literals in each base, a typedef and a case statement</span>
+    <span style="color:#0057ae">localparam</span> <span style="color:#0057ae">logic</span> <span style="color:#ca60ca">[</span><span style="color:#b08000">7</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> HEX <span style="color:#ca60ca">=</span> <span style="color:#b08000">8'hA5</span><span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">localparam</span> <span style="color:#0057ae">logic</span> <span style="color:#ca60ca">[</span><span style="color:#b08000">3</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> BIN <span style="color:#ca60ca">=</span> <span style="color:#b08000">4'b10xz</span><span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">localparam</span> <span style="color:#0057ae">logic</span> <span style="color:#ca60ca">[</span><span style="color:#b08000">5</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> OCT <span style="color:#ca60ca">=</span> <span style="color:#b08000">6'o17</span><span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">localparam</span> <span style="color:#0057ae">logic</span> <span style="color:#ca60ca">[</span><span style="color:#b08000">7</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> DEC <span style="color:#ca60ca">=</span> <span style="color:#b08000">8'd200</span><span style="color:#ca60ca">;</span>
+
+    <span style="color:#0057ae">typedef</span> <span style="color:#0057ae">enum</span> <span style="color:#0057ae">logic</span> <span style="color:#ca60ca">[</span><span style="color:#b08000">1</span><span style="color:#ca60ca">:</span><span style="color:#b08000">0</span><span style="color:#ca60ca">]</span> <span style="color:#ca60ca">{</span>IDLE<span style="color:#ca60ca">,</span> RUN<span style="color:#ca60ca">,</span> DONE<span style="color:#ca60ca">}</span> state_t<span style="color:#ca60ca">;</span>
+    state_t <span style="color:#006e28">state</span><span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span>   clk <span style="color:#ca60ca">=</span> <span style="color:#b08000">0</span><span style="color:#ca60ca">;</span>
+    <span style="color:#0057ae">logic</span>   rst_n<span style="color:#ca60ca">;</span>
+
+    <span style="color:#898887">/* Instance with named port connections */</span>
+    raster #<span style="color:#0057ae">(.NUM_ATTRS</span><span style="color:#ca60ca">(</span><span style="color:#b08000">3</span><span style="color:#ca60ca">))</span> <span style="color:#644a9b">dut</span> <span style="color:#ca60ca">(</span>
+       <span style="color:#0057ae"> .clk</span>   <span style="color:#ca60ca">(</span>clk<span style="color:#ca60ca">),</span>
+       <span style="color:#0057ae"> .rst_n</span> <span style="color:#ca60ca">(</span>rst_n<span style="color:#ca60ca">)</span>
+    <span style="color:#ca60ca">);</span>
+
+    <span style="font-weight:bold">initial</span> <span style="font-weight:bold">forever</span> #<span style="color:#006e28">`HALF_PERIOD</span> clk <span style="color:#ca60ca">=</span> <span style="color:#ca60ca">~</span>clk<span style="color:#ca60ca">;</span>
+
+    <span style="font-weight:bold">always_ff</span> <span style="color:#ca60ca">@(</span><span style="font-weight:bold">posedge</span> clk<span style="color:#ca60ca">)</span> <span style="font-weight:bold">begin</span>
+        <span style="font-weight:bold">unique</span> <span style="font-weight:bold">case</span> <span style="color:#ca60ca">(</span><span style="color:#006e28">state</span><span style="color:#ca60ca">)</span>
+            IDLE<span style="color:#ca60ca">:</span>    <span style="color:#006e28">state</span> <span style="color:#ca60ca">&lt;=</span> RUN<span style="color:#ca60ca">;</span>
+            RUN<span style="color:#ca60ca">:</span>     <span style="color:#006e28">state</span> <span style="color:#ca60ca">&lt;=</span> DONE<span style="color:#ca60ca">;</span>
+            <span style="font-weight:bold">default</span><span style="color:#ca60ca">:</span> <span style="color:#006e28">state</span> <span style="color:#ca60ca">&lt;=</span> IDLE<span style="color:#ca60ca">;</span>
+        <span style="font-weight:bold">endcase</span>
+    <span style="font-weight:bold">end</span>
+<span style="font-weight:bold">endmodule</span>
+</pre></body></html>

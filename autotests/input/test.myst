@@ -1,0 +1,488 @@
+---
+title: MyST Test Document
+author: Test
+comment: This metadata value spans
+  multiple lines in the YAML frontmatter
+---
+
+% This is a MyST comment with TODO and FIXME keywords
+
+Normal paragraph text with **bold**, _italic_, `code`.
+
+# Heading 1
+
+## Heading 2
+
+A paragraph with a [link](https://example.com) and an ![image](img.png).
+
+Bullet lists:
+
+- item 1
+- item 2
+  - nested item
+
+* item 1
+* item 2
+  * nested item
+
+Numbered list:
+
+1. first
+2. second
+
+Task list:
+
+- [ ] unchecked
+- [x] checked
+
+(my-target)=
+
+{.my-class #my-id}
+
+```{figure}
+:nnn: mmmm
+
+A simple note directive with **Markdown** body.
+```
+
+```{figure}
+:alt: My figure
+:width: 200px
+
+Caption text here.
+```
+
+```{warning} An argument here
+Body text of warning.
+```
+
+
+:::{tip}
+A colon-fence directive.
+:::
+
+::::{important}
+Outer directive (4 colons).
+
+:::{note}
+Inner directive (3 colons).
+:::
+::::
+
+:::{code-block}
+---
+caption: A Python snippet
+linenos: true
+---
+
+x = 1
+:::
+
+    This 4-space indented block is a Markdown indented code block,
+    deliberately kept as a sample — it is not parsed as a directive.
+
+## Directive edge cases
+
+Mid-line fence mention (must stay plain text — no directive opens):
+
+Use ```{note} to create a note in MyST.
+
+Code directives with languages:
+
+```{code-block} python
+def fenced():
+    pass
+```
+
+```{code} javascript
+const a = 1;
+```
+
+```{code-block} bash
+echo hi
+```
+
+Colon directives with languages:
+
+:::python
+def colon_directive():
+    pass
+:::
+
+:::{code-block} bash
+echo colon bash
+:::
+
+Unknown language colon fence (no fold region may open):
+
+:::kotlin
+val x = 1
+:::
+
+Nested fence lengths (inner 3-fence must not close outer 4-fence):
+
+````{note}
+Outer directive (4 backticks).
+
+```{code}
+inner example
+```
+````
+
+4-fence code directive with a language (inner 3-fence must not close it):
+
+````{code-block} python
+def nested_code_directive():
+    pass
+
+```{code}
+inner example
+```
+````
+
+Nested colon fences:
+
+::::{important}
+Outer directive (4 colons).
+
+:::{note}
+Inner directive (3 colons).
+:::
+::::
+
+Option keys with no space in the key:
+
+```{code-block} python
+---
+linenos: true
+---
+x = 1
+```
+
+## Roles
+
+Here is {ref}`a simple role`.
+
+Here is {ref}`Explicit text <#heading>`.
+
+Domain role: {py:class}`MyClass`.
+
+Math role: {math}`a < b` (edge case: < not a target).
+
+Autolink: <path:example.txt>
+
+Intersphinx autolink: <inv:sphinx:std#index>
+
+## Math
+
+Inline math: $E = mc^2$ and more text.
+
+Escaped dollars: \$E = mc^2\$ should not be math.
+
+$$
+y = ax^2 + bx + c
+$$
+
+$$ e = mc^2 $$ (eqn:einstein)
+
+\begin{gather*}
+a_1 = b_1 + c_1 \\
+a_2 = b_2 + c_2
+\end{gather*}
+
+\begin{align}
+f(x) &= x^2 \\
+g(x) &= x^3
+\end{align}
+
+## Block Extensions
+
+% A full-line comment
+
+Some text % not a comment (% only at line start)
+
+(section-label)=
+
+## Referenced Section
+
+{.bg-warning #special-id key="value"}
+
+A paragraph with an attribute block above it.
+
+:param x: The first parameter
+:param y: The second parameter
+:returns: The result value
+
+Term 1
+: This is the definition of Term 1
+
+  Term 2
+  : Definition line 1
+  : Definition line 2
+
+Term 3
+: Longer definition
+  that continues for all indented lines
+
+  and a second indented paragraph
+
+Back to normal text after the definition list.
+
+Term 4
+: Definition with **bold**, *emphasis*, ~~strikeout~~, and `code`.
+
+  Continuation with _emphasis_, [a link](https://example.com), and **more bold**.
+
+  Nested definition line:
+  : second definition of the same term
+
+Back to normal after the inline-markup definitions.
+
+> [!NOTE]
+> This is a GitHub-style note alert.
+
+> [!WARNING]
+> A warning alert.
+
+## Fences nested in lists
+
+- Bullet item introducing a directive
+
+  ```{note}
+  A directive fence inside a bullet list.
+  ```
+
+- Another bullet with a colon directive
+
+  :::{tip}
+  A colon directive inside a bullet list.
+  :::
+
+1. Numbered item introducing a directive
+
+   ```{note}
+   A directive fence inside a numbered list.
+   ```
+
+2. Numbered item with a plain fenced code block
+
+   ```python
+   x = 1
+   ```
+
+> A blockquote introducing a directive
+>
+> ```{note}
+> Fence sharing the line with the > marker: this is the documented
+> limitation — the marker is consumed before firstNonSpace rules can
+> fire, so the fence renders unstyled (not a directive).
+> ```
+
+> Regular blockquote (not an alert).
+
+## Inline Extensions
+
+Substitution: {{my-key}} in a sentence.
+
+Attrs inline: A [span of text]{.highlight} with class.
+
+Another [link]{#my-id} with id attribute.
+
+MyST autolink path: <path:../other-doc.md>
+
+MyST intersphinx: <inv:sphinx:std#index>
+
+MyST project link: <project:#some-heading>
+
+A list with inline MyST constructs:
+
+- Item with {ref}`a role`
+- Item with $math$
+- Item with {{substitution}}
+
+## Markdown Regression Tests
+
+Standard fenced code (not directive):
+
+```python
+x = 1
+print(x)
+```
+
+:::javascript
+const y = 2;
+:::
+
+Plain backtick fence (no language):
+
+```{foo}
+raw text
+```
+
+Standard table:
+
+| Column A | Column B | Column C |
+|:---------|:--------:|---------:|
+| left     | center   | right    |
+
+Standard link: [text](https://example.com)
+
+Colon directly after a link: [text](https://example.com): plain text, not part of the link (the underline Kate shows on links is view-layer, not syntax)
+
+Reference link: [text][ref]
+
+[ref]: https://example.com
+
+Inline image: ![alt](image.png)
+
+Wrapped link spanning lines:
+
+Standard link: [text
+more text](https://example.com)
+
+Wrapped reference spanning lines:
+
+Reference: [label
+more text][ref]
+
+Wrapped code span:
+
+Use `inline code
+spanning lines` here.
+
+Back to normal text after the wrapped constructs.
+
+Escaped backtick (must not open a wrapped span):
+
+a \` literal backtick
+
+Wrapped link with brackets and an image in the name:
+
+[outer
+[inner] group
+more](https://example.com)
+
+[see
+![img](https://url/to/i.png)
+more](https://example.com)
+
+Stray bracket gives up (the ] ends the pending; the consumed text keeps
+link styling, matching markdown's orphan-bracket behavior):
+
+[text
+more] x
+
+Orphan same-line bracket (markdown parity):
+
+[text] xxx
+
+Line-initial emoji (ambiguous with field names; pinned as Field Name):
+
+:joy: shipped!
+
+:author: Jane Doe
+
+Autolink: <https://example.com>
+
+Email: <user@example.com>
+
+Emphasis: *italic* and _also italic_
+
+Strong: **bold** and __also bold__
+
+Strikethrough: ~~deleted~~
+
+Setext heading:
+
+Level One
+=========
+
+## Markdown parity checks
+
+Task list:
+
+- [x] Finish my changes
+- [ ] Push my commits
+
+Bare URL as normal text: http://example.com
+
+Intentional line break via two trailing spaces  
+and this text continues on the next line.
+
+Emoji and highlight: :joy: :+1: ==very important words==
+
+Titled inline link: [an example](http://example.com/ "Title")
+
+Reference target with title:
+
+[id2]: http://example.com/  "Optional Title Here"
+
+Image inside a link: [![Alt text](https://url/to/img.svg)](https://link.com/)
+
+> block quote _italic_
+> more block quote
+
+- list item followed by a blockquote
+
+  > quoted inside a list item
+
+Code spans of varying run length: `simple`, ``simple ` ``, ```a `` b```, and ``a`b``.
+
+Line ending with a closed code span: see `pkg`
+
+Escaped pipe inside a table:
+
+| Col   | Note   |
+| ----- | ------ |
+| a     | \| this |
+
+Inline HTML: &copy; <strong>bold</strong> <code>code</code> <!-- a comment -->
+
+<table>
+    <tr>
+        <th>a</th>
+        <th>b</th>
+    </tr>
+</table>
+
+Title: some text
+
+Italic and bold combos: ***ib*** __b__ **_ib_** ___ib___
+
+Escapes within emphasis: \*normal text* and _text\_ more_
+
+Tilde fence:
+
+~~~bash
+echo "$f"
+~~~
+
+Nine-backtick fence with an inner shorter run:
+
+`````````
+outer content
+```
+the inner shorter run does not end the block
+`````````
+
+# Header folding 1
+
+## Header folding 2
+
+### Header folding 3
+
+#### Header folding 4
+
+##### Header folding 5
+
+###### Header folding 6
+
+# Header folding 11
+
+## Header folding 22
+
+### Header folding 33
+
+## Header folding 222
+
+---

@@ -1,0 +1,1069 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language
+[
+<!-- Replicated from "markdown.xml": -->
+<!ENTITY end "\s*$">
+<!ENTITY emptyline "^\s*$">
+<!ENTITY listbullet "[\*\+\-]">
+<!ENTITY rulerregex "\s*(?:(?:\*\s*){3,}|(?:_\s*){3,}|(?:\-\s*){3,})\s*$">
+<!ENTITY indentedcodeblock "(?:\s{4}|\t).*$">
+<!ENTITY checkbox "\[[ x]\](?=\s)">
+<!-- MyST-specific entities -->
+<!ENTITY dname "[a-zA-Z][a-zA-Z0-9-]*(?::[a-zA-Z0-9-]+)*">
+<!-- Inlined from "markdown.xml" v32 (wrapped-link closing side + id grammar);
+     keep in sync: -->
+<!ENTITY refchar "(?:\\.|[^\]\\])">
+<!ENTITY refname "(?:\\.|[^\s\[\]\\])&refchar;*">
+<!ENTITY reflinkid "\s*(?:&refname;)?">
+<!ENTITY reflinkidregex "(?:\s?\[&reflinkid;\]|\((?:\\.|[^\(\)\\])*\))">
+<!ENTITY startinlineimage "\!\[(?:\\.|[^\[\]\\])*\]\(">
+<!ENTITY endinlineimage "(?:\\.|[^\(\)\\])*\)">
+<!ENTITY refimageregex "\!\[(?:\\.|[^\[\]\\])*\]\[&reflinkid;\]">
+]>
+<!--
+    SPDX-FileCopyrightText: 2026 Robert Krátký <rkratky@gmail.com>
+
+    SPDX-License-Identifier: MIT
+
+    MyST (Markedly Structured Text) syntax highlighting. MyST is a strict
+    superset of Markdown used by Sphinx and Jupyter Book; see
+    https://myst-parser.readthedocs.io/
+
+    Depends on: Kate highlighting module for Markdown (kept in sync with
+    markdown.xml where contexts are copied), plus YAML, Python, JavaScript,
+    Bash, LaTeX and other language definitions for embedded code
+    highlighting.
+-->
+<language name="MyST"
+  version="1"
+  kateversion="6.22"
+  section="Markup"
+  extensions="*.myst;*.myst.md"
+  mimetype="text/x-myst"
+  author="Robert Krátký (rkratky@gmail.com)"
+  license="MIT">
+
+  <highlighting>
+    <contexts>
+
+      <!-- ═══════════════════════════════════════════════════════════
+           ENTRY POINT
+           ═══════════════════════════════════════════════════════════ -->
+      <context name="Start Document" attribute="Normal Text"
+               lineEndContext="Normal Text" lineEmptyContext="Normal Text"
+               fallthroughContext="Normal Text">
+        <!-- Own frontmatter handler: closing delimiter must push OUR Normal Text, not Markdown's -->
+        <RegExpr attribute="Metadata" context="frontmatter" String="^\-{3}&end;" column="0"
+                 beginRegion="frontmatter"/>
+      </context>
+
+      <context name="frontmatter" attribute="Metadata" lineEndContext="#stay">
+        <StringDetect attribute="Metadata" context="#pop!Normal Text" String="---" column="0"
+                      endRegion="frontmatter"/>
+        <StringDetect attribute="Metadata" context="#pop!Normal Text" String="..." column="0"
+                      endRegion="frontmatter"/>
+        <IncludeRules context="##YAML" includeAttrib="true"/>
+      </context>
+
+      <!-- ═══════════════════════════════════════════════════════════
+           NORMAL TEXT
+           ═══════════════════════════════════════════════════════════ -->
+      <context name="Normal Text" attribute="Normal Text"
+               lineEndContext="#stay" lineEmptyContext="find-code-block">
+        <IncludeRules context="myst-block"/>
+        <IncludeRules context="Overwrite Markdown Normal Text"/>
+        <IncludeRules context="Normal Text##Markdown" includeAttrib="true"/>
+      </context>
+
+      <context name="find-code-block" attribute="Normal Text"
+               lineEndContext="#stay" lineEmptyContext="#stay"
+               fallthroughContext="#pop">
+        <IncludeRules context="find-code-block##Markdown" includeAttrib="true"/>
+      </context>
+
+      <!-- ═══════════════════════════════════════════════════════════
+           OVERWRITE MARKDOWN NORMAL TEXT
+           ═══════════════════════════════════════════════════════════ -->
+      <context name="Overwrite Markdown Normal Text" attribute="Normal Text"
+               lineEndContext="#stay">
+        <DetectChar attribute="Blockquote" context="blockquote" char="&gt;" firstNonSpace="true"/>
+        <RegExpr attribute="List" context="list" String="^(\s*)&listbullet;(\s+)" column="0"/>
+        <RegExpr attribute="Number List" context="numlist" String="^(\s*)\d\.(\s+)" column="0"/>
+        <RegExpr attribute="Number List" context="numlist2" String="^(\s*)\d\d+\.(\s+)" column="0"/>
+      </context>
+
+      <!-- ═══════════════════════════════════════════════════════════
+           REDEFINED MARKDOWN SUB-CONTEXTS
+           ═══════════════════════════════════════════════════════════ -->
+      <!-- Copied from markdown.xml v32 (list/numlist/numlist2). If markdown.xml
+           changes these contexts, re-apply the change here. -->
+      <context name="list" attribute="List: Normal Text"
+               lineEndContext="#stay" fallthroughContext="content-list">
+        <RegExpr attribute="Code" String="^%1%2\s&indentedcodeblock;" column="0" dynamic="true"/>
+        <RegExpr attribute="Blockquote" context="blockquote-list" String="^%1%2\s+&gt;" column="0" dynamic="true"/>
+        <RegExpr attribute="Horizontal Rule" String="^%1%2\s+&rulerregex;" column="0" dynamic="true"/>
+        <RegExpr String="&emptyline;" column="0"/>
+        <RegExpr context="content-list" String="^%1%2\s" column="0" lookAhead="true" dynamic="true"/>
+        <RegExpr context="#pop" String="^\s*\S" column="0" lookAhead="true"/>
+        <RegExpr attribute="List: Checkbox" context="content-list" String="\s*&checkbox;"/>
+        <RegExpr attribute="Table" context="content-list-table" String="\s*\|"/>
+      </context>
+
+      <context name="numlist" attribute="List: Normal Text"
+               lineEndContext="#stay" fallthroughContext="content-list">
+        <RegExpr attribute="Code" String="^%1%2\s{2}&indentedcodeblock;" column="0" dynamic="true"/>
+        <RegExpr attribute="Blockquote" context="blockquote-list" String="^%1%2\s{2,}&gt;" column="0" dynamic="true"/>
+        <RegExpr attribute="Horizontal Rule" String="^%1%2\s{2,}&rulerregex;" column="0" dynamic="true"/>
+        <RegExpr String="&emptyline;" column="0"/>
+        <RegExpr context="content-list" String="^%1%2\s{2}" column="0" lookAhead="true" dynamic="true"/>
+        <RegExpr context="#pop" String="^\s*\S" column="0" lookAhead="true"/>
+      </context>
+
+      <context name="numlist2" attribute="List: Normal Text"
+               lineEndContext="#stay" fallthroughContext="content-list">
+        <RegExpr attribute="Code" String="^%1%2\s{3}&indentedcodeblock;" column="0" dynamic="true"/>
+        <RegExpr attribute="Blockquote" context="blockquote-list" String="^%1%2\s{3,}&gt;" column="0" dynamic="true"/>
+        <RegExpr attribute="Horizontal Rule" String="^%1%2\s{3,}&rulerregex;" column="0" dynamic="true"/>
+        <RegExpr String="&emptyline;" column="0"/>
+        <RegExpr context="content-list" String="^%1%2\s{3}" column="0" lookAhead="true" dynamic="true"/>
+        <RegExpr context="#pop" String="^\s*\S" column="0" lookAhead="true"/>
+      </context>
+
+      <context name="content-list" attribute="List: Normal Text"
+               lineEndContext="#stay" lineEmptyContext="#pop">
+        <!-- myst-block transitively includes myst-inline; a second include here
+             would duplicate every inline rule (includes are flattened, not deduped). -->
+        <IncludeRules context="myst-block"/>
+        <IncludeRules context="content-list##Markdown" includeAttrib="true"/>
+      </context>
+
+      <context name="content-list-table" attribute="List: Normal Text"
+               lineEndContext="#stay" lineEmptyContext="#pop">
+        <IncludeRules context="find-table-element##Markdown"/>
+        <IncludeRules context="content-list"/>
+      </context>
+
+      <context name="blockquote" attribute="Blockquote: Normal Text"
+               lineEndContext="#stay" lineEmptyContext="#pop">
+        <RegExpr attribute="Alert Marker" context="#stay"
+                 String="\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]"/>
+        <IncludeRules context="myst-block"/>
+        <IncludeRules context="blockquote##Markdown" includeAttrib="true"/>
+      </context>
+
+      <context name="blockquote-list" attribute="Blockquote: Normal Text"
+               lineEndContext="#stay" lineEmptyContext="#pop">
+        <RegExpr attribute="Alert Marker" context="#stay"
+                 String="\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]"/>
+        <IncludeRules context="myst-block"/>
+        <IncludeRules context="blockquote-list##Markdown" includeAttrib="true"/>
+      </context>
+
+      <!-- ═══════════════════════════════════════════════════════════
+           MYST BLOCK-LEVEL RULES
+           ═══════════════════════════════════════════════════════════ -->
+      <context name="myst-block" attribute="Normal Text" lineEndContext="#stay">
+        <!-- The comment marker only switches to a dedicated context: the
+             ##Comments include adds alert keywords (TODO, FIXME, …),
+             modelines and SPDX markers, as markdown.xml and other syntaxes
+             do for their comments. -->
+        <DetectChar attribute="Comment" context="myst-comment" char="%" firstNonSpace="true"/>
+        <RegExpr attribute="Target" context="#stay"
+                 String="\([^)]+\)=&end;" firstNonSpace="true"/>
+        <RegExpr attribute="Attribute" context="#stay"
+                 String="\{[^}]*(?:[.#][\w-]|\w[\w-]*=)[^}]*\}&end;" firstNonSpace="true"/>
+        <RegExpr attribute="Math" context="amsmath"
+                 String="\\begin\{(?:equation|multiline|gather|align|alignat|flalign|matrix|[pPbBvV]matrix|eqnarray)\*?\}"
+                 firstNonSpace="true" beginRegion="amsmath"/>
+        <!-- Single-line block math: $$ ... $$ with optional (label) -->
+        <RegExpr attribute="Math" context="math-block-dollar-close"
+                 String="\$\$.*?\$\$(?=\s*(?:\([^)]+\))?\s*$)"
+                 beginRegion="math-dollar" endRegion="math-dollar"
+                 firstNonSpace="true"/>
+        <RegExpr attribute="Math" context="math-block-dollar"
+                 String="\$\$&end;" firstNonSpace="true" beginRegion="math-dollar"/>
+        <!-- Code-directive routing (lookahead only — the finder's whole-line rules
+             capture the fence so body contexts get %1 for dynamic closers; captures
+             would be lost if the opener line were split across contexts). -->
+        <RegExpr attribute="Normal Text" context="find-myst-code-directive-nested-backtick"
+                 String="`{4,}(?=\{(?:code-block|code)\})" firstNonSpace="true" lookAhead="true"/>
+        <RegExpr attribute="Normal Text" context="find-myst-code-directive-nested-colon"
+                 String=":{4,}(?=\{(?:code-block|code)\})" firstNonSpace="true" lookAhead="true"/>
+        <RegExpr attribute="Normal Text" context="find-myst-code-directive-backtick"
+                 String="`{3}(?=\{(?:code-block|code)\})" firstNonSpace="true" lookAhead="true"/>
+        <RegExpr attribute="Normal Text" context="find-myst-code-directive-colon"
+                 String=":{3}(?=\{(?:code-block|code)\})" firstNonSpace="true" lookAhead="true"/>
+        <!-- Generic directives: whole opener line consumed with the fence captured
+             as %1 (directive name/argument share the Directive Fence attribute);
+             one {3,} rule per fence character covers 3-fence and nested 4+
+             fences alike. Plain context switch (no #pop!): myst-block
+             is flattened into its includer, so "#pop!" here would consume the
+             includer's stack frame and break nested generic directives; a plain
+             push keeps the same net stack depth as the old opener-context chain
+             (mirrors the markdown.xml "inc" bundle router at its fence rule). -->
+        <RegExpr attribute="Directive Fence" context="directive-body-backtick"
+                 String="(`{3,})\{&dname;\}[^\n]*$" firstNonSpace="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Directive Fence" context="directive-body-colon"
+                 String="(:{3,})\{&dname;\}[^\n]*$" firstNonSpace="true"
+                 beginRegion="directive-colon"/>
+        <!-- Plain-language colon fence (:::python); language confirmed in the
+             finder — beginRegion only fires there, so unknown languages (:::foo)
+             never open a dangling region. -->
+        <RegExpr attribute="Fenced Code" context="find-myst-colon-lang-fence"
+                 String=":{3,}(?=\s*[a-zA-Z])" firstNonSpace="true" lookAhead="true"/>
+        <IncludeRules context="myst-inline"/>
+      </context>
+
+      <!-- MyST comment (% to end of line); ##Comments highlights alert
+           keywords, modelines and SPDX markers inside it. -->
+      <context name="myst-comment" attribute="Comment" lineEndContext="#pop">
+        <IncludeRules context="##Comments"/>
+      </context>
+
+      <!-- ═══════════════════════════════════════════════════════════
+           CODE DIRECTIVE OPENERS
+           ═══════════════════════════════════════════════════════════ -->
+      <context name="find-myst-code-directive-backtick" attribute="Normal Text"
+               lineEndContext="#pop">
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codebt-body-python"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:python[23]?|py[23w]?|[rc]py|sconstruct|gypi?)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codebt-body-javascript"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:javascript|m?js|es6)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codebt-body-bash"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:bash(?:rc)?|sh|shell)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codebt-body-yaml"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:ya?ml)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codebt-body-json"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:json5?)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codebt-body-cpp"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:[ch]pp|[ch]\+\+)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codebt-body-sql"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:mysql|sql|ddl)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codebt-body-rst"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:rst|rest|restructuredtext)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codebt-body-typescript"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:typescript|ts)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codebt-body-xml"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:xml|xsd|svg)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codebt-body-html"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:s?html?)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codebt-body-go"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:go(?:lang)?)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codebt-body-rust"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:rust|rs)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codebt-body-java"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:java|bsh)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codebt-body-php"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:php[3457t]?|wml|phtml?|aw|ctp)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codebt-body-r"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:r|rscript)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codebt-body-ruby"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:ruby|rbx?|rjs|rake|f?cgi|gemspec|irbrc|ru|prawn|Appraisals|(?:Rake|Cap|Chef|Gem|Guard|Hobo|Vagrant|Rant|Berks|Thor|Puppet)file|rxml)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <!-- Fallback: no language or unrecognized language -->
+        <RegExpr attribute="Directive Fence" context="#pop!directive-body-backtick"
+                 String="(`{3,})\{(?:code-block|code)\}.*$" firstNonSpace="true"
+                 beginRegion="directive-backtick"/>
+      </context>
+
+      <!-- Nested (4+ fence) variant: same language table, Nested Directive
+           Fence attribute so deeply nested code directives keep their color. -->
+      <context name="find-myst-code-directive-nested-backtick" attribute="Normal Text"
+               lineEndContext="#pop">
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codebt-body-python"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:python[23]?|py[23w]?|[rc]py|sconstruct|gypi?)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codebt-body-javascript"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:javascript|m?js|es6)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codebt-body-bash"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:bash(?:rc)?|sh|shell)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codebt-body-yaml"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:ya?ml)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codebt-body-json"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:json5?)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codebt-body-cpp"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:[ch]pp|[ch]\+\+)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codebt-body-sql"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:mysql|sql|ddl)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codebt-body-rst"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:rst|rest|restructuredtext)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codebt-body-typescript"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:typescript|ts)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codebt-body-xml"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:xml|xsd|svg)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codebt-body-html"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:s?html?)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codebt-body-go"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:go(?:lang)?)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codebt-body-rust"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:rust|rs)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codebt-body-java"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:java|bsh)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codebt-body-php"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:php[3457t]?|wml|phtml?|aw|ctp)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codebt-body-r"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:r|rscript)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codebt-body-ruby"
+                 String="(`{3,})\{(?:code-block|code)\}\s*(?:ruby|rbx?|rjs|rake|f?cgi|gemspec|irbrc|ru|prawn|Appraisals|(?:Rake|Cap|Chef|Gem|Guard|Hobo|Vagrant|Rant|Berks|Thor|Puppet)file|rxml)\s*$" insensitive="true"
+                 beginRegion="directive-backtick"/>
+        <!-- Fallback: no language or unrecognized language -->
+        <RegExpr attribute="Nested Directive Fence" context="#pop!directive-body-backtick"
+                 String="(`{3,})\{(?:code-block|code)\}.*$" firstNonSpace="true"
+                 beginRegion="directive-backtick"/>
+      </context>
+
+      <context name="find-myst-code-directive-colon" attribute="Normal Text"
+               lineEndContext="#pop">
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codecol-body-python"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:python[23]?|py[23w]?|[rc]py|sconstruct|gypi?)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codecol-body-javascript"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:javascript|m?js|es6)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codecol-body-bash"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:bash(?:rc)?|sh|shell)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codecol-body-yaml"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:ya?ml)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codecol-body-json"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:json5?)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codecol-body-cpp"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:[ch]pp|[ch]\+\+)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codecol-body-sql"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:mysql|sql|ddl)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codecol-body-rst"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:rst|rest|restructuredtext)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codecol-body-typescript"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:typescript|ts)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codecol-body-xml"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:xml|xsd|svg)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codecol-body-html"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:s?html?)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codecol-body-go"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:go(?:lang)?)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codecol-body-rust"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:rust|rs)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codecol-body-java"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:java|bsh)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codecol-body-php"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:php[3457t]?|wml|phtml?|aw|ctp)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codecol-body-r"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:r|rscript)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Directive Fence" context="#pop!myst-codecol-body-ruby"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:ruby|rbx?|rjs|rake|f?cgi|gemspec|irbrc|ru|prawn|Appraisals|(?:Rake|Cap|Chef|Gem|Guard|Hobo|Vagrant|Rant|Berks|Thor|Puppet)file|rxml)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <!-- Fallback: no language or unrecognized language -->
+        <RegExpr attribute="Directive Fence" context="#pop!directive-body-colon"
+                 String="(:{3,})\{(?:code-block|code)\}.*$" firstNonSpace="true"
+                 beginRegion="directive-colon"/>
+      </context>
+
+      <!-- Nested (4+ fence) variant: same language table, Nested Directive
+           Fence attribute so deeply nested code directives keep their color. -->
+      <context name="find-myst-code-directive-nested-colon" attribute="Normal Text"
+               lineEndContext="#pop">
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codecol-body-python"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:python[23]?|py[23w]?|[rc]py|sconstruct|gypi?)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codecol-body-javascript"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:javascript|m?js|es6)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codecol-body-bash"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:bash(?:rc)?|sh|shell)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codecol-body-yaml"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:ya?ml)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codecol-body-json"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:json5?)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codecol-body-cpp"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:[ch]pp|[ch]\+\+)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codecol-body-sql"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:mysql|sql|ddl)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codecol-body-rst"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:rst|rest|restructuredtext)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codecol-body-typescript"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:typescript|ts)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codecol-body-xml"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:xml|xsd|svg)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codecol-body-html"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:s?html?)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codecol-body-go"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:go(?:lang)?)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codecol-body-rust"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:rust|rs)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codecol-body-java"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:java|bsh)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codecol-body-php"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:php[3457t]?|wml|phtml?|aw|ctp)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codecol-body-r"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:r|rscript)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <RegExpr attribute="Nested Directive Fence" context="#pop!myst-codecol-body-ruby"
+                 String="(:{3,})\{(?:code-block|code)\}\s*(?:ruby|rbx?|rjs|rake|f?cgi|gemspec|irbrc|ru|prawn|Appraisals|(?:Rake|Cap|Chef|Gem|Guard|Hobo|Vagrant|Rant|Berks|Thor|Puppet)file|rxml)\s*$" insensitive="true"
+                 beginRegion="directive-colon"/>
+        <!-- Fallback: no language or unrecognized language -->
+        <RegExpr attribute="Nested Directive Fence" context="#pop!directive-body-colon"
+                 String="(:{3,})\{(?:code-block|code)\}.*$" firstNonSpace="true"
+                 beginRegion="directive-colon"/>
+      </context>
+
+      <!-- ═══════════════════════════════════════════════════════════
+           COLON PLAIN LANGUAGE FENCE
+           ═══════════════════════════════════════════════════════════ -->
+      <!-- Language lists below are synced from markdown.xml v32
+           (find-lang-fenced-code), minus markdown's '||' empty-alternative quirk.
+           Re-sync when markdown.xml changes. -->
+      <context name="find-myst-colon-lang-fence" attribute="Normal Text"
+               lineEndContext="#pop">
+        <RegExpr attribute="Fenced Code" context="#pop!myst-colelang-body-python"
+                 String="(:{3,})\s*(?:python[23]?|py[23w]?|[rc]py|sconstruct|gypi?)\s*$" insensitive="true"
+                 beginRegion="code-block"/>
+        <RegExpr attribute="Fenced Code" context="#pop!myst-colelang-body-javascript"
+                 String="(:{3,})\s*(?:javascript|m?js|es6)\s*$" insensitive="true"
+                 beginRegion="code-block"/>
+        <RegExpr attribute="Fenced Code" context="#pop!myst-colelang-body-bash"
+                 String="(:{3,})\s*(?:bash(?:rc)?|sh|shell)\s*$" insensitive="true"
+                 beginRegion="code-block"/>
+        <RegExpr attribute="Fenced Code" context="#pop!myst-colelang-body-yaml"
+                 String="(:{3,})\s*(?:ya?ml)\s*$" insensitive="true"
+                 beginRegion="code-block"/>
+        <RegExpr attribute="Fenced Code" context="#pop!myst-colelang-body-json"
+                 String="(:{3,})\s*(?:json5?)\s*$" insensitive="true"
+                 beginRegion="code-block"/>
+        <RegExpr attribute="Fenced Code" context="#pop!myst-colelang-body-cpp"
+                 String="(:{3,})\s*(?:[ch]pp|[ch]\+\+)\s*$" insensitive="true"
+                 beginRegion="code-block"/>
+        <RegExpr attribute="Fenced Code" context="#pop!myst-colelang-body-sql"
+                 String="(:{3,})\s*(?:mysql|sql|ddl)\s*$" insensitive="true"
+                 beginRegion="code-block"/>
+        <RegExpr attribute="Fenced Code" context="#pop!myst-colelang-body-rst"
+                 String="(:{3,})\s*(?:rst|rest|restructuredtext)\s*$" insensitive="true"
+                 beginRegion="code-block"/>
+        <RegExpr attribute="Fenced Code" context="#pop!myst-colelang-body-typescript"
+                 String="(:{3,})\s*(?:typescript|ts)\s*$" insensitive="true"
+                 beginRegion="code-block"/>
+        <RegExpr attribute="Fenced Code" context="#pop!myst-colelang-body-xml"
+                 String="(:{3,})\s*(?:xml|xsd|svg)\s*$" insensitive="true"
+                 beginRegion="code-block"/>
+        <RegExpr attribute="Fenced Code" context="#pop!myst-colelang-body-html"
+                 String="(:{3,})\s*(?:s?html?)\s*$" insensitive="true"
+                 beginRegion="code-block"/>
+        <RegExpr attribute="Fenced Code" context="#pop!myst-colelang-body-go"
+                 String="(:{3,})\s*(?:go(?:lang)?)\s*$" insensitive="true"
+                 beginRegion="code-block"/>
+        <RegExpr attribute="Fenced Code" context="#pop!myst-colelang-body-rust"
+                 String="(:{3,})\s*(?:rust|rs)\s*$" insensitive="true"
+                 beginRegion="code-block"/>
+        <RegExpr attribute="Fenced Code" context="#pop!myst-colelang-body-java"
+                 String="(:{3,})\s*(?:java|bsh)\s*$" insensitive="true"
+                 beginRegion="code-block"/>
+        <RegExpr attribute="Fenced Code" context="#pop!myst-colelang-body-php"
+                 String="(:{3,})\s*(?:php[3457t]?|wml|phtml?|aw|ctp)\s*$" insensitive="true"
+                 beginRegion="code-block"/>
+        <RegExpr attribute="Fenced Code" context="#pop!myst-colelang-body-r"
+                 String="(:{3,})\s*(?:r|rscript)\s*$" insensitive="true"
+                 beginRegion="code-block"/>
+        <RegExpr attribute="Fenced Code" context="#pop!myst-colelang-body-ruby"
+                 String="(:{3,})\s*(?:ruby|rbx?|rjs|rake|f?cgi|gemspec|irbrc|ru|prawn|Appraisals|(?:Rake|Cap|Chef|Gem|Guard|Hobo|Vagrant|Rant|Berks|Thor|Puppet)file|rxml)\s*$" insensitive="true"
+                 beginRegion="code-block"/>
+        <!-- No match: pop (not a recognized language colon fence) -->
+      </context>
+
+      <!-- ═══════════════════════════════════════════════════════════
+           EMBEDDED LANGUAGE HIGHLIGHTING CONTEXTS
+           ═══════════════════════════════════════════════════════════ -->
+      <!-- Shared option parsing for code directive bodies -->
+      <context name="directive-body-code-options" attribute="Normal Text" lineEndContext="#stay">
+        <RegExpr attribute="Directive Option Key" context="directive-colon-option-value"
+                 String="^\s*:[a-zA-Z][a-zA-Z0-9-]*:\s*" column="0"/>
+        <RegExpr attribute="Directive Option Key" context="directive-yaml-options"
+                 String="^---\s*$" column="0"/>
+      </context>
+      <!-- Shared closers for the embedded-language body contexts below: each
+           myst-code{bt,col,elang}-body-* context includes the matching common
+           context instead of repeating the closer rule and, for directive
+           bodies, the option parsing. -->
+      <context name="myst-codebt-body-common" attribute="Normal Text" lineEndContext="#stay">
+        <RegExpr attribute="Directive Fence" context="#pop" String="%1[~`]*(?=&end;)" firstNonSpace="true" dynamic="true" endRegion="directive-backtick"/>
+        <IncludeRules context="directive-body-code-options"/>
+      </context>
+      <context name="myst-codecol-body-common" attribute="Normal Text" lineEndContext="#stay">
+        <RegExpr attribute="Directive Fence" context="#pop" String="%1:*(?=&end;)" firstNonSpace="true" dynamic="true" endRegion="directive-colon"/>
+        <IncludeRules context="directive-body-code-options"/>
+      </context>
+      <context name="myst-colelang-body-common" attribute="Normal Text" lineEndContext="#stay">
+        <RegExpr attribute="Fenced Code" context="#pop" String="%1:*(?=&end;)" firstNonSpace="true" dynamic="true" endRegion="code-block"/>
+      </context>
+      <!-- PYTHON contexts -->
+      <context name="myst-codebt-body-python" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codebt-body-common"/>
+        <IncludeRules context="##Python" includeAttrib="true"/>
+      </context>
+      <context name="myst-codecol-body-python" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codecol-body-common"/>
+        <IncludeRules context="##Python" includeAttrib="true"/>
+      </context>
+      <context name="myst-colelang-body-python" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-colelang-body-common"/>
+        <IncludeRules context="##Python" includeAttrib="true"/>
+      </context>
+
+      <!-- JAVASCRIPT contexts -->
+      <context name="myst-codebt-body-javascript" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codebt-body-common"/>
+        <IncludeRules context="Normal##JavaScript" includeAttrib="true"/>
+      </context>
+      <context name="myst-codecol-body-javascript" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codecol-body-common"/>
+        <IncludeRules context="Normal##JavaScript" includeAttrib="true"/>
+      </context>
+      <context name="myst-colelang-body-javascript" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-colelang-body-common"/>
+        <IncludeRules context="Normal##JavaScript" includeAttrib="true"/>
+      </context>
+
+      <!-- BASH contexts -->
+      <context name="myst-codebt-body-bash" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codebt-body-common"/>
+        <IncludeRules context="##Bash" includeAttrib="true"/>
+      </context>
+      <context name="myst-codecol-body-bash" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codecol-body-common"/>
+        <IncludeRules context="##Bash" includeAttrib="true"/>
+      </context>
+      <context name="myst-colelang-body-bash" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-colelang-body-common"/>
+        <IncludeRules context="##Bash" includeAttrib="true"/>
+      </context>
+
+      <!-- YAML contexts -->
+      <context name="myst-codebt-body-yaml" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codebt-body-common"/>
+        <IncludeRules context="##YAML" includeAttrib="true"/>
+      </context>
+      <context name="myst-codecol-body-yaml" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codecol-body-common"/>
+        <IncludeRules context="##YAML" includeAttrib="true"/>
+      </context>
+      <context name="myst-colelang-body-yaml" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-colelang-body-common"/>
+        <IncludeRules context="##YAML" includeAttrib="true"/>
+      </context>
+
+      <!-- JSON contexts -->
+      <context name="myst-codebt-body-json" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codebt-body-common"/>
+        <IncludeRules context="##JSON" includeAttrib="true"/>
+      </context>
+      <context name="myst-codecol-body-json" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codecol-body-common"/>
+        <IncludeRules context="##JSON" includeAttrib="true"/>
+      </context>
+      <context name="myst-colelang-body-json" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-colelang-body-common"/>
+        <IncludeRules context="##JSON" includeAttrib="true"/>
+      </context>
+
+      <!-- CPP contexts -->
+      <context name="myst-codebt-body-cpp" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codebt-body-common"/>
+        <IncludeRules context="##C++" includeAttrib="true"/>
+      </context>
+      <context name="myst-codecol-body-cpp" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codecol-body-common"/>
+        <IncludeRules context="##C++" includeAttrib="true"/>
+      </context>
+      <context name="myst-colelang-body-cpp" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-colelang-body-common"/>
+        <IncludeRules context="##C++" includeAttrib="true"/>
+      </context>
+
+      <!-- SQL contexts -->
+      <context name="myst-codebt-body-sql" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codebt-body-common"/>
+        <IncludeRules context="##SQL (MySQL)" includeAttrib="true"/>
+      </context>
+      <context name="myst-codecol-body-sql" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codecol-body-common"/>
+        <IncludeRules context="##SQL (MySQL)" includeAttrib="true"/>
+      </context>
+      <context name="myst-colelang-body-sql" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-colelang-body-common"/>
+        <IncludeRules context="##SQL (MySQL)" includeAttrib="true"/>
+      </context>
+
+      <!-- RST contexts -->
+      <context name="myst-codebt-body-rst" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codebt-body-common"/>
+        <IncludeRules context="##reStructuredText" includeAttrib="true"/>
+      </context>
+      <context name="myst-codecol-body-rst" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codecol-body-common"/>
+        <IncludeRules context="##reStructuredText" includeAttrib="true"/>
+      </context>
+      <context name="myst-colelang-body-rst" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-colelang-body-common"/>
+        <IncludeRules context="##reStructuredText" includeAttrib="true"/>
+      </context>
+
+      <!-- TYPESCRIPT contexts -->
+      <context name="myst-codebt-body-typescript" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codebt-body-common"/>
+        <IncludeRules context="Normal##TypeScript" includeAttrib="true"/>
+      </context>
+      <context name="myst-codecol-body-typescript" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codecol-body-common"/>
+        <IncludeRules context="Normal##TypeScript" includeAttrib="true"/>
+      </context>
+      <context name="myst-colelang-body-typescript" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-colelang-body-common"/>
+        <IncludeRules context="Normal##TypeScript" includeAttrib="true"/>
+      </context>
+
+      <!-- XML contexts -->
+      <context name="myst-codebt-body-xml" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codebt-body-common"/>
+        <IncludeRules context="##XML" includeAttrib="true"/>
+      </context>
+      <context name="myst-codecol-body-xml" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codecol-body-common"/>
+        <IncludeRules context="##XML" includeAttrib="true"/>
+      </context>
+      <context name="myst-colelang-body-xml" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-colelang-body-common"/>
+        <IncludeRules context="##XML" includeAttrib="true"/>
+      </context>
+
+      <!-- HTML contexts -->
+      <context name="myst-codebt-body-html" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codebt-body-common"/>
+        <IncludeRules context="##HTML" includeAttrib="true"/>
+      </context>
+      <context name="myst-codecol-body-html" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codecol-body-common"/>
+        <IncludeRules context="##HTML" includeAttrib="true"/>
+      </context>
+      <context name="myst-colelang-body-html" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-colelang-body-common"/>
+        <IncludeRules context="##HTML" includeAttrib="true"/>
+      </context>
+
+      <!-- GO contexts -->
+      <context name="myst-codebt-body-go" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codebt-body-common"/>
+        <IncludeRules context="##Go" includeAttrib="true"/>
+      </context>
+      <context name="myst-codecol-body-go" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codecol-body-common"/>
+        <IncludeRules context="##Go" includeAttrib="true"/>
+      </context>
+      <context name="myst-colelang-body-go" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-colelang-body-common"/>
+        <IncludeRules context="##Go" includeAttrib="true"/>
+      </context>
+
+      <!-- RUST contexts -->
+      <context name="myst-codebt-body-rust" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codebt-body-common"/>
+        <IncludeRules context="##Rust" includeAttrib="true"/>
+      </context>
+      <context name="myst-codecol-body-rust" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codecol-body-common"/>
+        <IncludeRules context="##Rust" includeAttrib="true"/>
+      </context>
+      <context name="myst-colelang-body-rust" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-colelang-body-common"/>
+        <IncludeRules context="##Rust" includeAttrib="true"/>
+      </context>
+
+      <!-- JAVA contexts -->
+      <context name="myst-codebt-body-java" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codebt-body-common"/>
+        <IncludeRules context="##Java" includeAttrib="true"/>
+      </context>
+      <context name="myst-codecol-body-java" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codecol-body-common"/>
+        <IncludeRules context="##Java" includeAttrib="true"/>
+      </context>
+      <context name="myst-colelang-body-java" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-colelang-body-common"/>
+        <IncludeRules context="##Java" includeAttrib="true"/>
+      </context>
+
+      <!-- PHP contexts -->
+      <context name="myst-codebt-body-php" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codebt-body-common"/>
+        <IncludeRules context="phpsource##PHP/PHP" includeAttrib="true"/>
+      </context>
+      <context name="myst-codecol-body-php" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codecol-body-common"/>
+        <IncludeRules context="phpsource##PHP/PHP" includeAttrib="true"/>
+      </context>
+      <context name="myst-colelang-body-php" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-colelang-body-common"/>
+        <IncludeRules context="phpsource##PHP/PHP" includeAttrib="true"/>
+      </context>
+
+      <!-- R contexts -->
+      <context name="myst-codebt-body-r" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codebt-body-common"/>
+        <IncludeRules context="##R Script" includeAttrib="true"/>
+      </context>
+      <context name="myst-codecol-body-r" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codecol-body-common"/>
+        <IncludeRules context="##R Script" includeAttrib="true"/>
+      </context>
+      <context name="myst-colelang-body-r" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-colelang-body-common"/>
+        <IncludeRules context="##R Script" includeAttrib="true"/>
+      </context>
+
+      <!-- RUBY contexts -->
+      <context name="myst-codebt-body-ruby" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codebt-body-common"/>
+        <IncludeRules context="Ruby##Ruby" includeAttrib="true"/>
+      </context>
+      <context name="myst-codecol-body-ruby" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-codecol-body-common"/>
+        <IncludeRules context="Ruby##Ruby" includeAttrib="true"/>
+      </context>
+      <context name="myst-colelang-body-ruby" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="myst-colelang-body-common"/>
+        <IncludeRules context="Ruby##Ruby" includeAttrib="true"/>
+      </context>
+
+
+      <!-- ═══════════════════════════════════════════════════════════
+           DIRECTIVE BODIES
+           ═══════════════════════════════════════════════════════════ -->
+      <context name="directive-body-backtick" attribute="Normal Text"
+               lineEndContext="#stay">
+        <RegExpr attribute="Directive Fence" context="#pop"
+                 String="%1[~`]*(?=&end;)" firstNonSpace="true" dynamic="true" endRegion="directive-backtick"/>
+        <IncludeRules context="directive-body-common"/>
+      </context>
+
+      <context name="directive-body-colon" attribute="Normal Text"
+               lineEndContext="#stay">
+        <RegExpr attribute="Directive Fence" context="#pop"
+                 String="%1:*(?=&end;)" firstNonSpace="true" dynamic="true" endRegion="directive-colon"/>
+        <IncludeRules context="directive-body-common"/>
+      </context>
+
+      <context name="directive-body-common" attribute="Normal Text"
+               lineEndContext="#stay">
+        <IncludeRules context="directive-body-code-options"/>
+        <IncludeRules context="myst-block"/>
+        <!-- Suppress Markdown rules that push find-code-block, which would disrupt the
+             directive body context. These must come before Normal Text##Markdown. -->
+        <!-- Suppress blank/empty-line → find-code-block (Markdown's &emptyline; rule) -->
+        <RegExpr attribute="Normal Text" context="#stay" String="^\s*$" column="0"/>
+        <!-- Suppress horizontal rule to find-code-block; covers dash, star, and underscore patterns -->
+        <RegExpr attribute="Normal Text" context="#stay"
+                 String="\s*(?:(?:\*\s*){3,}|(?:_\s*){3,}|(?:\-\s*){3,})\s*$"
+                 firstNonSpace="true"/>
+        <IncludeRules context="Normal Text##Markdown" includeAttrib="true"/>
+      </context>
+
+      <context name="directive-yaml-options" attribute="Normal Text"
+               lineEndContext="#stay">
+        <RegExpr attribute="Directive Option Key" context="#pop"
+                 String="^---&end;" column="0"/>
+        <IncludeRules context="##YAML" includeAttrib="true"/>
+      </context>
+
+      <context name="directive-colon-option-value" attribute="Directive Option Value"
+               lineEndContext="#pop">
+      </context>
+
+      <!-- ═══════════════════════════════════════════════════════════
+           MATH
+           ═══════════════════════════════════════════════════════════ -->
+      <context name="math-block-dollar" attribute="Math"
+               lineEndContext="#stay">
+        <RegExpr attribute="Math" context="math-block-dollar-close-ml"
+                 String="\$\$(?=\s*(?:\([^)]+\))?\s*$)" endRegion="math-dollar"
+                 firstNonSpace="true"/>
+      </context>
+
+      <!-- Used by single-line $$ case (one extra context level) -->
+      <context name="math-block-dollar-close" attribute="Normal Text" lineEndContext="#pop">
+        <RegExpr attribute="Target" context="#pop" String="\([^)]+\)\s*$"/>
+      </context>
+
+      <!-- Used by multi-line $$ case (two extra context levels: math-block-dollar + this) -->
+      <context name="math-block-dollar-close-ml" attribute="Normal Text" lineEndContext="#pop#pop">
+        <RegExpr attribute="Target" context="#pop#pop" String="\([^)]+\)\s*$"/>
+      </context>
+
+      <context name="amsmath" attribute="Math" lineEndContext="#stay">
+        <RegExpr attribute="Math" context="#pop"
+                 String="\\end\{(?:equation|multiline|gather|align|alignat|flalign|matrix|[pPbBvV]matrix|eqnarray)\*?\}"
+                 endRegion="amsmath"/>
+        <IncludeRules context="MathMode##LaTeX" includeAttrib="true"/>
+      </context>
+
+      <!-- ═══════════════════════════════════════════════════════════
+           MYST INLINE RULES
+           ═══════════════════════════════════════════════════════════ -->
+      <context name="myst-inline" attribute="Normal Text" lineEndContext="#stay">
+        <RegExpr attribute="Role Name" context="role-content"
+                 String="\{(&dname;)\}(?=`)"/>
+        <RegExpr attribute="Math" context="#stay"
+                 String="(?&lt;!\\)\$(?![\s$]).*?(?&lt;![\s\\])\$(?!\$)" minimal="true"/>
+        <RegExpr attribute="MyST Autolink Bracket" context="myst-autolink-scheme"
+                 String="&lt;(?=(?:path|inv|project|doi|myst):)"/>
+        <RegExpr attribute="Substitution" context="#stay" String="(?&lt;!\\)\{\{[^}]+\}\}"/>
+        <RegExpr attribute="Attribute" context="#stay"
+                 String="(?&lt;=\])\{[^}]*(?:[.#][\w-]|\w[\w-]*=)[^}]*\}"/>
+        <!-- Field names may contain spaces (rST/MyST field lists, e.g. ":param x:");
+             only directive OPTION keys forbid them. -->
+        <RegExpr attribute="Field Name" context="field-value"
+                 String=":[\w][\w -]*:(?=\s)" firstNonSpace="true"/>
+        <!-- Definition-list marker (": definition"); consumes only the marker
+             and pushes the body context so the definition text is styled with
+             inline markup (see definition-list-body). -->
+        <RegExpr attribute="Field Value" context="definition-list-body"
+                 String=":\s" firstNonSpace="true"/>
+        <!-- Wrapped inline constructs (A′): the entries fire only when the line
+             ends with an unclosed opener (near-zero false-positive rate), the
+             pending contexts continue on the following lines and give up at
+             blank lines (inline constructs never span blank lines in
+             CommonMark). Same-line constructs never match these entries (the
+             lookahead requires no closer before EOL) and remain with
+             markdown's rules. -->
+        <RegExpr attribute="Reference-Link" context="myst-find-reflink"
+                 String="\[(?=[^\]]*$)"/>
+        <!-- Wrapped code span entry: anchored at line start (^ + column="0"),
+             the prefix must start with a non-backtick, non-space, non-'>'
+             character and cannot cross a backtick. This makes the EOL run
+             provably an OPENER: a same-line span's closer at EOL can never
+             match (the prefix cannot reach past the opener run), and fence
+             lines (run at firstNonSpace, at column 0 or after a consumed '>'
+             marker) are excluded by the prefix class. One rule = one
+             attribute, so the prefix renders Normal Text (cosmetic); the
+             capture feeds the dynamic closer. Known limitations: wrapped
+             spans starting at line start, inside list items, or directly
+             after a '>' marker are not detected. -->
+        <RegExpr attribute="Normal Text" context="myst-wrapped-code-span"
+                 String="^[^ \t`>][^`]*?[ \t]*(?&lt;!\\)(`+)(?=[^`]*$)" column="0"/>
+      </context>
+
+      <!-- ═══════════════════════════════════════════════════════════
+           ROLE CONTEXTS
+           ═══════════════════════════════════════════════════════════ -->
+      <context name="role-content" attribute="Role Content" lineEndContext="#pop">
+        <DetectChar attribute="Role Content" char="`" context="role-content-inner"/>
+      </context>
+
+      <context name="role-content-inner" attribute="Role Content" lineEndContext="#pop">
+        <RegExpr attribute="Role Content Text" context="#stay" String="[^`&lt;]+"/>
+        <RegExpr attribute="Role Target" context="#stay" String="&lt;[^`&gt;]+&gt;"/>
+        <DetectChar attribute="Role Content" char="`" context="#pop#pop"/>
+      </context>
+
+      <!-- ═══════════════════════════════════════════════════════════
+           FIELD LIST VALUE
+           ═══════════════════════════════════════════════════════════ -->
+      <context name="field-value" attribute="Field Value" lineEndContext="#pop">
+      </context>
+
+      <!-- Pending context for wrapped links (entered by the myst-inline A′
+           entry): continuation of "[text" across lines. Full mirror of
+           markdown.xml v32's find-reflink (image rules and the nested-bracket
+           name rule included) plus a blank-line give-up (inline constructs
+           never span blank lines in CommonMark). The closing side reuses
+           markdown's own find-reflink-id, so `](url)` and `][ref]` render
+           exactly like the same-line chain. A bare "]" without a valid
+           id/url gives up and renders Reference-Link, matching markdown's
+           same-line chain. -->
+      <context name="myst-find-reflink" attribute="Reference-Link Name"
+               lineEndContext="#stay" lineEmptyContext="#pop">
+        <RegExpr attribute="Normal Text" context="#pop" String="^\s*$" column="0"
+                 lookAhead="true"/>
+        <Detect2Chars attribute="Reference-Link Name" char="\" char1="]"/>
+        <RegExpr attribute="Reference-Link" context="#pop!find-reflink-id##Markdown"
+                 String="\](?=&reflinkidregex;)"/>
+        <DetectChar attribute="Reference-Link" context="#pop" char="]"/>
+        <RegExpr attribute="Inline Image" context="inlineimage##Markdown"
+                 String="&startinlineimage;(?=&endinlineimage;)"/>
+        <RegExpr attribute="Reference Image" String="&refimageregex;"/>
+        <!-- Nested-bracket name rule adapted from markdown v32: the trailing
+             (?=\]) is dropped because in the wrapped pending the closing ']'
+             may be lines away — balanced [..] groups anywhere in the pending
+             are link-name content. -->
+        <RegExpr attribute="Reference-Link Name" context="#stay"
+                 String="(?:\[(?:\\.|[^\[\]\\])*\](?:\\.|[^\[\]\\])*)+" minimal="true"/>
+      </context>
+
+      <!-- Pending context for wrapped code spans: closes on an equal-length
+           backtick run (dynamic %1, the same capture mechanism as the fence
+           closers), gives up at blank lines. -->
+      <context name="myst-wrapped-code-span" attribute="Code"
+               lineEndContext="#stay" lineEmptyContext="#pop">
+        <RegExpr attribute="Normal Text" context="#pop" String="^\s*$" column="0"
+                 lookAhead="true"/>
+        <RegExpr attribute="Code" context="#pop" String="(?&lt;!`)%1(?!`)"
+                 dynamic="true"/>
+      </context>
+
+      <!-- Definition-list body (entered by the ": definition" marker rule).
+           Continuation: indented lines stay part of the definition (MyST
+           deflists continue "for all indented lines", no colon needed);
+           blank lines don't end the list; any column-0 line pops (zero-width)
+           so the parent context re-styles it (headings, lists, blockquotes).
+           After the indent is consumed, inline markup rules run with the
+           Field Value attribute as the base: MyST inline constructs
+           (myst-inline), strong/emphasis entry rules and strikethrough
+           mirrored from markdown.xml v32's Normal Text, and markdown's
+           shared inline-only "inc" bundle (code spans, links, images,
+           autolinks, escapes, inline HTML). Block-level rules are
+           deliberately excluded — inside a definition list, headings, lists
+           and indented fences are definition content (an indented fence
+           opens a real fenced-code region via inc's finder, matching how
+           MyST renders it). Keep the mirrored entries in sync with
+           markdown.xml. -->
+      <context name="definition-list-body" attribute="Field Value"
+               lineEndContext="#stay">
+        <RegExpr attribute="Normal Text" context="#stay" String="^\s*$" column="0"/>
+        <RegExpr attribute="Normal Text" context="#pop" String="^\S" column="0"
+                 lookAhead="true"/>
+        <DetectSpaces attribute="Field Value" context="#stay"/>
+        <IncludeRules context="myst-inline"/>
+        <DetectChar attribute="Normal Text" context="find-strong-normal##Markdown"
+                    char="*" lookAhead="true"/>
+        <DetectChar attribute="Normal Text" context="find-emphasis-normal##Markdown"
+                    char="_" lookAhead="true"/>
+        <RegExpr attribute="Strikethrough Text" minimal="true"
+                 String="[~]{2}[^~](?:.*[^~])?[~]{2}"/>
+        <IncludeRules context="inc##Markdown"/>
+      </context>
+
+      <!-- ═══════════════════════════════════════════════════════════
+           MYST AUTOLINK PATH
+           ═══════════════════════════════════════════════════════════ -->
+      <context name="myst-autolink-scheme" attribute="MyST Autolink Scheme"
+               lineEndContext="#pop">
+        <RegExpr attribute="MyST Autolink Scheme" context="myst-autolink-path"
+                 String="[a-zA-Z][a-zA-Z0-9+.-]*:"/>
+      </context>
+
+      <context name="myst-autolink-path" attribute="MyST Autolink Path"
+               lineEndContext="#pop">
+        <DetectChar attribute="MyST Autolink Bracket" char="&gt;" context="#pop"/>
+      </context>
+
+    </contexts>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         ITEM DATAS
+         ═══════════════════════════════════════════════════════════ -->
+    <itemDatas>
+      <itemData name="Normal Text"            defStyleNum="dsNormal"        spellChecking="true"/>
+      <itemData name="Metadata"               defStyleNum="dsOthers"         spellChecking="false"/>
+      <itemData name="Directive Fence"        defStyleNum="dsInformation"    spellChecking="false"/>
+      <itemData name="Nested Directive Fence" defStyleNum="dsInformation"   spellChecking="false"/>
+      <itemData name="Directive Option Key"   defStyleNum="dsAttribute"      spellChecking="false"/>
+      <!-- Directive Option Sep: reserved for future use as the ':' separator in ':key: value' options -->
+      <!-- <itemData name="Directive Option Sep"   defStyleNum="dsOperator"       spellChecking="false"/> -->
+      <itemData name="Directive Option Value" defStyleNum="dsString"         spellChecking="true"/>
+      <itemData name="Role Name"              defStyleNum="dsKeyword"        spellChecking="false"/>
+      <itemData name="Role Content"           defStyleNum="dsDecVal"         spellChecking="true"/>
+      <itemData name="Role Content Text"      defStyleNum="dsDecVal"         spellChecking="true"/>
+      <itemData name="Role Target"            defStyleNum="dsSpecialChar"    spellChecking="false"/>
+      <itemData name="Comment"                defStyleNum="dsComment"        spellChecking="false"/>
+      <itemData name="Math"                   defStyleNum="dsSpecialString"  spellChecking="false"/>
+      <itemData name="Substitution"           defStyleNum="dsPreprocessor"   spellChecking="false"/>
+      <itemData name="Field Name"             defStyleNum="dsAttribute"      spellChecking="false"/>
+      <itemData name="Field Value"            defStyleNum="dsString"         spellChecking="true"/>
+      <itemData name="Strikethrough Text"     defStyleNum="dsNormal" strikeOut="true" spellChecking="true"/>
+      <itemData name="Reference-Link"         defStyleNum="dsComment"        italic="false" spellChecking="false"/>
+      <itemData name="Reference-Link Name"    defStyleNum="dsOthers" underline="true" italic="false" spellChecking="true"/>
+      <itemData name="Inline Image"           defStyleNum="dsAlert" italic="false" bold="false" spellChecking="false"/>
+      <itemData name="Reference Image"        defStyleNum="dsAlert" italic="false" bold="false" spellChecking="false"/>
+      <itemData name="Target"                 defStyleNum="dsSpecialChar"    spellChecking="false"/>
+      <itemData name="Attribute"              defStyleNum="dsAnnotation"     spellChecking="false"/>
+      <itemData name="Alert Marker"           defStyleNum="dsWarning"        spellChecking="false"/>
+      <itemData name="MyST Autolink Scheme"   defStyleNum="dsSpecialChar"    spellChecking="false"/>
+      <itemData name="MyST Autolink Bracket"  defStyleNum="dsSpecialChar"    spellChecking="false"/>
+      <itemData name="MyST Autolink Path"     defStyleNum="dsString"         spellChecking="false"/>
+      <itemData name="Blockquote"             defStyleNum="dsAttribute"      spellChecking="false"/>
+      <itemData name="List"                   defStyleNum="dsSpecialString"  bold="1"  spellChecking="false"/>
+      <itemData name="Number List"            defStyleNum="dsSpecialString"  spellChecking="false"/>
+      <itemData name="List: Checkbox"         defStyleNum="dsVariable"       spellChecking="false"/>
+      <itemData name="List: Normal Text"      defStyleNum="dsNormal"         spellChecking="true"/>
+      <itemData name="Blockquote: Normal Text" defStyleNum="dsNormal"        spellChecking="true"/>
+      <itemData name="Code"                   defStyleNum="dsInformation"    spellChecking="false"/>
+      <itemData name="Fenced Code"            defStyleNum="dsInformation"    spellChecking="false"/>
+      <itemData name="Horizontal Rule"        defStyleNum="dsNormal"         bold="true" spellChecking="false"/>
+      <itemData name="Table"                  defStyleNum="dsPreprocessor"   spellChecking="false"/>
+    </itemDatas>
+
+  </highlighting>
+
+  <general>
+    <keywords additionalDeliminator="`"/>
+    <comments>
+      <comment name="singleLine" start="%"/>
+      <comment name="multiLine" start="&lt;!--" end="--&gt;"/>
+    </comments>
+  </general>
+
+</language>

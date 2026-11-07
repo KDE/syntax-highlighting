@@ -19,9 +19,11 @@
 (def nested (map |(+ $ (get {:a 1} :a)) @[-1 0 1]))
 
 # hash comment to end of line
-(def hash-comment-test 1) # trailing hash comment
+# TODO alert words: FIXME BUG WARNING NOTE XXX HACK - rendered via the shared ##Alerts rules
+(def hash-comment-test 1) # trailing hash comment with TODO marker
 ; semicolon comment to end of line
-(def semi-comment-test 2) ; trailing semicolon comment
+; FIXME alert words in the semicolon comment lane too: BUG and NOTE
+(def semi-comment-test 2) ; trailing semicolon comment with FIXME marker
 
 (def radix-binary 2r1011)
 (def radix-base36 36rZZ)

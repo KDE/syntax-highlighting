@@ -797,7 +797,7 @@ private:
                 this->filename = filename;
                 line = xml.lineNumber();
 
-                using Pair = QPair<QStringView, Type>;
+                using Pair = std::pair<QStringView, Type>;
                 static const auto pairs = {
                     Pair{u"AnyChar"_sv, Type::AnyChar},
                     Pair{u"Detect2Chars"_sv, Type::Detect2Chars},

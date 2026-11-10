@@ -110,7 +110,7 @@ public:
     CommentPosition singleLineCommentPosition = CommentPosition::StartOfLine;
     QString multiLineCommentStartMarker;
     QString multiLineCommentEndMarker;
-    QList<QPair<QChar, QString>> characterEncodings;
+    QList<std::pair<QChar, QString>> characterEncodings;
 
     QString fileName;
     QString name = QStringLiteral(QT_TRANSLATE_NOOP("Language", "None"));

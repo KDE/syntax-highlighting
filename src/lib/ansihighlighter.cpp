@@ -815,7 +815,7 @@ public:
                        QTextStream &out,
                        QLatin1String infoStyle,
                        QLatin1String editorBackground,
-                       const std::vector<QPair<QString, QString>> &ansiStyles,
+                       const std::vector<std::pair<QString, QString>> &ansiStyles,
                        Options options)
     {
         initRegionStyles(ansiStyles);
@@ -931,7 +931,7 @@ private:
     /**
      * Initializes with colors of \p ansiStyle without duplicate.
      */
-    void initRegionStyles(const std::vector<QPair<QString, QString>> &ansiStyles)
+    void initRegionStyles(const std::vector<std::pair<QString, QString>> &ansiStyles)
     {
         m_regionStyles.resize(ansiStyles.size());
         for (std::size_t i = 0; i < m_regionStyles.size(); ++i) {
@@ -996,7 +996,7 @@ private:
         return label;
     }
 
-    void printFormats(QTextStream &out, QLatin1String regionStyle, const std::vector<QPair<QString, QString>> &ansiStyles)
+    void printFormats(QTextStream &out, QLatin1String regionStyle, const std::vector<std::pair<QString, QString>> &ansiStyles)
     {
         // init graph
         m_formatGraph.clear();
@@ -1205,7 +1205,7 @@ public:
     QFile file;
     QStringView currentLine;
     // pairs of startColor / resetColor
-    std::vector<QPair<QString, QString>> ansiStyles;
+    std::vector<std::pair<QString, QString>> ansiStyles;
     Theme::EditorColorRole bgRole = Theme::BackgroundColor;
 };
 

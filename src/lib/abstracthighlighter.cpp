@@ -181,7 +181,7 @@ State AbstractHighlighter::highlightLine(QStringView text, const State &state)
      *   - store the result of the first position that matches (or -1 for no match in the full line) in the skipOffsets hash for re-use
      *   - have capturesForLastDynamicSkipOffset as guard for dynamic regexes to invalidate the cache if they might have changed
      */
-    QVarLengthArray<QPair<SkipOffsetId, int>, 8> skipOffsets;
+    QVarLengthArray<std::pair<SkipOffsetId, int>, 8> skipOffsets;
     QStringList capturesForLastDynamicSkipOffset;
 
     auto getSkipOffsetValue = [&skipOffsets](SkipOffsetId id) -> int {

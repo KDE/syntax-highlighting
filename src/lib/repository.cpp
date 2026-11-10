@@ -383,12 +383,12 @@ void RepositoryPrivate::addTheme(const Theme &theme)
 
 int RepositoryPrivate::foldingRegionId(const QString &defName, const QString &foldName)
 {
-    const auto it = m_foldingRegionIds.constFind(qMakePair(defName, foldName));
+    const auto it = m_foldingRegionIds.constFind(std::make_pair(defName, foldName));
     if (it != m_foldingRegionIds.constEnd()) {
         return it.value();
     }
     Q_ASSERT(m_foldingRegionId < std::numeric_limits<int>::max());
-    m_foldingRegionIds.insert(qMakePair(defName, foldName), ++m_foldingRegionId);
+    m_foldingRegionIds.insert(std::make_pair(defName, foldName), ++m_foldingRegionId);
     return m_foldingRegionId;
 }
 

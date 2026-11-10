@@ -58,7 +58,7 @@ public:
 
     QList<Theme> m_themes;
 
-    QHash<QPair<QString, QString>, int> m_foldingRegionIds;
+    QHash<std::pair<QString, QString>, int> m_foldingRegionIds;
     int m_foldingRegionId = 0;
     int m_formatId = 0;
 

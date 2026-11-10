@@ -11,10 +11,13 @@
 #include "ksyntaxhighlighting_export.h"
 
 #include <QList>
+#if KSYNTAXHIGHLIGHTING_ENABLE_DEPRECATED_SINCE(6, 33)
 #include <QPair>
+#endif
 #include <QString>
 #include <memory>
 #include <qobjectdefs.h>
+#include <utility>
 
 namespace KSyntaxHighlighting
 {
@@ -408,7 +411,7 @@ public:
      * For instance, in XML this is defined as "<!--" and "-->".
      * \since 5.50
      */
-    QPair<QString, QString> multiLineCommentMarker() const;
+    std::pair<QString, QString> multiLineCommentMarker() const;
 
     /*!
      * Returns a list of character/string mapping that can be used for spell
@@ -420,7 +423,7 @@ public:
      *
      * \since 5.50
      */
-    QList<QPair<QChar, QString>> characterEncodings() const;
+    QList<std::pair<QChar, QString>> characterEncodings() const;
 
 private:
     friend class DefinitionData;

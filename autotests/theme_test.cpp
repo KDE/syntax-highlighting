@@ -316,7 +316,7 @@ private Q_SLOTS:
 
         // verify custom-styles if any
         {
-            QList<QPair<QString, QString>> invalidCustomStyles;
+            QList<std::pair<QString, QString>> invalidCustomStyles;
             const auto customStyles = obj.value(QLatin1String("custom-styles")).toObject();
             for (auto it = customStyles.constBegin(); it != customStyles.constEnd(); ++it) {
                 // get definitions for this language

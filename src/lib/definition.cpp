@@ -270,13 +270,13 @@ CommentPosition Definition::singleLineCommentPosition() const
     return d->singleLineCommentPosition;
 }
 
-QPair<QString, QString> Definition::multiLineCommentMarker() const
+std::pair<QString, QString> Definition::multiLineCommentMarker() const
 {
     d->load();
     return {d->multiLineCommentStartMarker, d->multiLineCommentEndMarker};
 }
 
-QList<QPair<QChar, QString>> Definition::characterEncodings() const
+QList<std::pair<QChar, QString>> Definition::characterEncodings() const
 {
     d->load();
     return d->characterEncodings;

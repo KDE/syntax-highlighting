@@ -148,7 +148,7 @@ private Q_SLOTS:
         // comment markers
         QCOMPARE(def.singleLineCommentMarker(), QLatin1String("//"));
         QCOMPARE(def.singleLineCommentPosition(), KSyntaxHighlighting::CommentPosition::AfterWhitespace);
-        const auto cppMultiLineCommentMarker = QPair<QString, QString>(QLatin1String("/*"), QLatin1String("*/"));
+        const auto cppMultiLineCommentMarker = std::pair<QString, QString>(QLatin1String("/*"), QLatin1String("*/"));
         QCOMPARE(def.multiLineCommentMarker(), cppMultiLineCommentMarker);
 
         def = m_repo.definitionForName(QLatin1String("Python"));
@@ -332,7 +332,7 @@ private Q_SLOTS:
         QVERIFY(def.includedDefinitions().isEmpty());
         QVERIFY(def.singleLineCommentMarker().isEmpty());
         QCOMPARE(def.singleLineCommentPosition(), KSyntaxHighlighting::CommentPosition::StartOfLine);
-        const auto emptyPair = QPair<QString, QString>();
+        const auto emptyPair = std::pair<QString, QString>();
         QCOMPARE(def.multiLineCommentMarker(), emptyPair);
         QVERIFY(def.characterEncodings().isEmpty());
 

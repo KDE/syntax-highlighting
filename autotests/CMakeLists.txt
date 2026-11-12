@@ -47,6 +47,11 @@ ecm_mark_nongui_executable(folding_test)
 add_test(NAME folding_test COMMAND folding_test)
 target_link_libraries(folding_test KF6SyntaxHighlighting Qt6::Test)
 
+add_executable(syntaxhighlighter_test syntaxhighlighter_test.cpp)
+ecm_mark_nongui_executable(syntaxhighlighter_test)
+add_test(NAME syntaxhighlighter_test COMMAND syntaxhighlighter_test ${OFFSCREEN_QPA})
+target_link_libraries(syntaxhighlighter_test KF6SyntaxHighlighting Qt6::Test)
+
 #
 # benchmarks, don't execute during normal testing
 # they don't test additional stuff but only hang the CI

@@ -218,7 +218,19 @@ void SyntaxHighlighter::highlightBlock(const QString &text)
 
     const auto nextBlock = currentBlock().next();
     if (nextBlock.isValid()) {
-        QMetaObject::invokeMethod(this, "rehighlightBlock", Qt::QueuedConnection, Q_ARG(QTextBlock, nextBlock));
+        // a QTextBlock doesn't survive the document text being replaced, queue the block number
+        const int nextBlockNumber = nextBlock.blockNumber();
+        QMetaObject::invokeMethod(
+            this,
+            [this, nextBlockNumber]() {
+                if (const auto doc = document()) {
+                    const auto block = doc->findBlockByNumber(nextBlockNumber);
+                    if (block.isValid()) {
+                        rehighlightBlock(block);
+                    }
+                }
+            },
+            Qt::QueuedConnection);
     }
 }
 

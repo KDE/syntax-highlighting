@@ -66,7 +66,7 @@ constexpr DefinitionDataRow definitionsForFileNames[] = {
     {"*qmakefile.cpp", "test_qmakefile.cpp", "C++\nISO C++\nGCCExtensions\nSystemC"},
     {"*_makefile.mm", "bench_makefile.mm", "Objective-C++\nMetamath"},
 
-    {"xorg.conf", "/etc/literal-pattern/xorg.conf", "x.org Configuration\nTOML"},
+    {"xorg.conf", "/etc/literal-pattern/xorg.conf", "x.org Configuration"},
     {".profile", "2-literal-patterns/.profile", "Bash\nZsh"},
     {".envrc", ".envrc", "Bash"},
     {".env", ".env", "DotEnv"},

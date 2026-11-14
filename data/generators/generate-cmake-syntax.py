@@ -46,6 +46,7 @@ _PROPERTY_KEYS = [
   , 'source-properties'
   , 'cache-properties'
   , 'install-properties'
+  , 'rule-properties'
   ]
 _KW_RE_LIST = ['kw', 're']
 _VAR_KIND_LIST = ['variables', 'deprecated-or-internal-variables', 'environment-variables']
@@ -147,6 +148,7 @@ _HEURISTICS = [
       , 'CMAKE_POLICY_(DEFAULT|WARNING)_CMP[0-9]{4}'
       )
   , ({'CMAKE_ARGV[0-9]+', 'CMAKE_MATCH_[0-9]+'}, 'CMAKE_(ARGV|MATCH_)[0-9]+')
+  , ({'COMPILE_WRAPPER', 'LINK_WRAPPER'}, '(COMPILE|LINK)_WRAPPER')
  ]
 
 @dataclass

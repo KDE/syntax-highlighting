@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2017-2026 Alex Turbov <i.zaufi@gmail.com>
 #
 
-version: 61
+version: 62
 
 global-properties:
   - ALLOW_DUPLICATE_CUSTOM_TARGETS
@@ -12,8 +12,12 @@ global-properties:
   - AUTOMOC_TARGETS_FOLDER
   - AUTORCC_SOURCE_GROUP
   - CMAKE_C_KNOWN_FEATURES
+  - CMAKE_COMPILE_WRAPPER_<NAME>                            # Since 4.5
   - CMAKE_CUDA_KNOWN_FEATURES                               # Since 3.17
   - CMAKE_CXX_KNOWN_FEATURES
+  - CMAKE_HIP_KNOWN_FEATURES                                # Since 3.30
+  - CMAKE_LINK_WRAPPER_<NAME>                               # Since 4.5
+  - CMAKE_SYCL_KNOWN_FEATURES                               # Since 4.5
   - CMAKE_ROLE                                              # Since 3.14
   - DEBUG_CONFIGURATIONS
   - DISABLED_FEATURES
@@ -28,6 +32,7 @@ global-properties:
   - GLOBAL_DEPENDS_DEBUG_MODE
   - GLOBAL_DEPENDS_NO_CYCLES
   - IN_TRY_COMPILE
+  - INSTALL_PARALLEL                                        # Since 3.30
   - JOB_POOLS
   - PACKAGES_FOUND
   - PACKAGES_NOT_FOUND
@@ -58,6 +63,7 @@ directory-properties:
   - CACHE_VARIABLES
   - CLEAN_NO_CUSTOM
   - CMAKE_CONFIGURE_DEPENDS
+  - CMAKE_TEST_BUILD_DEPENDS                                # Since 4.5
   - COMPILE_DEFINITIONS
   - COMPILE_OPTIONS
   - DEFINITIONS
@@ -88,6 +94,33 @@ directory-properties:
   - VS_GLOBAL_SECTION_PRE_<section>
   - VS_SOLUTION_ITEMS                                       # Since 4.0
   - VS_STARTUP_PROJECT
+
+rule-properties:                                            # Since 4.5
+  - BYPRODUCTS
+  - COMMAND
+  - COMMAND_<INDEX>
+  - COMMAND_COUNT
+  - COMMAND_EXPAND_LISTS
+  - COMMENT
+  - COMPILE_DEFINITIONS
+  - COMPILE_OPTIONS
+  - DEPENDS_EXPLICIT_ONLY
+  - DEPENDS
+  - DEPFILE
+  - FILE_SET_CONFIGURATORS
+  - GLOBAL
+  - INCLUDE_DIRECTORIES
+  - JOB_POOL_COMPILE
+  - JOB_SERVER_AWARE
+  - NAME
+  - OUTPUT
+  - OUTPUT_FILE_SET
+  - OUTPUT_FILE_SET_BASE_DIRS
+  - PARENT_RULE
+  - SOURCE_CONFIGURATORS
+  - USES_TERMINAL
+  - VERBATIM
+  - WORKING_DIRECTORY
 
 # NOTE Copy-n-pasting this list from official docs may contain a redudant item `Example`! Check it!
 target-properties:
@@ -160,6 +193,7 @@ target-properties:
   - COMPILE_PDB_OUTPUT_DIRECTORY
   - COMPILE_PDB_OUTPUT_DIRECTORY_<CONFIG>
   - COMPILE_WARNING_AS_ERROR                                # Since 3.24
+  - COMPILE_WRAPPERS                                        # Since 4.5
   - <CONFIG>_OUTPUT_NAME
   - <CONFIG>_POSTFIX
   - CROSSCOMPILING_EMULATOR
@@ -204,7 +238,12 @@ target-properties:
   - EXPORT_NAME
   - EXPORT_NO_SYSTEM                                        # Since 3.25
   - EXPORT_PROPERTIES                                       # Since 3.12
+  - FASTBUILD_CACHING                                       # Since 4.2
+  - FASTBUILD_DISTRIBUTION                                  # Since 4.2
+  - FILE_SET_TYPES                                          # Since 4.5
+  - FILE_SETS_<TYPE>                                        # Since 4.5
   - FOLDER
+  - Fortran_BUILDING_INTRINSIC_MODULES                      # Sine 4.0
   - Fortran_FORMAT
   - Fortran_MODULE_DIRECTORY
   - Fortran_PREPROCESS                                      # Since 3.18
@@ -269,7 +308,9 @@ target-properties:
   - INTERFACE_COMPILE_DEFINITIONS
   - INTERFACE_COMPILE_FEATURES
   - INTERFACE_COMPILE_OPTIONS
+  - INTERFACE_COMPILE_WRAPPERS                              # Since 4.5
   - INTERFACE_CXX_MODULE_SETS                               # Since 3.28
+  - INTERFACE_FILE_SETS_<TYPE>                              # Since 4.5
   - INTERFACE_HEADER_SETS                                   # Since 3.23
   - INTERFACE_HEADER_SETS_TO_VERIFY                         # Since 3.24
   - INTERFACE_INCLUDE_DIRECTORIES
@@ -279,6 +320,7 @@ target-properties:
   - INTERFACE_LINK_LIBRARIES_DIRECT                         # Since 3.24
   - INTERFACE_LINK_LIBRARIES_DIRECT_EXCLUDE                 # Since 3.24
   - INTERFACE_LINK_OPTIONS                                  # Since 3.13
+  - INTERFACE_LINK_WRAPPERS                                 # Since 4.5
   - INTERFACE_PRECOMPILE_HEADERS                            # Since 3.16
   - INTERFACE_POSITION_INDEPENDENT_CODE
   - INTERFACE_SOURCES
@@ -312,6 +354,7 @@ target-properties:
   - LINK_DEPENDS_NO_SHARED
   - LINK_DEPENDS
   - LINK_DIRECTORIES                                        # Since 3.13
+  - LINK_WRAPPERS                                           # Since 4.5
   - LINKER_LANGUAGE
   - LINK_FLAGS_<CONFIG>
   - LINK_FLAGS
@@ -510,6 +553,7 @@ fileset-properties:                                         # Since 4.4
   - COMPILE_DEFINITIONS
   - COMPILE_OPTIONS
   - CXX_SCAN_FOR_MODULES
+  - LANGUAGE                                                # Since 4.5
   - JOB_POOL_COMPILE
   - INCLUDE_DIRECTORIES
   - INDEPENDENT_FILES
@@ -517,11 +561,13 @@ fileset-properties:                                         # Since 4.4
   - INTERFACE_COMPILE_OPTIONS
   - INTERFACE_INCLUDE_DIRECTORIES
   - INTERFACE_SOURCES
+  - RULE_PATTERNS                                           # Since 4.5
   - SCOPE
   - SKIP_LINTING
   - SKIP_PRECOMPILE_HEADERS
   - SKIP_UNITY_BUILD_INCLUSION
   - SOURCES
+  - SOURCE_GROUP                                            # Since 4.5
   - TYPE
 
 test-properties:
@@ -533,6 +579,7 @@ test-properties:
   - ENVIRONMENT
   - ENVIRONMENT_MODIFICATION                                # Since 3.22
   - FAIL_REGULAR_EXPRESSION
+  - FIXTURE_REPEAT_MODE                                     # Since 4.5
   - FIXTURES_CLEANUP
   - FIXTURES_REQUIRED
   - FIXTURES_SETUP
@@ -543,6 +590,7 @@ test-properties:
   - PROCESSOR_AFFINITY                                      # Since 3.12
   - PROCESSORS
   - REQUIRED_FILES
+  - RESOURCE_ERROR_ACTION                                   # Since 4.5
   - RESOURCE_GROUPS                                         # Since 3.16
   - RESOURCE_LOCK
   - RUN_SERIAL
@@ -586,6 +634,7 @@ source-properties:
   - SKIP_LINTING                                            # Since 3.27
   - SKIP_PRECOMPILE_HEADERS                                 # Since 3.16
   - SKIP_UNITY_BUILD_INCLUSION                              # Since 3.16
+  - SOURCE_GROUP                                            # Since 4.5
   - Swift_DEPENDENCIES_FILE                                 # Since 3.15
   - Swift_DIAGNOSTICS_FILE                                  # Since 3.15
   - SYMBOLIC
@@ -712,6 +761,9 @@ generator-expressions:
   - JOIN
   - REMOVE_DUPLICATES                                       # Since 3.15
   - FILTER                                                  # Since 3.15
+  # * Bound Operands
+  - _0                                                      # Since 4.5
+  - _1                                                      # Since 4.5
   # Path Expressions
   # * Path Comparisons
   - PATH_EQUAL                                              # Since 3.24
@@ -755,6 +807,15 @@ generator-expressions:
   - CONFIG
   - OUTPUT_CONFIG                                           # Since 3.20
   - COMMAND_CONFIG                                          # Since 3.20
+  # Global Expressions
+  # * Global Properties
+  - GLOBAL_PROPERTY
+  # Directory-dependent Expressions
+  # * Directory Properties
+  - DIRECTORY_PROPERTY
+  # Rule-Dependent Expressions
+  # * Rule Properties
+  - RULE_PROPERTY
   # Toolchain And Language Expressions
   # * Platform
   - PLATFORM_ID
@@ -889,7 +950,10 @@ generator-expressions:
   # Multi-level Expression Evaluation
   - GENEX_EVAL                                              # Since 3.12
   - TARGET_GENEX_EVAL                                       # Since 3.12
-  # Escaped Characters
+  # Support Expressions
+  # * Conversions
+  - ARGS
+  # * Escaped Characters
   - ANGLE-R
   - COMMA
   - SEMICOLON
@@ -921,7 +985,7 @@ variables:
   - CMAKE_CURRENT_LIST_FILE
   - CMAKE_CURRENT_LIST_LINE
   - CMAKE_CURRENT_SOURCE_DIR
-  - CMAKE_CXX_STDLIB_MODULES_JSON                           # Since 4.2
+  - CMAKE_CXX_STDLIB_MODULES_JSON                           # Since 4.5
   - CMAKE_DEBUG_TARGET_PROPERTIES
   - CMAKE_DIRECTORY_LABELS                                  # Since 3.10
   - CMAKE_DL_LIBS
@@ -1014,7 +1078,6 @@ variables:
   - CMAKE_Swift_MODULE_DIRECTORY                            # Since 3.15
   - CMAKE_Swift_NUM_THREADS                                 # Since 3.15
   - CMAKE_Swift_SEPARATE_MODULE_EMISSION                    # Since 4.4
-  - CMAKE_TEST_BUILD_DEPENDS                                # Since 4.4
   - CMAKE_TEST_LAUNCHER                                     # Since 3.29
   - CMAKE_TOOLCHAIN_FILE
   - CMAKE_TWEAK_VERSION
@@ -1135,6 +1198,7 @@ variables:
   - CMAKE_MAXIMUM_RECURSION_DEPTH                           # Since 3.14
   - CMAKE_MFC_FLAG
   - CMAKE_MODULE_PATH
+  - CMAKE_INSTALL_SBOM_FORMATS                              # Since 4.5
   - CMAKE_INTERMEDIATE_DIR_STRATEGY                         # Since 4.2
   - CMAKE_POLICY_DEFAULT_CMP<NNNN>
   - CMAKE_POLICY_VERSION_MINIMUM                            # Since 4.0
@@ -1148,7 +1212,9 @@ variables:
   - CMAKE_PROJECT_TOP_LEVEL_INCLUDES                        # Since 3.24
   - CMAKE_REQUIRE_FIND_PACKAGE_<PackageName>                # Since 3.22
   - CMAKE_SKIP_INSTALL_ALL_DEPENDENCY
+  - CMAKE_SKIP_INSTALL_PREP_TARGETS                         # Since 4.5
   - CMAKE_SKIP_TEST_ALL_DEPENDENCY                          # Since 3.29
+  - CMAKE_SKIP_TEST_PREP_TARGETS                            # Since 4.5
   - CMAKE_STAGING_PREFIX
   - CMAKE_SUBLIME_TEXT_2_ENV_SETTINGS
   - CMAKE_SUBLIME_TEXT_2_EXCLUDE_BUILD_TREE
@@ -1602,6 +1668,7 @@ variables:
   - CTEST_P4_UPDATE_OPTIONS
   - CTEST_PRESET                                            # Since 4.4
   - CTEST_PRESETS_FILE                                      # Since 4.4
+  - CTEST_RESOURCE_ERROR_ACTION                             # Since 4.5
   - CTEST_RESOURCE_SPEC_FILE                                # Since 3.18
   - CTEST_RUN_CURRENT_SCRIPT                                # Since 3.11
   - CTEST_SITE
@@ -1696,6 +1763,7 @@ variables:
   - ARGN
   - ARGV
   - ARGV<n>
+  - ARGNC                                                   # Since 4.5
   # - `cmake_parse_arguments`
   - <pfx>_UNPARSED_ARGUMENTS
   - <pfx>_KEYWORDS_MISSING_VALUES
@@ -1809,6 +1877,48 @@ variables:
   - GRAPHVIZ_EXTERNAL_LIBS
   - GRAPHVIZ_IGNORE_TARGETS
   - GRAPHVIZ_GENERATE_PER_TARGET
+  # - CPackAPK
+  #- CPACK_APK_SDK_ROOT
+  - CPACK_APK_JAVA_HOME
+  #- CPACK_APK_NDK_ROOT
+  #- CPACK_APK_BUILD_TOOLS_VERSION
+  #- CPACK_APK_COMPILE_SDK_VERSION
+  #- CPACK_APK_MIN_SDK_VERSION
+  #- CPACK_APK_TARGET_SDK_VERSION
+  - CPACK_APK_ABI
+  - CPACK_APK_STRIP_EXECUTABLE
+  - CPACK_APK_KEEP_DEBUG_SYMBOLS
+  - CPACK_APK_MANIFEST
+  - CPACK_APK_PACKAGE
+  - CPACK_APK_MANIFEST_PLACEHOLDERS
+  - CPACK_APK_RESOURCE_DIRECTORIES
+  - CPACK_APK_ASSET_DIRECTORIES
+  - CPACK_APK_JAVA_SOURCE_DIRECTORIES
+  #- CPACK_APK_JAVA_VERSION
+  - CPACK_APK_JARS
+  - CPACK_APK_MAVEN_DEPENDENCIES
+  - CPACK_APK_MAVEN_REPOSITORIES
+  - CPACK_APK_MAVEN_CACHE_DIRECTORY
+  - CPACK_APK_VERSION_CODE
+  - CPACK_APK_VERSION_NAME
+  - CPACK_APK_NO_COMPRESS_EXTENSIONS
+  - CPACK_APK_SIGN
+  - CPACK_APK_KEYSTORE
+  - CPACK_APK_KEYSTORE_PASSWORD
+  - CPACK_APK_KEY_ALIAS
+  - CPACK_APK_KEY_PASSWORD
+  - CPACK_APK_ZIPALIGN_OPTIONS
+  - CPACK_APK_AAPT2_EXECUTABLE
+  - CPACK_APK_D8_EXECUTABLE
+  - CPACK_APK_ZIPALIGN_EXECUTABLE
+  - CPACK_APK_APKSIGNER_EXECUTABLE
+  - CPACK_APK_JAR_EXECUTABLE
+  - CPACK_APK_KEYTOOL_EXECUTABLE
+  - CPACK_APK_AAPT2_LINK_EXTRA_OPTIONS
+  - CPACK_APK_JAVAC_EXTRA_OPTIONS
+  - CPACK_APK_D8_EXTRA_OPTIONS
+  - CPACK_APK_APKSIGNER_EXTRA_OPTIONS
+  - CPACK_APK_DEBUG
   # [built-in]: CPack AppImage Generator (since 4.2)
   - CPACK_APPIMAGE_TOOL_EXECUTABLE
   - CPACK_APPIMAGE_PATCHELF_EXECUTABLE
@@ -2806,6 +2916,7 @@ variables:
   - Python_SITEARCH
   - Python_SOABI
   - Python_SOSABI                                           # Since 3.26
+  - Python_SOSABI_PLATFORM                                  # Since 4.5
   - Python_COMPILER
   - Python_COMPILER_ID
   - Python_DOTNET_LAUNCHER
@@ -2819,8 +2930,13 @@ variables:
   - Python_FIND_VIRTUALENV
   - Python_FIND_IMPLEMENTATIONS
   - Python_FIND_UNVERSIONED_NAMES
+  - Python_LIBRARY
+  - Python_SABI_LIBRARY
+  - Python_INCLUDE_DIR
+  - Python_NumPy_INCLUDE_DIR
   - Python_ARTIFACTS_INTERACTIVE
   - Python_ARTIFACTS_PREFIX                                 # Since 4.0
+  - Python_CROSSCOMPILING_EMULATOR                          # Since 4.5
   # - FindPython2
   - Python2_EXECUTABLE
   - Python2_EXECUTABLE_DEBUG                                # Since 3.30
@@ -2834,6 +2950,9 @@ variables:
   - Python2_COMPILER
   - Python2_COMPILER_ID
   - Python2_DOTNET_LAUNCHER
+  - Python2_Development_FOUND
+  - Python2_Development.Module_FOUND
+  - Python2_Development.Embed_FOUND
   - Python2_DEBUG_POSTFIX                                   # Since 3.30
   - Python2_LINK_OPTIONS
   - Python2_USE_STATIC_LIBS
@@ -2844,8 +2963,12 @@ variables:
   - Python2_FIND_VIRTUALENV
   - Python2_FIND_IMPLEMENTATIONS
   - Python2_FIND_UNVERSIONED_NAMES
+  - Python2_LIBRARY
+  - Python2_INCLUDE_DIR
+  - Python2_NumPy_INCLUDE_DIR
   - Python2_ARTIFACTS_INTERACTIVE
   - Python2_ARTIFACTS_PREFIX                                # Since 4.0
+  - Python2_CROSSCOMPILING_EMULATOR                         # Since 4.5
   # - FindPython3
   - Python3_EXECUTABLE
   - Python3_EXECUTABLE_DEBUG                                # Since 3.30
@@ -2858,6 +2981,7 @@ variables:
   - Python3_SITEARCH
   - Python3_SOABI
   - Python3_SOSABI                                          # Since 3.26
+  - Python3_SOSABI_PLATFORM                                 # Since 4.5
   - Python3_COMPILER
   - Python3_COMPILER_ID
   - Python3_DOTNET_LAUNCHER
@@ -2871,8 +2995,13 @@ variables:
   - Python3_FIND_VIRTUALENV
   - Python3_FIND_IMPLEMENTATIONS
   - Python3_FIND_UNVERSIONED_NAMES
+  - Python3_LIBRARY
+  - Python3_SABI_LIBRARY
+  - Python3_INCLUDE_DIR
+  - Python3_NumPy_INCLUDE_DIR
   - Python3_ARTIFACTS_INTERACTIVE
   - Python3_ARTIFACTS_PREFIX                                # Since 4.0
+  - Python3_CROSSCOMPILING_EMULATOR                         # Since 4.5
   # - FindQt3
   # - FindQt4
   # - FindQuickTime
@@ -3122,6 +3251,8 @@ deprecated-or-internal-variables:
   - CMAKE_READELF
   # Mentioned in `Unix Makefiles` and `Ninja` generator docs
   - CMAKE_STRIP
+  # Used by toolchain files
+  - CMAKE_NM
   # Mentioned in "Deprecated and Removed Features" of release notes 3.21
   - CMAKE_SYSTEM_ARCH
   # Superseded by `CMAKE_EXECUTABLE_ENABLE_EXPORTS`
@@ -3136,12 +3267,15 @@ deprecated-or-internal-variables:
   # - FindLibXml2
   - LIBXML2_FOUND                                           # Since 4.2
   - LIBXML2_VERSION_STRING                                  # Since 4.2
+  - CMAKE_TEST_BUILD_DEPENDS                                # Since 4.5
 
 
 # https://cmake.org/cmake/help/latest/manual/cmake-env-variables.7.html
 # NOTE Added to syntax file version 14 at 3.15.0 version of CMake
 environment-variables:
   # Environment Variables that Change Behavior
+  - CLICOLOR                                                # Since 3.21
+  - CLICOLOR_FORCE                                          # Since 3.5
   - CMAKE_APPBUNDLE_PATH
   - CMAKE_FRAMEWORK_PATH
   - CMAKE_INCLUDE_PATH
@@ -3152,6 +3286,9 @@ environment-variables:
   - CMAKE_PROGRAM_PATH
   - CMAKE_TLS_VERIFY                                        # Since 3.30
   - CMAKE_TLS_VERSION                                       # Since 3.30
+  - CMAKE_SYSTEM_ENVIRONMENT_ACTION                         # Since 4.5
+  - CMAKE_SYSTEM_ENVIRONMENT_ID                             # Since 4.5
+  - NO_COLOR                                                # Since 4.1
   - SSL_CERT_DIR                                            # Since 3.25
   - SSL_CERT_FILE                                           # Since 3.25
   # Environment Variables that Control the Build
@@ -3270,6 +3407,8 @@ scripting-commands:
       - CMD_POLICY
       - CMD_UNINITIALIZED
       - CMD_UNUSED_CLI
+      - CMD_NON_TARGET_DIRECTIVE                            # Since 4.5
+      - CMD_STRICT                                          # Since 4.5
 
   - name: cmake_host_system_information
     named-args:
@@ -3350,10 +3489,39 @@ scripting-commands:
       # Since 4.2
       - TRACE
       - EXPAND
+      # Since 4.5
+      - PRINT_TARGETS
+      - REGEX
+      - IGNORE_CASE
+      - IMPORTED_ONLY
+      - NO_IMPORTED
+      - PRINT_VARIABLES
+      - ALL
+      - NAME_REGEX
+      - VALUE_REGEX
+      - NAMED
+      - PRINT_PROPERTIES
+      - TARGETS
+      - PROPERTY_NAME_REGEX
+      - PROPERTY_VALUE_REGEX
+      - DEFERRED
+      - FOLLOW_DEPENDENCIES
+      - SOURCES
+      - DIRECTORIES
+      - TESTS
+      - CACHE_ENTRIES
     # Since 3.24
     special-args:
       - FIND_PACKAGE
       - FETCHCONTENT_MAKEAVAILABLE_SERIAL
+    # Since 4.5
+    property-args:
+      - target-properties
+      - source-properties
+      - directory-properties
+      - test-properties
+      - cache-properties
+    has-target-names-after-kw: TARGETS
 
   - name: cmake_minimum_required
     named-args:
@@ -3514,6 +3682,8 @@ scripting-commands:
       - IN_LIST
       - DEFINED
       - PATH_EQUAL                                          # Since 3.24
+      - PATH_IS_PREFIX                                      # Since 4.5
+      - RULE                                                # Since 4.5
     has-target-name-after-kw: TARGET
     nested-parentheses?: true
 
@@ -3713,6 +3883,8 @@ scripting-commands:
       - ONLY_IF_DIFFERENT
       - EXPAND_TILDE
       - NO_REPLACE
+      # New sub-options since 4.5
+      - PATTERNS_EXCLUDE
     special-args:
       - UTF-8
       - UTF-16LE
@@ -3848,6 +4020,7 @@ scripting-commands:
       - BYPASS_PROVIDER                                     # Since 3.24
       - REGISTRY_VIEW                                       # Since 3.24
       - GLOBAL                                              # Since 3.24
+      - UNWIND_INCLUDE                                      # Since 4.2
     special-args: *reg_view_special                         # Since 3.24
 
   - name: find_path
@@ -3907,6 +4080,7 @@ scripting-commands:
     named-args:
       - GLOBAL
       - DIRECTORY
+      - RULE                                                # Since 4.5
       - TARGET
       - FILE_SET                                            # Since 4.3
       - SOURCE
@@ -3921,9 +4095,10 @@ scripting-commands:
       - DEFINED
       - BRIEF_DOCS
       - FULL_DOCS
-    property-args: &get-property
+    property-args: &get_property
       - global-properties
       - directory-properties
+      - rule-properties
       - target-properties
       - fileset-properties
       - test-properties
@@ -4017,6 +4192,8 @@ scripting-commands:
     named-args:
       - EXPR
       - OUTPUT_FORMAT                                       # Since 3.13
+      - INCREMENT                                           # Since 4.5
+      - DECREMENT                                           # Since 4.5
     # Since 3.13
     special-args:
       - DECIMAL
@@ -4059,12 +4236,13 @@ scripting-commands:
   - name: set_directory_properties
     named-args:
       - PROPERTIES
-    property-args: *get-property
+    property-args: *get_directory_property
 
   - name: set_property
     named-args:
       - GLOBAL
       - DIRECTORY
+      - RULE                                                # Since 4.5
       - TARGET
       - FILE_SET                                            # Since 4.3
       - DIRECTORY
@@ -4078,7 +4256,7 @@ scripting-commands:
       - APPEND
       - APPEND_STRING
       - PROPERTY
-    property-args: *get-property
+    property-args: *get_property
     has-target-name-after-kw: TARGET
 
   - name: set
@@ -4086,6 +4264,10 @@ scripting-commands:
       - PARENT_SCOPE
       - CACHE
       - FORCE
+      # Since 4.2
+      - TYPE
+      - HELP
+      - VALUE
     special-args:
       - BOOL
       - FILEPATH
@@ -4163,6 +4345,7 @@ scripting-commands:
       - EQUAL
       - STRING_ENCODE                                       # Since 4.3
       - PARTIAL_EQUAL                                       # Since 4.4
+      - ARRAY_SPLIT                                         # Since 4.5
 
   - name: unset
     named-args:
@@ -4208,6 +4391,21 @@ project-commands:
       - POST_BUILD
     nested-parentheses?: true
     has-target-name-after-kw: TARGET
+
+  - name: add_custom_rule                                   # Since 4.5
+    named-args:
+      - OUTPUT
+      - COMMAND
+      - DEPENDS
+      - BYPRODUCTS
+      - DEPFILE
+      - CONFIGURATOR
+      - FOR_FILE_SET
+      - FOR_SOURCE
+      - GLOBAL
+      - FROM_RULE
+      - CHAIN
+      - OVERRIDE
 
   - name: add_custom_target
     named-args:
@@ -4326,7 +4524,7 @@ project-commands:
       - BRIEF_DOCS
       - FULL_DOCS
       - INITIALIZE_FROM_VARIABLE                            # Since 3.23
-    property-args: *get-property
+    property-args: *get_property
 
   - name: discover_tests                                    # Since 4.4
     named-args:
@@ -4339,8 +4537,10 @@ project-commands:
       - TEST_NAME
       - TEST_ARGS
       - TEST_PROPERTIES
+      - BUILD_DEPENDS                                       # Since 4.5
     property-args:
       - test-properties
+    has-target-names-after-kw: BUILD_DEPENDS
 
   - name: enable_language
     named-args:
@@ -4402,6 +4602,10 @@ project-commands:
       - SBOM
       - FORMAT
       - PACKAGE_URL
+      # Since CMake 4.5
+      - SBOM
+      - EXPORTS
+      - DATA_LICENSE
     has-target-names-after-kw:
       - TARGETS
       - TARGET
@@ -4453,6 +4657,7 @@ project-commands:
       - EXCLUDE_FROM_ALL
       - RENAME
       - OPTIONAL
+      - BUILD_DEPENDS                                       # Since 4.5
       - TYPE                                                # Since 3.20
       # Installing Targets
       - TARGETS
@@ -4523,6 +4728,11 @@ project-commands:
       - SBOM
       - PACKAGE_URL
       - FORMAT
+      # Since CMake 4.5
+      - SBOM
+      - EXPORTS
+      - DATA_LICENSE
+      - RUNTIME_DEPENDENCY_TARGETS
     special-args:
       - OWNER_READ
       - OWNER_WRITE
@@ -4628,6 +4838,8 @@ project-commands:
       - REGULAR_EXPRESSION
       - TREE
       - PREFIX
+      - FILE_SETS                                           # Since 4.5
+      - TARGET                                              # Since 4.5
 
   - name: target_compile_definitions
     named-args: &target_compile_definitions
@@ -4722,6 +4934,22 @@ project-commands:
       - cuda_std_20
       - cuda_std_23                                         # Since 3.21
       - cuda_std_26                                         # Since 3.25
+      # CMAKE_HIP_KNOWN_FEATURES (since 3.30)
+      - hip_std_98
+      - hip_std_11
+      - hip_std_14
+      - hip_std_17
+      - hip_std_20
+      - hip_std_23
+      - hip_std_26
+      # CMAKE_SYCL_KNOWN_FEATURES (since 4.5)
+      - sycl_std_98
+      - sycl_std_11
+      - sycl_std_14
+      - sycl_std_17
+      - sycl_std_20
+      - sycl_std_23
+      - sycl_std_26
     first-arg-is-target?: true
 
   - name: target_compile_options
@@ -6104,6 +6332,7 @@ standard-module-commands:
       - WORKING_DIRECTORY
       - COMMENT
       - CONFIG_FILE                                         # Since 3.27
+      - USES_TERMINAL                                       # Since 4.5
   # FindEnvModules
   - name: env_module
     named-args:

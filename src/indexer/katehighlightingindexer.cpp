@@ -1068,6 +1068,7 @@ private:
                    || parser.extractXmlBool(boolean, u"underline"_sv)
                    || parser.extractXmlBool(boolean, u"strikeOut"_sv)
                    || parser.extractXmlBool(boolean, u"spellChecking"_sv)
+                   || parser.extractXmlBool(boolean, u"hyperlink"_sv)
                    || parser.checkColor(u"color"_sv)
                    || parser.checkColor(u"selColor"_sv)
                    || parser.checkColor(u"backgroundColor"_sv)

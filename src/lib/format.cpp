@@ -187,6 +187,11 @@ bool Format::spellCheck() const
     return d->spellCheck;
 }
 
+bool Format::isHyperlink() const
+{
+    return d->hyperlink;
+}
+
 bool Format::hasBoldOverride() const
 {
     return d->style.hasBold;
@@ -279,5 +284,10 @@ void FormatPrivate::load(QXmlStreamReader &reader)
     attribute = reader.attributes().value(QLatin1String("spellChecking"));
     if (!attribute.isEmpty()) {
         spellCheck = Xml::attrToBool(attribute);
+    }
+
+    attribute = reader.attributes().value(QLatin1String("hyperlink"));
+    if (!attribute.isEmpty()) {
+        hyperlink = Xml::attrToBool(attribute);
     }
 }

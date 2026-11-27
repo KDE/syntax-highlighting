@@ -7,6 +7,7 @@
 #include "test-config.h"
 
 #include <KSyntaxHighlighting/Definition>
+#include <KSyntaxHighlighting/Format>
 #include <KSyntaxHighlighting/Repository>
 #include <KSyntaxHighlighting/SyntaxHighlighter>
 #include <KSyntaxHighlighting/Theme>
@@ -29,6 +30,7 @@ class SyntaxHighlighterTest : public QObject
 private:
     Repository m_repo;
     Definition m_cpp;
+    Definition m_markdown;
     Theme m_theme;
 
     // without a layout, QTextDocument doesn't emit contentsChange() and nothing gets highlighted
@@ -53,6 +55,16 @@ private:
         return formats;
     }
 
+    static Format formatByName(const Definition &definition, const QString &name)
+    {
+        for (const auto &format : definition.formats()) {
+            if (format.name() == name) {
+                return format;
+            }
+        }
+        return Format();
+    }
+
     QList<QList<QTextLayout::FormatRange>> freshlyHighlightedFormats(const QString &text) const
     {
         QTextDocument doc;
@@ -71,6 +83,8 @@ private Q_SLOTS:
         initRepositorySearchPaths(m_repo);
         m_cpp = m_repo.definitionForName(QStringLiteral("C++"));
         QVERIFY(m_cpp.isValid());
+        m_markdown = m_repo.definitionForName(QStringLiteral("Markdown"));
+        QVERIFY(m_markdown.isValid());
         m_theme = m_repo.defaultTheme(Repository::LightTheme);
         QVERIFY(m_theme.isValid());
     }
@@ -113,6 +127,95 @@ private Q_SLOTS:
         runQueuedRehighlights(doc);
 
         QCOMPARE(blockFormats(doc), freshlyHighlightedFormats(shortText));
+    }
+
+    void testMarkdownHyperlinkFormats()
+    {
+        const QStringList linkFormats{
+            QStringLiteral("Normal Text: Link"),
+            QStringLiteral("Blockquote: Link"),
+            QStringLiteral("List: Link"),
+            QStringLiteral("Link"),
+            QStringLiteral("Reference-Link: Link"),
+            QStringLiteral("Reference-Link Target: Link"),
+            QStringLiteral("Inline Image: Link"),
+        };
+        for (const auto &name : linkFormats) {
+            const auto format = formatByName(m_markdown, name);
+            QVERIFY2(format.isValid(), qPrintable(name));
+            QVERIFY2(format.isHyperlink(), qPrintable(name));
+        }
+
+        // Underlining on its own does not make something a hyperlink, e.g.
+        // the label of [label](https://example.com) is not a URL.
+        const QStringList textFormats{
+            QStringLiteral("Normal Text"),
+            QStringLiteral("Emphasis Text"),
+            QStringLiteral("Reference-Link Name"),
+            QStringLiteral("Auto-Link"),
+        };
+        for (const auto &name : textFormats) {
+            const auto format = formatByName(m_markdown, name);
+            QVERIFY2(format.isValid(), qPrintable(name));
+            QVERIFY2(!format.isHyperlink(), qPrintable(name));
+        }
+    }
+
+    void testOtherDefinitions()
+    {
+        const auto rest = m_repo.definitionForName(QStringLiteral("reStructuredText"));
+        QVERIFY(rest.isValid());
+        QVERIFY(formatByName(rest, QStringLiteral("StandaloneHyperlink")).isHyperlink());
+        QVERIFY(!formatByName(rest, QStringLiteral("HyperlinkReference")).isHyperlink());
+
+        const auto org = m_repo.definitionForName(QStringLiteral("Org Mode"));
+        QVERIFY(org.isValid());
+        QVERIFY(formatByName(org, QStringLiteral("Normal Text: Link")).isHyperlink());
+    }
+
+    void testHyperlinkAnchors()
+    {
+        QTextDocument doc;
+        SyntaxHighlighter highlighter(&doc);
+        highlighter.setTheme(m_theme);
+        highlighter.setDefinition(m_markdown);
+
+        const QString text = QStringLiteral(
+            "See https://example.com/a and <https://kde.org> and [label](https://kate-editor.org).\n"
+            "More: https://example.org/b\n"
+            "[foo]: https://example.net/\n");
+        doc.setPlainText(text);
+        highlighter.rehighlight();
+
+        auto anchorHrefAt = [&doc](int position) {
+            const auto block = doc.findBlock(position);
+            const int positionInBlock = position - block.position();
+            for (const auto &range : block.layout()->formats()) {
+                if (positionInBlock >= range.start && positionInBlock < range.start + range.length && range.format.isAnchor()) {
+                    return range.format.anchorHref();
+                }
+            }
+            return QString();
+        };
+
+        auto checkLink = [&anchorHrefAt, &text, &doc](const QString &url) {
+            const int pos = text.indexOf(url);
+            QVERIFY(pos >= 0);
+            QCOMPARE(anchorHrefAt(pos), url);
+            // also in the middle of the link.
+            QCOMPARE(anchorHrefAt(pos + 3), url);
+        };
+
+        checkLink(QStringLiteral("https://example.com/a"));
+        checkLink(QStringLiteral("https://kde.org"));
+        checkLink(QStringLiteral("https://kate-editor.org"));
+        checkLink(QStringLiteral("https://example.org/b"));
+        checkLink(QStringLiteral("https://example.net/"));
+
+        // The label of [label](https://kate-editor.org) is not itself a URL.
+        const int labelPos = text.indexOf(QStringLiteral("label"));
+        QCOMPARE_GE(labelPos, 0);
+        QVERIFY(anchorHrefAt(labelPos).isEmpty());
     }
 };
 

@@ -68,6 +68,10 @@ void SyntaxHighlighterPrivate::initTextFormat(QTextCharFormat &tf, const Format 
     // always set the foreground color to avoid palette issues
     tf.setForeground(format.textColor(m_theme));
 
+    if (format.isHyperlink()) {
+        tf.setAnchor(true);
+    }
+
     if (format.hasBackgroundColor(m_theme)) {
         tf.setBackground(format.backgroundColor(m_theme));
     }
@@ -246,15 +250,27 @@ void SyntaxHighlighter::applyFormat(int offset, int length, const Format &format
         d->computeTextFormats();
     }
 
+    const auto setTextFormat = [this, offset, length](const QTextCharFormat &tf, bool isHyperlink) {
+        if (!isHyperlink) {
+            QSyntaxHighlighter::setFormat(offset, length, tf);
+            return;
+        }
+        // The matched text is the link target. It cannot be cached in tfs,
+        // as different fragments can use the same hyperlink format.
+        auto linkFormat = tf;
+        linkFormat.setAnchorHref(currentBlock().text().mid(offset, length).trimmed());
+        QSyntaxHighlighter::setFormat(offset, length, linkFormat);
+    };
+
     const auto id = static_cast<std::size_t>(format.id());
     // This doesn't happen when format comes from the definition.
     // But as the user can override the function to pass any format, this is a possible scenario.
     if (id < d->tfs.size() && d->tfs[id].ptrId == FormatPrivate::ptrId(format)) {
-        QSyntaxHighlighter::setFormat(offset, length, d->tfs[id].tf);
+        setTextFormat(d->tfs[id].tf, format.isHyperlink());
     } else {
         QTextCharFormat tf;
         d->initTextFormat(tf, format);
-        QSyntaxHighlighter::setFormat(offset, length, tf);
+        setTextFormat(tf, format.isHyperlink());
     }
 }
 

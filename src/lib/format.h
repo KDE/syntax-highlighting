@@ -128,6 +128,14 @@ public:
      */
     bool spellCheck() const;
 
+    /*!
+     * Returns whether this format is a hyperlink. The highlighted text itself
+     * is the link target.
+     *
+     * \since 6.34
+     */
+    bool isHyperlink() const;
+
     /*! Returns \c true if the syntax definition file sets a value for the bold text
      *  attribute and, therefore, overrides the theme and the default formatting
      *  style. If the return is \a true, this value is obtained by isBold().

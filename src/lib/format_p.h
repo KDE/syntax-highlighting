@@ -44,6 +44,7 @@ public:
     Theme::TextStyle defaultStyle = Theme::Normal;
     int id = 0;
     bool spellCheck = true;
+    bool hyperlink = false;
 };
 
 }

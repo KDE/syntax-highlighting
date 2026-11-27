@@ -232,6 +232,11 @@ void HtmlHighlighter::applyFormat(int offset, int length, const Format &format)
     Q_D(HtmlHighlighter);
 
     auto const &htmlStyle = d->htmlStyles[format.id()];
+    const bool isHyperlink = format.isHyperlink();
+
+    if (isHyperlink) {
+        *d->out << "<a href=\"" << d->currentLine.mid(offset, length).trimmed().toHtmlEscaped() << "\">";
+    }
 
     if (!htmlStyle.isEmpty()) {
         *d->out << htmlStyle;
@@ -248,5 +253,9 @@ void HtmlHighlighter::applyFormat(int offset, int length, const Format &format)
 
     if (!htmlStyle.isEmpty()) {
         *d->out << QStringLiteral("</span>");
+    }
+
+    if (isHyperlink) {
+        *d->out << QStringLiteral("</a>");
     }
 }
